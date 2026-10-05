@@ -33,7 +33,7 @@
     <nav class="main-nav">
       <a href="#boutique">Boutique</a>
       <a href="#werdi">Yemma Werdi</a>
-      <a href="#liens">Mariage & Matching</a>
+      <a href="#liens">Mariage & Matching</a><a href="#speed-dating">Speed dating</a><a href="#reseaux">Réseaux</a>
       <a href="#trouvailles">Trouvailles</a>
       <button class="cart-button" id="cartButton">Panier <span id="cartCount">0</span></button>
     </nav>
@@ -125,6 +125,52 @@
       <div class="curiosity-cabinet" aria-hidden="true"><div class="postcard">Alger<br><small>carte postale</small></div><div class="oldbook"><span>POÉSIE</span><small>édition ancienne</small></div><div class="coin">ⵣ</div><div class="tag">PIÈCE<br>UNIQUE</div></div>
     </section>
 
+
+    <section class="dating-section" id="speed-dating">
+      <div class="dating-intro">
+        <div>
+          <p class="eyebrow">Rencontres Lamia</p>
+          <h2>Des rencontres vraies,<br><em>dans un cadre doux et sérieux.</em></h2>
+          <p>Un profil unique pour le Matching Kabyle et les speed datings virtuels. Les échanges restent privés, les coordonnées ne sont jamais affichées automatiquement et chacun peut alerter Lamia à tout moment.</p>
+          <div class="dating-actions">
+            <button class="btn primary" id="memberButton">Espace membre</button>
+            <a class="btn soft disabled" id="matchingLink">Accéder au Matching Kabyle</a>
+          </div>
+        </div>
+        <div class="lamia-presence-card">
+          <div class="soft-portrait" aria-hidden="true">
+            <svg viewBox="0 0 180 180">
+              <path class="hair" d="M32 112C15 57 48 17 90 16c48 1 79 39 59 98-10-31-31-49-60-49-28 0-48 18-57 47z"/>
+              <path class="face" d="M53 69c6-24 21-37 38-37 22 0 38 17 40 41 2 29-14 64-40 75-29-12-45-49-38-79z"/>
+              <path class="glasses2" d="M56 72l8-6h27l4 10-6 11H66l-8-8zm66 0-8-6H87l-4 10 6 11h23l8-8zm-31 5h13"/>
+              <path class="lips2" d="M79 107c6-4 10-4 14-1 5-3 9-3 15 1-8 10-19 10-29 0z"/>
+              <path class="jewels" d="M60 124c-8 7-7 18 0 24 7-6 8-17 0-24zm62 0c-8 7-7 18 0 24 7-6 8-17 0-24z"/>
+            </svg>
+          </div>
+          <blockquote>« Ici, on vient pour rencontrer sérieusement. Et si quelque chose t’inquiète, tu peux m’alerter. »</blockquote>
+          <span>— Lamia</span>
+        </div>
+      </div>
+      <div class="event-grid" id="eventGrid"></div>
+      <div class="membership-card">
+        <div><p class="eyebrow">Pass Rencontre Lamia</p><h3>19 € / mois</h3><p>Accès mensuel aux rencontres virtuelles + univers Matching.</p></div>
+        <button class="btn primary" id="monthlyPassBtn">Choisir le pass</button>
+      </div>
+      <div class="safety-strip">
+        <div><strong>Tu as un doute sur un profil ?</strong><span>Comportement inquiétant, faux profil, personne déjà en couple, pression ou profil qui ne cherche pas réellement le mariage.</span></div>
+        <button class="alert-lamia" id="openReport">⚠ Alerter Lamia</button>
+      </div>
+    </section>
+
+    <section class="social-section" id="reseaux">
+      <div class="social-copy"><p class="eyebrow">Retrouve Lamia</p><h2>La communauté continue aussi ailleurs.</h2><p>Après l’inscription, le réseau préféré du membre est mis en avant dans son email de bienvenue pour rejoindre la communauté.</p></div>
+      <div class="social-grid">
+        <a data-social-link="facebook">Facebook</a>
+        <a data-social-link="instagram">Instagram</a>
+        <a data-social-link="tiktok">TikTok</a>
+        <a data-social-link="youtube">YouTube</a>
+      </div>
+    </section>
     <section class="story-section" id="histoire">
       <div class="story-copy"><p class="eyebrow">Pourquoi “Femme Berbère” ?</p><h2>Parce qu’avant d’être une marque,<br><em>c’est une mémoire.</em></h2><p>“Femme Berbère” est lié à une page créée pour une maman disparue, puis devenue un espace pour les femmes berbères. Le nom a continué de vivre, de grandir et de se transformer. Aujourd’hui, <strong>Lamia Femme Berbère</strong> réunit cette mémoire, la transmission, la création, l’amour et la communauté dans une seule maison.</p></div>
       <div class="story-symbol"><span>ⵣ</span><small>MÉMOIRE · TRANSMISSION · CRÉATION</small></div>
@@ -135,7 +181,7 @@
 
   <footer>
     <div class="footer-brand"><strong>Lamia Femme Berbère</strong><span>ⵣ</span><p>Bijoux · Livres · Liens · Trouvailles</p></div>
-    <div class="footer-links"><a href="#boutique">Boutique</a><a href="#werdi">Yemma Werdi</a><a href="#liens">Mariage & Matching</a><a href="#histoire">À propos</a></div>
+    <div class="footer-links"><a href="#boutique">Boutique</a><a href="#werdi">Yemma Werdi</a><a href="#liens">Mariage & Matching</a><a href="#speed-dating">Speed dating</a><a href="#reseaux">Réseaux</a><a href="#histoire">À propos</a></div>
   </footer>
 
   <aside class="drawer" id="cartDrawer" aria-hidden="true">
@@ -143,7 +189,68 @@
     <div id="cartItems" class="cart-items"></div>
     <div class="drawer-footer"><div class="total"><span>Total</span><strong id="cartTotal">0,00 €</strong></div><button class="btn primary full" id="checkoutBtn">Passer au paiement</button><small id="paymentStatus">Paiement Stripe en cours de raccordement.</small></div>
   </aside>
+  <div class="social-rail" aria-label="Réseaux Lamia"><a data-social-link="facebook">f</a><a data-social-link="instagram">◎</a><a data-social-link="tiktok">♪</a><a data-social-link="youtube">▶</a></div>
+  <div class="lfb-cursor" id="lfbCursor"><span>LFB</span></div>
+
+  <div class="modal-shell" id="memberModal">
+    <div class="modal-card member-modal">
+      <button class="modal-close" id="closeMember">×</button>
+      <p class="eyebrow">Espace membre</p><h2>Entre dans l’univers Rencontres Lamia</h2>
+      <div id="authForms" class="auth-grid">
+        <form id="signupForm"><h3>Créer mon compte</h3><input name="email" type="email" placeholder="Email" required><input name="password" type="password" minlength="8" placeholder="Mot de passe" required><button class="btn primary">Créer mon compte</button></form>
+        <form id="loginForm"><h3>J’ai déjà un compte</h3><input name="email" type="email" placeholder="Email" required><input name="password" type="password" placeholder="Mot de passe" required><button class="btn soft">Me connecter</button></form>
+      </div>
+      <form id="profileForm" hidden>
+        <div class="profile-head"><div><h3>Mon profil sérieux</h3><small id="memberEmail"></small></div><button type="button" class="tiny-link" id="logoutBtn" hidden>Déconnexion</button></div>
+        <div class="form-grid">
+          <label>Pseudo public<input name="display_name" required></label>
+          <label>Prénom réel (privé)<input name="real_first_name"></label>
+          <label>Date de naissance<input type="date" name="birth_date"></label>
+          <label>Ville<input name="city"></label>
+          <label>Région<input name="region"></label>
+          <label>Pays<input name="country" value="France"></label>
+          <label>Profession<input name="profession"></label>
+          <label>Horizon mariage<select name="marriage_horizon"><option value="">Choisir</option><option>Dans l’année</option><option>1 à 2 ans</option><option>Quand la bonne personne se présente</option></select></label>
+          <label>Réseau préféré<select name="preferred_social_network"><option value="tiktok">TikTok</option><option value="facebook">Facebook</option><option value="instagram">Instagram</option><option value="youtube">YouTube</option></select></label>
+          <label>Pseudo ou lien du réseau<input name="social_handle" placeholder="@pseudo ou lien"></label>
+        </div>
+        <label>Quelques mots sur moi<textarea name="bio" rows="4"></textarea></label>
+        <label class="check"><input type="checkbox" name="marriage_intent" checked> Je recherche réellement une relation sérieuse pouvant mener au mariage.</label>
+        <label class="check"><input type="checkbox" name="marketing_email_consent"> Je souhaite recevoir les nouvelles, lives et événements de Lamia.</label>
+        <button class="btn primary">Enregistrer mon profil</button>
+        <div class="member-matches"><h3>Mes matchs</h3><div id="matchStatus"><p>Aucun match actif pour le moment.</p></div></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-shell" id="reportModal">
+    <div class="modal-card report-modal">
+      <button class="modal-close" id="closeReport">×</button>
+      <p class="eyebrow">Sécurité</p><h2>Alerter Lamia</h2>
+      <p>Le profil signalé ne saura pas qui a envoyé l’alerte.</p>
+      <form id="reportForm">
+        <label>Profil concerné<input name="reported_label" placeholder="Pseudo ou prénom du profil" required></label>
+        <label>Pourquoi veux-tu m’alerter ?
+          <select name="reason" required>
+            <option value="not_marriage">Ce profil ne cherche pas réellement le mariage</option>
+            <option value="fake_profile">Faux profil / identité douteuse</option>
+            <option value="already_partnered">Déjà marié(e) / en couple</option>
+            <option value="pressure">Insistance, pression ou propos déplacés</option>
+            <option value="scam">Arnaque ou demande d’argent</option>
+            <option value="danger">Menace, harcèlement ou danger</option>
+            <option value="other">Autre</option>
+          </select>
+        </label>
+        <label>Raconte-moi ce qui s’est passé<textarea name="written_details" rows="5" placeholder="Donne-moi les faits, même simplement."></textarea></label>
+        <div class="audio-report"><button type="button" class="btn soft" id="startAudio">🎙 Enregistrer un audio</button><button type="button" class="tiny-link" id="stopAudio">Arrêter</button><span id="audioState"></span></div>
+        <button class="btn alert-submit">Envoyer l’alerte à Lamia</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="soft-toast" id="softToast"></div>
   <div class="overlay" id="overlay"></div>
   <script src="app.js"></script>
+  <script type="module" src="member.js"></script>
 </body>
 </html>
