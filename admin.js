@@ -15,7 +15,22 @@ document.querySelectorAll('[data-sev]').forEach(b=>b.onclick=()=>{filter=b.datas
 async function load(){
  const {data,error}=await supabase.from('safety_reports').select('id,reported_label,reason,severity,written_details,status,created_at').order('created_at',{ascending:false});
  if(error){$('#alerts').innerHTML='<div class="empty">Impossible de charger les alertes.</div>';return;}
- rows=data||[];render();
+ const reports=data||[];
+ const ids=reports.map(r=>r.id);
+ let evidence=[];
+ if(ids.length){const ev=await supabase.from('report_evidence').select('id,report_id,evidence_type,storage_path,text_content,created_at').in('report_id',ids); evidence=ev.data||[];}
+ rows=await Promise.all(reports.map(async r=>{
+   const evs=evidence.filter(e=>e.report_id===r.id);
+   const withUrls=await Promise.all(evs.map(async e=>{
+     if(e.storage_path&&e.evidence_type==='audio'){
+       const signed=await supabase.storage.from('safety-evidence').createSignedUrl(e.storage_path,900);
+       return {...e,signed_url:signed.data?.signedUrl||null};
+     }
+     return e;
+   }));
+   return {...r,evidence:withUrls};
+ }));
+ render();
 }
 function labelReason(r){return({not_marriage:'Ne cherche pas réellement le mariage',fake_profile:'Faux profil / identité douteuse',already_partnered:'Déjà marié(e) / en couple',pressure:'Insistance, pression ou propos déplacés',scam:'Arnaque ou demande d’argent',danger:'Menace, harcèlement ou danger',other:'Autre'})[r]||r}
 function render(){
