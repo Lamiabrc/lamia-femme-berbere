@@ -26,7 +26,7 @@ module.exports = async function paymentStatus(req, res) {
     const account = await response.json();
     return res.status(200).json({...config,
       stripeConnection: 'connected',
-      expectedAccount: account.id === 'acct_1R6UcrQqTigbk4Ts',
+      expectedAccount: account.id === 'acct_1OB0kuAiy7hcxWtQ',
       liveKey: /^(sk|rk)_live_/.test(key),
       chargesEnabled: account.charges_enabled === true,
       payoutsEnabled: account.payouts_enabled === true
