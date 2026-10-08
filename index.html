@@ -56,20 +56,10 @@
         <div class="kabyle-frame">
           <div class="pattern pattern-top">◆ ⵣ ◆ ⵣ ◆ ⵣ ◆</div>
           <div class="portrait-emblem">
-            <svg viewBox="0 0 380 480" aria-hidden="true">
-              <path class="hair" d="M88 183C50 85 124 23 192 24c87 2 149 66 113 163-9-54-51-89-112-88-57 0-96 33-105 84z"/>
-              <path class="face" d="M117 151c7-42 39-68 76-68 41 0 74 28 78 72 4 47-20 111-77 132-60-21-85-87-77-136z"/>
-              <path class="tattoo" d="M191 107v22m-10-11h20m-11 117v28m-8-10h16"/>
-              <path class="glasses2" d="M126 158l15-12h65l9 21-14 24h-53l-17-18zm129 0-15-12h-65l-9 21 14 24h53l17-18zm-49 8h37"/>
-              <path class="brow" d="M143 137c14-9 28-8 40-1m24 0c13-7 27-7 40 2"/>
-              <path class="nose" d="M194 177c-3 19-1 29 7 34"/>
-              <path class="lips2" d="M168 229c13-9 21-8 27-3 8-6 18-4 31 4-17 21-40 21-58-1z"/>
-              <path class="scarf" d="M79 174C54 125 57 79 95 52c8 28 45 39 98 31 56 8 92-5 99-34 41 31 41 79 15 128"/>
-              <path class="jewels" d="M114 243c-25 18-19 50 0 66 18-17 23-49 0-66zm157 0c-25 18-19 50 0 66 18-17 23-49 0-66zM132 293c25 28 40 51 61 83 22-32 36-55 62-83M142 306h103M154 326h79M168 346h51"/>
-              <path class="khmissa" d="M190 367c-16 0-29 13-29 29v18l13 18 16-10 16 10 13-18v-18c0-16-13-29-29-29zm0 10v36m-14-28 14 9 14-9"/>
-            </svg>
+            <img class="yemma-hero-art" src="assets/yemma-portrait.png" width="1024" height="1536" alt="Yemma, illustration aux lunettes noires, foulard rouge et bijoux turquoise" fetchpriority="high" decoding="async">
           </div>
           <div class="hero-badge">ALLÔ,<br><strong>D YEMMAM A WERDI !</strong></div>
+          <button class="art-motion-toggle" type="button" aria-pressed="false">Mettre l’animation en pause</button>
           <div class="pattern pattern-bottom">◆ ⵣ ◆ ⵣ ◆ ⵣ ◆</div>
         </div>
       </div>
@@ -103,6 +93,7 @@
         <p class="author">Lamia Bréchet · Lamia Femme Berbère</p>
       </div>
       <div class="werdi-copy">
+        <figure class="werdi-illustration"><img src="assets/yemma-transmission.png" width="1536" height="1024" alt="Yemma et sa fille échangent autour d’un livre, une scène de transmission" loading="lazy" decoding="async"></figure>
         <p class="eyebrow">La voix de Yemma</p>
         <h2>Aimer avec le cœur.<br><em>Choisir avec les yeux ouverts.</em></h2>
         <blockquote>« Aime, rêve, fais confiance… mais ne donne jamais ton cœur au point de perdre ton intelligence. »</blockquote>
@@ -139,13 +130,7 @@
         </div>
         <div class="lamia-presence-card">
           <div class="soft-portrait" aria-hidden="true">
-            <svg viewBox="0 0 180 180">
-              <path class="hair" d="M32 112C15 57 48 17 90 16c48 1 79 39 59 98-10-31-31-49-60-49-28 0-48 18-57 47z"/>
-              <path class="face" d="M53 69c6-24 21-37 38-37 22 0 38 17 40 41 2 29-14 64-40 75-29-12-45-49-38-79z"/>
-              <path class="glasses2" d="M56 72l8-6h27l4 10-6 11H66l-8-8zm66 0-8-6H87l-4 10 6 11h23l8-8zm-31 5h13"/>
-              <path class="lips2" d="M79 107c6-4 10-4 14-1 5-3 9-3 15 1-8 10-19 10-29 0z"/>
-              <path class="jewels" d="M60 124c-8 7-7 18 0 24 7-6 8-17 0-24zm62 0c-8 7-7 18 0 24 7-6 8-17 0-24z"/>
-            </svg>
+            <img src="assets/yemma-portrait.png" width="1024" height="1536" alt="" loading="lazy" decoding="async">
           </div>
           <blockquote>« Ici, on vient pour rencontrer sérieusement. Et si quelque chose t’inquiète, tu peux m’alerter. »</blockquote>
           <span>— Lamia</span>
@@ -250,6 +235,7 @@
 
   <div class="soft-toast" id="softToast"></div>
   <div class="overlay" id="overlay"></div>
+  <script src="art-motion.js"></script>
   <script src="app.js"></script>
   <script type="module" src="member.js"></script>
 </body>
