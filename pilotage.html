@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Pilotage — Lamia Femme Berbère</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--red:#b51e36;--turq:#177b79;--gold:#d5a64f;--pink:#fff5f7;--ink:#181214;--muted:#75666a;--line:#ecdde1;--serif:"Cormorant Garamond",Georgia,serif;--sans:"DM Sans",Arial,sans-serif}
+*{box-sizing:border-box}body{margin:0;background:#fffafc;color:var(--ink);font-family:var(--sans);line-height:1.5}
+header{padding:18px 5vw;border-bottom:1px solid var(--line);background:#fff;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{font-family:var(--serif);font-size:28px;font-weight:600}.brand span{color:var(--red)}
+main{padding:4vw 5vw;max-width:1200px;margin:auto}
+h1{font-family:var(--serif);font-size:clamp(40px,5.5vw,72px);margin:0;line-height:.95}
+h2{font-family:var(--serif);font-size:34px;margin:0 0 6px}h3{margin:0 0 4px}
+.sub{color:var(--muted);max-width:700px}
+button,input,select,textarea{font:inherit}
+button{border:0;border-radius:999px;padding:10px 16px;font-weight:700;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--turq);outline-offset:2px}
+.primary{background:var(--ink);color:#fff}.soft{background:#fff0f3;color:var(--red)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:26px 0}.tabs button{background:#fff;border:1px solid var(--line)}.tabs button[aria-selected=true]{background:var(--red);color:#fff;border-color:var(--red)}
+.card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:22px}
+.grid{display:grid;gap:16px}.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.brief{background:var(--ink);color:#fff;border-radius:26px;padding:26px;margin-bottom:18px}
+.brief h2{color:#fff}.brief p{margin:6px 0;color:#e9dfe1}.brief .tag{color:#f1aab4}
+.tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--red)}
+.bar{height:10px;border-radius:99px;background:#f3e6ea;overflow:hidden;margin:8px 0 4px}.bar i{display:block;height:100%;background:var(--red);transition:width .3s}
+.bar.t i{background:var(--turq)}.bar.m i{background:var(--gold)}
+.task{display:grid;grid-template-columns:auto 1fr auto;gap:12px;padding:12px 0;border-top:1px solid var(--line);align-items:start}
+.task:first-child{border-top:0}.task input{width:20px;height:20px;margin-top:2px;accent-color:var(--red)}
+.task.done label{text-decoration:line-through;color:var(--muted)}.task label{font-weight:600}.task small{display:block;color:var(--muted);font-weight:400}
+.pill{font-size:11px;border-radius:99px;padding:3px 9px;background:#fff0f3;color:var(--red);white-space:nowrap}.pill.p2{background:#fff7e3;color:#8a6410}.pill.p3{background:#eef7f6;color:var(--turq)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.filters button{background:#fff;border:1px solid var(--line);padding:7px 12px;font-size:13px}.filters button.on{background:var(--ink);color:#fff}
+label.f{display:grid;gap:5px;font-size:13px;font-weight:600}
+input[type=number],input[type=date],select{width:100%;padding:11px;border:1px solid var(--line);border-radius:14px;background:#fff}
+.kpi{font-family:var(--serif);font-size:44px;line-height:1}.kpi small{font-family:var(--sans);font-size:12px;color:var(--muted);display:block;margin-top:4px}
+.verdict{font-size:13px;margin-top:8px;padding:8px 10px;border-radius:12px;background:#f6f1f2}.verdict.ok{background:#eaf6ee}.verdict.warn{background:#fff7e3}.verdict.bad{background:#fdecef}
+.post{border-top:1px solid var(--line);padding:14px 0}.post:first-child{border-top:0}.post pre{white-space:pre-wrap;font:inherit;background:var(--pink);border-radius:14px;padding:12px;margin:8px 0}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px}.hidden{display:none!important}
+@media(max-width:860px){.g2,.g3,.g4{grid-template-columns:1fr}.task{grid-template-columns:auto 1fr}.task .pill{grid-column:2;justify-self:start}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">Lamia <span>Femme Berbère</span> · Pilotage</div>
+  <div><a href="index.html" class="soft" style="padding:10px 16px;border-radius:99px;font-weight:700;font-size:14px;color:var(--red);background:#fff0f3;text-decoration:none">← Voir le site</a></div>
+</header>
+<main>
+  <h1>Ton cockpit de marque</h1>
+  <p class="sub">Un manager, un expert marketing, un tech lead et une UX designer dans le même outil : on te dit quoi faire ensuite, on suit tes chiffres, et on te prépare tes contenus. Tout reste dans ton navigateur.</p>
+
+  <div class="tabs" role="tablist" id="tabs"></div>
+
+  <section id="tab-today" role="tabpanel"></section>
+  <section id="tab-road" role="tabpanel" class="hidden"></section>
+  <section id="tab-kpi" role="tabpanel" class="hidden"></section>
+  <section id="tab-edit" role="tabpanel" class="hidden"></section>
+</main>
+<script src="pilotage.js"></script>
+</body>
+</html>
