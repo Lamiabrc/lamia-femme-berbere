@@ -16,7 +16,7 @@ const saveCart=()=>localStorage.setItem('lfb_cart_v2',JSON.stringify(state.cart)
 async function loadProducts(){
   const status=$('#catalogStatus');
   try{
-    const endpoint=`${SUPABASE_URL}/rest/v1/products?select=id,slug,name,subtitle,description,price_cents,currency,stock_qty,is_unique,product_type,featured,cover_image_url,categories(name,slug)&status=eq.active&order=featured.desc,created_at.desc`;
+    const endpoint=`${SUPABASE_URL}/rest/v1/products?select=id,slug,name,subtitle,description,price_cents,compare_at_price_cents,currency,stock_qty,is_unique,product_type,featured,cover_image_url,categories(name,slug)&status=eq.active&order=featured.desc,created_at.desc`;
     const res=await fetch(endpoint,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`}});
     if(!res.ok) throw new Error(`Supabase ${res.status}`);
     state.products=await res.json();
@@ -49,7 +49,7 @@ function renderProducts(){
         <div class="product-meta"><span>${esc(categoryLabel(p))}</span><span>${soldOut?'Épuisé':p.is_unique?'1 exemplaire':`${p.stock_qty} en stock`}</span></div>
         <h3>${esc(p.name)}</h3>
         <p>${esc(p.description||p.subtitle||'')}</p>
-        <div class="product-footer"><span class="price">${fmt(p.price_cents,p.currency)}</span><button class="add-btn" data-add="${esc(p.id)}" ${soldOut?'disabled':''}>${soldOut?'Épuisé':'Ajouter'}</button></div>
+        <div class="product-footer"><span class="price">${p.compare_at_price_cents?`<del>${fmt(p.compare_at_price_cents,p.currency)}</del> `:""}${fmt(p.price_cents,p.currency)}</span><button class="add-btn" data-add="${esc(p.id)}" ${soldOut?'disabled':''}>${soldOut?'Épuisé':'Ajouter'}</button></div>
       </div>
     </article>`
   }).join('')||'<p>Aucun produit pour le moment dans cet univers.</p>';
