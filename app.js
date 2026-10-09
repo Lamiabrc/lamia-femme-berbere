@@ -16,7 +16,7 @@ const saveCart=()=>localStorage.setItem('lfb_cart_v2',JSON.stringify(state.cart)
 async function loadProducts(){
   const status=$('#catalogStatus');
   try{
-    const endpoint=`${SUPABASE_URL}/rest/v1/products?select=id,slug,name,subtitle,description,price_cents,compare_at_price_cents,currency,stock_qty,is_unique,product_type,featured,cover_image_url,categories(name,slug)&status=eq.active&order=featured.desc,created_at.desc`;
+    const endpoint=`${SUPABASE_URL}/rest/v1/products?select=id,slug,name,subtitle,description,price_cents,compare_at_price_cents,currency,stock_qty,is_unique,product_type,featured,cover_image_url,gallery,metadata,categories(name,slug)&status=eq.active&order=featured.desc,created_at.desc`;
     const res=await fetch(endpoint,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`}});
     if(!res.ok) throw new Error(`Supabase ${res.status}`);
     state.products=await res.json();
@@ -44,17 +44,47 @@ function renderProducts(){
     const soldOut=p.stock_qty<=0;
     const image=p.cover_image_url?`<img src="${esc(p.cover_image_url)}" alt="${esc(p.name)}">`:`<div class="product-placeholder">${esc(shortCategory(categorySlug(p)))}<small>Lamia Femme Berbère</small></div>`;
     return `<article class="product-card">
-      <div class="product-image">${image}${p.is_unique?'<span class="unique-badge">Pièce unique</span>':''}</div>
+      <button class="product-image product-view" data-view="${esc(p.id)}" aria-label="Voir ${esc(p.name)}">${image}${p.is_unique?'<span class="unique-badge">Pièce unique</span>':''}</button>
       <div class="product-body">
         <div class="product-meta"><span>${esc(categoryLabel(p))}</span><span>${soldOut?'Épuisé':p.is_unique?'1 exemplaire':`${p.stock_qty} en stock`}</span></div>
         <h3>${esc(p.name)}</h3>
         <p>${esc(p.description||p.subtitle||'')}</p>
-        <div class="product-footer"><span class="price">${p.compare_at_price_cents?`<del>${fmt(p.compare_at_price_cents,p.currency)}</del> `:""}${fmt(p.price_cents,p.currency)}</span><button class="add-btn" data-add="${esc(p.id)}" ${soldOut?'disabled':''}>${soldOut?'Épuisé':'Ajouter'}</button></div>
+        <button class="product-see" data-view="${esc(p.id)}">Voir le bijou</button><div class="product-footer"><span class="price">${p.compare_at_price_cents?`<del>${fmt(p.compare_at_price_cents,p.currency)}</del> `:""}${fmt(p.price_cents,p.currency)}</span><button class="add-btn" data-add="${esc(p.id)}" ${soldOut?'disabled':''}>${soldOut?'Épuisé':'Ajouter'}</button></div>
       </div>
     </article>`
   }).join('')||'<p>Aucun produit pour le moment dans cet univers.</p>';
-  document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>addToCart(b.dataset.add));
+  document.querySelectorAll('[data-add]').forEach(b=>b.onclick=e=>{e.stopPropagation();addToCart(b.dataset.add)});
+  document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>openProduct(b.dataset.view));
 }
+
+
+function openProduct(id){
+  const p=state.products.find(x=>x.id===id); if(!p)return;
+  const gallery=(Array.isArray(p.gallery)&&p.gallery.length?p.gallery:[p.cover_image_url]).filter(Boolean);
+  const main=$('#productGalleryMain');
+  main.src=gallery[0]||''; main.alt=p.name||'Bijou Lamia Femme Berbère';
+  $('#productDetailName').textContent=p.name||'';
+  $('#productDetailSubtitle').textContent=p.subtitle||'';
+  $('#productDetailDescription').textContent=p.description||'';
+  $('#productDetailPrice').innerHTML=(p.compare_at_price_cents?`<del>${fmt(p.compare_at_price_cents,p.currency)}</del>`:'')+`<strong>${fmt(p.price_cents,p.currency)}</strong>`;
+  const m=p.metadata||{};
+  const specs=[
+    m.weight_g?[`${m.weight_g} g`,'Poids']:null,
+    m.main_medallion_diameter_cm?[`${m.main_medallion_diameter_cm} cm`,'Médaillon central']:null,
+    m.side_medallion_diameter_cm?[`${m.side_medallion_diameter_cm} cm`,'Médaillons latéraux']:null,
+    m.origin?[m.origin,'Origine']:null
+  ].filter(Boolean);
+  $('#productSpecs').innerHTML=specs.map(([v,l])=>`<div><strong>${esc(v)}</strong><span>${esc(l)}</span></div>`).join('');
+  $('#productThumbs').innerHTML=gallery.map((src,i)=>`<button class="product-thumb ${i===0?'active':''}" data-gallery-src="${esc(src)}"><img src="${esc(src)}" alt="${esc(p.name)} — vue ${i+1}"></button>`).join('');
+  document.querySelectorAll('[data-gallery-src]').forEach(t=>t.onclick=()=>{main.src=t.dataset.gallerySrc;document.querySelectorAll('.product-thumb').forEach(x=>x.classList.remove('active'));t.classList.add('active')});
+  const add=$('#productDetailAdd'); add.disabled=p.stock_qty<=0; add.textContent=p.stock_qty<=0?'Épuisé':'Ajouter au panier'; add.onclick=()=>{addToCart(p.id);closeProduct()};
+  $('#productModal').classList.add('show'); $('#productModal').setAttribute('aria-hidden','false'); document.body.classList.add('modal-open');
+}
+function closeProduct(){
+  $('#productModal')?.classList.remove('show'); $('#productModal')?.setAttribute('aria-hidden','true'); document.body.classList.remove('modal-open');
+}
+$('#closeProductModal')?.addEventListener('click',closeProduct);
+$('#productModal')?.addEventListener('click',e=>{if(e.target.id==='productModal')closeProduct()});
 
 function addToCart(id){
   const p=state.products.find(x=>x.id===id); if(!p||p.stock_qty<=0)return;
