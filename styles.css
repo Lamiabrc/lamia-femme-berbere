@@ -25,3 +25,28 @@ body{cursor:auto}.dating-section,.social-section{padding:7vw;background:linear-g
 .portrait-emblem{inset:64px 30px 115px}
 .soft-portrait{background:#fff}
 @media(max-width:640px){.portrait-emblem{inset:54px 22px 110px}}
+
+/* Galerie produit — Lamia Femme Berbère */
+.product-image.product-view{display:block;width:100%;border:0;padding:0;background:none;text-align:left;position:relative}
+.product-image.product-view img{width:100%;height:100%;object-fit:cover}
+.product-see{border:0;background:none;padding:0;margin:0 0 15px;color:#9e1f34;font:600 12px var(--sans);text-decoration:underline;text-underline-offset:4px}
+.product-modal-card{width:min(1080px,96vw);padding:32px}
+.product-detail-layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);gap:44px;align-items:start}
+.product-gallery-main{background:#fafafa;aspect-ratio:4/5;overflow:hidden;border:1px solid #eee;border-radius:4px}
+.product-gallery-main img{width:100%;height:100%;object-fit:cover;display:block}
+.product-thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.product-thumb{border:1px solid #ddd;background:#fff;padding:0;aspect-ratio:4/5;overflow:hidden}
+.product-thumb.active{border:2px solid #b51e36}
+.product-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.product-detail-copy h2{font-family:var(--serif);font-size:clamp(38px,4vw,58px);line-height:.95;margin:8px 0 12px}
+.product-detail-subtitle{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.product-detail-price{display:flex;align-items:baseline;gap:12px;margin:20px 0 24px}
+.product-detail-price del{color:#8e8588;font-size:16px}
+.product-detail-price strong{font-family:var(--serif);font-size:40px;color:#b51e36}
+.product-detail-copy>p:not(.eyebrow):not(.product-detail-subtitle){line-height:1.7;color:#574b4e}
+.product-specs{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#e9e2e3;border:1px solid #e9e2e3;margin:26px 0}
+.product-specs div{background:#fff;padding:15px;display:flex;flex-direction:column;gap:3px}
+.product-specs strong{font-family:var(--serif);font-size:24px}
+.product-specs span{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#776b6e}
+.product-detail-note{display:block;margin-top:12px;color:#8a7d80;line-height:1.5}
+@media(max-width:760px){.product-modal-card{padding:22px}.product-detail-layout{grid-template-columns:1fr;gap:25px}.product-thumbs{gap:6px}.product-detail-copy h2{font-size:38px}}
