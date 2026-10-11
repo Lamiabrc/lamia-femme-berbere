@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Mes soirées · Lamia Femme Berbère</title>
+<link rel="stylesheet" href="/assets/maison.css">
+<style>
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 40px var(--gouttiere); }
+  table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 15px; }
+  th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--ligne); }
+  th { font-size: 13px; color: var(--gris); }
+  .paid { color: var(--email-vert); font-weight: 600; } .pending { color: var(--gris); }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: end; }
+  .row label { min-width: 280px; }
+  .box { background: var(--chaux); padding: 20px; margin-top: 24px; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <p class="room-name"><span class="pip" aria-hidden="true"></span>Espace privé de Lamia</p>
+  <h1>Mes soirées</h1>
+
+  <form id="login" class="auth-grid" style="max-width:480px">
+    <div class="report-form" style="margin:0">
+      <label>Email<input name="email" type="email" autocomplete="email" required></label>
+      <label>Mot de passe<input name="password" type="password" autocomplete="current-password" required></label>
+      <button class="btn btn-ink" type="submit">Me connecter</button>
+    </div>
+  </form>
+
+  <section id="board" hidden>
+    <div class="row">
+      <label>Soirée<select id="event"></select></label>
+      <button class="btn btn-line" type="button" id="refresh">Actualiser</button>
+      <button class="btn btn-line" type="button" id="logout">Me déconnecter</button>
+    </div>
+    <p id="summary" class="lead" style="margin-top:20px"></p>
+    <table><thead><tr><th>Email</th><th>Paiement</th><th>Inscription</th></tr></thead><tbody id="people"></tbody></table>
+    <div class="box">
+      <h2 style="font-size:26px">Envoyer le lien de la salle</h2>
+      <p>Les adresses des personnes ayant payé, à coller en copie cachée (Cci) de ton email :</p>
+      <textarea id="emails" rows="3" readonly style="width:100%"></textarea>
+      <button class="btn btn-ink" type="button" id="copy" style="margin-top:10px">Copier les adresses</button>
+    </div>
+    <div class="box">
+      <h2 style="font-size:26px">Souhaits après la soirée</h2>
+      <div id="wishes"></div>
+    </div>
+  </section>
+  <p id="status" class="form-status" role="status"></p>
+</main>
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm';
+const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc');
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
+const when = (iso) => new Date(iso).toLocaleString('fr-FR', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
+const say = (m, err) => { $('#status').textContent = m; $('#status').classList.toggle('is-error', !!err); };
+
+async function api(path) {
+  const { data: { session } } = await supabase.auth.getSession();
+  const r = await fetch(path, { headers: { Authorization: `Bearer ${session?.access_token}` } });
+  if (r.status === 403) throw new Error('forbidden');
+  if (!r.ok) throw new Error('failed');
+  return r.json();
+}
+
+async function boot() {
+  const { data: { session } } = await supabase.auth.getSession();
+  $('#login').hidden = !!session; $('#board').hidden = !session;
+  if (!session) return;
+  try {
+    const { events } = await api('/api/admin-events');
+    $('#event').innerHTML = events.map((e) => `<option value="${esc(e.id)}">${esc(e.title)} · ${esc(when(e.starts_at))} · ${esc(e.status)}</option>`).join('');
+    if (events.length) await load(); else say('Aucune soirée dans la base.');
+  } catch (e) {
+    say(e.message === 'forbidden' ? 'Ce compte n’a pas le rôle administratrice.' : 'Le tableau ne répond pas. Réessaie dans un instant.', true);
+  }
+}
+
+async function load() {
+  say('Chargement…');
+  try {
+    const { people, wishes, wishesAvailable } = await api(`/api/admin-events?event_id=${encodeURIComponent($('#event').value)}`);
+    const paid = people.filter((p) => p.paid);
+    $('#summary').textContent = `${paid.length} place${paid.length > 1 ? 's' : ''} payée${paid.length > 1 ? 's' : ''} · ${people.length - paid.length} en attente`;
+    $('#people').innerHTML = people.map((p) => `<tr><td>${esc(p.email || '—')}</td><td class="${p.paid ? 'paid' : 'pending'}">${p.paid ? 'Payée' : 'En attente'}</td><td>${p.registered_at ? esc(when(p.registered_at)) : ''}</td></tr>`).join('') || '<tr><td colspan="3">Personne n’est encore inscrit.</td></tr>';
+    $('#emails').value = paid.map((p) => p.email).filter(Boolean).join(', ');
+    $('#wishes').innerHTML = !wishesAvailable
+      ? '<p>Le formulaire des souhaits sera actif dès que sa table sera créée dans la base.</p>'
+      : wishes.length ? wishes.map((w) => `<p><strong>${esc(w.from)}</strong> souhaite revoir : ${esc(w.wished)}${w.message ? `<br><em>${esc(w.message)}</em>` : ''}</p>`).join('') : '<p>Aucun souhait pour cette soirée.</p>';
+    say('');
+  } catch { say('Le tableau ne répond pas. Réessaie dans un instant.', true); }
+}
+
+$('#login').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = new FormData(e.target);
+  const { error } = await supabase.auth.signInWithPassword({ email: f.get('email'), password: f.get('password') });
+  if (error) return say('Email ou mot de passe incorrect.', true);
+  boot();
+});
+$('#event').addEventListener('change', load);
+$('#refresh').addEventListener('click', load);
+$('#logout').addEventListener('click', async () => { await supabase.auth.signOut(); location.reload(); });
+$('#copy').addEventListener('click', async () => { try { await navigator.clipboard.writeText($('#emails').value); say('Adresses copiées.'); } catch { $('#emails').select(); say('Sélectionne et copie les adresses.'); } });
+boot();
+</script>
+</body>
+</html>

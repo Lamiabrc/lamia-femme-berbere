@@ -9,6 +9,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { rooms, roomBySlug } from '../content/rooms.mjs';
 import * as P from '../content/pages.mjs';
+import { legalPages } from '../content/legal.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = join(ROOT, 'dist');
@@ -109,7 +110,7 @@ function footer() {
       <li><a href="https://www.facebook.com/femmeberberes/" rel="noopener" target="_blank">Facebook Femme Berbère</a></li>
       <li data-social="youtube" hidden><a rel="noopener" target="_blank">YouTube</a></li>
     </ul>
-    <p class="footer-legal">Mentions légales, CGV et politique de confidentialité : en préparation, publiées avant l’ouverture du paiement en ligne.</p>
+    <p class="footer-legal"><a href="/mentions-legales/">Mentions légales</a> · <a href="/cgv/">Conditions de vente</a> · <a href="/confidentialite/">Confidentialité</a></p>
   </div>
 </footer>`;
 }
@@ -452,6 +453,7 @@ page(
   </div>
   <p class="form-status" role="status" data-member-status></p>
 </section>
+<section class="room-body"><p>Tu as participé à une soirée ? <a class="text-link" href="/speed-dating/souhaits/">Indique qui tu aimerais revoir</a>.</p></section>
 <section class="origin">
   <blockquote>« ${esc(P.speedDating.promise)} »<cite>Lamia</cite></blockquote>
   <p>${esc(P.speedDating.origin)}</p>
@@ -622,6 +624,58 @@ page(
   })
 );
 
+// Après le paiement d'une place
+page(
+  '/speed-dating/merci/',
+  layout({
+    title: 'Merci · Le Salon du Speed Dating',
+    description: 'Confirmation de ta place.',
+    path: '/speed-dating/merci/',
+    room: roomBySlug['speed-dating'],
+    noindex: true,
+    scripts: ['/assets/membre.js'],
+    body: `<section class="room-head" data-merci><p class="room-name"><span class="pip" aria-hidden="true"></span>Le Salon du Speed Dating</p><h1>Vérification de ton paiement…</h1><p class="lead" data-merci-text>Un instant, je confirme ta place.</p><p><a class="btn btn-line" href="/speed-dating/">Revenir au Salon</a></p></section>`,
+  })
+);
+
+// Souhaits après une soirée
+page(
+  '/speed-dating/souhaits/',
+  layout({
+    title: 'Mes souhaits après la soirée · Le Salon du Speed Dating',
+    description: 'Indique en privé les personnes que tu souhaites revoir.',
+    path: '/speed-dating/souhaits/',
+    room: roomBySlug['speed-dating'],
+    noindex: true,
+    scripts: ['/assets/membre.js'],
+    body: `${roomHead({ ...roomBySlug['speed-dating'], slug: 'souhaits', welcome: 'Qui aimerais-tu revoir ?', summary: 'Tes souhaits restent privés. Si un souhait est réciproque, Lamia vous met en relation.' })}
+<section class="room-body">
+  <form class="report-form" data-wishes hidden>
+    <label>La soirée<select name="event_id" required></select></label>
+    <label>Les prénoms ou numéros des personnes que tu souhaites revoir<textarea name="wished" rows="4" maxlength="1000" required placeholder="Par exemple : Yanis (n° 4), Karim (n° 9)"></textarea></label>
+    <label>Un mot pour Lamia (facultatif)<textarea name="message" rows="3" maxlength="1000"></textarea></label>
+    <button class="btn btn-ink" type="submit">Envoyer mes souhaits</button>
+  </form>
+  <div data-wishes-login><p>Connecte-toi à ton espace membre pour indiquer tes souhaits.</p><p><a class="btn btn-ink" href="/speed-dating/#member-title">Me connecter</a></p></div>
+  <p class="form-status" role="status" data-wishes-status></p>
+</section>`,
+  })
+);
+
+// Pages légales (brouillons)
+for (const lp of legalPages) {
+  page(
+    lp.path,
+    layout({
+      title: `${lp.title} · Lamia Femme Berbère`,
+      description: lp.title,
+      path: lp.path,
+      noindex: true,
+      body: `<article class="article legal"><p class="draft-banner">Brouillon : ce texte sera complété et relu avant l’ouverture des ventes.</p><h1>${esc(lp.title)}</h1>${lp.body}</article>`,
+    })
+  );
+}
+
 // 404
 page(
   '/404.html',
@@ -646,11 +700,11 @@ await cp(join(ROOT, 'public'), DIST, { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 for (const f of ['maison.css', 'maison.js', 'membre.js']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
 
-const indexable = pages.filter((p) => !p.path.endsWith('.html') && p.path !== '/produit/');
+const indexable = pages.filter((p) => !p.path.endsWith('.html') && !['/produit/', '/speed-dating/merci/', '/speed-dating/souhaits/', '/cgv/', '/mentions-legales/', '/confidentialite/'].includes(p.path));
 await writeFile(
   join(DIST, 'sitemap.xml'),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${indexable.map((p) => `<url><loc>${SITE_URL}${p.path}</loc></url>`).join('')}</urlset>\n`
 );
-await writeFile(join(DIST, 'robots.txt'), `User-agent: *\nAllow: /\nDisallow: /admin.html\nDisallow: /pilotage.html\nSitemap: ${SITE_URL}/sitemap.xml\n`);
+await writeFile(join(DIST, 'robots.txt'), `User-agent: *\nAllow: /\nDisallow: /admin.html\nDisallow: /pilotage.html\nDisallow: /admin-soirees.html\nDisallow: /speed-dating/merci/\nSitemap: ${SITE_URL}/sitemap.xml\n`);
 
 console.log(`Maison générée : ${pages.length} pages dans dist/`);

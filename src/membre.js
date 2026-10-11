@@ -47,7 +47,7 @@ async function refresh() {
     reportLogin.hidden = !!session;
   }
 }
-supabase.auth.onAuthStateChange(() => refresh());
+supabase.auth.onAuthStateChange(() => refresh().then(renderWishes));
 
 // ---------------------------------------------------------------- compte
 
@@ -102,7 +102,8 @@ async function renderEvents() {
         <h3>${esc(ev.title)}</h3>
         ${ev.description ? `<p>${esc(ev.description)}</p>` : ''}
         <div class="event-meta">${ages}<span>${money(ev.ticket_price_cents, ev.currency || 'EUR')}</span><span>${ev.capacity} places</span></div>
-        <button class="btn btn-ink" type="button" data-reserve="${esc(ev.id)}" ${full ? 'disabled' : ''}>${full ? 'Complet' : 'Pré-réserver ma place'}</button>
+        ${full ? '' : `<label class="check"><input type="checkbox" data-cgv="${esc(ev.id)}"><span>J’accepte les <a href="/cgv/" target="_blank" rel="noopener">conditions de vente</a>. La soirée ayant lieu à une date fixée, elle n’ouvre pas de droit de rétractation.</span></label>`}
+        <button class="btn btn-ink" type="button" data-reserve="${esc(ev.id)}" ${full ? 'disabled' : ''}>${full ? 'Complet' : 'Réserver ma place'}</button>
       </article>`;
     })
     .join('');
@@ -110,22 +111,99 @@ async function renderEvents() {
 }
 
 async function reserve(eventId, button) {
+  const st = $('[data-member-status]');
   if (!session) {
-    status($('[data-member-status]'), 'Connecte-toi ou crée ton espace pour réserver ta place.', true);
+    status(st, 'Connecte-toi ou crée ton espace pour réserver ta place.', true);
     $('#member-title')?.scrollIntoView({ behavior: 'smooth' });
     return;
   }
-  button.disabled = true;
-  const { error } = await supabase
-    .from('event_registrations')
-    .upsert({ event_id: eventId, user_id: session.user.id, payment_status: 'pending', attendance_status: 'registered' }, { onConflict: 'event_id,user_id' });
-  if (error) {
-    button.disabled = false;
-    return status($('[data-member-status]'), 'La pré-réservation n’a pas abouti. Réessaie dans un instant.', true);
+  const cgv = document.querySelector(`[data-cgv="${CSS.escape(eventId)}"]`);
+  if (cgv && !cgv.checked) {
+    status(st, 'Coche la case des conditions de vente pour continuer.', true);
+    cgv.focus();
+    return;
   }
-  button.textContent = 'Place pré-réservée';
-  status($('[data-member-status]'), 'Ta place est pré-réservée. Le paiement en ligne sera ouvert prochainement pour la confirmer.');
+  button.disabled = true;
+  button.textContent = 'Un instant…';
+  let res, data = {};
+  try {
+    res = await fetch('/api/event-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+      body: JSON.stringify({ event_id: eventId, cgv_accepted: true }),
+    });
+    data = await res.json().catch(() => ({}));
+  } catch { /* réseau */ }
+  if (res?.ok && data.url) { location.href = data.url; return; }
+
+  // Paiement pas encore ouvert : on garde la pré-réservation.
+  if (data.error === 'checkout_disabled' || data.error === 'not_configured' || res?.status === 404) {
+    const { error } = await supabase
+      .from('event_registrations')
+      .upsert({ event_id: eventId, user_id: session.user.id, payment_status: 'pending', attendance_status: 'registered' }, { onConflict: 'event_id,user_id' });
+    button.disabled = !error;
+    button.textContent = error ? 'Réserver ma place' : 'Place pré-réservée';
+    return status(st, error ? 'La pré-réservation n’a pas abouti. Réessaie dans un instant.' : 'Ta place est pré-réservée. Le paiement en ligne ouvre très bientôt pour la confirmer.', !!error);
+  }
+  const messages = {
+    email_not_confirmed: 'Confirme d’abord ton adresse email grâce au lien reçu, puis réessaie.',
+    event_full: 'Cette soirée est complète.',
+    event_past: 'Cette soirée est passée.',
+    event_unavailable: 'Cette soirée n’est plus disponible.',
+    login_required: 'Ta session a expiré. Reconnecte-toi puis réessaie.',
+  };
+  button.disabled = false;
+  button.textContent = 'Réserver ma place';
+  status(st, messages[data.error] || 'Le paiement n’a pas pu s’ouvrir. Réessaie dans un instant.', true);
 }
+
+// ---------------------------------------------------------------- après le paiement
+
+async function renderThanks() {
+  const box = $('[data-merci]');
+  if (!box) return;
+  const id = new URLSearchParams(location.search).get('session_id');
+  const title = $('h1', box), text = $('[data-merci-text]', box);
+  if (!id) return;
+  for (let i = 0; i < 4; i++) {
+    const r = await fetch(`/api/event-fulfill?session_id=${encodeURIComponent(id)}`).then((x) => x.json()).catch(() => ({}));
+    if (r.status === 'paid') {
+      title.textContent = 'Ta place est confirmée.';
+      text.textContent = 'Merci. Tu recevras le lien de la salle vidéo par email avant la soirée. Garde un œil sur ta boîte de réception, et sur tes courriers indésirables.';
+      return;
+    }
+    if (r.status !== 'unpaid') break;
+    await new Promise((ok) => setTimeout(ok, 2500));
+  }
+  title.textContent = 'Paiement en cours de vérification.';
+  text.textContent = 'Ton paiement n’est pas encore confirmé de notre côté. Si tu as été débitée, ta place sera confirmée sous peu. En cas de doute, écris à Lamia.';
+}
+
+// ---------------------------------------------------------------- souhaits après la soirée
+
+async function renderWishes() {
+  const form = $('[data-wishes]');
+  if (!form) return;
+  const login = $('[data-wishes-login]');
+  form.hidden = !session;
+  if (login) login.hidden = !!session;
+  const select = form.elements.event_id;
+  const since = new Date(Date.now() - 14 * 864e5).toISOString();
+  const { data } = await supabase.from('speed_dating_events').select('id,title,starts_at').gte('starts_at', since).lte('starts_at', new Date().toISOString()).order('starts_at', { ascending: false });
+  const wanted = new URLSearchParams(location.search).get('soiree');
+  select.innerHTML = (data || []).map((e) => `<option value="${esc(e.id)}" ${e.id === wanted ? 'selected' : ''}>${esc(e.title)} · ${esc(when(e.starts_at))}</option>`).join('') || '<option value="">Aucune soirée récente</option>';
+}
+
+$('[data-wishes]')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!session) return;
+  const f = new FormData(e.target);
+  if (!f.get('event_id')) return status($('[data-wishes-status]'), 'Choisis la soirée concernée.', true);
+  const { error } = await supabase.from('speed_dating_wishes').insert({ event_id: f.get('event_id'), user_id: session.user.id, wished: f.get('wished'), message: f.get('message') || null });
+  if (error) return status($('[data-wishes-status]'), 'Tes souhaits ne sont pas partis. Réessaie dans un instant.', true);
+  e.target.reset();
+  status($('[data-wishes-status]'), 'C’est noté. Si le souhait est réciproque, Lamia vous mettra en relation.');
+});
 
 // ---------------------------------------------------------------- alerte confidentielle
 
@@ -185,4 +263,4 @@ $('[data-report]')?.addEventListener('submit', async (e) => {
 });
 
 await refresh();
-await renderEvents();
+await Promise.all([renderEvents(), renderThanks(), renderWishes()]);
