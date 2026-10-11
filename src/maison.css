@@ -444,3 +444,44 @@ mark.todo { background: #fff3c4; color: var(--encre); padding: 0 4px; font-weigh
 }
 
 #plan, #member-title { scroll-margin-top: 90px; }
+
+/* ================================================================ Hall : lumière dorée qui mène à la Maison */
+.hall-hero { position: relative; overflow: hidden; padding-bottom: clamp(120px, 14vw, 200px);
+  background:
+    radial-gradient(ellipse 55% 50% at 72% 28%, rgba(255,244,214,.95), rgba(255,226,160,.35) 45%, transparent 70%),
+    radial-gradient(ellipse 90% 40% at 50% 100%, rgba(255,170,80,.35), transparent 70%),
+    linear-gradient(180deg, #fdf3d8 0%, #f6dfa6 30%, #ecc173 52%, #d79a4e 68%, #8e5a40 84%, #3a2a3f 94%, #1d1b33 100%); }
+.hall-hero::before { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    radial-gradient(circle, rgba(255,250,230,.95) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle, rgba(255,236,180,.9) 0 1px, transparent 2px),
+    radial-gradient(circle, rgba(255,250,230,.8) 0 1.2px, transparent 2.2px);
+  background-size: 180px 160px, 240px 210px, 310px 260px;
+  background-position: 20px 30px, 120px 90px, 60px 150px;
+  opacity: .55; animation: poussiere 7s ease-in-out infinite alternate; }
+.hall-hero::after { content: ''; position: absolute; inset: -20% -40%; pointer-events: none;
+  background: linear-gradient(115deg, transparent 40%, rgba(255,255,255,.35) 48%, rgba(255,240,200,.15) 52%, transparent 60%);
+  mix-blend-mode: soft-light; animation: miroitement 11s ease-in-out infinite; }
+.hall-hero > * { position: relative; z-index: 1; }
+.hall-hero .lead { color: #5b3d22; }
+.hall-hero .room-name { color: #7a5228; }
+.hall-hero .btn-line { border-color: #5b3d22; color: #3e2814; background: rgba(255,248,230,.35); }
+.hall-hero .btn-line:hover { color: var(--rouge); border-color: var(--rouge); }
+.hall-arch { box-shadow: 0 2px 4px rgba(90,50,10,.1), 0 40px 70px -14px rgba(120,60,10,.45), inset 0 0 0 10px #fffaf0, inset 0 0 0 11.5px #c8902e; }
+.arch-shadow { background: linear-gradient(160deg, #e9b65c, #b0162e); }
+.hall-cue { position: absolute; left: 50%; bottom: 28px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px;
+  color: #ffe2a3; text-decoration: none; font-family: var(--serif); font-style: italic; font-size: 20px; text-shadow: 0 0 18px rgba(255,190,100,.6); }
+.hall-cue svg { animation: invite 2.4s ease-in-out infinite; }
+.hall-cue:hover { color: #fff3d6; }
+.plan-section { background: radial-gradient(ellipse 60% 45% at 50% 55%, rgba(255,200,120,.10), transparent 70%), linear-gradient(180deg, #1d1b33 0%, #262038 55%, #34283f 100%); padding-top: clamp(24px, 4vw, 48px); }
+@keyframes miroitement { 0% { transform: translateX(-30%); } 50% { transform: translateX(30%); } 100% { transform: translateX(-30%); } }
+@keyframes poussiere { from { opacity: .35; transform: translateY(0); } to { opacity: .7; transform: translateY(-12px); } }
+@keyframes invite { 0%, 100% { transform: translateY(0); opacity: .7; } 50% { transform: translateY(6px); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .hall-hero::before, .hall-hero::after, .hall-cue svg { animation: none; } }
+@media (max-width: 900px) { .hall-hero { padding-bottom: 130px; } }
+/* Retouches : arche crème dorée, sans poussière en grille */
+.hall-hero::before { display: none; }
+.hall-arch { background: radial-gradient(ellipse at 50% 40%, #fffaf0, #fbedc9 75%); }
+.hall-medal { border-color: #fff6e2; }
+.hall-arch img { mix-blend-mode: multiply; }
+.head-arch.has-image img.is-drawing { mix-blend-mode: multiply; }

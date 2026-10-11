@@ -195,8 +195,8 @@ page(
       <img src="/images/collier/collier-kabyle-15g-detail-320.webp" width="320" height="400" alt="Médaillon kabyle émaillé bleu, vert et jaune, corail au centre">
     </figure>
   </div>
+  <a class="hall-cue" href="#plan"><span>Approcher de la Maison</span><svg width="22" height="34" viewBox="0 0 22 34" aria-hidden="true"><path d="M2 4l9 9 9-9M2 17l9 9 9-9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
 </section>
-<div class="frise" aria-hidden="true"></div>
 
 <section class="plan-section" id="plan" aria-labelledby="plan-title">
   <div class="plan-intro">
