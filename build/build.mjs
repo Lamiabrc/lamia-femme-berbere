@@ -106,7 +106,7 @@ function footer() {
       <li><a href="/werdi-ouvre-les-yeux/">Le livre Werdi</a></li>
       <li><a href="https://www.tiktok.com/@lamiaberbere" rel="noopener" target="_blank">TikTok @lamiaberbere</a></li>
       <li data-social="instagram" hidden><a rel="noopener" target="_blank">Instagram</a></li>
-      <li data-social="facebook" hidden><a rel="noopener" target="_blank">Facebook</a></li>
+      <li><a href="https://www.facebook.com/femmeberberes/" rel="noopener" target="_blank">Facebook Femme Berbère</a></li>
       <li data-social="youtube" hidden><a rel="noopener" target="_blank">YouTube</a></li>
     </ul>
     <p class="footer-legal">Mentions légales, CGV et politique de confidentialité : en préparation, publiées avant l’ouverture du paiement en ligne.</p>
@@ -310,7 +310,7 @@ page(
     <ul class="social-list">
       <li><a href="https://www.tiktok.com/@lamiaberbere" rel="noopener" target="_blank">TikTok @lamiaberbere</a></li>
       <li data-social="instagram" hidden><a rel="noopener" target="_blank">Instagram</a></li>
-      <li data-social="facebook" hidden><a rel="noopener" target="_blank">Facebook</a></li>
+      <li><a href="https://www.facebook.com/femmeberberes/" rel="noopener" target="_blank">Facebook Femme Berbère</a></li>
       <li data-social="youtube" hidden><a rel="noopener" target="_blank">YouTube</a></li>
     </ul>
   </aside>
