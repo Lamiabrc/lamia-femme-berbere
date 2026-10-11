@@ -89,7 +89,8 @@ function header(room) {
 }
 
 function footer() {
-  return `<footer class="site-footer">
+  return `<div class="frise" aria-hidden="true"></div>
+<footer class="site-footer">
   <div class="footer-house">
     <p class="footer-sign">ⵣ</p>
     <p>La Maison Lamia Femme Berbère<br>Mémoire, transmission, création.</p>
@@ -128,13 +129,26 @@ function cartDrawer() {
 
 // ---------------------------------------------------------------- blocs réutilisables
 
+// Image affichée dans l'arche de l'en-tête, quand la pièce en a une.
+const HEAD_IMAGES = {
+  ecrin: ['/images/collier/collier-kabyle-15g-porte-640.webp', 'Collier kabyle émaillé porté'],
+  galerie: ['/images/collier/collier-kabyle-15g-detail-640.webp', 'Détail d’un médaillon émaillé'],
+  bibliotheque: ['/images/marque/yemma-transmission-900.webp', 'Yemma transmet à sa fille, un livre à la main'],
+  salon: ['/images/marque/lamia-logo-600.webp', 'Le visage de Lamia Femme Berbère'],
+  boutique: ['/images/collier/collier-kabyle-15g-ecrin-640.webp', 'Collier kabyle dans son écrin'],
+};
 function roomHead(room, extra = '') {
-  return `<section class="room-head">
+  const im = HEAD_IMAGES[room.slug];
+  const arch = im
+    ? `<figure class="head-arch has-image"><img src="${im[0]}" alt="${esc(im[1])}"${room.slug === 'salon' ? ' class="is-drawing"' : ''}></figure>`
+    : '<span class="head-arch" aria-hidden="true"></span>';
+  return `<section class="room-head${im ? ' with-image' : ''}">${arch}
   <p class="room-name"><span class="pip" aria-hidden="true"></span>${esc(room.name)}</p>
   <h1>${esc(room.welcome)}</h1>
   <p class="lead">${esc(room.summary)}</p>
   ${extra}
-</section>`;
+</section>
+<div class="frise frise-fine" aria-hidden="true"></div>`;
 }
 
 const productGrid = (categories, opts = {}) =>
@@ -174,7 +188,8 @@ function housePlan() {
         door === 'bottom'
           ? `<path class="door-gap" d="M${cx - 30} ${y + h}H${cx + 30}"/><path class="door-swing" d="M${cx - 30} ${y + h}A60 60 0 0 1 ${cx + 30} ${y + h - 52}"/><text class="entree" x="${cx}" y="${y + h + 2}" dy="-8">Entrée</text>`
           : '';
-      const inner = `${shape}${soon ? `<rect class="room-hatch" x="${x}" y="${y}" width="${w}" height="${h}"/>` : ''}<text class="room-label" text-anchor="middle" font-size="${fs}">${label}</text>${soon && h >= 150 ? `<text class="room-soon" x="${cx}" y="${y + h - 18}" text-anchor="middle">bientôt</text>` : ''}${doorMark}`;
+      const pip = `<path class="room-pip" d="M${x + 18} ${y + 10}l7 7l-7 7l-7 -7z"/>`;
+      const inner = `${shape}${pip}${soon ? `<rect class="room-hatch" x="${x}" y="${y}" width="${w}" height="${h}"/>` : ''}<text class="room-label" text-anchor="middle" font-size="${fs}">${label}</text>${soon && h >= 150 ? `<text class="room-soon" x="${cx}" y="${y + h - 18}" text-anchor="middle">bientôt</text>` : ''}${doorMark}`;
       return soon
         ? `<g class="plan-room is-soon" data-accent="${r.accent}"><title>${esc(r.name)} : bientôt</title>${inner}</g>`
         : `<a class="plan-room" href="${r.path}" data-accent="${r.accent}" aria-label="${esc(r.name)} : ${esc(r.welcome)}">${inner}</a>`;
@@ -184,8 +199,9 @@ function housePlan() {
   <defs>
     <pattern id="hatch" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="12"/></pattern>
     <pattern id="tiles" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M15 3L27 15L15 27L3 15Z"/></pattern>
+    <filter id="house-shadow" x="-5%" y="-5%" width="110%" height="115%"><feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#1c1517" flood-opacity=".16"/></filter>
   </defs>
-  <rect class="house-wall" x="20" y="20" width="960" height="600"/>
+  <rect class="house-wall" x="20" y="20" width="960" height="600" filter="url(#house-shadow)"/>
   ${cells}
 </svg>`;
 }
@@ -210,10 +226,17 @@ page(
     <p class="lead">${esc(P.hall.lead)}</p>
     <p class="hall-actions"><a class="btn btn-ink" href="#plan">Visiter la Maison</a><a class="btn btn-line" href="/lamia-brechet/">Qui est Lamia</a></p>
   </div>
-  <figure class="hall-portrait">
-    <img src="/images/marque/lamia-logo-600.webp" width="600" height="600" alt="Le visage de Lamia Femme Berbère : lunettes, lèvres rouges et bijoux kabyles">
-  </figure>
+  <div class="hall-stage">
+    <span class="arch-shadow" aria-hidden="true"></span>
+    <figure class="hall-arch">
+      <img src="/images/marque/lamia-logo-600.webp" width="600" height="600" alt="Le visage de Lamia Femme Berbère : lunettes, lèvres rouges et bijoux kabyles">
+    </figure>
+    <figure class="hall-medal">
+      <img src="/images/collier/collier-kabyle-15g-detail-320.webp" width="320" height="400" alt="Médaillon kabyle émaillé bleu, vert et jaune, corail au centre">
+    </figure>
+  </div>
 </section>
+<div class="frise" aria-hidden="true"></div>
 
 <section class="plan-section" id="plan" aria-labelledby="plan-title">
   <div class="plan-intro">
@@ -227,7 +250,7 @@ page(
   </ul>
 </section>
 
-<section class="now-section" aria-labelledby="now-title">
+<section class="now-section is-dark" aria-labelledby="now-title">
   <h2 id="now-title">En ce moment dans la Maison</h2>
   <div class="now-grid">
     <article class="now-card" data-accent="rouge">

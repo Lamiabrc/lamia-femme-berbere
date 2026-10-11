@@ -259,3 +259,81 @@ body.cart-open { overflow: hidden; }
 .book-cover { margin: 0; }
 .book-cover img { max-height: 640px; width: auto; margin: 0 auto; box-shadow: 0 18px 50px rgba(28,21,23,.18); }
 .article-cover img { max-height: 520px; margin: 8px 0 28px; }
+
+/* ================================================================ Relief et profondeur */
+
+/* La frise : motif géométrique kabyle (triangles, losanges) aux couleurs de la Maison */
+.frise { height: 20px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='20' viewBox='0 0 56 20'%3E%3Cpath d='M0 20L14 6L28 20Z' fill='%231c1517'/%3E%3Cpath d='M28 0L42 14L56 0Z' fill='%23b0162e'/%3E%3Cpath d='M14 0l3 3l-3 3l-3-3z' fill='%23c99210'/%3E%3Cpath d='M42 20l3-3l3 3z' fill='%2323409a'/%3E%3C/svg%3E") repeat-x center / 56px 20px; }
+.frise-fine { height: 12px; background-size: 34px 12px; opacity: .9; }
+
+/* Hall : plans superposés autour d'une arche */
+.hall-hero { position: relative; overflow: hidden; background:
+  radial-gradient(ellipse 60% 70% at 85% 40%, color-mix(in srgb, var(--rouge) 7%, transparent), transparent 70%),
+  linear-gradient(180deg, var(--blanc), var(--chaux)); }
+.hall-stage { position: relative; justify-self: center; width: min(420px, 90%); aspect-ratio: 4 / 5; }
+.hall-arch { position: absolute; inset: 0; margin: 0; border-radius: 999px 999px 18px 18px; overflow: hidden; background: var(--blanc);
+  border: 1.5px solid var(--encre);
+  box-shadow: 0 2px 4px rgba(28,21,23,.06), 0 30px 60px -10px rgba(28,21,23,.28), inset 0 0 0 10px var(--blanc), inset 0 0 0 11.5px var(--rouge); }
+.hall-arch img { width: 100%; height: 100%; object-fit: contain; padding: 14% 8% 6%; }
+.arch-shadow { position: absolute; inset: 22px -22px -22px 22px; border-radius: 999px 999px 18px 18px; background: var(--rouge); opacity: .92; }
+.hall-medal { position: absolute; left: -54px; bottom: 34px; width: 38%; aspect-ratio: 1; margin: 0; border-radius: 50%; overflow: hidden;
+  border: 6px solid var(--blanc); box-shadow: 0 0 0 1.5px var(--encre), 0 20px 40px -8px rgba(28,21,23,.35); }
+.hall-medal img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.35); }
+.hall-portrait { display: none; }
+
+/* Le plan : sols teintés par pièce, losange d'émail, ombre portée */
+.plan-section { background:
+  radial-gradient(ellipse 50% 60% at 10% 0%, color-mix(in srgb, var(--email-cobalt) 6%, transparent), transparent 70%),
+  radial-gradient(ellipse 50% 60% at 90% 100%, color-mix(in srgb, var(--email-safran) 8%, transparent), transparent 70%),
+  var(--chaux); }
+.room-shape { fill: color-mix(in srgb, var(--accent) 5%, white); }
+.room-shape.is-court { fill: url(#tiles); }
+.room-pip { fill: var(--accent); stroke: var(--blanc); stroke-width: 2; }
+.plan-room.is-soon .room-pip { opacity: .45; }
+.plan-room:hover .room-shape, .plan-room:focus-visible .room-shape { fill: color-mix(in srgb, var(--accent) 18%, white); }
+
+/* En ce moment : section sombre, cartes en relief */
+.now-section.is-dark { background: var(--encre); color: var(--blanc); position: relative; }
+.now-section.is-dark h2 { color: var(--blanc); }
+.now-section.is-dark .now-card { border: 0; border-top: 4px solid var(--accent); box-shadow: 0 24px 50px -16px rgba(0,0,0,.6); color: var(--encre); }
+
+/* Cartes et produits : élévation douce */
+.now-card, .event-card, .live-card { border-radius: 4px; box-shadow: 0 1px 2px rgba(28,21,23,.05), 0 14px 34px -14px rgba(28,21,23,.18); transition: transform .25s ease, box-shadow .25s ease; }
+.now-card:hover, .event-card:hover { transform: translateY(-3px); box-shadow: 0 2px 4px rgba(28,21,23,.06), 0 24px 44px -14px rgba(28,21,23,.26); }
+.product-media { border-radius: 4px; box-shadow: 0 1px 2px rgba(28,21,23,.06), 0 18px 40px -18px rgba(28,21,23,.35); }
+.product-card:hover .product-media { box-shadow: 0 2px 4px rgba(28,21,23,.06), 0 28px 50px -18px rgba(28,21,23,.45); }
+.gallery-main { border-radius: 4px; box-shadow: 0 30px 60px -24px rgba(28,21,23,.4); }
+.side-note { box-shadow: inset 3px 0 0 var(--accent); border-left: 0; }
+
+/* En-têtes de pièces : arche en filigrane et lumière de la pièce */
+.room-head { overflow: hidden; background:
+  radial-gradient(ellipse 45% 80% at 92% 20%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 70%),
+  linear-gradient(180deg, var(--blanc), var(--chaux)); border-bottom: 0; }
+.room-head::after { display: none; }
+.head-arch { position: absolute; right: clamp(-80px, 4vw, 80px); top: 28px; width: clamp(160px, 22vw, 300px); aspect-ratio: 3 / 4;
+  border: 1.5px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 999px 999px 0 0;
+  box-shadow: 18px 18px 0 -1px color-mix(in srgb, var(--accent) 12%, transparent); pointer-events: none; }
+.room-head > *:not(.head-arch) { position: relative; }
+
+/* Histoire : image en profondeur */
+.story figure img { border-radius: 4px; box-shadow: -18px 18px 0 color-mix(in srgb, var(--rouge) 85%, transparent), 0 30px 60px -20px rgba(28,21,23,.4); }
+.book-feature img, .book-cover img { box-shadow: 0 30px 60px -20px rgba(28,21,23,.45); }
+
+@media (max-width: 900px) {
+  .hall-stage { width: min(300px, 78%); order: -1; margin-left: 40px; }
+  .hall-medal { left: -40px; }
+  .head-arch { opacity: .5; right: -60px; }
+}
+
+.head-arch.has-image { margin: 0; overflow: hidden; border: 1.5px solid var(--encre); background: var(--blanc);
+  box-shadow: 18px 18px 0 -1px color-mix(in srgb, var(--accent) 80%, transparent), 0 30px 60px -20px rgba(28,21,23,.35); top: 50%; transform: translateY(-50%); right: var(--gouttiere); width: clamp(200px, 24vw, 320px); }
+.head-arch.has-image img { width: 100%; height: 100%; object-fit: cover; }
+.head-arch.has-image img.is-drawing { object-fit: contain; padding: 16% 10% 8%; }
+.room-head.with-image { min-height: clamp(380px, 38vw, 520px); }
+.room-head.with-image h1, .room-head.with-image .lead { max-width: min(16ch, 55vw); }
+.room-head.with-image .lead { max-width: min(46ch, 52vw); }
+@media (max-width: 900px) {
+  .head-arch.has-image { position: relative; top: auto; right: auto; transform: none; width: min(240px, 70%); margin: 0 0 28px 0; }
+  .room-head.with-image { min-height: 0; display: flex; flex-direction: column; }
+  .room-head.with-image h1, .room-head.with-image .lead { max-width: none; }
+}
