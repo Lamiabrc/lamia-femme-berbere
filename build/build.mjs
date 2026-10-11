@@ -4,6 +4,7 @@
 // côté navigateur depuis Supabase avec la clé publique uniquement.
 
 import { mkdir, rm, writeFile, cp, readFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { rooms, roomBySlug } from '../content/rooms.mjs';
@@ -16,6 +17,12 @@ const VERSION = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 8) || String(Date.no
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
 const list = (items) => `<ul>${items.map((i) => `<li>${esc(i)}</li>`).join('')}</ul>`;
+
+// Couverture fournie par Lamia : public/images/couvertures/<nom>-640.webp (et -1120.webp).
+const cover = (name, alt, cls = 'cover') =>
+  existsSync(join(ROOT, 'public/images/couvertures', `${name}-640.webp`))
+    ? `<figure class="${cls}"><img src="/images/couvertures/${name}-640.webp" srcset="/images/couvertures/${name}-640.webp 640w, /images/couvertures/${name}-1120.webp 1120w" sizes="(max-width: 900px) 100vw, 40vw" alt="${esc(alt)}" loading="lazy"></figure>`
+    : '';
 
 const openRooms = rooms.filter((r) => r.status === 'open' && r.slug !== 'hall');
 const soonRooms = rooms.filter((r) => r.status === 'soon');
@@ -156,7 +163,7 @@ function housePlan() {
       const lines = words.length > 2 ? [words.slice(0, half).join(' '), words.slice(half).join(' ')] : [words.join(' ')];
       // Taille du nom adaptée à la largeur de la pièce (serif ≈ 0.5 em par caractère).
       const longest = Math.max(...lines.map((l) => l.length));
-      const fs = Math.round(Math.min(24, (w - 20) / (longest * 0.5)));
+      const fs = Math.round(Math.min(24, (w - 20) / (longest * 0.5), (h - 30) / (lines.length * 1.25)));
       const lh = Math.round(fs * 1.15);
       const ty = y + h / 2 - ((lines.length - 1) * lh) / 2 + fs * 0.33;
       const label = lines
@@ -167,7 +174,7 @@ function housePlan() {
         door === 'bottom'
           ? `<path class="door-gap" d="M${cx - 30} ${y + h}H${cx + 30}"/><path class="door-swing" d="M${cx - 30} ${y + h}A60 60 0 0 1 ${cx + 30} ${y + h - 52}"/><text class="entree" x="${cx}" y="${y + h + 2}" dy="-8">Entrée</text>`
           : '';
-      const inner = `${shape}${soon ? `<rect class="room-hatch" x="${x}" y="${y}" width="${w}" height="${h}"/>` : ''}<text class="room-label" text-anchor="middle" font-size="${fs}">${label}</text>${soon ? `<text class="room-soon" x="${cx}" y="${y + h - 18}" text-anchor="middle">bientôt</text>` : ''}${doorMark}`;
+      const inner = `${shape}${soon ? `<rect class="room-hatch" x="${x}" y="${y}" width="${w}" height="${h}"/>` : ''}<text class="room-label" text-anchor="middle" font-size="${fs}">${label}</text>${soon && h >= 150 ? `<text class="room-soon" x="${cx}" y="${y + h - 18}" text-anchor="middle">bientôt</text>` : ''}${doorMark}`;
       return soon
         ? `<g class="plan-room is-soon" data-accent="${r.accent}"><title>${esc(r.name)} : bientôt</title>${inner}</g>`
         : `<a class="plan-room" href="${r.path}" data-accent="${r.accent}" aria-label="${esc(r.name)} : ${esc(r.welcome)}">${inner}</a>`;
@@ -269,7 +276,7 @@ page(
     <p class="prose-lead">${esc(P.salon.intro)}</p>
     ${P.salon.lives
       .map(
-        (l) => `<article class="live-card"><h2>${esc(l.name)}</h2><p class="live-when">${esc(l.when)}</p><p>${esc(l.text)}</p><a class="btn btn-ink" href="https://www.tiktok.com/@lamiaberbere" rel="noopener" target="_blank">Suivre Lamia sur TikTok</a></article>`
+        (l) => `<article class="live-card">${cover('live', 'Couverture du Live Mariage Kabyle de Lamia', 'live-cover')}<h2>${esc(l.name)}</h2><p class="live-when">${esc(l.when)}</p><p>${esc(l.text)}</p><a class="btn btn-ink" href="https://www.tiktok.com/@lamiaberbere" rel="noopener" target="_blank">Suivre Lamia sur TikTok</a></article>`
       )
       .join('')}
   </div>
@@ -299,7 +306,7 @@ page(
     room: roomBySlug.bibliotheque,
     body: `${roomHead(roomBySlug.bibliotheque)}
 <section class="book-feature">
-  <figure><img src="/images/marque/yemma-portrait-700.webp" width="700" height="1050" loading="lazy" alt="Illustration : Yemma, la voix de la collection"></figure>
+  ${cover('werdi', 'Couverture du livre Werdi, ouvre les yeux ! de Lamia Bréchet', 'book-cover') || '<figure><img src="/images/marque/yemma-portrait-700.webp" width="700" height="1050" loading="lazy" alt="Illustration : Yemma, la voix de la collection"></figure>'}
   <div>
     <h2>${esc(P.bibliotheque.book.title)}</h2>
     <p class="book-sub">${esc(P.bibliotheque.book.subtitle)}</p>
@@ -575,6 +582,7 @@ page(
     body: `<article class="article">
   <p class="room-name"><span class="pip" aria-hidden="true"></span>La Bibliothèque de Yemma</p>
   <h1>Werdi, ouvre les yeux !</h1>
+  ${cover('werdi', 'Couverture du livre Werdi, ouvre les yeux ! de Lamia Bréchet', 'book-cover article-cover')}
   <p class="lead">Le petit manuel de la fille amoureuse, du virtuel au réel. Un livre de Lamia Bréchet pour aimer, choisir et construire sans se perdre.</p>
   <h2>La voix de Yemma pour parler d’amour</h2>
   <p>Ce guide s’adresse aux jeunes femmes qui se questionnent sur une rencontre, une relation ou un projet de mariage. Il invite à garder la douceur de l’amour tout en prenant le temps de connaître la personne en face de soi.</p>

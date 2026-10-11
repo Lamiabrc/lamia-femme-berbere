@@ -137,10 +137,20 @@ export const rooms = [
     path: '/coiffeuse/',
     name: 'La Coiffeuse de Lamia',
     welcome: 'Le rouge, les bijoux, les gestes qui nous ressemblent.',
-    summary: 'Le rouge à lèvres signature de Lamia, le maquillage, les foulards et les accessoires. En préparation.',
+    summary: 'Le rouge à lèvres signature de Lamia, le maquillage et les objets de beauté. En préparation.',
     status: 'soon',
     accent: 'rouge',
-    plan: { x: 800, y: 230, w: 180, h: 210 },
+    plan: { x: 800, y: 230, w: 180, h: 105 },
+  },
+  {
+    slug: 'dressing',
+    path: '/dressing/',
+    name: 'Le Dressing de Lamia',
+    welcome: 'Ce qu’on porte, ce qu’on transmet.',
+    summary: 'Les foulards, les accessoires et les futures collections textiles de la Maison. En préparation.',
+    status: 'soon',
+    accent: 'safran',
+    plan: { x: 800, y: 335, w: 180, h: 105 },
   },
 ];
 

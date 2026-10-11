@@ -252,3 +252,10 @@ body.cart-open { overflow: hidden; }
   .site-footer { grid-template-columns: 1fr; }
   .book-feature img { max-height: 420px; }
 }
+
+/* Couvertures (live, livre) */
+.live-cover { margin: -28px -28px 20px; }
+.live-cover img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+.book-cover { margin: 0; }
+.book-cover img { max-height: 640px; width: auto; margin: 0 auto; box-shadow: 0 18px 50px rgba(28,21,23,.18); }
+.article-cover img { max-height: 520px; margin: 8px 0 28px; }

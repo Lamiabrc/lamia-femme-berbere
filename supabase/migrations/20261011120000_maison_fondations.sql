@@ -88,7 +88,8 @@ insert into public.rooms (slug, name, welcome, status, accent, sort_order) value
   ('galerie', 'La Galerie', 'Regarder, comprendre, transmettre.', 'open', 'safran', 90),
   ('atelier', 'L’Atelier', 'Là où naissent les pièces.', 'soon', 'vert', 100),
   ('salle-de-bain', 'La Salle de bain de Lamia', 'Les rituels de la Maison.', 'soon', 'cobalt', 110),
-  ('coiffeuse', 'La Coiffeuse de Lamia', 'Le rouge, les bijoux, les gestes qui nous ressemblent.', 'soon', 'rouge', 120)
+  ('coiffeuse', 'La Coiffeuse de Lamia', 'Le rouge, les bijoux, les gestes qui nous ressemblent.', 'soon', 'rouge', 120),
+  ('dressing', 'Le Dressing de Lamia', 'Ce qu’on porte, ce qu’on transmet.', 'soon', 'safran', 130)
 on conflict (slug) do nothing;
 
 -- ------------------------------------------------------------------ médias
@@ -158,7 +159,8 @@ from (values
   ('livre', 'Livre', 'bibliotheque', false),
   ('trouvaille', 'Trouvaille', 'grenier', false),
   ('cosmetique', 'Cosmétique', 'salle-de-bain', true),
-  ('beaute', 'Beauté', 'coiffeuse', true)
+  ('beaute', 'Beauté', 'coiffeuse', true),
+  ('textile', 'Textile et accessoire', 'dressing', false)
 ) as v(slug, name, room, reg)
 join public.rooms r on r.slug = v.room
 on conflict (slug) do nothing;
