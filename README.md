@@ -1,45 +1,39 @@
-# Lamia Femme Berbère — boutique V2
+# La Maison Lamia Femme Berbère — version 2 (branche `maison-v2`)
 
-Cette version est directement reliée au projet Supabase **Lamia Femme Berbère**.
+La Maison numérique de Lamia : chaque activité est une pièce (le Hall, le Salon, la
+Bibliothèque de Yemma, l'Écrin, le Grenier des Trouvailles, le Salon du Speed Dating,
+le Cabinet des Confidences, le Patio, la Galerie, et trois pièces prévues : l'Atelier,
+la Salle de bain, la Coiffeuse).
 
-## Déjà connecté
-- Catalogue public Supabase
-- Catégories : Bijoux, Livres, Les Trouvailles de Lamia, Amour & communauté
-- Stock et pièces uniques
-- Panier local
-- Identité visuelle Lamia Femme Berbère
-- Univers Yemma Werdi, Live Mariage Kabyle et Matching Kabyle
+**Cette branche n'est pas en production.** Le site en ligne reste celui de `main` jusqu'à
+la validation explicite de Lamia.
+
+## Fonctionnement
+
+- `content/rooms.mjs` : la liste des pièces (nom, phrase d'accueil, statut, couleur d'émail, position dans le plan).
+- `content/pages.mjs` : les textes de chaque pièce.
+- `build/build.mjs` : génère toutes les pages dans `dist/`, sans aucune dépendance (`npm run build`).
+- `src/maison.js` : catalogue, fiche produit, panier, prochaine soirée (lecture publique Supabase).
+- `src/membre.js` : espace membre, pré-réservation de soirée, alerte confidentielle.
+- `public/` : images optimisées (WebP en 320, 640 et 1120 px) et pages d'administration existantes (`admin.html`, `pilotage.html`).
+- `api/` et `lib/` : réception des notifications Stripe (inchangée).
+- `supabase/migrations/` : schéma de la Maison, versionné. `20261011120000_maison_fondations.sql` **n'est pas encore appliquée**.
+
+Vercel lit `vercel.json` : commande `node build/build.mjs`, dossier publié `dist/`.
 
 ## Sécurité
-- Le navigateur utilise uniquement la clé Supabase publique/publishable.
-- Les tables commandes et lignes de commande ne sont pas lisibles par le public.
-- Aucune clé Stripe secrète ni clé Supabase service-role n'est présente dans le site.
 
-## À raccorder
-- Stripe Checkout : en attente de validation du compte Stripe dédié (le seul compte connecté actuellement se nomme Qvtbox).
-- Authentification admin Supabase pour le back-office produit.
+- Le navigateur n'utilise que la clé Supabase publique. Aucune clé secrète (Stripe, service-role) n'est dans le code.
+- Les droits sont écrits dans la base (RLS) et versionnés dans `supabase/migrations/`.
+- `npm test` vérifie la génération des pages et l'absence de secrets dans `dist/`.
 
-## Réception des notifications Stripe
+## Paiement
 
-Endpoint : `POST /api/stripe-webhook` (compte Lamia `acct_1OB0kuAiy7hcxWtQ`).
+Stripe : compte actuel de Lamia (`acct_1OB0…`). Le paiement en ligne reste désactivé
+jusqu'à la mise en ligne des CGV, des mentions légales et du traitement des commandes.
+Variables serveur attendues : `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `SUPABASE_SERVICE_ROLE_KEY`.
 
-Variables serveur de production : `STRIPE_SECRET_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
-(ou `SUPABASE_SECRET_KEY`), `STRIPE_WEBHOOK_SECRET`.
+## Outil de live
 
-Événements : `checkout.session.completed`, `checkout.session.async_payment_succeeded`,
-`checkout.session.async_payment_failed`, `checkout.session.expired`, `invoice.paid`,
-`invoice.payment_failed`, `customer.subscription.updated`, `customer.subscription.deleted`.
-
-Le SDK Stripe vérifie le corps brut et la signature (tolérance 300 secondes).
-Les notifications sélectionnées sont enregistrées dans `stripe_webhook_events`,
-avec accès serveur uniquement. La clé primaire empêche les doublons; un échec de
-stockage renvoie 503 afin que Stripe réessaie. Les données et secrets ne sont pas journalisés.
-
-**État : réception uniquement.** Les événements restent `pending`. Aucun consommateur
-ne traite encore les commandes, stocks, réservations ou abonnements. Le paiement
-Checkout reste désactivé jusqu'à la mise en place et au test de ce traitement.
-`GET /api/stripe-webhook` confirme le déploiement et la présence des variables,
-mais ne constitue pas un test de livraison signé depuis Stripe.
-
-Après ajout du secret de signature dans Vercel, redéployer le site, puis vérifier
-une livraison depuis Stripe. Tests locaux : `npm test` (signatures fictives uniquement).
+L'outil de matching utilisé pendant les lives reste sur le PC de Lamia. Il n'a aucun lien
+avec ce site : ni données, ni connexion.

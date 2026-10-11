@@ -1,0 +1,150 @@
+// Les pièces de la Maison Lamia Femme Berbère.
+// Source de vérité provisoire : la table `rooms` (migration 20261011120000) reprendra ces
+// mêmes slugs. Tant qu'elle n'est pas appliquée, le site se construit à partir de ce fichier.
+//
+// status : 'open' (ouverte) | 'soon' (prévue, porte entrouverte)
+// accent : couleur d'émail associée à la pièce (voir --email-* dans styles.css)
+// plan   : position dans le plan du Hall (unités du viewBox 1000 × 640)
+// productCategories : catégories de la table `products` affichées dans la pièce
+
+export const rooms = [
+  {
+    slug: 'hall',
+    path: '/',
+    name: 'Le Hall',
+    welcome: 'Bienvenue chez Lamia.',
+    summary: 'L’entrée de la Maison : qui est Lamia, son histoire, et le plan de toutes les pièces.',
+    status: 'open',
+    accent: 'rouge',
+    plan: { x: 220, y: 440, w: 240, h: 180, door: 'bottom' },
+  },
+  {
+    slug: 'salon',
+    path: '/salon/',
+    name: 'Le Salon de Lamia',
+    welcome: 'Installe-toi, on parle vrai.',
+    summary: 'Les lives, les débats et les prises de parole de Lamia sur l’amour, le mariage, la transmission et les femmes berbères.',
+    status: 'open',
+    accent: 'rouge',
+    plan: { x: 20, y: 230, w: 340, h: 210 },
+  },
+  {
+    slug: 'bibliotheque',
+    path: '/bibliotheque/',
+    name: 'La Bibliothèque de Yemma',
+    welcome: 'Ce que Yemma m’a transmis.',
+    summary: 'Werdi, ouvre les yeux !, la collection Yemma Werdi, les ebooks et les conseils pour aimer avec les yeux ouverts.',
+    status: 'open',
+    accent: 'cobalt',
+    productCategories: ['livres'],
+    plan: { x: 20, y: 20, w: 280, h: 210 },
+  },
+  {
+    slug: 'ecrin',
+    path: '/ecrin/',
+    name: 'L’Écrin',
+    welcome: 'Les bijoux qui racontent d’où l’on vient.',
+    summary: 'Bijoux kabyles émaillés, alliances et nouvelles collections de la Maison.',
+    status: 'open',
+    accent: 'vert',
+    productCategories: ['bijoux'],
+    plan: { x: 600, y: 230, w: 200, h: 210 },
+  },
+  {
+    slug: 'grenier',
+    path: '/grenier/',
+    name: 'Le Grenier des Trouvailles',
+    welcome: 'Ce que j’ai déniché pour toi.',
+    summary: 'Mes coups de cœur de brocante : livres anciennes éditions, bibelots, cadres, sculptures, cartes postales et pièces uniques.',
+    status: 'open',
+    accent: 'safran',
+    productCategories: ['trouvailles'],
+    plan: { x: 740, y: 20, w: 240, h: 210 },
+  },
+  {
+    slug: 'boutique',
+    path: '/boutique/',
+    name: 'La Boutique',
+    welcome: 'Tout ce que la Maison propose.',
+    summary: 'L’ensemble des bijoux, livres et trouvailles, rangés par pièce.',
+    status: 'open',
+    accent: 'rouge',
+    productCategories: ['bijoux', 'livres', 'trouvailles'],
+    plan: { x: 460, y: 440, w: 180, h: 180 },
+  },
+  {
+    slug: 'speed-dating',
+    path: '/speed-dating/',
+    name: 'Le Salon du Speed Dating',
+    welcome: 'Des rencontres vraies, dans un cadre sûr.',
+    summary: 'Des soirées en ligne pensées pour un public précis, des tête-à-tête courts, et Lamia qui veille.',
+    status: 'open',
+    accent: 'rouge',
+    plan: { x: 640, y: 440, w: 200, h: 180 },
+  },
+  {
+    slug: 'confidences',
+    path: '/confidences/',
+    name: 'Le Cabinet des Confidences',
+    welcome: 'Ici, tu peux tout me dire.',
+    summary: 'Alerter Lamia en toute confidentialité, être accompagnée, savoir comment la Maison te protège.',
+    status: 'open',
+    accent: 'cobalt',
+    plan: { x: 20, y: 440, w: 200, h: 180 },
+  },
+  {
+    slug: 'patio',
+    path: '/patio/',
+    name: 'Le Patio',
+    welcome: 'La Maison se retrouve ici.',
+    summary: 'Annonces, célébrations, témoignages et rendez-vous de la communauté.',
+    status: 'open',
+    accent: 'vert',
+    plan: { x: 360, y: 230, w: 240, h: 210, open: true },
+  },
+  {
+    slug: 'galerie',
+    path: '/galerie/',
+    name: 'La Galerie',
+    welcome: 'Regarder, comprendre, transmettre.',
+    summary: 'Le patrimoine des bijoux kabyles, l’émail, les symboles, et les créations de la Maison.',
+    status: 'open',
+    accent: 'safran',
+    plan: { x: 300, y: 20, w: 220, h: 210 },
+  },
+  {
+    slug: 'atelier',
+    path: '/atelier/',
+    name: 'L’Atelier',
+    welcome: 'Là où naissent les pièces.',
+    summary: 'Les coulisses des créations, les artisans et les collaborations.',
+    status: 'soon',
+    accent: 'vert',
+    plan: { x: 520, y: 20, w: 220, h: 210 },
+  },
+  {
+    slug: 'salle-de-bain',
+    path: '/salle-de-bain/',
+    name: 'La Salle de bain de Lamia',
+    welcome: 'Les rituels de la Maison.',
+    summary: 'Savons, soins, huiles et rituels inspirés de la Méditerranée berbère. La gamme est en préparation.',
+    status: 'soon',
+    accent: 'cobalt',
+    plan: { x: 840, y: 440, w: 140, h: 180 },
+  },
+  {
+    slug: 'coiffeuse',
+    path: '/coiffeuse/',
+    name: 'La Coiffeuse de Lamia',
+    welcome: 'Le rouge, les bijoux, les gestes qui nous ressemblent.',
+    summary: 'Le rouge à lèvres signature de Lamia, le maquillage, les foulards et les accessoires. En préparation.',
+    status: 'soon',
+    accent: 'rouge',
+    plan: { x: 800, y: 230, w: 180, h: 210 },
+  },
+];
+
+export const roomBySlug = Object.fromEntries(rooms.map((r) => [r.slug, r]));
+
+// Catégorie produit → pièce d'origine (pour l'affichage d'un produit dans sa pièce).
+export const categoryRoom = { bijoux: 'ecrin', livres: 'bibliotheque', trouvailles: 'grenier' };
