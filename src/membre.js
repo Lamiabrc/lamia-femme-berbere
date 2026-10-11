@@ -33,8 +33,17 @@ function explain(error) {
   return 'Une erreur est survenue. Réessaie dans un instant.';
 }
 
+// Les inscriptions et les alertes sont rattachées à un profil membre : on le crée au besoin.
+let profileEnsured = null;
+async function ensureProfile() {
+  if (!session || profileEnsured === session.user.id) return;
+  const { error } = await supabase.from('member_profiles').upsert({ user_id: session.user.id }, { onConflict: 'user_id', ignoreDuplicates: true });
+  if (!error) profileEnsured = session.user.id;
+}
+
 async function refresh() {
   ({ data: { session } } = await supabase.auth.getSession());
+  await ensureProfile();
   const out = $('[data-member-out]'), inn = $('[data-member-in]');
   if (out && inn) {
     out.hidden = !!session;
@@ -140,7 +149,7 @@ async function reserve(eventId, button) {
   if (data.error === 'checkout_disabled' || data.error === 'not_configured' || res?.status === 404) {
     const { error } = await supabase
       .from('event_registrations')
-      .upsert({ event_id: eventId, user_id: session.user.id, payment_status: 'pending', attendance_status: 'registered' }, { onConflict: 'event_id,user_id' });
+      .upsert({ event_id: eventId, user_id: session.user.id, payment_status: 'pending', attendance_status: 'registered' }, { onConflict: 'event_id,user_id', ignoreDuplicates: true });
     button.disabled = !error;
     button.textContent = error ? 'Réserver ma place' : 'Place pré-réservée';
     return status(st, error ? 'La pré-réservation n’a pas abouti. Réessaie dans un instant.' : 'Ta place est pré-réservée. Le paiement en ligne ouvre très bientôt pour la confirmer.', !!error);

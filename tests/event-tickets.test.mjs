@@ -20,6 +20,7 @@ function fakeDb({ event = {}, paid = 0, user = { id: USER, email: 'a@b.fr', emai
     if (url.includes('event_registrations') && init.method === 'POST') return { ok: regOk };
     if (url.includes('event_registrations') && init.method === 'PATCH') return { ok: patchOk };
     if (url.includes('event_registrations')) return ok([{ user_id: USER, payment_status: 'pending', attendance_status: 'registered', created_at: 'x' }]);
+    if (url.includes('member_profiles')) return { ok: true };
     if (url.includes('stripe_webhook_events')) return { ok: true };
     if (url.includes('speed_dating_wishes')) return { ok: false };
     throw new Error('appel inattendu ' + url);
@@ -32,7 +33,7 @@ function fakeStripe(session = {}) {
   return {
     created,
     checkout: { sessions: {
-      create: async (params) => { created.push(params); return { url: 'https://checkout.stripe.com/c/pay/cs_live_x' }; },
+      create: async (params) => { created.push(params); return { id: 'cs_live_x', url: 'https://checkout.stripe.com/c/pay/cs_live_x' }; },
       retrieve: async (id) => ({ id, livemode: true, payment_status: 'paid', metadata: { kind: 'event_ticket', event_id: EVENT, user_id: USER }, ...session }),
     } },
     paymentIntents: { search: async () => ({ data: [] }) },
