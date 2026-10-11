@@ -47,7 +47,7 @@ export function facade(rooms) {
   const lights = LANTERNS.map(([x, y, s], i) => `<span class="f-flame" style="left:${pct(x - s / 2, W)};top:${pct(y - s / 2, H)};width:${pct(s, W)};height:${pct(s, H)};animation-delay:${i * 0.7}s" aria-hidden="true"></span>`).join('');
   const stars = STARS.map(([x, y], i) => `<span class="f-twinkle" style="left:${pct(x, W)};top:${pct(y, H)};animation-delay:${(i * 0.9) % 4}s" aria-hidden="true"></span>`).join('');
   return `<div class="facade" role="group" aria-label="La façade de la Maison Lamia Femme Berbère : chaque fenêtre est une pièce">
-  <img class="facade-img" src="/images/maison/facade-nuit-1200.webp" srcset="/images/maison/facade-nuit-800.webp 800w, /images/maison/facade-nuit-1200.webp 1200w, /images/maison/facade-nuit-1672.webp 1672w" sizes="(max-width: 1100px) 100vw, 1100px" width="1672" height="941" alt="La Maison Lamia Femme Berbère au coucher du soleil : maison de pierre aux volets bleus et bougainvilliers, chaque fenêtre éclairée porte le nom de sa pièce, grande porte de bois entrouverte, pergola du Patio à droite, montagnes de Kabylie au loin">
+  <img class="facade-img" src="/images/maison/facade-soir-1200.webp" srcset="/images/maison/facade-soir-800.webp 800w, /images/maison/facade-soir-1200.webp 1200w, /images/maison/facade-soir-1672.webp 1672w" sizes="(max-width: 1100px) 100vw, 1100px" width="1672" height="941" alt="La Maison Lamia Femme Berbère au coucher du soleil : maison de pierre aux volets bleus et bougainvilliers, chaque fenêtre éclairée porte le nom de sa pièce, grande porte de bois entrouverte, pergola du Patio à droite, montagnes de Kabylie au loin">
   ${lights}${stars}
   ${rooms.map(spot).join('\n  ')}
 </div>`;
