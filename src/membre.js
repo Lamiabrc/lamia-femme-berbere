@@ -110,16 +110,17 @@ async function renderEvents() {
         <p class="event-date">${esc(when(ev.starts_at))}</p>
         <h3>${esc(ev.title)}</h3>
         ${ev.description ? `<p>${esc(ev.description)}</p>` : ''}
-        <div class="event-meta">${ages}<span>${money(ev.ticket_price_cents, ev.currency || 'EUR')}</span><span>${ev.capacity} places</span></div>
-        ${full ? '' : `<label class="check"><input type="checkbox" data-cgv="${esc(ev.id)}"><span>J’accepte les <a href="/cgv/" target="_blank" rel="noopener">conditions de vente</a>. La soirée ayant lieu à une date fixée, elle n’ouvre pas de droit de rétractation.</span></label>`}
+        <div class="event-meta">${ages}<span>${ev.ticket_price_cents > 0 ? money(ev.ticket_price_cents, ev.currency || 'EUR') : 'Gratuit'}</span><span>${ev.capacity} places</span></div>
+        ${full ? '' : `<label class="check"><input type="checkbox" data-cgv="${esc(ev.id)}"><span>${ev.ticket_price_cents > 0 ? 'J’accepte les <a href="/cgv/" target="_blank" rel="noopener">conditions de vente</a>. La place n’est pas remboursable.' : 'J’accepte les <a href="/cgv/" target="_blank" rel="noopener">règles de la soirée</a> : respect, sérieux, aucun propos déplacé.'}</span></label>`}
         <button class="btn btn-ink" type="button" data-reserve="${esc(ev.id)}" ${full ? 'disabled' : ''}>${full ? 'Complet' : 'Réserver ma place'}</button>
       </article>`;
     })
     .join('');
-  $$('[data-reserve]', box).forEach((b) => b.addEventListener('click', () => reserve(b.dataset.reserve, b)));
+  const prices = Object.fromEntries(data.map((ev) => [ev.id, ev.ticket_price_cents]));
+  $$('[data-reserve]', box).forEach((b) => b.addEventListener('click', () => reserve(b.dataset.reserve, b, prices[b.dataset.reserve] > 0)));
 }
 
-async function reserve(eventId, button) {
+async function reserve(eventId, button, paying = true) {
   const st = $('[data-member-status]');
   if (!session) {
     status(st, 'Connecte-toi ou crée ton espace pour réserver ta place.', true);
@@ -134,6 +135,14 @@ async function reserve(eventId, button) {
   }
   button.disabled = true;
   button.textContent = 'Un instant…';
+  if (!paying) {
+    const { error } = await supabase
+      .from('event_registrations')
+      .upsert({ event_id: eventId, user_id: session.user.id, payment_status: 'pending', attendance_status: 'registered' }, { onConflict: 'event_id,user_id', ignoreDuplicates: true });
+    button.disabled = !error;
+    button.textContent = error ? 'Réserver ma place' : 'Place réservée';
+    return status(st, error ? 'La réservation n’a pas abouti. Réessaie dans un instant.' : 'Ta place est réservée. Tu recevras le lien de la salle par email avant la soirée.', !!error);
+  }
   let res, data = {};
   try {
     res = await fetch('/api/event-checkout', {

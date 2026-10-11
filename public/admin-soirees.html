@@ -40,7 +40,7 @@
     <table><thead><tr><th>Email</th><th>Paiement</th><th>Inscription</th></tr></thead><tbody id="people"></tbody></table>
     <div class="box">
       <h2 style="font-size:26px">Envoyer le lien de la salle</h2>
-      <p>Les adresses des personnes ayant payé, à coller en copie cachée (Cci) de ton email :</p>
+      <p>Les adresses des personnes inscrites (ayant payé pour une soirée payante), à coller en copie cachée (Cci) de ton email :</p>
       <textarea id="emails" rows="3" readonly style="width:100%"></textarea>
       <button class="btn btn-ink" type="button" id="copy" style="margin-top:10px">Copier les adresses</button>
     </div>
@@ -83,10 +83,10 @@ async function boot() {
 async function load() {
   say('Chargement…');
   try {
-    const { people, wishes, wishesAvailable } = await api(`/api/admin-events?event_id=${encodeURIComponent($('#event').value)}`);
+    const { people, wishes, wishesAvailable, free } = await api(`/api/admin-events?event_id=${encodeURIComponent($('#event').value)}`);
     const paid = people.filter((p) => p.paid);
-    $('#summary').textContent = `${paid.length} place${paid.length > 1 ? 's' : ''} payée${paid.length > 1 ? 's' : ''} · ${people.length - paid.length} en attente`;
-    $('#people').innerHTML = people.map((p) => `<tr><td>${esc(p.email || '—')}</td><td class="${p.paid ? 'paid' : 'pending'}">${p.paid ? 'Payée' : 'En attente'}</td><td>${p.registered_at ? esc(when(p.registered_at)) : ''}</td></tr>`).join('') || '<tr><td colspan="3">Personne n’est encore inscrit.</td></tr>';
+    $('#summary').textContent = free ? `Soirée gratuite · ${people.length} inscrit${people.length > 1 ? 's' : ''}` : `${paid.length} place${paid.length > 1 ? 's' : ''} payée${paid.length > 1 ? 's' : ''} · ${people.length - paid.length} en attente`;
+    $('#people').innerHTML = people.map((p) => `<tr><td>${esc(p.email || '—')}</td><td class="${p.paid ? 'paid' : 'pending'}">${free ? 'Gratuite' : p.paid ? 'Payée' : 'En attente'}</td><td>${p.registered_at ? esc(when(p.registered_at)) : ''}</td></tr>`).join('') || '<tr><td colspan="3">Personne n’est encore inscrit.</td></tr>';
     $('#emails').value = paid.map((p) => p.email).filter(Boolean).join(', ');
     $('#wishes').innerHTML = !wishesAvailable
       ? '<p>Le formulaire des souhaits sera actif dès que sa table sera créée dans la base.</p>'
