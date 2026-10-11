@@ -116,7 +116,9 @@ const SPECS = [
   ['weight_g', 'Poids', (v) => `${v} g`],
   ['main_medallion_diameter_cm', 'Médaillon central', (v) => `${v} cm`],
   ['side_medallion_diameter_cm', 'Médaillons latéraux', (v) => `${v} cm`],
-  ['craft', 'Technique', (v) => v],
+  ['craft', 'Savoir-faire', (v) => v],
+  ['model_year', 'Modèle créé en', (v) => v],
+  ['designers', 'Création', (v) => v],
   ['origin', 'Origine', (v) => v],
 ];
 

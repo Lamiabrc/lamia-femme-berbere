@@ -18,7 +18,7 @@ export const rooms = [
   { slug: 'hall', path: '/', floor: 0, name: 'Le Hall', welcome: 'Bienvenue chez Lamia.',
     summary: 'L’entrée de la Maison : qui est Lamia, son histoire, et toutes les pièces.', status: 'open', accent: 'rouge' },
   { slug: 'ecrin', path: '/ecrin/', floor: 0, name: 'L’Écrin', welcome: 'Les bijoux qui racontent d’où l’on vient.',
-    summary: 'Bijoux kabyles émaillés, alliances et nouvelles collections de la Maison.', status: 'open', accent: 'vert', productCategories: ['bijoux'] },
+    summary: 'La collection exclusive de bijoux kabyles de la Maison, fabriquée à Ath Yenni par ses artisans bijoutiers.', status: 'open', accent: 'vert', productCategories: ['bijoux'] },
   { slug: 'boutique', path: '/boutique/', floor: 0, name: 'La Boutique', welcome: 'Tout ce que la Maison propose.',
     summary: 'L’ensemble des bijoux, livres et trouvailles, rangés par pièce.', status: 'open', accent: 'rouge', productCategories: ['bijoux', 'livres', 'trouvailles'] },
   { slug: 'dressing', path: '/dressing/', floor: 0, name: 'Le Dressing de Lamia', welcome: 'Ce qu’on porte, ce qu’on prend soin de soi.',

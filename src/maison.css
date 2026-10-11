@@ -593,3 +593,22 @@ mark.todo { background: #fff3c4; color: var(--encre); padding: 0 4px; font-weigh
 @media (max-width: 900px) {
   .facade, .facade[class] { -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 8%, #000 97%, transparent 100%); mask-image: linear-gradient(180deg, transparent 0, #000 8%, #000 97%, transparent 100%); }
 }
+
+/* Nouvelle façade au coucher du soleil : la transition rejoint le ciel crépusculaire */
+:root { --nuit-photo: #3a3566; --nuit-profonde: #23203f; }
+.hall-hero, .hall-hero[class] {
+  background:
+    radial-gradient(ellipse 16% 7% at 50% 80%, rgba(255,238,185,.95), rgba(255,180,95,.75) 45%, rgba(240,110,60,0) 85%),
+    radial-gradient(ellipse 75% 20% at 50% 80%, rgba(255,128,64,.42), rgba(190,40,60,.22) 55%, transparent 80%),
+    radial-gradient(ellipse 55% 40% at 72% 24%, rgba(255,244,214,.9), rgba(255,226,160,.3) 45%, transparent 70%),
+    linear-gradient(180deg, #fdefcd 0%, #f9dc9c 20%, #f4c172 36%, #ee9a52 50%, #e3713f 60%, #c94a3e 68%, #9c3346 76%, #7a3456 83%, #5a3561 90%, #463566 96%, var(--nuit-photo) 100%);
+}
+.plan-section, .plan-section[class] { background: linear-gradient(180deg, var(--nuit-photo) 0%, #2c2950 50%, var(--nuit-profonde) 100%); }
+.f-spot.is-pergola { border-radius: 10px; }
+.f-spot.is-pergola::before { inset: -10%; background: radial-gradient(ellipse at 50% 60%, rgba(255,214,140,.55), rgba(255,170,80,.2) 50%, transparent 75%); }
+.f-spot:not(.is-door):not(.is-pergola) { border-radius: 999px 999px 6px 6px; }
+@media (max-width: 900px) {
+  .hall-hero, .hall-hero[class] { background:
+    radial-gradient(ellipse 34% 4% at 50% 86%, rgba(255,238,185,.95), rgba(255,180,95,.75) 45%, rgba(240,110,60,0) 85%),
+    linear-gradient(180deg, #fdefcd 0%, #f9dc9c 18%, #f4c172 34%, #ee9a52 50%, #e3713f 62%, #c94a3e 71%, #9c3346 79%, #7a3456 86%, #5a3561 92%, var(--nuit-photo) 100%); }
+}

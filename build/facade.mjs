@@ -8,26 +8,25 @@ const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '
 const W = 1672, H = 941;
 const ZONES = {
   // deuxième étage
-  grenier: [362, 150, 475, 295],
-  galerie: [640, 150, 752, 295],
-  atelier: [912, 140, 1037, 295],
+  grenier: [362, 128, 535, 284],
+  galerie: [676, 128, 826, 284],
+  atelier: [978, 128, 1134, 286],
   // premier étage
-  salon: [325, 378, 434, 535],
-  'speed-dating': [512, 335, 770, 545],
-  bibliotheque: [797, 378, 905, 532],
-  confidences: [1022, 372, 1145, 535],
+  salon: [250, 330, 420, 505],
+  'speed-dating': [514, 330, 688, 505],
+  bibliotheque: [775, 330, 948, 505],
+  confidences: [1012, 330, 1192, 505],
   // rez-de-chaussée
-  ecrin: [303, 632, 450, 795],
-  boutique: [530, 632, 640, 790],
-  hall: [772, 628, 921, 866],
-  dressing: [1043, 632, 1153, 790],
-  coiffeuse: [1237, 628, 1360, 790],
-  // la cour pavée, devant la Maison
-  patio: [270, 876, 1440, 938],
+  ecrin: [206, 566, 346, 752],
+  boutique: [392, 566, 540, 754],
+  hall: [638, 560, 792, 772],
+  dressing: [854, 566, 978, 754],
+  coiffeuse: [1012, 566, 1142, 754],
+  patio: [1236, 566, 1560, 830], // la pergola et la terrasse
 };
 // Lanternes et étoiles qui scintillent : [x, y, taille].
-const LANTERNS = [[713, 660, 70], [976, 660, 70], [648, 400, 60], [380, 662, 46]];
-const STARS = [[1460, 70], [1530, 150], [1620, 40], [120, 30], [250, 80], [1390, 30], [60, 120]];
+const LANTERNS = [[600, 600, 60], [828, 600, 60], [1280, 618, 50], [1434, 624, 50], [255, 870, 60], [1500, 900, 50]];
+const STARS = [[60, 30], [180, 18], [1300, 24], [1470, 70]];
 
 const pct = (v, total) => `${((v / total) * 100).toFixed(3)}%`;
 const box = ([l, t, r, b]) => `left:${pct(l, W)};top:${pct(t, H)};width:${pct(r - l, W)};height:${pct(b - t, H)}`;
@@ -37,7 +36,7 @@ function spot(r) {
   const z = ZONES[r.slug];
   if (!z) return '';
   const soon = r.status === 'soon';
-  const cls = ['f-spot', soon && 'is-soon', r.slug === 'hall' && 'is-door', r.slug === 'patio' && 'is-court', z[1] < 300 && 'tip-below'].filter(Boolean).join(' ');
+  const cls = ['f-spot', soon && 'is-soon', r.slug === 'hall' && 'is-door', r.slug === 'patio' && 'is-pergola', z[1] < 300 && 'tip-below'].filter(Boolean).join(' ');
   const tip = `<span class="f-tip"><strong>${esc(LABELS[r.slug] || r.name)}</strong><em>${soon ? 'Bientôt' : esc(r.welcome)}</em></span>`;
   return soon
     ? `<span class="${cls}" style="${box(z)}" tabindex="0" role="img" aria-label="${esc(r.name)} : bientôt" data-accent="${r.accent}">${tip}</span>`
@@ -48,7 +47,7 @@ export function facade(rooms) {
   const lights = LANTERNS.map(([x, y, s], i) => `<span class="f-flame" style="left:${pct(x - s / 2, W)};top:${pct(y - s / 2, H)};width:${pct(s, W)};height:${pct(s, H)};animation-delay:${i * 0.7}s" aria-hidden="true"></span>`).join('');
   const stars = STARS.map(([x, y], i) => `<span class="f-twinkle" style="left:${pct(x, W)};top:${pct(y, H)};animation-delay:${(i * 0.9) % 4}s" aria-hidden="true"></span>`).join('');
   return `<div class="facade" role="group" aria-label="La façade de la Maison Lamia Femme Berbère : chaque fenêtre est une pièce">
-  <img class="facade-img" src="/images/maison/facade-nuit-1200.webp" srcset="/images/maison/facade-nuit-800.webp 800w, /images/maison/facade-nuit-1200.webp 1200w, /images/maison/facade-nuit-1672.webp 1672w" sizes="(max-width: 1100px) 100vw, 1100px" width="1672" height="941" alt="La Maison Lamia Femme Berbère la nuit : façade blanchie à la chaux ornée de motifs kabyles, bijoux en vitrine au rez-de-chaussée, boudoir aux fauteuils rouges au premier étage, volets bleus, grande porte rouge surmontée du visage de Lamia">
+  <img class="facade-img" src="/images/maison/facade-nuit-1200.webp" srcset="/images/maison/facade-nuit-800.webp 800w, /images/maison/facade-nuit-1200.webp 1200w, /images/maison/facade-nuit-1672.webp 1672w" sizes="(max-width: 1100px) 100vw, 1100px" width="1672" height="941" alt="La Maison Lamia Femme Berbère au coucher du soleil : maison de pierre aux volets bleus et bougainvilliers, chaque fenêtre éclairée porte le nom de sa pièce, grande porte de bois entrouverte, pergola du Patio à droite, montagnes de Kabylie au loin">
   ${lights}${stars}
   ${rooms.map(spot).join('\n  ')}
 </div>`;

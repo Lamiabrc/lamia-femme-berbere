@@ -40,8 +40,13 @@ export const bibliotheque = {
 
 export const ecrin = {
   intro:
-    'Dans l’Écrin, chaque bijou porte la Kabylie : l’argent, l’émail bleu, vert et jaune, le corail. Des pièces à porter, à offrir, à transmettre.',
-  note: 'Pièces artisanales : les couleurs et les petits détails peuvent légèrement varier d’une pièce à l’autre.',
+    'Les bijoux de l’Écrin forment une collection exclusive, fabriquée à Ath Yenni par les artisans bijoutiers du village. Chaque modèle est une création de Lamia et de Hamani Hamid, son chef artisan : l’argent, l’émail bleu, vert et jaune, le corail.',
+  athYenni: {
+    title: 'Fabriqués à Ath Yenni',
+    text: 'Ath Yenni, en Kabylie, est le village des bijoutiers. C’est là que nos bijoux sont façonnés, à la main, par des artisans qui perpétuent un savoir-faire transmis de génération en génération. Notre collier émaillé reprend un modèle exclusif créé en 1974 par les artisans d’Ath Yenni.',
+    signature: 'Création exclusive Lamia Femme Berbère · Hamani Hamid, chef artisan',
+  },
+  note: 'Bijoux faits main : les couleurs et les petits détails peuvent légèrement varier d’un bijou à l’autre.',
 };
 
 export const grenier = {
@@ -99,7 +104,7 @@ export const patio = {
 // À RELIRE par Lamia : texte de présentation du patrimoine.
 export const galerie = {
   intro:
-    'La Galerie raconte ce que portent nos bijoux. En Kabylie, l’argent émaillé se travaille depuis des générations : l’émail bleu, vert et jaune, cloisonné de fils d’argent, et le corail rouge au cœur des pièces.',
+    'La Galerie raconte ce que portent nos bijoux. À Ath Yenni, en Kabylie, l’argent émaillé se travaille depuis des générations : l’émail bleu, vert et jaune, cloisonné de fils d’argent, et le corail rouge au cœur des pièces.',
   items: [
     { title: 'L’émail', text: 'Les couleurs sont posées dans de petites alvéoles d’argent, puis cuites. Chaque pièce garde la trace de la main qui l’a faite.' },
     { title: 'Le corail', text: 'Le cabochon rouge, souvent au centre, est la signature des parures kabyles.' },

@@ -228,7 +228,7 @@ page(
     <article class="now-card" data-accent="vert">
       <p class="now-room">L’Écrin</p>
       <h3>Collier kabyle émaillé</h3>
-      <p>Argent émaillé et corail, une pièce unique.</p>
+      <p>Modèle exclusif de 1974, fabriqué à Ath Yenni.</p>
       <a href="/ecrin/">Entrer dans l’Écrin</a>
     </article>
   </div>
@@ -320,6 +320,10 @@ page(
   <p class="prose-lead">${esc(P.ecrin.intro)}</p>
   ${productGrid(roomBySlug.ecrin.productCategories)}
   <p class="fine">${esc(P.ecrin.note)}</p>
+</section>
+<section class="room-body two-col">
+  <div><h2>${esc(P.ecrin.athYenni.title)}</h2><p>${esc(P.ecrin.athYenni.text)}</p></div>
+  <aside class="side-note"><p><strong>${esc(P.ecrin.athYenni.signature)}</strong></p></aside>
 </section>
 ${otherRooms('ecrin')}`,
   })
