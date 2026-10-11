@@ -62,7 +62,7 @@ export const speedDating = {
   intro:
     'Ici, on ne fait pas défiler des profils. On s’inscrit à une soirée pensée pour un public précis, on rencontre quelques personnes en tête-à-tête, et on repart avec, peut-être, l’envie de se revoir.',
   origin:
-    'Ces soirées sont nées de mes lives : pendant des années, j’ai présenté des personnes qui cherchaient sérieusement à se marier. Le Salon reprend cet esprit, avec un cadre fait pour le site.',
+    'Ces soirées sont nées de mes lives : pendant des années, j’ai présenté des personnes qui cherchaient sérieusement à se marier. Le Boudoir reprend cet esprit, avec un cadre fait pour le site.',
   criteria: [
     'une tranche d’âge',
     'un niveau d’études',

@@ -524,3 +524,49 @@ mark.todo { background: #fff3c4; color: var(--encre); padding: 0 4px; font-weigh
 }
 .hall-cue span { white-space: nowrap; }
 @media (max-width: 900px) { .hall-hero { padding-bottom: 200px; } .hall-cue { font-size: 18px; } }
+/* ================================================================ Transition douce : soleil couchant → nuit de la façade */
+:root { --nuit-photo: #0d3170; --nuit-profonde: #0a2456; }
+.hall-hero, .hall-hero[class] {
+  padding-bottom: clamp(220px, 22vw, 320px);
+  background:
+    radial-gradient(ellipse 16% 7% at 50% 80%, rgba(255,238,185,.95), rgba(255,180,95,.75) 45%, rgba(240,110,60,0) 85%),
+    radial-gradient(ellipse 75% 20% at 50% 80%, rgba(255,128,64,.42), rgba(190,40,60,.22) 55%, transparent 80%),
+    radial-gradient(ellipse 55% 40% at 72% 24%, rgba(255,244,214,.9), rgba(255,226,160,.3) 45%, transparent 70%),
+    linear-gradient(180deg,
+      #fdefcd 0%, #f9dc9c 20%, #f4c172 36%, #ee9a52 50%, #e3713f 60%, #c94a3e 68%,
+      #9c3346 75%, #6e2a52 81%, #47295f 86%, #2a2e6a 91%, #16306c 96%, var(--nuit-photo) 100%);
+}
+.hall-hero::before { top: 80%; height: 14%;
+  background: radial-gradient(ellipse 18% 100% at 50% 0%, rgba(255,214,140,.45), transparent 80%);
+  -webkit-mask-image: linear-gradient(180deg, #000, transparent); mask-image: linear-gradient(180deg, #000, transparent); }
+.hall-cue { top: calc(80% - 96px); }
+.plan-section, .plan-section[class] {
+  border: 0; padding-top: clamp(8px, 2vw, 24px);
+  background: linear-gradient(180deg, var(--nuit-photo) 0%, var(--nuit-profonde) 55%, #0b1d43 100%);
+}
+/* La photo se fond dans le ciel : bords adoucis, sans cadre */
+.facade { border-radius: 0; box-shadow: none; max-width: 1180px;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 9%, #000 92%, transparent 100%), linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
+  -webkit-mask-composite: source-in; mask-image: linear-gradient(180deg, transparent 0, #000 9%, #000 92%, transparent 100%), linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
+  mask-composite: intersect; }
+.f-tip { z-index: 5; }
+
+/* Les étages */
+.floors { max-width: 1180px; margin: 32px auto 0; display: grid; gap: 28px; }
+.floor h3 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; color: #fff3d6; font-size: 26px; margin: 0 0 4px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,214,140,.35); }
+.floor h3 span { font-family: var(--sans); font-size: 15px; font-weight: 500; color: #e9c98a; }
+.floor .room-index { margin-top: 0; }
+.plan-section .room-index span:not(.pip) { color: #c5cde0; }
+.plan-section .pip { box-shadow: 0 0 0 2px var(--nuit-profonde), 0 0 0 3px var(--accent); }
+@media (max-width: 900px) {
+  .hall-hero, .hall-hero[class] { padding-bottom: 230px;
+    background:
+      radial-gradient(ellipse 34% 4% at 50% 86%, rgba(255,238,185,.95), rgba(255,180,95,.75) 45%, rgba(240,110,60,0) 85%),
+      linear-gradient(180deg, #fdefcd 0%, #f9dc9c 18%, #f4c172 34%, #ee9a52 50%, #e3713f 62%, #c94a3e 71%, #9c3346 78%, #6e2a52 84%, #47295f 89%, #2a2e6a 94%, var(--nuit-photo) 100%); }
+  .hall-hero::before { top: 86%; height: 9%; }
+  .hall-cue { top: calc(86% - 96px); }
+  .facade { -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 8%, #000 92%, transparent 100%); mask-image: linear-gradient(180deg, transparent 0, #000 8%, #000 92%, transparent 100%); }
+}
+.floors, .floor, .floor .room-index { min-width: 0; }
+.floor .room-index { grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr)); }
+.room-index, .next-rooms ul { grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr)); }

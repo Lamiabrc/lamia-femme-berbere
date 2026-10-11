@@ -7,7 +7,7 @@ import { mkdir, rm, writeFile, cp, readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { rooms, roomBySlug } from '../content/rooms.mjs';
+import { rooms, roomBySlug, floors } from '../content/rooms.mjs';
 import * as P from '../content/pages.mjs';
 import { legalPages } from '../content/legal.mjs';
 import { facade } from './facade.mjs';
@@ -80,7 +80,7 @@ function header(room) {
     ${link('/ecrin/', 'L’Écrin', 'ecrin')}
     ${link('/grenier/', 'Le Grenier', 'grenier')}
     ${link('/bibliotheque/', 'La Bibliothèque', 'bibliotheque')}
-    ${link('/speed-dating/', 'Speed dating', 'speed-dating')}
+    ${link('/speed-dating/', 'Rencontres', 'speed-dating')}
   </nav>
   <div class="header-actions">
     <a class="plan-link" href="/#plan">La Maison</a>
@@ -201,13 +201,15 @@ page(
 <section class="plan-section" id="plan" aria-labelledby="plan-title">
   <div class="plan-intro">
     <h2 id="plan-title">La Maison, à la tombée du soir</h2>
-    <p>Chaque fenêtre éclairée est une pièce ouverte : pousse celle qui t’appelle. Derrière les volets clos, d’autres pièces se préparent.</p>
+    <p>Les vitrines au rez-de-chaussée, les rencontres et la lecture au premier, les trouvailles tout en haut. Pousse la fenêtre qui t’appelle.</p>
   </div>
   ${facade(rooms)}
-  <ul class="room-index">
-    ${openRooms.map((r) => `<li data-accent="${r.accent}"><a href="${r.path}"><span class="pip" aria-hidden="true"></span><strong>${esc(r.name)}</strong><span>${esc(r.welcome)}</span></a></li>`).join('')}
-    ${soonRooms.map((r) => `<li class="is-soon" data-accent="${r.accent}"><a href="${r.path}"><span class="pip" aria-hidden="true"></span><strong>${esc(r.name)}</strong><span>Bientôt</span></a></li>`).join('')}
-  </ul>
+  <div class="floors">
+    ${[...floors].reverse().map((f) => `<section class="floor" aria-labelledby="etage-${f.level}">
+      <h3 id="etage-${f.level}">${esc(f.name)}<span>${esc(f.theme)}</span></h3>
+      <ul class="room-index">${rooms.filter((r) => r.floor === f.level && r.slug !== 'hall').map((r) => `<li class="${r.status === 'soon' ? 'is-soon' : ''}" data-accent="${r.accent}"><a href="${r.path}"><span class="pip" aria-hidden="true"></span><strong>${esc(r.name)}</strong><span>${r.status === 'soon' ? 'Bientôt' : esc(r.welcome)}</span></a></li>`).join('')}</ul>
+    </section>`).join('')}
+  </div>
 </section>
 
 <section class="now-section is-dark" aria-labelledby="now-title">
@@ -220,7 +222,7 @@ page(
       <a href="https://www.tiktok.com/@lamiaberbere" rel="noopener" target="_blank">Rejoindre le live sur TikTok</a>
     </article>
     <article class="now-card" data-accent="rouge" data-next-event>
-      <p class="now-room">Le Salon du Speed Dating</p>
+      <p class="now-room">Le Boudoir des Rencontres</p>
       <h3>Prochaine soirée</h3>
       <p>Les prochaines soirées arrivent.</p>
       <a href="/speed-dating/">Voir les soirées</a>
@@ -374,7 +376,7 @@ page(
 page(
   '/speed-dating/',
   layout({
-    title: 'Le Salon du Speed Dating · Rencontres sérieuses',
+    title: 'Le Boudoir des Rencontres · Speed dating sérieux',
     description: 'Des soirées de rencontre en ligne pour un public précis, en tête-à-tête, dans un cadre sûr veillé par Lamia.',
     path: '/speed-dating/',
     room: roomBySlug['speed-dating'],
@@ -479,7 +481,7 @@ page(
   <p class="prose-lead">${esc(P.patio.intro)}</p>
   <div class="now-grid">
     <article class="now-card" data-accent="rouge"><p class="now-room">Chaque soir</p><h3>Live Mariage Kabyle</h3><p>De 21 h à 23 h, sur TikTok.</p><a href="https://www.tiktok.com/@lamiaberbere" rel="noopener" target="_blank">Rejoindre le live</a></article>
-    <article class="now-card" data-accent="rouge" data-next-event><p class="now-room">Le Salon du Speed Dating</p><h3>Prochaine soirée</h3><p>Les prochaines soirées arrivent.</p><a href="/speed-dating/">Voir les soirées</a></article>
+    <article class="now-card" data-accent="rouge" data-next-event><p class="now-room">Le Boudoir des Rencontres</p><h3>Prochaine soirée</h3><p>Les prochaines soirées arrivent.</p><a href="/speed-dating/">Voir les soirées</a></article>
     <article class="now-card" data-accent="vert"><p class="now-room">Bientôt</p><h3>Vos témoignages</h3><p>Le mur des célébrations et des témoignages ouvrira avec les premiers récits de la communauté.</p></article>
   </div>
 </section>
@@ -587,13 +589,13 @@ page(
 page(
   '/speed-dating/merci/',
   layout({
-    title: 'Merci · Le Salon du Speed Dating',
+    title: 'Merci · Le Boudoir des Rencontres',
     description: 'Confirmation de ta place.',
     path: '/speed-dating/merci/',
     room: roomBySlug['speed-dating'],
     noindex: true,
     scripts: ['/assets/membre.js'],
-    body: `<section class="room-head" data-merci><p class="room-name"><span class="pip" aria-hidden="true"></span>Le Salon du Speed Dating</p><h1>Vérification de ton paiement…</h1><p class="lead" data-merci-text>Un instant, je confirme ta place.</p><p><a class="btn btn-line" href="/speed-dating/">Revenir au Salon</a></p></section>`,
+    body: `<section class="room-head" data-merci><p class="room-name"><span class="pip" aria-hidden="true"></span>Le Boudoir des Rencontres</p><h1>Vérification de ton paiement…</h1><p class="lead" data-merci-text>Un instant, je confirme ta place.</p><p><a class="btn btn-line" href="/speed-dating/">Revenir au Salon</a></p></section>`,
   })
 );
 
@@ -601,7 +603,7 @@ page(
 page(
   '/speed-dating/souhaits/',
   layout({
-    title: 'Mes souhaits après la soirée · Le Salon du Speed Dating',
+    title: 'Mes souhaits après la soirée · Le Boudoir des Rencontres',
     description: 'Indique en privé les personnes que tu souhaites revoir.',
     path: '/speed-dating/souhaits/',
     room: roomBySlug['speed-dating'],

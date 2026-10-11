@@ -82,14 +82,13 @@ insert into public.rooms (slug, name, welcome, status, accent, sort_order) value
   ('ecrin', 'L’Écrin', 'Les bijoux qui racontent d’où l’on vient.', 'open', 'vert', 30),
   ('grenier', 'Le Grenier des Trouvailles', 'Ce que j’ai déniché pour toi.', 'open', 'safran', 40),
   ('boutique', 'La Boutique', 'Tout ce que la Maison propose.', 'open', 'rouge', 50),
-  ('speed-dating', 'Le Salon du Speed Dating', 'Des rencontres vraies, dans un cadre sûr.', 'open', 'rouge', 60),
+  ('speed-dating', 'Le Boudoir des Rencontres', 'Des rencontres vraies, dans un cadre sûr.', 'open', 'rouge', 60),
   ('confidences', 'Le Cabinet des Confidences', 'Ici, tu peux tout me dire.', 'open', 'cobalt', 70),
   ('patio', 'Le Patio', 'La Maison se retrouve ici.', 'open', 'vert', 80),
   ('galerie', 'La Galerie', 'Regarder, comprendre, transmettre.', 'open', 'safran', 90),
   ('atelier', 'L’Atelier', 'Là où naissent les pièces.', 'soon', 'vert', 100),
-  ('salle-de-bain', 'La Salle de bain de Lamia', 'Les rituels de la Maison.', 'soon', 'cobalt', 110),
   ('coiffeuse', 'La Coiffeuse de Lamia', 'Le rouge, les bijoux, les gestes qui nous ressemblent.', 'soon', 'rouge', 120),
-  ('dressing', 'Le Dressing de Lamia', 'Ce qu’on porte, ce qu’on transmet.', 'soon', 'safran', 130)
+  ('dressing', 'Le Dressing de Lamia', 'Ce qu’on porte, ce qu’on prend soin de soi.', 'soon', 'safran', 130)
 on conflict (slug) do nothing;
 
 -- ------------------------------------------------------------------ médias
@@ -158,7 +157,7 @@ from (values
   ('bijou', 'Bijou', 'ecrin', false),
   ('livre', 'Livre', 'bibliotheque', false),
   ('trouvaille', 'Trouvaille', 'grenier', false),
-  ('cosmetique', 'Cosmétique', 'salle-de-bain', true),
+  ('cosmetique', 'Cosmétique', 'dressing', true),
   ('beaute', 'Beauté', 'coiffeuse', true),
   ('textile', 'Textile et accessoire', 'dressing', false)
 ) as v(slug, name, room, reg)
