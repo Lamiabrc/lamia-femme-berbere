@@ -347,3 +347,55 @@ mark.todo { background: #fff3c4; color: var(--encre); padding: 0 4px; font-weigh
 .legal h2 { font-size: 28px; }
 .legal li { margin-bottom: 6px; }
 .footer-legal a { text-decoration: underline; }
+
+/* ================================================================ La façade, à la tombée du soir */
+.house-facade { width: 100%; max-width: 1040px; display: block; margin: 0 auto; filter: drop-shadow(0 30px 60px rgba(0,0,0,.45)); }
+.plan-section { background: radial-gradient(ellipse 60% 45% at 50% 55%, rgba(255,200,120,.10), transparent 70%), linear-gradient(180deg, #17172d 0%, #262038 55%, #34283f 100%); border-block: 0; }
+.plan-section .room-index a { border-color: rgba(255,255,255,.12); }
+.plan-section .room-index strong { color: #fbfaf7; }
+.plan-section .room-index span:not(.pip) { color: #c9c1cf; }
+.plan-section .room-index .is-soon strong { color: #9a91a3; }
+.plan-section .room-index a:hover strong { color: #ffd48a; }
+.plan-section .pip { box-shadow: 0 0 0 2px #262038, 0 0 0 3px var(--accent); }
+.plan-section .plan-intro h2 { color: var(--blanc); }
+.plan-section .plan-intro p { color: #d9d3e0; }
+.f-star { fill: #fff6dc; opacity: .85; }
+.f-moon { fill: #fbeccb; }
+.f-wall { fill: #fbfaf7; stroke: #1c1517; stroke-width: 2; }
+.f-roof { fill: #8f3b28; }
+.f-tile { fill: none; stroke: #6f2c1d; stroke-width: 2; }
+.f-ground { fill: #1a1528; opacity: .55; }
+.f-frame { fill: #efe9df; stroke: #1c1517; stroke-width: 2.5; }
+.f-light { fill: url(#f-glow); }
+.f-court { fill: url(#f-court); }
+.f-glass { fill: none; stroke: #1c1517; stroke-width: 2.5; }
+.f-mullion { fill: none; stroke: #fbfaf7; stroke-width: 4; opacity: .85; }
+.f-leaf { fill: #3c6b3a; }
+.f-chain, .f-lantern line { stroke: #1c1517; stroke-width: 2; }
+.f-lantern-small, .f-lantern path { fill: #f7c66b; stroke: #1c1517; stroke-width: 2; }
+.f-pip { fill: var(--accent); stroke: #fbfaf7; stroke-width: 2; }
+.f-label { font-family: var(--serif); font-style: italic; font-weight: 600; font-size: 21px; fill: #1c1517; }
+.f-label.is-soon { fill: #8a8083; }
+.f-label.is-main { font-size: 24px; fill: var(--rouge); font-style: normal; letter-spacing: .02em; }
+.f-welcome { font-family: var(--serif); font-style: italic; font-size: 15px; fill: #6c6265; opacity: 0; transition: opacity .25s; }
+.f-room { cursor: pointer; outline: none; }
+.f-room .f-light, .f-room .f-court { transition: filter .3s; }
+.f-room:hover .f-light, .f-room:focus-visible .f-light, .f-room:hover .f-court, .f-room:focus-visible .f-court { filter: brightness(1.12) drop-shadow(0 0 14px rgba(255,200,110,.9)); }
+.f-room:hover .f-welcome, .f-room:focus-visible .f-welcome { opacity: 1; }
+.f-room:focus-visible .f-frame { stroke: var(--rouge); stroke-width: 4; }
+.f-room.is-soon { cursor: default; }
+.f-room.is-soon .f-light { filter: brightness(.9); }
+.f-room.is-soon .f-welcome { opacity: .8; }
+.f-shutter { fill: #6d7b8c; stroke: #1c1517; stroke-width: 2; }
+.f-slat { stroke: #55606e; stroke-width: 2; }
+.f-door-frame { fill: #efe9df; stroke: #1c1517; stroke-width: 2.5; }
+.f-door { fill: var(--rouge); stroke: #1c1517; stroke-width: 2.5; transition: filter .3s; }
+.f-door-split { stroke: #6e0d1d; stroke-width: 2.5; }
+.f-knocker { fill: none; stroke: #d9a43a; stroke-width: 3; }
+.f-stud { fill: #d9a43a; }
+.f-door-main:hover .f-door, .f-door-main:focus-visible .f-door { filter: brightness(1.12); }
+@media (prefers-reduced-motion: reduce) { .f-welcome, .f-room .f-light { transition: none; } }
+@media (max-width: 720px) {
+  .house-facade { display: block; }
+  .f-label { font-size: 26px; }
+}

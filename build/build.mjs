@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { rooms, roomBySlug } from '../content/rooms.mjs';
 import * as P from '../content/pages.mjs';
 import { legalPages } from '../content/legal.mjs';
+import { facade } from './facade.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = join(ROOT, 'dist');
@@ -75,14 +76,14 @@ function header(room) {
     <span><strong>Lamia</strong> Femme Berbère</span>
   </a>
   <nav class="site-nav" aria-label="Navigation principale">
-    ${link('/#plan', 'Le plan de la Maison', 'plan')}
+    ${link('/#plan', 'La Maison', 'plan')}
     ${link('/ecrin/', 'L’Écrin', 'ecrin')}
     ${link('/grenier/', 'Le Grenier', 'grenier')}
     ${link('/bibliotheque/', 'La Bibliothèque', 'bibliotheque')}
     ${link('/speed-dating/', 'Speed dating', 'speed-dating')}
   </nav>
   <div class="header-actions">
-    <a class="plan-link" href="/#plan">Le plan</a>
+    <a class="plan-link" href="/#plan">La Maison</a>
     <a class="alert-link" href="/confidences/">Alerter Lamia</a>
     <button class="cart-button" type="button" data-cart-open aria-label="Ouvrir le panier">Panier <span data-cart-count>0</span></button>
   </div>
@@ -165,48 +166,6 @@ function otherRooms(current) {
 </section>`;
 }
 
-// Le plan de la Maison : l'élément signature du Hall.
-function housePlan() {
-  const cells = rooms
-    .map((r) => {
-      const { x, y, w, h, door, open } = r.plan;
-      const soon = r.status === 'soon';
-      const cx = x + w / 2;
-      const words = r.name.replace(/^(Le |La |L’)/, '').split(' ');
-      // Coupe le nom en deux lignes au plus.
-      const half = Math.ceil(words.length / 2);
-      const lines = words.length > 2 ? [words.slice(0, half).join(' '), words.slice(half).join(' ')] : [words.join(' ')];
-      // Taille du nom adaptée à la largeur de la pièce (serif ≈ 0.5 em par caractère).
-      const longest = Math.max(...lines.map((l) => l.length));
-      const fs = Math.round(Math.min(24, (w - 20) / (longest * 0.5), (h - 30) / (lines.length * 1.25)));
-      const lh = Math.round(fs * 1.15);
-      const ty = y + h / 2 - ((lines.length - 1) * lh) / 2 + fs * 0.33;
-      const label = lines
-        .map((l, i) => `<tspan x="${cx}" y="${Math.round(ty + i * lh)}">${esc(l)}</tspan>`)
-        .join('');
-      const shape = `<rect class="room-shape${open ? ' is-court' : ''}" x="${x}" y="${y}" width="${w}" height="${h}"/>`;
-      const doorMark =
-        door === 'bottom'
-          ? `<path class="door-gap" d="M${cx - 30} ${y + h}H${cx + 30}"/><path class="door-swing" d="M${cx - 30} ${y + h}A60 60 0 0 1 ${cx + 30} ${y + h - 52}"/><text class="entree" x="${cx}" y="${y + h + 2}" dy="-8">Entrée</text>`
-          : '';
-      const pip = `<path class="room-pip" d="M${x + 18} ${y + 10}l7 7l-7 7l-7 -7z"/>`;
-      const inner = `${shape}${pip}${soon ? `<rect class="room-hatch" x="${x}" y="${y}" width="${w}" height="${h}"/>` : ''}<text class="room-label" text-anchor="middle" font-size="${fs}">${label}</text>${soon && h >= 150 ? `<text class="room-soon" x="${cx}" y="${y + h - 18}" text-anchor="middle">bientôt</text>` : ''}${doorMark}`;
-      return soon
-        ? `<g class="plan-room is-soon" data-accent="${r.accent}"><title>${esc(r.name)} : bientôt</title>${inner}</g>`
-        : `<a class="plan-room" href="${r.path}" data-accent="${r.accent}" aria-label="${esc(r.name)} : ${esc(r.welcome)}">${inner}</a>`;
-    })
-    .join('');
-  return `<svg class="house-plan" viewBox="0 0 1000 660" role="group" aria-label="Plan de la Maison Lamia Femme Berbère">
-  <defs>
-    <pattern id="hatch" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="12"/></pattern>
-    <pattern id="tiles" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M15 3L27 15L15 27L3 15Z"/></pattern>
-    <filter id="house-shadow" x="-5%" y="-5%" width="110%" height="115%"><feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#1c1517" flood-opacity=".16"/></filter>
-  </defs>
-  <rect class="house-wall" x="20" y="20" width="960" height="600" filter="url(#house-shadow)"/>
-  ${cells}
-</svg>`;
-}
-
 // ---------------------------------------------------------------- pages
 
 const pages = [];
@@ -241,10 +200,10 @@ page(
 
 <section class="plan-section" id="plan" aria-labelledby="plan-title">
   <div class="plan-intro">
-    <h2 id="plan-title">Le plan de la Maison</h2>
-    <p>Chaque pièce a son rôle. Les portes hachurées s’ouvriront bientôt.</p>
+    <h2 id="plan-title">La Maison, à la tombée du soir</h2>
+    <p>Chaque fenêtre éclairée est une pièce ouverte : pousse celle qui t’appelle. Derrière les volets clos, d’autres pièces se préparent.</p>
   </div>
-  ${housePlan()}
+  ${facade(rooms)}
   <ul class="room-index">
     ${openRooms.map((r) => `<li data-accent="${r.accent}"><a href="${r.path}"><span class="pip" aria-hidden="true"></span><strong>${esc(r.name)}</strong><span>${esc(r.welcome)}</span></a></li>`).join('')}
     ${soonRooms.map((r) => `<li class="is-soon" data-accent="${r.accent}"><a href="${r.path}"><span class="pip" aria-hidden="true"></span><strong>${esc(r.name)}</strong><span>Bientôt</span></a></li>`).join('')}
@@ -684,7 +643,7 @@ page(
     description: 'Cette page n’existe pas.',
     path: '/404.html',
     noindex: true,
-    body: `<section class="room-head"><p class="room-name"><span class="pip" aria-hidden="true"></span>Porte introuvable</p><h1>Cette porte ne mène nulle part.</h1><p class="lead">La page a peut-être changé de pièce. Reviens au Hall pour retrouver ton chemin.</p><p><a class="btn btn-ink" href="/#plan">Revenir au plan de la Maison</a></p></section>`,
+    body: `<section class="room-head"><p class="room-name"><span class="pip" aria-hidden="true"></span>Porte introuvable</p><h1>Cette porte ne mène nulle part.</h1><p class="lead">La page a peut-être changé de pièce. Reviens au Hall pour retrouver ton chemin.</p><p><a class="btn btn-ink" href="/#plan">Revenir à la Maison</a></p></section>`,
   })
 );
 
