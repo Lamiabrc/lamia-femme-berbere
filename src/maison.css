@@ -399,3 +399,16 @@ mark.todo { background: #fff3c4; color: var(--encre); padding: 0 4px; font-weigh
   .house-facade { display: block; }
   .f-label { font-size: 26px; }
 }
+
+/* Bordures tissées (tapis kabyle) et thichrad */
+.f-weave { fill: none; stroke: url(#f-tapis); stroke-width: 11; }
+.f-weave.is-main { stroke-width: 18; }
+.f-tichrad { color: #1c1517; opacity: .62; }
+.f-door-main .f-tichrad { color: var(--rouge); opacity: .9; }
+
+/* Motifs de tapis kabyle dans les pièces (noir, blanc, ocre) */
+.frise-fine { height: 30px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='44' viewBox='0 0 64 44'%3E%3Crect width='64' height='44' fill='%23fbfaf7'/%3E%3Crect width='64' height='6' fill='%231c1517'/%3E%3Crect y='38' width='64' height='6' fill='%231c1517'/%3E%3Cpath d='M0 6L16 22L0 38Z M64 6L48 22L64 38Z' fill='%23c8902e'/%3E%3Cpath d='M32 9L45 22L32 35L19 22Z' fill='%231c1517'/%3E%3Cpath d='M32 15L39 22L32 29L25 22Z' fill='%23c8902e'/%3E%3Cpath d='M32 19.5L34.5 22L32 24.5L29.5 22Z' fill='%23fbfaf7'/%3E%3Ccircle cx='16' cy='22' r='2' fill='%231c1517'/%3E%3Ccircle cx='48' cy='22' r='2' fill='%231c1517'/%3E%3C/svg%3E") repeat-x center / auto 30px; opacity: 1; }
+.head-arch.has-image { padding: 12px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' fill='%23c8902e'/%3E%3Cpath d='M12 3L21 12L12 21L3 12Z' fill='%231c1517'/%3E%3Cpath d='M12 8L16 12L12 16L8 12Z' fill='%23fbfaf7'/%3E%3Ccircle cx='12' cy='12' r='1.6' fill='%23c8902e'/%3E%3Cpath d='M0 0L3 3L0 6Z M24 0L21 3L24 6Z M0 18L3 21L0 24Z M24 18L21 21L24 24Z' fill='%23fbfaf7'/%3E%3C/svg%3E") repeat center / 32px 32px; border: 1.5px solid var(--encre); }
+.head-arch.has-image img { border-radius: 999px 999px 0 0; border: 1.5px solid var(--encre); background: var(--blanc); }
+.side-note { position: relative; box-shadow: none; padding-left: 40px; }
+.side-note::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 16px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' fill='%23c8902e'/%3E%3Cpath d='M12 3L21 12L12 21L3 12Z' fill='%231c1517'/%3E%3Cpath d='M12 8L16 12L12 16L8 12Z' fill='%23fbfaf7'/%3E%3Ccircle cx='12' cy='12' r='1.6' fill='%23c8902e'/%3E%3Cpath d='M0 0L3 3L0 6Z M24 0L21 3L24 6Z M0 18L3 21L0 24Z M24 18L21 21L24 24Z' fill='%23fbfaf7'/%3E%3C/svg%3E") repeat-y center top / 16px 16px; }
