@@ -485,3 +485,42 @@ mark.todo { background: #fff3c4; color: var(--encre); padding: 0 4px; font-weigh
 .hall-medal { border-color: #fff6e2; }
 .hall-arch img { mix-blend-mode: multiply; }
 .head-arch.has-image img.is-drawing { mix-blend-mode: multiply; }
+/* Coucher de soleil sur la mer à Azeffoune : or, orange, rouge, puis la nuit */
+.hall-hero {
+  background:
+    radial-gradient(ellipse 22% 16% at 50% 86%, rgba(255,236,170,1), rgba(255,178,90,.85) 40%, rgba(232,80,50,.0) 75%),
+    radial-gradient(ellipse 70% 30% at 50% 86%, rgba(255,120,60,.55), rgba(190,40,50,.35) 50%, transparent 75%),
+    radial-gradient(ellipse 55% 45% at 72% 26%, rgba(255,244,214,.9), rgba(255,226,160,.3) 45%, transparent 70%),
+    linear-gradient(180deg, #fdefcd 0%, #f9dc9c 26%, #f4c172 46%, #ee9a52 62%, #e0623a 74%, #b8303a 83%, #6c2140 90.5%, #2e1f3c 96%, #1d1b33 100%);
+}
+/* L'horizon de la mer et le scintillement du soleil sur l'eau */
+.hall-hero::before { display: block; content: ''; position: absolute; left: 0; right: 0; top: 88%; height: 9%; pointer-events: none; opacity: 1; animation: scintille 5s ease-in-out infinite alternate;
+  background:
+    linear-gradient(180deg, rgba(255,214,150,.55) 0 1px, transparent 1px),
+    repeating-linear-gradient(180deg, transparent 0 7px, rgba(255,200,120,.22) 7px 8px),
+    radial-gradient(ellipse 14% 100% at 50% 0%, rgba(255,214,140,.65), transparent 80%);
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 100%); mask-image: linear-gradient(180deg, #000 0%, transparent 100%);
+  background-size: auto, auto, auto; transform: none; }
+.hall-cue { bottom: 4.5%; color: #fff1cf; text-shadow: 0 0 14px rgba(120,20,30,.8); }
+@keyframes scintille { from { opacity: .7; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .hall-hero::before { animation: none; } }
+/* Le soleil se pose sur l'horizon, l'invitation passe au-dessus de la mer */
+.hall-hero {
+  background:
+    radial-gradient(ellipse 13% 9% at 50% 88%, rgba(255,240,190,1), rgba(255,190,100,.9) 45%, rgba(240,110,60,0) 80%),
+    radial-gradient(ellipse 60% 22% at 50% 88%, rgba(255,130,60,.55), rgba(190,40,50,.3) 55%, transparent 78%),
+    radial-gradient(ellipse 55% 45% at 72% 26%, rgba(255,244,214,.9), rgba(255,226,160,.3) 45%, transparent 70%),
+    linear-gradient(180deg, #fdefcd 0%, #f9dc9c 26%, #f4c172 46%, #ee9a52 62%, #e0623a 74%, #b8303a 83%, #6c2140 90.5%, #2e1f3c 96%, #1d1b33 100%);
+}
+.hall-cue { bottom: auto; top: calc(88% - 92px); }
+.hall-cue span { padding: 4px 14px; border-radius: 99px; background: rgba(60,15,30,.35); backdrop-filter: blur(2px); }
+@media (max-width: 900px) {
+  .hall-hero { padding-bottom: 170px; background:
+    radial-gradient(ellipse 30% 5% at 50% 91%, rgba(255,240,190,1), rgba(255,190,100,.9) 45%, rgba(240,110,60,0) 80%),
+    radial-gradient(ellipse 90% 12% at 50% 91%, rgba(255,130,60,.55), rgba(190,40,50,.3) 55%, transparent 78%),
+    linear-gradient(180deg, #fdefcd 0%, #f9dc9c 22%, #f4c172 44%, #ee9a52 62%, #e0623a 76%, #b8303a 85%, #6c2140 92%, #2e1f3c 97%, #1d1b33 100%); }
+  .hall-hero::before { top: 91%; height: 7%; }
+  .hall-cue { top: calc(91% - 92px); }
+}
+.hall-cue span { white-space: nowrap; }
+@media (max-width: 900px) { .hall-hero { padding-bottom: 200px; } .hall-cue { font-size: 18px; } }
