@@ -34,8 +34,10 @@ Données stockées par Supabase, centre de données de Paris (Union européenne)
 <p>Les prix sont indiqués en euros, ${todo('toutes taxes comprises, ou « TVA non applicable, art. 293 B du CGI »')}. Les frais de livraison sont indiqués avant la validation de la commande. Le prix des livres respecte la loi sur le prix unique du livre.</p>
 <h2>3. Commande et paiement</h2>
 <p>Le paiement se fait par carte bancaire via Stripe, prestataire de paiement sécurisé. La Maison n'a jamais accès aux données de carte. La commande est ferme après confirmation du paiement.</p>
-<h2>4. Livraison des bijoux, objets et livres papier</h2>
-<p>Expédition sous ${todo('délai, par exemple 3 jours ouvrés')} par ${todo('transporteur')}, vers ${todo('pays desservis')}. Frais : ${todo('tarifs de livraison')}.</p>
+<h2>4. Précommandes</h2>
+<p>Une précommande réserve un article sans paiement immédiat. La Maison confirme la disponibilité par email et transmet le moyen de paiement. La vente est conclue à réception du paiement ; avant cela, la cliente peut annuler sa précommande par simple email, sans frais. Une pièce unique est réservée à la première précommande ; les suivantes sont inscrites en liste d'attente. Le livre broché en précommande est expédié dès réception des exemplaires imprimés.</p>
+<h2>4 bis. Livraison des bijoux, objets et livres papier</h2>
+<p>Envoi suivi Colissimo en France métropolitaine : livre broché 7,90 € (2 ou 3 exemplaires : 9,90 €), bijou 10,90 € (envoi contre signature, assuré). Remise en main propre gratuite à Rennes, sur rendez-vous. Expédition sous 3 jours ouvrés après paiement. Pour une livraison hors de France métropolitaine, écrire à lamia.brechet@outlook.fr.</p>
 <h2>5. Livre numérique</h2>
 <p>Le fichier est mis à disposition dans l'espace membre dès la confirmation du paiement. En demandant ce téléchargement immédiat, la cliente donne son accord exprès et renonce à son droit de rétractation, conformément à l'article L221-28 du Code de la consommation.</p>
 <h2>6. Soirées</h2>

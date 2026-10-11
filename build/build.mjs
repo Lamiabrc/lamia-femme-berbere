@@ -60,7 +60,6 @@ ${header(room)}
 ${body}
 </main>
 ${footer()}
-${cartDrawer()}
 <script type="module" src="/assets/maison.js?v=${VERSION}"></script>
 ${scripts.map((s) => `<script type="module" src="${s}?v=${VERSION}"></script>`).join('\n')}
 </body>
@@ -85,7 +84,6 @@ function header(room) {
   <div class="header-actions">
     <a class="plan-link" href="/#plan">La Maison</a>
     <a class="alert-link" href="/confidences/">Alerter Lamia</a>
-    <button class="cart-button" type="button" data-cart-open aria-label="Ouvrir le panier">Panier <span data-cart-count>0</span></button>
   </div>
 </header>`;
 }
@@ -660,6 +658,7 @@ for (const p of pages) {
 await cp(join(ROOT, 'public'), DIST, { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 for (const f of ['maison.css', 'maison.js', 'membre.js']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
+await cp(join(ROOT, 'content', 'shipping.mjs'), join(DIST, 'assets', 'shipping.mjs'));
 
 const indexable = pages.filter((p) => !p.path.endsWith('.html') && !['/produit/', '/speed-dating/merci/', '/speed-dating/souhaits/', '/cgv/', '/mentions-legales/', '/confidentialite/'].includes(p.path));
 await writeFile(

@@ -1,6 +1,8 @@
 // Données vivantes de la Maison : catalogue, fiche produit, panier, prochaine soirée.
 // Le navigateur n'utilise que la clé publique Supabase ; aucune donnée privée n'est lue ici.
 
+import { SHIPPING_METHODS, shippingFor, MAX_QTY } from '/assets/shipping.mjs';
+
 export const SUPABASE_URL = 'https://tybwvxinigahhntfeeur.supabase.co';
 export const SUPABASE_KEY = 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc';
 
@@ -154,8 +156,7 @@ async function renderProductPage() {
       <p class="product-price">${p.compare_at_price_cents ? `<del>${money(p.compare_at_price_cents, p.currency)}</del>` : ''}${money(p.price_cents, p.currency)}</p>
       ${p.description ? `<p>${esc(p.description)}</p>` : ''}
       ${specs ? `<div class="specs">${specs}</div>` : ''}
-      <button class="btn btn-ink" type="button" data-add="${esc(p.id)}" ${sold ? 'disabled' : ''}>${sold ? 'Déjà partie' : 'Ajouter au panier'}</button>
-      ${p.is_unique && !sold ? '<p class="fine">Pièce unique : un seul exemplaire.</p>' : ''}
+      ${sold ? '<button class="btn btn-ink" type="button" disabled>Déjà partie</button>' : preorderForm(p)}
     </div>`;
   $$('[data-thumb]', box).forEach((b) =>
     b.addEventListener('click', () => {
@@ -166,7 +167,79 @@ async function renderProductPage() {
       $$('[data-thumb]', box).forEach((t) => t.setAttribute('aria-current', String(t === b)));
     })
   );
-  $('[data-add]', box)?.addEventListener('click', () => addToCart(p.id));
+  wirePreorder(p, box);
+}
+
+// ---------------------------------------------------------------- précommande
+
+function preorderForm(p) {
+  const digital = p.product_type === 'digital';
+  const max = MAX_QTY(p);
+  return `<form class="preorder" data-preorder novalidate>
+    <h2>Précommander</h2>
+    <p class="fine">${p.is_unique ? 'Pièce unique : la première précommande la réserve.' : 'Réserve ton exemplaire dès maintenant.'} Rien n’est payé ici : Lamia te confirme ta précommande par email et t’envoie le moyen de paiement.</p>
+    ${max > 1 ? `<label>Quantité<select name="qty">${Array.from({ length: max }, (_, i) => `<option>${i + 1}</option>`).join('')}</select></label>` : '<input type="hidden" name="qty" value="1">'}
+    ${digital ? '' : `<fieldset><legend>Livraison</legend>
+      <label class="check"><input type="radio" name="method" value="colissimo" checked><span>${SHIPPING_METHODS.colissimo.label} <small data-ship-price></small><br><small>${SHIPPING_METHODS.colissimo.delay}</small></span></label>
+      <label class="check"><input type="radio" name="method" value="retrait"><span>${SHIPPING_METHODS.retrait.label} <small>(gratuit)</small><br><small>${SHIPPING_METHODS.retrait.delay}</small></span></label>
+    </fieldset>`}
+    <label>Prénom et nom<input name="name" autocomplete="name" required maxlength="120"></label>
+    <label>Email<input name="email" type="email" autocomplete="email" required></label>
+    <label>Téléphone (facultatif)<input name="phone" type="tel" autocomplete="tel" maxlength="30"></label>
+    ${digital ? '' : `<div data-address>
+      <label>Adresse<input name="line1" autocomplete="address-line1" maxlength="160"></label>
+      <label>Complément (facultatif)<input name="line2" autocomplete="address-line2" maxlength="160"></label>
+      <div class="two"><label>Code postal<input name="postal_code" inputmode="numeric" autocomplete="postal-code" maxlength="5"></label><label>Ville<input name="city" autocomplete="address-level2" maxlength="80"></label></div>
+    </div>`}
+    <label>Un mot pour Lamia (facultatif)<textarea name="message" rows="2" maxlength="600"></textarea></label>
+    <input name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <div class="preorder-total"><span>Total à régler à la confirmation</span><strong data-total></strong></div>
+    <label class="check"><input type="checkbox" name="cgv"><span>J’accepte les <a href="/cgv/" target="_blank" rel="noopener">conditions de vente</a> (précommande sans paiement immédiat).</span></label>
+    <button class="btn btn-ink" type="submit">Envoyer ma précommande</button>
+    <p class="form-status" role="status" data-preorder-status></p>
+  </form>`;
+}
+
+function wirePreorder(p, box) {
+  const form = $('[data-preorder]', box);
+  if (!form) return;
+  const update = () => {
+    const qty = Number(form.elements.qty.value) || 1;
+    const method = form.elements.method ? form.querySelector('[name=method]:checked').value : 'email';
+    const ship = shippingFor(p, qty, method);
+    const col = shippingFor(p, qty, 'colissimo');
+    const sp = $('[data-ship-price]', form);
+    if (sp) sp.textContent = `(${money(col.cents)})`;
+    const addr = $('[data-address]', form);
+    if (addr) addr.hidden = ship.method !== 'colissimo';
+    $('[data-total]', form).textContent = `${money(p.price_cents * qty + ship.cents, p.currency)}${ship.cents ? ` dont ${money(ship.cents)} d’envoi` : ''}`;
+  };
+  form.addEventListener('change', update);
+  update();
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const st = $('[data-preorder-status]', form);
+    const f = form.elements;
+    const say = (m, err) => { st.textContent = m; st.classList.toggle('is-error', !!err); };
+    if (!f.cgv.checked) return say('Coche la case des conditions de vente pour continuer.', true);
+    const btn = form.querySelector('[type=submit]');
+    btn.disabled = true; btn.textContent = 'Envoi…';
+    const body = {
+      slug: p.slug, qty: f.qty.value, name: f.name.value, email: f.email.value, phone: f.phone.value,
+      method: f.method ? form.querySelector('[name=method]:checked').value : 'email',
+      address: f.line1 ? { line1: f.line1.value, line2: f.line2.value, postal_code: f.postal_code.value, city: f.city.value } : null,
+      message: f.message.value, website: f.website.value, cgv_accepted: true,
+    };
+    let r = {}, res;
+    try { res = await fetch('/api/preorder', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); r = await res.json().catch(() => ({})); } catch { /* réseau */ }
+    btn.disabled = false; btn.textContent = 'Envoyer ma précommande';
+    if (res?.ok && r.ok) {
+      form.innerHTML = `<h2>Merci, ta précommande est enregistrée.</h2><p>Numéro de précommande : <strong>${esc(r.order_number)}</strong></p><p>${r.waitlist ? 'Cette pièce unique est déjà réservée : tu es inscrite en liste d’attente. Lamia te prévient si elle se libère.' : `Lamia te confirme ta précommande par email et t’envoie le moyen de paiement. Total : ${money(r.total_cents)}.`}</p>`;
+      return;
+    }
+    const msg = { invalid_contact: 'Vérifie ton nom et ton adresse email.', invalid_address: 'Vérifie ton adresse : rue, code postal à 5 chiffres et ville.', product_unavailable: 'Cette pièce n’est plus disponible.' };
+    say(msg[r.error] || 'La précommande n’est pas partie. Réessaie dans un instant.', true);
+  });
 }
 
 // ---------------------------------------------------------------- panier (local au navigateur)
@@ -190,6 +263,7 @@ async function addToCart(id) {
 
 async function renderCart() {
   const box = $('[data-cart-items]');
+  if (!box) return;
   let cart = readCart();
   let products = [];
   if (cart.length) {

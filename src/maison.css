@@ -570,3 +570,16 @@ mark.todo { background: #fff3c4; color: var(--encre); padding: 0 4px; font-weigh
 .floors, .floor, .floor .room-index { min-width: 0; }
 .floor .room-index { grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr)); }
 .room-index, .next-rooms ul { grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr)); }
+
+/* Précommande */
+.preorder { display: grid; gap: 12px; margin-top: 20px; padding: 22px; background: var(--chaux); border: 1px solid var(--ligne); }
+.preorder h2 { font-size: 28px; margin: 0; }
+.preorder fieldset { border: 1px solid var(--ligne); padding: 10px 14px; margin: 0; background: var(--blanc); }
+.preorder legend { font-weight: 600; padding: 0 6px; }
+.preorder .check { color: var(--encre); font-size: 15px; }
+.preorder .check small { color: var(--gris); }
+.preorder .two { display: grid; grid-template-columns: 1fr 2fr; gap: 12px; }
+.preorder-total { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 12px 0; border-top: 1px solid var(--ligne); flex-wrap: wrap; }
+.preorder-total strong { font-size: 20px; }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+[data-address][hidden] { display: none; }
