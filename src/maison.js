@@ -1,7 +1,11 @@
 // Données vivantes de la Maison : catalogue, fiche produit, panier, prochaine soirée.
 // Le navigateur n'utilise que la clé publique Supabase ; aucune donnée privée n'est lue ici.
 
+import { inject } from '/assets/vercel-analytics.mjs';
 import { SHIPPING_METHODS, shippingFor, MAX_QTY } from '/assets/shipping.mjs';
+
+// Initialiser Vercel Web Analytics
+inject();
 
 export const SUPABASE_URL = 'https://tybwvxinigahhntfeeur.supabase.co';
 export const SUPABASE_KEY = 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc';
