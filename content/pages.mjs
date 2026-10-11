@@ -93,7 +93,7 @@ export const confidences = {
 };
 
 export const patio = {
-  intro: 'Le Patio, c’est la cour de la Maison : on s’y croise, on s’y annonce les bonnes nouvelles, on s’y donne rendez-vous.',
+  intro: 'Le Patio, c’est la cour pavée devant la Maison, entre les jarres et les oliviers : on s’y croise, on s’y annonce les bonnes nouvelles, on s’y donne rendez-vous.',
 };
 
 // À RELIRE par Lamia : texte de présentation du patrimoine.

@@ -4,13 +4,13 @@
 // status : 'open' (ouverte) | 'soon' (en préparation)
 // accent : couleur d'émail associée à la pièce (voir --email-* dans maison.css)
 // floor  : 0 rez-de-chaussée (la vente), 1 premier étage (rencontres, parole, lecture),
-//          2 deuxième étage (trouvailles, galerie, atelier, communauté)
+//          2 deuxième étage (trouvailles, galerie, atelier)
 // productCategories : catégories de la table `products` affichées dans la pièce
 
 export const floors = [
-  { level: 0, name: 'Le rez-de-chaussée', theme: 'Les vitrines de la Maison' },
+  { level: 0, name: 'Le rez-de-chaussée', theme: 'Les vitrines et la cour de la Maison' },
   { level: 1, name: 'Le premier étage', theme: 'Les rencontres, la parole et la lecture' },
-  { level: 2, name: 'Le deuxième étage', theme: 'Les trouvailles et les ateliers' },
+  { level: 2, name: 'Le deuxième étage', theme: 'Les trouvailles, la galerie et l’atelier' },
 ];
 
 export const rooms = [
@@ -25,6 +25,9 @@ export const rooms = [
     summary: 'Les vêtements, les accessoires et les cosmétiques de la Maison : foulards, robes, sacs, savons, soins, huiles et rituels de beauté. Les premières pièces se préparent.', status: 'soon', accent: 'safran' },
   { slug: 'coiffeuse', path: '/coiffeuse/', floor: 0, name: 'La Coiffeuse de Lamia', welcome: 'Le rouge, les bijoux, les gestes qui nous ressemblent.',
     summary: 'Le rouge à lèvres signature de Lamia et le maquillage. En préparation.', status: 'soon', accent: 'rouge' },
+
+  { slug: 'patio', path: '/patio/', floor: 0, name: 'Le Patio', welcome: 'La cour de la Maison, où l’on se retrouve.',
+    summary: 'Devant la Maison, la cour pavée : annonces, célébrations, témoignages et rendez-vous de la communauté.', status: 'open', accent: 'vert' },
 
   // ---------- premier étage : rencontres, parole, lecture
   { slug: 'salon', path: '/salon/', floor: 1, name: 'Le Salon de Lamia', welcome: 'Installe-toi, on parle vrai.',
@@ -43,8 +46,6 @@ export const rooms = [
     summary: 'Le patrimoine des bijoux kabyles, l’émail, les symboles, et les créations de la Maison.', status: 'open', accent: 'safran' },
   { slug: 'atelier', path: '/atelier/', floor: 2, name: 'L’Atelier', welcome: 'Là où naissent les pièces.',
     summary: 'Les coulisses des créations, les artisans et les collaborations.', status: 'soon', accent: 'vert' },
-  { slug: 'patio', path: '/patio/', floor: 2, name: 'Le Patio', welcome: 'La Maison se retrouve ici.',
-    summary: 'Annonces, célébrations, témoignages et rendez-vous de la communauté.', status: 'open', accent: 'vert' },
 ];
 
 export const roomBySlug = Object.fromEntries(rooms.map((r) => [r.slug, r]));

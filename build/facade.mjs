@@ -11,7 +11,6 @@ const ZONES = {
   grenier: [362, 150, 475, 295],
   galerie: [640, 150, 752, 295],
   atelier: [912, 140, 1037, 295],
-  patio: [1198, 150, 1310, 295],
   // premier étage
   salon: [325, 378, 434, 535],
   'speed-dating': [512, 335, 770, 545],
@@ -23,6 +22,8 @@ const ZONES = {
   hall: [772, 628, 921, 866],
   dressing: [1043, 632, 1153, 790],
   coiffeuse: [1237, 628, 1360, 790],
+  // la cour pavée, devant la Maison
+  patio: [270, 876, 1440, 938],
 };
 // Lanternes et étoiles qui scintillent : [x, y, taille].
 const LANTERNS = [[713, 660, 70], [976, 660, 70], [648, 400, 60], [380, 662, 46]];
@@ -36,7 +37,7 @@ function spot(r) {
   const z = ZONES[r.slug];
   if (!z) return '';
   const soon = r.status === 'soon';
-  const cls = ['f-spot', soon && 'is-soon', r.slug === 'hall' && 'is-door', z[1] < 300 && 'tip-below'].filter(Boolean).join(' ');
+  const cls = ['f-spot', soon && 'is-soon', r.slug === 'hall' && 'is-door', r.slug === 'patio' && 'is-court', z[1] < 300 && 'tip-below'].filter(Boolean).join(' ');
   const tip = `<span class="f-tip"><strong>${esc(LABELS[r.slug] || r.name)}</strong><em>${soon ? 'Bientôt' : esc(r.welcome)}</em></span>`;
   return soon
     ? `<span class="${cls}" style="${box(z)}" tabindex="0" role="img" aria-label="${esc(r.name)} : bientôt" data-accent="${r.accent}">${tip}</span>`
