@@ -196,39 +196,32 @@ page(
     description: 'Bienvenue chez Lamia : bijoux kabyles, livres de Yemma Werdi, trouvailles de brocante, lives et soirées de rencontre sérieuses.',
     path: '/',
     room: roomBySlug.hall,
-    body: `<section class="entree" data-entree aria-label="Entrer dans la Maison">
-  <div class="entree-scene">
-    <div class="entree-cam" data-entree-cam>
-      <img class="entree-img" src="/images/maison/facade-soir-1672.webp" srcset="/images/maison/facade-soir-800.webp 800w, /images/maison/facade-soir-1200.webp 1200w, /images/maison/facade-soir-1672.webp 1672w" sizes="(max-width: 700px) 200vw, 100vw" width="1672" height="941" alt="" fetchpriority="high" decoding="async">
-    </div>
-    <span class="entree-stars" aria-hidden="true"></span>
-    <span class="entree-glow" aria-hidden="true"></span>
-    <div class="entree-text">
-      <p class="entree-kicker">Lamia Femme Berbère</p>
-      <p class="entree-title">La Maison t’attend.</p>
-      <p class="entree-hint">Fais défiler pour pousser la porte</p>
-      <svg width="22" height="34" viewBox="0 0 22 34" aria-hidden="true"><path d="M2 4l9 9 9-9M2 17l9 9 9-9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </div>
-    <span class="entree-lumiere" aria-hidden="true"></span>
-    <a class="entree-skip" href="#hall">Entrer directement</a>
+    body: `<section class="maison-welcome" aria-labelledby="welcome-title">
+  <img class="maison-welcome-image" src="/images/maison/maison-kabyle-1376.webp" srcset="/images/maison/maison-kabyle-800.webp 800w, /images/maison/maison-kabyle-1200.webp 1200w, /images/maison/maison-kabyle-1376.webp 1376w" sizes="100vw" width="1376" height="768" alt="Une maison de pierre kabyle accueillante, au milieu des oliviers, face aux montagnes" fetchpriority="high" decoding="async">
+  <div class="maison-welcome-copy">
+    <p class="yemma-eyebrow">Lamia Femme Berbère · ⵣ</p>
+    <h1 id="welcome-title">Bienvenue à la Maison.</h1>
+    <p>Un lieu pour se retrouver, créer et transmettre.</p>
+    <a class="btn btn-ink" href="#hall">Entre, tu es chez toi →</a>
   </div>
 </section>
 
 <section class="hall-hero" id="hall">
   <div class="hall-copy">
     <p class="room-name"><span class="pip" aria-hidden="true"></span>Le Hall</p>
-    <h1>${esc(P.hall.title)}</h1>
+    <h2>${esc(P.hall.title)}</h2>
     <p class="lead">${esc(P.hall.lead)}</p>
     <p class="hall-actions"><a class="btn btn-ink" href="#plan">Visiter la Maison</a><a class="btn btn-line" href="/lamia-brechet/">Qui est Lamia</a></p>
   </div>
   <div class="hall-stage">
     <span class="arch-shadow" aria-hidden="true"></span>
     <figure class="hall-arch">
-      <img src="${esc(imgOr('hall-arch', '/images/marque/lamia-logo-600.webp'))}" width="600" height="600" alt="Le visage de Lamia Femme Berbère : lunettes, lèvres rouges et bijoux kabyles">
+      <img src="${esc(imgOr('hall-arch', '/images/marque/yemma-werdi-accueil-900.webp'))}" width="1122" height="1402" loading="lazy" alt="Yemma Werdi, le personnage du livre de Lamia Femme Berbère">
     </figure>
     <figure class="hall-medal">
       <img src="${esc(imgOr('hall-medal', '/images/collier/collier-kabyle-15g-detail-320.webp'))}" width="320" height="400" alt="Médaillon kabyle émaillé bleu, vert et jaune, corail au centre">
     </figure>
+    <a class="yemma-signature" href="/bibliotheque/">Yemma Werdi <span>Découvrir la voix de mon livre →</span></a>
   </div>
   <div class="hall-apercus" aria-label="En ce moment dans la Maison">
     <a class="apercu is-bal" href="/speed-dating/#events-title">
@@ -262,7 +255,7 @@ page(
 
 <section class="plan-section" id="plan" aria-labelledby="plan-title">
   <div class="plan-intro">
-    <h2 id="plan-title">La Maison, à la tombée du soir</h2>
+    <h2 id="plan-title">Une Maison au cœur de la Kabylie</h2>
     <p>Les vitrines au rez-de-chaussée, les rencontres et la lecture au premier, les trouvailles tout en haut. Pousse la fenêtre qui t’appelle.</p>
   </div>
   ${facade(rooms)}
