@@ -735,3 +735,7 @@ body { background: var(--qvt-ivoire); }
 .apercu.is-bal { padding-left: 20px; }
 .salon-hint { margin: -4px 0 10px; font-size: 13px; color: var(--qvt-taupe); }
 .salon-grid { grid-template-columns: repeat(auto-fit, minmax(min(165px, 100%), 1fr)); }
+.soiree-card { max-width: 980px; }
+.salon-choice.is-tous { grid-column: 1 / -1; background: var(--qvt-creme); border-style: dashed; }
+.salon-choice.is-tous:has(input:checked) { border-style: solid; }
+.event-card.soiree-card { max-width: 980px; }

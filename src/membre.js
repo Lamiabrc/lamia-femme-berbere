@@ -137,15 +137,17 @@ function freeSoiree(s) {
   const maxBirth = new Date(Date.now() - 18 * 365.25 * 864e5).toISOString().slice(0, 10);
   // Les salons sont rangés par zone (« France · 25-39 ans ») : on choisit sa zone, l'âge choisit la tranche.
   const zoneOf = (ev) => (ev.audience || 'Salon unique').split(' · ')[0];
-  const zones = [...new Set(s.salons.map(zoneOf))];
+  const ORDER = ['France', 'Algérie', 'Canada', 'Autres pays'];
+  const rank = (z) => (ORDER.includes(z) ? ORDER.indexOf(z) : /tous/i.test(z) ? 99 : 50);
+  const zones = [...new Set(s.salons.map(zoneOf))].sort((a, b) => rank(a) - rank(b));
   SALONS[s.key] = s.salons.map((ev) => ({ id: ev.id, zone: zoneOf(ev), min: ev.min_age, max: ev.max_age, full: ev.status === 'sold_out', label: ev.audience }));
   const salons = zones.map((z, i) => {
     const list = s.salons.filter((ev) => zoneOf(ev) === z);
-    const tranches = list.map((ev) => (ev.audience || '').split(' · ')[1]).filter(Boolean).join(' · ');
+    const tranches = list.map((ev) => (ev.audience || '').split(' · ')[1]).filter(Boolean).map((t) => t.replace(' ans', '').replace('plus de 50', '50+')).join(' · ');
     const allFull = list.every((ev) => ev.status === 'sold_out');
-    return `<label class="salon-choice${allFull ? ' is-full' : ''}">
+    return `<label class="salon-choice${allFull ? ' is-full' : ''}${/tous/i.test(z) ? ' is-tous' : ''}">
       <input type="radio" name="zone" value="${esc(z)}" ${allFull ? 'disabled' : ''} ${zones.length === 1 && i === 0 ? 'checked' : ''} required>
-      <span><strong>${esc(z === 'Salon unique' ? z : `Salon ${z}`)}</strong><small>${esc(tranches || ages(list[0]))} · ${allFull ? 'complet' : `${list[0].capacity} places par salon`}</small></span>
+      <span><strong>${esc(z === 'Salon unique' ? z : /tous/i.test(z) ? 'Salon Tous âges' : `Salon ${z}`)}</strong><small>${esc(/tous/i.test(z) ? 'Toutes zones, tous âges : pour celles et ceux pour qui l’âge n’est pas important' : tranches ? `${tranches} ans` : ages(list[0]))}${allFull ? ' · complet' : ''}</small></span>
     </label>`;
   }).join('');
   const many = zones.length > 1;
@@ -207,7 +209,7 @@ async function freeRegister(e) {
   const age = ageAt(f.get('birth_date'), form.dataset.starts);
   if (!(age >= 18)) return status(st, FREE_ERRORS.too_young, true);
   const salon = (SALONS[form.dataset.soiree] || []).find((x) => x.zone === f.get('zone') && (!x.min || age >= x.min) && (!x.max || age <= x.max));
-  if (!salon) return status(st, 'Aucun salon de cette zone ne correspond à ton âge pour cette soirée. Lamia annoncera bientôt d’autres soirées.', true);
+  if (!salon) return status(st, 'Aucun salon de cette zone ne correspond à ton âge. Choisis le salon Tous âges, ouvert à tout le monde.', true);
   if (salon.full) return status(st, `Le salon ${salon.label} est complet.`, true);
   btn.disabled = true;
   btn.textContent = 'Un instant…';

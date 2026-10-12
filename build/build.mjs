@@ -198,7 +198,7 @@ page(
       <span class="apercu-mask" aria-hidden="true"><svg viewBox="0 0 64 32" width="64" height="32"><path d="M2 8c10-6 20-4 30 4C42 4 52 2 62 8c0 12-8 20-18 20-6 0-9-4-12-8-3 4-6 8-12 8C10 28 2 20 2 8Z" fill="none" stroke="currentColor" stroke-width="2.2"/><ellipse cx="19" cy="15" rx="6" ry="4" fill="currentColor"/><ellipse cx="45" cy="15" rx="6" ry="4" fill="currentColor"/></svg></span>
       <span class="apercu-kicker">Speed dating · gratuit</span>
       <strong>Bal masqué de Venise</strong>
-      <span class="apercu-info">Samedi 31 octobre, 21 h · en visio · salons France, Algérie, Canada et autres pays · 20 personnes par salon</span>
+      <span class="apercu-info">Samedi 31 octobre, 21 h · en visio · salons France, Algérie, Canada, autres pays et tous âges · 20 personnes par salon</span>
       <span class="apercu-cta">Réserver ma place →</span>
     </a>
     <a class="apercu" href="/produit/?p=collier-kabyle-argente-emaille-15g">
