@@ -83,6 +83,7 @@ function header(room) {
   </nav>
   <div class="header-actions">
     <a class="plan-link" href="/#plan">La Maison</a>
+    <a class="account-link" href="/mon-espace/" data-account-link>Se connecter</a>
     <a class="alert-link" href="/confidences/">Alerter Lamia</a>
   </div>
 </header>`;
@@ -461,6 +462,75 @@ page(
   <p>${esc(P.speedDating.origin)}</p>
 </section>
 </div>`,
+  })
+);
+
+// Mon espace : connexion des membres et de Lamia
+page(
+  '/mon-espace/',
+  layout({
+    title: 'Mon espace · Lamia Femme Berbère',
+    description: 'Connecte-toi à ton espace de la Maison Lamia Femme Berbère.',
+    path: '/mon-espace/',
+    room: roomBySlug.hall,
+    noindex: true,
+    scripts: ['/assets/espace.js'],
+    body: `<section class="espace">
+  <p class="room-name"><span class="pip" aria-hidden="true"></span>Mon espace</p>
+
+  <div data-espace-out hidden>
+    <h1>Se connecter</h1>
+    <div class="espace-grid">
+      <form class="espace-card" data-espace-login>
+        <h2>J’ai un mot de passe</h2>
+        <label>Email<input name="email" type="email" autocomplete="email" required></label>
+        <label>Mot de passe<input name="password" type="password" autocomplete="current-password" required></label>
+        <button class="btn btn-ink" type="submit">Me connecter</button>
+        <p class="form-status" role="status" data-espace-status></p>
+      </form>
+      <form class="espace-card" data-espace-reset>
+        <h2>Pas encore de mot de passe ?</h2>
+        <p>Tu t’es inscrit·e à une soirée sans mot de passe, ou tu l’as oublié : reçois un lien par email pour en choisir un.</p>
+        <label>Email<input name="email" type="email" autocomplete="email" required></label>
+        <button class="btn btn-line" type="submit">Recevoir le lien</button>
+        <p class="form-status" role="status" data-reset-status></p>
+      </form>
+    </div>
+    <p class="espace-note">Pour entrer au Bal masqué, pas besoin de compte : <a class="text-link" href="/speed-dating/bal/">la porte du bal</a> te demande seulement ton email et ta date de naissance.</p>
+  </div>
+
+  <form class="espace-card espace-new" data-espace-newpass hidden>
+    <h1>Choisis ton mot de passe</h1>
+    <label>Nouveau mot de passe<input name="password" type="password" autocomplete="new-password" minlength="8" required></label>
+    <button class="btn btn-ink" type="submit">Enregistrer</button>
+    <p class="form-status" role="status" data-newpass-status></p>
+  </form>
+
+  <div data-espace-in hidden>
+    <h1>Bonjour <span data-espace-nom></span></h1>
+    <p class="espace-email">Connecté·e avec <strong data-espace-email></strong> · <button class="link-button" type="button" data-espace-logout>Se déconnecter</button></p>
+
+    <section class="espace-admin" data-espace-admin hidden>
+      <h2>Espace administratrice</h2>
+      <div class="espace-liens">
+        <a href="/admin-soirees/"><strong>Mes soirées et précommandes</strong><span>Inscrits, salons, précommandes du livre et du collier</span></a>
+        <a href="/admin-bal.html"><strong>Maîtresse du bal</strong><span>Ouvrir les portes, lancer les tours, souhaits réciproques</span></a>
+        <a href="/admin.html"><strong>Alertes du Cabinet</strong><span>Signalements écrits et audio, suivi</span></a>
+        <a href="/pilotage.html"><strong>Pilotage</strong><span>Feuille de route et indicateurs</span></a>
+      </div>
+    </section>
+
+    <section>
+      <h2>Mes soirées</h2>
+      <div class="espace-soirees" data-espace-soirees><p class="loading">Un instant…</p></div>
+    </section>
+    <div class="espace-liens is-light">
+      <a href="/speed-dating/bal/"><strong>Entrer au bal</strong><span>Le soir de la soirée</span></a>
+      <a href="/speed-dating/souhaits/"><strong>Mes souhaits</strong><span>Qui aimerais-tu revoir ?</span></a>
+      <a href="/confidences/"><strong>Alerter Lamia</strong><span>En toute confidentialité</span></a>
+    </div>
+  </div>
+</section>`,
   })
 );
 
@@ -905,7 +975,7 @@ for (const p of pages) {
 }
 await cp(join(ROOT, 'public'), DIST, { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
-for (const f of ['maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'bal.js']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
+for (const f of ['maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'bal.js', 'espace.js']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
 await cp(join(ROOT, 'content', 'shipping.mjs'), join(DIST, 'assets', 'shipping.mjs'));
 
 const indexable = pages.filter((p) => !p.path.endsWith('.html') && !['/produit/', '/speed-dating/merci/', '/speed-dating/souhaits/', '/cgv/', '/mentions-legales/', '/confidentialite/'].includes(p.path));
@@ -913,6 +983,6 @@ await writeFile(
   join(DIST, 'sitemap.xml'),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${indexable.map((p) => `<url><loc>${SITE_URL}${p.path}</loc></url>`).join('')}</urlset>\n`
 );
-await writeFile(join(DIST, 'robots.txt'), `User-agent: *\nAllow: /\nDisallow: /admin.html\nDisallow: /pilotage.html\nDisallow: /admin-soirees.html\nDisallow: /speed-dating/merci/\nDisallow: /speed-dating/bal/\nDisallow: /admin-bal.html\nSitemap: ${SITE_URL}/sitemap.xml\n`);
+await writeFile(join(DIST, 'robots.txt'), `User-agent: *\nAllow: /\nDisallow: /admin.html\nDisallow: /pilotage.html\nDisallow: /admin-soirees.html\nDisallow: /speed-dating/merci/\nDisallow: /speed-dating/bal/\nDisallow: /mon-espace/\nDisallow: /admin-bal.html\nSitemap: ${SITE_URL}/sitemap.xml\n`);
 
 console.log(`Maison générée : ${pages.length} pages dans dist/`);

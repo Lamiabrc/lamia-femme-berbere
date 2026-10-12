@@ -376,3 +376,13 @@ renderSocials();
   addEventListener('scroll', ask, { passive: true });
   addEventListener('resize', () => { measure(); ask(); });
 })();
+
+// ---------------------------------------------------------------- lien « Se connecter » / « Mon espace » dans l'en-tête
+(function compte() {
+  const a = document.querySelector('[data-account-link]');
+  if (!a) return;
+  try {
+    const raw = localStorage.getItem('sb-tybwvxinigahhntfeeur-auth-token');
+    if (raw && JSON.parse(raw)?.access_token) a.textContent = 'Mon espace';
+  } catch { /* stockage indisponible */ }
+})();
