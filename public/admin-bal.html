@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Maîtresse du bal · Lamia Femme Berbère</title>
+<link rel="stylesheet" href="/assets/maison.css">
+<style>
+  body { background: #120d1a; color: #efe4cf; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 32px var(--gouttiere) 64px; }
+  h1, h2 { color: #fff; } h2 { font-size: 26px; margin: 28px 0 10px; }
+  .kicker { color: #e3bd6e; font-size: 12px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; margin: 0; }
+  .box { background: rgba(255,255,255,.05); border: 1px solid rgba(227,189,110,.3); border-radius: 16px; padding: 18px; margin-top: 14px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }
+  label { display: grid; gap: 6px; font-weight: 600; }
+  input, select { min-height: 44px; padding: 8px 12px; border-radius: 10px; border: 1px solid rgba(227,189,110,.5); font: 16px var(--sans); }
+  .btn-gold { background: #f3e0b9; color: #151515; border-color: #f3e0b9; }
+  .btn-out { background: transparent; color: #fff1c9; border-color: rgba(227,189,110,.7); }
+  .btn-stop { background: #5c1424; color: #fff; border-color: #5c1424; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; display: block; overflow-x: auto; }
+  th, td { text-align: left; padding: 8px; border-bottom: 1px solid rgba(227,189,110,.2); }
+  th { color: #e3bd6e; font-size: 13px; }
+  .big { font-family: var(--serif); font-size: 40px; color: #fff1c9; margin: 0; }
+  .status { color: #fff1c9; min-height: 1.4em; }
+  .status.err { color: #ff9aa8; }
+  [hidden] { display: none !important; }
+  .tat { display: flex; flex-wrap: wrap; gap: 8px; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <p class="kicker">Espace privé de Lamia</p>
+  <h1>Maîtresse du bal</h1>
+
+  <form id="login" class="box" style="max-width:460px">
+    <label>Email<input name="email" type="email" autocomplete="email" required></label>
+    <label style="margin-top:10px">Mot de passe<input name="password" type="password" autocomplete="current-password" required></label>
+    <button class="btn btn-gold" type="submit" style="margin-top:12px">Me connecter</button>
+  </form>
+
+  <section id="panel" hidden>
+    <p class="status" id="status"></p>
+    <div class="box" id="no-video" hidden>La vidéo n’est pas encore branchée : ajoute DAILY_API_KEY dans Vercel, puis redéploie.</div>
+
+    <div class="box" id="ouvrir">
+      <h2 style="margin-top:0">Ouvrir le bal</h2>
+      <div class="row">
+        <label style="flex:1;min-width:260px">Soirée<select id="soiree"></select></label>
+        <button class="btn btn-gold" id="btn-open" type="button">Ouvrir les portes</button>
+      </div>
+      <p style="font-size:14px;color:#b8a98f">Ouvrir les portes crée le grand salon. Les inscrits entrent sur lamia-femme-berbere.com/speed-dating/bal/ avec leur email et leur date de naissance.</p>
+    </div>
+
+    <div id="bal" hidden>
+      <div class="box">
+        <p class="kicker" id="phase"></p>
+        <p class="big" id="presents"></p>
+        <div class="row" style="margin-top:12px">
+          <button class="btn btn-gold" id="btn-salon" type="button">Entrer dans le grand salon (nouvel onglet)</button>
+        </div>
+      </div>
+
+      <div class="box">
+        <h2 style="margin-top:0">Les tête-à-tête</h2>
+        <div class="row">
+          <label>Durée d’un tour (minutes)<input id="minutes" type="number" min="2" max="15" value="6" style="width:120px"></label>
+          <button class="btn btn-gold" id="btn-round" type="button">Lancer un tour</button>
+          <button class="btn btn-out" id="btn-grand" type="button">Rappeler tout le monde au grand salon</button>
+        </div>
+        <p id="last" style="color:#b8a98f;font-size:14px"></p>
+        <div class="tat" id="tat"></div>
+      </div>
+
+      <h2>Les salons</h2>
+      <table><thead><tr><th>Salon</th><th>Inscrits</th><th>Présents</th><th>Femmes</th><th>Hommes</th></tr></thead><tbody id="salons"></tbody></table>
+
+      <div class="box">
+        <h2 style="margin-top:0">Fin du bal</h2>
+        <div class="row">
+          <button class="btn btn-out" id="btn-fin" type="button">Annoncer la fin du bal (souhaits)</button>
+          <button class="btn btn-stop" id="btn-close" type="button">Fermer les portes</button>
+        </div>
+        <p id="wishes" style="margin-top:12px"></p>
+        <table><thead><tr><th>Souhait réciproque</th><th>Emails</th></tr></thead><tbody id="mutual"></tbody></table>
+      </div>
+    </div>
+  </section>
+</main>
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm';
+const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc');
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
+const when = (iso) => new Date(iso).toLocaleString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
+const PHASES = { accueil: 'Grand salon ouvert', tour: 'Tête-à-tête en cours', fin: 'Fin du bal : souhaits', ferme: 'Portes fermées' };
+const ERRORS = { forbidden: 'Ce compte n’a pas le rôle administratrice.', video_not_configured: 'La clé Daily manque dans Vercel.', bal_closed: 'Le bal est fermé.', temporary_failure: 'Erreur temporaire, réessaie.' };
+
+async function bal(body) {
+  const { data: { session } } = await supabase.auth.getSession();
+  const r = await fetch('/api/bal', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` }, body: JSON.stringify(body) });
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) { $('#status').textContent = ERRORS[data.error] || 'Une erreur est survenue.'; $('#status').className = 'status err'; throw new Error(data.error); }
+  $('#status').textContent = ''; $('#status').className = 'status';
+  return data;
+}
+
+async function soirees() {
+  const { data } = await supabase.from('speed_dating_events').select('id,title,audience,starts_at').in('status', ['published', 'sold_out']).order('starts_at');
+  const seen = new Set();
+  $('#soiree').innerHTML = (data || []).filter((e) => { const k = e.title + e.starts_at; if (seen.has(k)) return false; seen.add(k); return true; })
+    .map((e) => `<option value="${esc(e.id)}">${esc(e.title)} · ${esc(when(e.starts_at))}</option>`).join('');
+}
+
+function paint(d) {
+  $('#no-video').hidden = d.video;
+  const open = d.state?.open;
+  $('#ouvrir').hidden = !!open;
+  $('#bal').hidden = !open;
+  if (!open) return;
+  const s = d.state;
+  $('#phase').textContent = `${PHASES[s.phase] || ''}${s.round ? ` · tour ${s.round}` : ''}${s.ends_at && s.phase === 'tour' ? ` · fin à ${new Date(s.ends_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}` : ''}`;
+  $('#presents').textContent = `${d.present} masque${d.present > 1 ? 's' : ''} au bal`;
+  $('#salons').innerHTML = d.salons.map((x) => `<tr><td>${esc(x.label)}</td><td>${x.inscrits}</td><td>${x.presents}</td><td>${x.femmes}</td><td>${x.hommes}</td></tr>`).join('');
+  $('#last').textContent = s.last_round ? `Dernier tour : ${s.last_round.pairs} tête-à-tête${s.last_round.waiting.length ? ` · en attente : ${s.last_round.waiting.join(', ')}` : ''}` : '';
+  $('#tat').innerHTML = s.phase === 'tour' ? d.tat.map((t, i) => `<button class="btn btn-out" type="button" data-room="${esc(t.room)}">Voir le tête-à-tête ${i + 1}</button>`).join('') : '';
+  $('#wishes').textContent = `${d.wishes_count} personne${d.wishes_count > 1 ? 's ont' : ' a'} envoyé ses souhaits.`;
+  $('#mutual').innerHTML = d.mutual.map(([a, b]) => `<tr><td>${esc(a.name)} et ${esc(b.name)}</td><td>${esc(a.email || '')} · ${esc(b.email || '')}</td></tr>`).join('') || '<tr><td colspan="2">Pas encore de souhait réciproque.</td></tr>';
+}
+
+async function refresh() { try { paint(await bal({ action: 'admin_state' })); } catch { /* message affiché */ } }
+
+async function start() {
+  const { data: { session } } = await supabase.auth.getSession();
+  $('#login').hidden = !!session; $('#panel').hidden = !session;
+  if (!session) return;
+  await soirees(); await refresh();
+  setInterval(refresh, 10000);
+}
+$('#login').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = new FormData(e.target);
+  const { error } = await supabase.auth.signInWithPassword({ email: f.get('email'), password: f.get('password') });
+  if (error) { alert('Connexion impossible : vérifie ton email et ton mot de passe.'); return; }
+  start();
+});
+const act = (body, confirmText) => async () => { if (confirmText && !confirm(confirmText)) return; try { paint(await bal(body())); } catch { /* */ } };
+$('#btn-open').addEventListener('click', act(() => ({ action: 'open', event_id: $('#soiree').value })));
+$('#btn-round').addEventListener('click', act(() => ({ action: 'round', minutes: Number($('#minutes').value) })));
+$('#btn-grand').addEventListener('click', act(() => ({ action: 'grand' })));
+$('#btn-fin').addEventListener('click', act(() => ({ action: 'fin' })));
+$('#btn-close').addEventListener('click', act(() => ({ action: 'close' }), 'Fermer les portes du bal ? Tout le monde sera déconnecté.'));
+const openRoom = async (room) => { const w = window.open('', '_blank'); try { const { url } = await bal({ action: 'admin_join', room }); w.location = url; } catch { w.close(); } };
+$('#btn-salon').addEventListener('click', () => openRoom());
+$('#tat').addEventListener('click', (e) => { const b = e.target.closest('[data-room]'); if (b) openRoom(b.dataset.room); });
+start();
+</script>
+</body>
+</html>

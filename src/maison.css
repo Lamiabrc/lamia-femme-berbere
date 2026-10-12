@@ -947,3 +947,49 @@ body { background: var(--qvt-ivoire); }
 .bal-deroule li { align-content: start; }
 @media (max-width: 480px) { .bal-deroule ol { grid-template-columns: 1fr; } }
 .bal-welcome { margin: 8px 0 0; font-family: var(--serif); font-style: italic; font-size: 22px; color: #fff; }
+
+/* ================================================================ La salle du bal (vidéo) */
+.bal-step[hidden] { display: none !important; }
+.bal-salle-page { min-height: 80vh; }
+.bal-porte { display: grid; gap: 12px; max-width: 440px; margin: 0 auto; padding: 0 var(--gouttiere) clamp(48px, 7vw, 96px); }
+.bal-porte label { display: grid; gap: 6px; font-weight: 600; color: #efe4cf; }
+.bal-porte input { min-height: 48px; padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(227,189,110,.5); font: 16px var(--sans); }
+.bal-petit { font-size: 14px; color: #b8a98f; }
+.bal-petit .text-link, .bal-porte .text-link { color: var(--or); }
+.salle { max-width: 1180px; margin: 0 auto; padding: clamp(20px, 3vw, 36px) var(--gouttiere) clamp(40px, 6vw, 72px); display: grid; gap: 14px; }
+.salle-haut { display: flex; justify-content: space-between; align-items: end; gap: 16px; flex-wrap: wrap; }
+.salle-haut h1 { margin: 0; color: #fff; font-size: clamp(28px, 4vw, 44px); }
+.salle-temps { margin: 0; min-width: 120px; padding: 8px 18px; border-radius: 999px; border: 1px solid rgba(227,189,110,.6); font-family: var(--serif); font-size: 34px; line-height: 1; text-align: center; color: var(--or-clair); font-variant-numeric: tabular-nums; }
+.salle-temps:empty { display: none; }
+.salle-temps.is-fin { color: #fff; border-color: #ff8a9a; animation: battement 1s ease-in-out infinite; }
+@keyframes battement { 50% { box-shadow: 0 0 22px rgba(255,138,154,.6); } }
+.salle-scene { position: relative; }
+.salle-autre { position: relative; margin: 0; aspect-ratio: 16 / 9; border-radius: 28px; overflow: hidden; background: radial-gradient(ellipse at 50% 40%, #2a1a2a, #0c0810);
+  box-shadow: 0 0 0 4px #120d1a, 0 0 0 7px var(--or), 0 0 0 11px #5c1424, 0 0 0 13px var(--or), 0 40px 90px -30px rgba(0,0,0,.9); }
+.salle-autre video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.salle-autre figcaption { position: absolute; left: 50%; bottom: 16px; translate: -50% 0; padding: 6px 18px; border-radius: 999px; background: rgba(18,13,26,.7); color: var(--or-clair); font-family: var(--serif); font-size: 22px; backdrop-filter: blur(6px); white-space: nowrap; }
+.salle-cadre { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 50%, transparent 66%, rgba(18,13,26,.5) 100%); }
+.salle-moi { position: absolute; right: 18px; top: 18px; width: clamp(110px, 20%, 240px); aspect-ratio: 4 / 3; margin: 0; border-radius: 16px; overflow: hidden; border: 2px solid var(--or); background: #0c0810; box-shadow: 0 10px 30px rgba(0,0,0,.6); }
+.salle-moi video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); display: block; }
+.salle-moi figcaption { position: absolute; left: 8px; bottom: 6px; font-size: 12px; color: var(--or-clair); text-shadow: 0 1px 4px #000; }
+.salle-msg { margin: 6px 0 0; font-family: var(--serif); font-style: italic; font-size: 21px; color: #fff; text-align: center; }
+.salle-compte { margin: 0; text-align: center; color: var(--or); font-size: 14px; letter-spacing: .08em; }
+.salle-compte:empty { display: none; }
+.salle-boutons { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.salle-boutons [aria-pressed="true"] { background: #5c1424; border-color: #ff8a9a; color: #fff; }
+.salle[data-where="tat"] .salle-autre { box-shadow: 0 0 0 4px #120d1a, 0 0 0 7px var(--or), 0 0 0 11px #5c1424, 0 0 0 13px var(--or), 0 0 70px rgba(227,189,110,.35); }
+.souhaits { display: grid; gap: 12px; max-width: 640px; margin: 10px auto 0; padding: 22px; border-radius: 18px; background: var(--qvt-ivoire); color: var(--qvt-encre); }
+.souhaits[hidden] { display: none; }
+.souhaits h2 { color: var(--qvt-encre) !important; font-size: 30px; margin: 0; }
+.souhaits h2::after { display: none !important; }
+.souhaits-liste { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; }
+.souhait { display: flex; gap: 8px; align-items: center; padding: 10px 12px; border: 1px solid var(--qvt-sable); border-radius: 12px; background: #fff; cursor: pointer; }
+.souhait:has(input:checked) { border-color: #b08a4e; background: var(--qvt-champagne-clair); }
+.souhait input { width: 18px; height: 18px; accent-color: #5c1424; }
+.souhaits textarea { width: 100%; box-sizing: border-box; padding: 10px; border-radius: 10px; border: 1px solid var(--qvt-sable); font: 15px var(--sans); }
+.souhaits label { display: grid; gap: 6px; font-weight: 600; }
+.souhaits-ok { margin: 0; font-family: var(--serif); font-size: 22px; }
+@media (max-width: 640px) {
+  .salle-autre { aspect-ratio: 3 / 4; border-radius: 22px; }
+  .salle-moi { width: 34%; right: 10px; top: 10px; }
+}

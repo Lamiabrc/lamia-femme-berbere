@@ -464,6 +464,85 @@ page(
   })
 );
 
+// La salle du bal (vidéo) : grand salon, tête-à-tête, souhaits
+page(
+  '/speed-dating/bal/',
+  layout({
+    title: 'La salle du Bal masqué de Venise',
+    description: 'Entre dans la salle du Bal masqué de Venise : grand salon, tête-à-tête masqués et souhaits de fin de bal.',
+    path: '/speed-dating/bal/',
+    room: roomBySlug['speed-dating'],
+    noindex: true,
+    body: `<div class="bal bal-salle-page">
+<section class="bal-step" data-step="entree">
+  <div class="bal-hero is-short">
+    <p class="bal-kicker">Le Bal masqué de Venise</p>
+    <h1>La porte du bal</h1>
+    <p class="bal-lead">Entre avec l’email et la date de naissance donnés à ton inscription.</p>
+  </div>
+  <form class="bal-porte" data-bal-entree>
+    <label>Email<input name="email" type="email" autocomplete="email" required></label>
+    <label>Date de naissance<input name="birth_date" type="date" required></label>
+    <button class="btn btn-gold" type="submit">Pousser la porte</button>
+    <p class="form-status" role="status" data-entree-status></p>
+    <p class="bal-petit">Pas encore inscrit·e ? <a class="text-link" href="/speed-dating/#events-title">Réserve ta place</a>. Un souci de caméra ? <a class="text-link" href="/speed-dating/salle/">Passe par l’antichambre</a>.</p>
+  </form>
+</section>
+
+<section class="bal-step" data-step="pret" hidden>
+  <div class="bal-hero is-short">
+    <p class="bal-kicker" data-pret-salon></p>
+    <h1>Bonsoir <span data-pret-nom></span></h1>
+  </div>
+  <div class="ante">
+    <div class="ante-miroir"><video data-pret-video playsinline muted autoplay></video><span class="ante-cadre" aria-hidden="true"></span></div>
+    <div class="ante-panneau">
+      <p class="ante-msg" data-pret-msg>Activation de ta caméra…</p>
+      <button class="btn btn-gold" type="button" data-entrer>Entrer au bal</button>
+      <button class="btn bal-btn-line" type="button" data-sortir>Ce n’est pas moi</button>
+    </div>
+  </div>
+</section>
+
+<section class="bal-step salle" data-step="salle" data-salle hidden>
+  <header class="salle-haut">
+    <div><p class="bal-kicker" data-salle-tour></p><h1 data-salle-titre>Le grand salon</h1></div>
+    <p class="salle-temps" data-salle-temps aria-live="off"></p>
+  </header>
+  <div class="salle-scene">
+    <figure class="salle-autre"><video data-video-autre playsinline autoplay></video><figcaption data-autre-nom>Lamia arrive…</figcaption><span class="salle-cadre" aria-hidden="true"></span></figure>
+    <figure class="salle-moi"><video data-video-moi playsinline autoplay muted></video><figcaption>Toi</figcaption></figure>
+    <audio data-audio-autre autoplay></audio>
+  </div>
+  <p class="salle-msg" role="status" data-salle-msg></p>
+  <p class="salle-compte" data-salle-compte></p>
+  <div class="salle-boutons">
+    <button class="btn bal-btn-line" type="button" data-micro aria-pressed="false">Micro</button>
+    <button class="btn bal-btn-line" type="button" data-camera aria-pressed="false">Caméra</button>
+    <a class="btn bal-btn-line" href="/confidences/" target="_blank" rel="noopener">Signaler à Lamia</a>
+    <button class="btn bal-btn-line" type="button" data-quitter>Quitter le bal</button>
+  </div>
+  <form class="souhaits" data-souhaits hidden>
+    <h2>Qui aimerais-tu revoir ?</h2>
+    <p>Ton choix reste privé. Si c’est réciproque, Lamia vous met en relation.</p>
+    <div class="souhaits-liste" data-souhaits-liste></div>
+    <label>Un mot pour Lamia (facultatif)<textarea name="message" rows="2" maxlength="500"></textarea></label>
+    <button class="btn btn-gold" type="submit">Envoyer mes souhaits</button>
+    <p class="form-status" data-souhaits-status></p>
+  </form>
+</section>
+
+<section class="bal-step" data-step="ferme" hidden>
+  <div class="bal-hero is-short"><h1>Le bal est fermé</h1><p class="bal-lead">Les portes ne sont pas encore ouvertes, ou le bal est terminé. Merci, et à très vite à la Maison.</p><p class="bal-actions"><a class="btn btn-gold" href="/speed-dating/">Retour au Boudoir</a></p></div>
+</section>
+<section class="bal-step" data-step="quitte" hidden>
+  <div class="bal-hero is-short"><h1>Tu as quitté le bal</h1><p class="bal-lead">Tu peux revenir à tout moment tant que le bal est ouvert.</p><p class="bal-actions"><button class="btn btn-gold" type="button" onclick="location.reload()">Revenir au bal</button></p></div>
+</section>
+</div>
+<script type="module" src="/assets/bal.js?v=${VERSION}"></script>`,
+  })
+);
+
 // L'antichambre : tester sa caméra et son micro avant le bal (rien n'est envoyé)
 page(
   '/speed-dating/salle/',
@@ -826,7 +905,7 @@ for (const p of pages) {
 }
 await cp(join(ROOT, 'public'), DIST, { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
-for (const f of ['maison.css', 'maison.js', 'membre.js', 'antichambre.js']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
+for (const f of ['maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'bal.js']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
 await cp(join(ROOT, 'content', 'shipping.mjs'), join(DIST, 'assets', 'shipping.mjs'));
 
 const indexable = pages.filter((p) => !p.path.endsWith('.html') && !['/produit/', '/speed-dating/merci/', '/speed-dating/souhaits/', '/cgv/', '/mentions-legales/', '/confidentialite/'].includes(p.path));
@@ -834,6 +913,6 @@ await writeFile(
   join(DIST, 'sitemap.xml'),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${indexable.map((p) => `<url><loc>${SITE_URL}${p.path}</loc></url>`).join('')}</urlset>\n`
 );
-await writeFile(join(DIST, 'robots.txt'), `User-agent: *\nAllow: /\nDisallow: /admin.html\nDisallow: /pilotage.html\nDisallow: /admin-soirees.html\nDisallow: /speed-dating/merci/\nSitemap: ${SITE_URL}/sitemap.xml\n`);
+await writeFile(join(DIST, 'robots.txt'), `User-agent: *\nAllow: /\nDisallow: /admin.html\nDisallow: /pilotage.html\nDisallow: /admin-soirees.html\nDisallow: /speed-dating/merci/\nDisallow: /speed-dating/bal/\nDisallow: /admin-bal.html\nSitemap: ${SITE_URL}/sitemap.xml\n`);
 
 console.log(`Maison générée : ${pages.length} pages dans dist/`);
