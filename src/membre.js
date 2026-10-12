@@ -90,7 +90,7 @@ async function renderEvents() {
   if (!box) return;
   const { data, error } = await supabase
     .from('speed_dating_events')
-    .select('id,title,description,starts_at,min_age,max_age,capacity,ticket_price_cents,currency,status')
+    .select('id,title,description,audience,starts_at,min_age,max_age,capacity,ticket_price_cents,currency,status')
     .in('status', ['published', 'sold_out'])
     .gte('starts_at', new Date().toISOString())
     .order('starts_at');
@@ -99,67 +99,93 @@ async function renderEvents() {
     return;
   }
   if (!data.length) {
-    box.innerHTML = '<p class="empty">Aucune soirée programmée pour l’instant. Crée ton espace : les prochaines soirées seront annoncées ici et en live.</p>';
+    box.innerHTML = '<p class="empty">Aucune soirée programmée pour l’instant. Les prochaines soirées seront annoncées ici et en live.</p>';
     return;
   }
-  box.innerHTML = data
-    .map((ev) => {
-      const full = ev.status === 'sold_out';
-      const ages = ev.min_age || ev.max_age ? `<span>${ev.min_age || 18} à ${ev.max_age || '…'} ans</span>` : '';
-      return `<article class="event-card">
-        <p class="event-date">${esc(when(ev.starts_at))}</p>
-        <h3>${esc(ev.title)}</h3>
-        ${ev.description ? `<p>${esc(ev.description)}</p>` : ''}
-        <div class="event-meta">${ages}<span>${ev.ticket_price_cents > 0 ? money(ev.ticket_price_cents, ev.currency || 'EUR') : 'Gratuit'}</span><span>${ev.capacity} places</span></div>
-        ${!full && !(ev.ticket_price_cents > 0) ? freeForm(ev) : ''}
-        ${full || !(ev.ticket_price_cents > 0) ? '' : `<label class="check"><input type="checkbox" data-cgv="${esc(ev.id)}"><span>${ev.ticket_price_cents > 0 ? 'J’accepte les <a href="/cgv/" target="_blank" rel="noopener">conditions de vente</a>. La place n’est pas remboursable.' : 'J’accepte les <a href="/cgv/" target="_blank" rel="noopener">règles de la soirée</a> : respect, sérieux, aucun propos déplacé.'}</span></label>`}
-        ${full ? '<button class="btn btn-ink" type="button" disabled>Complet</button>' : ev.ticket_price_cents > 0 ? `<button class="btn btn-ink" type="button" data-reserve="${esc(ev.id)}">Réserver ma place</button>` : ''}
-      </article>`;
-    })
-    .join('');
-  const prices = Object.fromEntries(data.map((ev) => [ev.id, ev.ticket_price_cents]));
+  // Une soirée = un titre et une date ; chacune peut avoir plusieurs salons dédiés.
+  const soirees = [];
+  for (const ev of data) {
+    const key = `${ev.title}|${ev.starts_at}`;
+    let s = soirees.find((x) => x.key === key);
+    if (!s) soirees.push((s = { key, title: ev.title, starts_at: ev.starts_at, description: ev.description, free: !(ev.ticket_price_cents > 0), salons: [] }));
+    s.salons.push(ev);
+  }
+  box.innerHTML = soirees.map((s) => (s.free ? freeSoiree(s) : s.salons.map(paidCard).join(''))).join('');
   $$('[data-free-form]', box).forEach((f) => f.addEventListener('submit', freeRegister));
+  const prices = Object.fromEntries(data.map((ev) => [ev.id, ev.ticket_price_cents]));
   $$('[data-reserve]', box).forEach((b) => b.addEventListener('click', () => reserve(b.dataset.reserve, b, prices[b.dataset.reserve] > 0)));
 }
 
-// Soirées gratuites : inscription directe, sans compte à confirmer par email.
-function freeForm(ev) {
-  const id = esc(ev.id);
-  const ages = ev.min_age || ev.max_age ? ` (${ev.min_age || 18} à ${ev.max_age || 99} ans)` : '';
-  return `<form class="free-form" data-free-form data-event="${id}" novalidate>
-    <p class="free-form-lead">Inscris-toi en une minute, sans mot de passe${esc(ages)}.</p>
-    <div class="free-grid">
-      <label>Prénom<input name="first_name" autocomplete="given-name" required maxlength="60"></label>
-      <label>Email<input name="email" type="email" autocomplete="email" required maxlength="254"></label>
-      <label>Je suis<select name="gender" required><option value="">Choisir</option><option value="femme">une femme</option><option value="homme">un homme</option></select></label>
-      <label>Date de naissance<input name="birth_date" type="date" required max="${new Date(Date.now() - 18 * 365.25 * 864e5).toISOString().slice(0, 10)}"></label>
-      <label class="free-wide">Ville<input name="city" autocomplete="address-level2" maxlength="80"></label>
-    </div>
-    <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
-    <label class="check"><input type="checkbox" name="rules"><span>J’accepte les <a href="/cgv/" target="_blank" rel="noopener">règles de la soirée</a> : respect, sérieux, aucun propos déplacé. J’ai 18 ans ou plus.</span></label>
-    <button class="btn btn-ink" type="submit">Réserver ma place</button>
-    <p class="form-status" role="status" data-free-status></p>
-  </form>`;
+const ages = (ev) => (ev.min_age || ev.max_age ? `${ev.min_age || 18} à ${ev.max_age || 99} ans` : 'Tous âges (18 ans et plus)');
+
+function paidCard(ev) {
+  const full = ev.status === 'sold_out';
+  return `<article class="event-card">
+    <p class="event-date">${esc(when(ev.starts_at))}</p>
+    <h3>${esc(ev.title)}</h3>
+    ${ev.audience ? `<p class="salon-name">Salon ${esc(ev.audience)}</p>` : ''}
+    ${ev.description ? `<p>${esc(ev.description)}</p>` : ''}
+    <div class="event-meta"><span>${esc(ages(ev))}</span><span>${money(ev.ticket_price_cents, ev.currency || 'EUR')}</span><span>${ev.capacity} places</span></div>
+    ${full ? '' : `<label class="check"><input type="checkbox" data-cgv="${esc(ev.id)}"><span>J’accepte les <a href="/cgv/" target="_blank" rel="noopener">conditions de vente</a>. La place n’est pas remboursable.</span></label>`}
+    <button class="btn btn-ink" type="button" ${full ? 'disabled' : `data-reserve="${esc(ev.id)}"`}>${full ? 'Complet' : 'Réserver ma place'}</button>
+  </article>`;
+}
+
+// Soirée gratuite : on choisit son salon, puis on s'inscrit en une minute, sans mot de passe.
+function freeSoiree(s) {
+  const open = s.salons.filter((ev) => ev.status !== 'sold_out');
+  const many = s.salons.length > 1;
+  const maxBirth = new Date(Date.now() - 18 * 365.25 * 864e5).toISOString().slice(0, 10);
+  const salons = s.salons.map((ev, i) => `<label class="salon-choice${ev.status === 'sold_out' ? ' is-full' : ''}">
+      <input type="radio" name="event_id" value="${esc(ev.id)}" ${ev.status === 'sold_out' ? 'disabled' : ''} ${!many && i === 0 ? 'checked' : ''} required>
+      <span><strong>${esc(ev.audience ? `Salon ${ev.audience}` : 'Salon unique')}</strong><small>${esc(ages(ev))} · ${ev.status === 'sold_out' ? 'complet' : `${ev.capacity} places`}</small></span>
+    </label>`).join('');
+  return `<article class="event-card soiree-card">
+    <p class="event-date">${esc(when(s.starts_at))}</p>
+    <h3>${esc(s.title)}</h3>
+    ${s.description ? `<p>${esc(s.description)}</p>` : ''}
+    <div class="event-meta"><span>Gratuit</span><span>En visio</span>${many ? `<span>${s.salons.length} salons</span>` : ''}</div>
+    ${open.length ? `<form class="free-form" data-free-form novalidate>
+      <fieldset class="salons"><legend>${many ? '1. Choisis ton salon' : 'Ton salon'}</legend><div class="salon-grid">${salons}</div></fieldset>
+      <fieldset class="about"><legend>${many ? '2. Présente-toi' : 'Présente-toi'}</legend>
+      <div class="free-grid">
+        <label>Prénom<input name="first_name" autocomplete="given-name" required maxlength="60"></label>
+        <label>Email<input name="email" type="email" autocomplete="email" required maxlength="254"></label>
+        <label>Je suis<select name="gender" required><option value="">Choisir</option><option value="femme">une femme</option><option value="homme">un homme</option></select></label>
+        <label>Date de naissance<input name="birth_date" type="date" required max="${maxBirth}"></label>
+        <label>Ma ville<input name="city" autocomplete="address-level2" required maxlength="80" placeholder="ex. Lyon, Tizi Ouzou, Montréal"></label>
+        <label>Je cherche quelqu’un<select name="search_zone" required><option value="">Choisir</option><option value="ville">dans ma ville et alentours</option><option value="region">dans ma région</option><option value="france">dans toute la France</option><option value="europe">en France ou en Europe</option><option value="algerie">en Algérie</option><option value="monde">peu importe où</option></select></label>
+      </div></fieldset>
+      <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <label class="check"><input type="checkbox" name="rules"><span>J’accepte les <a href="/cgv/" target="_blank" rel="noopener">règles de la soirée</a> : respect, sérieux, aucun propos déplacé. J’ai 18 ans ou plus.</span></label>
+      <button class="btn btn-ink" type="submit">Réserver ma place</button>
+      <p class="form-status" role="status" data-free-status></p>
+    </form>` : '<button class="btn btn-ink" type="button" disabled>Complet</button>'}
+  </article>`;
 }
 
 const FREE_ERRORS = {
+  bad_request: 'Choisis ton salon.',
   invalid_email: 'Vérifie ton adresse email.',
   missing_name: 'Indique ton prénom.',
   missing_gender: 'Indique si tu es une femme ou un homme.',
+  missing_city: 'Indique ta ville.',
+  missing_zone: 'Indique où tu cherches quelqu’un.',
   invalid_birth_date: 'Vérifie ta date de naissance.',
   rules_required: 'Coche la case des règles de la soirée pour continuer.',
   too_young: 'Les soirées sont réservées aux personnes majeures.',
-  age_out_of_range: 'Cette soirée est réservée à une autre tranche d’âge.',
-  event_full: 'Cette soirée est complète.',
+  age_out_of_range: 'Ce salon est réservé à une autre tranche d’âge : choisis le salon qui correspond à ton âge.',
+  event_full: 'Ce salon est complet : choisis-en un autre.',
   event_past: 'Cette soirée est passée.',
-  event_unavailable: 'Cette soirée n’est plus disponible.',
+  event_unavailable: 'Ce salon n’est plus disponible.',
 };
 
 async function freeRegister(e) {
   e.preventDefault();
   const form = e.target, st = $('[data-free-status]', form), btn = $('[type=submit]', form);
   const f = new FormData(form);
-  if (!f.get('first_name') || !f.get('email') || !f.get('gender') || !f.get('birth_date')) return status(st, 'Remplis ton prénom, ton email, ton genre et ta date de naissance.', true);
+  if (!f.get('event_id')) return status(st, FREE_ERRORS.bad_request, true);
+  if (!f.get('first_name') || !f.get('email') || !f.get('gender') || !f.get('birth_date') || !f.get('city') || !f.get('search_zone')) return status(st, 'Remplis tous les champs pour réserver ta place.', true);
   if (!f.get('rules')) return status(st, FREE_ERRORS.rules_required, true);
   btn.disabled = true;
   btn.textContent = 'Un instant…';
@@ -168,12 +194,12 @@ async function freeRegister(e) {
     res = await fetch('/api/event-register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ event_id: form.dataset.event, first_name: f.get('first_name'), email: f.get('email'), gender: f.get('gender'), birth_date: f.get('birth_date'), city: f.get('city'), website: f.get('website'), rules_accepted: true }),
+      body: JSON.stringify({ event_id: f.get('event_id'), first_name: f.get('first_name'), email: f.get('email'), gender: f.get('gender'), birth_date: f.get('birth_date'), city: f.get('city'), search_zone: f.get('search_zone'), website: f.get('website'), rules_accepted: true }),
     });
     data = await res.json().catch(() => ({}));
   } catch { /* réseau */ }
   if (res?.ok && data.status === 'registered') {
-    form.innerHTML = `<div class="free-done"><strong>Ta place est réservée, ${esc(f.get('first_name'))}.</strong><p>Lamia t’enverra le lien de la salle vidéo à <b>${esc(f.get('email'))}</b> avant la soirée. Pense à regarder tes courriers indésirables, et prépare ton masque !</p></div>`;
+    form.innerHTML = `<div class="free-done"><strong>Ta place est réservée, ${esc(f.get('first_name'))}${data.salon ? ` : salon ${esc(data.salon)}` : ''}.</strong><p>Lamia t’enverra le lien de la salle vidéo à <b>${esc(f.get('email'))}</b> avant la soirée. Pense à regarder tes courriers indésirables, et prépare ton masque !</p></div>`;
     return;
   }
   btn.disabled = false;

@@ -37,7 +37,7 @@
       <button class="btn btn-line" type="button" id="logout">Me déconnecter</button>
     </div>
     <p id="summary" class="lead" style="margin-top:20px"></p>
-    <table><thead><tr><th>Prénom</th><th>Email</th><th>Genre</th><th>Âge</th><th>Ville</th><th>Paiement</th><th>Inscription</th></tr></thead><tbody id="people"></tbody></table>
+    <table><thead><tr><th>Prénom</th><th>Email</th><th>Genre</th><th>Âge</th><th>Ville</th><th>Cherche</th><th>Paiement</th><th>Inscription</th></tr></thead><tbody id="people"></tbody></table>
     <div class="box">
       <h2 style="font-size:26px">Envoyer le lien de la salle</h2>
       <p>Les adresses des personnes inscrites (ayant payé pour une soirée payante), à coller en copie cachée (Cci) de ton email :</p>
@@ -78,7 +78,7 @@ async function boot() {
   if (!session) return;
   try {
     const { events } = await api('/api/admin-events');
-    $('#event').innerHTML = events.map((e) => `<option value="${esc(e.id)}">${esc(e.title)} · ${esc(when(e.starts_at))} · ${esc(e.status)}</option>`).join('');
+    $('#event').innerHTML = events.map((e) => `<option value="${esc(e.id)}">${esc(e.title)}${e.audience ? ' — ' + esc(e.audience) : ''} · ${esc(when(e.starts_at))} · ${esc(e.status)}</option>`).join('');
     loadOrders();
     if (events.length) await load(); else say('Aucune soirée dans la base.');
   } catch (e) {
@@ -105,7 +105,7 @@ async function load() {
     const { people, wishes, wishesAvailable, free } = await api(`/api/admin-events?event_id=${encodeURIComponent($('#event').value)}`);
     const paid = people.filter((p) => p.paid);
     $('#summary').textContent = free ? `Soirée gratuite · ${people.length} inscrit${people.length > 1 ? 's' : ''} · ${people.filter((p) => p.gender === 'femme').length} femmes · ${people.filter((p) => p.gender === 'homme').length} hommes` : `${paid.length} place${paid.length > 1 ? 's' : ''} payée${paid.length > 1 ? 's' : ''} · ${people.length - paid.length} en attente`;
-    $('#people').innerHTML = people.map((p) => `<tr><td>${esc(p.first_name || '—')}</td><td>${esc(p.email || '—')}</td><td>${esc(p.gender || '')}</td><td>${p.age ?? ''}</td><td>${esc(p.city || '')}</td><td class="${p.paid ? 'paid' : 'pending'}">${free ? 'Gratuite' : p.paid ? 'Payée' : 'En attente'}</td><td>${p.registered_at ? esc(when(p.registered_at)) : ''}</td></tr>`).join('') || '<tr><td colspan="7">Personne n’est encore inscrit.</td></tr>';
+    $('#people').innerHTML = people.map((p) => `<tr><td>${esc(p.first_name || '—')}</td><td>${esc(p.email || '—')}</td><td>${esc(p.gender || '')}</td><td>${p.age ?? ''}</td><td>${esc(p.city || '')}</td><td>${esc(({ ville: 'Sa ville', region: 'Sa région', france: 'Toute la France', europe: 'France + Europe', algerie: 'Algérie', monde: 'Peu importe' })[p.search_zone] || '')}</td><td class="${p.paid ? 'paid' : 'pending'}">${free ? 'Gratuite' : p.paid ? 'Payée' : 'En attente'}</td><td>${p.registered_at ? esc(when(p.registered_at)) : ''}</td></tr>`).join('') || '<tr><td colspan="8">Personne n’est encore inscrit.</td></tr>';
     $('#emails').value = paid.map((p) => p.email).filter(Boolean).join(', ');
     $('#wishes').innerHTML = !wishesAvailable
       ? '<p>Le formulaire des souhaits sera actif dès que sa table sera créée dans la base.</p>'

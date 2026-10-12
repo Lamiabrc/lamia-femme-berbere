@@ -682,3 +682,15 @@ body { background: var(--qvt-ivoire); }
 @media (max-width: 900px) { .hall-invite { margin-top: 26px; } }
 .hall-cue span { background: none; backdrop-filter: none; padding: 0; }
 .event-card:has(.free-form) { grid-column: 1 / -1; max-width: 780px; }
+.soiree-card { grid-column: 1 / -1; max-width: 860px; }
+.free-form fieldset { border: 0; padding: 0; margin: 0; }
+.free-form legend { font-weight: 700; font-size: 16px; margin-bottom: 10px; padding: 0; }
+.salon-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 10px; }
+.salon-choice { position: relative; display: flex; gap: 10px; align-items: flex-start; padding: 14px 16px; border: 1.5px solid var(--qvt-sable); border-radius: 14px; background: #fff; cursor: pointer; transition: border-color .2s, background .2s; }
+.salon-choice input { margin-top: 4px; accent-color: var(--qvt-encre); }
+.salon-choice strong { display: block; font-size: 16px; }
+.salon-choice small { display: block; color: var(--qvt-taupe); font-size: 13px; }
+.salon-choice:has(input:checked) { border-color: var(--qvt-encre); background: var(--qvt-champagne-clair); }
+.salon-choice.is-full { opacity: .5; cursor: not-allowed; }
+.salon-name { margin: -4px 0 8px; font-weight: 600; color: var(--qvt-bronze); }
+.salon-choice input { width: 18px; height: 18px; min-height: 0; flex: none; padding: 0; }

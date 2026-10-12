@@ -8,15 +8,17 @@ const UID = '11111111-2222-3333-4444-555555555555';
 const now = () => new Date('2026-10-12T10:00:00Z');
 const event = { id: EV, title: 'Bal masqué', starts_at: '2026-10-31T20:00:00Z', capacity: 30, ticket_price_cents: 0, status: 'published', min_age: null, max_age: null };
 
-function fake({ ev = event, exists = false, confirmed = true, taken = 0, mine = [], profile = [] } = {}) {
+function fake({ ev = event, exists = false, confirmed = true, taken = 0, mine = [], profile = [], siblings = [] } = {}) {
   const calls = [];
   const ok = (b, extra = {}) => ({ ok: true, status: 200, json: async () => b, headers: new Headers(extra) });
   const fetcher = async (url, init = {}) => {
     calls.push({ url, method: init.method || 'GET', body: init.body ? JSON.parse(init.body) : null });
+    if (url.includes('speed_dating_events?') && url.includes('id=neq.')) return ok(siblings);
     if (url.includes('speed_dating_events?')) return ok(ev ? [ev] : []);
     if (url.endsWith('/auth/v1/admin/users') && init.method === 'POST') return exists ? { ok: false, status: 422, json: async () => ({}) } : ok({ id: UID });
     if (url.endsWith('/auth/v1/admin/generate_link')) return ok({ user: { id: UID, email_confirmed_at: confirmed ? 'x' : null } });
     if (url.includes(`/auth/v1/admin/users/${UID}`)) return ok({});
+    if (url.includes('event_registrations?user_id=eq') && init.method === 'PATCH') return ok(null);
     if (url.includes('event_registrations?event_id') && url.includes('user_id=eq') && !init.method) return ok(mine);
     if (url.includes('event_registrations?event_id') && url.includes('neq.cancelled')) return ok([], { 'content-range': `0-0/${taken}` });
     if (url.includes('member_profiles?user_id') && !init.method) return ok(profile);
@@ -26,7 +28,7 @@ function fake({ ev = event, exists = false, confirmed = true, taken = 0, mine = 
   return { fetcher, calls };
 }
 const req = (b) => new Request('https://x/api/event-register', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(b) });
-const base = { event_id: EV, email: 'Nadia@Exemple.fr', first_name: 'Nadia', gender: 'femme', birth_date: '1990-05-04', city: 'Lyon', rules_accepted: true };
+const base = { event_id: EV, email: 'Nadia@Exemple.fr', first_name: 'Nadia', gender: 'femme', birth_date: '1990-05-04', city: 'Lyon', search_zone: 'france', rules_accepted: true };
 
 test('âge calculé au jour de la soirée', () => {
   assert.equal(ageOn('1990-11-01', '2026-10-31T20:00:00Z'), 35);
@@ -77,4 +79,23 @@ test('refus : complet, payante, mineure, règles, robot', async () => {
   r = await registerForEvent(req({ ...base, website: 'spam' }), { env, fetcher: bot.fetcher, now });
   assert.equal(r.status, 200);
   assert.equal(bot.calls.length, 0);
+});
+
+test('ville et zone de recherche obligatoires, enregistrées sur le compte', async () => {
+  let r = await registerForEvent(req({ ...base, search_zone: '' }), { env, fetcher: fake().fetcher, now });
+  assert.equal((await r.json()).error, 'missing_zone');
+  r = await registerForEvent(req({ ...base, city: '' }), { env, fetcher: fake().fetcher, now });
+  assert.equal((await r.json()).error, 'missing_city');
+  const { fetcher, calls } = fake();
+  await registerForEvent(req(base), { env, fetcher, now });
+  assert.equal(calls.find((c) => c.url.endsWith('/admin/users')).body.user_metadata.search_zone, 'france');
+});
+
+test('changement de salon : l’ancienne place de la même soirée est libérée', async () => {
+  const OTHER = '99999999-2222-3333-4444-555555555555';
+  const { fetcher, calls } = fake({ exists: true, siblings: [{ id: OTHER }] });
+  const r = await registerForEvent(req(base), { env, fetcher, now });
+  assert.equal(r.status, 200);
+  const freed = calls.find((c) => c.method === 'PATCH' && c.url.includes(`event_id=in.(${OTHER})`));
+  assert.equal(freed.body.attendance_status, 'cancelled');
 });
