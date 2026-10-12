@@ -411,6 +411,7 @@ page(
   <svg class="bal-mask" viewBox="0 0 220 120" aria-hidden="true"><defs><linearGradient id="or" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff1c9"/><stop offset=".45" stop-color="#e3bd6e"/><stop offset="1" stop-color="#9c7134"/></linearGradient></defs><path d="M110 18c-6-14 2-16 10-16M110 18c-4-12-14-14-22-10" fill="none" stroke="url(#or)" stroke-width="2.5" stroke-linecap="round"/><path d="M8 34c30-20 66-16 102 10 36-26 72-30 102-10 0 40-24 70-58 70-20 0-32-12-44-26-12 14-24 26-44 26C32 104 8 74 8 34Z" fill="url(#or)" stroke="#fff3d0" stroke-width="1.5"/><path d="M22 40c20-12 46-10 70 8M198 40c-20-12-46-10-70 8" fill="none" stroke="#7a1e2e" stroke-width="2" opacity=".6"/><ellipse cx="68" cy="58" rx="22" ry="13" fill="#120d1a"/><ellipse cx="152" cy="58" rx="22" ry="13" fill="#120d1a"/><circle cx="110" cy="80" r="5" fill="#7a1e2e"/><path d="M4 30c-4 18-2 40 6 60M216 30c4 18 2 40-6 60" stroke="url(#or)" stroke-width="2" fill="none" opacity=".7"/></svg>
   <h1>Le Bal masqué<br><span>de Venise</span></h1>
   <p class="bal-date">Samedi 31 octobre · 21 h · en visio · gratuit</p>
+  <p class="bal-welcome">${esc(roomBySlug['speed-dating'].welcome)}</p>
   <p class="bal-lead">${esc(P.speedDating.intro)}</p>
   <p class="bal-actions"><a class="btn btn-gold" href="#events-title">Réserver ma place au bal</a><a class="btn bal-btn-line" href="/speed-dating/salle/">Tester ma caméra</a></p>
 </section>

@@ -946,3 +946,4 @@ body { background: var(--qvt-ivoire); }
 .bal .origin blockquote { border-left-color: var(--or); }
 .bal-deroule li { align-content: start; }
 @media (max-width: 480px) { .bal-deroule ol { grid-template-columns: 1fr; } }
+.bal-welcome { margin: 8px 0 0; font-family: var(--serif); font-style: italic; font-size: 22px; color: #fff; }
