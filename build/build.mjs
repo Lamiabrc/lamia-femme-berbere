@@ -183,12 +183,6 @@ page(
     <h1>${esc(P.hall.title)}</h1>
     <p class="lead">${esc(P.hall.lead)}</p>
     <p class="hall-actions"><a class="btn btn-ink" href="#plan">Visiter la Maison</a><a class="btn btn-line" href="/lamia-brechet/">Qui est Lamia</a></p>
-    <div class="hall-invite" data-next-event>
-      <p class="now-room">Le Boudoir des Rencontres · speed dating en ligne</p>
-      <h3>Bal masqué de Venise</h3>
-      <p>Samedi 31 octobre, en visio</p>
-      <a class="btn btn-gold" href="/speed-dating/#events-title">Réserver ma place, c’est gratuit</a>
-    </div>
   </div>
   <div class="hall-stage">
     <span class="arch-shadow" aria-hidden="true"></span>
@@ -198,6 +192,33 @@ page(
     <figure class="hall-medal">
       <img src="/images/collier/collier-kabyle-15g-detail-320.webp" width="320" height="400" alt="Médaillon kabyle émaillé bleu, vert et jaune, corail au centre">
     </figure>
+  </div>
+  <div class="hall-apercus" aria-label="En ce moment dans la Maison">
+    <a class="apercu is-bal" href="/speed-dating/#events-title">
+      <span class="apercu-mask" aria-hidden="true"><svg viewBox="0 0 64 32" width="64" height="32"><path d="M2 8c10-6 20-4 30 4C42 4 52 2 62 8c0 12-8 20-18 20-6 0-9-4-12-8-3 4-6 8-12 8C10 28 2 20 2 8Z" fill="none" stroke="currentColor" stroke-width="2.2"/><ellipse cx="19" cy="15" rx="6" ry="4" fill="currentColor"/><ellipse cx="45" cy="15" rx="6" ry="4" fill="currentColor"/></svg></span>
+      <span class="apercu-kicker">Speed dating · gratuit</span>
+      <strong>Bal masqué de Venise</strong>
+      <span class="apercu-info">Samedi 31 octobre, 21 h · en visio · 3 salons dédiés</span>
+      <span class="apercu-cta">Réserver ma place →</span>
+    </a>
+    <a class="apercu" href="/produit/?p=collier-kabyle-argente-emaille-15g">
+      <img src="/images/collier/collier-kabyle-15g-hero-320.webp" width="320" height="400" alt="" loading="lazy">
+      <span class="apercu-kicker">L’Écrin · précommande</span>
+      <strong>Collier kabyle émaillé</strong>
+      <span class="apercu-info">Modèle de 1974, fabriqué à Ath Yenni · 99 €</span>
+    </a>
+    <a class="apercu" href="/bibliotheque/">
+      <img src="/images/marque/yemma-portrait-700.webp" width="700" height="1050" alt="" loading="lazy">
+      <span class="apercu-kicker">La Bibliothèque · précommande</span>
+      <strong>Werdi, ouvre les yeux !</strong>
+      <span class="apercu-info">Livre broché 15,90 € · ebook 12,90 €</span>
+    </a>
+    <a class="apercu" href="https://www.tiktok.com/@lamiaberbere" rel="noopener" target="_blank">
+      <img src="/images/marque/lamia-logo-160.webp" width="160" height="160" alt="" loading="lazy" class="is-logo">
+      <span class="apercu-kicker">Le Salon · chaque soir</span>
+      <strong>Live Mariage Kabyle</strong>
+      <span class="apercu-info">De 21 h à 23 h, en direct sur TikTok</span>
+    </a>
   </div>
   <a class="hall-cue" href="#plan"><span>Approcher de la Maison</span><svg width="22" height="34" viewBox="0 0 22 34" aria-hidden="true"><path d="M2 4l9 9 9-9M2 17l9 9 9-9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
 </section>
@@ -213,30 +234,6 @@ page(
       <h3 id="etage-${f.level}">${esc(f.name)}<span>${esc(f.theme)}</span></h3>
       <ul class="room-index">${rooms.filter((r) => r.floor === f.level && r.slug !== 'hall').map((r) => `<li class="${r.status === 'soon' ? 'is-soon' : ''}" data-accent="${r.accent}"><a href="${r.path}"><span class="pip" aria-hidden="true"></span><strong>${esc(r.name)}</strong><span>${r.status === 'soon' ? 'Bientôt' : esc(r.welcome)}</span></a></li>`).join('')}</ul>
     </section>`).join('')}
-  </div>
-</section>
-
-<section class="now-section is-dark" aria-labelledby="now-title">
-  <h2 id="now-title">En ce moment dans la Maison</h2>
-  <div class="now-grid">
-    <article class="now-card" data-accent="rouge">
-      <p class="now-room">Le Salon de Lamia</p>
-      <h3>Live Mariage Kabyle</h3>
-      <p>Tous les soirs, de 21 h à 23 h, sur TikTok.</p>
-      <a href="https://www.tiktok.com/@lamiaberbere" rel="noopener" target="_blank">Rejoindre le live sur TikTok</a>
-    </article>
-    <article class="now-card" data-accent="rouge" data-next-event>
-      <p class="now-room">Le Boudoir des Rencontres</p>
-      <h3>Prochaine soirée</h3>
-      <p>Les prochaines soirées arrivent.</p>
-      <a href="/speed-dating/">Voir les soirées</a>
-    </article>
-    <article class="now-card" data-accent="vert">
-      <p class="now-room">L’Écrin</p>
-      <h3>Collier kabyle émaillé</h3>
-      <p>Modèle exclusif de 1974, fabriqué à Ath Yenni.</p>
-      <a href="/ecrin/">Entrer dans l’Écrin</a>
-    </article>
   </div>
 </section>
 
