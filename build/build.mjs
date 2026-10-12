@@ -11,11 +11,29 @@ import { rooms, roomBySlug, floors } from '../content/rooms.mjs';
 import * as P from '../content/pages.mjs';
 import { legalPages } from '../content/legal.mjs';
 import { facade } from './facade.mjs';
+import { EDITABLE, defaults, applyOverrides } from '../content/editable.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = join(ROOT, 'dist');
 const SITE_URL = (process.env.SITE_URL || 'https://lamia-femme-berbere.com').replace(/\/$/, '');
 const VERSION = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 8) || String(Date.now());
+
+// Textes et images modifiés par Lamia depuis son tableau de bord (platform_settings « site_content »).
+// Lus avec la clé de service, disponible uniquement pendant la construction sur Vercel.
+const DEFAULTS = defaults();
+let IMG = {};
+async function loadOverrides() {
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY;
+  if (!key) return {};
+  try {
+    const h = { apikey: key, ...(key.startsWith('sb_secret_') ? {} : { Authorization: `Bearer ${key}` }) };
+    const r = await fetch('https://tybwvxinigahhntfeeur.supabase.co/rest/v1/platform_settings?key=eq.site_content&select=value', { headers: h, signal: AbortSignal.timeout(10000) });
+    if (!r.ok) return {};
+    return (await r.json())[0]?.value?.values || {};
+  } catch { return {}; }
+}
+IMG = applyOverrides(await loadOverrides());
+const imgOr = (name, fallback) => IMG[name] || fallback;
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
 const list = (items) => `<ul>${items.map((i) => `<li>${esc(i)}</li>`).join('')}</ul>`;
@@ -206,10 +224,10 @@ page(
   <div class="hall-stage">
     <span class="arch-shadow" aria-hidden="true"></span>
     <figure class="hall-arch">
-      <img src="/images/marque/lamia-logo-600.webp" width="600" height="600" alt="Le visage de Lamia Femme Berbère : lunettes, lèvres rouges et bijoux kabyles">
+      <img src="${esc(imgOr('hall-arch', '/images/marque/lamia-logo-600.webp'))}" width="600" height="600" alt="Le visage de Lamia Femme Berbère : lunettes, lèvres rouges et bijoux kabyles">
     </figure>
     <figure class="hall-medal">
-      <img src="/images/collier/collier-kabyle-15g-detail-320.webp" width="320" height="400" alt="Médaillon kabyle émaillé bleu, vert et jaune, corail au centre">
+      <img src="${esc(imgOr('hall-medal', '/images/collier/collier-kabyle-15g-detail-320.webp'))}" width="320" height="400" alt="Médaillon kabyle émaillé bleu, vert et jaune, corail au centre">
     </figure>
   </div>
   <div class="hall-apercus" aria-label="En ce moment dans la Maison">
@@ -513,6 +531,7 @@ page(
     <section class="espace-admin" data-espace-admin hidden>
       <h2>Espace administratrice</h2>
       <div class="espace-liens">
+        <a href="/tableau-de-bord"><strong>Tableau de bord</strong><span>Ventes, produits, textes du site, visites, alertes</span></a>
         <a href="/admin-soirees/"><strong>Mes soirées et précommandes</strong><span>Inscrits, salons, précommandes du livre et du collier</span></a>
         <a href="/admin-bal.html"><strong>Maîtresse du bal</strong><span>Ouvrir les portes, lancer les tours, souhaits réciproques</span></a>
         <a href="/admin.html"><strong>Alertes du Cabinet</strong><span>Signalements écrits et audio, suivi</span></a>
@@ -791,7 +810,7 @@ page(
       <p class="lamia-derriere">derrière « Lamia Femme Berbère »</p>
     </div>
     <figure class="lamia-portrait">
-      <img src="/images/lamia/lamia-salon-900.webp" srcset="/images/lamia/lamia-salon-560.webp 560w, /images/lamia/lamia-salon-900.webp 900w, /images/lamia/lamia-salon-1122.webp 1122w" sizes="(max-width: 900px) 92vw, 46vw" width="1122" height="1402" fetchpriority="high" alt="Lamia Bréchet Ighil dans son salon, en robe kabyle brodée, lunettes, collier et bracelet d’argent émaillé, au coucher du soleil">
+      ${IMG['lamia-portrait'] ? `<img src="${esc(IMG['lamia-portrait'])}"` : '<img src="/images/lamia/lamia-salon-900.webp" srcset="/images/lamia/lamia-salon-560.webp 560w, /images/lamia/lamia-salon-900.webp 900w, /images/lamia/lamia-salon-1122.webp 1122w"'} sizes="(max-width: 900px) 92vw, 46vw" width="1122" height="1402" fetchpriority="high" alt="Lamia Bréchet Ighil dans son salon, en robe kabyle brodée, lunettes, collier et bracelet d’argent émaillé, au coucher du soleil">
     </figure>
   </header>
 
@@ -990,6 +1009,8 @@ for (const p of pages) {
 }
 await cp(join(ROOT, 'public'), DIST, { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
+await mkdir(join(DIST, 'assets'), { recursive: true });
+await writeFile(join(DIST, 'assets', 'editable.json'), JSON.stringify({ fields: EDITABLE, defaults: DEFAULTS }));
 for (const f of ['maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'bal.js', 'espace.js']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
 await cp(join(ROOT, 'content', 'shipping.mjs'), join(DIST, 'assets', 'shipping.mjs'));
 
@@ -998,6 +1019,6 @@ await writeFile(
   join(DIST, 'sitemap.xml'),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${indexable.map((p) => `<url><loc>${SITE_URL}${p.path}</loc></url>`).join('')}</urlset>\n`
 );
-await writeFile(join(DIST, 'robots.txt'), `User-agent: *\nAllow: /\nDisallow: /admin.html\nDisallow: /pilotage.html\nDisallow: /admin-soirees.html\nDisallow: /speed-dating/merci/\nDisallow: /speed-dating/bal/\nDisallow: /mon-espace/\nDisallow: /admin-bal.html\nSitemap: ${SITE_URL}/sitemap.xml\n`);
+await writeFile(join(DIST, 'robots.txt'), `User-agent: *\nAllow: /\nDisallow: /admin.html\nDisallow: /pilotage.html\nDisallow: /admin-soirees.html\nDisallow: /speed-dating/merci/\nDisallow: /speed-dating/bal/\nDisallow: /mon-espace/\nDisallow: /tableau-de-bord\nDisallow: /admin-bal.html\nSitemap: ${SITE_URL}/sitemap.xml\n`);
 
 console.log(`Maison générée : ${pages.length} pages dans dist/`);

@@ -1,0 +1,106 @@
+/* Tableau de bord de Lamia — palette de la Maison (crème, champagne, encre) */
+.tdb { background: var(--qvt-creme); color: var(--qvt-encre); }
+.tdb [hidden] { display: none !important; }
+.tdb-top { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; padding: 10px var(--gouttiere); background: var(--qvt-nuit); color: var(--qvt-sable-fonce); }
+.tdb-marque { display: flex; align-items: center; gap: 10px; color: #fff; text-decoration: none; font-family: var(--serif); font-size: 20px; }
+.tdb-marque img { border-radius: 50%; background: #fff; }
+.tdb-marque em { color: var(--qvt-champagne); font-size: 16px; }
+.tdb-onglets { display: flex; gap: 4px; flex-wrap: wrap; flex: 1; }
+.tdb-onglets button { background: none; border: 0; color: var(--qvt-sable-fonce); font: 600 14px var(--sans); padding: 8px 12px; border-radius: 999px; cursor: pointer; }
+.tdb-onglets button:hover { color: #fff; }
+.tdb-onglets button[aria-current="true"] { background: var(--qvt-champagne); color: var(--qvt-nuit); }
+.tdb-moi { font-size: 13px; }
+.tdb-moi .link-button { color: var(--qvt-champagne); }
+.tdb-main { max-width: 1240px; margin: 0 auto; padding: 24px var(--gouttiere) 80px; }
+.tdb-titre { font-size: clamp(30px, 4vw, 44px); margin: 8px 0 18px; }
+.tdb-entete { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.tdb-carte { background: #fff; border: 1px solid var(--qvt-sable); border-radius: 18px; padding: 20px; margin-bottom: 16px; }
+.tdb-carte h2 { font-size: 22px; margin: 0 0 12px; }
+.tdb-login { max-width: 420px; margin: 40px auto; display: grid; gap: 12px; }
+.tdb-login label, .champ, .produit-form label { display: grid; gap: 6px; font-weight: 600; font-size: 14px; }
+.tdb input, .tdb select, .tdb textarea { min-height: 44px; padding: 8px 12px; border: 1px solid var(--qvt-sable); border-radius: 10px; font: 16px var(--sans); color: var(--qvt-encre); background: #fff; box-sizing: border-box; width: 100%; }
+.tdb textarea { line-height: 1.5; resize: vertical; }
+.tdb-message { min-height: 1.4em; margin: 0 0 8px; font-weight: 600; color: #2f6b34; }
+.tdb-message.is-error { color: var(--rouge); }
+.aide { color: var(--qvt-taupe); font-size: 14px; }
+
+.tdb-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 14px; margin-bottom: 16px; }
+.kpi { display: grid; gap: 4px; padding: 18px 20px; border-radius: 18px; background: var(--qvt-nuit); color: var(--qvt-sable-fonce); text-decoration: none; cursor: pointer; transition: transform .2s; }
+.kpi:hover { transform: translateY(-2px); }
+.kpi span { font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--qvt-champagne); }
+.kpi strong { font-family: var(--serif); font-size: 40px; line-height: 1.1; color: #fff; }
+.kpi small { font-size: 13px; color: #b9ad99; }
+.tdb-deux { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; }
+.tdb-trois { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 16px; }
+@media (max-width: 900px) { .tdb-deux { grid-template-columns: 1fr; } }
+.tdb-raccourcis { display: flex; flex-wrap: wrap; gap: 10px; }
+.ligne { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; margin: 0; border-bottom: 1px solid var(--qvt-sable); }
+.ligne small { color: var(--qvt-taupe); }
+
+.barres { position: relative; display: flex; align-items: flex-end; gap: 3px; height: 160px; padding-bottom: 22px; }
+.barre { flex: 1; height: 100%; display: flex; align-items: flex-end; }
+.barre i { display: block; width: 100%; height: max(2px, var(--h)); border-radius: 4px 4px 0 0; background: linear-gradient(180deg, #d9c19a, var(--qvt-bronze)); }
+.barre:hover i { background: var(--rouge); }
+.barres-legende { position: absolute; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-between; font-size: 12px; color: var(--qvt-taupe); }
+
+.tdb-filtres { display: flex; gap: 16px; align-items: end; flex-wrap: wrap; margin-bottom: 12px; }
+.tdb-filtres label { display: grid; gap: 6px; font-weight: 600; font-size: 14px; min-width: 240px; }
+.tdb-table { overflow-x: auto; background: #fff; border: 1px solid var(--qvt-sable); border-radius: 18px; }
+.tdb table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.tdb th, .tdb td { text-align: left; vertical-align: top; padding: 12px; border-bottom: 1px solid var(--qvt-sable); }
+.tdb th { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--qvt-taupe); }
+.statut-select { min-width: 190px; font-weight: 600; }
+.statut-select.is-pending { background: var(--qvt-champagne-clair); }
+.statut-select.is-paid { background: #fff3c4; }
+.statut-select.is-fulfilled { background: #e4f3e6; }
+.statut-select.is-cancelled, .statut-select.is-refunded { background: #f6e3e5; }
+
+.produits-grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr)); gap: 14px; margin-bottom: 20px; }
+.produit-carte { display: grid; grid-template-rows: 180px auto; text-align: left; padding: 0; border: 1px solid var(--qvt-sable); border-radius: 16px; overflow: hidden; background: #fff; cursor: pointer; font: inherit; color: inherit; }
+.produit-carte:hover { border-color: var(--qvt-bronze); }
+.produit-carte img, .sans-photo { width: 100%; height: 180px; object-fit: cover; background: var(--qvt-creme); display: grid; place-items: center; color: var(--qvt-taupe); }
+.pc-texte { display: grid; gap: 2px; padding: 12px 14px; }
+.pc-texte strong { font-family: var(--serif); font-size: 18px; }
+.pc-texte em { font-style: normal; font-size: 13px; color: var(--qvt-bronze); }
+.produit-carte.is-draft, .produit-carte.is-archived { opacity: .65; }
+.produit-form .champs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 12px; }
+.produit-form .large { grid-column: 1 / -1; }
+.produit-form .case { display: flex; align-items: center; gap: 8px; }
+.produit-form .case input { width: 18px; min-height: 0; height: 18px; }
+.photos { display: flex; flex-wrap: wrap; gap: 10px; margin: 8px 0 12px; }
+.photo { position: relative; margin: 0; width: 120px; height: 120px; border-radius: 12px; overflow: hidden; border: 1px solid var(--qvt-sable); }
+.photo img { width: 100%; height: 100%; object-fit: cover; }
+.photo figcaption { position: absolute; inset: auto 0 0; display: flex; justify-content: space-between; padding: 4px; background: rgba(21,21,21,.6); }
+.photo button { border: 0; background: #fff; border-radius: 6px; cursor: pointer; padding: 2px 7px; }
+.principale { font-size: 11px; color: #fff; padding: 2px 4px; }
+.ajout-photo { cursor: pointer; }
+.actions { display: flex; align-items: center; gap: 16px; margin-top: 16px; }
+
+.groupe summary { cursor: pointer; font-family: var(--serif); font-size: 22px; }
+.groupe[open] summary { margin-bottom: 14px; }
+.groupe .champ { margin-bottom: 12px; }
+.champ-image { display: grid; grid-template-columns: 1fr 120px auto; gap: 12px; align-items: center; margin-bottom: 12px; font-weight: 600; font-size: 14px; }
+.champ-image img { width: 120px; height: 90px; object-fit: contain; background: var(--qvt-creme); border-radius: 10px; border: 1px solid var(--qvt-sable); }
+@media (max-width: 640px) { .champ-image { grid-template-columns: 1fr; } }
+
+.classement { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.classement li { position: relative; display: flex; justify-content: space-between; gap: 10px; padding: 6px 10px; font-size: 14px; }
+.classement li i { position: absolute; left: 0; top: 0; bottom: 0; width: var(--w); background: var(--qvt-champagne-clair); border-radius: 8px; z-index: 0; }
+.classement li span, .classement li b { position: relative; z-index: 1; }
+.alerte { border-left: 5px solid #d9c19a; }
+.alerte.is-red { border-left-color: var(--rouge); }
+.alerte.is-orange { border-left-color: #e08a2e; }
+.alerte p { margin: 0 0 4px; }
+.produit-form label.ajout-photo { display: inline-flex; width: auto; }
+@media (max-width: 760px) {
+  .tdb-top { gap: 8px; }
+  .tdb-onglets { order: 3; flex: 0 0 100%; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .tdb-onglets button { white-space: nowrap; }
+  .tdb-moi { margin-left: auto; }
+  .tdb-marque em { display: none; }
+  .tdb-table { background: none; border: 0; }
+  .tdb table, .tdb tbody, .tdb tr, .tdb td { display: block; }
+  .tdb thead { display: none; }
+  .tdb tr { background: #fff; border: 1px solid var(--qvt-sable); border-radius: 14px; margin-bottom: 10px; padding: 6px 4px; }
+  .tdb td { border: 0; padding: 4px 12px; }
+}

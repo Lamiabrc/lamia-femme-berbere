@@ -1,0 +1,297 @@
+// Tableau de bord de Lamia : ventes, produits, soirées, alertes, textes du site, visites.
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm';
+
+const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc');
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
+const money = (c, cur = 'EUR') => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: cur || 'EUR' }).format((c || 0) / 100);
+const date = (iso, opts = { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) => (iso ? new Date(iso).toLocaleString('fr-FR', { timeZone: 'Europe/Paris', ...opts }) : '');
+const STATUTS = { pending: 'En attente de paiement', paid: 'Payée, à expédier', fulfilled: 'Expédiée', cancelled: 'Annulée', refunded: 'Remboursée' };
+const ALERTES = { new: 'Nouvelle', reviewing: 'En cours', needs_info: 'Besoin d’infos', watch: 'Sous surveillance', suspended: 'Suspendu', resolved: 'Résolue', dismissed: 'Classée' };
+const GRAVITE = { red: 'Danger', orange: 'Inquiétant', yellow: 'À surveiller' };
+
+let token = null, data = null, produits = [], categories = [], edition = null;
+
+function message(t, err = false) { const m = $('[data-message]'); m.textContent = t; m.classList.toggle('is-error', err); if (t && !err) setTimeout(() => { if (m.textContent === t) m.textContent = ''; }, 4000); }
+
+async function api(body, method = 'POST') {
+  const r = await fetch(method === 'GET' ? `/api/admin?action=${body.action}` : '/api/admin', {
+    method, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: method === 'GET' ? undefined : JSON.stringify(body),
+  });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) {
+    const msg = { forbidden: 'Ce compte n’a pas le rôle administratrice.', slug_taken: 'Un autre produit porte déjà ce nom d’adresse.', bad_price: 'Vérifie le prix.', missing_name: 'Indique un nom.', too_big: 'Photo trop lourde.', bad_type: 'Format de photo non accepté (JPG, PNG ou WEBP).', publish_not_configured: 'La publication n’est pas encore branchée (voir les explications).' }[d.error];
+    throw new Error(msg || 'Une erreur est survenue. Réessaie dans un instant.');
+  }
+  return d;
+}
+
+// ---------------------------------------------------------------- navigation
+function ouvrir(tab) {
+  $$('[data-panel]').forEach((p) => { p.hidden = p.dataset.panel !== tab; });
+  $$('[data-tab]').forEach((b) => b.setAttribute('aria-current', String(b.dataset.tab === tab)));
+  try { history.replaceState(null, '', `#${tab}`); } catch { /* */ }
+  if (tab === 'produits' && !produits.length) chargerProduits();
+  if (tab === 'textes') chargerTextes();
+  scrollTo({ top: 0 });
+}
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('[data-tab],[data-go]');
+  if (!t) return;
+  e.preventDefault();
+  ouvrir(t.dataset.tab || t.dataset.go);
+  if (t.hasAttribute('data-nouveau-produit')) setTimeout(() => editer(null), 50);
+});
+
+// ---------------------------------------------------------------- vue d'ensemble
+async function charger() {
+  try { data = await api({ action: 'dashboard' }); } catch (e) { return message(e.message, true); }
+  const v = data.ventes, i = data.inscrits, a = data.alertes, vis = data.visites;
+  $('[data-k="ventes-total"]').textContent = money(v.total_cents);
+  $('[data-k="ventes-detail"]').textContent = `${v.nombre} commande${v.nombre > 1 ? 's' : ''} · ${v.en_attente} en attente · ${v.payees} à expédier`;
+  $('[data-k="inscrits"]').textContent = i.total;
+  $('[data-k="inscrits-detail"]').textContent = `+${i.nouveaux_7j} cette semaine`;
+  $('[data-k="alertes"]').textContent = a.nouvelles;
+  $('[data-k="visiteurs"]').textContent = vis ? vis.aujourdhui.visiteurs : '—';
+  $('[data-k="visiteurs-detail"]').textContent = vis ? `${vis.semaine.visiteurs} sur 7 jours · ${vis.mois.visiteurs} sur 30 jours` : 'Compteur en route';
+  barres($('[data-barres-accueil]'), vis?.jours || []);
+  $('[data-dernieres]').innerHTML = v.orders.slice(0, 5).map((o) => `<p class="ligne"><span>n° ${esc(o.order_number)} · ${esc(o.customer_name || o.customer_email || '')}<br><small>${esc((o.order_items || []).map((x) => x.product_name).join(', '))}</small></span><strong>${money(o.amount_total_cents, o.currency)}</strong></p>`).join('') || '<p>Pas encore de commande.</p>';
+  ventes(); soirees(); alertes(); visites();
+}
+
+function barres(box, jours) {
+  const max = Math.max(1, ...jours.map((j) => j.visiteurs));
+  box.innerHTML = jours.map((j) => `<span class="barre" style="--h:${(j.visiteurs / max) * 100}%" title="${esc(date(j.day + 'T12:00:00Z', { day: 'numeric', month: 'short' }))} : ${j.visiteurs} visiteur${j.visiteurs > 1 ? 's' : ''}, ${j.vues} page${j.vues > 1 ? 's' : ''} vue${j.vues > 1 ? 's' : ''}"><i></i></span>`).join('')
+    + `<span class="barres-legende"><span>${esc(date((jours[0]?.day || '') + 'T12:00:00Z', { day: 'numeric', month: 'short' }))}</span><span>aujourd’hui</span></span>`;
+}
+
+// ---------------------------------------------------------------- ventes
+function ventes() {
+  const filtre = $('[data-filtre-ventes]').value;
+  const list = data.ventes.orders.filter((o) => !filtre || o.status === filtre);
+  $('[data-ventes-resume]').textContent = `${list.length} commande${list.length > 1 ? 's' : ''} · ${money(list.reduce((t, o) => t + (o.amount_total_cents || 0), 0))}`;
+  $('[data-ventes]').innerHTML = list.map((o) => {
+    const adr = o.shipping_address ? [o.shipping_address.line1, o.shipping_address.postal_code, o.shipping_address.city].filter(Boolean).join(', ') : '';
+    const livraison = /retrait/i.test(o.notes || '') ? 'Retrait en main propre' : adr || (/email/i.test(o.notes || '') ? 'Par email' : '');
+    return `<tr>
+      <td>${esc(o.order_number)}</td><td>${esc(date(o.created_at))}</td>
+      <td><strong>${esc(o.customer_name || '')}</strong><br><a href="mailto:${esc(o.customer_email)}">${esc(o.customer_email)}</a></td>
+      <td>${(o.order_items || []).map((x) => `${esc(x.product_name)}${x.quantity > 1 ? ` × ${x.quantity}` : ''}`).join('<br>')}</td>
+      <td>${esc(livraison)}</td><td><strong>${money(o.amount_total_cents, o.currency)}</strong></td>
+      <td><select data-statut="${esc(o.id)}" class="statut-select is-${esc(o.status)}">${Object.entries(STATUTS).map(([k, l]) => `<option value="${k}" ${k === o.status ? 'selected' : ''}>${l}</option>`).join('')}</select></td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="7">Aucune commande pour ce filtre.</td></tr>';
+}
+$('[data-filtre-ventes]').addEventListener('change', ventes);
+$('[data-ventes]').addEventListener('change', async (e) => {
+  const sel = e.target.closest('[data-statut]');
+  if (!sel) return;
+  try {
+    await api({ action: 'order_status', id: sel.dataset.statut, status: sel.value });
+    const o = data.ventes.orders.find((x) => x.id === sel.dataset.statut); if (o) o.status = sel.value;
+    sel.className = `statut-select is-${sel.value}`;
+    message('Statut mis à jour.');
+  } catch (err) { message(err.message, true); }
+});
+
+// ---------------------------------------------------------------- soirées et alertes
+function soirees() {
+  const s = data.inscrits.salons;
+  $('[data-soirees-resume]').textContent = `${data.inscrits.total} inscription${data.inscrits.total > 1 ? 's' : ''} au total, dont ${data.inscrits.nouveaux_7j} cette semaine.`;
+  $('[data-soirees]').innerHTML = s.map((e) => `<tr><td>${esc(e.title)}</td><td>${esc(e.audience || '')}</td><td>${esc(date(e.starts_at, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }))}</td><td><strong>${e.inscrits}</strong></td><td>${e.capacity}</td></tr>`).join('') || '<tr><td colspan="5">Aucune soirée à venir.</td></tr>';
+}
+function alertes() {
+  const list = data.alertes.recentes;
+  $('[data-alertes]').innerHTML = list.length
+    ? list.map((r) => `<article class="tdb-carte alerte is-${esc(r.severity)}"><p><strong>${esc(GRAVITE[r.severity] || '')}</strong> · ${esc(ALERTES[r.status] || r.status)} · ${esc(date(r.created_at))}</p><p>${esc(r.reported_label || 'Personne non précisée')} — ${esc(r.reason || '')}</p></article>`).join('')
+    : '<p class="tdb-carte">Aucune alerte pour le moment.</p>';
+}
+
+// ---------------------------------------------------------------- visites
+function visites() {
+  const v = data.visites;
+  if (!v) { $('[data-visites-kpis]').innerHTML = '<p>Les statistiques arrivent dès les premières visites.</p>'; return; }
+  $('[data-visites-kpis]').innerHTML = [['Aujourd’hui', v.aujourdhui], ['7 derniers jours', v.semaine], ['30 derniers jours', v.mois]]
+    .map(([l, x]) => `<div class="kpi"><span>${l}</span><strong>${x.visiteurs}</strong><small>${x.vues} page${x.vues > 1 ? 's' : ''} vue${x.vues > 1 ? 's' : ''}</small></div>`).join('');
+  barres($('[data-barres]'), v.jours || []);
+  const NOMS = { '/': 'Le Hall (accueil)', '/speed-dating/': 'Le Bal masqué', '/ecrin/': 'L’Écrin', '/bibliotheque/': 'La Bibliothèque', '/boutique/': 'La Boutique', '/lamia-brechet/': 'Qui est Lamia', '/produit/': 'Fiche produit', '/grenier/': 'Le Grenier', '/confidences/': 'Le Cabinet des Confidences' };
+  const SOURCES = { direct: 'Lien direct ou appli', tiktok: 'TikTok', facebook: 'Facebook', instagram: 'Instagram', google: 'Google', youtube: 'YouTube', whatsapp: 'WhatsApp' };
+  const top = (box, rows, nom) => { const max = Math.max(1, ...rows.map((r) => r[1])); box.innerHTML = rows.map(([k, n]) => `<li><span>${esc(nom(k))}</span><b>${n}</b><i style="--w:${(n / max) * 100}%"></i></li>`).join('') || '<li>Pas encore de données</li>'; };
+  top($('[data-top-pages]'), v.pages || [], (k) => NOMS[k] || k);
+  top($('[data-top-sources]'), v.sources || [], (k) => SOURCES[k] || k);
+  top($('[data-top-appareils]'), v.appareils || [], (k) => ({ mobile: 'Téléphone', ordinateur: 'Ordinateur', tablette: 'Tablette' })[k] || k);
+}
+
+// ---------------------------------------------------------------- produits
+async function chargerProduits() {
+  try { ({ products: produits, categories } = await api({ action: 'products' })); } catch (e) { return message(e.message, true); }
+  $('[data-categories]').innerHTML = categories.map((c) => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('');
+  const VIS = { active: 'En vente', draft: 'Brouillon', archived: 'Archivé' };
+  $('[data-produits]').innerHTML = produits.map((p) => {
+    const photo = (Array.isArray(p.gallery) && p.gallery[0] && (p.gallery[0].url || p.gallery[0])) || p.cover_image_url || (p.slug === 'collier-kabyle-argente-emaille-15g' ? '/images/collier/collier-kabyle-15g-hero-320.webp' : '');
+    return `<button type="button" class="produit-carte is-${esc(p.status)}" data-produit="${esc(p.id)}">
+      ${photo ? `<img src="${esc(photo)}" alt="" loading="lazy">` : '<span class="sans-photo">Pas de photo</span>'}
+      <span class="pc-texte"><strong>${esc(p.name)}</strong><span>${money(p.price_cents, p.currency)} · stock ${p.stock_qty}</span><em>${VIS[p.status] || p.status}${p.categories ? ` · ${esc(p.categories.name)}` : ''}</em></span>
+    </button>`;
+  }).join('') || '<p>Aucun produit.</p>';
+}
+$('[data-produits]').addEventListener('click', (e) => { const b = e.target.closest('[data-produit]'); if (b) editer(produits.find((p) => p.id === b.dataset.produit)); });
+$$('[data-panel="produits"] [data-nouveau-produit]').forEach((b) => b.addEventListener('click', () => editer(null)));
+
+function editer(p) {
+  const f = $('[data-produit-form]');
+  edition = { photos: [] };
+  f.reset();
+  f.hidden = false;
+  $('[data-produit-titre]').textContent = p ? `Modifier : ${p.name}` : 'Nouveau produit';
+  $('[data-produit-status]').textContent = '';
+  if (p) {
+    for (const k of ['id', 'slug', 'name', 'subtitle', 'description', 'stock_qty', 'category_id', 'product_type', 'status']) if (f.elements[k]) f.elements[k].value = p[k] ?? '';
+    f.elements.price.value = (p.price_cents / 100).toFixed(2);
+    f.elements.compare.value = p.compare_at_price_cents ? (p.compare_at_price_cents / 100).toFixed(2) : '';
+    f.elements.is_unique.checked = !!p.is_unique; f.elements.featured.checked = !!p.featured;
+    edition.photos = (Array.isArray(p.gallery) ? p.gallery : []).map((g) => (typeof g === 'string' ? { url: g } : g)).filter((g) => g.url);
+    edition.metadata = p.metadata;
+    // Le collier a des photos d'origine intégrées au site : on les propose pour pouvoir les réordonner ou les remplacer.
+    if (!edition.photos.length && p.slug === 'collier-kabyle-argente-emaille-15g') edition.photos = ['hero', 'porte', 'detail', 'ecrin'].map((v) => ({ url: `/images/collier/collier-kabyle-15g-${v}-1120.webp` }));
+    const voir = $('[data-produit-voir]'); voir.hidden = false; voir.href = `/produit/?p=${encodeURIComponent(p.slug)}`;
+  } else {
+    f.elements.status.value = 'active'; f.elements.stock_qty.value = 1; $('[data-produit-voir]').hidden = true;
+    if (categories[0]) f.elements.category_id.value = categories[0].id;
+  }
+  photos();
+  f.scrollIntoView({ behavior: 'smooth' });
+}
+$('[data-produit-fermer]').addEventListener('click', () => { $('[data-produit-form]').hidden = true; });
+
+function photos() {
+  $('[data-photos]').innerHTML = edition.photos.map((g, i) => `<figure class="photo"><img src="${esc(g.url)}" alt=""><figcaption>
+    ${i ? `<button type="button" data-photo-gauche="${i}" title="Mettre en premier">◀</button>` : '<span class="principale">Principale</span>'}
+    <button type="button" data-photo-suppr="${i}" title="Retirer">✕</button></figcaption></figure>`).join('') || '<p class="aide">Aucune photo pour l’instant.</p>';
+}
+$('[data-photos]').addEventListener('click', (e) => {
+  const g = e.target.closest('[data-photo-gauche]'), s = e.target.closest('[data-photo-suppr]');
+  if (g) { const i = +g.dataset.photoGauche; [edition.photos[i - 1], edition.photos[i]] = [edition.photos[i], edition.photos[i - 1]]; photos(); }
+  if (s) { edition.photos.splice(+s.dataset.photoSuppr, 1); photos(); }
+});
+
+// Réduit la photo (1600 px max, WEBP) avant l'envoi.
+async function reduire(file, max = 1600) {
+  const bmp = await createImageBitmap(file);
+  const k = Math.min(1, max / Math.max(bmp.width, bmp.height));
+  const c = document.createElement('canvas'); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+  c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+  const blob = await new Promise((ok) => c.toBlob(ok, 'image/webp', 0.84));
+  const b64 = await new Promise((ok) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(',')[1]); r.readAsDataURL(blob); });
+  return { data: b64, content_type: blob.type || 'image/webp' };
+}
+async function envoyer(file, folder) {
+  const img = await reduire(file);
+  const { url } = await api({ action: 'upload', folder, name: file.name.replace(/\.[^.]+$/, ''), ...img });
+  return url;
+}
+$('[data-photo-input]').addEventListener('change', async (e) => {
+  const st = $('[data-produit-status]');
+  for (const file of e.target.files) {
+    st.textContent = `Envoi de ${file.name}…`;
+    try { edition.photos.push({ url: await envoyer(file, 'produits') }); photos(); } catch (err) { st.textContent = err.message; }
+  }
+  st.textContent = '';
+  e.target.value = '';
+});
+
+$('[data-produit-form]').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = e.target, st = $('[data-produit-status]');
+  const val = (k) => f.elements[k].value;
+  const product = {
+    id: val('id') || undefined, slug: val('slug') || undefined, name: val('name'), subtitle: val('subtitle'), description: val('description'),
+    price_cents: Math.round(parseFloat(val('price').replace(',', '.')) * 100), compare_at_price_cents: val('compare') ? Math.round(parseFloat(val('compare').replace(',', '.')) * 100) : null,
+    stock_qty: Number(val('stock_qty')), category_id: val('category_id'), product_type: val('product_type'), status: val('status'),
+    is_unique: f.elements.is_unique.checked, featured: f.elements.featured.checked, gallery: edition.photos, metadata: edition.metadata,
+  };
+  st.textContent = 'Enregistrement…';
+  try {
+    const { product: saved } = await api({ action: 'product_save', product });
+    st.textContent = 'Produit enregistré. Il apparaît tout de suite sur le site.';
+    f.elements.id.value = saved.id; f.elements.slug.value = saved.slug;
+    const voir = $('[data-produit-voir]'); voir.hidden = false; voir.href = `/produit/?p=${encodeURIComponent(saved.slug)}`;
+    await chargerProduits();
+  } catch (err) { st.textContent = err.message; }
+});
+
+// ---------------------------------------------------------------- textes et images
+let champs = null;
+async function chargerTextes() {
+  if (champs) return;
+  try {
+    const [ed, cur] = await Promise.all([fetch('/assets/editable.json').then((r) => r.json()), api({ action: 'content' })]);
+    champs = ed;
+    const groups = {};
+    for (const f of ed.fields) (groups[f.group] ||= []).push(f);
+    $('[data-textes]').innerHTML = Object.entries(groups).map(([g, fields]) => `<details class="tdb-carte groupe"${g === 'Le Hall' ? ' open' : ''}><summary>${esc(g)}</summary>${fields.map((f) => {
+      const v = cur.values[f.key] ?? ed.defaults[f.key] ?? '';
+      if (f.image) return `<div class="champ-image"><span>${esc(f.label)}</span><img src="${esc(v)}" alt="" data-apercu="${esc(f.key)}"><input type="hidden" data-champ="${esc(f.key)}" value="${esc(v)}"><label class="btn btn-line">Changer l’image<input type="file" accept="image/*" data-image-champ="${esc(f.key)}" hidden></label></div>`;
+      return `<label class="champ">${esc(f.label)}${f.long ? `<textarea data-champ="${esc(f.key)}" rows="4">${esc(v)}</textarea>` : `<input data-champ="${esc(f.key)}" value="${esc(v)}">`}</label>`;
+    }).join('')}</details>`).join('');
+    etat(cur);
+  } catch (e) { message(e.message, true); }
+}
+function etat(cur) {
+  const p = cur.published_at ? `Dernière publication : ${date(cur.published_at)}.` : 'Pas encore publié depuis le tableau de bord.';
+  $('[data-textes-etat]').textContent = cur.publish_ready ? `${p} Modifie, enregistre, puis publie : le site se met à jour en une minute environ.` : `${p} La publication automatique n’est pas encore branchée : enregistre tes modifications, elles seront appliquées au prochain déploiement.`;
+}
+$('[data-textes]').addEventListener('change', async (e) => {
+  const inp = e.target.closest('[data-image-champ]');
+  if (!inp?.files[0]) return;
+  message('Envoi de l’image…');
+  try {
+    const url = await envoyer(inp.files[0], 'site');
+    $(`[data-champ="${CSS.escape(inp.dataset.imageChamp)}"]`).value = url;
+    $(`[data-apercu="${CSS.escape(inp.dataset.imageChamp)}"]`).src = url;
+    message('Image prête. Pense à enregistrer puis publier.');
+  } catch (err) { message(err.message, true); }
+});
+function valeurs() {
+  const out = {};
+  for (const el of $$('[data-champ]')) { const k = el.dataset.champ; if (el.value.trim() && el.value !== champs.defaults[k]) out[k] = el.value; }
+  return out;
+}
+$('[data-textes-enregistrer]').addEventListener('click', async () => {
+  try { await api({ action: 'content_save', values: valeurs() }); message('Modifications enregistrées.'); } catch (e) { message(e.message, true); }
+});
+$('[data-textes-publier]').addEventListener('click', async () => {
+  try {
+    await api({ action: 'content_save', values: valeurs() });
+    await api({ action: 'publish' });
+    message('Publication lancée : le site sera à jour dans une minute environ.');
+    etat({ published_at: new Date().toISOString(), publish_ready: true });
+  } catch (e) { message(e.message, true); }
+});
+
+// ---------------------------------------------------------------- connexion
+async function demarrer() {
+  const { data: { session } } = await supabase.auth.getSession();
+  token = session?.access_token || null;
+  const admin = session?.user?.app_metadata?.role === 'admin';
+  $('[data-login]').hidden = admin;
+  $('[data-onglets]').hidden = !admin;
+  $('[data-moi]').hidden = !session;
+  if (session) $('[data-moi-email]').textContent = session.user.email;
+  if (session && !admin) message('Ce compte n’a pas le rôle administratrice.', true);
+  if (!admin) return;
+  const tab = location.hash.slice(1);
+  ouvrir(['accueil', 'ventes', 'produits', 'soirees', 'alertes', 'textes', 'visites'].includes(tab) ? tab : 'accueil');
+  await charger();
+}
+$('[data-login]').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = new FormData(e.target);
+  const { error } = await supabase.auth.signInWithPassword({ email: f.get('email'), password: f.get('password') });
+  if (error) { $('[data-login-status]').textContent = 'Email ou mot de passe incorrect.'; return; }
+  demarrer();
+});
+$('[data-deconnexion]').addEventListener('click', async () => { await supabase.auth.signOut(); location.reload(); });
+supabase.auth.onAuthStateChange((ev, s) => { if (s?.access_token) token = s.access_token; });
+demarrer();

@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Tableau de bord · Lamia Femme Berbère</title>
+<link rel="icon" href="/images/marque/lamia-logo-160.webp">
+<link rel="stylesheet" href="/assets/maison.css">
+<link rel="stylesheet" href="/tableau.css">
+</head>
+<body class="tdb">
+<header class="tdb-top">
+  <a class="tdb-marque" href="/"><img src="/images/marque/lamia-logo-160.webp" width="40" height="40" alt=""><span>La Maison <em>· tableau de bord</em></span></a>
+  <nav class="tdb-onglets" aria-label="Rubriques" data-onglets hidden>
+    <button type="button" data-tab="accueil" aria-current="true">Accueil</button>
+    <button type="button" data-tab="ventes">Ventes</button>
+    <button type="button" data-tab="produits">Produits</button>
+    <button type="button" data-tab="soirees">Soirées</button>
+    <button type="button" data-tab="alertes">Alertes</button>
+    <button type="button" data-tab="textes">Textes &amp; images</button>
+    <button type="button" data-tab="visites">Visites</button>
+  </nav>
+  <div class="tdb-moi" data-moi hidden><span data-moi-email></span> <button type="button" class="link-button" data-deconnexion>Se déconnecter</button></div>
+</header>
+
+<main class="tdb-main">
+  <form class="tdb-carte tdb-login" data-login hidden>
+    <h1>Tableau de bord</h1>
+    <p>Connecte-toi avec ton compte administratrice.</p>
+    <label>Email<input name="email" type="email" autocomplete="email" required></label>
+    <label>Mot de passe<input name="password" type="password" autocomplete="current-password" required></label>
+    <button class="btn btn-ink" type="submit">Me connecter</button>
+    <p class="form-status" data-login-status></p>
+  </form>
+
+  <p class="tdb-message" role="status" data-message></p>
+
+  <!-- ===================================================== Accueil -->
+  <section data-panel="accueil" hidden>
+    <h1 class="tdb-titre">Bonjour Lamia</h1>
+    <div class="tdb-kpis">
+      <a class="kpi" data-go="ventes"><span>Ventes et précommandes</span><strong data-k="ventes-total">—</strong><small data-k="ventes-detail"></small></a>
+      <a class="kpi" data-go="soirees"><span>Inscrits aux soirées</span><strong data-k="inscrits">—</strong><small data-k="inscrits-detail"></small></a>
+      <a class="kpi" data-go="alertes"><span>Alertes à traiter</span><strong data-k="alertes">—</strong><small>Cabinet des Confidences</small></a>
+      <a class="kpi" data-go="visites"><span>Visiteurs aujourd’hui</span><strong data-k="visiteurs">—</strong><small data-k="visiteurs-detail"></small></a>
+    </div>
+    <div class="tdb-deux">
+      <div class="tdb-carte"><h2>Visiteurs, 30 derniers jours</h2><div class="barres" data-barres-accueil></div></div>
+      <div class="tdb-carte"><h2>Dernières commandes</h2><div data-dernieres></div><p><button class="link-button" type="button" data-go="ventes">Toutes les ventes</button></p></div>
+    </div>
+    <div class="tdb-carte">
+      <h2>Raccourcis</h2>
+      <div class="tdb-raccourcis">
+        <button class="btn btn-ink" type="button" data-go="produits" data-nouveau-produit>Ajouter un produit</button>
+        <button class="btn btn-line" type="button" data-go="textes">Modifier les textes du site</button>
+        <a class="btn btn-line" href="/admin-bal.html">Poste du bal</a>
+        <a class="btn btn-line" href="/admin-soirees/">Détail des inscrits</a>
+        <a class="btn btn-line" href="/" target="_blank" rel="noopener">Voir le site</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================== Ventes -->
+  <section data-panel="ventes" hidden>
+    <h1 class="tdb-titre">Ventes et précommandes</h1>
+    <div class="tdb-filtres">
+      <label>Afficher<select data-filtre-ventes><option value="">Toutes</option><option value="pending">En attente de paiement</option><option value="paid">Payées, à expédier</option><option value="fulfilled">Expédiées</option><option value="cancelled">Annulées</option></select></label>
+      <p data-ventes-resume></p>
+    </div>
+    <div class="tdb-table"><table><thead><tr><th>N°</th><th>Date</th><th>Client</th><th>Articles</th><th>Livraison</th><th>Total</th><th>Statut</th></tr></thead><tbody data-ventes></tbody></table></div>
+  </section>
+
+  <!-- ===================================================== Produits -->
+  <section data-panel="produits" hidden>
+    <div class="tdb-entete"><h1 class="tdb-titre">Produits</h1><button class="btn btn-ink" type="button" data-nouveau-produit>Ajouter un produit</button></div>
+    <div class="produits-grille" data-produits></div>
+
+    <form class="tdb-carte produit-form" data-produit-form hidden>
+      <div class="tdb-entete"><h2 data-produit-titre>Nouveau produit</h2><button class="link-button" type="button" data-produit-fermer>Fermer</button></div>
+      <input type="hidden" name="id"><input type="hidden" name="slug">
+      <div class="champs">
+        <label class="large">Nom du produit<input name="name" required maxlength="140"></label>
+        <label class="large">Sous-titre<input name="subtitle" maxlength="200" placeholder="ex. Argent émaillé, fabriqué à Ath Yenni"></label>
+        <label class="large">Description<textarea name="description" rows="6" maxlength="6000"></textarea></label>
+        <label>Prix (€)<input name="price" type="number" step="0.01" min="0" required></label>
+        <label>Ancien prix barré (€, facultatif)<input name="compare" type="number" step="0.01" min="0"></label>
+        <label>Stock<input name="stock_qty" type="number" min="0" step="1" value="1"></label>
+        <label>Rayon<select name="category_id" data-categories></select></label>
+        <label>Type<select name="product_type"><option value="physical">Objet à expédier</option><option value="digital">Numérique (ebook…)</option><option value="service">Service</option></select></label>
+        <label>Visibilité<select name="status"><option value="active">En vente sur le site</option><option value="draft">Brouillon (caché)</option><option value="archived">Archivé</option></select></label>
+        <label class="case"><input type="checkbox" name="is_unique"> Pièce unique (un seul exemplaire)</label>
+        <label class="case"><input type="checkbox" name="featured"> Mettre en avant</label>
+      </div>
+      <h3>Photos</h3>
+      <p class="aide">La première photo est la photo principale. Les photos sont réduites automatiquement avant l’envoi.</p>
+      <div class="photos" data-photos></div>
+      <label class="btn btn-line ajout-photo">Ajouter des photos<input type="file" accept="image/*" multiple data-photo-input hidden></label>
+      <div class="actions"><button class="btn btn-ink" type="submit">Enregistrer le produit</button><a class="link-button" data-produit-voir target="_blank" rel="noopener" hidden>Voir sur le site</a></div>
+      <p class="form-status" data-produit-status></p>
+    </form>
+  </section>
+
+  <!-- ===================================================== Soirées -->
+  <section data-panel="soirees" hidden>
+    <div class="tdb-entete"><h1 class="tdb-titre">Soirées et inscrits</h1><div class="tdb-raccourcis"><a class="btn btn-ink" href="/admin-soirees/">Détail des inscrits</a><a class="btn btn-line" href="/admin-bal.html">Poste du bal</a></div></div>
+    <p data-soirees-resume></p>
+    <div class="tdb-table"><table><thead><tr><th>Soirée</th><th>Salon</th><th>Date</th><th>Inscrits</th><th>Places</th></tr></thead><tbody data-soirees></tbody></table></div>
+  </section>
+
+  <!-- ===================================================== Alertes -->
+  <section data-panel="alertes" hidden>
+    <div class="tdb-entete"><h1 class="tdb-titre">Alertes</h1><a class="btn btn-ink" href="/admin.html">Ouvrir le Cabinet des Confidences</a></div>
+    <div data-alertes></div>
+  </section>
+
+  <!-- ===================================================== Textes & images -->
+  <section data-panel="textes" hidden>
+    <div class="tdb-entete"><h1 class="tdb-titre">Textes et images du site</h1>
+      <div class="tdb-raccourcis"><button class="btn btn-line" type="button" data-textes-enregistrer>Enregistrer</button><button class="btn btn-ink" type="button" data-textes-publier>Publier sur le site</button></div>
+    </div>
+    <p class="aide" data-textes-etat>Modifie un texte, enregistre, puis clique sur « Publier » : le site se met à jour en une minute environ.</p>
+    <div data-textes></div>
+  </section>
+
+  <!-- ===================================================== Visites -->
+  <section data-panel="visites" hidden>
+    <h1 class="tdb-titre">Visites</h1>
+    <div class="tdb-kpis" data-visites-kpis></div>
+    <div class="tdb-carte"><h2>Visiteurs par jour</h2><div class="barres" data-barres></div></div>
+    <div class="tdb-trois">
+      <div class="tdb-carte"><h2>Pages les plus vues</h2><ol class="classement" data-top-pages></ol></div>
+      <div class="tdb-carte"><h2>D’où viennent-ils ?</h2><ol class="classement" data-top-sources></ol></div>
+      <div class="tdb-carte"><h2>Appareils</h2><ol class="classement" data-top-appareils></ol></div>
+    </div>
+    <p class="aide">Visites comptées sans cookie et sans suivre personne : un visiteur = une personne différente dans la journée. Astuce : ajoute <code>?utm_source=live</code> à la fin du lien que tu donnes en live pour savoir combien viennent du live.</p>
+  </section>
+</main>
+<script type="module" src="/tableau.js"></script>
+</body>
+</html>

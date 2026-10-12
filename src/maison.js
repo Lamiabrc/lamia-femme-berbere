@@ -32,11 +32,12 @@ const MEDIA = {
     }[v],
   })),
 };
-const mediaFor = (p) =>
-  MEDIA[p.slug] ||
-  (Array.isArray(p.gallery) && p.gallery.length ? p.gallery : [p.cover_image_url])
-    .filter(Boolean)
-    .map((src) => ({ url: src, kind: 'inconnu', alt: p.name }));
+// Les photos ajoutées depuis le tableau de bord (gallery) passent avant les photos d'origine.
+const mediaFor = (p) => {
+  const fromDb = (Array.isArray(p.gallery) ? p.gallery : []).map((x) => (typeof x === 'string' ? { url: x } : x)).filter((x) => x?.url);
+  if (fromDb.length) return fromDb.map((x) => ({ url: x.url, kind: 'reel', alt: x.alt || p.name }));
+  return MEDIA[p.slug] || [p.cover_image_url].filter(Boolean).map((src) => ({ url: src, kind: 'inconnu', alt: p.name }));
+};
 const srcset = (m) => (m.src ? `${m.src}-320.webp 320w, ${m.src}-640.webp 640w, ${m.src}-1120.webp 1120w` : '');
 const img = (m, sizes, attrs = '') =>
   m.src
@@ -385,4 +386,14 @@ renderSocials();
     const raw = localStorage.getItem('sb-tybwvxinigahhntfeeur-auth-token');
     if (raw && JSON.parse(raw)?.access_token) a.textContent = 'Mon espace';
   } catch { /* stockage indisponible */ }
+})();
+
+// ---------------------------------------------------------------- compteur de visites anonyme (sans cookie)
+(function visite() {
+  try {
+    if (!/lamia-femme-berbere\.com$/.test(location.hostname)) return;
+    const utm = new URLSearchParams(location.search).get('utm_source') || '';
+    const body = JSON.stringify({ action: 'visit', path: location.pathname, ref: document.referrer, utm });
+    if (!navigator.sendBeacon?.('/api/admin', new Blob([body], { type: 'application/json' }))) fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, keepalive: true }).catch(() => {});
+  } catch { /* jamais bloquant */ }
 })();
