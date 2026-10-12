@@ -352,11 +352,11 @@ renderSocials();
   if (!box || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const cam = box.querySelector('[data-entree-cam]');
   const scene = box.querySelector('.entree-scene');
-  const DOOR = { x: 715 / 1672, y: 666 / 941 }; // la grande porte du Hall sur la photo
+  const DOOR = { x: 0.504, y: 0.60 }; // la grande porte du Hall sur la photo
   let door = { x: 0, y: 0 }, vw = 0, vh = 0, ticking = false;
   function measure() {
     vw = scene.clientWidth; vh = scene.clientHeight;
-    const k = Math.max(vw / 1672, vh / 941), W = 1672 * k, H = 941 * k;
+    const k = Math.max(vw / 1376, vh / 768), W = 1376 * k, H = 768 * k;
     const ox = (vw - W) * 0.43, oy = (vh - H) / 2; // object-position 43% 50%
     door = { x: ox + DOOR.x * W, y: oy + DOOR.y * H };
     box.style.setProperty('--door-x', `${door.x}px`);

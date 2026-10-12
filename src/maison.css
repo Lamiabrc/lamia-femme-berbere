@@ -1042,8 +1042,8 @@ body { background: var(--qvt-ivoire); }
 .hall-arch img { padding: 0; mix-blend-mode: normal; object-fit: cover; object-position: center top; }
 
 .f-label { position: absolute; left: 50%; top: -20px; transform: translateX(-50%); background: rgba(26,24,22,.85); color: #fff; padding: 5px 8px; border-radius: 4px; font-size: clamp(9px, 1.1cqw, 13px); line-height: 1.2; white-space: nowrap; }
-.f-spot::before { display: none; }
-.f-spot:hover::after, .f-spot:focus-visible::after { box-shadow: 0 0 0 2px #fff; }
+
+
 @media (max-width: 720px) { .f-label { display: none; } }
 
 .maison-welcome { position: relative; background: #17261f; }
@@ -1058,3 +1058,14 @@ body { background: var(--qvt-ivoire); }
 .yemma-signature span { display: block; font-family: var(--sans); font-size: 12px; }
 .hall-stage { margin-bottom: 60px; }
 @media (max-width: 700px) { .maison-welcome-image { height: 540px; object-position: 50% 50%; } .maison-welcome-copy { top: 24px; } }
+
+/* Lumière des pièces et entrée au défilement, sur la nouvelle maison. */
+.f-spot:not(.is-soon)::before { display: block; opacity: .22; animation: piece-light 4s ease-in-out infinite; }
+.f-spot:not(.is-soon):hover::before, .f-spot:not(.is-soon):focus-visible::before { opacity: 1; animation: none; }
+.f-spot:hover::after, .f-spot:focus-visible::after { box-shadow: 0 0 0 2px rgba(255,222,160,.9), 0 0 24px 4px rgba(255,190,100,.55), 0 0 0 9999px rgba(12,10,24,.42); }
+@keyframes piece-light { 0%, 100% { opacity: .18; } 50% { opacity: .36; } }
+@media (prefers-reduced-motion: reduce) {
+  .entree { height: auto; }
+  .entree-scene { position: relative; height: 70vh; }
+  .f-spot:not(.is-soon)::before { animation: none; }
+}
