@@ -151,7 +151,12 @@ function freeSoiree(s) {
     </label>`;
   }).join('');
   const many = zones.length > 1;
-  return `<article class="event-card soiree-card">
+  const venise = /venise/i.test(s.title);
+  return `<article class="event-card soiree-card${venise ? ' is-venise' : ''}">
+    ${venise ? `<div class="venise-banner">
+      <svg class="venise-mask" viewBox="0 0 64 32" width="84" height="42" aria-hidden="true"><path d="M2 8c10-6 20-4 30 4C42 4 52 2 62 8c0 12-8 20-18 20-6 0-9-4-12-8-3 4-6 8-12 8C10 28 2 20 2 8Z" fill="currentColor" stroke="#fff6dc" stroke-width="1.2"/><ellipse cx="19" cy="15" rx="6" ry="4" fill="#151515"/><ellipse cx="45" cy="15" rx="6" ry="4" fill="#151515"/><path d="M32 12c-2-6 0-10 4-11" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+      <div><p>Thème de la soirée</p><strong>Carnaval de Venise</strong><span>Masque vénitien, loup ou déguisement : viens comme au bal, le mystère fait partie du jeu.</span></div>
+    </div>` : ''}
     <p class="event-date">${esc(when(s.starts_at))}</p>
     <h3>${esc(s.title)}</h3>
     ${s.description ? `<p>${esc(s.description)}</p>` : ''}

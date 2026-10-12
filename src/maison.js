@@ -344,3 +344,35 @@ renderGrids();
 renderProductPage();
 renderNextEvent();
 renderSocials();
+
+// ---------------------------------------------------------------- l'entrée dans la Maison (effet de défilement)
+(function entree() {
+  const box = document.querySelector('[data-entree]');
+  if (!box || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cam = box.querySelector('[data-entree-cam]');
+  const scene = box.querySelector('.entree-scene');
+  const DOOR = { x: 715 / 1672, y: 666 / 941 }; // la grande porte du Hall sur la photo
+  let door = { x: 0, y: 0 }, vw = 0, vh = 0, ticking = false;
+  function measure() {
+    vw = scene.clientWidth; vh = scene.clientHeight;
+    const k = Math.max(vw / 1672, vh / 941), W = 1672 * k, H = 941 * k;
+    const ox = (vw - W) * 0.43, oy = (vh - H) / 2; // object-position 43% 50%
+    door = { x: ox + DOOR.x * W, y: oy + DOOR.y * H };
+    box.style.setProperty('--door-x', `${door.x}px`);
+    box.style.setProperty('--door-y', `${door.y}px`);
+  }
+  function frame() {
+    ticking = false;
+    const total = box.offsetHeight - vh;
+    const p = Math.min(1, Math.max(0, -box.getBoundingClientRect().top / total));
+    const e = p * p * (3 - 2 * p); // douceur d'entrée et de sortie
+    const zoom = 1 + e * 5;
+    const tx = (vw / 2 - door.x) * e, ty = (vh * 0.55 - door.y) * e;
+    cam.style.transform = `translate3d(${tx}px, ${ty}px, 0) scale(${zoom})`;
+    box.style.setProperty('--p', p.toFixed(4));
+  }
+  const ask = () => { if (!ticking) { ticking = true; requestAnimationFrame(frame); } };
+  measure(); frame();
+  addEventListener('scroll', ask, { passive: true });
+  addEventListener('resize', () => { measure(); ask(); });
+})();

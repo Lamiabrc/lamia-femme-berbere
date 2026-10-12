@@ -177,7 +177,25 @@ page(
     description: 'Bienvenue chez Lamia : bijoux kabyles, livres de Yemma Werdi, trouvailles de brocante, lives et soirées de rencontre sérieuses.',
     path: '/',
     room: roomBySlug.hall,
-    body: `<section class="hall-hero">
+    body: `<section class="entree" data-entree aria-label="Entrer dans la Maison">
+  <div class="entree-scene">
+    <div class="entree-cam" data-entree-cam>
+      <img class="entree-img" src="/images/maison/facade-soir-1672.webp" srcset="/images/maison/facade-soir-800.webp 800w, /images/maison/facade-soir-1200.webp 1200w, /images/maison/facade-soir-1672.webp 1672w" sizes="(max-width: 700px) 200vw, 100vw" width="1672" height="941" alt="" fetchpriority="high" decoding="async">
+    </div>
+    <span class="entree-stars" aria-hidden="true"></span>
+    <span class="entree-glow" aria-hidden="true"></span>
+    <div class="entree-text">
+      <p class="entree-kicker">Lamia Femme Berbère</p>
+      <p class="entree-title">La Maison t’attend.</p>
+      <p class="entree-hint">Fais défiler pour pousser la porte</p>
+      <svg width="22" height="34" viewBox="0 0 22 34" aria-hidden="true"><path d="M2 4l9 9 9-9M2 17l9 9 9-9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <span class="entree-lumiere" aria-hidden="true"></span>
+    <a class="entree-skip" href="#hall">Entrer directement</a>
+  </div>
+</section>
+
+<section class="hall-hero" id="hall">
   <div class="hall-copy">
     <p class="room-name"><span class="pip" aria-hidden="true"></span>Le Hall</p>
     <h1>${esc(P.hall.title)}</h1>

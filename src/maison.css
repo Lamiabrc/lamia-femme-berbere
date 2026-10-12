@@ -739,3 +739,59 @@ body { background: var(--qvt-ivoire); }
 .salon-choice.is-tous { grid-column: 1 / -1; background: var(--qvt-creme); border-style: dashed; }
 .salon-choice.is-tous:has(input:checked) { border-style: solid; }
 .event-card.soiree-card { max-width: 980px; }
+
+/* ================================================================ L'entrée : on s'approche de la Maison en défilant, la porte s'ouvre sur le Hall */
+.entree { position: relative; height: 260vh; background: var(--qvt-nuit); }
+.entree-scene { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
+.entree-cam { position: absolute; inset: 0; will-change: transform; transform-origin: var(--door-x, 43%) var(--door-y, 71%); }
+.entree-img { width: 100%; height: 100%; object-fit: cover; object-position: 43% 50%; display: block; }
+.entree-scene::after { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse 80% 70% at var(--door-x, 43%) var(--door-y, 71%), transparent 40%, rgba(21,21,21,.55) 100%), linear-gradient(180deg, rgba(21,21,21,.55) 0%, transparent 28%); }
+.entree-stars { position: absolute; inset: -10% 0 auto; height: 60%; pointer-events: none; opacity: calc(1 - var(--p, 0) * 1.6);
+  transform: translateY(calc(var(--p, 0) * -120px));
+  background-image: radial-gradient(circle, rgba(255,246,220,.95) 0 1.2px, transparent 2px), radial-gradient(circle, rgba(243,224,185,.8) 0 1px, transparent 1.8px);
+  background-size: 190px 150px, 270px 210px; background-position: 30px 20px, 140px 90px; }
+.entree-glow { position: absolute; left: var(--door-x, 43%); top: var(--door-y, 71%); width: 40vmax; height: 40vmax; translate: -50% -50%; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgba(255,226,160,.85), rgba(243,224,185,.35) 35%, transparent 65%);
+  opacity: calc(var(--p, 0) * 1.4); transform: scale(calc(.3 + var(--p, 0) * 3)); mix-blend-mode: screen; }
+.entree-lumiere { position: absolute; inset: 0; pointer-events: none; background: var(--qvt-ivoire); opacity: calc((var(--p, 0) - .72) * 3.6); }
+.entree-text { position: absolute; left: 0; right: 0; top: 14vh; display: grid; justify-items: center; gap: 6px; padding: 0 var(--gouttiere); text-align: center; color: #fff;
+  opacity: calc(1 - var(--p, 0) * 3.2); transform: translateY(calc(var(--p, 0) * -60px)); text-shadow: 0 2px 24px rgba(0,0,0,.6); pointer-events: none; }
+.entree-kicker { margin: 0; font-size: 13px; letter-spacing: .2em; text-transform: uppercase; color: var(--qvt-champagne); }
+.entree-title { margin: 0; font-family: var(--serif); font-size: clamp(40px, 7vw, 96px); line-height: 1; }
+.entree-hint { margin: 10px 0 0; font-family: var(--serif); font-style: italic; font-size: 20px; color: var(--qvt-champagne-clair); }
+.entree-text svg { color: var(--qvt-champagne); animation: invite 2.4s ease-in-out infinite; }
+.entree-skip { position: absolute; right: var(--gouttiere); bottom: 22px; padding: 8px 14px; border-radius: 999px; background: rgba(21,21,21,.55); color: var(--qvt-champagne); font-size: 14px; text-decoration: none; backdrop-filter: blur(6px); opacity: calc(1 - var(--p, 0) * 2); }
+.entree-skip:hover, .entree-skip:focus-visible { background: var(--qvt-champagne); color: var(--qvt-nuit); opacity: 1; }
+/* Sans animation (préférence du système) : une simple vue de la Maison */
+@media (prefers-reduced-motion: reduce) {
+  .entree { height: auto; }
+  .entree-scene { position: relative; height: 70vh; }
+  .entree-glow, .entree-lumiere { display: none; }
+  .entree-text svg { animation: none; }
+}
+.entree { height: 230vh; }
+.entree-scene::after { z-index: 1; opacity: calc(1 - var(--p, 0) * 1.4); background: radial-gradient(ellipse 80% 70% at var(--door-x, 43%) var(--door-y, 71%), transparent 40%, rgba(21,21,21,.55) 100%), linear-gradient(180deg, rgba(21,21,21,.7) 0%, rgba(21,21,21,.25) 34%, transparent 50%); }
+.entree-stars { z-index: 1; } .entree-glow { z-index: 2; } .entree-text { z-index: 2; } .entree-lumiere { z-index: 3; } .entree-skip { z-index: 4; }
+
+/* Thème Carnaval de Venise dans les salons */
+.soiree-card.is-venise { border-top: 0; padding-top: 0; overflow: hidden; }
+.venise-banner { display: flex; align-items: center; gap: 18px; margin: 0 -24px 18px; padding: 22px 24px; color: var(--qvt-champagne);
+  background:
+    linear-gradient(135deg, rgba(21,21,21,.92), rgba(70,18,32,.9)),
+    repeating-conic-gradient(from 45deg, #2a1218 0 25%, #151515 0 50%) 0 0 / 34px 34px; }
+.venise-banner p { margin: 0; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: #d9c19a; }
+.venise-banner strong { display: block; font-family: var(--serif); font-size: clamp(26px, 3.4vw, 38px); line-height: 1.05; color: #fff; }
+.venise-banner span { display: block; margin-top: 4px; font-size: 15px; color: var(--qvt-sable-fonce); }
+.venise-mask { flex: none; color: var(--qvt-champagne); filter: drop-shadow(0 0 12px rgba(243,224,185,.35)); }
+.is-venise .salon-choice strong::before { content: ''; display: inline-block; width: 22px; height: 11px; margin-right: 6px; vertical-align: -1px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 32'%3E%3Cpath d='M2 8c10-6 20-4 30 4C42 4 52 2 62 8c0 12-8 20-18 20-6 0-9-4-12-8-3 4-6 8-12 8C10 28 2 20 2 8Z' fill='%237e5b2e'/%3E%3Cellipse cx='19' cy='15' rx='6' ry='4' fill='%23fff'/%3E%3Cellipse cx='45' cy='15' rx='6' ry='4' fill='%23fff'/%3E%3C/svg%3E") center / contain no-repeat; }
+.is-venise .salon-choice:has(input:checked) { border-color: #b08a4e; background: linear-gradient(135deg, #fbf3e2, var(--qvt-champagne-clair)); box-shadow: 0 0 0 3px rgba(176,138,78,.18); }
+.is-venise .free-form .btn-ink { background: linear-gradient(135deg, #151515, #461220); border-color: #461220; }
+.is-venise .free-form .btn-ink:hover { background: var(--qvt-champagne); color: var(--qvt-nuit); border-color: var(--qvt-champagne); }
+@media (max-width: 560px) { .venise-banner { margin: 0 -18px 16px; padding: 18px; } .venise-mask { width: 60px; } }
+.salon-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 760px) { .salon-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 380px) { .salon-grid { grid-template-columns: 1fr; } }
+@media (max-width: 560px) { .venise-banner { margin: 0 -24px 16px; padding: 18px 20px; } }
+@media (max-width: 480px) { .salon-grid { grid-template-columns: 1fr; } }
