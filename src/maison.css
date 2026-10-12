@@ -733,3 +733,5 @@ body { background: var(--qvt-ivoire); }
 .apercu img { width: 84px; }
 .apercu strong { font-size: 20px; }
 .apercu.is-bal { padding-left: 20px; }
+.salon-hint { margin: -4px 0 10px; font-size: 13px; color: var(--qvt-taupe); }
+.salon-grid { grid-template-columns: repeat(auto-fit, minmax(min(165px, 100%), 1fr)); }

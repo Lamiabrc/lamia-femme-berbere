@@ -134,19 +134,28 @@ function paidCard(ev) {
 // Soirée gratuite : on choisit son salon, puis on s'inscrit en une minute, sans mot de passe.
 function freeSoiree(s) {
   const open = s.salons.filter((ev) => ev.status !== 'sold_out');
-  const many = s.salons.length > 1;
   const maxBirth = new Date(Date.now() - 18 * 365.25 * 864e5).toISOString().slice(0, 10);
-  const salons = s.salons.map((ev, i) => `<label class="salon-choice${ev.status === 'sold_out' ? ' is-full' : ''}">
-      <input type="radio" name="event_id" value="${esc(ev.id)}" ${ev.status === 'sold_out' ? 'disabled' : ''} ${!many && i === 0 ? 'checked' : ''} required>
-      <span><strong>${esc(ev.audience ? `Salon ${ev.audience}` : 'Salon unique')}</strong><small>${esc(ages(ev))} · ${ev.status === 'sold_out' ? 'complet' : `${ev.capacity} places`}</small></span>
-    </label>`).join('');
+  // Les salons sont rangés par zone (« France · 25-39 ans ») : on choisit sa zone, l'âge choisit la tranche.
+  const zoneOf = (ev) => (ev.audience || 'Salon unique').split(' · ')[0];
+  const zones = [...new Set(s.salons.map(zoneOf))];
+  SALONS[s.key] = s.salons.map((ev) => ({ id: ev.id, zone: zoneOf(ev), min: ev.min_age, max: ev.max_age, full: ev.status === 'sold_out', label: ev.audience }));
+  const salons = zones.map((z, i) => {
+    const list = s.salons.filter((ev) => zoneOf(ev) === z);
+    const tranches = list.map((ev) => (ev.audience || '').split(' · ')[1]).filter(Boolean).join(' · ');
+    const allFull = list.every((ev) => ev.status === 'sold_out');
+    return `<label class="salon-choice${allFull ? ' is-full' : ''}">
+      <input type="radio" name="zone" value="${esc(z)}" ${allFull ? 'disabled' : ''} ${zones.length === 1 && i === 0 ? 'checked' : ''} required>
+      <span><strong>${esc(z === 'Salon unique' ? z : `Salon ${z}`)}</strong><small>${esc(tranches || ages(list[0]))} · ${allFull ? 'complet' : `${list[0].capacity} places par salon`}</small></span>
+    </label>`;
+  }).join('');
+  const many = zones.length > 1;
   return `<article class="event-card soiree-card">
     <p class="event-date">${esc(when(s.starts_at))}</p>
     <h3>${esc(s.title)}</h3>
     ${s.description ? `<p>${esc(s.description)}</p>` : ''}
-    <div class="event-meta"><span>Gratuit</span><span>En visio</span>${many ? `<span>${s.salons.length} salons</span>` : ''}</div>
-    ${open.length ? `<form class="free-form" data-free-form novalidate>
-      <fieldset class="salons"><legend>${many ? '1. Choisis ton salon' : 'Ton salon'}</legend><div class="salon-grid">${salons}</div></fieldset>
+    <div class="event-meta"><span>Gratuit</span><span>En visio</span>${many ? `<span>${zones.length} salons</span>` : ''}<span>20 personnes par salon</span></div>
+    ${open.length ? `<form class="free-form" data-free-form data-soiree="${esc(s.key)}" data-starts="${esc(s.starts_at)}" novalidate>
+      <fieldset class="salons"><legend>${many ? '1. Choisis ton salon' : 'Ton salon'}</legend><p class="salon-hint">Ta tranche d’âge est choisie automatiquement d’après ta date de naissance.</p><div class="salon-grid">${salons}</div></fieldset>
       <fieldset class="about"><legend>${many ? '2. Présente-toi' : 'Présente-toi'}</legend>
       <div class="free-grid">
         <label>Prénom<input name="first_name" autocomplete="given-name" required maxlength="60"></label>
@@ -154,7 +163,7 @@ function freeSoiree(s) {
         <label>Je suis<select name="gender" required><option value="">Choisir</option><option value="femme">une femme</option><option value="homme">un homme</option></select></label>
         <label>Date de naissance<input name="birth_date" type="date" required max="${maxBirth}"></label>
         <label>Ma ville<input name="city" autocomplete="address-level2" required maxlength="80" placeholder="ex. Lyon, Tizi Ouzou, Montréal"></label>
-        <label>Je cherche quelqu’un<select name="search_zone" required><option value="">Choisir</option><option value="ville">dans ma ville et alentours</option><option value="region">dans ma région</option><option value="france">dans toute la France</option><option value="europe">en France ou en Europe</option><option value="algerie">en Algérie</option><option value="monde">peu importe où</option></select></label>
+        <label>Je cherche quelqu’un<select name="search_zone" required><option value="">Choisir</option><option value="ville">dans ma ville et alentours</option><option value="region">dans ma région</option><option value="france">dans toute la France</option><option value="europe">en France ou en Europe</option><option value="canada">au Canada</option><option value="algerie">en Algérie</option><option value="monde">peu importe où</option></select></label>
       </div></fieldset>
       <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
       <label class="check"><input type="checkbox" name="rules"><span>J’accepte les <a href="/cgv/" target="_blank" rel="noopener">règles de la soirée</a> : respect, sérieux, aucun propos déplacé. J’ai 18 ans ou plus.</span></label>
@@ -180,13 +189,26 @@ const FREE_ERRORS = {
   event_unavailable: 'Ce salon n’est plus disponible.',
 };
 
+const SALONS = {};
+const ageAt = (birth, at) => {
+  const b = new Date(`${birth}T12:00:00Z`), d = new Date(at);
+  let a = d.getUTCFullYear() - b.getUTCFullYear();
+  if (d.getUTCMonth() < b.getUTCMonth() || (d.getUTCMonth() === b.getUTCMonth() && d.getUTCDate() < b.getUTCDate())) a--;
+  return a;
+};
+
 async function freeRegister(e) {
   e.preventDefault();
   const form = e.target, st = $('[data-free-status]', form), btn = $('[type=submit]', form);
   const f = new FormData(form);
-  if (!f.get('event_id')) return status(st, FREE_ERRORS.bad_request, true);
+  if (!f.get('zone')) return status(st, FREE_ERRORS.bad_request, true);
   if (!f.get('first_name') || !f.get('email') || !f.get('gender') || !f.get('birth_date') || !f.get('city') || !f.get('search_zone')) return status(st, 'Remplis tous les champs pour réserver ta place.', true);
   if (!f.get('rules')) return status(st, FREE_ERRORS.rules_required, true);
+  const age = ageAt(f.get('birth_date'), form.dataset.starts);
+  if (!(age >= 18)) return status(st, FREE_ERRORS.too_young, true);
+  const salon = (SALONS[form.dataset.soiree] || []).find((x) => x.zone === f.get('zone') && (!x.min || age >= x.min) && (!x.max || age <= x.max));
+  if (!salon) return status(st, 'Aucun salon de cette zone ne correspond à ton âge pour cette soirée. Lamia annoncera bientôt d’autres soirées.', true);
+  if (salon.full) return status(st, `Le salon ${salon.label} est complet.`, true);
   btn.disabled = true;
   btn.textContent = 'Un instant…';
   let res, data = {};
@@ -194,7 +216,7 @@ async function freeRegister(e) {
     res = await fetch('/api/event-register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ event_id: f.get('event_id'), first_name: f.get('first_name'), email: f.get('email'), gender: f.get('gender'), birth_date: f.get('birth_date'), city: f.get('city'), search_zone: f.get('search_zone'), website: f.get('website'), rules_accepted: true }),
+      body: JSON.stringify({ event_id: salon.id, first_name: f.get('first_name'), email: f.get('email'), gender: f.get('gender'), birth_date: f.get('birth_date'), city: f.get('city'), search_zone: f.get('search_zone'), website: f.get('website'), rules_accepted: true }),
     });
     data = await res.json().catch(() => ({}));
   } catch { /* réseau */ }
