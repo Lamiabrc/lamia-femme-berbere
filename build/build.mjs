@@ -404,22 +404,39 @@ page(
     path: '/speed-dating/',
     room: roomBySlug['speed-dating'],
     scripts: ['/assets/membre.js'],
-    body: `${roomHead(roomBySlug['speed-dating'])}
-<section class="room-body two-col">
-  <div>
-    <p class="prose-lead">${esc(P.speedDating.intro)}</p>
-    <h2>Comment se passe une soirée</h2>
-    <ol class="steps">${P.speedDating.steps.map((s) => `<li>${esc(s)}</li>`).join('')}</ol>
-  </div>
-  <aside class="side-note">
-    <h2>Chaque soirée a son public</h2>
-    <p>Lamia choisit pour chaque soirée qui peut y participer, par exemple :</p>
-    ${list(P.speedDating.criteria)}
-    <p>Tu ne vois que les soirées qui te correspondent. Personne ne peut parcourir les profils des autres membres.</p>
-  </aside>
+    body: `<div class="bal">
+<section class="bal-hero">
+  <span class="bal-paillettes" aria-hidden="true"></span>
+  <p class="bal-kicker">Le Boudoir des Rencontres · speed dating en ligne</p>
+  <svg class="bal-mask" viewBox="0 0 220 120" aria-hidden="true"><defs><linearGradient id="or" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff1c9"/><stop offset=".45" stop-color="#e3bd6e"/><stop offset="1" stop-color="#9c7134"/></linearGradient></defs><path d="M110 18c-6-14 2-16 10-16M110 18c-4-12-14-14-22-10" fill="none" stroke="url(#or)" stroke-width="2.5" stroke-linecap="round"/><path d="M8 34c30-20 66-16 102 10 36-26 72-30 102-10 0 40-24 70-58 70-20 0-32-12-44-26-12 14-24 26-44 26C32 104 8 74 8 34Z" fill="url(#or)" stroke="#fff3d0" stroke-width="1.5"/><path d="M22 40c20-12 46-10 70 8M198 40c-20-12-46-10-70 8" fill="none" stroke="#7a1e2e" stroke-width="2" opacity=".6"/><ellipse cx="68" cy="58" rx="22" ry="13" fill="#120d1a"/><ellipse cx="152" cy="58" rx="22" ry="13" fill="#120d1a"/><circle cx="110" cy="80" r="5" fill="#7a1e2e"/><path d="M4 30c-4 18-2 40 6 60M216 30c4 18 2 40-6 60" stroke="url(#or)" stroke-width="2" fill="none" opacity=".7"/></svg>
+  <h1>Le Bal masqué<br><span>de Venise</span></h1>
+  <p class="bal-date">Samedi 31 octobre · 21 h · en visio · gratuit</p>
+  <p class="bal-lead">${esc(P.speedDating.intro)}</p>
+  <p class="bal-actions"><a class="btn btn-gold" href="#events-title">Réserver ma place au bal</a><a class="btn bal-btn-line" href="/speed-dating/salle/">Tester ma caméra</a></p>
+</section>
+
+<section class="bal-deroule" aria-labelledby="deroule-title">
+  <h2 id="deroule-title">Le déroulé du bal</h2>
+  <ol>
+    <li><strong>L’invitation</strong><span>Tu choisis ton salon (France, Algérie, Canada, autres pays ou tous âges) et tu réserves ta place en une minute.</span></li>
+    <li><strong>L’antichambre</strong><span>Avant le bal, tu passes par l’antichambre pour vérifier ta caméra et ton micro. Lamia t’envoie le lien de la salle par email.</span></li>
+    <li><strong>L’ouverture du bal</strong><span>À 21 h, Lamia accueille tout le monde et ouvre la soirée.</span></li>
+    <li><strong>Les tête-à-tête masqués</strong><span>Les rencontres se font en tête-à-tête de quelques minutes, dans ton salon. Masque, loup ou déguisement : le mystère fait partie du jeu.</span></li>
+    <li><strong>La fin du bal</strong><span>Tu indiques en privé qui tu aimerais revoir. Si le souhait est réciproque, Lamia vous met en relation.</span></li>
+  </ol>
+</section>
+
+<section class="bal-code" aria-labelledby="code-title">
+  <h2 id="code-title">Le code du bal</h2>
+  <ul>
+    <li><strong>Un masque ou un loup</strong>, ou un déguisement complet : Venise, Halloween, à toi de choisir.</li>
+    <li><strong>Caméra allumée</strong>, dans un endroit calme et bien éclairé.</li>
+    <li><strong>Respect et sérieux</strong> : on vient pour rencontrer, jamais de propos déplacé.</li>
+    <li><strong>Un souci ?</strong> <a href="/confidences/">Le Cabinet des Confidences</a> est là pour alerter Lamia en toute discrétion.</li>
+  </ul>
 </section>
 <section class="events" aria-labelledby="events-title">
-  <h2 id="events-title">Les prochaines soirées</h2>
+  <h2 id="events-title">Réserve ta place au bal</h2>
   <div class="event-grid" data-events><p class="loading">Les soirées arrivent…</p></div>
 </section>
 <section class="member-panel" aria-labelledby="member-title" data-member>
@@ -441,7 +458,47 @@ page(
 <section class="origin">
   <blockquote>« ${esc(P.speedDating.promise)} »<cite>Lamia</cite></blockquote>
   <p>${esc(P.speedDating.origin)}</p>
-</section>`,
+</section>
+</div>`,
+  })
+);
+
+// L'antichambre : tester sa caméra et son micro avant le bal (rien n'est envoyé)
+page(
+  '/speed-dating/salle/',
+  layout({
+    title: 'L’antichambre du bal · tester ma caméra',
+    description: 'Avant le Bal masqué de Venise, vérifie ta caméra et ton micro. Ta vidéo reste sur ton appareil.',
+    path: '/speed-dating/salle/',
+    room: roomBySlug['speed-dating'],
+    noindex: true,
+    body: `<div class="bal bal-ante">
+<section class="bal-hero is-short">
+  <p class="bal-kicker">Le Bal masqué de Venise</p>
+  <h1>L’antichambre</h1>
+  <p class="bal-lead">Avant d’entrer au bal, ajuste ton masque et vérifie ta caméra et ton micro. Ta vidéo reste sur ton appareil : rien n’est enregistré ni envoyé.</p>
+</section>
+<section class="ante" data-ante>
+  <div class="ante-miroir">
+    <video data-ante-video playsinline muted autoplay></video>
+    <p class="ante-vide" data-ante-vide>Ton reflet apparaîtra ici.</p>
+    <span class="ante-cadre" aria-hidden="true"></span>
+  </div>
+  <div class="ante-panneau">
+    <button class="btn btn-gold" type="button" data-ante-start>Activer ma caméra et mon micro</button>
+    <ul class="ante-checks">
+      <li data-check="camera"><span></span>Caméra</li>
+      <li data-check="micro"><span></span>Micro <i class="ante-niveau"><b data-ante-niveau></b></i></li>
+      <li data-check="reseau"><span></span>Connexion internet</li>
+    </ul>
+    <p class="ante-msg" role="status" data-ante-msg>Clique sur le bouton, puis autorise la caméra et le micro quand ton navigateur te le demande.</p>
+    <button class="btn bal-btn-line" type="button" data-ante-stop hidden>Couper la caméra</button>
+    <p class="ante-note">Le soir du bal, Lamia t’envoie par email le lien de la salle. Garde cette page pour faire un essai avant 21 h.</p>
+    <p><a class="text-link" href="/speed-dating/">Retour au Bal masqué</a></p>
+  </div>
+</section>
+</div>
+<script type="module" src="/assets/antichambre.js?v=${VERSION}"></script>`,
   })
 );
 
@@ -768,7 +825,7 @@ for (const p of pages) {
 }
 await cp(join(ROOT, 'public'), DIST, { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
-for (const f of ['maison.css', 'maison.js', 'membre.js']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
+for (const f of ['maison.css', 'maison.js', 'membre.js', 'antichambre.js']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
 await cp(join(ROOT, 'content', 'shipping.mjs'), join(DIST, 'assets', 'shipping.mjs'));
 
 const indexable = pages.filter((p) => !p.path.endsWith('.html') && !['/produit/', '/speed-dating/merci/', '/speed-dating/souhaits/', '/cgv/', '/mentions-legales/', '/confidentialite/'].includes(p.path));

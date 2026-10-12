@@ -851,3 +851,98 @@ body { background: var(--qvt-ivoire); }
   .lamia-live.has-photo { grid-template-columns: 1fr; }
   .lamia-intro, .lamia-chapitre { font-size: 18px; }
 }
+
+/* ================================================================ Le Bal masqué de Venise (page Rencontres) */
+.bal { --or: #e3bd6e; --or-clair: #fff1c9; --bordeaux: #5c1424; --nuit-bal: #120d1a;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 0%, rgba(227,189,110,.16), transparent 70%),
+    linear-gradient(180deg, var(--nuit-bal) 0%, #1c1020 40%, #2a1020 100%);
+  color: #efe4cf; }
+.bal-hero { position: relative; overflow: hidden; display: grid; justify-items: center; text-align: center; gap: 10px;
+  padding: clamp(40px, 7vw, 96px) var(--gouttiere) clamp(40px, 6vw, 80px);
+  background:
+    radial-gradient(ellipse 40% 50% at 50% 40%, rgba(227,189,110,.22), transparent 70%),
+    repeating-conic-gradient(from 45deg at 50% 50%, rgba(92,20,36,.55) 0 25%, rgba(18,13,26,.0) 0 50%) 50% 0 / 64px 64px; }
+.bal-hero::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 40%; background: linear-gradient(180deg, transparent, var(--nuit-bal)); pointer-events: none; }
+.bal-hero > * { position: relative; z-index: 1; }
+.bal-paillettes { position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: .7;
+  background-image: radial-gradient(circle, rgba(255,241,201,.9) 0 1.2px, transparent 2px), radial-gradient(circle, rgba(227,189,110,.8) 0 1px, transparent 1.8px), radial-gradient(circle, rgba(255,255,255,.6) 0 .8px, transparent 1.5px);
+  background-size: 170px 140px, 230px 190px, 300px 260px; background-position: 10px 20px, 90px 70px, 40px 120px; animation: paillettes 9s ease-in-out infinite alternate; }
+@keyframes paillettes { from { transform: translateY(0); opacity: .45; } to { transform: translateY(-14px); opacity: .85; } }
+.bal-kicker { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--or); }
+.bal-mask { width: min(260px, 60vw); height: auto; filter: drop-shadow(0 10px 30px rgba(227,189,110,.35)); animation: flotte 6s ease-in-out infinite; }
+@keyframes flotte { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-8px) rotate(2deg); } }
+.bal-hero h1 { margin: 0; font-size: clamp(48px, 8vw, 104px); line-height: .95; color: #fff; }
+.bal-hero h1 span { font-style: italic; font-weight: 500; background: linear-gradient(90deg, var(--or-clair), var(--or), #c9944a); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.bal-date { margin: 6px 0 0; font-family: var(--serif); font-size: clamp(20px, 2.4vw, 26px); color: var(--or-clair); }
+.bal-lead { max-width: 640px; margin: 6px auto 0; font-size: 17px; line-height: 1.65; color: #d9cbb3; }
+.bal-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 14px; }
+.bal-btn-line { background: transparent; color: var(--or-clair); border-color: rgba(227,189,110,.7); }
+.bal-btn-line:hover { background: rgba(227,189,110,.12); color: #fff; border-color: var(--or); }
+.bal-hero.is-short { padding-bottom: 32px; }
+
+.bal-deroule, .bal-code { max-width: 1080px; margin: 0 auto; padding: clamp(32px, 5vw, 64px) var(--gouttiere) 0; }
+.bal h2 { color: #fff; font-size: clamp(30px, 4vw, 44px); margin: 0 0 22px; }
+.bal h2::after { content: ''; display: block; width: 64px; height: 2px; margin-top: 12px; background: linear-gradient(90deg, var(--or), transparent); }
+.bal-deroule ol { counter-reset: etape; list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(190px, 100%), 1fr)); gap: 14px; }
+.bal-deroule li { counter-increment: etape; position: relative; display: grid; gap: 6px; padding: 22px 18px 18px; border: 1px solid rgba(227,189,110,.28); border-radius: 18px 18px 6px 6px; background: linear-gradient(180deg, rgba(92,20,36,.35), rgba(18,13,26,.4)); }
+.bal-deroule li::before { content: counter(etape, upper-roman); font-family: var(--serif); font-style: italic; font-size: 22px; color: var(--or); }
+.bal-deroule strong { font-family: var(--serif); font-size: 22px; color: #fff; }
+.bal-deroule span { font-size: 15px; line-height: 1.55; color: #d9cbb3; }
+.bal-code ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 10px 28px; }
+.bal-code li { padding: 12px 0 12px 34px; position: relative; border-bottom: 1px solid rgba(227,189,110,.18); line-height: 1.55; }
+.bal-code li::before { content: ''; position: absolute; left: 0; top: 16px; width: 22px; height: 11px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 32'%3E%3Cpath d='M2 8c10-6 20-4 30 4C42 4 52 2 62 8c0 12-8 20-18 20-6 0-9-4-12-8-3 4-6 8-12 8C10 28 2 20 2 8Z' fill='%23e3bd6e'/%3E%3Cellipse cx='19' cy='15' rx='6' ry='4' fill='%23120d1a'/%3E%3Cellipse cx='45' cy='15' rx='6' ry='4' fill='%23120d1a'/%3E%3C/svg%3E") center / contain no-repeat; }
+.bal-code strong { color: var(--or-clair); }
+.bal-code a { color: var(--or); }
+
+.bal .events { padding-top: clamp(40px, 6vw, 72px); }
+.bal .events > h2 { max-width: 980px; }
+.bal .event-card { color: var(--qvt-encre); background: var(--qvt-ivoire); border: 1px solid rgba(227,189,110,.5); border-radius: 18px; box-shadow: 0 30px 70px -30px rgba(0,0,0,.8); }
+.bal .event-card .venise-banner { border-radius: 18px 18px 0 0; }
+.bal .empty, .bal .loading { color: #d9cbb3; }
+.bal .member-panel { background: rgba(255,255,255,.04); border-color: rgba(227,189,110,.25); color: #efe4cf; }
+.bal .member-panel h2, .bal .member-panel h3 { color: #fff; }
+.bal .member-panel label { color: #efe4cf; }
+.bal .member-panel input { background: #fff; color: var(--qvt-encre); }
+.bal .member-panel .btn-line { color: var(--or-clair); border-color: rgba(227,189,110,.7); }
+.bal .room-body { color: #d9cbb3; }
+.bal .room-body .text-link { color: var(--or); }
+.bal .origin { background: transparent; color: #d9cbb3; padding-bottom: clamp(48px, 7vw, 96px); }
+.bal .origin blockquote { color: #fff; }
+.bal .origin cite { color: var(--or); }
+.bal .form-status { color: var(--or-clair); }
+.bal .event-card .form-status { color: var(--qvt-taupe); }
+.bal .form-status.is-error { color: #ff9aa8; }
+.bal .event-card .form-status.is-error { color: var(--rouge); }
+
+/* L'antichambre : le miroir vénitien */
+.ante { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); gap: clamp(24px, 4vw, 56px); align-items: center; max-width: 1100px; margin: 0 auto; padding: 8px var(--gouttiere) clamp(56px, 8vw, 96px); }
+.ante-miroir { position: relative; aspect-ratio: 4 / 3; border-radius: 50% 50% 46% 46% / 40% 40% 34% 34%; overflow: hidden; background: radial-gradient(ellipse at 50% 40%, #2a1a2a, #0c0810); box-shadow: 0 0 0 6px #120d1a, 0 0 0 9px var(--or), 0 0 0 13px #5c1424, 0 0 0 15px var(--or), 0 40px 80px -30px rgba(0,0,0,.9), 0 0 60px rgba(227,189,110,.25); }
+.ante-miroir video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); display: block; }
+.ante-vide { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; font-family: var(--serif); font-style: italic; font-size: 22px; color: rgba(255,241,201,.6); }
+.ante-cadre { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 50%, transparent 62%, rgba(18,13,26,.55) 100%); }
+.ante-panneau { display: grid; gap: 14px; }
+.ante-checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.ante-checks li { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 1px solid rgba(227,189,110,.25); border-radius: 12px; }
+.ante-checks li > span { width: 14px; height: 14px; border-radius: 50%; background: #5a4d5c; flex: none; }
+.ante-checks li.is-ok > span { background: #6fcf8f; box-shadow: 0 0 10px #6fcf8f; }
+.ante-checks li.is-ko > span { background: #ff6b7d; }
+.ante-niveau { flex: 1; height: 6px; margin-left: auto; max-width: 140px; border-radius: 6px; background: rgba(255,255,255,.1); overflow: hidden; font-style: normal; }
+.ante-niveau b { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--or), #6fcf8f); transition: width .08s; }
+.ante-msg { margin: 0; min-height: 3em; color: var(--or-clair); }
+.ante-note { margin: 0; font-size: 14px; color: #b8a98f; }
+.bal-ante .text-link { color: var(--or); }
+@media (max-width: 860px) { .ante { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .bal-paillettes, .bal-mask { animation: none; } }
+.ante-vide[hidden] { display: none; }
+.bal-deroule ol { grid-template-columns: repeat(auto-fit, minmax(min(160px, 100%), 1fr)); }
+.bal .events, .bal .member-panel, .bal > .room-body, .bal .origin { max-width: 1080px; margin-left: auto; margin-right: auto; box-sizing: border-box; }
+.bal .member-panel { margin-top: 24px; border-radius: 18px; }
+.bal .auth-grid form { background: rgba(255,255,255,.05); border: 1px solid rgba(227,189,110,.3); border-radius: 14px; }
+.bal .auth-grid form label { color: #efe4cf; }
+.bal .origin { border-top: 1px solid rgba(227,189,110,.2); }
+.bal .origin p { color: #cdbfa6; }
+.bal .origin blockquote { border-left-color: var(--or); }
+.bal-deroule li { align-content: start; }
+@media (max-width: 480px) { .bal-deroule ol { grid-template-columns: 1fr; } }
