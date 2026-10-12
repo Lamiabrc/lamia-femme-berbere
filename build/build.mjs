@@ -552,31 +552,117 @@ ${otherRooms(r.slug)}`,
   );
 }
 
-// Lamia Bréchet (URL conservée)
+// Qui est Lamia ? (URL conservée) — page éditoriale, texte de Lamia
+const LIVE_PHOTO = existsSync(join(ROOT, 'public/images/lamia/lamia-live-900.webp'));
 page(
   '/lamia-brechet/',
   layout({
-    title: 'Lamia Bréchet, autrice de Yemma Werdi | Lamia Femme Berbère',
-    description: 'Lamia Bréchet, la voix derrière Yemma Werdi : des lives aux pages d’un livre, transmettre sans décider à la place de l’autre.',
+    title: 'Qui est Lamia ? Lamia Bréchet Ighil | Lamia Femme Berbère',
+    description: 'Lamia Bréchet Ighil, derrière « Lamia Femme Berbère » : les lives, la culture kabyle, Yemma Werdi, les rencontres, les bijoux d’Ath Yenni, et une Maison où l’on vient la retrouver.',
     path: '/lamia-brechet/',
     room: roomBySlug.hall,
-    body: `<article class="article">
-  <p class="room-name"><span class="pip" aria-hidden="true"></span>Qui est Lamia</p>
-  <h1>Lamia Bréchet, la voix derrière Yemma Werdi.</h1>
-  <p class="lead">Des échanges en live aux pages d’un livre, Lamia parle d’amour, de mariage et de choix avec une même intention : transmettre sans décider à la place de l’autre.</p>
-  <h2>« De mon écran à ton cœur »</h2>
-  <p>Dans le mot qui ouvre <em>Werdi, ouvre les yeux !</em>, Lamia Bréchet s’adresse à sa lectrice comme à une fille ou à une sœur. Elle évoque les lives, les vidéos et les discussions sur l’amour et le mariage qui peuvent avoir été leur première rencontre.</p>
-  <p>Le livre prolonge cette proximité. La voix de Yemma apporte des repères pour prendre le temps de connaître l’autre, écouter, parler et observer la cohérence des actes dans la durée.</p>
-  <h2>Une transmission ancrée dans la culture kabyle</h2>
-  <p>L’univers Yemma Werdi fait dialoguer la transmission kabyle avec les questions des relations d’aujourd’hui, du virtuel au réel. La tendresse d’une parole maternelle y accompagne la liberté de choisir.</p>
-  <p>Le Mektoub a sa place dans cette vision de l’amour. Mais une rencontre ne construit pas à elle seule un couple : le dialogue, les efforts réciproques et la manière de se respecter comptent aussi.</p>
-  <blockquote>« Je ne suis pas là pour décider à ta place »<cite>Lamia, « Un mot de Lamia »</cite></blockquote>
-  <h2>Aimer sans s’effacer</h2>
-  <p>La démarche de Lamia laisse une place à l’imperfection. Les maladresses et les différences ne sont pas toutes des signaux d’alerte. L’enjeu est de distinguer les ajustements ordinaires d’un couple de ce qui abîme le respect, la liberté ou la sécurité.</p>
-  <p>Choisir avec les yeux ouverts, c’est pouvoir aimer, faire des concessions et construire une relation sans renoncer à soi.</p>
-  <p class="article-links"><a class="btn btn-ink" href="/werdi-ouvre-les-yeux/">Découvrir le livre</a><a class="btn btn-line" href="/salon/">Les lives de Lamia</a></p>
+    body: `<article class="lamia-page">
+  <header class="lamia-open">
+    <div class="lamia-open-text">
+      <p class="lamia-kicker">Qui est Lamia ?</p>
+      <h1><span class="lamia-prenom">Lamia</span><span class="lamia-nom">Bréchet Ighil</span></h1>
+      <p class="lamia-derriere">derrière « Lamia Femme Berbère »</p>
+    </div>
+    <figure class="lamia-portrait">
+      <img src="/images/lamia/lamia-salon-900.webp" srcset="/images/lamia/lamia-salon-560.webp 560w, /images/lamia/lamia-salon-900.webp 900w, /images/lamia/lamia-salon-1122.webp 1122w" sizes="(max-width: 900px) 92vw, 46vw" width="1122" height="1402" fetchpriority="high" alt="Lamia Bréchet Ighil dans son salon, en robe kabyle brodée, lunettes, collier et bracelet d’argent émaillé, au coucher du soleil">
+    </figure>
+  </header>
+
+  <section class="lamia-intro">
+    <p class="lamia-lettrine">Je m’appelle Lamia Bréchet Ighil.</p>
+    <p>Si tu me connais déjà, il y a de fortes chances que nous nous soyons rencontrés sur un écran : dans un live, une vidéo, un débat sur le couple, le mariage, le célibat… ou au détour d’une de ces discussions où l’on commence très sérieusement et où, cinq minutes plus tard, tout le monde éclate de rire.</p>
+    <p>Lamia Femme Berbère, c’est moi, mais ce n’est pas seulement mon nom sur les réseaux.</p>
+    <p class="lamia-fort">C’est un regard, une voix, une communauté et désormais une Maison.</p>
+    <p>Je parle d’amour et de mariage, bien sûr. Mais aussi de société, de relations humaines, de contradictions, de transmission et de tout ce qui fait nos vies entre plusieurs cultures, plusieurs générations et plusieurs façons de voir le monde.</p>
+    <p>Et j’aime le faire avec une règle assez simple : <em>on peut parler de choses sérieuses sans devenir triste ni moralisatrice.</em></p>
+  </section>
+
+  <section class="lamia-chapitre">
+    <p class="lamia-num">I</p>
+    <h2>Tout a commencé par la parole</h2>
+    <p>Avant les livres, avant les bijoux et avant La Maison, il y a eu les échanges.</p>
+    <p class="lamia-fort">Les lives sont devenus mon salon.</p>
+    <p>On y parle de célibat, d’amour, de mariage, de choix, de comportements qui nous font rire ou nous interrogent, de ce qu’on attend d’un homme ou d’une femme, de traditions que l’on veut conserver et de celles que l’on a parfois envie de bousculer.</p>
+    <p>Je ne cherche pas à distribuer les bons et les mauvais points. J’aime davantage poser la question que personne n’ose poser, écouter les réponses, confronter les points de vue et parfois mettre les pieds dans le plat.</p>
+    <p><em>Avec humour, mais jamais sans respect.</em></p>
+    <p>C’est aussi pour cela que beaucoup de personnes qui arrivent pour un débat restent ensuite pour l’ambiance, les rencontres et la communauté.</p>
+  </section>
+
+  <section class="lamia-chapitre">
+    <p class="lamia-num">II</p>
+    <h2>«&nbsp;Lamia Femme Berbère&nbsp;», entre héritage et vie d’aujourd’hui</h2>
+    <p>Je suis profondément attachée à la culture kabyle et à ce qu’elle transmet : la famille, les histoires, les bijoux, les symboles, la parole des anciens, cette façon particulière de rire de nous-mêmes aussi.</p>
+    <p>Mais je ne veux pas enfermer cette culture dans une vitrine. <strong>Une culture vit lorsqu’on la porte dans le présent.</strong></p>
+    <p>C’est cette idée que j’essaie de faire vivre dans tout ce que je crée : faire dialoguer l’héritage et la modernité, la Kabylie et la France, les traditions et les choix individuels.</p>
+    <p class="lamia-trio"><span>Sans folklore forcé.</span><span>Sans nostalgie obligatoire.</span><span>Sans demander à quelqu’un de choisir une moitié de lui-même.</span></p>
+  </section>
+
+  <section class="lamia-chapitre">
+    <p class="lamia-num">III</p>
+    <h2>Yemma Werdi est née de ces conversations</h2>
+    <p>À force de parler avec des jeunes femmes de leurs rencontres, de leurs doutes, de leurs emballements amoureux et parfois de leurs mauvaises surprises, une autre voix est apparue : Yemma.</p>
+    <p>La mère qui écoute avant de juger. Celle qui peut te dire :</p>
+    <blockquote class="lamia-citation">Aime. Rêve. Fais confiance.<br>Mais garde les yeux ouverts.</blockquote>
+    <p>C’est ainsi qu’est né <a class="text-link" href="/werdi-ouvre-les-yeux/"><em>Werdi, ouvre les yeux !</em></a></p>
+    <p>Je ne veux pas dire à une femme qui elle doit aimer ni décider à sa place. Je veux lui donner suffisamment de repères pour qu’elle puisse décider elle-même, avec son cœur mais aussi avec son intelligence.</p>
+    <p>Et je tiens beaucoup à une nuance : construire un couple ne signifie pas chercher une personne parfaite. Un couple demande aussi du dialogue, des efforts, des compromis et des concessions. Il faut simplement apprendre à distinguer <strong>faire une place à l’autre</strong> de <strong>s’effacer soi-même</strong>.</p>
+  </section>
+
+  <section class="lamia-chapitre">
+    <p class="lamia-num">IV</p>
+    <h2>Et puis il y a eu les rencontres</h2>
+    <p>Les lives m’ont également montré quelque chose : énormément de personnes veulent encore rencontrer quelqu’un sérieusement, mais ne se reconnaissent pas forcément dans les applications classiques.</p>
+    <p>Alors j’ai commencé à créer des occasions de rencontre autour de la communauté. <strong>Pas un catalogue de profils à faire défiler.</strong> Des moments où des personnes viennent avec une véritable intention, discutent, rient, se découvrent et décident ensuite, librement, si elles souhaitent se revoir.</p>
+    <p>C’est aujourd’hui <a class="text-link" href="/speed-dating/">le Boudoir des Rencontres</a> de La Maison.</p>
+    <p>Et parce qu’une rencontre doit rester respectueuse et sûre, j’ai aussi voulu <a class="text-link" href="/confidences/">un Cabinet des Confidences</a> : un endroit où quelqu’un peut venir me signaler discrètement un comportement inquiétant.</p>
+  </section>
+
+  <section class="lamia-chapitre">
+    <p class="lamia-num">V</p>
+    <h2>Mes bijoux : porter quelque chose qui raconte d’où l’on vient</h2>
+    <p>Mon amour des bijoux kabyles est devenu lui aussi un projet concret.</p>
+    <p>Dans <a class="text-link" href="/ecrin/">L’Écrin</a>, je développe avec Hamani Hamid, chef artisan à Ath Yenni, une collection de bijoux fabriqués en Kabylie par les artisans bijoutiers d’Ath Yenni.</p>
+    <p>Je ne voulais pas simplement vendre un objet « inspiré de ». Je voulais participer à une création qui reste liée aux artisans, au geste, aux émaux, à l’argent et à cette histoire que l’on porte littéralement sur soi.</p>
+    <p>Le premier collier de la Maison reprend un modèle exclusif créé en 1974.</p>
+  </section>
+
+  <section class="lamia-live${LIVE_PHOTO ? ' has-photo' : ''}">
+    ${LIVE_PHOTO ? `<figure><img src="/images/lamia/lamia-live-900.webp" width="900" height="1125" loading="lazy" alt="Lamia en live, casque sur les oreilles, motifs kabyles dessinés sur le visage"></figure>` : ''}
+    <div>
+      <h2>Et oui… c’est aussi moi en live</h2>
+      <p>Pas de studio, pas de personnage figé : c’est aussi comme ça que beaucoup d’entre vous me connaissent. En direct, avec mes lunettes, mes idées, mes coups de gueule, mes fous rires… et parfois quelques thichrad supplémentaires.</p>
+      <p><a class="text-link" href="/salon/">Tous les soirs au Salon, de 21 h à 23 h</a></p>
+    </div>
+  </section>
+
+  <section class="lamia-chapitre lamia-maison">
+    <h2>La Maison, c’est finalement tout ça</h2>
+    <p>Aujourd’hui, La Maison Lamia Femme Berbère réunit les différentes facettes de ce que je construis.</p>
+    <ul class="lamia-pieces">
+      <li><a href="/salon/"><strong>Le Salon</strong> pour parler.</a></li>
+      <li><a href="/bibliotheque/"><strong>La Bibliothèque de Yemma</strong> pour transmettre.</a></li>
+      <li><a href="/ecrin/"><strong>L’Écrin</strong> pour créer et faire vivre les bijoux d’Ath Yenni.</a></li>
+      <li><a href="/speed-dating/"><strong>Le Boudoir</strong> pour provoquer de vraies rencontres.</a></li>
+      <li><a href="/confidences/"><strong>Le Cabinet des Confidences</strong> pour protéger.</a></li>
+      <li><a href="/grenier/"><strong>Le Grenier</strong> pour mes trouvailles et mes coups de cœur.</a></li>
+      <li><a href="/patio/"><strong>Le Patio</strong> pour la communauté.</a></li>
+    </ul>
+    <p>Et d’autres portes s’ouvriront encore.</p>
+    <p>Parce que cette Maison n’a pas été pensée comme une boutique dans laquelle on vient seulement acheter quelque chose. <strong>Elle a été pensée comme un endroit où l’on vient retrouver Lamia.</strong></p>
+  </section>
+
+  <footer class="lamia-fin">
+    <blockquote>« Tu peux être profondément attachée à ce que l’on t’a transmis et rester totalement libre de décider de ce que tu veux en faire. »</blockquote>
+    <p class="lamia-bienvenue">Bienvenue chez moi. Bienvenue à la Maison.</p>
+    <p class="lamia-boutons"><a class="btn btn-ink" href="/#hall">Entrer dans la Maison</a><a class="btn btn-line" href="/werdi-ouvre-les-yeux/">Découvrir Werdi</a><a class="btn btn-line" href="/salon/">Retrouver mes lives</a></p>
+  </footer>
 </article>
-<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@type': 'Person', name: 'Lamia Bréchet', url: SITE_URL + '/lamia-brechet/', sameAs: ['https://www.tiktok.com/@lamiaberbere'] })}</script>`,
+<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@type': 'Person', name: 'Lamia Bréchet Ighil', alternateName: 'Lamia Femme Berbère', url: SITE_URL + '/lamia-brechet/', image: SITE_URL + '/images/lamia/lamia-salon-900.webp', sameAs: ['https://www.tiktok.com/@lamiaberbere', 'https://www.facebook.com/femmeberberes/'] })}</script>`,
   })
 );
 
