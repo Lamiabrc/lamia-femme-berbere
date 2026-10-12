@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="/assets/maison.css">
 <style>
   .wrap { max-width: 1100px; margin: 0 auto; padding: 40px var(--gouttiere); }
-  table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 15px; }
+  table { display: block; overflow-x: auto; width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 15px; }
   th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--ligne); }
   th { font-size: 13px; color: var(--gris); }
   .paid { color: var(--email-vert); font-weight: 600; } .pending { color: var(--gris); }
@@ -37,7 +37,7 @@
       <button class="btn btn-line" type="button" id="logout">Me déconnecter</button>
     </div>
     <p id="summary" class="lead" style="margin-top:20px"></p>
-    <table><thead><tr><th>Email</th><th>Paiement</th><th>Inscription</th></tr></thead><tbody id="people"></tbody></table>
+    <table><thead><tr><th>Prénom</th><th>Email</th><th>Genre</th><th>Âge</th><th>Ville</th><th>Paiement</th><th>Inscription</th></tr></thead><tbody id="people"></tbody></table>
     <div class="box">
       <h2 style="font-size:26px">Envoyer le lien de la salle</h2>
       <p>Les adresses des personnes inscrites (ayant payé pour une soirée payante), à coller en copie cachée (Cci) de ton email :</p>
@@ -104,8 +104,8 @@ async function load() {
   try {
     const { people, wishes, wishesAvailable, free } = await api(`/api/admin-events?event_id=${encodeURIComponent($('#event').value)}`);
     const paid = people.filter((p) => p.paid);
-    $('#summary').textContent = free ? `Soirée gratuite · ${people.length} inscrit${people.length > 1 ? 's' : ''}` : `${paid.length} place${paid.length > 1 ? 's' : ''} payée${paid.length > 1 ? 's' : ''} · ${people.length - paid.length} en attente`;
-    $('#people').innerHTML = people.map((p) => `<tr><td>${esc(p.email || '—')}</td><td class="${p.paid ? 'paid' : 'pending'}">${free ? 'Gratuite' : p.paid ? 'Payée' : 'En attente'}</td><td>${p.registered_at ? esc(when(p.registered_at)) : ''}</td></tr>`).join('') || '<tr><td colspan="3">Personne n’est encore inscrit.</td></tr>';
+    $('#summary').textContent = free ? `Soirée gratuite · ${people.length} inscrit${people.length > 1 ? 's' : ''} · ${people.filter((p) => p.gender === 'femme').length} femmes · ${people.filter((p) => p.gender === 'homme').length} hommes` : `${paid.length} place${paid.length > 1 ? 's' : ''} payée${paid.length > 1 ? 's' : ''} · ${people.length - paid.length} en attente`;
+    $('#people').innerHTML = people.map((p) => `<tr><td>${esc(p.first_name || '—')}</td><td>${esc(p.email || '—')}</td><td>${esc(p.gender || '')}</td><td>${p.age ?? ''}</td><td>${esc(p.city || '')}</td><td class="${p.paid ? 'paid' : 'pending'}">${free ? 'Gratuite' : p.paid ? 'Payée' : 'En attente'}</td><td>${p.registered_at ? esc(when(p.registered_at)) : ''}</td></tr>`).join('') || '<tr><td colspan="7">Personne n’est encore inscrit.</td></tr>';
     $('#emails').value = paid.map((p) => p.email).filter(Boolean).join(', ');
     $('#wishes').innerHTML = !wishesAvailable
       ? '<p>Le formulaire des souhaits sera actif dès que sa table sera créée dans la base.</p>'

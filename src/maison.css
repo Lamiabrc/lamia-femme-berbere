@@ -612,3 +612,73 @@ mark.todo { background: #fff3c4; color: var(--encre); padding: 0 4px; font-weigh
     radial-gradient(ellipse 34% 4% at 50% 86%, rgba(255,238,185,.95), rgba(255,180,95,.75) 45%, rgba(240,110,60,0) 85%),
     linear-gradient(180deg, #fdefcd 0%, #f9dc9c 18%, #f4c172 34%, #ee9a52 50%, #e3713f 62%, #c94a3e 71%, #9c3346 79%, #7a3456 86%, #5a3561 92%, var(--nuit-photo) 100%); }
 }
+
+/* ================================================================ Palette QVT Box : crème, sable, champagne doré, encre */
+:root {
+  --qvt-creme: #faf6ee; --qvt-ivoire: #fdf9f0; --qvt-sable: #e8dcc8; --qvt-sable-fonce: #e5d7bf;
+  --qvt-champagne: #f3e0b9; --qvt-champagne-clair: #f7e7c5; --qvt-bronze: #7e5b2e;
+  --qvt-encre: #1b1a18; --qvt-nuit: #151515; --qvt-nuit-2: #1b1916; --qvt-taupe: #6f6454; --qvt-taupe-clair: #9c8d77;
+  --encre: var(--qvt-encre); --gris: var(--qvt-taupe); --chaux: var(--qvt-creme); --ligne: var(--qvt-sable);
+  --nuit-photo: var(--qvt-nuit); --nuit-profonde: var(--qvt-nuit-2);
+}
+body { background: var(--qvt-ivoire); }
+.site-header { background: rgba(250,246,238,.96); border-bottom-color: var(--qvt-sable); }
+.btn-gold { background: var(--qvt-champagne); color: var(--qvt-nuit); border-color: var(--qvt-champagne); }
+.btn-gold:hover { background: var(--qvt-champagne-clair); border-color: var(--qvt-champagne-clair); color: var(--qvt-nuit); }
+
+/* Le Hall : fond crème, halo champagne, plus de bandeau vide */
+.hall-hero, .hall-hero[class] {
+  padding-bottom: clamp(48px, 6vw, 84px);
+  background:
+    radial-gradient(ellipse 42% 60% at 76% 45%, rgba(243,224,185,.85), rgba(243,224,185,0) 70%),
+    radial-gradient(ellipse 60% 50% at 10% 0%, rgba(247,231,197,.55), transparent 70%),
+    linear-gradient(180deg, var(--qvt-ivoire) 0%, var(--qvt-creme) 100%);
+}
+.hall-hero::before, .hall-hero::after { display: none; }
+.hall-hero .room-name { color: var(--qvt-bronze); }
+.hall-hero .lead { color: var(--qvt-taupe); }
+.hall-hero .btn-line { border-color: var(--qvt-encre); color: var(--qvt-encre); background: transparent; }
+.hall-hero .btn-line:hover { border-color: var(--qvt-bronze); color: var(--qvt-bronze); }
+.hall-hero .btn-ink:hover { background: var(--qvt-bronze); border-color: var(--qvt-bronze); }
+.hall-arch { background: var(--qvt-ivoire); box-shadow: 0 2px 4px rgba(27,26,24,.06), 0 40px 70px -24px rgba(27,26,24,.35), inset 0 0 0 10px var(--qvt-ivoire), inset 0 0 0 11.5px #d9c19a; }
+.arch-shadow { background: linear-gradient(160deg, var(--qvt-champagne), #d9c19a); opacity: 1; }
+.hall-medal { box-shadow: 0 0 0 6px var(--qvt-ivoire), 0 0 0 7.5px #d9c19a, 0 20px 40px -12px rgba(27,26,24,.4); }
+
+/* L'invitation à la prochaine soirée, dans le Hall */
+.hall-invite { margin-top: 34px; max-width: 560px; padding: 20px 22px 22px; border-radius: 18px; background: var(--qvt-nuit); color: var(--qvt-sable-fonce);
+  box-shadow: 0 24px 50px -24px rgba(27,26,24,.6); border: 1px solid #2f2923; }
+.hall-invite .now-room { margin: 0 0 4px; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--qvt-champagne); }
+.hall-invite h3 { margin: 0; font-size: clamp(26px, 3vw, 34px); color: #fff; }
+.hall-invite p:not(.now-room) { margin: 2px 0 14px; color: var(--qvt-sable-fonce); text-transform: none; }
+.hall-invite p:not(.now-room)::first-letter { text-transform: uppercase; }
+
+/* Le bas du Hall mène doucement à la Maison, de nuit */
+.hall-cue, .hall-cue[class] { position: static; transform: none; grid-column: 1 / -1; justify-self: center; margin-top: 12px; color: var(--qvt-taupe); text-shadow: none; font-size: 19px; }
+.hall-cue:hover { color: var(--qvt-bronze); }
+.plan-section, .plan-section[class] { padding-top: clamp(40px, 5vw, 72px);
+  background: radial-gradient(ellipse 60% 40% at 50% 45%, rgba(243,224,185,.08), transparent 70%), linear-gradient(180deg, var(--qvt-nuit) 0%, var(--qvt-nuit-2) 100%); }
+.plan-section .plan-intro h2 { color: #fff; }
+.plan-section .plan-intro p { color: var(--qvt-sable-fonce); }
+.floor h3 { color: var(--qvt-champagne); border-bottom-color: rgba(243,224,185,.28); }
+.floor h3 span { color: var(--qvt-taupe-clair); }
+.plan-section .room-index a { border-color: rgba(243,224,185,.14); }
+.plan-section .room-index strong { color: var(--qvt-creme); }
+.plan-section .room-index span:not(.pip) { color: #b9ad99; }
+.plan-section .room-index a:hover strong { color: var(--qvt-champagne); }
+.plan-section .room-index .is-soon strong { color: #8b7d67; }
+.plan-section .pip { box-shadow: 0 0 0 2px var(--qvt-nuit), 0 0 0 3px var(--accent); }
+.now-section.is-dark { background: var(--qvt-nuit-2); }
+.now-section.is-dark .now-card { background: var(--qvt-creme); }
+
+/* Formulaire d'inscription directe aux soirées gratuites */
+.free-form { display: grid; gap: 12px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--ligne); }
+.free-form-lead { margin: 0; font-weight: 600; }
+.free-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr)); gap: 10px 14px; }
+.free-grid label { display: grid; gap: 4px; font-size: 14px; font-weight: 600; }
+.free-grid input, .free-grid select { min-height: 44px; padding: 8px 12px; border: 1px solid var(--qvt-sable); border-radius: 10px; background: #fff; font: 16px var(--sans); color: var(--encre); width: 100%; box-sizing: border-box; }
+.free-grid .free-wide { grid-column: 1 / -1; }
+.free-done { padding: 16px 18px; border-radius: 14px; background: var(--qvt-champagne-clair); color: var(--qvt-encre); }
+.free-done p { margin: 6px 0 0; }
+@media (max-width: 900px) { .hall-invite { margin-top: 26px; } }
+.hall-cue span { background: none; backdrop-filter: none; padding: 0; }
+.event-card:has(.free-form) { grid-column: 1 / -1; max-width: 780px; }

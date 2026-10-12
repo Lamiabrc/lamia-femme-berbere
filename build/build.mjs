@@ -183,6 +183,12 @@ page(
     <h1>${esc(P.hall.title)}</h1>
     <p class="lead">${esc(P.hall.lead)}</p>
     <p class="hall-actions"><a class="btn btn-ink" href="#plan">Visiter la Maison</a><a class="btn btn-line" href="/lamia-brechet/">Qui est Lamia</a></p>
+    <div class="hall-invite" data-next-event>
+      <p class="now-room">Le Boudoir des Rencontres · speed dating en ligne</p>
+      <h3>Bal masqué de Venise</h3>
+      <p>Samedi 31 octobre, en visio</p>
+      <a class="btn btn-gold" href="/speed-dating/#events-title">Réserver ma place, c’est gratuit</a>
+    </div>
   </div>
   <div class="hall-stage">
     <span class="arch-shadow" aria-hidden="true"></span>
@@ -404,7 +410,7 @@ page(
 <section class="member-panel" aria-labelledby="member-title" data-member>
   <h2 id="member-title">Ton espace membre</h2>
   <div data-member-out>
-    <p>Crée ton espace pour réserver une soirée. Ton adresse email reste privée.</p>
+    <p>Pour une soirée gratuite, pas besoin d’espace : inscris-toi directement dans la soirée, juste au-dessus. Ton espace membre sert ensuite à indiquer qui tu aimerais revoir et à alerter Lamia. Ton adresse email reste privée.</p>
     <div class="auth-grid">
       <form data-signup><h3>Créer mon espace</h3><label>Email<input name="email" type="email" autocomplete="email" required></label><label>Mot de passe<input name="password" type="password" autocomplete="new-password" minlength="8" required></label><button class="btn btn-ink" type="submit">Créer mon espace</button></form>
       <form data-login><h3>J’ai déjà un espace</h3><label>Email<input name="email" type="email" autocomplete="email" required></label><label>Mot de passe<input name="password" type="password" autocomplete="current-password" required></label><button class="btn btn-line" type="submit">Me connecter</button></form>

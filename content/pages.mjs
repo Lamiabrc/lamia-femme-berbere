@@ -77,8 +77,8 @@ export const speedDating = {
     'un horizon de mariage',
   ],
   steps: [
-    'Tu crées ton espace membre.',
-    'Tu choisis une soirée qui te correspond et tu réserves ta place.',
+    'Tu choisis une soirée qui te correspond et tu réserves ta place en une minute.',
+    'Lamia t’envoie par email le lien de la salle vidéo avant la soirée.',
     'Le soir venu, tu rejoins une salle vidéo privée. Les tête-à-tête tournent toutes les quelques minutes.',
     'À la fin, tu indiques en privé les personnes que tu souhaites revoir.',
     'Si le souhait est mutuel, vous recevez le moyen de vous recontacter.',
