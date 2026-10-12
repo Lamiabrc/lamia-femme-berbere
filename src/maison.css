@@ -1026,3 +1026,14 @@ body { background: var(--qvt-ivoire); }
 .espace-soiree h3 { margin: 2px 0; font-size: 20px; }
 .espace-soiree p { margin: 0; }
 .espace [hidden] { display: none !important; }
+.espace-achats { display: grid; gap: 10px; }
+.espace-achat { display: flex; justify-content: space-between; gap: 16px; align-items: center; flex-wrap: wrap; padding: 14px 18px; background: #fff; border: 1px solid var(--ligne); border-radius: 12px; }
+.espace-achat h3 { margin: 2px 0 0; font-size: 19px; }
+.espace-achat p { margin: 0; }
+.espace-achat-droite { display: grid; justify-items: end; gap: 4px; }
+.espace-achat-droite strong { font-size: 18px; }
+.statut { font-size: 13px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: var(--qvt-champagne-clair); color: var(--qvt-bronze); }
+.statut.is-paid, .statut.is-fulfilled, .statut.is-shipped { background: #e4f3e6; color: #2f6b34; }
+.statut.is-cancelled, .statut.is-refunded { background: #f6e3e5; color: var(--rouge); }
+.espace-liens.is-boutiques { margin-top: 0; }
+@media (min-width: 900px) { .espace-liens.is-boutiques { grid-template-columns: repeat(4, 1fr); } }

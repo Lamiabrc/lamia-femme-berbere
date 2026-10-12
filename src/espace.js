@@ -18,6 +18,7 @@ async function render() {
   $('[data-espace-email]').textContent = u.email || '';
   $('[data-espace-nom]').textContent = u.user_metadata?.first_name || '';
   $('[data-espace-admin]').hidden = u.app_metadata?.role !== 'admin';
+  achats(session);
   const { data } = await supabase.from('event_registrations')
     .select('attendance_status, speed_dating_events(title, audience, starts_at)')
     .neq('attendance_status', 'cancelled');
@@ -25,6 +26,23 @@ async function render() {
   $('[data-espace-soirees]').innerHTML = rows.length
     ? rows.map((r) => `<article class="espace-soiree"><p class="event-date">${esc(when(r.speed_dating_events.starts_at))}</p><h3>${esc(r.speed_dating_events.title)}</h3>${r.speed_dating_events.audience ? `<p>Salon ${esc(r.speed_dating_events.audience)}</p>` : ''}</article>`).join('')
     : '<p>Tu n’as pas encore réservé de soirée. <a class="text-link" href="/speed-dating/#events-title">Voir le Bal masqué</a></p>';
+}
+
+const money = (c, cur = 'EUR') => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: cur || 'EUR' }).format((c || 0) / 100);
+const STATUTS = { pending: 'Précommande enregistrée', paid: 'Payée', fulfilled: 'Expédiée', shipped: 'Expédiée', cancelled: 'Annulée', refunded: 'Remboursée' };
+async function achats(session) {
+  const box = $('[data-espace-achats]');
+  try {
+    const r = await fetch('/api/mes-achats', { headers: { Authorization: `Bearer ${session.access_token}` } });
+    const { orders = [] } = await r.json();
+    box.innerHTML = orders.length
+      ? orders.map((o) => `<article class="espace-achat">
+          <div><p class="event-date">${esc(new Date(o.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }))} · n° ${esc(o.order_number)}</p>
+          <h3>${(o.order_items || []).map((i) => `${esc(i.product_name)}${i.quantity > 1 ? ` × ${i.quantity}` : ''}`).join(', ') || 'Commande'}</h3></div>
+          <div class="espace-achat-droite"><strong>${money(o.amount_total_cents, o.currency)}</strong><span class="statut is-${esc(o.status)}">${esc(STATUTS[o.status] || o.status)}</span></div>
+        </article>`).join('')
+      : '<p>Pas encore d’achat. Les précommandes du livre et du collier apparaîtront ici. <a class="text-link" href="/boutique/">Voir la Boutique</a></p>';
+  } catch { box.innerHTML = '<p>Tes achats ne s’affichent pas pour le moment. Réessaie dans un instant.</p>'; }
 }
 
 $('[data-espace-login]').addEventListener('submit', async (e) => {

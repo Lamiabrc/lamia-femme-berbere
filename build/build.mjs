@@ -521,6 +521,21 @@ page(
     </section>
 
     <section>
+      <h2>Mes achats</h2>
+      <div class="espace-achats" data-espace-achats><p class="loading">Un instant…</p></div>
+    </section>
+
+    <section>
+      <h2>Les boutiques de la Maison</h2>
+      <div class="espace-liens is-light is-boutiques">
+        <a href="/boutique/"><strong>La Boutique</strong><span>Tout ce que la Maison propose</span></a>
+        <a href="/ecrin/"><strong>L’Écrin</strong><span>Les bijoux d’Ath Yenni</span></a>
+        <a href="/bibliotheque/"><strong>La Bibliothèque</strong><span>Werdi, broché et ebook</span></a>
+        <a href="/grenier/"><strong>Le Grenier</strong><span>Mes trouvailles de brocante</span></a>
+      </div>
+    </section>
+
+    <section>
       <h2>Mes soirées</h2>
       <div class="espace-soirees" data-espace-soirees><p class="loading">Un instant…</p></div>
     </section>
