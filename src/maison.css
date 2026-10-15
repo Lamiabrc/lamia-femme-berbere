@@ -949,7 +949,7 @@ body { background: var(--qvt-ivoire); }
 .bal-welcome { margin: 8px 0 0; font-family: var(--serif); font-style: italic; font-size: 22px; color: #fff; }
 
 /* ================================================================ La salle du bal (vidéo) */
-.bal-step[hidden] { display: none !important; }
+.bal-step[hidden], .bal [hidden] { display: none !important; }
 .bal-salle-page { min-height: 80vh; }
 .bal-porte { display: grid; gap: 12px; max-width: 440px; margin: 0 auto; padding: 0 var(--gouttiere) clamp(48px, 7vw, 96px); }
 .bal-porte label { display: grid; gap: 6px; font-weight: 600; color: #efe4cf; }

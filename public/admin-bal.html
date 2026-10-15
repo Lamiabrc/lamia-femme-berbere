@@ -48,7 +48,7 @@
         <label style="flex:1;min-width:260px">Soirée<select id="soiree"></select></label>
         <button class="btn btn-gold" id="btn-open" type="button">Ouvrir les portes</button>
       </div>
-      <p style="font-size:14px;color:#b8a98f">Ouvrir les portes crée le grand salon. Les inscrits entrent sur lamia-femme-berbere.com/speed-dating/bal/ avec leur email et leur date de naissance.</p>
+      <p style="font-size:14px;color:#b8a98f">Ouvrir les portes crée le grand salon. Les inscrits entrent sur lamia-femme-berbere.com/speed-dating/bal/ avec leur compte et une adresse email vérifiée.</p>
     </div>
 
     <div id="bal" hidden>
@@ -64,15 +64,15 @@
         <h2 style="margin-top:0">Les tête-à-tête</h2>
         <div class="row">
           <label>Durée d’un tour (minutes)<input id="minutes" type="number" min="2" max="15" value="6" style="width:120px"></label>
-          <button class="btn btn-gold" id="btn-round" type="button">Lancer un tour</button>
+          <label>Nombre de tours<input id="max-rounds" type="number" min="1" max="20" value="8"></label><label><input id="automatic" type="checkbox" checked>Enchaîner automatiquement (pause de 30 s)</label><button class="btn btn-gold" id="btn-round" type="button">Lancer un tour</button>
           <button class="btn btn-out" id="btn-grand" type="button">Rappeler tout le monde au grand salon</button>
         </div>
         <p id="last" style="color:#b8a98f;font-size:14px"></p>
         <div class="tat" id="tat"></div>
       </div>
 
-      <h2>Les salons</h2>
-      <table><thead><tr><th>Salon</th><th>Inscrits</th><th>Présents</th><th>Femmes</th><th>Hommes</th></tr></thead><tbody id="salons"></tbody></table>
+      <h2>Admission et modération</h2><div id="admissions"></div><p>Une exclusion coupe la vidéo et interdit toute nouvelle entrée. Les conversations privées restent inaccessibles à l’administratrice.</p><h2>Les salons</h2>
+      <table><thead><tr><th>Salon</th><th>Inscrits</th><th>Présents</th></tr></thead><tbody id="salons"></tbody></table>
 
       <div class="box">
         <h2 style="margin-top:0">Fin du bal</h2>
@@ -87,13 +87,14 @@
   </section>
 </main>
 <script type="module">
+import { DATABASE_URL, PUBLIC_KEY } from "/assets/supabase-config.js";
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm';
-const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc');
+const supabase = createClient(DATABASE_URL, PUBLIC_KEY);
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
 const when = (iso) => new Date(iso).toLocaleString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
 const PHASES = { accueil: 'Grand salon ouvert', tour: 'Tête-à-tête en cours', fin: 'Fin du bal : souhaits', ferme: 'Portes fermées' };
-const ERRORS = { forbidden: 'Ce compte n’a pas le rôle administratrice.', video_not_configured: 'La clé Daily manque dans Vercel.', bal_closed: 'Le bal est fermé.', temporary_failure: 'Erreur temporaire, réessaie.' };
+const ERRORS = { video_service_failed:'La coupure vidéo reste à confirmer. Garde cette page ouverte : une nouvelle tentative sera effectuée.', forbidden: 'Ce compte n’a pas le rôle administratrice.', video_not_configured: 'La clé Daily manque dans Vercel.', bal_closed: 'Le bal est fermé.', temporary_failure: 'Erreur temporaire, réessaie.', state_changed:'Une autre commande a été appliquée. Actualise avant de recommencer.', round_running:'Un tour est déjà en cours.', login_required:'Connecte-toi.', already_open:'Un bal est déjà ouvert.' };
 
 async function bal(body) {
   const { data: { session } } = await supabase.auth.getSession();
@@ -115,16 +116,19 @@ function paint(d) {
   $('#no-video').hidden = d.video;
   const open = d.state?.open;
   $('#ouvrir').hidden = !!open;
-  $('#bal').hidden = !open;
-  if (!open) return;
+  $('#bal').hidden = !d.state;
+  if (!d.state) return;
+  for(const id of ['btn-salon','btn-round','btn-grand','btn-fin','btn-close'])$('#'+id).disabled=!open;
   const s = d.state;
   $('#phase').textContent = `${PHASES[s.phase] || ''}${s.round ? ` · tour ${s.round}` : ''}${s.ends_at && s.phase === 'tour' ? ` · fin à ${new Date(s.ends_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}` : ''}`;
   $('#presents').textContent = `${d.present} masque${d.present > 1 ? 's' : ''} au bal`;
-  $('#salons').innerHTML = d.salons.map((x) => `<tr><td>${esc(x.label)}</td><td>${x.inscrits}</td><td>${x.presents}</td><td>${x.femmes}</td><td>${x.hommes}</td></tr>`).join('');
+  $('#salons').innerHTML = d.salons.map((x) => `<tr><td>${esc(x.label)}</td><td>${x.inscrits}</td><td>${x.presents}</td></tr>`).join('');
   $('#last').textContent = s.last_round ? `Dernier tour : ${s.last_round.pairs} tête-à-tête${s.last_round.waiting.length ? ` · en attente : ${s.last_round.waiting.join(', ')}` : ''}` : '';
-  $('#tat').innerHTML = s.phase === 'tour' ? d.tat.map((t, i) => `<button class="btn btn-out" type="button" data-room="${esc(t.room)}">Voir le tête-à-tête ${i + 1}</button>`).join('') : '';
+  $('#tat').textContent = s.phase === 'tour' ? d.tat.length + ' tête-à-tête attribué(s) — connexion vidéo à vérifier' : '';
+  $('#admissions').innerHTML=(d.people||[]).map(p=>`<p>${esc(p.name)} · ${esc(p.salon)} · ${p.present?'présent·e':'absent·e'} ${open&&p.present&&!p.admitted ? '<button type="button" class="btn btn-gold" data-admit="'+esc(p.uid)+'">Admettre</button>':''} ${open&&p.admitted?'<button type="button" class="btn btn-stop" data-exclude="'+esc(p.uid)+'">Exclure</button>':''}</p>`).join('');
+
   $('#wishes').textContent = `${d.wishes_count} personne${d.wishes_count > 1 ? 's ont' : ' a'} envoyé ses souhaits.`;
-  $('#mutual').innerHTML = d.mutual.map(([a, b]) => `<tr><td>${esc(a.name)} et ${esc(b.name)}</td><td>${esc(a.email || '')} · ${esc(b.email || '')}</td></tr>`).join('') || '<tr><td colspan="2">Pas encore de souhait réciproque.</td></tr>';
+  $('#mutual').innerHTML = d.mutual.map(([a, b]) => `<tr><td>${esc(a.name)} et ${esc(b.name)}</td><td>${a.email && b.email ? esc(a.email)+' · '+esc(b.email) : 'Accord de transmission des deux personnes attendu'}</td></tr>`).join('') || '<tr><td colspan="2">Pas encore de souhait réciproque.</td></tr>';
 }
 
 async function refresh() { try { paint(await bal({ action: 'admin_state' })); } catch { /* message affiché */ } }
@@ -134,7 +138,7 @@ async function start() {
   $('#login').hidden = !!session; $('#panel').hidden = !session;
   if (!session) return;
   await soirees(); await refresh();
-  setInterval(refresh, 10000);
+  setInterval(refresh, 15000);
 }
 $('#login').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -145,13 +149,18 @@ $('#login').addEventListener('submit', async (e) => {
 });
 const act = (body, confirmText) => async () => { if (confirmText && !confirm(confirmText)) return; try { paint(await bal(body())); } catch { /* */ } };
 $('#btn-open').addEventListener('click', act(() => ({ action: 'open', event_id: $('#soiree').value })));
-$('#btn-round').addEventListener('click', act(() => ({ action: 'round', minutes: Number($('#minutes').value) })));
+$('#btn-round').addEventListener('click', act(() => ({ action: 'round', minutes: Number($('#minutes').value), max_rounds: Number($('#max-rounds').value), automatic: $('#automatic').checked })));
 $('#btn-grand').addEventListener('click', act(() => ({ action: 'grand' })));
 $('#btn-fin').addEventListener('click', act(() => ({ action: 'fin' })));
 $('#btn-close').addEventListener('click', act(() => ({ action: 'close' }), 'Fermer les portes du bal ? Tout le monde sera déconnecté.'));
 const openRoom = async (room) => { const w = window.open('', '_blank'); try { const { url } = await bal({ action: 'admin_join', room }); w.location = url; } catch { w.close(); } };
 $('#btn-salon').addEventListener('click', () => openRoom());
-$('#tat').addEventListener('click', (e) => { const b = e.target.closest('[data-room]'); if (b) openRoom(b.dataset.room); });
+$('#admissions').addEventListener('click',async e=>{
+ const b=e.target.closest('[data-admit],[data-exclude]'); if(!b)return;
+ if(b.dataset.exclude&&!confirm('Exclure cette personne de la soirée ?'))return;
+ b.disabled=true;
+ try {paint(await bal({action:b.dataset.admit?'admit':'exclude',user_id:b.dataset.admit||b.dataset.exclude}));} catch {} finally {b.disabled=false;}
+});
 start();
 </script>
 </body>

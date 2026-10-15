@@ -8,7 +8,7 @@ const USER = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee';
 const env = { CHECKOUT_ENABLED: 'true', STRIPE_SECRET_KEY: 'sk_live_fixture', SUPABASE_SERVICE_ROLE_KEY: 'sb_secret_fixture' };
 const now = () => new Date('2026-10-12T10:00:00Z');
 
-function fakeDb({ event = {}, paid = 0, user = { id: USER, email: 'a@b.fr', email_confirmed_at: 'x' }, regOk = true, patchOk = true } = {}) {
+function fakeDb({ event = {}, paid = 0, user = { id: USER, email: 'a@b.fr', email_confirmed_at: 'x' }, regOk = true, patchOk = true, attendance = 'registered' } = {}) {
   const calls = [];
   const fetcher = async (url, init = {}) => {
     calls.push({ url, init });
@@ -19,7 +19,7 @@ function fakeDb({ event = {}, paid = 0, user = { id: USER, email: 'a@b.fr', emai
     if (url.includes('event_registrations') && init.headers?.Prefer === 'count=exact') return ok([], { 'content-range': `0-0/${paid}` });
     if (url.includes('event_registrations') && init.method === 'POST') return { ok: regOk };
     if (url.includes('event_registrations') && init.method === 'PATCH') return { ok: patchOk };
-    if (url.includes('event_registrations')) return ok([{ user_id: USER, payment_status: 'pending', attendance_status: 'registered', created_at: 'x' }]);
+    if (url.includes('event_registrations')) return ok([{ user_id: USER, payment_status: 'pending', attendance_status: attendance, created_at: 'x' }]);
     if (url.includes('member_profiles')) return { ok: true };
     if (url.includes('stripe_webhook_events')) return { ok: true };
     if (url.includes('speed_dating_wishes')) return { ok: false };
@@ -100,4 +100,16 @@ test('le tableau des inscrits est réservé au rôle admin', async () => {
   const body = await res.json();
   assert.equal(body.people[0].email, 'membre@exemple.fr');
   assert.equal(body.wishesAvailable, false);
+});
+
+
+test('une place gratuite en liste d’attente n’est pas confirmée dans le rapport admin', async () => {
+  const { fetcher } = fakeDb({event:{ticket_price_cents:0},attendance:'waitlisted',user:{id:USER,app_metadata:{role:'admin'}}});
+  const request=new Request(`https://maison.example/api/admin-events?event_id=${EVENT}`,{headers:{authorization:'Bearer jwt'}});
+  const res=await adminEventReport(request,{env:{SUPABASE_SERVICE_ROLE_KEY:'fixture'},fetcher});
+  assert.equal(res.status,200);
+  const body=await res.json();
+  assert.equal(body.people[0].paid,true);
+  assert.equal(body.people[0].confirmed,false);
+  assert.equal(body.people[0].attendance,'waitlisted');
 });

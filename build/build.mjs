@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { rooms, roomBySlug, floors } from '../content/rooms.mjs';
 import * as P from '../content/pages.mjs';
 import { legalPages } from '../content/legal.mjs';
+import { DATABASE_URL, PUBLIC_KEY } from '../lib/supabase-config.mjs';
 import { facade } from './facade.mjs';
 import { EDITABLE, defaults, applyOverrides } from '../content/editable.mjs';
 
@@ -27,7 +28,7 @@ async function loadOverrides() {
   if (!key) return {};
   try {
     const h = { apikey: key, ...(key.startsWith('sb_secret_') ? {} : { Authorization: `Bearer ${key}` }) };
-    const r = await fetch('https://tybwvxinigahhntfeeur.supabase.co/rest/v1/platform_settings?key=eq.site_content&select=value', { headers: h, signal: AbortSignal.timeout(10000) });
+    const r = await fetch(DATABASE_URL + '/rest/v1/platform_settings?key=eq.site_content&select=value', { headers: h, signal: AbortSignal.timeout(10000) });
     if (!r.ok) return {};
     return (await r.json())[0]?.value?.values || {};
   } catch { return {}; }
@@ -440,7 +441,7 @@ page(
   <h2 id="deroule-title">Le déroulé du bal</h2>
   <ol>
     <li><strong>L’invitation</strong><span>Tu choisis ton salon (France, Algérie, Canada, autres pays ou tous âges) et tu réserves ta place en une minute.</span></li>
-    <li><strong>L’antichambre</strong><span>Avant le bal, tu passes par l’antichambre pour vérifier ta caméra et ton micro. Lamia t’envoie le lien de la salle par email.</span></li>
+    <li><strong>L’antichambre</strong><span>Avant le bal, tu passes par l’antichambre pour vérifier ta caméra et ton micro. Le lien de la salle est accessible dans ton espace membre.</span></li>
     <li><strong>L’ouverture du bal</strong><span>À 21 h, Lamia accueille tout le monde et ouvre la soirée.</span></li>
     <li><strong>Les tête-à-tête masqués</strong><span>Les rencontres se font en tête-à-tête de quelques minutes, dans ton salon. Masque, loup ou déguisement : le mystère fait partie du jeu.</span></li>
     <li><strong>La fin du bal</strong><span>Tu indiques en privé qui tu aimerais revoir. Si le souhait est réciproque, Lamia vous met en relation.</span></li>
@@ -515,7 +516,7 @@ page(
         <p class="form-status" role="status" data-reset-status></p>
       </form>
     </div>
-    <p class="espace-note">Pour entrer au Bal masqué, pas besoin de compte : <a class="text-link" href="/speed-dating/bal/">la porte du bal</a> te demande seulement ton email et ta date de naissance.</p>
+    <p class="espace-note">Pour entrer au Bal masqué, utilise ton espace membre : <a class="text-link" href="/speed-dating/bal/">la porte du bal</a> utilise ton compte et une connexion vérifiée par email.</p>
   </div>
 
   <form class="espace-card espace-new" data-espace-newpass hidden>
@@ -583,11 +584,11 @@ page(
   <div class="bal-hero is-short">
     <p class="bal-kicker">Le Bal masqué de Venise</p>
     <h1>La porte du bal</h1>
-    <p class="bal-lead">Entre avec l’email et la date de naissance donnés à ton inscription.</p>
+    <p class="bal-lead">Connecte-toi avec le lien personnel envoyé à ton adresse email, puis pousse la porte.</p>
   </div>
   <form class="bal-porte" data-bal-entree>
     <label>Email<input name="email" type="email" autocomplete="email" required></label>
-    <label>Date de naissance<input name="birth_date" type="date" required></label>
+
     <button class="btn btn-gold" type="submit">Pousser la porte</button>
     <p class="form-status" role="status" data-entree-status></p>
     <p class="bal-petit">Pas encore inscrit·e ? <a class="text-link" href="/speed-dating/#events-title">Réserve ta place</a>. Un souci de caméra ? <a class="text-link" href="/speed-dating/salle/">Passe par l’antichambre</a>.</p>
@@ -624,17 +625,17 @@ page(
   <div class="salle-boutons">
     <button class="btn bal-btn-line" type="button" data-micro aria-pressed="false">Micro</button>
     <button class="btn bal-btn-line" type="button" data-camera aria-pressed="false">Caméra</button>
+    <button class="btn bal-btn-line" type="button" data-block hidden>Bloquer et quitter ce tête-à-tête</button>
     <a class="btn bal-btn-line" href="/confidences/" target="_blank" rel="noopener">Signaler à Lamia</a>
     <button class="btn bal-btn-line" type="button" data-quitter>Quitter le bal</button>
   </div>
-  <form class="souhaits" data-souhaits hidden>
-    <h2>Qui aimerais-tu revoir ?</h2>
-    <p>Ton choix reste privé. Si c’est réciproque, Lamia vous met en relation.</p>
-    <div class="souhaits-liste" data-souhaits-liste></div>
-    <label>Un mot pour Lamia (facultatif)<textarea name="message" rows="2" maxlength="500"></textarea></label>
-    <button class="btn btn-gold" type="submit">Envoyer mes souhaits</button>
-    <p class="form-status" data-souhaits-status></p>
-  </form>
+  <section class="souhaits" data-souhaits hidden>
+    <h2>Après chaque rencontre</h2>
+    <p>Ton choix reste privé. Un intérêt réciproque ne transmet aucune coordonnée sans votre accord à tous les deux.</p>
+    <div data-souhaits-liste></div>
+    <h3>Intérêts réciproques</h3><div data-mutual></div>
+    <p class="form-status" role="status" data-souhaits-status></p>
+  </section>
 </section>
 
 <section class="bal-step" data-step="ferme" hidden>
@@ -678,7 +679,7 @@ page(
     </ul>
     <p class="ante-msg" role="status" data-ante-msg>Clique sur le bouton, puis autorise la caméra et le micro quand ton navigateur te le demande.</p>
     <button class="btn bal-btn-line" type="button" data-ante-stop hidden>Couper la caméra</button>
-    <p class="ante-note">Le soir du bal, Lamia t’envoie par email le lien de la salle. Garde cette page pour faire un essai avant 21 h.</p>
+    <p class="ante-note">Le soir du bal, retrouve la salle dans ton espace membre. Garde cette page pour faire un essai avant 21 h.</p>
     <p><a class="text-link" href="/speed-dating/">Retour au Bal masqué</a></p>
   </div>
 </section>
@@ -1013,6 +1014,7 @@ await mkdir(join(DIST, 'assets'), { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await writeFile(join(DIST, 'assets', 'editable.json'), JSON.stringify({ fields: EDITABLE, defaults: DEFAULTS }));
 for (const f of ['maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'bal.js', 'espace.js']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
+await writeFile(join(DIST, 'assets', 'supabase-config.js'), `export const DATABASE_URL = ${JSON.stringify(DATABASE_URL)};\nexport const PUBLIC_KEY = ${JSON.stringify(PUBLIC_KEY)};\n`);
 await cp(join(ROOT, 'content', 'shipping.mjs'), join(DIST, 'assets', 'shipping.mjs'));
 
 const indexable = pages.filter((p) => !p.path.endsWith('.html') && !['/produit/', '/speed-dating/merci/', '/speed-dating/souhaits/', '/cgv/', '/mentions-legales/', '/confidentialite/'].includes(p.path));

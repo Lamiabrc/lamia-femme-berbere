@@ -1,7 +1,8 @@
+import { DATABASE_URL, PUBLIC_KEY } from "/assets/supabase-config.js";
 // Mon espace : connexion, mot de passe, soirées réservées, liens d'administration.
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm';
 
-const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc');
+const supabase = createClient(DATABASE_URL, PUBLIC_KEY);
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
 const when = (iso) => new Date(iso).toLocaleString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
@@ -20,11 +21,11 @@ async function render() {
   $('[data-espace-admin]').hidden = u.app_metadata?.role !== 'admin';
   achats(session);
   const { data } = await supabase.from('event_registrations')
-    .select('attendance_status, speed_dating_events(title, audience, starts_at)')
+    .select('attendance_status, payment_status, speed_dating_events(title, audience, starts_at)')
     .neq('attendance_status', 'cancelled');
   const rows = (data || []).filter((r) => r.speed_dating_events).sort((a, b) => a.speed_dating_events.starts_at.localeCompare(b.speed_dating_events.starts_at));
   $('[data-espace-soirees]').innerHTML = rows.length
-    ? rows.map((r) => `<article class="espace-soiree"><p class="event-date">${esc(when(r.speed_dating_events.starts_at))}</p><h3>${esc(r.speed_dating_events.title)}</h3>${r.speed_dating_events.audience ? `<p>Salon ${esc(r.speed_dating_events.audience)}</p>` : ''}</article>`).join('')
+    ? rows.map((r) => `<article class="espace-soiree"><p class="event-date">${esc(when(r.speed_dating_events.starts_at))}</p><h3>${esc(r.speed_dating_events.title)}</h3><p>${r.attendance_status === "waitlisted" ? "Liste d’attente — aucune place confirmée" : ["paid","waived"].includes(r.payment_status) ? "Inscription confirmée" : "En attente de confirmation"}</p>${r.speed_dating_events.audience ? `<p>Salon ${esc(r.speed_dating_events.audience)}</p>` : ''}</article>`).join('')
     : '<p>Tu n’as pas encore réservé de soirée. <a class="text-link" href="/speed-dating/#events-title">Voir le Bal masqué</a></p>';
 }
 
@@ -74,5 +75,5 @@ $('[data-espace-newpass]').addEventListener('submit', async (e) => {
 
 $('[data-espace-logout]').addEventListener('click', async () => { await supabase.auth.signOut(); render(); });
 
-supabase.auth.onAuthStateChange((event) => { if (event === 'PASSWORD_RECOVERY') recovering = true; render(); });
+supabase.auth.onAuthStateChange((event) => { if (event === 'PASSWORD_RECOVERY') recovering = true; setTimeout(render, 0); });
 render();

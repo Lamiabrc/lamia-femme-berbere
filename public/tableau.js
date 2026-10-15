@@ -1,7 +1,8 @@
+import { DATABASE_URL, PUBLIC_KEY } from "/assets/supabase-config.js";
 // Tableau de bord de Lamia : ventes, produits, soirées, alertes, textes du site, visites.
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm';
 
-const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc');
+const supabase = createClient(DATABASE_URL, PUBLIC_KEY);
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
