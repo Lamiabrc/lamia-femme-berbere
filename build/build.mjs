@@ -326,7 +326,7 @@ page(
 
 <section class="home-speed" aria-labelledby="home-speed-title">
   <a class="home-speed-visual home-speed-poster" href="/speed-dating/#events-title" aria-label="Découvrir le Bal masqué de Venise et réserver une place">
-    <img src="/images/bal-venise-2026.png" alt="Bal masqué de Venise, speed dating Halloween de Lamia Femme Berbère, samedi 31 octobre à 21 h" loading="lazy">
+    <img src="/images/lamia/lamia-salon-1122.webp" alt="Bal masqué de Venise, speed dating Halloween de Lamia Femme Berbère, samedi 31 octobre à 21 h" loading="lazy">
   </a>
   <div class="home-speed-copy">
     <p class="home-speed-kicker">Le Boudoir des Rencontres · Événement actuel</p>
@@ -525,13 +525,13 @@ page(
     scripts: ['/assets/membre.js'],
     ogTitle: 'Bal masqué de Venise — Speed Dating Halloween | Lamia Femme Berbère',
     ogDescription: 'Rejoignez une soirée de speed dating en visio, élégante et chaleureuse, le 31 octobre à 21 h. Places limitées. Réservation gratuite.',
-    ogImage: '/images/bal-venise-og-1200x630.jpg',
+    ogImage: '/images/lamia/lamia-salon-1122.webp',
     ogImageAlt: 'Bal masqué de Venise — Speed Dating Halloween, 31 octobre à 21 h, avec Lamia Femme Berbère',
     body: `<div class="bal">
 <section class="bal-hero bal-hero-rich">
   <span class="bal-paillettes" aria-hidden="true"></span>
   <figure class="bal-hero-poster">
-    <img src="/images/bal-venise-2026.png" alt="Lamia portant un masque vénitien rouge à plumes pour le Bal masqué de Venise, speed dating Halloween" loading="eager">
+    <img src="/images/lamia/lamia-salon-1122.webp" alt="Lamia portant un masque vénitien rouge à plumes pour le Bal masqué de Venise, speed dating Halloween" loading="eager">
   </figure>
   <div class="bal-hero-copy">
     <p class="bal-kicker">Le Boudoir des Rencontres · speed dating en ligne</p>
@@ -554,7 +554,7 @@ page(
     <p class="boudoir-welcome"><strong>Lamia vous accueille.</strong> Installez-vous, choisissez votre salon et réservez votre place. Le soir du bal, vous recevrez toutes les informations utiles pour entrer dans la salle.</p>
   </div>
   <figure class="boudoir-intro-visual">
-    <img src="/images/bal-venise-2026.png" alt="Lamia dans l’univers feutré du Bal masqué de Venise" loading="lazy">
+    <img src="/images/lamia/lamia-salon-1122.webp" alt="Lamia dans l’univers feutré du Bal masqué de Venise" loading="lazy">
   </figure>
 </section>
 
