@@ -189,12 +189,13 @@ const HEAD_IMAGES = {
   galerie: ['/images/collier/collier-kabyle-15g-detail-640.webp', 'Détail d’un médaillon émaillé'],
   bibliotheque: ['/images/marque/yemma-transmission-900.webp', 'Yemma transmet à sa fille, un livre à la main'],
   salon: ['/images/marque/lamia-portrait-reel-480.webp', 'Lamia Femme Berbère, portrait réel'],
+  'speed-dating': ['/images/marque/lamia-portrait-reel-480.webp', 'Lamia Femme Berbère, hôte du Boudoir des Rencontres'],
   boutique: ['/images/collier/collier-kabyle-15g-ecrin-640.webp', 'Collier kabyle dans son écrin'],
 };
 function roomHead(room, extra = '') {
   const im = HEAD_IMAGES[room.slug];
   const arch = im
-    ? `<figure class="head-arch has-image"><img src="${im[0]}" alt="${esc(im[1])}"${room.slug === 'salon' ? ' class="is-lamia-photo"' : ''}></figure>`
+    ? `<figure class="head-arch has-image"><img src="${im[0]}" alt="${esc(im[1])}"${['salon', 'speed-dating'].includes(room.slug) ? ' class="is-lamia-photo"' : ''}></figure>`
     : '<span class="head-arch" aria-hidden="true"></span>';
   return `<section class="room-head${im ? ' with-image' : ''}">${arch}
   <p class="room-name"><span class="pip" aria-hidden="true"></span>${esc(room.name)}</p>
