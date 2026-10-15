@@ -1450,3 +1450,338 @@ body { background: var(--qvt-ivoire); }
   .home-speed-poster { transition: none; }
   .home-speed-poster:hover { transform: none; }
 }
+
+
+/* ================================================================ Boudoir des Rencontres : page immersive */
+.boudoir-intro {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0,1.15fr) minmax(280px,.85fr);
+  gap: clamp(28px,5vw,72px);
+  align-items: center;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: clamp(50px,7vw,92px) var(--gouttiere);
+}
+.boudoir-intro::before {
+  content:'';
+  position:absolute;
+  inset: 12% 6% auto 6%;
+  height: 74%;
+  border: 1px solid rgba(227,189,110,.14);
+  border-radius: 36px;
+  pointer-events:none;
+}
+.boudoir-intro-copy { position:relative; z-index:1; }
+.boudoir-intro h2 { margin-bottom:14px; }
+.boudoir-intro p {
+  max-width: 62ch;
+  color:#d9cbb3;
+  font-size:17px;
+  line-height:1.7;
+}
+.boudoir-welcome {
+  margin-top:18px;
+  padding:16px 18px;
+  border-left:3px solid var(--or);
+  background:rgba(255,255,255,.035);
+}
+.boudoir-welcome strong { color:#fff; }
+.boudoir-intro-visual {
+  position:relative;
+  z-index:1;
+  margin:0;
+  overflow:hidden;
+  border-radius: 180px 180px 20px 20px;
+  border:1px solid rgba(227,189,110,.34);
+  box-shadow:0 35px 90px -44px rgba(0,0,0,.9);
+  background:#120d1a;
+}
+.boudoir-intro-visual::after {
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg, transparent 58%, rgba(18,13,26,.55));
+  pointer-events:none;
+}
+.boudoir-intro-visual img {
+  display:block;
+  width:100%;
+  height:100%;
+  aspect-ratio:4/5;
+  object-fit:cover;
+  object-position:center 38%;
+}
+
+.boudoir-reservation {
+  position:relative;
+  overflow:hidden;
+  padding: clamp(64px,8vw,110px) max(var(--gouttiere), calc((100% - 1180px)/2));
+  background:
+    radial-gradient(circle at 50% 22%, rgba(227,189,110,.14), transparent 36%),
+    linear-gradient(180deg, #1d101a 0%, #2a101d 46%, #160d16 100%);
+  border-top:1px solid rgba(227,189,110,.18);
+  border-bottom:1px solid rgba(227,189,110,.16);
+}
+.boudoir-reservation::before {
+  content:'';
+  position:absolute;
+  left:0; right:0; bottom:0;
+  height:26%;
+  background:
+    linear-gradient(180deg, transparent, rgba(0,0,0,.16)),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.018) 0 1px, transparent 1px 54px);
+  pointer-events:none;
+}
+.boudoir-curtain {
+  position:absolute;
+  top:-3%;
+  width:22%;
+  height:108%;
+  opacity:.52;
+  filter: blur(.2px);
+  pointer-events:none;
+  background:
+    linear-gradient(90deg, rgba(59,6,20,.95), rgba(112,20,38,.68) 45%, rgba(39,7,16,.92)),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.06) 0 7%, transparent 7% 14%);
+  box-shadow: inset 0 0 40px rgba(0,0,0,.38);
+}
+.boudoir-curtain-left { left:-10%; transform:skewX(-4deg); border-radius:0 0 48% 0; }
+.boudoir-curtain-right { right:-10%; transform:skewX(4deg) scaleX(-1); border-radius:0 0 0 48%; }
+
+.boudoir-reservation-head {
+  position:relative;
+  z-index:2;
+  max-width:760px;
+  margin:0 auto 34px;
+  text-align:center;
+}
+.boudoir-reservation-head h2 {
+  margin:8px 0 12px;
+  color:#fff;
+  font-size:clamp(38px,5vw,62px);
+}
+.boudoir-reservation-head p:last-child {
+  margin:0 auto;
+  max-width:62ch;
+  color:#dfd0b8;
+  font-size:17px;
+  line-height:1.65;
+}
+
+.boudoir-reservation-stage {
+  position:relative;
+  z-index:2;
+  display:grid;
+  grid-template-columns:minmax(210px,.45fr) minmax(0,1.55fr);
+  gap:clamp(20px,3vw,34px);
+  align-items:start;
+  max-width:1080px;
+  margin:0 auto;
+}
+.boudoir-side-note {
+  position:sticky;
+  top:100px;
+  display:grid;
+  gap:10px;
+  padding:24px 20px;
+  border:1px solid rgba(227,189,110,.35);
+  border-radius:22px 22px 8px 8px;
+  background:rgba(18,13,26,.7);
+  backdrop-filter: blur(10px);
+  box-shadow:0 20px 60px -36px rgba(0,0,0,.85);
+  color:#efe4cf;
+}
+.boudoir-side-note strong {
+  font-family:var(--serif);
+  font-size:27px;
+  color:#fff;
+}
+.boudoir-side-note span:not(.boudoir-side-icon) {
+  color:#d9cbb3;
+}
+.boudoir-side-icon {
+  width:44px;
+  height:44px;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(227,189,110,.45);
+  border-radius:50%;
+  color:var(--or);
+  font-size:20px;
+}
+
+.boudoir-reservation .events {
+  padding:0;
+  background:transparent;
+}
+.boudoir-reservation .event-grid {
+  display:block;
+}
+.boudoir-reservation .event-card {
+  max-width:none;
+  margin:0;
+  background:rgba(250,246,238,.985);
+  border:1px solid rgba(243,224,185,.78);
+  border-radius:26px 26px 12px 12px;
+  box-shadow:0 42px 100px -48px rgba(0,0,0,.95);
+  overflow:hidden;
+}
+.boudoir-reservation .event-card::before { display:none; }
+
+.venise-card-visual {
+  position:relative;
+  margin:0;
+  min-height:280px;
+  overflow:hidden;
+  background:#120d1a;
+}
+.venise-card-visual img {
+  width:100%;
+  height:100%;
+  min-height:280px;
+  max-height:520px;
+  object-fit:cover;
+  object-position:center 38%;
+  display:block;
+}
+.venise-card-visual::after {
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg, transparent 40%, rgba(18,13,26,.84) 100%);
+  pointer-events:none;
+}
+.venise-card-visual figcaption {
+  position:absolute;
+  z-index:2;
+  left:24px;
+  right:24px;
+  bottom:22px;
+  display:grid;
+  gap:3px;
+  color:#fff;
+  text-shadow:0 2px 18px rgba(0,0,0,.72);
+}
+.venise-card-visual figcaption span {
+  color:var(--or-clair);
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+}
+.venise-card-visual figcaption strong {
+  font-family:var(--serif);
+  font-size:clamp(30px,4vw,46px);
+  line-height:1;
+}
+.venise-card-visual figcaption em {
+  max-width:52ch;
+  font-size:14px;
+  line-height:1.45;
+  font-style:normal;
+  color:#efe4cf;
+}
+
+.boudoir-reservation .event-card > :not(.venise-card-visual) {
+  margin-left:clamp(20px,3vw,34px);
+  margin-right:clamp(20px,3vw,34px);
+}
+.boudoir-reservation .event-card > .event-date { margin-top:28px; }
+.boudoir-reservation .event-card > form { margin-bottom:30px; }
+
+.boudoir-reservation .event-card h3 {
+  font-size:clamp(30px,4vw,46px);
+  margin-bottom:6px;
+}
+.boudoir-reservation .event-meta {
+  margin-top:16px;
+  margin-bottom:24px;
+}
+.boudoir-reservation .event-meta span {
+  background:#F3E0B9;
+  color:#1B1A18;
+}
+.boudoir-reservation .free-form {
+  margin-top:16px;
+  padding-top:22px;
+  border-top:1px solid #E8DCC8;
+}
+.boudoir-reservation .free-form fieldset {
+  padding:18px;
+  border:1px solid #E8DCC8;
+  border-radius:16px;
+  background:#fffdfa;
+}
+.boudoir-reservation .free-form fieldset + fieldset { margin-top:16px; }
+.boudoir-reservation .free-form legend {
+  padding:0 8px;
+  font-family:var(--serif);
+  font-size:22px;
+  font-weight:700;
+  color:#1B1A18;
+}
+.boudoir-reservation .salon-choice {
+  border-color:#E8DCC8;
+  background:#FAF6EE;
+}
+.boudoir-reservation .salon-choice:has(input:checked) {
+  border-color:#b4162e;
+  box-shadow:0 0 0 2px rgba(180,22,46,.08);
+  background:#fff;
+}
+.boudoir-reservation .free-form > .btn {
+  width:100%;
+  min-height:54px;
+  margin-top:18px;
+  background:#1B1A18;
+  color:#FAF6EE;
+  border-color:#1B1A18;
+  font-size:16px;
+}
+.boudoir-reservation .free-form > .btn:hover {
+  background:#5c1424;
+  border-color:#5c1424;
+}
+.boudoir-reservation input,
+.boudoir-reservation select,
+.boudoir-reservation textarea {
+  border-color:#d8cbb6;
+  background:#fff;
+}
+.boudoir-reservation input:focus,
+.boudoir-reservation select:focus,
+.boudoir-reservation textarea:focus {
+  outline:2px solid rgba(180,22,46,.25);
+  outline-offset:1px;
+  border-color:#b4162e;
+}
+
+@media (max-width:900px) {
+  .boudoir-intro {
+    grid-template-columns:1fr;
+    text-align:center;
+  }
+  .boudoir-intro p { margin-inline:auto; }
+  .boudoir-intro-visual { width:min(420px,84vw); justify-self:center; }
+  .boudoir-reservation-stage { grid-template-columns:1fr; }
+  .boudoir-side-note {
+    position:relative;
+    top:auto;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    align-items:center;
+  }
+  .boudoir-side-note .boudoir-side-icon,
+  .boudoir-side-note strong { grid-column:1/-1; }
+}
+@media (max-width:620px) {
+  .boudoir-curtain { width:34%; opacity:.28; }
+  .boudoir-reservation { padding-inline:16px; }
+  .boudoir-side-note { grid-template-columns:1fr; }
+  .venise-card-visual { min-height:220px; }
+  .venise-card-visual img { min-height:220px; max-height:360px; }
+  .boudoir-reservation .event-card > :not(.venise-card-visual) {
+    margin-left:16px;
+    margin-right:16px;
+  }
+}
