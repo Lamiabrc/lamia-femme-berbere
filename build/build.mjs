@@ -83,9 +83,13 @@ const HOME_UNIVERSES = [
 
 // ---------------------------------------------------------------- gabarit commun
 
-function layout({ title, description, path, room, body, scripts = [], noindex = false }) {
+function layout({ title, description, path, room, body, scripts = [], noindex = false, ogTitle, ogDescription, ogImage, ogImageAlt }) {
   const canonical = SITE_URL + path;
   const accent = room?.accent || 'rouge';
+  const socialTitle = ogTitle || title;
+  const socialDescription = ogDescription || description;
+  const socialImage = ogImage ? (ogImage.startsWith('http') ? ogImage : SITE_URL + ogImage) : SITE_URL + '/images/marque/lamia-logo-600.webp';
+  const socialImageAlt = ogImageAlt || 'Lamia Femme Berbère';
   return `<!doctype html>
 <html lang="fr">
 <head>
@@ -94,12 +98,21 @@ function layout({ title, description, path, room, body, scripts = [], noindex = 
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(description)}">
 ${noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" href="${esc(canonical)}">`}
-<meta property="og:title" content="${esc(title)}">
-<meta property="og:description" content="${esc(description)}">
+<meta property="og:site_name" content="La Maison Lamia Femme Berbère">
+<meta property="og:title" content="${esc(socialTitle)}">
+<meta property="og:description" content="${esc(socialDescription)}">
 <meta property="og:type" content="website">
 <meta property="og:url" content="${esc(canonical)}">
-<meta property="og:image" content="${SITE_URL}/images/marque/lamia-logo-600.webp">
-<meta name="theme-color" content="#ffffff">
+<meta property="og:image" content="${esc(socialImage)}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="${esc(socialImageAlt)}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${esc(socialTitle)}">
+<meta name="twitter:description" content="${esc(socialDescription)}">
+<meta name="twitter:image" content="${esc(socialImage)}">
+<meta name="twitter:image:alt" content="${esc(socialImageAlt)}">
+<meta name="theme-color" content="#1B1A18">
 <link rel="icon" href="/images/marque/lamia-logo-160.webp" type="image/webp">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -312,15 +325,9 @@ page(
 </section>
 
 <section class="home-speed" aria-labelledby="home-speed-title">
-  <div class="home-speed-visual" aria-hidden="true">
-    <svg class="home-speed-mask" viewBox="0 0 160 80" role="img">
-      <path d="M6 21c25-15 49-11 74 9 25-20 49-24 74-9 0 30-19 49-45 49-15 0-23-10-29-20-7 10-14 20-29 20C25 70 6 51 6 21Z" fill="none" stroke="currentColor" stroke-width="4"/>
-      <ellipse cx="49" cy="38" rx="15" ry="10" fill="currentColor"/>
-      <ellipse cx="111" cy="38" rx="15" ry="10" fill="currentColor"/>
-      <path d="M80 30c-5-15 0-25 10-28" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
-    </svg>
-    <span>31 · 10</span>
-  </div>
+  <a class="home-speed-visual home-speed-poster" href="/speed-dating/#events-title" aria-label="Découvrir le Bal masqué de Venise et réserver une place">
+    <img src="/images/bal-venise-2026.png" alt="Bal masqué de Venise, speed dating Halloween de Lamia Femme Berbère, samedi 31 octobre à 21 h" loading="lazy">
+  </a>
   <div class="home-speed-copy">
     <p class="home-speed-kicker">Le Boudoir des Rencontres · Événement actuel</p>
     <h2 id="home-speed-title">Bal masqué de Venise — Speed Dating Halloween</h2>
@@ -511,21 +518,32 @@ page(
 page(
   '/speed-dating/',
   layout({
-    title: 'Le Boudoir des Rencontres · Speed dating sérieux',
-    description: 'Des soirées de rencontre en ligne pour un public précis, en tête-à-tête, dans un cadre sûr veillé par Lamia.',
+    title: 'Bal masqué de Venise — Speed Dating Halloween | Lamia Femme Berbère',
+    description: 'Rejoignez une soirée de speed dating en visio, élégante et chaleureuse, le 31 octobre à 21 h. Places limitées. Réservation gratuite.',
     path: '/speed-dating/',
     room: roomBySlug['speed-dating'],
     scripts: ['/assets/membre.js'],
+    ogTitle: 'Bal masqué de Venise — Speed Dating Halloween | Lamia Femme Berbère',
+    ogDescription: 'Rejoignez une soirée de speed dating en visio, élégante et chaleureuse, le 31 octobre à 21 h. Places limitées. Réservation gratuite.',
+    ogImage: '/images/bal-venise-og-1200x630.jpg',
+    ogImageAlt: 'Bal masqué de Venise — Speed Dating Halloween, 31 octobre à 21 h, avec Lamia Femme Berbère',
     body: `<div class="bal">
-<section class="bal-hero">
+<section class="bal-hero bal-hero-rich">
   <span class="bal-paillettes" aria-hidden="true"></span>
-  <p class="bal-kicker">Le Boudoir des Rencontres · speed dating en ligne</p>
-  <svg class="bal-mask" viewBox="0 0 220 120" aria-hidden="true"><defs><linearGradient id="or" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff1c9"/><stop offset=".45" stop-color="#e3bd6e"/><stop offset="1" stop-color="#9c7134"/></linearGradient></defs><path d="M110 18c-6-14 2-16 10-16M110 18c-4-12-14-14-22-10" fill="none" stroke="url(#or)" stroke-width="2.5" stroke-linecap="round"/><path d="M8 34c30-20 66-16 102 10 36-26 72-30 102-10 0 40-24 70-58 70-20 0-32-12-44-26-12 14-24 26-44 26C32 104 8 74 8 34Z" fill="url(#or)" stroke="#fff3d0" stroke-width="1.5"/><path d="M22 40c20-12 46-10 70 8M198 40c-20-12-46-10-70 8" fill="none" stroke="#7a1e2e" stroke-width="2" opacity=".6"/><ellipse cx="68" cy="58" rx="22" ry="13" fill="#120d1a"/><ellipse cx="152" cy="58" rx="22" ry="13" fill="#120d1a"/><circle cx="110" cy="80" r="5" fill="#7a1e2e"/><path d="M4 30c-4 18-2 40 6 60M216 30c4 18 2 40-6 60" stroke="url(#or)" stroke-width="2" fill="none" opacity=".7"/></svg>
-  <h1>Le Bal masqué<br><span>de Venise</span></h1>
-  <p class="bal-date">Samedi 31 octobre · 21 h · en visio · gratuit</p>
-  <p class="bal-welcome">${esc(roomBySlug['speed-dating'].welcome)}</p>
-  <p class="bal-lead">${esc(P.speedDating.intro)}</p>
-  <p class="bal-actions"><a class="btn btn-gold" href="#events-title">Réserver ma place au bal</a><a class="btn bal-btn-line" href="/speed-dating/salle/">Tester ma caméra</a></p>
+  <figure class="bal-hero-poster">
+    <img src="/images/bal-venise-2026.png" alt="Lamia portant un masque vénitien rouge à plumes pour le Bal masqué de Venise, speed dating Halloween" loading="eager">
+  </figure>
+  <div class="bal-hero-copy">
+    <p class="bal-kicker">Le Boudoir des Rencontres · speed dating en ligne</p>
+    <h1>Le Bal masqué<br><span>de Venise</span></h1>
+    <p class="bal-date">Samedi 31 octobre · 21 h · en visio · gratuit</p>
+    <p class="bal-welcome">${esc(roomBySlug['speed-dating'].welcome)}</p>
+    <p class="bal-lead">${esc(P.speedDating.intro)}</p>
+    <div class="bal-facts" aria-label="Informations pratiques">
+      <span>31 octobre 2026</span><span>21 h – 23 h</span><span>20 personnes max / salon</span>
+    </div>
+    <p class="bal-actions"><a class="btn btn-gold" href="#events-title">Réserver ma place</a><a class="btn bal-btn-line" href="/speed-dating/salle/">Tester ma caméra</a></p>
+  </div>
 </section>
 
 <section class="bal-deroule" aria-labelledby="deroule-title">
