@@ -153,17 +153,17 @@ function freeSoiree(s) {
   const many = zones.length > 1;
   const venise = /venise/i.test(s.title);
   return `<article class="event-card soiree-card${venise ? ' is-venise' : ''}">
-    ${venise ? `<div class="venise-banner">
-      <svg class="venise-mask" viewBox="0 0 64 32" width="84" height="42" aria-hidden="true"><path d="M2 8c10-6 20-4 30 4C42 4 52 2 62 8c0 12-8 20-18 20-6 0-9-4-12-8-3 4-6 8-12 8C10 28 2 20 2 8Z" fill="currentColor" stroke="#fff6dc" stroke-width="1.2"/><ellipse cx="19" cy="15" rx="6" ry="4" fill="#151515"/><ellipse cx="45" cy="15" rx="6" ry="4" fill="#151515"/><path d="M32 12c-2-6 0-10 4-11" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
-      <div><p>Thème de la soirée</p><strong>Carnaval de Venise</strong><span>Masque vénitien, loup ou déguisement : viens comme au bal, le mystère fait partie du jeu.</span></div>
-    </div>` : ''}
+    ${venise ? `<figure class="venise-card-visual">
+      <img src="/images/bal-venise-2026.png" alt="Bal masqué de Venise — soirée speed dating Halloween" loading="lazy">
+      <figcaption><span>Thème de la soirée</span><strong>Carnaval de Venise</strong><em>Masque, loup ou tenue élégante : le mystère fait partie du jeu.</em></figcaption>
+    </figure>` : ''}
     <p class="event-date">${esc(when(s.starts_at))}</p>
     <h3>${esc(s.title)}</h3>
     ${s.description ? `<p>${esc(s.description)}</p>` : ''}
     <div class="event-meta"><span>Gratuit</span><span>En visio</span>${many ? `<span>${zones.length} salons</span>` : ''}<span>20 personnes par salon</span></div>
     ${open.length ? `<form class="free-form" data-free-form data-soiree="${esc(s.key)}" data-starts="${esc(s.starts_at)}" novalidate>
-      <fieldset class="salons"><legend>${many ? '1. Choisis ton salon' : 'Ton salon'}</legend><p class="salon-hint">Ta tranche d’âge est choisie automatiquement d’après ta date de naissance.</p><div class="salon-grid">${salons}</div></fieldset>
-      <fieldset class="about"><legend>${many ? '2. Présente-toi' : 'Présente-toi'}</legend>
+      <fieldset class="salons"><legend>${many ? '1. Choisissez votre salon' : 'Votre salon'}</legend><p class="salon-hint">Votre tranche d’âge est choisie automatiquement d’après votre date de naissance.</p><div class="salon-grid">${salons}</div></fieldset>
+      <fieldset class="about"><legend>${many ? '2. Présentez-vous' : 'Présentez-vous'}</legend>
       <div class="free-grid">
         <label>Prénom<input name="first_name" autocomplete="given-name" required maxlength="60"></label>
         <label>Email<input name="email" type="email" autocomplete="email" required maxlength="254"></label>
@@ -174,7 +174,7 @@ function freeSoiree(s) {
       </div></fieldset>
       <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
       <label class="check"><input type="checkbox" name="rules"><span>J’accepte les <a href="/cgv/" target="_blank" rel="noopener">règles de la soirée</a> : respect, sérieux, aucun propos déplacé. J’ai 18 ans ou plus.</span></label>
-      <button class="btn btn-ink" type="submit">Réserver ma place</button>
+      <button class="btn btn-ink" type="submit">Je réserve ma place</button>
       <p class="form-status" role="status" data-free-status></p>
     </form>` : '<button class="btn btn-ink" type="button" disabled>Complet</button>'}
   </article>`;
