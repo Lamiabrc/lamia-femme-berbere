@@ -1069,3 +1069,33 @@ body { background: var(--qvt-ivoire); }
   .entree-scene { position: relative; height: 70vh; }
   .f-spot:not(.is-soon)::before { animation: none; }
 }
+
+
+/* ================================================================ Accueil SEO / UX */
+.room-index a, .next-rooms a { column-gap: 12px; }
+.room-index-copy { grid-column: 2; display: grid; gap: 2px; min-width: 0; }
+.room-index-copy > strong { display: block; }
+.room-index-copy > span { display: block; color: var(--gris); font-size: 15px; line-height: 1.45; }
+
+.home-universes { padding: clamp(44px, 6vw, 84px) var(--gouttiere); background: var(--qvt-creme, #FAF6EE); }
+.home-universes-intro { max-width: 760px; margin: 0 auto 28px; text-align: center; }
+.home-universes-intro .room-name { justify-content: center; }
+.home-universes-intro p:last-child { color: var(--gris); font-size: 18px; }
+.home-universes-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; max-width: 1180px; margin: 0 auto; }
+.home-universe-card { display: block; padding: 26px; border: 1px solid var(--qvt-sable, #E8DCC8); border-radius: 18px; background: rgba(255,255,255,.76); color: var(--encre); text-decoration: none; transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+.home-universe-card:hover, .home-universe-card:focus-visible { transform: translateY(-3px); border-color: #d9c19a; box-shadow: 0 18px 40px -24px rgba(27,26,24,.35); }
+.home-universe-room { display: block; margin-bottom: 7px; color: var(--qvt-bronze, #8d6a3d); font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.home-universe-card h3 { margin: 0 0 10px; font-size: clamp(23px, 2.3vw, 31px); line-height: 1.12; }
+.home-universe-card p { color: var(--gris); max-width: 50ch; }
+.home-universe-cta { font-weight: 700; color: var(--rouge); }
+
+.home-reassurance { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px 14px; padding: 14px 18px; border: 1px solid var(--qvt-sable, #E8DCC8); border-radius: 16px; background: rgba(255,255,255,.78); color: var(--qvt-encre, #1B1A18); font-size: 14px; }
+.home-reassurance strong { font-family: var(--serif); font-size: 18px; }
+.home-reassurance span + span::before { content: '•'; margin-right: 14px; color: var(--qvt-bronze, #8d6a3d); }
+
+@media (max-width: 760px) {
+  .home-universes-grid { grid-template-columns: 1fr; }
+  .home-reassurance { justify-content: flex-start; }
+  .home-reassurance span { width: 100%; }
+  .home-reassurance span + span::before { content: none; }
+}
