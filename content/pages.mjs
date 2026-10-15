@@ -51,13 +51,14 @@ export const ecrin = {
 
 export const grenier = {
   intro:
-    'Le Grenier, c’est ma brocante personnelle. Les objets y arrivent au gré de mes coups de cœur, presque toujours en un seul exemplaire.',
+    'Le Grenier, c’est ma brocante personnelle. J’y rassemble des objets français, kabyles ou algériens, des livres, de la décoration et des curiosités chinées au fil de mes coups de cœur.',
   families: [
     'Livres anciens et anciennes éditions',
-    'Cartes postales',
-    'Bibelots et décoration',
-    'Cadres et images',
-    'Sculptures et statuettes',
+    'Objets français de brocante',
+    'Cartes postales et souvenirs',
+    'Bibelots, vaisselle et décoration',
+    'Cadres, images, sculptures et statuettes',
+    'Objets kabyles et algériens',
     'Bijoux anciens chinés',
     'Et toutes les trouvailles qui ne rentrent dans aucune case',
   ],
@@ -65,7 +66,7 @@ export const grenier = {
 
 export const speedDating = {
   intro:
-    'Ici, on ne fait pas défiler des profils. On s’inscrit à une soirée pensée pour un public précis, on rencontre quelques personnes en tête-à-tête, et on repart avec, peut-être, l’envie de se revoir.',
+    'Ici, on ne fait pas défiler des profils. On s’inscrit à une soirée pensée pour un public précis, on enchaîne des tête-à-tête rapides en visio, puis on repart avec, peut-être, l’envie de se revoir.',
   origin:
     'Ces soirées sont nées de mes lives : pendant des années, j’ai présenté des personnes qui cherchaient sérieusement à se marier. Le Boudoir reprend cet esprit, avec un cadre fait pour le site.',
   criteria: [
