@@ -546,29 +546,60 @@ page(
   </div>
 </section>
 
+<section class="boudoir-intro" aria-labelledby="boudoir-intro-title">
+  <div class="boudoir-intro-copy">
+    <p class="bal-kicker">Vous êtes entrée dans le Boudoir</p>
+    <h2 id="boudoir-intro-title">Une soirée pour faire de vraies rencontres</h2>
+    <p>Rejoignez une soirée de speed dating en visio, pensée pour favoriser des échanges rapides, sérieux et respectueux dans une ambiance chaleureuse.</p>
+    <p class="boudoir-welcome"><strong>Lamia vous accueille.</strong> Installez-vous, choisissez votre salon et réservez votre place. Le soir du bal, vous recevrez toutes les informations utiles pour entrer dans la salle.</p>
+  </div>
+  <figure class="boudoir-intro-visual">
+    <img src="/images/bal-venise-2026.png" alt="Lamia dans l’univers feutré du Bal masqué de Venise" loading="lazy">
+  </figure>
+</section>
+
 <section class="bal-deroule" aria-labelledby="deroule-title">
   <h2 id="deroule-title">Le déroulé du bal</h2>
   <ol>
-    <li><strong>L’invitation</strong><span>Tu choisis ton salon (France, Algérie, Canada, autres pays ou tous âges) et tu réserves ta place en une minute.</span></li>
-    <li><strong>L’antichambre</strong><span>Avant le bal, tu passes par l’antichambre pour vérifier ta caméra et ton micro. Lamia t’envoie le lien de la salle par email.</span></li>
-    <li><strong>L’ouverture du bal</strong><span>À 21 h, Lamia accueille tout le monde et ouvre la soirée.</span></li>
-    <li><strong>Les tête-à-tête masqués</strong><span>Les rencontres se font en tête-à-tête de quelques minutes, dans ton salon. Masque, loup ou déguisement : le mystère fait partie du jeu.</span></li>
-    <li><strong>La fin du bal</strong><span>Tu indiques en privé qui tu aimerais revoir. Si le souhait est réciproque, Lamia vous met en relation.</span></li>
+    <li><strong>Vous réservez</strong><span>Choisissez votre salon (France, Algérie, Canada, autres pays ou tous âges) et réservez votre place en quelques instants.</span></li>
+    <li><strong>Vous recevez l’invitation</strong><span>Les informations pratiques vous sont envoyées par e-mail avant la soirée.</span></li>
+    <li><strong>Vous entrez dans le salon</strong><span>À 21 h, Lamia ouvre le bal et vous accueille dans la salle en visio.</span></li>
+    <li><strong>Vous faites connaissance</strong><span>Les échanges se font en tête-à-tête de quelques minutes. Masque, loup ou déguisement : le mystère fait partie du jeu.</span></li>
+    <li><strong>Vous indiquez vos souhaits</strong><span>Après la soirée, vous indiquez en privé qui vous aimeriez revoir. Si le souhait est réciproque, Lamia vous met en relation.</span></li>
   </ol>
 </section>
 
 <section class="bal-code" aria-labelledby="code-title">
-  <h2 id="code-title">Le code du bal</h2>
+  <h2 id="code-title">Un cadre chaleureux et respectueux</h2>
   <ul>
-    <li><strong>Un masque ou un loup</strong>, ou un déguisement complet : Venise, Halloween, à toi de choisir.</li>
-    <li><strong>Caméra allumée</strong>, dans un endroit calme et bien éclairé.</li>
-    <li><strong>Respect et sérieux</strong> : on vient pour rencontrer, jamais de propos déplacé.</li>
-    <li><strong>Un souci ?</strong> <a href="/confidences/">Le Cabinet des Confidences</a> est là pour alerter Lamia en toute discrétion.</li>
+    <li><strong>Inscription simple</strong> : vous choisissez votre salon et réservez votre place en quelques instants.</li>
+    <li><strong>Places limitées</strong> : 20 personnes maximum par salon pour conserver des échanges de qualité.</li>
+    <li><strong>Respect et sérieux</strong> : caméra allumée, endroit calme et aucun propos déplacé.</li>
+    <li><strong>Présence de Lamia</strong> : l’organisation, l’accueil et le suivi de la soirée restent encadrés par Lamia.</li>
+    <li><strong>Ambiance du bal</strong> : masque vénitien, loup ou déguisement élégant sont les bienvenus.</li>
+    <li><strong>Un souci ?</strong> <a href="/confidences/">Le Cabinet des Confidences</a> permet d’alerter Lamia en toute discrétion.</li>
   </ul>
 </section>
-<section class="events" aria-labelledby="events-title">
-  <h2 id="events-title">Réserve ta place au bal</h2>
-  <div class="event-grid" data-events><p class="loading">Les soirées arrivent…</p></div>
+<section class="boudoir-reservation" aria-labelledby="events-title">
+  <span class="boudoir-curtain boudoir-curtain-left" aria-hidden="true"></span>
+  <span class="boudoir-curtain boudoir-curtain-right" aria-hidden="true"></span>
+  <div class="boudoir-reservation-head">
+    <p class="bal-kicker">Prenez place dans le salon</p>
+    <h2 id="events-title">Réserver ma place au Bal masqué de Venise</h2>
+    <p>Participation gratuite, sur inscription préalable. Les places sont limitées afin de préserver la qualité des échanges.</p>
+  </div>
+  <div class="boudoir-reservation-stage">
+    <aside class="boudoir-side-note">
+      <span class="boudoir-side-icon" aria-hidden="true">✦</span>
+      <strong>Samedi 31 octobre</strong>
+      <span>21 h · en visio</span>
+      <span>Gratuit</span>
+      <span>20 personnes maximum par salon</span>
+    </aside>
+    <div class="events">
+      <div class="event-grid" data-events><p class="loading">Les soirées arrivent…</p></div>
+    </div>
+  </div>
 </section>
 <section class="member-panel" aria-labelledby="member-title" data-member>
   <h2 id="member-title">Ton espace membre</h2>
