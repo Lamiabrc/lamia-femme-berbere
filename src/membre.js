@@ -1,11 +1,12 @@
+import { DATABASE_URL, PUBLIC_KEY } from "/assets/supabase-config.js";
 // Espace membre : compte, réservation de soirée, alerte confidentielle.
 // Reprend les tables existantes (event_registrations, safety_reports, report_evidence)
 // et la protection serveur (RLS) déjà en place côté Supabase.
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm';
 
-const SUPABASE_URL = 'https://tybwvxinigahhntfeeur.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc';
+const SUPABASE_URL = DATABASE_URL;
+const SUPABASE_KEY = PUBLIC_KEY;
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const $ = (s, root = document) => root.querySelector(s);
@@ -56,7 +57,7 @@ async function refresh() {
     reportLogin.hidden = !!session;
   }
 }
-supabase.auth.onAuthStateChange(() => refresh().then(renderWishes));
+supabase.auth.onAuthStateChange(() => { setTimeout(() => refresh().then(renderWishes), 0); });
 
 // ---------------------------------------------------------------- compte
 
@@ -160,7 +161,7 @@ function freeSoiree(s) {
     <p class="event-date">${esc(when(s.starts_at))}</p>
     <h3>${esc(s.title)}</h3>
     ${s.description ? `<p>${esc(s.description)}</p>` : ''}
-    <div class="event-meta"><span>Gratuit</span><span>En visio</span>${many ? `<span>${zones.length} salons</span>` : ''}<span>20 personnes par salon</span></div>
+    <div class="event-meta"><span>Gratuit</span><span>En visio</span>${many ? `<span>${zones.length} salons</span>` : ''}<span>Jusqu’à 20 personnes par salon</span></div>
     ${open.length ? `<form class="free-form" data-free-form data-soiree="${esc(s.key)}" data-starts="${esc(s.starts_at)}" novalidate>
       <fieldset class="salons"><legend>${many ? '1. Choisis ton salon' : 'Ton salon'}</legend><p class="salon-hint">Ta tranche d’âge est choisie automatiquement d’après ta date de naissance.</p><div class="salon-grid">${salons}</div></fieldset>
       <fieldset class="about"><legend>${many ? '2. Présente-toi' : 'Présente-toi'}</legend>
@@ -168,13 +169,13 @@ function freeSoiree(s) {
         <label>Prénom<input name="first_name" autocomplete="given-name" required maxlength="60"></label>
         <label>Email<input name="email" type="email" autocomplete="email" required maxlength="254"></label>
         <label>Je suis<select name="gender" required><option value="">Choisir</option><option value="femme">une femme</option><option value="homme">un homme</option></select></label>
-        <label>Date de naissance<input name="birth_date" type="date" required max="${maxBirth}"></label>
+        <label>Je souhaite rencontrer<select name="preferred_gender" required><option value="">Choisir explicitement</option><option value="femme">Des femmes</option><option value="homme">Des hommes</option><option value="both">Des femmes et des hommes</option></select></label><label>Âge minimum souhaité<input name="min_age" type="number" min="18" max="99" value="18" required></label><label>Âge maximum souhaité<input name="max_age" type="number" min="18" max="99" value="99" required></label><label>Date de naissance<input name="birth_date" type="date" required max="${maxBirth}"></label>
         <label>Ma ville<input name="city" autocomplete="address-level2" required maxlength="80" placeholder="ex. Lyon, Tizi Ouzou, Montréal"></label>
-        <label>Je cherche quelqu’un<select name="search_zone" required><option value="">Choisir</option><option value="ville">dans ma ville et alentours</option><option value="region">dans ma région</option><option value="france">dans toute la France</option><option value="europe">en France ou en Europe</option><option value="canada">au Canada</option><option value="algerie">en Algérie</option><option value="monde">peu importe où</option></select></label>
+        <label hidden>Zone de recherche<select name="search_zone"><option value="">Choisir</option><option value="ville">dans ma ville et alentours</option><option value="region">dans ma région</option><option value="france">dans toute la France</option><option value="europe">en France ou en Europe</option><option value="canada">au Canada</option><option value="algerie">en Algérie</option><option value="monde" selected>dans le salon choisi</option></select></label>
       </div></fieldset>
       <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
       <label class="check"><input type="checkbox" name="rules"><span>J’accepte les <a href="/cgv/" target="_blank" rel="noopener">règles de la soirée</a> : respect, sérieux, aucun propos déplacé. J’ai 18 ans ou plus.</span></label>
-      <button class="btn btn-ink" type="submit">Réserver ma place</button>
+      <p>Les rencontres ont lieu dans le salon choisi, uniquement si vos préférences de genre et d’âge sont réciproques. Aucun score ni promesse de rencontre.</p><button class="btn btn-ink" type="submit">Vérifier mon email et réserver</button>
       <p class="form-status" role="status" data-free-status></p>
     </form>` : '<button class="btn btn-ink" type="button" disabled>Complet</button>'}
   </article>`;
@@ -182,6 +183,10 @@ function freeSoiree(s) {
 
 const FREE_ERRORS = {
   bad_request: 'Choisis ton salon.',
+  login_required: 'Connecte-toi pour réserver.',
+  preferences_required: 'Vérifie tes préférences et les âges souhaités (18 à 99 ans).',
+  profile_unavailable: 'Ton profil est suspendu ou en pause. Contacte Lamia.',
+  email_not_confirmed: 'Vérifie ton adresse email avant de réserver.',
   invalid_email: 'Vérifie ton adresse email.',
   missing_name: 'Indique ton prénom.',
   missing_gender: 'Indique si tu es une femme ou un homme.',
@@ -216,19 +221,28 @@ async function freeRegister(e) {
   const salon = (SALONS[form.dataset.soiree] || []).find((x) => x.zone === f.get('zone') && (!x.min || age >= x.min) && (!x.max || age <= x.max));
   if (!salon) return status(st, 'Aucun salon de cette zone ne correspond à ton âge. Choisis le salon Tous âges, ouvert à tout le monde.', true);
   if (salon.full) return status(st, `Le salon ${salon.label} est complet.`, true);
+  if (!f.get('preferred_gender')) return status(st, 'Choisis les personnes que tu souhaites rencontrer.', true);
+  ({ data: { session } } = await supabase.auth.getSession());
+  if (!session) {
+    btn.disabled = true;
+    const { error } = await supabase.auth.signInWithOtp({ email: f.get('email'), options: { emailRedirectTo: location.origin + '/speed-dating/#events-title' } });
+    btn.disabled = false;
+    return status(st, error ? explain(error) : 'Ouvre le lien reçu par email, puis reviens remplir ce formulaire pour confirmer ta place. Aucune place n’est encore réservée.', !!error);
+  }
+  if (session.user.email?.toLowerCase() !== String(f.get('email')).toLowerCase()) return status(st, 'Utilise l’email de ton compte connecté, ou déconnecte-toi dans Mon espace.', true);
   btn.disabled = true;
   btn.textContent = 'Un instant…';
   let res, data = {};
   try {
     res = await fetch('/api/event-register', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ event_id: salon.id, first_name: f.get('first_name'), email: f.get('email'), gender: f.get('gender'), birth_date: f.get('birth_date'), city: f.get('city'), search_zone: f.get('search_zone'), website: f.get('website'), rules_accepted: true }),
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + session.access_token },
+      body: JSON.stringify({ event_id: salon.id, first_name: f.get('first_name'), email: f.get('email'), gender: f.get('gender'), birth_date: f.get('birth_date'), city: f.get('city'), search_zone: f.get('search_zone'), website: f.get('website'), rules_accepted: true, preferred_genders: f.get('preferred_gender') === 'both' ? ['femme','homme'] : [f.get('preferred_gender')], min_age: Number(f.get('min_age')), max_age: Number(f.get('max_age')) }),
     });
     data = await res.json().catch(() => ({}));
   } catch { /* réseau */ }
-  if (res?.ok && data.status === 'registered') {
-    form.innerHTML = `<div class="free-done"><strong>Ta place est réservée, ${esc(f.get('first_name'))}${data.salon ? ` : salon ${esc(data.salon)}` : ''}.</strong><p>Lamia t’enverra le lien de la salle vidéo à <b>${esc(f.get('email'))}</b> avant la soirée. Pense à regarder tes courriers indésirables, et prépare ton masque !</p></div>`;
+  if (res?.ok && ['registered','waitlisted'].includes(data.status)) {
+    form.innerHTML = `<div class="free-done"><strong>${data.status === 'waitlisted' ? 'Tu es sur liste d’attente : aucune place confirmée.' : 'Ta place est réservée.'}</strong><p>${esc(data.title)} · ${esc(when(data.starts_at))} (heure de Paris) · ${esc(data.salon || '')}</p><p>Retrouve ton inscription dans <a href="/mon-espace/">Mon espace</a>. Le soir venu, <a href="/speed-dating/bal/">entre ici avec ton compte</a>.</p></div>`;
     return;
   }
   btn.disabled = false;
@@ -252,12 +266,8 @@ async function reserve(eventId, button, paying = true) {
   button.disabled = true;
   button.textContent = 'Un instant…';
   if (!paying) {
-    const { error } = await supabase
-      .from('event_registrations')
-      .upsert({ event_id: eventId, user_id: session.user.id, payment_status: 'pending', attendance_status: 'registered' }, { onConflict: 'event_id,user_id', ignoreDuplicates: true });
-    button.disabled = !error;
-    button.textContent = error ? 'Réserver ma place' : 'Place réservée';
-    return status(st, error ? 'La réservation n’a pas abouti. Réessaie dans un instant.' : 'Ta place est réservée. Tu recevras le lien de la salle par email avant la soirée.', !!error);
+    button.disabled = false;
+    return status(st, 'Utilise le formulaire gratuit pour indiquer tes préférences.', true);
   }
   let res, data = {};
   try {
@@ -270,14 +280,9 @@ async function reserve(eventId, button, paying = true) {
   } catch { /* réseau */ }
   if (res?.ok && data.url) { location.href = data.url; return; }
 
-  // Paiement pas encore ouvert : on garde la pré-réservation.
-  if (data.error === 'checkout_disabled' || data.error === 'not_configured' || res?.status === 404) {
-    const { error } = await supabase
-      .from('event_registrations')
-      .upsert({ event_id: eventId, user_id: session.user.id, payment_status: 'pending', attendance_status: 'registered' }, { onConflict: 'event_id,user_id', ignoreDuplicates: true });
-    button.disabled = !error;
-    button.textContent = error ? 'Réserver ma place' : 'Place pré-réservée';
-    return status(st, error ? 'La pré-réservation n’a pas abouti. Réessaie dans un instant.' : 'Ta place est pré-réservée. Le paiement en ligne ouvre très bientôt pour la confirmer.', !!error);
+  if (data.error === 'checkout_disabled' || data.error === 'not_configured') {
+    button.disabled = false; button.textContent = 'Réserver ma place';
+    return status(st, 'Les réservations payantes ne sont pas encore ouvertes. Aucune place n’a été confirmée.', true);
   }
   const messages = {
     email_not_confirmed: 'Confirme d’abord ton adresse email grâce au lien reçu, puis réessaie.',

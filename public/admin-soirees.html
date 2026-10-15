@@ -31,13 +31,31 @@
   </form>
 
   <section id="board" hidden>
+    <details class="box"><summary>Créer ou modifier un salon gratuit</summary>
+    <p>Les horaires utilisent le fuseau de cet appareil : <strong id="editor-zone"></strong>. Chaque salon accueille au maximum 20 personnes.</p>
+    <form id="event-editor" class="auth-grid">
+      <input type="hidden" name="id">
+      <label>Titre de la soirée<input name="title" required maxlength="150"></label>
+      <label>Salon / zone<input name="audience" required maxlength="150"></label>
+      <label>Description<textarea name="description" maxlength="2000"></textarea></label>
+      <label>Début<input name="starts_at" type="datetime-local" required></label>
+      <label>Fin<input name="ends_at" type="datetime-local" required></label>
+      <label>Places<input name="capacity" type="number" min="2" max="20" value="20" required></label>
+      <label>Âge minimum<input name="min_age" type="number" min="18" max="99" value="18" required></label>
+      <label>Âge maximum<input name="max_age" type="number" min="18" max="99" value="99" required></label>
+      <label>État<select name="status"><option value="draft">Brouillon</option><option value="published">Ouvrir les inscriptions</option><option value="cancelled">Annulé (sans inscrit)</option><option value="completed">Terminé</option></select></label>
+      <button class="btn btn-ink" type="submit">Enregistrer le salon gratuit</button>
+      <button class="btn btn-line" type="button" id="new-event">Nouveau salon</button>
+      <button class="btn btn-line" type="button" id="edit-event">Charger le salon sélectionné ci-dessous</button>
+      <p id="editor-status" role="status"></p>
+    </form></details>
     <div class="row">
       <label>Soirée<select id="event"></select></label>
       <button class="btn btn-line" type="button" id="refresh">Actualiser</button>
       <button class="btn btn-line" type="button" id="logout">Me déconnecter</button>
     </div>
     <p id="summary" class="lead" style="margin-top:20px"></p>
-    <table><thead><tr><th>Prénom</th><th>Email</th><th>Genre</th><th>Âge</th><th>Ville</th><th>Cherche</th><th>Paiement</th><th>Inscription</th></tr></thead><tbody id="people"></tbody></table>
+    <table><thead><tr><th>Prénom</th><th>Email</th><th>Genre</th><th>Âge</th><th>Ville</th><th>Cherche</th><th>Paiement</th><th>Statut</th><th>Inscription</th></tr></thead><tbody id="people"></tbody></table>
     <div class="box">
       <h2 style="font-size:26px">Envoyer le lien de la salle</h2>
       <p>Les adresses des personnes inscrites (ayant payé pour une soirée payante), à coller en copie cachée (Cci) de ton email :</p>
@@ -57,10 +75,38 @@
   <p id="status" class="form-status" role="status"></p>
 </main>
 <script type="module">
+import { DATABASE_URL, PUBLIC_KEY } from "/assets/supabase-config.js";
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm';
-const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc');
+const supabase = createClient(DATABASE_URL, PUBLIC_KEY);
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
+document.querySelector('#editor-zone').textContent = Intl.DateTimeFormat().resolvedOptions().timeZone;
+const editor = document.querySelector('#event-editor');
+document.querySelector('#new-event').onclick = () => { editor.reset(); editor.elements.id.value=''; };
+document.querySelector('#edit-event').onclick = async () => {
+ const id=document.querySelector('#event').value;
+ const {data,error}=await supabase.from('speed_dating_events').select('*').eq('id',id).single();
+ if(error) {document.querySelector('#editor-status').textContent='Chargement impossible.';return;}
+ for(const name of ['id','title','audience','description','capacity','status'])editor.elements[name].value=data[name]||'';
+ editor.elements.min_age.value=data.min_age||18; editor.elements.max_age.value=data.max_age||99;
+ for(const name of ['starts_at','ends_at']) {
+  const d=new Date(data[name]);d.setMinutes(d.getMinutes()-d.getTimezoneOffset());
+  editor.elements[name].value=d.toISOString().slice(0,16);
+ }
+};
+editor.addEventListener('submit',async e=>{
+ e.preventDefault();
+ const fields=Object.fromEntries(new FormData(editor));
+ for(const k of ['starts_at','ends_at'])fields[k]=new Date(fields[k]).toISOString();
+ const {data:{session}}=await supabase.auth.getSession();
+ const st=document.querySelector('#editor-status'),btn=editor.querySelector('[type=submit]');btn.disabled=true;
+ try {
+  const r=await fetch('/api/admin-events',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+session.access_token},body:JSON.stringify(fields)});
+  const d=await r.json();
+  const errors={registered_event_requires_notification:'Des personnes sont inscrites : changement bloqué tant que leur notification n’est pas organisée.',cancellation_requires_notification:'Des personnes sont inscrites : préviens-les avant de finaliser une annulation.',capacity_below_registrations:'La capacité ne peut pas être inférieure au nombre d’inscrits.',paid_event_requires_review:'Les soirées payantes nécessitent une validation du paiement avant modification.',invalid_event:'Vérifie les horaires, âges et la capacité.'};
+  st.textContent=r.ok?'Salon enregistré. Recharge le tableau pour le retrouver.':errors[d.error]||'Enregistrement impossible.';
+ } catch {st.textContent='Connexion interrompue.';} finally {btn.disabled=false;}
+});
 const when = (iso) => new Date(iso).toLocaleString('fr-FR', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
 const say = (m, err) => { $('#status').textContent = m; $('#status').classList.toggle('is-error', !!err); };
 
@@ -103,10 +149,11 @@ async function load() {
   say('Chargement…');
   try {
     const { people, wishes, wishesAvailable, free } = await api(`/api/admin-events?event_id=${encodeURIComponent($('#event').value)}`);
-    const paid = people.filter((p) => p.paid);
-    $('#summary').textContent = free ? `Soirée gratuite · ${people.length} inscrit${people.length > 1 ? 's' : ''} · ${people.filter((p) => p.gender === 'femme').length} femmes · ${people.filter((p) => p.gender === 'homme').length} hommes` : `${paid.length} place${paid.length > 1 ? 's' : ''} payée${paid.length > 1 ? 's' : ''} · ${people.length - paid.length} en attente`;
-    $('#people').innerHTML = people.map((p) => `<tr><td>${esc(p.first_name || '—')}</td><td>${esc(p.email || '—')}</td><td>${esc(p.gender || '')}</td><td>${p.age ?? ''}</td><td>${esc(p.city || '')}</td><td>${esc(({ ville: 'Sa ville', region: 'Sa région', france: 'Toute la France', europe: 'France + Europe', canada: 'Canada', algerie: 'Algérie', monde: 'Peu importe' })[p.search_zone] || '')}</td><td class="${p.paid ? 'paid' : 'pending'}">${free ? 'Gratuite' : p.paid ? 'Payée' : 'En attente'}</td><td>${p.registered_at ? esc(when(p.registered_at)) : ''}</td></tr>`).join('') || '<tr><td colspan="8">Personne n’est encore inscrit.</td></tr>';
-    $('#emails').value = paid.map((p) => p.email).filter(Boolean).join(', ');
+    const confirmed = people.filter((p) => p.confirmed);
+    const waiting = people.filter((p) => p.attendance === 'waitlisted');
+    $('#summary').textContent = `${free ? 'Soirée gratuite · ' : ''}${confirmed.length} place(s) confirmée(s) · ${waiting.length} en liste d’attente · ${people.length - confirmed.length - waiting.length} autre(s) dossier(s)`;
+    $('#people').innerHTML = people.map((p) => `<tr><td>${esc(p.first_name || '—')}</td><td>${esc(p.email || '—')}</td><td>${esc(p.gender || '')}</td><td>${p.age ?? ''}</td><td>${esc(p.city || '')}</td><td>${esc(({ ville: 'Sa ville', region: 'Sa région', france: 'Toute la France', europe: 'France + Europe', canada: 'Canada', algerie: 'Algérie', monde: 'Peu importe' })[p.search_zone] || '')}</td><td class="${p.paid ? 'paid' : 'pending'}">${free ? 'Gratuite' : p.paid ? 'Payée' : 'En attente'}</td><td>${esc(({registered:'Inscription confirmée',checked_in:'Présent·e',attended:'Participation terminée',waitlisted:'Liste d’attente',no_show:'Absent·e'})[p.attendance] || p.attendance)}</td><td>${p.registered_at ? esc(when(p.registered_at)) : ''}</td></tr>`).join('') || '<tr><td colspan="9">Personne n’est encore inscrit.</td></tr>';
+    $('#emails').value = confirmed.map((p) => p.email).filter(Boolean).join(', ');
     $('#wishes').innerHTML = !wishesAvailable
       ? '<p>Le formulaire des souhaits sera actif dès que sa table sera créée dans la base.</p>'
       : wishes.length ? wishes.map((w) => `<p><strong>${esc(w.from)}</strong> souhaite revoir : ${esc(w.wished)}${w.message ? `<br><em>${esc(w.message)}</em>` : ''}</p>`).join('') : '<p>Aucun souhait pour cette soirée.</p>';

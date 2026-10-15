@@ -1,22 +1,19 @@
+import { DATABASE_URL, PUBLIC_KEY } from "/assets/supabase-config.js";
 // La salle du Bal masqué de Venise, côté participant.
 // Vidéo : Daily (mode « call object ») ; l'interface est celle de la Maison.
 // Le serveur décide où chacun doit être (grand salon, tête-à-tête, attente, fin du bal).
 
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm';
+const supabase = createClient(DATABASE_URL, PUBLIC_KEY);
 import Daily from 'https://cdn.jsdelivr.net/npm/@daily-co/daily-js@0.89.1/+esm';
 
 const $ = (s, r = document) => r.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
-const store = {
-  get() { try { return JSON.parse(sessionStorage.getItem('bal-pass') || 'null'); } catch { return null; } },
-  set(v) { try { sessionStorage.setItem('bal-pass', JSON.stringify(v)); } catch { /* navigation privée */ } },
-  clear() { try { sessionStorage.removeItem('bal-pass'); } catch { /* */ } },
-};
-
-let me = store.get();           // { pass, name, salon }
-let call = null, roomKey = null, state = null, offset = 0, poll = 0, joining = false, wishesSent = false;
-
+let me = null;
+let call = null, roomKey = null, state = null, offset = 0, poll = 0, clock = 0, joining = false, polling = false;
 async function api(body) {
-  const r = await fetch('/api/bal', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const { data: { session } } = await supabase.auth.getSession();
+  const r = await fetch('/api/bal', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (session?.access_token || '') }, body: JSON.stringify(body) });
   const data = await r.json().catch(() => ({}));
   return { ok: r.ok, status: r.status, data };
 }
@@ -27,19 +24,28 @@ function show(step) {
 
 // ---------------------------------------------------------------- 1. l'entrée
 const ERR = {
-  bal_closed: 'Le bal n’est pas encore ouvert. Reviens à l’heure de la soirée : Lamia ouvre les portes quelques minutes avant.',
-  not_registered: 'Nous ne trouvons pas ton inscription avec cet email et cette date de naissance. Vérifie-les, ou réserve ta place sur la page du bal.',
-  bad_request: 'Vérifie ton email et ta date de naissance.',
+ bal_closed: 'Les portes ne sont pas ouvertes. Reviens quelques minutes avant la soirée.',
+ not_registered: 'Aucune inscription confirmée disponible pour ce compte. Vérifie Mon espace.',
+ preferences_required: 'Complète tes préférences en reprenant le formulaire d’inscription à la soirée.',
+ login_required: 'Connecte-toi grâce au lien reçu par email.',
+ email_not_confirmed: 'Vérifie ton adresse email avant de continuer.'
 };
-$('[data-bal-entree]')?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const f = new FormData(e.target), st = $('[data-entree-status]'), btn = $('[type=submit]', e.target);
-  btn.disabled = true; st.textContent = 'Un instant…'; st.classList.remove('is-error');
-  const { ok, data } = await api({ action: 'enter', email: f.get('email'), birth_date: f.get('birth_date') });
-  btn.disabled = false;
-  if (!ok) { st.textContent = ERR[data.error] || 'L’entrée n’a pas fonctionné. Réessaie dans un instant.'; st.classList.add('is-error'); return; }
-  me = data; store.set(me);
-  pret();
+$('[data-bal-entree]')?.addEventListener('submit', async e => {
+ e.preventDefault();
+ const f = new FormData(e.target), st = $('[data-entree-status]'), btn = $('[type=submit]',e.target);
+ btn.disabled = true;
+ try {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) {
+   const { error } = await supabase.auth.signInWithOtp({email:f.get('email'),options:{shouldCreateUser:false,emailRedirectTo:location.origin+'/speed-dating/bal/'}});
+   st.textContent = error ? 'Le lien n’a pas pu être envoyé. Réessaie plus tard ou connecte-toi dans Mon espace.' : 'Si ce compte existe, ouvre le lien reçu par email, puis pousse la porte.';
+   return;
+  }
+  const {ok,data} = await api({action:'enter'});
+  if (!ok) { st.textContent = ERR[data.error] || 'Entrée indisponible. Réessaie dans un instant.'; return; }
+  me = data; await pret();
+ } catch { st.textContent = 'La connexion a échoué. Réessaie.'; }
+ finally {btn.disabled = false;}
 });
 
 // ---------------------------------------------------------------- 2. devant la porte : aperçu caméra
@@ -65,33 +71,37 @@ $('[data-entrer]')?.addEventListener('click', async () => {
   call.on('error', () => message('La connexion vidéo s’est interrompue. Nous te reconnectons…'));
   await tick();
   poll = setInterval(tick, 4000);
-  setInterval(countdown, 500);
+  clock = setInterval(countdown, 500);
 });
-$('[data-sortir]')?.addEventListener('click', async () => { store.clear(); location.reload(); });
+$('[data-sortir]')?.addEventListener('click', async () => { preview?.getTracks().forEach(t=>t.stop()); await supabase.auth.signOut(); location.reload(); });
 
 // ---------------------------------------------------------------- 3. dans la salle
 async function tick() {
-  const { ok, status, data } = await api({ action: 'state', pass: me.pass }).catch(() => ({ ok: false }));
+  if(polling) return; polling = true;
+  try {
+  const { ok, status, data } = await api({ action: 'state' }).catch(() => ({ ok: false }));
   if (!ok) {
-    if (status === 401) { store.clear(); location.reload(); return; }
+    if (status === 401 || status === 403) { await call?.leave().catch(()=>{}); clearInterval(poll); show('entree'); return; }
     if (data?.error === 'bal_closed') { await call?.leave().catch(() => {}); clearInterval(poll); show('ferme'); return; }
     return;
   }
   state = data;
   offset = Date.parse(data.server_time) - Date.now();
-  if (data.key !== roomKey && !joining) await rejoindre(data.key);
+  if(data.where === 'admission') { if(roomKey) await call?.leave(); roomKey=null; }
+  else if (data.key !== roomKey && !joining) await rejoindre(data.key);
   decor();
   render();
+  } finally {polling=false;}
 }
 
 async function rejoindre(key) {
   joining = true;
   try {
-    const { ok, data } = await api({ action: 'join', pass: me.pass });
+    const { ok, data } = await api({ action: 'join' });
     if (!ok) { message('La salle ne s’ouvre pas encore. Nouvel essai dans quelques secondes…'); return; }
     if (call.meetingState() === 'joined-meeting') await call.leave();
     await call.join({ url: data.url, token: data.token, startVideoOff: false, startAudioOff: false });
-    roomKey = key;
+    roomKey = data.key;
     if (state?.where === 'tat') carillon();
   } catch { message('La connexion à la salle a échoué. Nouvel essai…'); }
   finally { joining = false; }
@@ -101,6 +111,8 @@ function message(t) { $('[data-salle-msg]').textContent = t; }
 
 function decor() {
   const s = state, salle = $('[data-salle]');
+  $('[data-micro]').disabled = s.where !== 'tat';
+  $('[data-camera]').disabled = s.where !== 'tat';
   salle.dataset.where = s.where;
   salle.dataset.phase = s.phase;
   const titres = {
@@ -113,19 +125,31 @@ function decor() {
   $('[data-salle-titre]').textContent = titre;
   message(texte);
   $('[data-salle-tour]').textContent = s.round ? `Tour ${s.round}` : '';
+  if(s.where === 'admission') { $('[data-salle-titre]').textContent='Salle d’attente'; message('Lamia vérifie les présences et va te laisser entrer.'); }
+  $('[data-block]').hidden = s.where !== 'tat';
   const souhaits = $('[data-souhaits]');
-  souhaits.hidden = s.phase !== 'fin';
-  if (s.phase === 'fin' && !wishesSent) {
-    const list = s.met || [];
-    const box = $('[data-souhaits-liste]');
-    const sig = list.map((m) => m.uid).join(',');
-    if (box.dataset.sig !== sig) {
-      box.dataset.sig = sig;
-      box.innerHTML = list.length
-        ? list.map((m) => `<label class="souhait"><input type="checkbox" value="${esc(m.uid)}"><span>${esc(m.name)}</span></label>`).join('')
-        : '<p>Tu n’as pas eu de tête-à-tête ce soir. Lamia te réservera une place au prochain bal.</p>';
-    }
+  souhaits.hidden = !(s.met?.length || s.mutual?.length);
+  const box = $('[data-souhaits-liste]');
+  const sig = JSON.stringify([s.met,s.choices]);
+  if(box.dataset.sig !== sig) {
+    box.dataset.sig = sig;
+    box.innerHTML = (s.met || []).map(m => {
+      const c = s.choices?.find(c=>c.other_id===m.uid);
+      return `<div class="box"><strong>${esc(m.name)}</strong>
+       <p>${c ? ({yes:'Intérêt enregistré',no:'Pas intéressé',skip:'Choix passé'})[c.choice] : 'Ton choix'}</p>
+       <button type="button" class="btn bal-btn-line" data-choice="yes" data-other="${esc(m.uid)}">Intéressé·e</button>
+       <button type="button" class="btn bal-btn-line" data-choice="no" data-other="${esc(m.uid)}">Pas intéressé·e</button>
+       <button type="button" class="btn bal-btn-line" data-choice="skip" data-other="${esc(m.uid)}">Passer</button>
+       <button type="button" class="btn bal-btn-line" data-block-other="${esc(m.uid)}">Bloquer</button></div>`;
+    }).join('');
   }
+  const mutualBox=$('[data-mutual]'), ms=JSON.stringify(s.mutual);
+  if(mutualBox.dataset.sig !== ms) {
+    mutualBox.dataset.sig=ms;
+    mutualBox.innerHTML=(s.mutual||[]).map(m=>`<p>${esc(m.name)} : intérêt réciproque.
+     <button type="button" class="btn bal-btn-line" data-consent="${esc(m.uid)}" data-value="${!m.contact_consent}">${m.contact_consent?'Retirer mon accord':'Autoriser Lamia à transmettre mon email si l’autre accepte aussi'}</button></p>`).join('') || '<p>Aucun intérêt réciproque pour le moment.</p>';
+  }
+
 }
 
 function countdown() {
@@ -157,6 +181,8 @@ function attach(el, track) {
 
 function render() {
   if (!call || call.meetingState() !== 'joined-meeting') return;
+  $('[data-micro]').disabled = state?.where !== 'tat';
+  $('[data-camera]').disabled = state?.where !== 'tat';
   const ps = call.participants();
   const local = ps.local;
   const others = Object.values(ps).filter((p) => !p.local);
@@ -179,15 +205,30 @@ function render() {
 
 $('[data-micro]')?.addEventListener('click', () => { call?.setLocalAudio(!call.localAudio()); render(); });
 $('[data-camera]')?.addEventListener('click', () => { call?.setLocalVideo(!call.localVideo()); render(); });
-$('[data-quitter]')?.addEventListener('click', async () => { clearInterval(poll); await call?.leave(); show('quitte'); });
+$('[data-quitter]')?.addEventListener('click', async () => { clearInterval(poll); clearInterval(clock); await call?.leave(); await call?.destroy(); show('quitte'); });
 
-$('[data-souhaits]')?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const wished = [...e.target.querySelectorAll('input[type=checkbox]:checked')].map((x) => x.value);
-  const { ok } = await api({ action: 'wish', pass: me.pass, wished, message: new FormData(e.target).get('message') });
-  if (ok) { wishesSent = true; e.target.innerHTML = '<p class="souhaits-ok">C’est noté. Si un souhait est réciproque, Lamia vous mettra en relation. Belle nuit !</p>'; }
-  else $('[data-souhaits-status]').textContent = 'L’envoi n’a pas fonctionné. Réessaie.';
+async function block(other) {
+ if(!other || !confirm('Bloquer cette personne et arrêter le tête-à-tête ?')) return;
+ const {ok}=await api({action:'block',other_id:other});
+ if(ok) { await call?.leave().catch(()=>{}); roomKey=null; await tick(); }
+ else message('Le blocage n’a pas pu être confirmé. Quitte la salle et alerte Lamia.');
+}
+$('[data-block]')?.addEventListener('click',()=>block(state?.partner_uid));
+$('[data-souhaits]')?.addEventListener('click',async e=>{
+ const blocked=e.target.closest('[data-block-other]');
+ if(blocked)return block(blocked.dataset.blockOther);
+ const b=e.target.closest('[data-choice],[data-consent]'); if(!b)return;
+ b.disabled=true;
+ try {
+  const body=b.dataset.consent ? {action:'feedback',other_id:b.dataset.consent,choice:'yes',contact_consent:b.dataset.value==='true'} : {action:'feedback',other_id:b.dataset.other,choice:b.dataset.choice,contact_consent:false};
+  const {ok}=await api(body);
+  $('[data-souhaits-status]').textContent=ok?'Ton choix est enregistré.':'L’enregistrement a échoué. Réessaie.';
+  await tick();
+ } finally {b.disabled=false;}
 });
-
-// Au chargement : si la personne est déjà entrée ce soir, on reprend.
-if (me?.pass) pret(); else show('entree');
+show('entree');
+const {data:{session:initialSession}}=await supabase.auth.getSession();
+if(initialSession) {
+ $('[data-bal-entree] input[name=email]').value=initialSession.user.email || '';
+ $('[data-entree-status]').textContent='Compte connecté. Tu peux pousser la porte.';
+}

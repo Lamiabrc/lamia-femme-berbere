@@ -1,10 +1,11 @@
+import { DATABASE_URL, PUBLIC_KEY } from "/assets/supabase-config.js";
 // Données vivantes de la Maison : catalogue, fiche produit, panier, prochaine soirée.
 // Le navigateur n'utilise que la clé publique Supabase ; aucune donnée privée n'est lue ici.
 
 import { SHIPPING_METHODS, shippingFor, MAX_QTY } from '/assets/shipping.mjs';
 
-export const SUPABASE_URL = 'https://tybwvxinigahhntfeeur.supabase.co';
-export const SUPABASE_KEY = 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc';
+export const SUPABASE_URL = DATABASE_URL;
+export const SUPABASE_KEY = PUBLIC_KEY;
 
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => [...root.querySelectorAll(s)];
