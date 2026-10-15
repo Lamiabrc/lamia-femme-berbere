@@ -47,6 +47,33 @@ const cover = (name, alt, cls = 'cover') =>
 const openRooms = rooms.filter((r) => r.status === 'open' && r.slug !== 'hall');
 const soonRooms = rooms.filter((r) => r.status === 'soon');
 
+const HOME_UNIVERSES = [
+  {
+    href: '/ecrin/',
+    room: 'L’Écrin',
+    title: 'Bijoux kabyles artisanaux et créations d’Ath Yenni',
+    text: 'Découvrez les bijoux kabyles émaillés de la Maison, façonnés à la main par des artisans d’Ath Yenni.',
+  },
+  {
+    href: '/bibliotheque/',
+    room: 'La Bibliothèque de Yemma',
+    title: 'Livres et guides de transmission, amour et culture kabyle',
+    text: 'Des livres et guides pour transmettre, réfléchir et aimer avec les yeux ouverts.',
+  },
+  {
+    href: '/salon/',
+    room: 'Le Salon de Lamia',
+    title: 'Lives TikTok, débats et mariage kabyle',
+    text: 'Retrouvez les lives, débats et prises de parole de Lamia autour du couple, du mariage et de la société.',
+  },
+  {
+    href: '/grenier/',
+    room: 'Le Grenier des Trouvailles',
+    title: 'Brocante, objets anciens et patrimoine berbère',
+    text: 'Objets chinés, livres anciens, cadres et trouvailles choisies au fil des coups de cœur.',
+  },
+];
+
 // ---------------------------------------------------------------- gabarit commun
 
 function layout({ title, description, path, room, body, scripts = [], noindex = false }) {
@@ -93,11 +120,12 @@ function header(room) {
     <span><strong>Lamia</strong> Femme Berbère</span>
   </a>
   <nav class="site-nav" aria-label="Navigation principale">
-    ${link('/#plan', 'La Maison', 'plan')}
-    ${link('/ecrin/', 'L’Écrin', 'ecrin')}
-    ${link('/grenier/', 'Le Grenier', 'grenier')}
-    ${link('/bibliotheque/', 'La Bibliothèque', 'bibliotheque')}
+    ${link('/', 'Accueil', 'hall')}
+    ${link('/boutique/', 'Boutique', 'boutique')}
+    ${link('/ecrin/', 'Bijoux kabyles', 'ecrin')}
+    ${link('/bibliotheque/', 'Livres & transmission', 'bibliotheque')}
     ${link('/speed-dating/', 'Rencontres', 'speed-dating')}
+    ${link('/salon/', 'Lives TikTok', 'salon')}
   </nav>
   <div class="header-actions">
     <a class="plan-link" href="/#plan">La Maison</a>
@@ -179,7 +207,7 @@ function otherRooms(current) {
   const picks = openRooms.filter((r) => r.slug !== current).slice(0, 4);
   return `<section class="next-rooms" aria-label="Continuer la visite">
   <h2>Continuer la visite</h2>
-  <ul>${picks.map((r) => `<li data-accent="${r.accent}"><a href="${r.path}"><span class="pip" aria-hidden="true"></span><strong>${esc(r.name)}</strong><span>${esc(r.welcome)}</span></a></li>`).join('')}</ul>
+  <ul>${picks.map((r) => `<li data-accent="${r.accent}"><a href="${r.path}"><span class="pip" aria-hidden="true"></span><span class="room-index-copy"><strong>${esc(r.name)}</strong><span>${esc(r.welcome)}</span></span></a></li>`).join('')}</ul>
 </section>`;
 }
 
@@ -192,8 +220,8 @@ const page = (path, html) => pages.push({ path, html });
 page(
   '/',
   layout({
-    title: 'La Maison Lamia Femme Berbère',
-    description: 'Bienvenue chez Lamia : bijoux kabyles, livres de Yemma Werdi, trouvailles de brocante, lives et soirées de rencontre sérieuses.',
+    title: 'Lamia Femme Berbère | Bijoux kabyles, livres & rencontres',
+    description: 'Découvrez la Maison Lamia Femme Berbère : bijoux kabyles artisanaux, livres de transmission, lives TikTok, brocante et rencontres sérieuses.',
     path: '/',
     room: roomBySlug.hall,
     body: `<section class="entree" data-entree aria-label="Entrer dans la Maison">
@@ -217,8 +245,8 @@ page(
 <section class="hall-hero" id="hall">
   <div class="hall-copy">
     <p class="room-name"><span class="pip" aria-hidden="true"></span>Le Hall</p>
-    <h2>${esc(P.hall.title)}</h2>
-    <p class="lead">${esc(P.hall.lead)}</p>
+    <h2>Le Hall — Lamia Femme Berbère, univers kabyle contemporain</h2>
+    <p class="lead">Découvrez une Maison virtuelle dédiée aux bijoux kabyles, aux livres de transmission, aux rencontres, aux lives et aux trouvailles choisies par Lamia.</p>
     <p class="hall-actions"><a class="btn btn-ink" href="#plan">Visiter la Maison</a><a class="btn btn-line" href="/lamia-brechet/">Qui est Lamia</a></p>
   </div>
   <div class="hall-stage">
@@ -258,7 +286,31 @@ page(
       <span class="apercu-info">De 21 h à 23 h, en direct sur TikTok</span>
     </a>
   </div>
-  <a class="hall-cue" href="#plan"><span>Approcher de la Maison</span><svg width="22" height="34" viewBox="0 0 22 34" aria-hidden="true"><path d="M2 4l9 9 9-9M2 17l9 9 9-9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+
+  <aside class="home-reassurance" aria-label="Informations de commande">
+    <strong>Achetez en toute confiance.</strong>
+    <span>Paiement sécurisé</span>
+    <span>Précommandes suivies avec soin</span>
+    <span>Vous êtes informé(e) par e-mail dès l’expédition</span>
+  </aside>
+
+  <a class="hall-cue" href="#univers"><span>Découvrir les univers de la Maison</span><svg width="22" height="34" viewBox="0 0 22 34" aria-hidden="true"><path d="M2 4l9 9 9-9M2 17l9 9 9-9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+</section>
+
+<section class="home-universes" id="univers" aria-labelledby="univers-title">
+  <div class="home-universes-intro">
+    <p class="room-name"><span class="pip" aria-hidden="true"></span>Les pièces essentielles</p>
+    <h2 id="univers-title">Explorez la Maison Lamia Femme Berbère</h2>
+    <p>Vous arrivez pour la première fois ? Commencez par l’univers qui vous ressemble.</p>
+  </div>
+  <div class="home-universes-grid">
+    ${HOME_UNIVERSES.map((u) => `<a class="home-universe-card" href="${u.href}">
+      <span class="home-universe-room">${esc(u.room)}</span>
+      <h3>${esc(u.room)} — ${esc(u.title)}</h3>
+      <p>${esc(u.text)}</p>
+      <span class="home-universe-cta">Découvrir →</span>
+    </a>`).join('')}
+  </div>
 </section>
 
 <section class="plan-section" id="plan" aria-labelledby="plan-title">
@@ -270,7 +322,7 @@ page(
   <div class="floors">
     ${[...floors].reverse().map((f) => `<section class="floor" aria-labelledby="etage-${f.level}">
       <h3 id="etage-${f.level}">${esc(f.name)}<span>${esc(f.theme)}</span></h3>
-      <ul class="room-index">${rooms.filter((r) => r.floor === f.level && r.slug !== 'hall').map((r) => `<li class="${r.status === 'soon' ? 'is-soon' : ''}" data-accent="${r.accent}"><a href="${r.path}"><span class="pip" aria-hidden="true"></span><strong>${esc(r.name)}</strong><span>${r.status === 'soon' ? 'Bientôt' : esc(r.welcome)}</span></a></li>`).join('')}</ul>
+      <ul class="room-index">${rooms.filter((r) => r.floor === f.level && r.slug !== 'hall').map((r) => `<li class="${r.status === 'soon' ? 'is-soon' : ''}" data-accent="${r.accent}"><a href="${r.path}"><span class="pip" aria-hidden="true"></span><span class="room-index-copy"><strong>${esc(r.name)}</strong><span>${r.status === 'soon' ? 'Bientôt' : esc(r.welcome)}</span></span></a></li>`).join('')}</ul>
     </section>`).join('')}
   </div>
 </section>
