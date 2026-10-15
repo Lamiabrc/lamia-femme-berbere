@@ -51,26 +51,33 @@ const HOME_UNIVERSES = [
   {
     href: '/ecrin/',
     room: 'L’Écrin',
-    title: 'Bijoux kabyles artisanaux et créations d’Ath Yenni',
-    text: 'Découvrez les bijoux kabyles émaillés de la Maison, façonnés à la main par des artisans d’Ath Yenni.',
+    title: 'Bijoux kabyles artisanaux d’Ath Yenni',
+    text: 'Argent, émail, corail et créations de la Maison, façonnés à la main par des artisans d’Ath Yenni.',
   },
   {
     href: '/bibliotheque/',
     room: 'La Bibliothèque de Yemma',
-    title: 'Livres et guides de transmission, amour et culture kabyle',
-    text: 'Des livres et guides pour transmettre, réfléchir et aimer avec les yeux ouverts.',
+    title: 'Livres, guides et transmission',
+    text: 'Amour, relations, famille et culture : des livres pour transmettre et garder les yeux ouverts.',
+  },
+  {
+    href: '/speed-dating/',
+    room: 'Le Boudoir des Rencontres',
+    title: 'Speed dating et rencontres sérieuses',
+    text: 'Des soirées en visio, des tête-à-tête rapides et un cadre chaleureux pensé par Lamia.',
+    featured: true,
   },
   {
     href: '/salon/',
     room: 'Le Salon de Lamia',
-    title: 'Lives TikTok, débats et mariage kabyle',
-    text: 'Retrouvez les lives, débats et prises de parole de Lamia autour du couple, du mariage et de la société.',
+    title: 'Lives TikTok, débats et société',
+    text: 'Couple, mariage, célibat, humour et sujets de société : retrouvez les prises de parole de Lamia.',
   },
   {
     href: '/grenier/',
     room: 'Le Grenier des Trouvailles',
-    title: 'Brocante, objets anciens et patrimoine berbère',
-    text: 'Objets chinés, livres anciens, cadres et trouvailles choisies au fil des coups de cœur.',
+    title: 'Brocante, objets anciens et coups de cœur',
+    text: 'Objets français, souvenirs kabyles, livres anciens, décoration et curiosités chinées au fil du temps.',
   },
 ];
 
@@ -123,8 +130,8 @@ function header(room) {
     ${link('/', 'Accueil', 'hall')}
     ${link('/boutique/', 'Boutique', 'boutique')}
     ${link('/ecrin/', 'Bijoux kabyles', 'ecrin')}
-    ${link('/bibliotheque/', 'Livres & transmission', 'bibliotheque')}
-    ${link('/speed-dating/', 'Rencontres', 'speed-dating')}
+    ${link('/bibliotheque/', 'Livres', 'bibliotheque')}
+    ${link('/speed-dating/', 'Speed Dating', 'speed-dating')}
     ${link('/salon/', 'Lives TikTok', 'salon')}
   </nav>
   <div class="header-actions">
@@ -191,7 +198,7 @@ function roomHead(room, extra = '') {
     : '<span class="head-arch" aria-hidden="true"></span>';
   return `<section class="room-head${im ? ' with-image' : ''}">${arch}
   <p class="room-name"><span class="pip" aria-hidden="true"></span>${esc(room.name)}</p>
-  <h1>${esc(room.welcome)}</h1>
+  <h1>${esc(room.headline || room.welcome)}</h1>
   <p class="lead">${esc(room.summary)}</p>
   ${extra}
 </section>
@@ -220,8 +227,8 @@ const page = (path, html) => pages.push({ path, html });
 page(
   '/',
   layout({
-    title: 'Lamia Femme Berbère | Bijoux kabyles, livres & rencontres',
-    description: 'Découvrez la Maison Lamia Femme Berbère : bijoux kabyles artisanaux, livres de transmission, lives TikTok, brocante et rencontres sérieuses.',
+    title: 'Lamia Femme Berbère | Bijoux kabyles, livres, speed dating & brocante',
+    description: 'Entrez dans la Maison Lamia Femme Berbère : bijoux kabyles artisanaux, livres de transmission, speed dating, lives TikTok et brocante, entre Kabylie et France.',
     path: '/',
     room: roomBySlug.hall,
     body: `<section class="entree" data-entree aria-label="Entrer dans la Maison">
@@ -233,8 +240,9 @@ page(
     <span class="entree-glow" aria-hidden="true"></span>
     <div class="entree-text">
       <p class="entree-kicker">Lamia Femme Berbère</p>
-      <p class="entree-title">La Maison t’attend.</p>
-      <p class="entree-hint">Fais défiler pour pousser la porte</p>
+      <h1 class="entree-title">La Maison Lamia Femme Berbère</h1>
+      <p class="entree-subtitle">Une Maison franco-kabyle vivante. La Maison vous attend.</p>
+      <p class="entree-hint">Faites défiler pour pousser la porte</p>
       <svg width="22" height="34" viewBox="0 0 22 34" aria-hidden="true"><path d="M2 4l9 9 9-9M2 17l9 9 9-9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <span class="entree-lumiere" aria-hidden="true"></span>
@@ -245,8 +253,8 @@ page(
 <section class="hall-hero" id="hall">
   <div class="hall-copy">
     <p class="room-name"><span class="pip" aria-hidden="true"></span>Le Hall</p>
-    <h2>Le Hall — Lamia Femme Berbère, univers kabyle contemporain</h2>
-    <p class="lead">Découvrez une Maison virtuelle dédiée aux bijoux kabyles, aux livres de transmission, aux rencontres, aux lives et aux trouvailles choisies par Lamia.</p>
+    <h2>Le Hall — Entrez dans l’univers de Lamia Femme Berbère</h2>
+    <p class="lead">Bijoux kabyles, livres, brocante, speed dating, lives et créations : cette Maison rassemble l’univers de Lamia entre Kabylie, Algérie et France.</p>
     <p class="hall-actions"><a class="btn btn-ink" href="#plan">Visiter la Maison</a><a class="btn btn-line" href="/lamia-brechet/">Qui est Lamia</a></p>
   </div>
   <div class="hall-stage">
@@ -291,20 +299,47 @@ page(
     <strong>Achetez en toute confiance.</strong>
     <span>Paiement sécurisé</span>
     <span>Précommandes suivies avec soin</span>
-    <span>Vous êtes informé(e) par e-mail dès l’expédition</span>
+    <span>Vous êtes informé(e) par e-mail de l’avancement</span>
+    <span>Livraison depuis la France</span>
   </aside>
 
   <a class="hall-cue" href="#univers"><span>Découvrir les univers de la Maison</span><svg width="22" height="34" viewBox="0 0 22 34" aria-hidden="true"><path d="M2 4l9 9 9-9M2 17l9 9 9-9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
 </section>
 
+<section class="home-speed" aria-labelledby="home-speed-title">
+  <div class="home-speed-visual" aria-hidden="true">
+    <svg class="home-speed-mask" viewBox="0 0 160 80" role="img">
+      <path d="M6 21c25-15 49-11 74 9 25-20 49-24 74-9 0 30-19 49-45 49-15 0-23-10-29-20-7 10-14 20-29 20C25 70 6 51 6 21Z" fill="none" stroke="currentColor" stroke-width="4"/>
+      <ellipse cx="49" cy="38" rx="15" ry="10" fill="currentColor"/>
+      <ellipse cx="111" cy="38" rx="15" ry="10" fill="currentColor"/>
+      <path d="M80 30c-5-15 0-25 10-28" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+    </svg>
+    <span>31 · 10</span>
+  </div>
+  <div class="home-speed-copy">
+    <p class="home-speed-kicker">Le Boudoir des Rencontres · Événement actuel</p>
+    <h2 id="home-speed-title">Bal masqué de Venise — Speed Dating Halloween</h2>
+    <p class="home-speed-lead">Des rencontres rapides en visio, sérieuses mais légères : quelques minutes pour faire connaissance, puis on change de tête-à-tête.</p>
+    <ul class="home-speed-meta">
+      <li><strong>Samedi 31 octobre</strong></li>
+      <li>21 h</li>
+      <li>Gratuit</li>
+      <li>En visio</li>
+      <li>20 personnes maximum par salon</li>
+    </ul>
+    <p class="home-speed-note">Salons France, Algérie, Canada, autres pays, tranches d’âge et salon tous âges / toutes zones.</p>
+    <p><a class="btn home-speed-cta" href="/speed-dating/#events-title">Réserver ma place</a></p>
+  </div>
+</section>
+
 <section class="home-universes" id="univers" aria-labelledby="univers-title">
   <div class="home-universes-intro">
     <p class="room-name"><span class="pip" aria-hidden="true"></span>Les pièces essentielles</p>
-    <h2 id="univers-title">Explorez la Maison Lamia Femme Berbère</h2>
-    <p>Vous arrivez pour la première fois ? Commencez par l’univers qui vous ressemble.</p>
+    <h2 id="univers-title">Que souhaitez-vous découvrir ?</h2>
+    <p>La Maison garde ses pièces et son histoire. Ces cinq portes vous permettent simplement d’aller directement à l’essentiel.</p>
   </div>
   <div class="home-universes-grid">
-    ${HOME_UNIVERSES.map((u) => `<a class="home-universe-card" href="${u.href}">
+    ${HOME_UNIVERSES.map((u) => `<a class="home-universe-card${u.featured ? ' is-featured' : ''}" href="${u.href}">
       <span class="home-universe-room">${esc(u.room)}</span>
       <h3>${esc(u.room)} — ${esc(u.title)}</h3>
       <p>${esc(u.text)}</p>
@@ -315,8 +350,8 @@ page(
 
 <section class="plan-section" id="plan" aria-labelledby="plan-title">
   <div class="plan-intro">
-    <h2 id="plan-title">Une Maison au cœur de la Kabylie</h2>
-    <p>Les vitrines au rez-de-chaussée, les rencontres et la lecture au premier, les trouvailles tout en haut. Pousse la fenêtre qui t’appelle.</p>
+    <h2 id="plan-title">Une Maison entre Kabylie et France</h2>
+    <p>Les bijoux et la boutique au rez-de-chaussée, les rencontres, les lives et les livres au premier, les trouvailles tout en haut. Chaque pièce garde son caractère.</p>
   </div>
   ${facade(rooms)}
   <div class="floors">
