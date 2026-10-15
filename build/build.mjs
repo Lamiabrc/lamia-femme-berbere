@@ -188,13 +188,13 @@ const HEAD_IMAGES = {
   ecrin: ['/images/collier/collier-kabyle-15g-porte-640.webp', 'Collier kabyle émaillé porté'],
   galerie: ['/images/collier/collier-kabyle-15g-detail-640.webp', 'Détail d’un médaillon émaillé'],
   bibliotheque: ['/images/marque/yemma-transmission-900.webp', 'Yemma transmet à sa fille, un livre à la main'],
-  salon: ['/images/marque/lamia-logo-600.webp', 'Le visage de Lamia Femme Berbère'],
+  salon: ['/images/marque/lamia-portrait-reel-480.webp', 'Lamia Femme Berbère, portrait réel'],
   boutique: ['/images/collier/collier-kabyle-15g-ecrin-640.webp', 'Collier kabyle dans son écrin'],
 };
 function roomHead(room, extra = '') {
   const im = HEAD_IMAGES[room.slug];
   const arch = im
-    ? `<figure class="head-arch has-image"><img src="${im[0]}" alt="${esc(im[1])}"${room.slug === 'salon' ? ' class="is-drawing"' : ''}></figure>`
+    ? `<figure class="head-arch has-image"><img src="${im[0]}" alt="${esc(im[1])}"${room.slug === 'salon' ? ' class="is-lamia-photo"' : ''}></figure>`
     : '<span class="head-arch" aria-hidden="true"></span>';
   return `<section class="room-head${im ? ' with-image' : ''}">${arch}
   <p class="room-name"><span class="pip" aria-hidden="true"></span>${esc(room.name)}</p>
@@ -259,13 +259,17 @@ page(
   </div>
   <div class="hall-stage">
     <span class="arch-shadow" aria-hidden="true"></span>
-    <figure class="hall-arch">
-      <img src="${esc(imgOr('hall-arch', '/images/marque/yemma-werdi-accueil-900.webp'))}" width="1122" height="1402" loading="lazy" alt="Yemma Werdi, le personnage du livre de Lamia Femme Berbère">
+    <figure class="hall-arch hall-arch-lamia">
+      <picture>
+        <source media="(max-width: 560px)" srcset="/images/marque/lamia-portrait-reel-320.webp">
+        <img src="/images/marque/lamia-portrait-reel-480.webp" width="480" height="615" loading="eager" alt="Lamia Femme Berbère, portrait réel">
+      </picture>
+      <figcaption><strong>Lamia</strong><span>Je vous ouvre la porte de ma Maison.</span></figcaption>
     </figure>
     <figure class="hall-medal">
       <img src="${esc(imgOr('hall-medal', '/images/collier/collier-kabyle-15g-detail-320.webp'))}" width="320" height="400" alt="Médaillon kabyle émaillé bleu, vert et jaune, corail au centre">
     </figure>
-    <a class="yemma-signature" href="/bibliotheque/">Yemma Werdi <span>Découvrir la voix de mon livre →</span></a>
+    <a class="yemma-signature lamia-signature" href="/lamia-brechet/">Lamia Femme Berbère <span>Découvrir mon histoire →</span></a>
   </div>
   <div class="hall-apercus" aria-label="En ce moment dans la Maison">
     <a class="apercu is-bal" href="/speed-dating/#events-title">
@@ -288,7 +292,7 @@ page(
       <span class="apercu-info">Livre broché 15,90 € · ebook 12,90 €</span>
     </a>
     <a class="apercu" href="https://www.tiktok.com/@lamiaberbere" rel="noopener" target="_blank">
-      <img src="/images/marque/lamia-logo-160.webp" width="160" height="160" alt="" loading="lazy" class="is-logo">
+      <img src="/images/marque/lamia-portrait-reel-320.webp" width="320" height="410" alt="Lamia Femme Berbère" loading="lazy" class="is-lamia">
       <span class="apercu-kicker">Le Salon · chaque soir</span>
       <strong>Live Mariage Kabyle</strong>
       <span class="apercu-info">De 21 h à 23 h, en direct sur TikTok</span>
@@ -362,8 +366,8 @@ page(
   </div>
 </section>
 
-<section class="story" aria-labelledby="story-title">
-  <figure><img src="/images/marque/yemma-transmission-900.webp" width="900" height="600" loading="lazy" alt="Illustration : Yemma transmet à sa fille"></figure>
+<section class="story story-lamia" aria-labelledby="story-title">
+  <figure class="story-lamia-portrait"><img src="/images/marque/lamia-portrait-reel-480.webp" width="480" height="615" loading="lazy" alt="Lamia Femme Berbère"></figure>
   <div>
     <h2 id="story-title">${esc(P.hall.story.title)}</h2>
     ${P.hall.story.paragraphs.map((p) => `<p>${esc(p)}</p>`).join('')}
