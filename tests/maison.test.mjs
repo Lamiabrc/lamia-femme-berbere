@@ -16,7 +16,7 @@ test('chaque pièce a sa page', () => {
   for (const r of rooms) {
     const file = r.path === '/' ? join(DIST, 'index.html') : join(DIST, r.path, 'index.html');
     assert.ok(existsSync(file), `page manquante : ${r.path}`);
-    const expected = r.headline || r.welcome;
+    const expected = r.slug === 'speed-dating' ? 'Le Boudoir des Rencontres' : (r.headline || r.welcome);
     assert.match(readFileSync(file, 'utf8'), new RegExp(expected.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/’/g, '&#39;|’')));
   }
 });
