@@ -1091,27 +1091,17 @@ page(
   })
 );
 
-// Souhaits après une soirée
+// Souhaits après une soirée : le choix se fait directement dans la salle du bal.
+// La page autonome reste informative tant que la table dédiée n'a pas été validée.
 page(
   '/speed-dating/souhaits/',
   layout({
     title: 'Mes souhaits après la soirée · Le Boudoir des Rencontres',
-    description: 'Indique en privé les personnes que tu souhaites revoir.',
+    description: 'À la fin du bal, indique en privé les personnes que tu souhaites revoir.',
     path: '/speed-dating/souhaits/',
     room: roomBySlug['speed-dating'],
     noindex: true,
-    scripts: ['/assets/membre.js'],
-    body: `${roomHead({ ...roomBySlug['speed-dating'], slug: 'souhaits', welcome: 'Qui aimerais-tu revoir ?', summary: 'Tes souhaits restent privés. Si un souhait est réciproque, Lamia vous met en relation.' })}
-<section class="room-body">
-  <form class="report-form" data-wishes hidden>
-    <label>La soirée<select name="event_id" required></select></label>
-    <label>Les prénoms ou numéros des personnes que tu souhaites revoir<textarea name="wished" rows="4" maxlength="1000" required placeholder="Par exemple : Yanis (n° 4), Karim (n° 9)"></textarea></label>
-    <label>Un mot pour Lamia (facultatif)<textarea name="message" rows="3" maxlength="1000"></textarea></label>
-    <button class="btn btn-ink" type="submit">Envoyer mes souhaits</button>
-  </form>
-  <div data-wishes-login><p>Connecte-toi à ton espace membre pour indiquer tes souhaits.</p><p><a class="btn btn-ink" href="/speed-dating/#member-title">Me connecter</a></p></div>
-  <p class="form-status" role="status" data-wishes-status></p>
-</section>`,
+    body: `<section class="room-head"><p class="room-name"><span class="pip" aria-hidden="true"></span>Le Boudoir des Rencontres</p><h1>Qui aimerais-tu revoir ?</h1><p class="lead">À la fin de chaque Bal, ton formulaire de souhaits s’ouvre directement dans la salle. Tu ne peux choisir que parmi les personnes que tu as réellement rencontrées.</p><p>Ton choix reste privé. Si le souhait est réciproque, Lamia voit la réciprocité et peut vous mettre en relation.</p><p class="bal-actions"><a class="btn btn-ink" href="/speed-dating/bal/">Revenir à la salle du bal</a><a class="btn btn-line" href="/speed-dating/">Retour au Boudoir</a></p></section>`,
   })
 );
 
