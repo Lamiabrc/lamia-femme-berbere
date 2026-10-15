@@ -83,7 +83,7 @@ const HOME_UNIVERSES = [
 
 // ---------------------------------------------------------------- gabarit commun
 
-function layout({ title, description, path, room, body, scripts = [], noindex = false, ogTitle, ogDescription, ogImage, ogImageAlt }) {
+function layout({ title, description, path, room, body, scripts = [], noindex = false, ogTitle, ogDescription, ogImage, ogImageAlt, ogImageWidth = 600, ogImageHeight = 600 }) {
   const canonical = SITE_URL + path;
   const accent = room?.accent || 'rouge';
   const socialTitle = ogTitle || title;
@@ -104,8 +104,8 @@ ${noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" hr
 <meta property="og:type" content="website">
 <meta property="og:url" content="${esc(canonical)}">
 <meta property="og:image" content="${esc(socialImage)}">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
+<meta property="og:image:width" content="${esc(ogImageWidth)}">
+<meta property="og:image:height" content="${esc(ogImageHeight)}">
 <meta property="og:image:alt" content="${esc(socialImageAlt)}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${esc(socialTitle)}">
@@ -526,7 +526,9 @@ page(
     ogTitle: 'Bal masqué de Venise — Speed Dating Halloween | Lamia Femme Berbère',
     ogDescription: 'Rejoignez une soirée de speed dating en visio, élégante et chaleureuse, le 31 octobre à 21 h. Places limitées. Réservation gratuite.',
     ogImage: '/images/lamia/lamia-salon-1122.webp',
-    ogImageAlt: 'Bal masqué de Venise — Speed Dating Halloween, 31 octobre à 21 h, avec Lamia Femme Berbère',
+    ogImageAlt: 'Lamia Femme Berbère dans l’univers feutré du Bal masqué de Venise — Speed Dating Halloween',
+    ogImageWidth: 1122,
+    ogImageHeight: 1402,
     body: `<div class="bal">
 <section class="bal-hero bal-hero-rich">
   <span class="bal-paillettes" aria-hidden="true"></span>
