@@ -1785,3 +1785,37 @@ body { background: var(--qvt-ivoire); }
     margin-right:16px;
   }
 }
+
+
+/* Fallback vénitien visible tant que le visuel photo final n'est pas encore un asset binaire valide. */
+.bal-hero-poster,
+.home-speed-poster,
+.venise-card-visual { position: relative; }
+.bal-hero-poster::before,
+.home-speed-poster::before,
+.venise-card-visual::before {
+  content:'';
+  position:absolute;
+  z-index:3;
+  top:18px;
+  right:18px;
+  width:clamp(88px,14vw,170px);
+  aspect-ratio:2/1;
+  pointer-events:none;
+  opacity:.92;
+  filter:drop-shadow(0 7px 18px rgba(0,0,0,.42));
+  background:center/contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 120'%3E%3Cpath d='M110 18c-6-14 2-16 10-16M110 18c-4-12-14-14-22-10' fill='none' stroke='%23F3E0B9' stroke-width='3' stroke-linecap='round'/%3E%3Cpath d='M8 34c30-20 66-16 102 10 36-26 72-30 102-10 0 40-24 70-58 70-20 0-32-12-44-26-12 14-24 26-44 26C32 104 8 74 8 34Z' fill='%2383142b' stroke='%23F3E0B9' stroke-width='3'/%3E%3Cellipse cx='68' cy='58' rx='22' ry='13' fill='%231B1A18'/%3E%3Cellipse cx='152' cy='58' rx='22' ry='13' fill='%231B1A18'/%3E%3Cpath d='M4 30c-4 18-2 40 6 60M216 30c4 18 2 40-6 60' stroke='%23F3E0B9' stroke-width='3' fill='none' opacity='.8'/%3E%3C/svg%3E");
+}
+.bal-hero-poster::after,
+.home-speed-poster::after {
+  content:'';
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  z-index:1;
+  background:
+    linear-gradient(180deg,rgba(27,26,24,.05) 45%,rgba(44,10,22,.6) 100%),
+    repeating-radial-gradient(circle at 100% 0,rgba(243,224,185,.12) 0 1px,transparent 1px 9px);
+}
+.bal-hero-poster img,
+.home-speed-poster img { position:relative; z-index:0; }
