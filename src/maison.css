@@ -1947,3 +1947,10 @@ body { background: var(--qvt-ivoire); }
   .bal-deroule span, .bal-code li { font-size: 16px; }
   .bal-code ul { grid-template-columns: repeat(3, 1fr); }
 }
+
+/* Bandeau de consentement aux cookies (Google Analytics) */
+.cookies { position: fixed; z-index: 1000; left: 16px; right: 16px; bottom: 16px; max-width: 720px; margin: 0 auto; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding: 16px 20px; border-radius: 16px; background: #fffaf0; color: var(--qvt-encre, #1b1a18); border: 1px solid #c8a86d; box-shadow: 0 20px 50px -20px rgba(0,0,0,.5); font-size: 15px; }
+.cookies p { margin: 0; flex: 1 1 320px; line-height: 1.5; }
+.cookies a { color: var(--rouge); }
+.cookies div { display: flex; gap: 10px; }
+.cookies .btn { min-height: 42px; padding: 8px 18px; }

@@ -419,7 +419,7 @@ renderSocials();
   };
   envoyer();
   // Actions importantes (réservation, précommande…), comptées sans identifier personne.
-  window.lfbEvent = (event) => envoyer({ event });
+  window.lfbEvent = (event) => { envoyer({ event }); try { window.gtag?.('event', event); } catch { /* */ } };
   // Temps passé sur la page, envoyé une seule fois quand on la quitte.
   const debut = Date.now();
   let tempsEnvoye = false;
@@ -475,5 +475,55 @@ renderSocials();
       t.remove();
     }
     e.target.textContent = 'Lien copié : colle-le dans Safari ou Chrome';
+  });
+})();
+
+// ---------------------------------------------------------------- Google Analytics, seulement avec l'accord du visiteur (RGPD)
+(function analytics() {
+  const GA = 'G-YZ486LN6LV';
+  const KEY = 'lfb-cookies';
+  if (!/lamia-femme-berbere\.com$/.test(location.hostname)) return;
+  const lire = () => { try { return localStorage.getItem(KEY); } catch { return null; } };
+  const ecrire = (v) => { try { localStorage.setItem(KEY, v); } catch { /* */ } };
+  function charger() {
+    if (window.gtag) return;
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function gtag() { window.dataLayer.push(arguments); };
+    window.gtag('js', new Date());
+    window.gtag('config', GA, { anonymize_ip: true });
+    const s = document.createElement('script');
+    s.async = true;
+    s.src = `https://www.googletagmanager.com/gtag/js?id=${GA}`;
+    document.head.appendChild(s);
+  }
+  function effacer() {
+    // Retire les cookies Google Analytics déjà posés.
+    for (const c of document.cookie.split(';')) {
+      const nom = c.split('=')[0].trim();
+      if (/^_ga/.test(nom)) for (const d of ['', location.hostname, '.' + location.hostname.replace(/^www\./, '')]) document.cookie = `${nom}=; Max-Age=0; path=/${d ? `; domain=${d}` : ''}`;
+    }
+  }
+  function bandeau() {
+    if (document.querySelector('[data-cookies]')) return;
+    const b = document.createElement('div');
+    b.className = 'cookies';
+    b.setAttribute('data-cookies', '');
+    b.setAttribute('role', 'dialog');
+    b.setAttribute('aria-label', 'Mesure d’audience');
+    b.innerHTML = `<p>Avec ton accord, la Maison utilise Google Analytics pour savoir comment le site est visité et l’améliorer. Aucune publicité. <a href="/confidentialite/">En savoir plus</a></p>
+      <div><button type="button" class="btn btn-line" data-refuser>Refuser</button><button type="button" class="btn btn-ink" data-accepter>Accepter</button></div>`;
+    b.querySelector('[data-accepter]').addEventListener('click', () => { ecrire('oui'); b.remove(); charger(); });
+    b.querySelector('[data-refuser]').addEventListener('click', () => { ecrire('non'); b.remove(); effacer(); });
+    document.body.appendChild(b);
+  }
+  const choix = lire();
+  if (choix === 'oui') charger();
+  else if (choix !== 'non') bandeau();
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('[data-gerer-cookies]')) return;
+    e.preventDefault();
+    try { localStorage.removeItem(KEY); } catch { /* */ }
+    effacer();
+    bandeau();
   });
 })();

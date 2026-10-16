@@ -73,6 +73,7 @@ Données stockées par Supabase, centre de données de Paris (Union européenne)
 <li>Vercel : hébergement du site (États-Unis, avec garanties contractuelles de la Commission européenne).</li>
 <li>Daily : vidéo en direct des soirées (États-Unis, avec garanties contractuelles), sans enregistrement.</li>
 <li>Stripe : paiement sécurisé.</li>
+<li>Google Analytics (Google Ireland) : mesure d’audience, <strong>uniquement si tu l’acceptes</strong>.</li>
 </ul>
 <h2>Durée de conservation</h2>
 <ul>
@@ -83,8 +84,9 @@ Données stockées par Supabase, centre de données de Paris (Union européenne)
 <li>Mesure d’audience : 13 mois.</li>
 </ul>
 <h2>Cookies et stockage dans ton navigateur</h2>
-<p>Le site n’utilise <strong>aucun cookie publicitaire ni de suivi</strong>, c’est pourquoi aucun bandeau ne te demande ton accord. Ton navigateur garde seulement ce qui est nécessaire au fonctionnement : ta connexion à ton espace, ton panier, ton passage au bal (le temps de la soirée) et tes réglages de musique et de flou.</p>
-<p>Mesure d’audience : pour savoir quelles pages sont lues et d’où viennent les visites, le site compte les pages vues sans cookie. Il enregistre la page, la provenance (réseau social, lien direct…), le type d’appareil, l’heure, ainsi que le pays, la région et la ville approximatifs déduits du réseau internet. L’adresse IP n’est jamais enregistrée, et l’empreinte technique utilisée pour compter les visiteurs change chaque jour : elle ne permet pas de suivre une personne dans le temps.</p>
+<p>Le site n’utilise <strong>aucun cookie publicitaire</strong>. Ton navigateur garde ce qui est nécessaire au fonctionnement, sans demande d’accord : ta connexion à ton espace, ton panier, ton passage au bal (le temps de la soirée), tes réglages de musique et de flou, et ton choix concernant les cookies.</p>
+<p><strong>Google Analytics</strong> : si tu cliques sur « Accepter » dans le bandeau, des cookies de mesure d’audience Google (_ga) sont déposés pour 13 mois au maximum, avec une adresse IP anonymisée, afin de savoir quelles pages sont consultées. Si tu refuses, rien n’est déposé. Tu peux changer d’avis à tout moment avec le lien « Gérer les cookies » en bas de chaque page.</p>
+<p>Mesure d’audience interne, sans cookie : pour savoir quelles pages sont lues et d’où viennent les visites, le site compte les pages vues sans cookie. Il enregistre la page, la provenance (réseau social, lien direct…), le type d’appareil, l’heure, ainsi que le pays, la région et la ville approximatifs déduits du réseau internet. L’adresse IP n’est jamais enregistrée, et l’empreinte technique utilisée pour compter les visiteurs change chaque jour : elle ne permet pas de suivre une personne dans le temps.</p>
 <h2>Tes droits</h2>
 <p>Tu peux accéder à tes données, les corriger, les supprimer, en obtenir une copie, ou t’opposer à leur traitement en écrivant à <a href="mailto:lamia.brechet@outlook.fr">lamia.brechet@outlook.fr</a>. Réponse sous un mois. Tu peux aussi saisir la CNIL (<a href="https://www.cnil.fr" rel="noopener" target="_blank">cnil.fr</a>).</p>
 <p class="fine">Version 2026-10.</p>`,
