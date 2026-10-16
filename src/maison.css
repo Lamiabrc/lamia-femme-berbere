@@ -1872,3 +1872,13 @@ body { background: var(--qvt-ivoire); }
 .lancement-masque { filter: drop-shadow(0 0 18px rgba(227,189,110,.45)); }
 .bal-note { max-width: 1080px; margin: 12px auto 0; color: #cdbfa6; font-size: 15px; }
 @media (max-width: 860px) { .lancement { grid-template-columns: 1fr; margin: 20px var(--gouttiere) 0; text-align: left; } }
+
+/* Accueil : titre principal pour Google et section rencontres */
+.entree-title-sous { display: block; margin-top: .25em; font-size: .42em; line-height: 1.2; color: #F3E0B9; font-style: italic; }
+.home-speed h2 { max-width: 20ch; }
+.home-speed-pourquoi { margin: 22px 0 8px; color: #F3E0B9; font-size: 22px; }
+.home-speed-raisons { margin: 0; padding-left: 1.1em; display: grid; gap: 8px; color: #E8DCC8; max-width: 64ch; }
+.home-speed-raisons strong { color: #FAF6EE; }
+.home-speed-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.home-speed-live { background: transparent; color: #F3E0B9; border-color: rgba(243,224,185,.6); }
+.home-speed-live:hover { background: rgba(243,224,185,.12); color: #FAF6EE; }

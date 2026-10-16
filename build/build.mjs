@@ -253,8 +253,8 @@ const page = (path, html) => pages.push({ path, html });
 page(
   '/',
   layout({
-    title: 'Lamia Femme Berbère | Bijoux kabyles, livres, speed dating & brocante',
-    description: 'Entrez dans la Maison Lamia Femme Berbère : bijoux kabyles artisanaux, livres de transmission, speed dating, lives TikTok et brocante, entre Kabylie et France.',
+    title: 'Lamia Femme Berbère | Speed Dating & Rencontre Célibataire Kabyle',
+    description: 'Découvrez Lamia Femme Berbère, pour des rencontres sérieuses entre célibataires kabyles et maghrébins. Participez à nos soirées de speed dating en visio pour trouver l’amour et le mariage.',
     path: '/',
     room: roomBySlug.hall,
     body: `<section class="entree" data-entree aria-label="Entrer dans la Maison">
@@ -265,9 +265,9 @@ page(
     <span class="entree-stars" aria-hidden="true"></span>
     <span class="entree-glow" aria-hidden="true"></span>
     <div class="entree-text">
-      <p class="entree-kicker">Lamia Femme Berbère</p>
-      <h1 class="entree-title">La Maison Lamia Femme Berbère</h1>
-      <p class="entree-subtitle">Une Maison franco-kabyle vivante. La Maison vous attend.</p>
+      <p class="entree-kicker">La Maison franco-kabyle</p>
+      <h1 class="entree-title">Lamia Femme Berbère<span class="entree-title-sous">Speed Dating & Rencontres Célibataires Kabyles</span></h1>
+      <p class="entree-subtitle">Trouvez l’amour et le mariage sérieux grâce à l’alliance de la tradition berbère et de la modernité.</p>
       <p class="entree-hint">Faites défiler pour pousser la porte</p>
       <svg width="22" height="34" viewBox="0 0 22 34" aria-hidden="true"><path d="M2 4l9 9 9-9M2 17l9 9 9-9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
@@ -337,22 +337,27 @@ page(
 </section>
 
 <section class="home-speed" aria-labelledby="home-speed-title">
-  <a class="home-speed-visual home-speed-poster" href="/speed-dating/#events-title" aria-label="Découvrir le Bal masqué de Venise et réserver une place">
-    <img src="/images/lamia/lamia-salon-1122.webp" alt="Bal masqué de Venise, speed dating Halloween de Lamia Femme Berbère, samedi 31 octobre à 21 h" loading="lazy">
+  <a class="home-speed-visual home-speed-poster" href="/speed-dating/#events-title" aria-label="Le speed dating de Lamia Femme Berbère : réserver une place">
+    <img src="/images/lamia/lamia-salon-1122.webp" alt="Lamia Femme Berbère anime les soirées de speed dating kabyle" loading="lazy">
   </a>
   <div class="home-speed-copy">
-    <p class="home-speed-kicker">Le Boudoir des Rencontres · Événement actuel</p>
-    <h2 id="home-speed-title">Bal masqué de Venise — Speed Dating Halloween</h2>
-    <p class="home-speed-lead">Des rencontres rapides en visio, sérieuses mais légères : quelques minutes pour faire connaissance, puis on change de tête-à-tête.</p>
-    <ul class="home-speed-meta">
-      <li><strong>Samedi 31 octobre</strong></li>
-      <li>21 h</li>
-      <li>Gratuit</li>
-      <li>En visio</li>
-      <li>20 personnes maximum par salon</li>
+    <p class="home-speed-kicker">Le Boudoir des Rencontres · speed dating kabyle</p>
+    <h2 id="home-speed-title">Trouvez l’amour et le mariage sérieux</h2>
+    <p class="home-speed-lead">Bienvenue sur Lamia Femme Berbère, un espace dédié aux rencontres sérieuses au sein de la communauté kabyle et maghrébine. Marre des discussions virtuelles sans lendemain sur les applications de rencontre classiques ? Ici, l’humain et l’authenticité reviennent au cœur de la rencontre.</p>
+    <p class="home-speed-note">À travers nos soirées de speed dating kabyle en visio et nos lives, nous offrons aux célibataires un espace bienveillant, sécurisé et chaleureux pour faire des rencontres authentiques. Notre objectif : vous accompagner pas à pas vers un mariage sérieux et durable, dans le respect des valeurs culturelles et familiales berbères.</p>
+    <h3 class="home-speed-pourquoi">Pourquoi choisir nos soirées ?</h3>
+    <ul class="home-speed-raisons">
+      <li><strong>Une connexion authentique</strong> : pas de profils fantômes, on échange en direct et en tête-à-tête, caméra allumée.</li>
+      <li><strong>La tradition et la modernité</strong> : des salons par pays et par âge (Algérie–France, Europe, Algérie, Canada et USA…) pour rencontrer les bonnes personnes.</li>
+      <li><strong>Une communauté engagée</strong> : des participants motivés par la même recherche de stabilité et de mariage, et Lamia qui veille sur chaque soirée.</li>
     </ul>
-    <p class="home-speed-note">Salon Algérie–France, Salon Europe, Salon de l’Olivier (Algérie), Salon des Érables (Canada et USA), Salon des Voyageurs, et un salon tous âges.</p>
-    <p><a class="btn home-speed-cta" href="/speed-dating/#events-title">Réserver ma place</a></p>
+    <ul class="home-speed-meta" aria-label="Prochaine soirée">
+      <li><strong>Première soirée offerte</strong></li>
+      <li>Bal masqué de Venise</li>
+      <li>Samedi 31 octobre · 21 h</li>
+      <li>En visio</li>
+    </ul>
+    <p class="home-speed-actions"><a class="btn home-speed-cta" href="/speed-dating/#events-title">Je m’inscris au prochain speed dating</a><a class="btn home-speed-live" href="https://www.tiktok.com/@lamiaberbere" rel="noopener" target="_blank">Rejoindre le live</a></p>
   </div>
 </section>
 
