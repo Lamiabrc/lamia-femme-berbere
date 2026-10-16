@@ -213,8 +213,8 @@ const HEAD_IMAGES = {
   ecrin: ['/images/collier/collier-mannequin-robe-kabyle-640.webp', 'Le collier kabyle émaillé porté avec une robe kabyle brodée'],
   galerie: ['/images/collier/collier-mannequin-cou-640.webp', 'Le collier émaillé porté, médaillon et pampilles'],
   bibliotheque: ['/images/marque/lamia-illu-ecrit-480.webp', 'Lamia assise en tailleur, écrivant dans un carnet', true],
-  salon: ['/images/marque/lamia-portrait-reel-480.webp', 'Lamia Femme Berbère, portrait réel'],
-  'speed-dating': ['/images/marque/lamia-portrait-reel-480.webp', 'Lamia Femme Berbère, hôte du Boudoir des Rencontres'],
+  salon: ['/images/lamia/lamia-portrait-pro-480.webp', 'Lamia Femme Berbère, portrait réel'],
+  'speed-dating': ['/images/lamia/lamia-portrait-pro-480.webp', 'Lamia Femme Berbère, hôte du Boudoir des Rencontres'],
   boutique: ['/images/collier/collier-mannequin-lanterne-640.webp', 'Le collier kabyle émaillé porté, à la lumière des lanternes'],
   patio: ['/images/marque/lamia-illu-debout-480.webp', 'Lamia en robe kabyle brodée, debout, la main sur le cœur', true],
   grenier: ['/images/marque/lamia-illu-pensive-480.webp', 'Lamia pensive, foulard kabyle et bracelets d’argent', true],
@@ -291,8 +291,8 @@ page(
     <span class="arch-shadow" aria-hidden="true"></span>
     <figure class="hall-arch hall-arch-lamia">
       <picture>
-        <source media="(max-width: 560px)" srcset="/images/marque/lamia-portrait-reel-320.webp">
-        <img src="/images/marque/lamia-portrait-reel-480.webp" width="480" height="615" loading="eager" alt="Lamia Femme Berbère, portrait réel">
+        <source media="(max-width: 560px)" srcset="/images/lamia/lamia-portrait-pro-320.webp">
+        <img src="/images/lamia/lamia-portrait-pro-480.webp" width="480" height="600" loading="eager" alt="Lamia Femme Berbère, portrait réel">
       </picture>
       <figcaption><strong>Lamia</strong><span>Je vous ouvre la porte de ma Maison.</span></figcaption>
     </figure>
@@ -322,7 +322,7 @@ page(
       <span class="apercu-info" data-prix-werdi>Livre broché et ebook</span>
     </a>
     <a class="apercu" href="https://www.tiktok.com/@lamiaberbere" rel="noopener" target="_blank">
-      <img src="/images/marque/lamia-portrait-reel-320.webp" width="320" height="410" alt="Lamia Femme Berbère" loading="lazy" class="is-lamia">
+      <img src="/images/lamia/lamia-portrait-pro-320.webp" width="320" height="400" alt="Lamia Femme Berbère" loading="lazy" class="is-lamia">
       <span class="apercu-kicker">Le Salon · chaque soir</span>
       <strong>Live Mariage Kabyle</strong>
       <span class="apercu-info">De 21 h à 23 h, en direct sur TikTok</span>
@@ -396,7 +396,7 @@ page(
 </section>
 
 <section class="story story-lamia" aria-labelledby="story-title">
-  <figure class="story-lamia-portrait"><img src="/images/marque/lamia-portrait-reel-480.webp" width="480" height="615" loading="lazy" alt="Lamia Femme Berbère"></figure>
+  <figure class="story-lamia-portrait"><img src="/images/lamia/lamia-portrait-pro-480.webp" width="480" height="600" loading="lazy" alt="Lamia Femme Berbère"></figure>
   <div>
     <h2 id="story-title">${esc(P.hall.story.title)}</h2>
     ${P.hall.story.paragraphs.map((p) => `<p>${esc(p)}</p>`).join('')}
