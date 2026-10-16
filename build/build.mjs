@@ -526,88 +526,98 @@ page(
   })
 );
 
-// Le Salon du Speed Dating
+// Le Boudoir des Rencontres : le speed dating de la Maison (page générale, la première soirée est offerte)
 page(
   '/speed-dating/',
   layout({
-    title: 'Bal masqué de Venise — Speed Dating Halloween | Lamia Femme Berbère',
-    description: 'Rejoignez une soirée de speed dating en visio, élégante et chaleureuse, le 31 octobre à 21 h. Places limitées. Réservation gratuite.',
+    title: 'Speed dating en ligne sérieux — Le Boudoir des Rencontres | Lamia Femme Berbère',
+    description: 'Des soirées de speed dating en visio pour des rencontres sérieuses, par salons (Algérie–France, Europe, Algérie, Canada et USA…) et par âge, animées par Lamia. Pour le lancement, la première soirée est offerte : le Bal masqué de Venise, le 31 octobre à 21 h.',
     path: '/speed-dating/',
     room: roomBySlug['speed-dating'],
     scripts: ['/assets/membre.js'],
-    ogTitle: 'Bal masqué de Venise — Speed Dating Halloween | Lamia Femme Berbère',
-    ogDescription: 'Rejoignez une soirée de speed dating en visio, élégante et chaleureuse, le 31 octobre à 21 h. Places limitées. Réservation gratuite.',
+    ogTitle: 'Le speed dating de Lamia Femme Berbère — première soirée offerte',
+    ogDescription: 'Rencontres sérieuses en visio, par salons et par âge, animées par Lamia. Pour le lancement, le Bal masqué de Venise du 31 octobre est gratuit.',
     ogImage: '/images/lamia/lamia-salon-1122.webp',
-    ogImageAlt: 'Lamia Femme Berbère dans l’univers feutré du Bal masqué de Venise — Speed Dating Halloween',
+    ogImageAlt: 'Lamia Femme Berbère vous accueille dans le Boudoir des Rencontres',
     ogImageWidth: 1122,
     ogImageHeight: 1402,
     body: `<div class="bal">
 <section class="bal-hero bal-hero-rich">
   <span class="bal-paillettes" aria-hidden="true"></span>
   <figure class="bal-hero-poster">
-    <img src="/images/lamia/lamia-salon-1122.webp" alt="Lamia portant un masque vénitien rouge à plumes pour le Bal masqué de Venise, speed dating Halloween" loading="eager">
+    <img src="/images/lamia/lamia-salon-1122.webp" alt="Lamia vous accueille dans le Boudoir des Rencontres" loading="eager">
   </figure>
   <div class="bal-hero-copy">
-    <p class="bal-kicker">Le Boudoir des Rencontres · speed dating en ligne</p>
-    <h1>Le Bal masqué<br><span>de Venise</span></h1>
-    <p class="bal-date">Samedi 31 octobre · 21 h · en visio · gratuit</p>
+    <p class="bal-kicker">Speed dating en ligne · animé par Lamia</p>
+    <h1>Le Boudoir<br><span>des Rencontres</span></h1>
     <p class="bal-welcome">${esc(roomBySlug['speed-dating'].welcome)}</p>
     <p class="bal-lead">${esc(P.speedDating.intro)}</p>
-    <div class="bal-facts" aria-label="Informations pratiques">
-      <span>31 octobre 2026</span><span>21 h – 23 h</span><span>20 personnes max / salon</span>
+    <div class="bal-facts" aria-label="En bref">
+      <span>En visio, depuis chez vous</span><span>Salons par pays et par âge</span><span>20 personnes max par salon</span><span>Lamia veille</span>
     </div>
-    <p class="bal-actions"><a class="btn btn-gold" href="#events-title">Réserver ma place</a><a class="btn bal-btn-line" href="/speed-dating/salle/">Tester ma caméra</a></p>
+    <p class="bal-actions"><a class="btn btn-gold" href="#events-title">Voir les prochaines soirées</a><a class="btn bal-btn-line" href="/speed-dating/salle/">Tester ma caméra</a></p>
   </div>
 </section>
 
-<section class="boudoir-intro" aria-labelledby="boudoir-intro-title">
-  <div class="boudoir-intro-copy">
-    <p class="bal-kicker">Vous êtes entrée dans le Boudoir</p>
-    <h2 id="boudoir-intro-title">Une soirée pour faire de vraies rencontres</h2>
-    <p>Rejoignez une soirée de speed dating en visio, pensée pour favoriser des échanges rapides, sérieux et respectueux dans une ambiance chaleureuse.</p>
-    <p class="boudoir-welcome"><strong>Lamia vous accueille.</strong> Installez-vous, choisissez votre salon et réservez votre place. Le soir du bal, vous recevrez toutes les informations utiles pour entrer dans la salle.</p>
+<section class="lancement" aria-labelledby="lancement-title">
+  <svg class="lancement-masque" viewBox="0 0 64 32" width="96" height="48" aria-hidden="true"><path d="M2 8c10-6 20-4 30 4C42 4 52 2 62 8c0 12-8 20-18 20-6 0-9-4-12-8-3 4-6 8-12 8C10 28 2 20 2 8Z" fill="#e3bd6e" stroke="#fff6dc" stroke-width="1.2"/><ellipse cx="19" cy="15" rx="6" ry="4" fill="#120d1a"/><ellipse cx="45" cy="15" rx="6" ry="4" fill="#120d1a"/></svg>
+  <div>
+    <p class="bal-kicker">Soirée de lancement · offerte</p>
+    <h2 id="lancement-title">La première soirée est gratuite : le Bal masqué de Venise</h2>
+    <p>Pour lancer le Boudoir, Lamia vous offre la première soirée, le <strong>samedi 31 octobre à 21 h</strong>, en visio, sur le thème du Carnaval de Venise. Venez masqué·e, le mystère fait partie du jeu. Les soirées suivantes seront payantes.</p>
   </div>
-  <figure class="boudoir-intro-visual">
-    <img src="/images/lamia/lamia-salon-1122.webp" alt="Lamia dans l’univers feutré du Bal masqué de Venise" loading="lazy">
-  </figure>
+  <a class="btn btn-gold" href="#events-title">Réserver ma place offerte</a>
 </section>
 
 <section class="bal-deroule" aria-labelledby="deroule-title">
-  <h2 id="deroule-title">Le déroulé du bal</h2>
+  <h2 id="deroule-title">Comment se passe une soirée</h2>
   <ol>
-    <li><strong>Vous réservez</strong><span>Choisissez votre salon (Algérie–France, Europe, Algérie, Canada et USA, autres pays ou tous âges) et réservez votre place en quelques instants.</span></li>
-    <li><strong>Vous recevez l’invitation</strong><span>Les informations pratiques vous sont envoyées par e-mail avant la soirée.</span></li>
-    <li><strong>Vous entrez dans le salon</strong><span>À 21 h, Lamia ouvre le bal et vous accueille dans la salle en visio.</span></li>
-    <li><strong>Vous faites connaissance</strong><span>Les échanges se font en tête-à-tête de quelques minutes. Masque, loup ou déguisement : le mystère fait partie du jeu.</span></li>
-    <li><strong>Vous indiquez vos souhaits</strong><span>Après la soirée, vous indiquez en privé qui vous aimeriez revoir. Si le souhait est réciproque, Lamia vous met en relation.</span></li>
+    <li><strong>Vous choisissez</strong><span>Une soirée, puis votre salon. Votre tranche d’âge est choisie automatiquement. L’inscription prend une minute, sans mot de passe.</span></li>
+    <li><strong>Vous vous préparez</strong><span>Vous testez votre caméra et votre micro dans l’antichambre. Les informations pratiques vous sont envoyées avant la soirée.</span></li>
+    <li><strong>Vous entrez dans le grand salon</strong><span>À l’heure dite, Lamia accueille tout le monde et ouvre la soirée.</span></li>
+    <li><strong>Vous faites connaissance</strong><span>Des tête-à-tête de quelques minutes, au son d’une cloche. Les cavaliers rencontrés s’inscrivent dans votre carnet de bal.</span></li>
+    <li><strong>Vous choisissez qui revoir</strong><span>En privé, dans votre carnet. Si le souhait est réciproque, Lamia vous met en relation.</span></li>
   </ol>
+</section>
+
+<section class="bal-code" aria-labelledby="salons-title">
+  <h2 id="salons-title">Des salons pour se retrouver</h2>
+  <ul>
+    <li><strong>Salon Algérie–France</strong> : pour échanger entre les deux rives, que vous viviez en Algérie ou en France.</li>
+    <li><strong>Salon Europe</strong> : France et pays d’Europe.</li>
+    <li><strong>Salon de l’Olivier</strong> : Algérie.</li>
+    <li><strong>Salon des Érables</strong> : Canada et États-Unis.</li>
+    <li><strong>Salon des Voyageurs</strong> : tous les autres pays.</li>
+    <li><strong>Salon Tous âges</strong> : pour celles et ceux pour qui l’âge n’est pas important.</li>
+  </ul>
+  <p class="bal-note">Chaque salon est divisé en trois tranches d’âge (25-39, 40-50, plus de 50 ans), avec 20 personnes au maximum, pour garder des échanges de qualité.</p>
 </section>
 
 <section class="bal-code" aria-labelledby="code-title">
   <h2 id="code-title">Un cadre chaleureux et respectueux</h2>
   <ul>
-    <li><strong>Inscription simple</strong> : vous choisissez votre salon et réservez votre place en quelques instants.</li>
-    <li><strong>Places limitées</strong> : 20 personnes maximum par salon pour conserver des échanges de qualité.</li>
-    <li><strong>Respect et sérieux</strong> : caméra allumée, endroit calme et aucun propos déplacé.</li>
-    <li><strong>Présence de Lamia</strong> : l’organisation, l’accueil et le suivi de la soirée restent encadrés par Lamia.</li>
-    <li><strong>Ambiance du bal</strong> : masque vénitien, loup ou déguisement élégant sont les bienvenus.</li>
+    <li><strong>Des rencontres sérieuses</strong> : on vient pour rencontrer quelqu’un, pas pour faire défiler des profils.</li>
+    <li><strong>Caméra allumée</strong>, dans un endroit calme, et aucun propos déplacé.</li>
+    <li><strong>Lamia veille</strong> : l’accueil, l’animation et le suivi de chaque soirée.</li>
+    <li><strong>Une ambiance</strong> : chaque soirée a son thème. Pour la première, masque vénitien, loup ou tenue élégante.</li>
     <li><strong>Un souci ?</strong> <a href="/confidences/">Le Cabinet des Confidences</a> permet d’alerter Lamia en toute discrétion.</li>
   </ul>
 </section>
+
 <section class="boudoir-reservation" aria-labelledby="events-title">
   <span class="boudoir-curtain boudoir-curtain-left" aria-hidden="true"></span>
   <span class="boudoir-curtain boudoir-curtain-right" aria-hidden="true"></span>
   <div class="boudoir-reservation-head">
     <p class="bal-kicker">Prenez place dans le salon</p>
-    <h2 id="events-title">Réserver ma place au Bal masqué de Venise</h2>
-    <p>Participation gratuite, sur inscription préalable. Les places sont limitées afin de préserver la qualité des échanges.</p>
+    <h2 id="events-title">Les prochaines soirées</h2>
+    <p>Pour le lancement, la première soirée est offerte, sur inscription. Les places sont limitées afin de préserver la qualité des échanges.</p>
   </div>
   <div class="boudoir-reservation-stage">
     <aside class="boudoir-side-note">
       <span class="boudoir-side-icon" aria-hidden="true">✦</span>
-      <strong>Samedi 31 octobre</strong>
-      <span>21 h · en visio</span>
-      <span>Gratuit</span>
+      <strong>Soirée de lancement</strong>
+      <span>Samedi 31 octobre · 21 h</span>
+      <span>En visio · offerte</span>
       <span>20 personnes maximum par salon</span>
     </aside>
     <div class="events">
@@ -616,15 +626,16 @@ page(
   </div>
 </section>
 <section class="member-panel bal-espace" aria-labelledby="member-title">
-  <h2 id="member-title">Ton espace</h2>
-  <p>Pour le bal, pas besoin de compte : inscris-toi juste au-dessus, puis le soir venu, entre par la porte du bal avec ton email et ta date de naissance. À la fin du bal, ton <strong>carnet de bal</strong> te permet d’indiquer, en privé, qui tu aimerais revoir.</p>
-  <p class="bal-actions"><a class="btn btn-gold" href="/speed-dating/bal/">La porte du bal</a><a class="btn bal-btn-line" href="/speed-dating/salle/">Tester ma caméra</a><a class="btn bal-btn-line" href="/mon-espace/">Mon espace</a></p>
+  <h2 id="member-title">Le soir de la soirée</h2>
+  <p>Pas besoin de compte : inscrivez-vous juste au-dessus, puis le soir venu, entrez par la porte de la salle avec votre email et votre date de naissance. À la fin, votre <strong>carnet de bal</strong> vous permet d’indiquer, en privé, qui vous aimeriez revoir.</p>
+  <p class="bal-actions"><a class="btn btn-gold" href="/speed-dating/bal/">Entrer dans la salle</a><a class="btn bal-btn-line" href="/speed-dating/salle/">Tester ma caméra</a><a class="btn bal-btn-line" href="/mon-espace/">Mon espace</a></p>
 </section>
 <section class="origin">
   <blockquote>« ${esc(P.speedDating.promise)} »<cite>Lamia</cite></blockquote>
   <p>${esc(P.speedDating.origin)}</p>
 </section>
-</div>`,
+</div>
+<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@type': 'Event', name: 'Bal masqué de Venise — soirée de lancement du speed dating de Lamia Femme Berbère', startDate: '2026-10-31T21:00:00+01:00', endDate: '2026-10-31T23:00:00+01:00', eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode', eventStatus: 'https://schema.org/EventScheduled', location: { '@type': 'VirtualLocation', url: SITE_URL + '/speed-dating/' }, image: SITE_URL + '/images/lamia/lamia-salon-1122.webp', description: 'Soirée de speed dating en visio, par salons et par âge, sur le thème du Carnaval de Venise. Offerte pour le lancement.', offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR', availability: 'https://schema.org/InStock', url: SITE_URL + '/speed-dating/' }, organizer: { '@type': 'Person', name: 'Lamia Bréchet Ighil', url: SITE_URL + '/lamia-brechet/' } })}</script>`,
   })
 );
 
