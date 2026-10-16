@@ -238,6 +238,7 @@ async function freeRegister(e) {
     data = await res.json().catch(() => ({}));
   } catch { /* réseau */ }
   if (res?.ok && data.status === 'registered') {
+    window.lfbEvent?.('inscription_bal');
     form.innerHTML = `<div class="free-done"><strong>Ta place est réservée, ${esc(f.get('first_name'))}${data.salon ? ` : salon ${esc(data.salon)}` : ''}.</strong><p>Lamia t’enverra le lien de la salle vidéo à <b>${esc(f.get('email'))}</b> avant la soirée. Pense à regarder tes courriers indésirables, et prépare ton masque !</p></div>`;
     return;
   }

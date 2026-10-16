@@ -39,6 +39,7 @@ $('[data-bal-entree]')?.addEventListener('submit', async (e) => {
   btn.disabled = false;
   if (!ok) { st.textContent = ERR[data.error] || 'L’entrée n’a pas fonctionné. Réessaie dans un instant.'; st.classList.add('is-error'); return; }
   me = data; store.set(me);
+  window.lfbEvent?.('entree_bal');
   pret();
 });
 

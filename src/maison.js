@@ -243,6 +243,7 @@ function wirePreorder(p, box) {
     try { res = await fetch('/api/preorder', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); r = await res.json().catch(() => ({})); } catch { /* réseau */ }
     btn.disabled = false; btn.textContent = 'Envoyer ma précommande';
     if (res?.ok && r.ok) {
+      window.lfbEvent?.('precommande');
       form.innerHTML = `<h2>Merci, ta précommande est enregistrée.</h2><p>Numéro de précommande : <strong>${esc(r.order_number)}</strong></p><p>${r.waitlist ? 'Cette pièce unique est déjà réservée : tu es inscrite en liste d’attente. Lamia te prévient si elle se libère.' : `Lamia te confirme ta précommande par email et t’envoie le moyen de paiement. Total : ${money(r.total_cents)}.`}</p>`;
       return;
     }
@@ -408,12 +409,32 @@ renderSocials();
       sessionStorage.setItem('lfb-source', src.slice(0, 40));
     }
   } catch { /* */ }
-  try {
-    if (!/lamia-femme-berbere\.com$/.test(location.hostname)) return;
-    const utm = new URLSearchParams(location.search).get('utm_source') || '';
-    const body = JSON.stringify({ action: 'visit', path: location.pathname, ref: document.referrer, utm });
-    if (!navigator.sendBeacon?.('/api/admin', new Blob([body], { type: 'application/json' }))) fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, keepalive: true }).catch(() => {});
-  } catch { /* jamais bloquant */ }
+  const envoyer = (extra = {}) => {
+    try {
+      if (!/lamia-femme-berbere\.com$/.test(location.hostname)) return;
+      const utm = new URLSearchParams(location.search).get('utm_source') || '';
+      const body = JSON.stringify({ action: 'visit', path: location.pathname, ref: document.referrer, utm, ...extra });
+      if (!navigator.sendBeacon?.('/api/admin', new Blob([body], { type: 'application/json' }))) fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, keepalive: true }).catch(() => {});
+    } catch { /* jamais bloquant */ }
+  };
+  envoyer();
+  // Actions importantes (réservation, précommande…), comptées sans identifier personne.
+  window.lfbEvent = (event) => envoyer({ event });
+  // Temps passé sur la page, envoyé une seule fois quand on la quitte.
+  const debut = Date.now();
+  let tempsEnvoye = false;
+  const temps = () => { if (tempsEnvoye) return; tempsEnvoye = true; envoyer({ event: 'temps', duration: Math.round((Date.now() - debut) / 1000) }); };
+  addEventListener('pagehide', temps);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') temps(); });
+  // Clics sur les boutons qui rapportent.
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a,button');
+    if (!a) return;
+    const href = a.getAttribute('href') || '', txt = (a.textContent || '').toLowerCase();
+    if (/r[ée]serv/.test(txt) || /speed-dating\/#/.test(href)) window.lfbEvent('clic_reserver');
+    else if (/\/produit\//.test(href)) window.lfbEvent('clic_produit');
+    else if (/^\/(boutique|ecrin|bibliotheque|grenier)\//.test(href)) window.lfbEvent('clic_boutique');
+  }, { capture: true });
 })();
 
 // ---------------------------------------------------------------- prix du Hall lus dans la boutique (modifiables depuis le tableau de bord)

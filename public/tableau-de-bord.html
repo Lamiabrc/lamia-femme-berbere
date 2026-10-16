@@ -163,15 +163,25 @@
 
   <!-- ===================================================== Visites -->
   <section data-panel="visites" hidden>
-    <h1 class="tdb-titre">Visites</h1>
+    <div class="tdb-entete"><h1 class="tdb-titre">Visites</h1>
+      <label class="periode">Période<select data-periode><option value="7">7 derniers jours</option><option value="30" selected>30 derniers jours</option><option value="90">3 derniers mois</option><option value="365">12 derniers mois</option></select></label>
+    </div>
     <div class="tdb-kpis" data-visites-kpis></div>
+    <div class="tdb-deux">
+      <div class="tdb-carte"><h2>Ce qui rapporte : le parcours des visiteurs</h2><div class="entonnoirs" data-entonnoirs></div></div>
+      <div class="tdb-carte"><h2>D’où viennent-ils ?</h2><ol class="classement" data-top-sources></ol></div>
+    </div>
     <div class="tdb-carte"><h2>Visiteurs par jour</h2><div class="barres" data-barres></div></div>
     <div class="tdb-trois">
-      <div class="tdb-carte"><h2>Pages les plus vues</h2><ol class="classement" data-top-pages></ol></div>
-      <div class="tdb-carte"><h2>D’où viennent-ils ?</h2><ol class="classement" data-top-sources></ol></div>
-      <div class="tdb-carte"><h2>Appareils</h2><ol class="classement" data-top-appareils></ol></div>
+      <div class="tdb-carte"><h2>Pays</h2><ol class="classement" data-top-pays></ol></div>
+      <div class="tdb-carte"><h2>Villes</h2><ol class="classement" data-top-villes></ol></div>
+      <div class="tdb-carte"><h2>Régions</h2><ol class="classement" data-top-regions></ol></div>
     </div>
-    <p class="aide">Visites comptées sans cookie et sans suivre personne : un visiteur = une personne différente dans la journée. Astuce : ajoute <code>?utm_source=live</code> à la fin du lien que tu donnes en live pour savoir combien viennent du live.</p>
+    <div class="tdb-deux">
+      <div class="tdb-carte"><h2>Pages les plus vues <small class="aide">(temps moyen passé)</small></h2><ol class="classement" data-top-pages></ol></div>
+      <div class="tdb-carte"><h2>À quelle heure ? <small class="aide">(heure de Paris)</small></h2><div class="barres heures" data-heures></div><h2 style="margin-top:18px">Appareils</h2><ol class="classement" data-top-appareils></ol></div>
+    </div>
+    <p class="aide">Visites comptées sans cookie et sans suivre personne : un visiteur = une personne différente dans la journée. La ville et le pays sont approximatifs (déduits du réseau internet, sans jamais enregistrer l’adresse IP). Astuce : ajoute <code>?utm_source=live</code> à la fin du lien que tu donnes en live pour savoir combien viennent du live.</p>
   </section>
 </main>
 <script type="module" src="/tableau.js"></script>

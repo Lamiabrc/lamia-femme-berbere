@@ -60,3 +60,14 @@ test('textes du site : les modifications de Lamia remplacent les textes par déf
   assert.deepEqual(img, { 'hall-arch': 'https://x/arche.webp' });
   P.hall.title = before;
 });
+
+test('visite géolocalisée : pays, région, ville, heure, sans IP enregistrée', async () => {
+  const { fetcher, calls } = fake();
+  await handleAdmin(post({ action: 'visit', path: '/speed-dating/', event: 'clic_reserver' }, { 'user-agent': 'Mozilla iPhone Mobile', 'x-vercel-ip-country': 'dz', 'x-vercel-ip-country-region': '15', 'x-vercel-ip-city': 'Tizi%20Ouzou', 'x-forwarded-for': '1.2.3.4' }), { env, fetcher, now: () => new Date('2026-10-31T20:30:00Z') });
+  const row = calls.find((c) => c.url.includes('page_views')).body;
+  assert.deepEqual([row.country, row.city, row.region, row.event, row.hour], ['DZ', 'Tizi Ouzou', '15', 'clic_reserver', 21]);
+  assert.ok(!JSON.stringify(row).includes('1.2.3.4'));
+  const t = fake();
+  await handleAdmin(post({ action: 'visit', path: '/', event: 'pirate' }), { env, fetcher: t.fetcher });
+  assert.equal(t.calls.find((c) => c.url.includes('page_views')).body.event, null);
+});

@@ -69,7 +69,8 @@ Données stockées par Supabase, centre de données de Paris (Union européenne)
 <p>${todo('durées choisies, par exemple : compte jusqu’à sa suppression, commandes 10 ans pour la comptabilité, alertes 3 ans')}.</p>
 <h2>Tes droits</h2>
 <p>Tu peux accéder à tes données, les corriger, les supprimer ou t'opposer à leur traitement en écrivant à lamia.brechet@outlook.fr. Tu peux aussi saisir la CNIL (cnil.fr).</p>
-<p>Le site n'utilise pas de cookies publicitaires.</p>`,
+<p>Le site n'utilise pas de cookies publicitaires.</p>
+<p>Mesure d'audience : pour savoir quelles pages sont lues et d'où viennent les visites, le site compte les pages vues sans cookie. Il enregistre la page, la provenance (réseau social, lien direct…), le type d'appareil, l'heure, ainsi que le pays, la région et la ville approximatifs déduits du réseau internet. L'adresse IP n'est jamais enregistrée, et l'empreinte technique utilisée pour compter les visiteurs change chaque jour : elle ne permet pas de suivre une personne dans le temps.</p>`,
   },
 ];
 

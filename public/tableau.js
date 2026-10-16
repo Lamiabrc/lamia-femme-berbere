@@ -55,7 +55,7 @@ async function charger() {
   $('[data-k="inscrits-detail"]').textContent = `+${i.nouveaux_7j} cette semaine`;
   $('[data-k="alertes"]').textContent = a.nouvelles;
   $('[data-k="visiteurs"]').textContent = vis ? vis.aujourdhui.visiteurs : '—';
-  $('[data-k="visiteurs-detail"]').textContent = vis ? `${vis.semaine.visiteurs} sur 7 jours · ${vis.mois.visiteurs} sur 30 jours` : 'Compteur en route';
+  $('[data-k="visiteurs-detail"]').textContent = vis ? `${vis.periode?.visiteurs ?? 0} sur 30 jours · ${(vis.pays || []).length} pays` : 'Compteur en route';
   barres($('[data-barres-accueil]'), vis?.jours || []);
   $('[data-dernieres]').innerHTML = v.orders.slice(0, 5).map((o) => `<p class="ligne"><span>n° ${esc(o.order_number)} · ${esc(o.customer_name || o.customer_email || '')}<br><small>${esc((o.order_items || []).map((x) => x.product_name).join(', '))}</small></span><strong>${money(o.amount_total_cents, o.currency)}</strong></p>`).join('') || '<p>Pas encore de commande.</p>';
   ventes(); soirees(); alertes(); visites();
@@ -113,16 +113,50 @@ function alertes() {
 function visites() {
   const v = data.visites;
   if (!v) { $('[data-visites-kpis]').innerHTML = '<p>Les statistiques arrivent dès les premières visites.</p>'; return; }
-  $('[data-visites-kpis]').innerHTML = [['Aujourd’hui', v.aujourdhui], ['7 derniers jours', v.semaine], ['30 derniers jours', v.mois]]
-    .map(([l, x]) => `<div class="kpi"><span>${l}</span><strong>${x.visiteurs}</strong><small>${x.vues} page${x.vues > 1 ? 's' : ''} vue${x.vues > 1 ? 's' : ''}</small></div>`).join('');
+  const per = v.periode || { vues: 0, visiteurs: 0 };
+  const duree = (s) => (s == null ? '—' : s < 60 ? `${s} s` : `${Math.floor(s / 60)} min ${String(s % 60).padStart(2, '0')}`);
+  const nomPer = { 7: '7 jours', 30: '30 jours', 90: '3 mois', 365: '12 mois' }[v.jours_periode] || `${v.jours_periode} jours`;
+  $('[data-visites-kpis]').innerHTML = [
+    ['Aujourd’hui', v.aujourdhui.visiteurs, `${v.aujourdhui.vues} page${v.aujourdhui.vues > 1 ? 's' : ''} vue${v.aujourdhui.vues > 1 ? 's' : ''}`],
+    [`Visiteurs sur ${nomPer}`, per.visiteurs, `${per.vues} pages vues`],
+    ['Pages par visiteur', per.pages_par_visiteur ?? '—', 'en moyenne'],
+    ['Temps moyen sur une page', duree(v.temps_moyen_s), 'quand on quitte la page'],
+  ].map(([l, x, d]) => `<div class="kpi"><span>${l}</span><strong>${esc(x)}</strong><small>${esc(d)}</small></div>`).join('');
   barres($('[data-barres]'), v.jours || []);
-  const NOMS = { '/': 'Le Hall (accueil)', '/speed-dating/': 'Le Bal masqué', '/ecrin/': 'L’Écrin', '/bibliotheque/': 'La Bibliothèque', '/boutique/': 'La Boutique', '/lamia-brechet/': 'Qui est Lamia', '/produit/': 'Fiche produit', '/grenier/': 'Le Grenier', '/confidences/': 'Le Cabinet des Confidences' };
-  const SOURCES = { direct: 'Lien direct ou appli', tiktok: 'TikTok', facebook: 'Facebook', instagram: 'Instagram', google: 'Google', youtube: 'YouTube', whatsapp: 'WhatsApp' };
-  const top = (box, rows, nom) => { const max = Math.max(1, ...rows.map((r) => r[1])); box.innerHTML = rows.map(([k, n]) => `<li><span>${esc(nom(k))}</span><b>${n}</b><i style="--w:${(n / max) * 100}%"></i></li>`).join('') || '<li>Pas encore de données</li>'; };
-  top($('[data-top-pages]'), v.pages || [], (k) => NOMS[k] || k);
-  top($('[data-top-sources]'), v.sources || [], (k) => SOURCES[k] || k);
-  top($('[data-top-appareils]'), v.appareils || [], (k) => ({ mobile: 'Téléphone', ordinateur: 'Ordinateur', tablette: 'Tablette' })[k] || k);
+  // Heures de la journée
+  const hmax = Math.max(1, ...(v.heures || []).map((h) => h.n));
+  $('[data-heures]').innerHTML = (v.heures || []).map((h) => `<span class="barre" style="--h:${(h.n / hmax) * 100}%" title="${h.h} h : ${h.n} page${h.n > 1 ? 's' : ''} vue${h.n > 1 ? 's' : ''}"><i></i></span>`).join('') + '<span class="barres-legende"><span>0 h</span><span>12 h</span><span>23 h</span></span>';
+  // Parcours qui rapportent
+  const E = v.evenements || {};
+  const vuesDe = (p) => (v.pages || []).find((x) => x[0] === p)?.[1] || 0;
+  const etape = (l, n, ref) => `<li><span>${l}</span><b>${n}</b>${ref ? `<em>${ref > 0 ? Math.round((n / ref) * 100) : 0} %</em>` : ''}</li>`;
+  const bal = vuesDe('/speed-dating/');
+  const boutique = ['/boutique/', '/ecrin/', '/bibliotheque/', '/grenier/'].reduce((t, p) => t + vuesDe(p), 0);
+  $('[data-entonnoirs]').innerHTML = `
+    <div><h3>Le Bal</h3><ol class="entonnoir">${etape('Pages du Bal vues', bal)}${etape('Clics « Réserver »', E.clic_reserver || 0, bal)}${etape('Inscriptions', E.inscription_bal || 0, E.clic_reserver || 0)}${etape('Caméras testées', E.test_camera || 0)}${etape('Entrées dans la salle', E.entree_bal || 0)}</ol></div>
+    <div><h3>La boutique</h3><ol class="entonnoir">${etape('Pages boutique vues', boutique)}${etape('Fiches produit ouvertes', E.clic_produit || 0, boutique)}${etape('Précommandes', E.precommande || 0, E.clic_produit || 0)}</ol></div>`;
+  const NOMS = { '/': 'Le Hall (accueil)', '/speed-dating/': 'Le Bal masqué', '/speed-dating/bal/': 'La salle du bal', '/speed-dating/salle/': 'L’antichambre', '/ecrin/': 'L’Écrin', '/bibliotheque/': 'La Bibliothèque', '/boutique/': 'La Boutique', '/lamia-brechet/': 'Qui est Lamia', '/produit/': 'Fiche produit', '/grenier/': 'Le Grenier', '/confidences/': 'Le Cabinet des Confidences', '/mon-espace/': 'Mon espace', '/werdi-ouvre-les-yeux/': 'Werdi' };
+  const SOURCES = { direct: 'Lien direct ou appli', tiktok: 'TikTok', facebook: 'Facebook', instagram: 'Instagram', google: 'Google', youtube: 'YouTube', whatsapp: 'WhatsApp', live: 'Le live', snapchat: 'Snapchat', bing: 'Bing' };
+  const top = (box, rows, nom, extra = () => '') => { const max = Math.max(1, ...rows.map((r) => r[1])); box.innerHTML = rows.map((r) => `<li><span>${nom(r)}</span><b>${r[1]}${extra(r)}</b><i style="--w:${(r[1] / max) * 100}%"></i></li>`).join('') || '<li>Pas encore de données</li>'; };
+  const pays = (() => { try { return new Intl.DisplayNames(['fr'], { type: 'region' }); } catch { return null; } })();
+  const drapeau = (c) => (/^[A-Z]{2}$/.test(c || '') ? String.fromCodePoint(...[...c].map((ch) => 0x1f1e6 + ch.charCodeAt(0) - 65)) : '🌍');
+  const nomPays = (c) => (/^[A-Z]{2}$/.test(c || '') ? (pays?.of(c) || c) : 'Inconnu');
+  top($('[data-top-pages]'), v.pages || [], (r) => esc(NOMS[r[0]] || r[0]), (r) => (r[2] ? ` <small>· ${duree(r[2])}</small>` : ''));
+  top($('[data-top-sources]'), (v.sources || []).map((r) => [r[0], r[2] ?? r[1]]), (r) => esc(SOURCES[r[0]] || r[0]), () => ' <small>visiteurs</small>');
+  top($('[data-top-appareils]'), v.appareils || [], (r) => esc(({ mobile: 'Téléphone', ordinateur: 'Ordinateur', tablette: 'Tablette' })[r[0]] || r[0]));
+  top($('[data-top-pays]'), v.pays || [], (r) => `${drapeau(r[0])} ${esc(nomPays(r[0]))}`);
+  top($('[data-top-villes]'), (v.villes || []).map((r) => [`${r[0]}|${r[1]}`, r[2]]), (r) => { const [ville, c] = r[0].split('|'); return `${drapeau(c)} ${esc(ville)}`; });
+  const REGIONS = {
+    FR: { IDF: 'Île-de-France', ARA: 'Auvergne-Rhône-Alpes', BFC: 'Bourgogne-Franche-Comté', BRE: 'Bretagne', CVL: 'Centre-Val de Loire', COR: 'Corse', GES: 'Grand Est', HDF: 'Hauts-de-France', NOR: 'Normandie', NAQ: 'Nouvelle-Aquitaine', OCC: 'Occitanie', PDL: 'Pays de la Loire', PAC: 'Provence-Alpes-Côte d’Azur' },
+    DZ: { '06': 'Béjaïa', '09': 'Blida', '10': 'Bouira', '15': 'Tizi Ouzou', '16': 'Alger', '19': 'Sétif', '25': 'Constantine', '31': 'Oran', '34': 'Bordj Bou Arréridj', '35': 'Boumerdès' },
+    CA: { QC: 'Québec', ON: 'Ontario', BC: 'Colombie-Britannique', AB: 'Alberta' },
+    BE: { BRU: 'Bruxelles', WAL: 'Wallonie', VLG: 'Flandre' },
+  };
+  top($('[data-top-regions]'), (v.regions || []).map((r) => [`${r[0]}|${r[1]}`, r[2]]), (r) => { const [reg, c] = r[0].split('|'); return `${drapeau(c)} ${esc(REGIONS[c]?.[reg] || (c === 'DZ' ? `Wilaya ${reg}` : reg))}`; });
 }
+$('[data-periode]')?.addEventListener('change', async (e) => {
+  try { const d = await api({ action: 'dashboard', jours: Number(e.target.value) }); data.visites = d.visites; visites(); } catch (err) { message(err.message, true); }
+});
 
 // ---------------------------------------------------------------- bilan du bal
 async function chargerBilan() {

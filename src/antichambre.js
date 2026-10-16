@@ -52,6 +52,7 @@ async function start() {
   $('[data-ante-start]').hidden = true;
   $('[data-ante-stop]').hidden = false;
   mark('camera', stream.getVideoTracks().length ? 'ok' : 'ko');
+  window.lfbEvent?.('test_camera');
 
   const track = stream.getAudioTracks()[0];
   if (!track) { mark('micro', 'ko'); return say('La caméra fonctionne, mais aucun micro n’est disponible.'); }
