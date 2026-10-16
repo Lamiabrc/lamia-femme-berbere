@@ -261,7 +261,7 @@ let flouDispo = false;
 async function flou(actif) {
   if (!call || !flouDispo) return;
   try {
-    await call.updateInputSettings({ video: { processor: actif ? { type: 'background-blur', config: { strength: 0.6 } } : { type: 'none' } } });
+    await call.updateInputSettings({ video: { processor: actif ? { type: 'background-blur', config: { strength: 1 } } : { type: 'none' } } });
     $('[data-flou]').setAttribute('aria-pressed', String(actif));
     $('[data-flou]').textContent = actif ? 'Décor net' : 'Flouter mon décor';
   } catch { $('[data-flou]').hidden = true; }
