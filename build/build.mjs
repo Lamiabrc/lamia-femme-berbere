@@ -565,13 +565,15 @@ page(
 </section>
 
 <section class="lancement" aria-labelledby="lancement-title">
-  <svg class="lancement-masque" viewBox="0 0 64 32" width="96" height="48" aria-hidden="true"><path d="M2 8c10-6 20-4 30 4C42 4 52 2 62 8c0 12-8 20-18 20-6 0-9-4-12-8-3 4-6 8-12 8C10 28 2 20 2 8Z" fill="#e3bd6e" stroke="#fff6dc" stroke-width="1.2"/><ellipse cx="19" cy="15" rx="6" ry="4" fill="#120d1a"/><ellipse cx="45" cy="15" rx="6" ry="4" fill="#120d1a"/></svg>
-  <div>
+  <figure class="lancement-image">
+    <img src="/images/lamia/lamia-venise-1672.webp" srcset="/images/lamia/lamia-venise-900.webp 900w, /images/lamia/lamia-venise-1672.webp 1672w" sizes="(max-width: 860px) 100vw, 560px" width="1672" height="941" alt="Lamia, masque vénitien à la main, sur le Grand Canal de Venise à la tombée de la nuit" loading="lazy">
+  </figure>
+  <div class="lancement-texte">
     <p class="bal-kicker">Soirée de lancement · offerte</p>
     <h2 id="lancement-title">La première soirée est gratuite : le Bal masqué de Venise</h2>
     <p>Pour lancer le Boudoir, Lamia vous offre la première soirée, le <strong>samedi 31 octobre à 21 h</strong>, en visio, sur le thème du Carnaval de Venise. Venez masqué·e, le mystère fait partie du jeu. Les soirées suivantes seront payantes.</p>
+    <p><a class="btn btn-gold" href="#events-title">Réserver ma place offerte</a></p>
   </div>
-  <a class="btn btn-gold" href="#events-title">Réserver ma place offerte</a>
 </section>
 
 <section class="bal-deroule" aria-labelledby="deroule-title">

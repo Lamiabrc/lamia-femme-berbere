@@ -1904,3 +1904,11 @@ body { background: var(--qvt-ivoire); }
 .espace-mdp label { display: grid; gap: 6px; font-weight: 600; }
 .espace-mdp input { min-height: 46px; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--qvt-sable, #ddd); font: 16px var(--sans); }
 .legal .modele { padding: 16px 20px; border: 1px dashed #c8a86d; border-radius: 12px; background: #fffaf0; }
+
+/* Bandeau de lancement avec l'image vénitienne */
+.lancement { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(20px, 3vw, 36px); padding: 18px; }
+.lancement-image { margin: 0; border-radius: 14px; overflow: hidden; box-shadow: 0 0 0 1px rgba(227,189,110,.6), 0 20px 40px -20px rgba(0,0,0,.8); }
+.lancement-image img { display: block; width: 100%; height: 100%; aspect-ratio: 16 / 9; object-fit: cover; object-position: 70% center; }
+.lancement-texte { padding: 6px 10px 6px 0; }
+.lancement-texte p + p { margin-top: 14px; }
+@media (max-width: 860px) { .lancement { grid-template-columns: 1fr; padding: 12px; } .lancement-texte { padding: 4px 8px 10px; } }
