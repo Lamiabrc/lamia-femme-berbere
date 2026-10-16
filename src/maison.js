@@ -390,10 +390,63 @@ renderSocials();
 
 // ---------------------------------------------------------------- compteur de visites anonyme (sans cookie)
 (function visite() {
+  // Provenance de la première visite de la session (réseau social, Google…), réutilisée à l'inscription au bal.
+  try {
+    if (!sessionStorage.getItem('lfb-source')) {
+      const utm = new URLSearchParams(location.search).get('utm_source');
+      let src = utm || 'direct';
+      if (!utm && document.referrer) {
+        const h = new URL(document.referrer).hostname;
+        src = /tiktok/.test(h) ? 'tiktok' : /facebook|fb\./.test(h) ? 'facebook' : /instagram/.test(h) ? 'instagram' : /youtube|youtu\.be/.test(h) ? 'youtube' : /google\./.test(h) ? 'google' : /lamia-femme-berbere/.test(h) ? 'direct' : h.replace(/^www\./, '');
+      }
+      sessionStorage.setItem('lfb-source', src.slice(0, 40));
+    }
+  } catch { /* */ }
   try {
     if (!/lamia-femme-berbere\.com$/.test(location.hostname)) return;
     const utm = new URLSearchParams(location.search).get('utm_source') || '';
     const body = JSON.stringify({ action: 'visit', path: location.pathname, ref: document.referrer, utm });
     if (!navigator.sendBeacon?.('/api/admin', new Blob([body], { type: 'application/json' }))) fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, keepalive: true }).catch(() => {});
   } catch { /* jamais bloquant */ }
+})();
+
+// ---------------------------------------------------------------- prix du Hall lus dans la boutique (modifiables depuis le tableau de bord)
+(async function prixDuHall() {
+  const one = document.querySelectorAll('[data-prix]'), werdi = document.querySelector('[data-prix-werdi]');
+  if (!one.length && !werdi) return;
+  try {
+    const list = await rest('products?select=slug,price_cents,currency,status&status=eq.active');
+    const by = Object.fromEntries(list.map((p) => [p.slug, p]));
+    one.forEach((el) => { const p = by[el.dataset.prix]; if (p) el.textContent = ` · ${money(p.price_cents, p.currency || 'EUR')}`; });
+    const b = by['werdi-ouvre-les-yeux-broche'], e = by['werdi-ouvre-les-yeux'];
+    if (werdi && (b || e)) werdi.textContent = [b && `Livre broché ${money(b.price_cents)}`, e && `ebook ${money(e.price_cents)}`].filter(Boolean).join(' · ');
+  } catch { /* le texte sans prix reste affiché */ }
+})();
+
+// ---------------------------------------------------------------- navigateurs intégrés (TikTok, Instagram, Facebook…) : la caméra y est souvent bloquée
+(function navigateurIntegre() {
+  const box = document.querySelector('[data-appli]');
+  if (!box) return;
+  const ua = navigator.userAgent || '';
+  const apps = [[/musical_ly|BytedanceWebview|TikTok|trill/i, 'TikTok'], [/Instagram/i, 'Instagram'], [/FBAN|FBAV|FB_IAB|FBIOS|Messenger/i, 'Facebook'], [/Snapchat/i, 'Snapchat'], [/LinkedInApp/i, 'LinkedIn'], [/Twitter/i, 'X']];
+  const found = apps.find(([re]) => re.test(ua));
+  if (!found) return;
+  box.hidden = false;
+  box.querySelector('[data-appli-nom]').textContent = found[1];
+  const android = /Android/i.test(ua);
+  box.querySelector(android ? '[data-appli-android]' : '[data-appli-ios]').hidden = false;
+  if (android) {
+    const chrome = box.querySelector('[data-appli-chrome]');
+    chrome.href = `intent://${location.host}${location.pathname}${location.search}#Intent;scheme=https;package=com.android.chrome;end`;
+    chrome.hidden = false;
+  }
+  box.querySelector('[data-appli-copier]').addEventListener('click', async (e) => {
+    try { await navigator.clipboard.writeText(location.href); }
+    catch {
+      const t = document.createElement('textarea'); t.value = location.href; document.body.append(t); t.select();
+      try { document.execCommand('copy'); } catch { /* */ }
+      t.remove();
+    }
+    e.target.textContent = 'Lien copié : colle-le dans Safari ou Chrome';
+  });
 })();

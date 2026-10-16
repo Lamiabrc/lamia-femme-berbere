@@ -34,6 +34,7 @@ function ouvrir(tab) {
   try { history.replaceState(null, '', `#${tab}`); } catch { /* */ }
   if (tab === 'produits' && !produits.length) chargerProduits();
   if (tab === 'textes') chargerTextes();
+  if (tab === 'bilan') chargerBilan();
   scrollTo({ top: 0 });
 }
 document.addEventListener('click', (e) => {
@@ -122,6 +123,28 @@ function visites() {
   top($('[data-top-sources]'), v.sources || [], (k) => SOURCES[k] || k);
   top($('[data-top-appareils]'), v.appareils || [], (k) => ({ mobile: 'Téléphone', ordinateur: 'Ordinateur', tablette: 'Tablette' })[k] || k);
 }
+
+// ---------------------------------------------------------------- bilan du bal
+async function chargerBilan() {
+  try {
+    const r = await fetch('/api/bal', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ action: 'bilan' }) });
+    const { bilan } = await r.json();
+    if (!r.ok || !bilan) { $('[data-bilan-intro]').textContent = 'Pas encore de bal ouvert : le bilan apparaîtra dès l’ouverture des portes.'; return; }
+    $('[data-bilan-intro]').textContent = `${bilan.soiree || 'Le bal'} · portes ouvertes ${date(bilan.ouvert_le)}${bilan.fini_le ? ` · fin du bal ${date(bilan.fini_le)}` : ''}`;
+    const k = [['Inscrits', bilan.inscrits, ''], ['Venus au bal', bilan.presents, bilan.inscrits ? `${Math.round((bilan.presents / bilan.inscrits) * 100)} % des inscrits` : ''], ['Restés jusqu’à la fin', bilan.jusqu_a_la_fin ?? '—', 'au moment de « fin du bal »'], ['Tête-à-tête', bilan.tete_a_tete, `${bilan.tours.length} tour${bilan.tours.length > 1 ? 's' : ''}`], ['Carnets envoyés', bilan.souhaits, `${bilan.reciproques} souhait${bilan.reciproques > 1 ? 's' : ''} réciproque${bilan.reciproques > 1 ? 's' : ''}`], ['Incidents signalés', bilan.incidents, 'Cabinet des Confidences']];
+    $('[data-bilan-kpis]').innerHTML = k.map(([l, v, d]) => `<div class="kpi"><span>${l}</span><strong>${esc(v)}</strong><small>${esc(d)}</small></div>`).join('');
+    const top = (box, obj, noms) => { const rows = Object.entries(obj || {}).sort((a, b) => b[1] - a[1]); const max = Math.max(1, ...rows.map((x) => x[1])); box.innerHTML = rows.map(([kk, n]) => `<li><span>${esc(noms[kk] || kk)}</span><b>${n}</b><i style="--w:${(n / max) * 100}%"></i></li>`).join('') || '<li>Pas encore de réponse</li>'; };
+    const R = { oui: 'Oui', moyen: 'Moyen', non: 'Non', 'peut-etre': 'Peut-être' };
+    top($('[data-bilan-aime]'), bilan.avis.aime, R);
+    top($('[data-bilan-revient]'), bilan.avis.reviendrait, R);
+    top($('[data-bilan-paie]'), bilan.avis.paierait, R);
+    top($('[data-bilan-sources]'), bilan.sources, { direct: 'Lien direct ou appli', inconnue: 'Avant le suivi', tiktok: 'TikTok', facebook: 'Facebook', instagram: 'Instagram', youtube: 'YouTube', google: 'Google', live: 'Le live' });
+    $('[data-bilan-salons]').innerHTML = bilan.salons.map((x) => `<tr><td>${esc(x.label)}</td><td>${x.inscrits}</td><td>${x.presents}</td><td>${x.femmes}</td><td>${x.hommes}</td></tr>`).join('') || '<tr><td colspan="5">Aucun inscrit.</td></tr>';
+    $('[data-bilan-tours]').innerHTML = bilan.tours.map((x) => `<tr><td>${x.round}${x.demasque ? ' (démasquage)' : ''}</td><td>${esc(date(x.at, { hour: '2-digit', minute: '2-digit' }))}</td><td>${x.minutes} min</td><td>${x.presents}</td><td>${x.pairs}</td><td>${x.attente}</td></tr>`).join('') || '<tr><td colspan="6">Aucun tour lancé.</td></tr>';
+    $('[data-bilan-mots]').innerHTML = bilan.messages.length ? bilan.messages.map((m) => `<blockquote class="mot">${esc(m)}</blockquote>`).join('') : '<p class="aide">Les petits mots laissés dans les carnets apparaîtront ici.</p>';
+  } catch { message('Le bilan ne s’affiche pas pour le moment.', true); }
+}
+$('[data-bilan-maj]')?.addEventListener('click', chargerBilan);
 
 // ---------------------------------------------------------------- produits
 async function chargerProduits() {
@@ -282,7 +305,7 @@ async function demarrer() {
   if (session && !admin) message('Ce compte n’a pas le rôle administratrice.', true);
   if (!admin) return;
   const tab = location.hash.slice(1);
-  ouvrir(['accueil', 'ventes', 'produits', 'soirees', 'alertes', 'textes', 'visites'].includes(tab) ? tab : 'accueil');
+  ouvrir(['accueil', 'ventes', 'produits', 'soirees', 'bilan', 'alertes', 'textes', 'visites'].includes(tab) ? tab : 'accueil');
   await charger();
 }
 $('[data-login]').addEventListener('submit', async (e) => {

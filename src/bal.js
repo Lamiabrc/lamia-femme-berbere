@@ -62,6 +62,8 @@ $('[data-entrer]')?.addEventListener('click', async () => {
   call = Daily.createCallObject({ subscribeToTracksAutomatically: false, dailyConfig: { useDevicePreferenceCookies: true } });
   for (const ev of ['participant-joined', 'participant-updated', 'participant-left', 'track-started', 'track-stopped', 'joined-meeting']) call.on(ev, render);
   call.on('left-meeting', () => { roomKey = null; });
+  let flouPret = false;
+  call.on('joined-meeting', () => { if (!flouPret) { flouPret = true; preparerFlou(); } else if (prefs.flou) flou(true); });
   call.on('error', () => message('La connexion vidéo s’est interrompue. Nous te reconnectons…'));
   await tick();
   poll = setInterval(tick, 4000);
@@ -85,6 +87,7 @@ async function tick() {
 }
 
 async function rejoindre(key) {
+  const avant = roomKey;
   joining = true;
   try {
     const { ok, data } = await api({ action: 'join', pass: me.pass });
@@ -92,7 +95,8 @@ async function rejoindre(key) {
     if (call.meetingState() === 'joined-meeting') await call.leave();
     await call.join({ url: data.url, token: data.token, startVideoOff: false, startAudioOff: false });
     roomKey = key;
-    if (state?.where === 'tat') carillon();
+    if (state?.where === 'tat') transition('Le prochain masque vous invite…', state.partner);
+    else if (avant?.startsWith('tat:')) transition('Merci pour cette danse', 'Retour au grand salon');
   } catch { message('La connexion à la salle a échoué. Nouvel essai…'); }
   finally { joining = false; }
 }
@@ -112,11 +116,18 @@ function decor() {
   const [titre, texte] = s.phase === 'fin' ? titres.fin : titres[s.where] || titres.accueil;
   $('[data-salle-titre]').textContent = titre;
   message(texte);
-  $('[data-salle-tour]').textContent = s.round ? `Tour ${s.round}` : '';
+  $('[data-salle-tour]').textContent = s.round ? `· tour ${s.round}` : '';
+  $('[data-salle-salon]').textContent = s.salon ? `Salon ${s.salon}` : 'Le Bal masqué';
+  $('[data-demasque]').hidden = !(s.where === 'tat' && s.demasque);
+  const pb = $('[data-planb]');
+  pb.hidden = !s.planb;
+  if (s.planb) pb.querySelector('[data-planb-lien]').href = s.planb;
+  carnet(s.met || []);
+  ambiance();
   const souhaits = $('[data-souhaits]');
   souhaits.hidden = s.phase !== 'fin';
   if (s.phase === 'fin' && !wishesSent) {
-    const list = s.met || [];
+    const list = [...new Map((s.met || []).map((m) => [m.uid, m])).values()];
     const box = $('[data-souhaits-liste]');
     const sig = list.map((m) => m.uid).join(',');
     if (box.dataset.sig !== sig) {
@@ -184,10 +195,78 @@ $('[data-quitter]')?.addEventListener('click', async () => { clearInterval(poll)
 $('[data-souhaits]')?.addEventListener('submit', async (e) => {
   e.preventDefault();
   const wished = [...e.target.querySelectorAll('input[type=checkbox]:checked')].map((x) => x.value);
-  const { ok } = await api({ action: 'wish', pass: me.pass, wished, message: new FormData(e.target).get('message') });
-  if (ok) { wishesSent = true; e.target.innerHTML = '<p class="souhaits-ok">C’est noté. Si un souhait est réciproque, Lamia vous mettra en relation. Belle nuit !</p>'; }
+  const fd = new FormData(e.target);
+  const { ok } = await api({ action: 'wish', pass: me.pass, wished, message: fd.get('message'), avis: { aime: fd.get('aime'), reviendrait: fd.get('reviendrait'), paierait: fd.get('paierait') } });
+  if (ok) { wishesSent = true; e.target.innerHTML = '<p class="souhaits-ok">Ton carnet est envoyé. Si un souhait est réciproque, Lamia vous mettra en relation. Merci d’être venu·e au bal, belle nuit !</p>'; }
   else $('[data-souhaits-status]').textContent = 'L’envoi n’a pas fonctionné. Réessaie.';
 });
+
+// ---------------------------------------------------------------- le carnet de bal
+function carnet(met) {
+  const ol = $('[data-carnet-liste]');
+  const sig = met.map((m) => `${m.uid}:${m.round}`).join(',');
+  if (ol.dataset.sig === sig) return;
+  ol.dataset.sig = sig;
+  ol.innerHTML = met.length
+    ? met.map((m) => `<li><span class="carnet-tour">Tour ${esc(m.round)}</span><span class="carnet-nom">${esc(m.name)}</span></li>`).join('')
+    : '<li class="carnet-vide">Tes cavaliers s’inscriront ici au fil des tours.</li>';
+}
+
+// ---------------------------------------------------------------- transitions entre les danses
+function transition(titre, nom) {
+  const t = $('[data-transition]');
+  $('[data-transition-titre]').textContent = titre;
+  $('[data-transition-nom]').textContent = nom || '';
+  t.hidden = false;
+  t.classList.remove('is-out'); void t.offsetWidth; t.classList.add('is-in');
+  carillon();
+  clearTimeout(transition.timer);
+  transition.timer = setTimeout(() => { t.classList.add('is-out'); setTimeout(() => { t.hidden = true; }, 600); }, 3200);
+}
+
+// ---------------------------------------------------------------- ambiance feutrée : musique douce et flou du décor
+const prefs = (() => { try { return JSON.parse(localStorage.getItem('bal-prefs') || '{}'); } catch { return {}; } })();
+const savePrefs = () => { try { localStorage.setItem('bal-prefs', JSON.stringify(prefs)); } catch { /* */ } };
+let musique = null;
+// Nappe musicale très douce, synthétisée (rien à télécharger) : accords lents, volume bas.
+function creerMusique() {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const master = ctx.createGain(); master.gain.value = 0; master.connect(ctx.destination);
+  const filtre = ctx.createBiquadFilter(); filtre.type = 'lowpass'; filtre.frequency.value = 900; filtre.connect(master);
+  const accords = [[220, 277.18, 329.63], [196, 246.94, 293.66], [174.61, 220, 261.63], [196, 246.94, 329.63]];
+  const voix = accords[0].map((f) => { const o = ctx.createOscillator(); o.type = 'triangle'; o.frequency.value = f; const g = ctx.createGain(); g.gain.value = 0.18; o.connect(g); g.connect(filtre); o.start(); return o; });
+  let i = 0;
+  const tourne = setInterval(() => { i = (i + 1) % accords.length; voix.forEach((o, k) => o.frequency.linearRampToValueAtTime(accords[i][k], ctx.currentTime + 3)); }, 9000);
+  return {
+    volume(v) { master.gain.linearRampToValueAtTime(v, ctx.currentTime + 1.5); if (ctx.state === 'suspended') ctx.resume(); },
+    stop() { clearInterval(tourne); ctx.close().catch(() => {}); },
+  };
+}
+function ambiance() {
+  const veut = prefs.musique !== false;
+  const auSalon = state && state.where !== 'tat';
+  $('[data-musique]').setAttribute('aria-pressed', String(veut));
+  $('[data-musique]').textContent = veut ? 'Couper la musique' : 'Musique douce';
+  if (veut && !musique) { try { musique = creerMusique(); } catch { musique = null; } }
+  musique?.volume(veut && auSalon ? 0.035 : 0);
+}
+$('[data-musique]')?.addEventListener('click', () => { prefs.musique = prefs.musique === false; savePrefs(); ambiance(); });
+
+let flouDispo = false;
+async function flou(actif) {
+  if (!call || !flouDispo) return;
+  try {
+    await call.updateInputSettings({ video: { processor: actif ? { type: 'background-blur', config: { strength: 0.6 } } : { type: 'none' } } });
+    $('[data-flou]').setAttribute('aria-pressed', String(actif));
+    $('[data-flou]').textContent = actif ? 'Décor net' : 'Flouter mon décor';
+  } catch { $('[data-flou]').hidden = true; }
+}
+$('[data-flou]')?.addEventListener('click', () => { prefs.flou = !(prefs.flou === true); savePrefs(); flou(prefs.flou); });
+function preparerFlou() {
+  try { flouDispo = Boolean(Daily.supportedBrowser?.().supportsVideoProcessing); } catch { flouDispo = false; }
+  $('[data-flou]').hidden = !flouDispo;
+  if (flouDispo && prefs.flou) flou(true);
+}
 
 // Au chargement : si la personne est déjà entrée ce soir, on reprend.
 if (me?.pass) pret(); else show('entree');

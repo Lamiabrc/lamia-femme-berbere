@@ -87,3 +87,22 @@ test('les commandes du bal sont réservées à Lamia', async () => {
   const r = await handleBal(req({ action: 'round' }, { authorization: 'Bearer x' }), { env, fetcher });
   assert.equal(r.status, 403);
 });
+
+test('carnet de bal : les cavaliers rencontrés et le démasquage sont visibles pendant le bal', async () => {
+  const now = new Date('2026-10-31T20:10:00Z');
+  const pass = signPass(env, { uid: U1, ev: EV, name: 'Nadia', s: 'abc123', exp: now.getTime() + 3600e3 });
+  const st = { ...open, phase: 'tour', round: 2, planb: 'https://meet.google.com/abc-defg-hij', met: { [U1]: [{ uid: 'k', name: 'Karim', round: 1 }] }, assign: { [U1]: { room: 'r', url: 'u', partner: 'Yanis', ends_at: '2026-10-31T20:16:00Z', demasque: true } } };
+  const r = await handleBal(req({ action: 'state', pass }), { env, fetcher: fake(st).fetcher, now: () => now });
+  const s = await r.json();
+  assert.deepEqual(s.met.map((m) => m.name), ['Karim']);
+  assert.equal(s.demasque, true);
+  assert.equal(s.salon, 'France · 25-39 ans');
+  assert.equal(s.planb, 'https://meet.google.com/abc-defg-hij');
+});
+
+test('questionnaire : seules les réponses prévues sont gardées', async () => {
+  const pass = signPass(env, { uid: U1, ev: EV, name: 'Nadia', s: 'abc123', exp: Date.now() + 3600e3 });
+  const { fetcher, calls } = fake({ ...open, phase: 'fin', met: { [U1]: [] } });
+  await handleBal(req({ action: 'wish', pass, wished: [], avis: { aime: 'oui', reviendrait: 'peut-etre', paierait: '<script>' } }), { env, fetcher });
+  assert.deepEqual(calls.find((c) => c.url.includes('on_conflict')).body.value.avis, { aime: 'oui', reviendrait: 'peut-etre', paierait: null });
+});

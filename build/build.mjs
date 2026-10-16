@@ -297,13 +297,13 @@ page(
       <img src="/images/collier/collier-kabyle-15g-hero-320.webp" width="320" height="400" alt="" loading="lazy">
       <span class="apercu-kicker">L’Écrin · précommande</span>
       <strong>Collier kabyle émaillé</strong>
-      <span class="apercu-info">Modèle de 1974, fabriqué à Ath Yenni · 99 €</span>
+      <span class="apercu-info">Modèle de 1974, fabriqué à Ath Yenni<span data-prix="collier-kabyle-argente-emaille-15g"></span></span>
     </a>
     <a class="apercu" href="/bibliotheque/">
       <img src="/images/marque/yemma-portrait-700.webp" width="700" height="1050" alt="" loading="lazy">
       <span class="apercu-kicker">La Bibliothèque · précommande</span>
       <strong>Werdi, ouvre les yeux !</strong>
-      <span class="apercu-info">Livre broché 15,90 € · ebook 12,90 €</span>
+      <span class="apercu-info" data-prix-werdi>Livre broché et ebook</span>
     </a>
     <a class="apercu" href="https://www.tiktok.com/@lamiaberbere" rel="noopener" target="_blank">
       <img src="/images/marque/lamia-portrait-reel-320.webp" width="320" height="410" alt="Lamia Femme Berbère" loading="lazy" class="is-lamia">
@@ -603,22 +603,11 @@ page(
     </div>
   </div>
 </section>
-<section class="member-panel" aria-labelledby="member-title" data-member>
-  <h2 id="member-title">Ton espace membre</h2>
-  <div data-member-out>
-    <p>Pour une soirée gratuite, pas besoin d’espace : inscris-toi directement dans la soirée, juste au-dessus. Ton espace membre sert ensuite à indiquer qui tu aimerais revoir et à alerter Lamia. Ton adresse email reste privée.</p>
-    <div class="auth-grid">
-      <form data-signup><h3>Créer mon espace</h3><label>Email<input name="email" type="email" autocomplete="email" required></label><label>Mot de passe<input name="password" type="password" autocomplete="new-password" minlength="8" required></label><button class="btn btn-ink" type="submit">Créer mon espace</button></form>
-      <form data-login><h3>J’ai déjà un espace</h3><label>Email<input name="email" type="email" autocomplete="email" required></label><label>Mot de passe<input name="password" type="password" autocomplete="current-password" required></label><button class="btn btn-line" type="submit">Me connecter</button></form>
-    </div>
-  </div>
-  <div data-member-in hidden>
-    <p>Connectée en tant que <strong data-member-email></strong>.</p>
-    <button class="btn btn-line" type="button" data-logout>Me déconnecter</button>
-  </div>
-  <p class="form-status" role="status" data-member-status></p>
+<section class="member-panel bal-espace" aria-labelledby="member-title">
+  <h2 id="member-title">Ton espace</h2>
+  <p>Pour le bal, pas besoin de compte : inscris-toi juste au-dessus, puis le soir venu, entre par la porte du bal avec ton email et ta date de naissance. À la fin du bal, ton <strong>carnet de bal</strong> te permet d’indiquer, en privé, qui tu aimerais revoir.</p>
+  <p class="bal-actions"><a class="btn btn-gold" href="/speed-dating/bal/">La porte du bal</a><a class="btn bal-btn-line" href="/speed-dating/salle/">Tester ma caméra</a><a class="btn bal-btn-line" href="/mon-espace/">Mon espace</a></p>
 </section>
-<section class="room-body"><p>Tu as participé à une soirée ? <a class="text-link" href="/speed-dating/souhaits/">Indique qui tu aimerais revoir</a>.</p></section>
 <section class="origin">
   <blockquote>« ${esc(P.speedDating.promise)} »<cite>Lamia</cite></blockquote>
   <p>${esc(P.speedDating.origin)}</p>
@@ -704,7 +693,7 @@ page(
     </section>
     <div class="espace-liens is-light">
       <a href="/speed-dating/bal/"><strong>Entrer au bal</strong><span>Le soir de la soirée</span></a>
-      <a href="/speed-dating/souhaits/"><strong>Mes souhaits</strong><span>Qui aimerais-tu revoir ?</span></a>
+      <a href="/speed-dating/souhaits/"><strong>Mon carnet de bal</strong><span>Qui aimerais-tu revoir ?</span></a>
       <a href="/confidences/"><strong>Alerter Lamia</strong><span>En toute confidentialité</span></a>
     </div>
   </div>
@@ -722,6 +711,13 @@ page(
     room: roomBySlug['speed-dating'],
     noindex: true,
     body: `<div class="bal bal-salle-page">
+<div class="appli-alerte" data-appli hidden role="alert">
+  <p class="appli-titre">Ouvre cette page dans Safari ou Chrome</p>
+  <p>Tu es dans le navigateur de <strong data-appli-nom>ton application</strong> : il bloque souvent la caméra et le micro.</p>
+  <p data-appli-ios hidden>Sur iPhone : touche <strong>…</strong> ou l’icône de partage en haut ou en bas de l’écran, puis <strong>« Ouvrir dans le navigateur »</strong> (ou « Ouvrir dans Safari »).</p>
+  <p data-appli-android hidden>Sur Android : touche <strong>⋮</strong> en haut à droite, puis <strong>« Ouvrir dans Chrome »</strong>, ou utilise le bouton ci-dessous.</p>
+  <p class="bal-actions"><button class="btn btn-gold" type="button" data-appli-copier>Copier le lien</button><a class="btn bal-btn-line" data-appli-chrome hidden>Ouvrir dans Chrome</a></p>
+</div>
 <section class="bal-step" data-step="entree">
   <div class="bal-hero is-short">
     <p class="bal-kicker">Le Bal masqué de Venise</p>
@@ -753,8 +749,10 @@ page(
 </section>
 
 <section class="bal-step salle" data-step="salle" data-salle hidden>
+  <div class="planb" data-planb hidden role="alert"><p><strong>La salle a un souci ?</strong> Lamia a ouvert une salle de secours.</p><a class="btn btn-gold" data-planb-lien target="_blank" rel="noopener">Rejoindre la salle de secours</a></div>
+  <div class="transition" data-transition hidden aria-live="polite"><div><svg viewBox="0 0 64 32" width="120" height="60" aria-hidden="true"><path d="M2 8c10-6 20-4 30 4C42 4 52 2 62 8c0 12-8 20-18 20-6 0-9-4-12-8-3 4-6 8-12 8C10 28 2 20 2 8Z" fill="#e3bd6e" stroke="#fff6dc" stroke-width="1.2"/><ellipse cx="19" cy="15" rx="6" ry="4" fill="#120d1a"/><ellipse cx="45" cy="15" rx="6" ry="4" fill="#120d1a"/></svg><p class="transition-titre" data-transition-titre>Le prochain masque vous invite…</p><p class="transition-nom" data-transition-nom></p></div></div>
   <header class="salle-haut">
-    <div><p class="bal-kicker" data-salle-tour></p><h1 data-salle-titre>Le grand salon</h1></div>
+    <div><p class="bal-kicker"><span data-salle-salon></span> <span data-salle-tour></span></p><h1 data-salle-titre>Le grand salon</h1></div>
     <p class="salle-temps" data-salle-temps aria-live="off"></p>
   </header>
   <div class="salle-scene">
@@ -763,19 +761,28 @@ page(
     <audio data-audio-autre autoplay></audio>
   </div>
   <p class="salle-msg" role="status" data-salle-msg></p>
+  <p class="salle-demasque" data-demasque hidden>Dernier tête-à-tête : le moment du démasquage. Retire ton masque si tu le souhaites.</p>
   <p class="salle-compte" data-salle-compte></p>
+  <aside class="carnet" data-carnet aria-label="Mon carnet de bal"><h2>Mon carnet de bal</h2><ol data-carnet-liste><li class="carnet-vide">Tes cavaliers s’inscriront ici au fil des tours.</li></ol></aside>
   <div class="salle-boutons">
     <button class="btn bal-btn-line" type="button" data-micro aria-pressed="false">Micro</button>
     <button class="btn bal-btn-line" type="button" data-camera aria-pressed="false">Caméra</button>
+    <button class="btn bal-btn-line" type="button" data-flou aria-pressed="false" hidden>Flouter mon décor</button>
+    <button class="btn bal-btn-line" type="button" data-musique aria-pressed="true">Musique douce</button>
     <a class="btn bal-btn-line" href="/confidences/" target="_blank" rel="noopener">Signaler à Lamia</a>
     <button class="btn bal-btn-line" type="button" data-quitter>Quitter le bal</button>
   </div>
   <form class="souhaits" data-souhaits hidden>
-    <h2>Qui aimerais-tu revoir ?</h2>
-    <p>Ton choix reste privé. Si c’est réciproque, Lamia vous met en relation.</p>
+    <h2>Ton carnet de bal</h2>
+    <p>Coche les personnes que tu aimerais revoir. Ton choix reste privé : si c’est réciproque, Lamia vous met en relation.</p>
     <div class="souhaits-liste" data-souhaits-liste></div>
+    <fieldset class="avis"><legend>Trois questions sur ce bal</legend>
+      <div class="avis-q"><span>As-tu aimé ce bal ?</span><label><input type="radio" name="aime" value="oui"> Oui</label><label><input type="radio" name="aime" value="moyen"> Moyen</label><label><input type="radio" name="aime" value="non"> Non</label></div>
+      <div class="avis-q"><span>Reviendrais-tu ?</span><label><input type="radio" name="reviendrait" value="oui"> Oui</label><label><input type="radio" name="reviendrait" value="peut-etre"> Peut-être</label><label><input type="radio" name="reviendrait" value="non"> Non</label></div>
+      <div class="avis-q"><span>Paierais-tu 12 € pour la prochaine soirée ?</span><label><input type="radio" name="paierait" value="oui"> Oui</label><label><input type="radio" name="paierait" value="peut-etre"> Peut-être</label><label><input type="radio" name="paierait" value="non"> Non</label></div>
+    </fieldset>
     <label>Un mot pour Lamia (facultatif)<textarea name="message" rows="2" maxlength="500"></textarea></label>
-    <button class="btn btn-gold" type="submit">Envoyer mes souhaits</button>
+    <button class="btn btn-gold" type="submit">Envoyer mon carnet</button>
     <p class="form-status" data-souhaits-status></p>
   </form>
 </section>
@@ -801,6 +808,13 @@ page(
     room: roomBySlug['speed-dating'],
     noindex: true,
     body: `<div class="bal bal-ante">
+<div class="appli-alerte" data-appli hidden role="alert">
+  <p class="appli-titre">Ouvre cette page dans Safari ou Chrome</p>
+  <p>Tu es dans le navigateur de <strong data-appli-nom>ton application</strong> : il bloque souvent la caméra et le micro.</p>
+  <p data-appli-ios hidden>Sur iPhone : touche <strong>…</strong> ou l’icône de partage en haut ou en bas de l’écran, puis <strong>« Ouvrir dans le navigateur »</strong> (ou « Ouvrir dans Safari »).</p>
+  <p data-appli-android hidden>Sur Android : touche <strong>⋮</strong> en haut à droite, puis <strong>« Ouvrir dans Chrome »</strong>, ou utilise le bouton ci-dessous.</p>
+  <p class="bal-actions"><button class="btn btn-gold" type="button" data-appli-copier>Copier le lien</button><a class="btn bal-btn-line" data-appli-chrome hidden>Ouvrir dans Chrome</a></p>
+</div>
 <section class="bal-hero is-short">
   <p class="bal-kicker">Le Bal masqué de Venise</p>
   <h1>L’antichambre</h1>

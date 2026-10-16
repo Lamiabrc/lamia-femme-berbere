@@ -1819,3 +1819,43 @@ body { background: var(--qvt-ivoire); }
 }
 .bal-hero-poster img,
 .home-speed-poster img { position:relative; z-index:0; }
+
+/* Alerte navigateur intégré (TikTok, Instagram, Facebook…) */
+.appli-alerte { max-width: 760px; margin: 18px auto 0; padding: 18px 20px; border-radius: 16px; border: 1px solid var(--or, #e3bd6e); background: rgba(92,20,36,.55); color: #fff1c9; position: relative; z-index: 3; }
+.appli-alerte[hidden] { display: none !important; }
+.appli-alerte p { margin: 0 0 8px; line-height: 1.5; }
+.appli-titre { font-family: var(--serif); font-size: 24px; color: #fff; }
+@media (max-width: 800px) { .appli-alerte { margin: 12px var(--gouttiere) 0; } }
+
+/* ================================================================ Salle du bal : carnet, transitions, ambiance feutrée */
+.salle { position: relative; }
+.salle-autre video, .salle-moi video { filter: saturate(1.06) sepia(.12) brightness(1.03) contrast(1.02); }
+.salle-autre::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 120%, rgba(255,190,110,.18), transparent 60%); }
+.salle-demasque { margin: 0; text-align: center; font-family: var(--serif); font-style: italic; font-size: 20px; color: var(--or, #e3bd6e); }
+.salle-demasque[hidden], .planb[hidden], .transition[hidden] { display: none !important; }
+.carnet { justify-self: center; width: min(560px, 100%); padding: 16px 20px; border-radius: 18px; border: 1px solid rgba(227,189,110,.4);
+  background: linear-gradient(180deg, rgba(255,241,201,.06), rgba(92,20,36,.25)); }
+.carnet h2 { margin: 0 0 8px; font-size: 22px; color: var(--or-clair, #fff1c9); }
+.carnet h2::after { display: none !important; }
+.carnet ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.carnet li { display: flex; gap: 12px; align-items: baseline; padding: 6px 0; border-bottom: 1px dashed rgba(227,189,110,.25); }
+.carnet-tour { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--or, #e3bd6e); min-width: 64px; }
+.carnet-nom { font-family: var(--serif); font-style: italic; font-size: 20px; color: #fff; }
+.carnet-vide { color: #b8a98f; font-style: italic; border: 0 !important; }
+.transition { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; text-align: center; background: radial-gradient(ellipse at 50% 45%, rgba(92,20,36,.92), rgba(18,13,26,.97) 70%); opacity: 0; transition: opacity .6s ease; }
+.transition.is-in { opacity: 1; }
+.transition.is-out { opacity: 0; }
+.transition svg { filter: drop-shadow(0 0 24px rgba(227,189,110,.5)); animation: flotte 4s ease-in-out infinite; }
+.transition-titre { margin: 14px 0 6px; font-family: var(--serif); font-style: italic; font-size: clamp(28px, 5vw, 46px); color: #fff; }
+.transition-nom { margin: 0; font-family: var(--serif); font-size: clamp(24px, 4vw, 36px); color: var(--or, #e3bd6e); }
+.planb { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 14px 18px; border-radius: 14px; background: #5c1424; color: #fff; }
+.planb p { margin: 0; }
+.avis { border: 0; padding: 0; margin: 4px 0; display: grid; gap: 10px; }
+.avis legend { font-weight: 700; margin-bottom: 6px; }
+.avis-q { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+.avis-q span { flex: 1 0 100%; font-weight: 600; font-size: 15px; }
+.avis-q label { display: inline-flex !important; gap: 6px; align-items: center; font-weight: 400 !important; }
+.avis-q input { width: 18px; height: 18px; accent-color: #5c1424; }
+@media (prefers-reduced-motion: reduce) { .transition, .transition svg { transition: none; animation: none; } }
+.salle-boutons [data-musique][aria-pressed="true"], .salle-boutons [data-flou][aria-pressed="true"] { background: rgba(227,189,110,.15); border-color: var(--or, #e3bd6e); color: #fff1c9; }
+.appli-alerte [hidden] { display: none !important; }

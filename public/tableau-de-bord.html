@@ -16,6 +16,7 @@
     <button type="button" data-tab="ventes">Ventes</button>
     <button type="button" data-tab="produits">Produits</button>
     <button type="button" data-tab="soirees">Soirées</button>
+    <button type="button" data-tab="bilan">Bilan du bal</button>
     <button type="button" data-tab="alertes">Alertes</button>
     <button type="button" data-tab="textes">Textes &amp; images</button>
     <button type="button" data-tab="visites">Visites</button>
@@ -105,6 +106,24 @@
     <div class="tdb-entete"><h1 class="tdb-titre">Soirées et inscrits</h1><div class="tdb-raccourcis"><a class="btn btn-ink" href="/admin-soirees/">Détail des inscrits</a><a class="btn btn-line" href="/admin-bal.html">Poste du bal</a></div></div>
     <p data-soirees-resume></p>
     <div class="tdb-table"><table><thead><tr><th>Soirée</th><th>Salon</th><th>Date</th><th>Inscrits</th><th>Places</th></tr></thead><tbody data-soirees></tbody></table></div>
+  </section>
+
+  <!-- ===================================================== Bilan du bal -->
+  <section data-panel="bilan" hidden>
+    <div class="tdb-entete"><h1 class="tdb-titre">Bilan du bal</h1><button class="btn btn-line" type="button" data-bilan-maj>Actualiser</button></div>
+    <p class="aide" data-bilan-intro>Ce que le bal nous apprend : qui est venu, d’où, combien de rencontres, et ce que les participants en pensent.</p>
+    <div class="tdb-kpis" data-bilan-kpis></div>
+    <div class="tdb-trois">
+      <div class="tdb-carte"><h2>Ils ont aimé ?</h2><ol class="classement" data-bilan-aime></ol></div>
+      <div class="tdb-carte"><h2>Reviendraient ?</h2><ol class="classement" data-bilan-revient></ol></div>
+      <div class="tdb-carte"><h2>Paieraient 12 € ?</h2><ol class="classement" data-bilan-paie></ol></div>
+    </div>
+    <div class="tdb-deux">
+      <div class="tdb-carte"><h2>Par salon</h2><div class="tdb-table"><table><thead><tr><th>Salon</th><th>Inscrits</th><th>Présents</th><th>Femmes</th><th>Hommes</th></tr></thead><tbody data-bilan-salons></tbody></table></div></div>
+      <div class="tdb-carte"><h2>D’où viennent les inscrits ?</h2><ol class="classement" data-bilan-sources></ol></div>
+    </div>
+    <div class="tdb-carte"><h2>Les tours</h2><div class="tdb-table"><table><thead><tr><th>Tour</th><th>Heure</th><th>Durée</th><th>Présents</th><th>Tête-à-tête</th><th>En attente</th></tr></thead><tbody data-bilan-tours></tbody></table></div></div>
+    <div class="tdb-carte"><h2>Les mots pour Lamia</h2><div data-bilan-mots></div></div>
   </section>
 
   <!-- ===================================================== Alertes -->

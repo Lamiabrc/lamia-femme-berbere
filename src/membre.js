@@ -223,7 +223,7 @@ async function freeRegister(e) {
     res = await fetch('/api/event-register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ event_id: salon.id, first_name: f.get('first_name'), email: f.get('email'), gender: f.get('gender'), birth_date: f.get('birth_date'), city: f.get('city'), search_zone: f.get('search_zone'), website: f.get('website'), rules_accepted: true }),
+      body: JSON.stringify({ event_id: salon.id, first_name: f.get('first_name'), email: f.get('email'), gender: f.get('gender'), birth_date: f.get('birth_date'), city: f.get('city'), search_zone: f.get('search_zone'), source: (() => { try { return sessionStorage.getItem('lfb-source') || ''; } catch { return ''; } })(), website: f.get('website'), rules_accepted: true }),
     });
     data = await res.json().catch(() => ({}));
   } catch { /* réseau */ }

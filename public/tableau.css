@@ -104,3 +104,4 @@
   .tdb tr { background: #fff; border: 1px solid var(--qvt-sable); border-radius: 14px; margin-bottom: 10px; padding: 6px 4px; }
   .tdb td { border: 0; padding: 4px 12px; }
 }
+.mot { margin: 0 0 10px; padding: 10px 14px; border-left: 3px solid #d9c19a; background: var(--qvt-creme); border-radius: 0 10px 10px 0; font-family: var(--serif); font-style: italic; }

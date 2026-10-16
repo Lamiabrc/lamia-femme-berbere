@@ -64,11 +64,23 @@
         <h2 style="margin-top:0">Les tête-à-tête</h2>
         <div class="row">
           <label>Durée d’un tour (minutes)<input id="minutes" type="number" min="2" max="15" value="6" style="width:120px"></label>
+          <label style="display:flex;gap:8px;align-items:center;font-weight:600"><input id="demasque" type="checkbox" style="width:20px;min-height:0;height:20px"> Démasquage à ce tour</label>
           <button class="btn btn-gold" id="btn-round" type="button">Lancer un tour</button>
           <button class="btn btn-out" id="btn-grand" type="button">Rappeler tout le monde au grand salon</button>
         </div>
         <p id="last" style="color:#b8a98f;font-size:14px"></p>
         <div class="tat" id="tat"></div>
+      </div>
+
+      <div class="box">
+        <h2 style="margin-top:0">Plan B : salle de secours</h2>
+        <p style="font-size:14px;color:#b8a98f">Si la salle du site a un souci, crée une réunion Google Meet ou Zoom, colle son lien ici et clique sur « Afficher » : un bandeau « Rejoindre la salle de secours » apparaît chez tous les participants, en quelques secondes. Pour prévenir aussi par email : copie la liste « Cci » dans Mes soirées et envoie le message ci-dessous.</p>
+        <div class="row">
+          <label style="flex:1;min-width:260px">Lien de secours (Meet ou Zoom)<input id="planb" type="url" placeholder="https://meet.google.com/..."></label>
+          <button class="btn btn-gold" id="btn-planb" type="button">Afficher aux participants</button>
+          <button class="btn btn-out" id="btn-planb-off" type="button">Retirer</button>
+        </div>
+        <textarea readonly rows="4" style="width:100%;margin-top:10px;border-radius:10px;padding:10px;font:14px var(--sans)">Bonsoir, la salle du Bal masqué rencontre un souci technique. Rejoins-nous tout de suite dans la salle de secours : [colle le lien ici]. Garde ton masque, on reprend dans quelques minutes ! Lamia</textarea>
       </div>
 
       <h2>Les salons</h2>
@@ -93,7 +105,7 @@ const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
 const when = (iso) => new Date(iso).toLocaleString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
 const PHASES = { accueil: 'Grand salon ouvert', tour: 'Tête-à-tête en cours', fin: 'Fin du bal : souhaits', ferme: 'Portes fermées' };
-const ERRORS = { forbidden: 'Ce compte n’a pas le rôle administratrice.', video_not_configured: 'La clé Daily manque dans Vercel.', bal_closed: 'Le bal est fermé.', temporary_failure: 'Erreur temporaire, réessaie.' };
+const ERRORS = { forbidden: 'Ce compte n’a pas le rôle administratrice.', video_not_configured: 'La clé Daily manque dans Vercel.', bal_closed: 'Le bal est fermé.', bad_planb: 'Le lien de secours doit être un lien Google Meet, Zoom ou Jitsi.', temporary_failure: 'Erreur temporaire, réessaie.' };
 
 async function bal(body) {
   const { data: { session } } = await supabase.auth.getSession();
@@ -118,6 +130,7 @@ function paint(d) {
   $('#bal').hidden = !open;
   if (!open) return;
   const s = d.state;
+  if (document.activeElement !== $('#planb')) $('#planb').value = s.planb || '';
   $('#phase').textContent = `${PHASES[s.phase] || ''}${s.round ? ` · tour ${s.round}` : ''}${s.ends_at && s.phase === 'tour' ? ` · fin à ${new Date(s.ends_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}` : ''}`;
   $('#presents').textContent = `${d.present} masque${d.present > 1 ? 's' : ''} au bal`;
   $('#salons').innerHTML = d.salons.map((x) => `<tr><td>${esc(x.label)}</td><td>${x.inscrits}</td><td>${x.presents}</td><td>${x.femmes}</td><td>${x.hommes}</td></tr>`).join('');
@@ -145,7 +158,9 @@ $('#login').addEventListener('submit', async (e) => {
 });
 const act = (body, confirmText) => async () => { if (confirmText && !confirm(confirmText)) return; try { paint(await bal(body())); } catch { /* */ } };
 $('#btn-open').addEventListener('click', act(() => ({ action: 'open', event_id: $('#soiree').value })));
-$('#btn-round').addEventListener('click', act(() => ({ action: 'round', minutes: Number($('#minutes').value) })));
+$('#btn-round').addEventListener('click', act(() => ({ action: 'round', minutes: Number($('#minutes').value), demasque: $('#demasque').checked })));
+$('#btn-planb').addEventListener('click', act(() => ({ action: 'planb', url: $('#planb').value.trim() })));
+$('#btn-planb-off').addEventListener('click', act(() => ({ action: 'planb', url: '' })));
 $('#btn-grand').addEventListener('click', act(() => ({ action: 'grand' })));
 $('#btn-fin').addEventListener('click', act(() => ({ action: 'fin' })));
 $('#btn-close').addEventListener('click', act(() => ({ action: 'close' }), 'Fermer les portes du bal ? Tout le monde sera déconnecté.'));
