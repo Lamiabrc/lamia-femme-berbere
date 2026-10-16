@@ -542,10 +542,10 @@ page(
     scripts: ['/assets/membre.js'],
     ogTitle: 'Le speed dating de Lamia Femme Berbère — première soirée offerte',
     ogDescription: 'Rencontres sérieuses en visio, par salons et par âge, animées par Lamia. Pour le lancement, le Bal masqué de Venise du 31 octobre est gratuit.',
-    ogImage: '/images/lamia/lamia-salon-1122.webp',
-    ogImageAlt: 'Lamia Femme Berbère vous accueille dans le Boudoir des Rencontres',
-    ogImageWidth: 1122,
-    ogImageHeight: 1402,
+    ogImage: '/images/lamia/lamia-venise-1672.webp',
+    ogImageAlt: 'Lamia Femme Berbère, masque vénitien à la main, sur le Grand Canal de Venise',
+    ogImageWidth: 1672,
+    ogImageHeight: 941,
     body: `<div class="bal">
 <section class="bal-hero bal-hero-rich">
   <span class="bal-paillettes" aria-hidden="true"></span>
@@ -757,7 +757,7 @@ page(
     path: '/speed-dating/bal/',
     room: roomBySlug['speed-dating'],
     noindex: true,
-    body: `<div class="bal bal-salle-page" style="--salle-decor:url('${esc(imgOr('salle-decor', '/images/lamia/lamia-salon-1122.webp'))}')">
+    body: `<div class="bal bal-salle-page" style="--salle-decor:url('${esc(imgOr('salle-decor', '/images/lamia/lamia-venise-1672.webp'))}')">
 <div class="appli-alerte" data-appli hidden role="alert">
   <p class="appli-titre">Ouvre cette page dans Safari ou Chrome</p>
   <p>Tu es dans le navigateur de <strong data-appli-nom>ton application</strong> : il bloque souvent la caméra et le micro.</p>
@@ -803,7 +803,7 @@ page(
     <p class="salle-temps" data-salle-temps aria-live="off"></p>
   </header>
   <div class="salle-scene">
-    <figure class="salle-autre"><div class="salle-accueil" data-salle-accueil><img src="${esc(imgOr('salle-accueil', '/images/marque/lamia-portrait-reel-480.webp'))}" alt="Lamia" width="240" height="300"><p>« ${esc(P.speedDating.salleAccueil)} »<span>Lamia</span></p></div><video data-video-autre playsinline autoplay></video><img class="salle-logo" src="/images/marque/lamia-logo-160.webp" alt="" width="64" height="64"><figcaption data-autre-nom>Lamia arrive…</figcaption><span class="salle-cadre" aria-hidden="true"></span></figure>
+    <figure class="salle-autre"><div class="salle-accueil" data-salle-accueil style="--accueil:url('${esc(imgOr('salle-accueil', '/images/lamia/lamia-venise-1672.webp'))}')" role="img" aria-label="Lamia vous accueille au Bal masqué de Venise"><p>« ${esc(P.speedDating.salleAccueil)} »<span>Lamia</span></p></div><video data-video-autre playsinline autoplay></video><img class="salle-logo" src="/images/marque/lamia-logo-160.webp" alt="" width="64" height="64"><figcaption data-autre-nom>Lamia arrive…</figcaption><span class="salle-cadre" aria-hidden="true"></span></figure>
     <figure class="salle-moi"><video data-video-moi playsinline autoplay muted></video><figcaption>Toi</figcaption></figure>
     <audio data-audio-autre autoplay></audio>
   </div>

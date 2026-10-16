@@ -34,8 +34,8 @@ export const EDITABLE = [
   ]),
   { key: 'images.hall-arch', group: 'Images', label: 'Image de l’arche du Hall', image: true, def: '/images/marque/lamia-logo-600.webp' },
   { key: 'images.hall-medal', group: 'Images', label: 'Médaillon rond du Hall', image: true, def: '/images/collier/collier-kabyle-15g-detail-320.webp' },
-  { key: 'images.salle-decor', group: 'Images', label: 'Décor de la salle vidéo du bal (fond derrière les vidéos)', image: true, def: '/images/lamia/lamia-salon-1122.webp' },
-  { key: 'images.salle-accueil', group: 'Images', label: 'Photo de Lamia dans la salle vidéo (avant son arrivée)', image: true, def: '/images/marque/lamia-portrait-reel-480.webp' },
+  { key: 'images.salle-decor', group: 'Images', label: 'Décor de la salle vidéo du bal (fond flouté derrière les vidéos)', image: true, def: '/images/lamia/lamia-venise-1672.webp' },
+  { key: 'images.salle-accueil', group: 'Images', label: 'Image d’accueil dans la salle vidéo, avant l’arrivée de Lamia (format paysage)', image: true, def: '/images/lamia/lamia-venise-1672.webp' },
   { key: 'images.lamia-portrait', group: 'Images', label: 'Portrait de la page « Qui est Lamia »', image: true, def: '/images/lamia/lamia-salon-900.webp' },
 ];
 
