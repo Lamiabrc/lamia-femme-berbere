@@ -432,6 +432,12 @@ page(
     path: '/salon/',
     room: roomBySlug.salon,
     body: `${roomHead(roomBySlug.salon)}
+<section class="videos-haut">
+  <div class="videos" data-youtube-videos hidden>
+    <h2>Mes dernières vidéos YouTube</h2>
+    <div class="video-cadre" data-youtube-cadre><button class="btn btn-gold" type="button" data-youtube-charger>▶ Afficher mes vidéos</button><p class="video-note">En affichant les vidéos, YouTube peut déposer ses propres cookies.</p></div>
+  </div>
+</section>
 <section class="room-body two-col">
   <div>
     <p class="prose-lead">${esc(P.salon.intro)}</p>
@@ -451,10 +457,6 @@ page(
   <h2 id="reseaux-titre">Mes réseaux</h2>
   <p class="reseaux-intro">Où me retrouver, me suivre et me poser vos questions.</p>
   <div class="reseaux-grille"><a class="reseau reseau-tiktok" data-social="tiktok" href="https://www.tiktok.com/@lamiaberbere" rel="noopener" target="_blank"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" fill="currentColor"><path d="M16.6 5.8a4.3 4.3 0 0 1-3.4-3.8h-3v12.4a2.6 2.6 0 1 1-2.6-2.6c.3 0 .5 0 .8.1V8.8a5.7 5.7 0 1 0 4.8 5.6V8.1a7.3 7.3 0 0 0 4.3 1.4v-3c-.3 0-.6-.1-.9-.7Z"/></svg><strong>TikTok</strong><span>Mes lives chaque soir, de 21 h à 23 h</span></a><a class="reseau reseau-facebook" data-social="facebook" href="https://www.facebook.com/femmeberberes/" rel="noopener" target="_blank"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" fill="currentColor"><path d="M13.5 22v-8h2.7l.4-3.2h-3.1V8.8c0-.9.3-1.5 1.6-1.5h1.7V4.5c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.1v2.3H7.7V14h2.7v8h3.1Z"/></svg><strong>Facebook</strong><span>La page Femme Berbère</span></a><a class="reseau reseau-instagram" data-social="instagram" hidden rel="noopener" target="_blank"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" fill="currentColor"><path d="M12 7.2a4.8 4.8 0 1 0 0 9.6 4.8 4.8 0 0 0 0-9.6Zm0 7.9a3.1 3.1 0 1 1 0-6.2 3.1 3.1 0 0 1 0 6.2Zm5-8.1a1.1 1.1 0 1 1-2.2 0 1.1 1.1 0 0 1 2.2 0ZM12 3.6c2.7 0 3 0 4.1.1 2.7.1 4 1.4 4.1 4.1.1 1.1.1 1.4.1 4.1s0 3-.1 4.1c-.1 2.7-1.4 4-4.1 4.1-1.1.1-1.4.1-4.1.1s-3 0-4.1-.1c-2.7-.1-4-1.4-4.1-4.1C3.7 15 3.6 14.7 3.6 12s0-3 .1-4.1C3.8 5.2 5.1 3.8 7.9 3.7 9 3.6 9.3 3.6 12 3.6Z"/></svg><strong>Instagram</strong><span>Photos, coulisses et bijoux</span></a><a class="reseau reseau-youtube" data-social="youtube" hidden rel="noopener" target="_blank"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" fill="currentColor"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4a2.5 2.5 0 0 0-1.8 1.8C2 8.8 2 12 2 12s0 3.2.4 4.8a2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8c.4-1.6.4-4.8.4-4.8s0-3.2-.4-4.8ZM10 15V9l5.2 3L10 15Z"/></svg><strong>YouTube</strong><span>Mes vidéos et mes lives en replay</span></a><a class="reseau reseau-snapchat" data-social="snapchat" hidden rel="noopener" target="_blank"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" fill="currentColor"><path d="M12 3c2.9 0 4.9 2.1 4.9 5v2.1l1.3-.4c.6-.1 1 .6.5 1l-1.6 1c.6 1.9 2 3.2 3.6 3.6.4.1.4.6 0 .8-.7.3-1.5.5-2.2.6-.1.4-.2.9-.4 1.2-1.1-.2-2.2 0-3.1.7-.9.6-2 .9-3 .9s-2.1-.3-3-.9c-.9-.7-2-.9-3.1-.7-.2-.3-.3-.8-.4-1.2-.7-.1-1.5-.3-2.2-.6-.4-.2-.4-.7 0-.8 1.6-.4 3-1.7 3.6-3.6l-1.6-1c-.5-.4-.1-1.1.5-1l1.3.4V8c0-2.9 2-5 4.9-5Z"/></svg><strong>Snapchat</strong><span>Le quotidien, au plus près</span></a><a class="reseau reseau-whatsapp" data-social="whatsapp" hidden rel="noopener" target="_blank"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" fill="currentColor"><path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.6-1.2A9 9 0 1 0 12 3Zm4.9 12.6c-.2.6-1.2 1.2-1.7 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.6-.4.8-.4h.6c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .6l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.7-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.3Z"/></svg><strong>WhatsApp</strong><span>La chaîne des nouvelles de la Maison</span></a></div>
-  <div class="videos" data-youtube-videos hidden>
-    <h2>Mes dernières vidéos YouTube</h2>
-    <div class="video-cadre" data-youtube-cadre><button class="btn btn-gold" type="button" data-youtube-charger>▶ Afficher mes vidéos</button><p class="video-note">En affichant les vidéos, YouTube peut déposer ses propres cookies.</p></div>
-  </div>
   <div class="videos" data-tiktok-videos>
     <h2>Mes vidéos TikTok</h2>
     <div class="video-cadre is-tiktok" data-tiktok-cadre><button class="btn btn-gold" type="button" data-tiktok-charger>▶ Afficher mes vidéos TikTok</button><p class="video-note">En affichant les vidéos, TikTok peut déposer ses propres cookies.</p></div>

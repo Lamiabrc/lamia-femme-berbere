@@ -2477,3 +2477,7 @@ body[data-ambiance="bibliotheque"] .head-illu img { filter: drop-shadow(0 22px 3
 body[data-room="hall"] .hall-hero::before, body[data-room="hall"] .hall-hero::after { display: none !important; }
 body[data-ambiance="bibliotheque"] .frise-fine { height: 22px !important; }
 body[data-ambiance="grenier"] .room-head::before { display: none; }
+.videos-haut { padding: 8px var(--marge-centre) 0; }
+.videos-haut .videos { margin-top: 0; }
+.videos-haut .video-cadre { min-height: 0; padding: 18px; }
+body[data-ambiance="salon"] .videos-haut h2 { color: #fff4e0; }

@@ -353,6 +353,8 @@ async function renderSocials() {
       yt.querySelector('[data-youtube-charger]').addEventListener('click', () => {
         yt.querySelector('[data-youtube-cadre]').innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/videoseries?list=UU${links.youtube_chaine.slice(2)}" title="Les dernières vidéos de Lamia sur YouTube" loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
       }, { once: true });
+      // Si le visiteur a déjà accepté les cookies, les vidéos s'affichent directement.
+      try { if (localStorage.getItem('lfb-cookies') === 'oui') yt.querySelector('[data-youtube-charger]').click(); } catch { /* */ }
     }
     const tt = document.querySelector('[data-tiktok-videos]');
     const tiktok = links.tiktok || 'https://www.tiktok.com/@lamiaberbere';
