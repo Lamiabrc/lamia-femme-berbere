@@ -29,6 +29,7 @@ const PAGE_FIELDS = {
 export const EDITABLE = [
   ...rooms.flatMap((r) => [
     ...(PAGE_FIELDS[r.slug] || []).map(([key, label, long]) => ({ key, group: r.name, label, long: Boolean(long) })),
+    ...(r.headline ? [{ key: `rooms.${r.slug}.headline`, group: r.name, label: 'Grand titre de la page' }] : []),
     { key: `rooms.${r.slug}.welcome`, group: r.name, label: 'Phrase d’accueil (titre de la pièce)' },
     { key: `rooms.${r.slug}.summary`, group: r.name, label: 'Présentation courte (cartes et plan)', long: true },
   ]),

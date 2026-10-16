@@ -33,7 +33,24 @@ async function loadOverrides() {
     return (await r.json())[0]?.value?.values || {};
   } catch { return {}; }
 }
-IMG = applyOverrides(await loadOverrides());
+const OVR = await loadOverrides();
+IMG = applyOverrides(OVR);
+// Tout texte ou image marqué avec T() / IMGT() devient modifiable depuis le tableau de bord (clés « site.* »).
+const REGISTRE = [];
+const vu = new Set();
+const enreg = (f) => { if (!vu.has(f.key)) { vu.add(f.key); REGISTRE.push(f); DEFAULTS[f.key] = f.def; } };
+const T = (key, group, label, def, long = false) => {
+  enreg({ key: `site.${key}`, group, label, long, def });
+  const v = OVR[`site.${key}`];
+  return typeof v === 'string' && v.trim() ? v.trim().slice(0, 4000) : def;
+};
+const IMGT = (key, group, label, tag) => {
+  const def = tag.match(/ src="([^"]+)"/)[1];
+  enreg({ key: `site.${key}`, group, label, image: true, def });
+  const v = OVR[`site.${key}`];
+  if (typeof v !== 'string' || !/^(https:\/\/|\/images\/)/.test(v)) return tag;
+  return tag.replace(/ srcset="[^"]*"/, '').replace(/ sizes="[^"]*"/, '').replace(` src="${def}"`, ` src="${v.replace(/"/g, '&quot;')}"`);
+};
 // Réglages de la boutique (frais d'envoi, TVA) pour les conditions de vente.
 async function loadBoutique() {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY;
@@ -221,10 +238,11 @@ const HEAD_IMAGES = {
 };
 function roomHead(room, extra = '') {
   const im = HEAD_IMAGES[room.slug];
+  const imgTete = im && IMGT(`image.tete.${room.slug}`, room.name, 'Image en haut de la pièce', `<img src="${im[0]}" alt="${esc(im[1])}"${!im[2] && ['salon', 'speed-dating'].includes(room.slug) ? ' class="is-lamia-photo"' : ''}>`);
   const arch = im?.[2]
-    ? `<figure class="head-illu"><img src="${im[0]}" alt="${esc(im[1])}"></figure>`
+    ? `<figure class="head-illu">${imgTete}</figure>`
     : im
-    ? `<figure class="head-arch has-image"><img src="${im[0]}" alt="${esc(im[1])}"${['salon', 'speed-dating'].includes(room.slug) ? ' class="is-lamia-photo"' : ''}></figure>`
+    ? `<figure class="head-arch has-image">${imgTete}</figure>`
     : '<span class="head-arch" aria-hidden="true"></span>';
   return `<section class="room-head${im ? ' with-image' : ''}${im?.[2] ? ' with-illu' : ''}">${arch}
   <p class="room-name"><span class="pip" aria-hidden="true"></span>${esc(room.name)}</p>
@@ -264,14 +282,14 @@ page(
     body: `<section class="entree" data-entree aria-label="Entrer dans la Maison">
   <div class="entree-scene">
     <div class="entree-cam" data-entree-cam>
-      <img class="entree-img" src="/images/maison/maison-kabyle-1376.webp" srcset="/images/maison/maison-kabyle-800.webp 800w, /images/maison/maison-kabyle-1200.webp 1200w, /images/maison/maison-kabyle-1376.webp 1376w" sizes="(max-width: 700px) 200vw, 100vw" width="1376" height="768" alt="La Maison de Lamia en Kabylie, sa porte ouverte et lumineuse" fetchpriority="high" decoding="async">
+      ${IMGT('image.hall.entree', 'Le Hall', 'Image de la maison (entrée du site)', `<img class="entree-img" src="/images/maison/maison-kabyle-1376.webp" srcset="/images/maison/maison-kabyle-800.webp 800w, /images/maison/maison-kabyle-1200.webp 1200w, /images/maison/maison-kabyle-1376.webp 1376w" sizes="(max-width: 700px) 200vw, 100vw" width="1376" height="768" alt="La Maison de Lamia en Kabylie, sa porte ouverte et lumineuse" fetchpriority="high" decoding="async">`)}
     </div>
     <span class="entree-stars" aria-hidden="true"></span>
     <span class="entree-glow" aria-hidden="true"></span>
     <div class="entree-text">
       <p class="entree-kicker">La Maison franco-kabyle</p>
-      <h1 class="entree-title">Lamia Femme Berbère<span class="entree-title-sous">Speed Dating & Rencontres Célibataires Kabyles</span></h1>
-      <p class="entree-subtitle">Trouvez l’amour et le mariage sérieux grâce à l’alliance de la tradition berbère et de la modernité.</p>
+      <h1 class="entree-title">Lamia Femme Berbère<span class="entree-title-sous">${esc(T('hall.titre-sous', 'Le Hall', 'Sous-titre du grand titre', 'Speed Dating & Rencontres Célibataires Kabyles'))}</span></h1>
+      <p class="entree-subtitle">${esc(T('hall.phrase', 'Le Hall', 'Phrase sous le grand titre', 'Trouvez l’amour et le mariage sérieux grâce à l’alliance de la tradition berbère et de la modernité.', true))}</p>
       <p class="entree-hint">Faites défiler pour pousser la porte</p>
       <svg width="22" height="34" viewBox="0 0 22 34" aria-hidden="true"><path d="M2 4l9 9 9-9M2 17l9 9 9-9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
@@ -291,8 +309,7 @@ page(
     <span class="arch-shadow" aria-hidden="true"></span>
     <figure class="hall-arch hall-arch-lamia">
       <picture>
-        <source media="(max-width: 560px)" srcset="/images/lamia/lamia-portrait-pro-320.webp">
-        <img src="/images/lamia/lamia-portrait-pro-480.webp" width="480" height="600" loading="eager" alt="Lamia Femme Berbère, portrait réel">
+        ${IMGT('image.hall.portrait', 'Le Hall', 'Portrait de Lamia dans l’arche', `<img src="/images/lamia/lamia-portrait-pro-480.webp" width="480" height="600" loading="eager" alt="Lamia Femme Berbère, portrait réel">`)}
       </picture>
       <figcaption><strong>Lamia</strong><span>Je vous ouvre la porte de ma Maison.</span></figcaption>
     </figure>
@@ -310,19 +327,19 @@ page(
       <span class="apercu-cta">Réserver ma place →</span>
     </a>
     <a class="apercu" href="/produit/?p=collier-kabyle-argente-emaille-15g">
-      <img src="/images/collier/collier-kabyle-15g-hero-320.webp" width="320" height="400" alt="" loading="lazy">
+      ${IMGT('image.hall.apercu-collier', 'Le Hall', 'Aperçu : collier', `<img src="/images/collier/collier-kabyle-15g-hero-320.webp" width="320" height="400" alt="" loading="lazy">`)}
       <span class="apercu-kicker">L’Écrin · précommande</span>
       <strong>Collier kabyle émaillé</strong>
       <span class="apercu-info">Modèle de 1974, fabriqué à Ath Yenni<span data-prix="collier-kabyle-argente-emaille-15g"></span></span>
     </a>
     <a class="apercu" href="/bibliotheque/">
-      <img src="/images/marque/lamia-illu-banquette-560.webp" width="560" height="678" alt="" loading="lazy">
+      ${IMGT('image.hall.apercu-werdi', 'Le Hall', 'Aperçu : livre Werdi', `<img src="/images/marque/lamia-illu-banquette-560.webp" width="560" height="678" alt="" loading="lazy">`)}
       <span class="apercu-kicker">La Bibliothèque · précommande</span>
       <strong>Werdi, ouvre les yeux !</strong>
       <span class="apercu-info" data-prix-werdi>Livre broché et ebook</span>
     </a>
     <a class="apercu" href="https://www.tiktok.com/@lamiaberbere" rel="noopener" target="_blank">
-      <img src="/images/lamia/lamia-portrait-pro-320.webp" width="320" height="400" alt="Lamia Femme Berbère" loading="lazy" class="is-lamia">
+      ${IMGT('image.hall.apercu-live', 'Le Hall', 'Aperçu : live TikTok', `<img src="/images/lamia/lamia-portrait-pro-320.webp" width="320" height="400" alt="Lamia Femme Berbère" loading="lazy" class="is-lamia">`)}
       <span class="apercu-kicker">Le Salon · chaque soir</span>
       <strong>Live Mariage Kabyle</strong>
       <span class="apercu-info">De 21 h à 23 h, en direct sur TikTok</span>
@@ -342,13 +359,13 @@ page(
 
 <section class="home-speed" aria-labelledby="home-speed-title">
   <a class="home-speed-visual home-speed-poster" href="/speed-dating/#events-title" aria-label="Le speed dating de Lamia Femme Berbère : réserver une place">
-    <img src="/images/lamia/affiche-boudoir-venise-1149.webp" srcset="/images/lamia/affiche-boudoir-venise-560.webp 560w, /images/lamia/affiche-boudoir-venise-1149.webp 1149w" sizes="(max-width: 820px) 86vw, 430px" width="1149" height="1368" alt="Affiche : le Boudoir des Rencontres, spécial Bal masqué de Venise, speed dating sérieux en ligne avec Lamia" loading="lazy">
+    ${IMGT('image.hall.affiche-rencontres', 'Le Hall', 'Affiche du speed dating (partie rencontres)', `<img src="/images/lamia/affiche-boudoir-venise-1149.webp" srcset="/images/lamia/affiche-boudoir-venise-560.webp 560w, /images/lamia/affiche-boudoir-venise-1149.webp 1149w" sizes="(max-width: 820px) 86vw, 430px" width="1149" height="1368" alt="Affiche : le Boudoir des Rencontres, spécial Bal masqué de Venise, speed dating sérieux en ligne avec Lamia" loading="lazy">`)}
   </a>
   <div class="home-speed-copy">
     <p class="home-speed-kicker">Le Boudoir des Rencontres · speed dating kabyle</p>
-    <h2 id="home-speed-title">Trouvez l’amour et le mariage sérieux</h2>
-    <p class="home-speed-lead">Bienvenue sur Lamia Femme Berbère, un espace dédié aux rencontres sérieuses au sein de la communauté kabyle et maghrébine. Marre des discussions virtuelles sans lendemain sur les applications de rencontre classiques ? Ici, l’humain et l’authenticité reviennent au cœur de la rencontre.</p>
-    <p class="home-speed-note">À travers nos soirées de speed dating kabyle en visio et nos lives, nous offrons aux célibataires un espace bienveillant, sécurisé et chaleureux pour faire des rencontres authentiques. Notre objectif : vous accompagner pas à pas vers un mariage sérieux et durable, dans le respect des valeurs culturelles et familiales berbères.</p>
+    <h2 id="home-speed-title">${esc(T('hall.rencontres-titre', 'Le Hall', 'Partie rencontres : titre', 'Trouvez l’amour et le mariage sérieux'))}</h2>
+    <p class="home-speed-lead">${esc(T('hall.rencontres-texte', 'Le Hall', 'Partie rencontres : premier paragraphe', 'Bienvenue sur Lamia Femme Berbère, un espace dédié aux rencontres sérieuses au sein de la communauté kabyle et maghrébine. Marre des discussions virtuelles sans lendemain sur les applications de rencontre classiques ? Ici, l’humain et l’authenticité reviennent au cœur de la rencontre.', true))}</p>
+    <p class="home-speed-note">${esc(T('hall.rencontres-texte2', 'Le Hall', 'Partie rencontres : deuxième paragraphe', 'À travers nos soirées de speed dating kabyle en visio et nos lives, nous offrons aux célibataires un espace bienveillant, sécurisé et chaleureux pour faire des rencontres authentiques. Notre objectif : vous accompagner pas à pas vers un mariage sérieux et durable, dans le respect des valeurs culturelles et familiales berbères.', true))}</p>
     <h3 class="home-speed-pourquoi">Pourquoi choisir nos soirées ?</h3>
     <ul class="home-speed-raisons">
       <li><strong>Une connexion authentique</strong> : pas de profils fantômes, on échange en direct et en tête-à-tête, caméra allumée.</li>
@@ -396,7 +413,7 @@ page(
 </section>
 
 <section class="story story-lamia" aria-labelledby="story-title">
-  <figure class="story-lamia-portrait"><img src="/images/lamia/lamia-portrait-pro-480.webp" width="480" height="600" loading="lazy" alt="Lamia Femme Berbère"></figure>
+  <figure class="story-lamia-portrait">${IMGT('image.hall.histoire', 'Le Hall', 'Portrait à côté de mon histoire', `<img src="/images/lamia/lamia-portrait-pro-480.webp" width="480" height="600" loading="lazy" alt="Lamia Femme Berbère">`)}</figure>
   <div>
     <h2 id="story-title">${esc(P.hall.story.title)}</h2>
     ${P.hall.story.paragraphs.map((p) => `<p>${esc(p)}</p>`).join('')}
@@ -429,7 +446,7 @@ page(
     ${list(P.salon.rules)}
   </aside>
 </section>
-<figure class="banniere-salon"><img src="/images/lamia/banniere-lamia-berbere-1672.webp" srcset="/images/lamia/banniere-lamia-berbere-900.webp 900w, /images/lamia/banniere-lamia-berbere-1672.webp 1672w" sizes="(max-width: 1300px) 100vw, 1240px" width="1672" height="941" loading="lazy" alt="Lamia Berbère : humour, société, politique, contradictions du quotidien. Un regard berbère, kabyle, algérien, français et maghrébin."></figure>
+<figure class="banniere-salon">${IMGT('image.salon.banniere', 'Le Salon de Lamia', 'Grande bannière', `<img src="/images/lamia/banniere-lamia-berbere-1672.webp" srcset="/images/lamia/banniere-lamia-berbere-900.webp 900w, /images/lamia/banniere-lamia-berbere-1672.webp 1672w" sizes="(max-width: 1300px) 100vw, 1240px" width="1672" height="941" loading="lazy" alt="Lamia Berbère : humour, société, politique, contradictions du quotidien. Un regard berbère, kabyle, algérien, français et maghrébin.">`)}</figure>
 <section class="reseaux" aria-labelledby="reseaux-titre">
   <h2 id="reseaux-titre">Mes réseaux</h2>
   <p class="reseaux-intro">Où me retrouver, me suivre et me poser vos questions.</p>
@@ -492,13 +509,13 @@ page(
 <section class="ecrin-portes" aria-labelledby="portes-titre">
   <h2 id="portes-titre">Le collier, porté</h2>
   <div class="ecrin-portes-grille">
-    <img src="/images/collier/collier-mannequin-noir-640.webp" width="640" height="800" loading="lazy" alt="Le collier kabyle émaillé porté sur une robe noire">
-    <img src="/images/collier/collier-mannequin-robe-kabyle-640.webp" width="640" height="800" loading="lazy" alt="Le collier porté avec une robe kabyle blanche brodée de rouge">
-    <img src="/images/collier/collier-mannequin-lanterne-640.webp" width="640" height="800" loading="lazy" alt="Le collier porté à la lumière des lanternes">
-    <img src="/images/collier/collier-mannequin-cou-640.webp" width="640" height="800" loading="lazy" alt="Le médaillon central, son corail et ses trois pampilles">
+    ${IMGT('image.ecrin.porte-1', 'L’Écrin', 'Collier porté, photo 1', `<img src="/images/collier/collier-mannequin-noir-640.webp" width="640" height="800" loading="lazy" alt="Le collier kabyle émaillé porté sur une robe noire">`)}
+    ${IMGT('image.ecrin.porte-2', 'L’Écrin', 'Collier porté, photo 2', `<img src="/images/collier/collier-mannequin-robe-kabyle-640.webp" width="640" height="800" loading="lazy" alt="Le collier porté avec une robe kabyle blanche brodée de rouge">`)}
+    ${IMGT('image.ecrin.porte-3', 'L’Écrin', 'Collier porté, photo 3', `<img src="/images/collier/collier-mannequin-lanterne-640.webp" width="640" height="800" loading="lazy" alt="Le collier porté à la lumière des lanternes">`)}
+    ${IMGT('image.ecrin.porte-4', 'L’Écrin', 'Collier porté, photo 4', `<img src="/images/collier/collier-mannequin-cou-640.webp" width="640" height="800" loading="lazy" alt="Le médaillon central, son corail et ses trois pampilles">`)}
   </div>
-  <figure class="ecrin-planche"><img src="/images/collier/collier-planche-presentation-1536.webp" srcset="/images/collier/collier-planche-presentation-900.webp 900w, /images/collier/collier-planche-presentation-1536.webp 1536w" sizes="(max-width: 1300px) 100vw, 1240px" width="1536" height="1024" loading="lazy" alt="Collier kabyle artisanal : argent véritable 15 g, émaillage traditionnel, fait main, livraison en France, emballage soigné"></figure>
-  <figure class="ecrin-planche"><img src="/images/collier/collier-planche-details-1536.webp" srcset="/images/collier/collier-planche-details-900.webp 900w, /images/collier/collier-planche-details-1536.webp 1536w" sizes="(max-width: 1300px) 100vw, 1240px" width="1536" height="1024" loading="lazy" alt="Les détails du collier : médaillons émaillés, corail, pampilles, fermoir, écrin cadeau"></figure>
+  <figure class="ecrin-planche">${IMGT('image.ecrin.planche-1', 'L’Écrin', 'Planche de présentation 1', `<img src="/images/collier/collier-planche-presentation-1536.webp" srcset="/images/collier/collier-planche-presentation-900.webp 900w, /images/collier/collier-planche-presentation-1536.webp 1536w" sizes="(max-width: 1300px) 100vw, 1240px" width="1536" height="1024" loading="lazy" alt="Collier kabyle artisanal : argent véritable 15 g, émaillage traditionnel, fait main, livraison en France, emballage soigné">`)}</figure>
+  <figure class="ecrin-planche">${IMGT('image.ecrin.planche-2', 'L’Écrin', 'Planche de présentation 2', `<img src="/images/collier/collier-planche-details-1536.webp" srcset="/images/collier/collier-planche-details-900.webp 900w, /images/collier/collier-planche-details-1536.webp 1536w" sizes="(max-width: 1300px) 100vw, 1240px" width="1536" height="1024" loading="lazy" alt="Les détails du collier : médaillons émaillés, corail, pampilles, fermoir, écrin cadeau">`)}</figure>
 </section>
 <section class="room-body two-col">
   <div><h2>${esc(P.ecrin.athYenni.title)}</h2><p>${esc(P.ecrin.athYenni.text)}</p></div>
@@ -574,11 +591,11 @@ page(
   <span class="boudoir-curtain boudoir-curtain-left hero-rideau" aria-hidden="true"></span>
   <span class="boudoir-curtain boudoir-curtain-right hero-rideau" aria-hidden="true"></span>
   <figure class="bal-hero-poster">
-    <img src="/images/lamia/boudoir-speed-dating-1024.webp" srcset="/images/lamia/boudoir-speed-dating-600.webp 600w, /images/lamia/boudoir-speed-dating-1024.webp 1024w" sizes="(max-width: 900px) 92vw, 480px" width="1024" height="1024" alt="Le Boudoir des Rencontres : salon de velours bordeaux et logo Lamia Femme Berbère, LF Virtual Speed Dating" loading="eager">
+    ${IMGT('image.speed.affiche', 'Le Boudoir des Rencontres', 'Image en haut de la page Speed dating', `<img src="/images/lamia/boudoir-speed-dating-1024.webp" srcset="/images/lamia/boudoir-speed-dating-600.webp 600w, /images/lamia/boudoir-speed-dating-1024.webp 1024w" sizes="(max-width: 900px) 92vw, 480px" width="1024" height="1024" alt="Le Boudoir des Rencontres : salon de velours bordeaux et logo Lamia Femme Berbère, LF Virtual Speed Dating" loading="eager">`)}
   </figure>
   <div class="bal-hero-copy">
     <p class="bal-kicker">Speed dating en ligne · animé par Lamia</p>
-    <h1>Le Boudoir <span>des Rencontres</span></h1>
+    <h1>${esc(T('speed.titre', 'Le Boudoir des Rencontres', 'Titre en haut (ligne 1)', 'Le Boudoir'))} <span>${esc(T('speed.titre2', 'Le Boudoir des Rencontres', 'Titre en haut (ligne 2)', 'des Rencontres'))}</span></h1>
     <p class="bal-welcome">${esc(roomBySlug['speed-dating'].welcome)}</p>
     <p class="bal-lead">${esc(P.speedDating.intro)}</p>
     <div class="bal-facts" aria-label="En bref">
@@ -590,11 +607,11 @@ page(
 
 <section class="lancement" aria-labelledby="lancement-title">
   <figure class="lancement-image">
-    <img src="/images/lamia/lamia-venise-1672.webp" srcset="/images/lamia/lamia-venise-900.webp 900w, /images/lamia/lamia-venise-1672.webp 1672w" sizes="(max-width: 860px) 100vw, 560px" width="1672" height="941" alt="Lamia, masque vénitien à la main, sur le Grand Canal de Venise à la tombée de la nuit" loading="lazy">
+    ${IMGT('image.speed.lancement', 'Le Boudoir des Rencontres', 'Image de la soirée de lancement', `<img src="/images/lamia/lamia-venise-1672.webp" srcset="/images/lamia/lamia-venise-900.webp 900w, /images/lamia/lamia-venise-1672.webp 1672w" sizes="(max-width: 860px) 100vw, 560px" width="1672" height="941" alt="Lamia, masque vénitien à la main, sur le Grand Canal de Venise à la tombée de la nuit" loading="lazy">`)}
   </figure>
   <div class="lancement-texte">
     <p class="bal-kicker">Soirée de lancement · offerte</p>
-    <h2 id="lancement-title">La première soirée est gratuite : le Bal masqué de Venise</h2>
+    <h2 id="lancement-title">${esc(T('speed.lancement-titre', 'Le Boudoir des Rencontres', 'Soirée de lancement : titre', 'La première soirée est gratuite : le Bal masqué de Venise'))}</h2>
     <p>Pour lancer le Boudoir, Lamia vous offre la première soirée, le <strong>samedi 31 octobre à 21 h</strong>, en visio, sur le thème du Carnaval de Venise. Venez masqué·e, le mystère fait partie du jeu. Les soirées suivantes seront payantes.</p>
     <p><a class="btn btn-gold" href="#events-title">Réserver ma place offerte</a></p>
   </div>
@@ -1215,7 +1232,7 @@ page(
     room: roomBySlug.galerie,
     body: `${roomHead(roomBySlug.galerie)}
 <section class="gallery-feature">
-  <figure><img src="/images/collier/collier-kabyle-15g-detail-1120.webp" width="1120" height="1399" loading="lazy" alt="Détail d’un médaillon kabyle émaillé bleu, vert et jaune, cabochon de corail au centre"><figcaption>Visuel d’ambiance</figcaption></figure>
+  <figure>${IMGT('image.galerie.oeuvre', 'La Galerie', 'Image dans le cadre doré', `<img src="/images/collier/collier-kabyle-15g-detail-1120.webp" width="1120" height="1399" loading="lazy" alt="Détail d’un médaillon kabyle émaillé bleu, vert et jaune, cabochon de corail au centre">`)}<figcaption>Visuel d’ambiance</figcaption></figure>
   <div>
     <p class="prose-lead">${esc(P.galerie.intro)}</p>
     ${P.galerie.items.map((i) => `<h2>${esc(i.title)}</h2><p>${esc(i.text)}</p>`).join('')}
@@ -1452,7 +1469,7 @@ for (const p of pages) {
 await cp(join(ROOT, 'public'), DIST, { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
-await writeFile(join(DIST, 'assets', 'editable.json'), JSON.stringify({ fields: EDITABLE, defaults: DEFAULTS }));
+await writeFile(join(DIST, 'assets', 'editable.json'), JSON.stringify({ fields: [...EDITABLE, ...REGISTRE], defaults: DEFAULTS }));
 for (const f of ['maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
 await cp(join(ROOT, 'content', 'shipping.mjs'), join(DIST, 'assets', 'shipping.mjs'));
 

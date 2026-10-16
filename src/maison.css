@@ -2450,3 +2450,24 @@ body[data-ambiance="ecrin"] .ecrin-portes h2 { color: #fff; }
 body[data-ambiance="bibliotheque"] .book-feature .book-illu img { box-shadow: none; }
 body[data-ambiance="bibliotheque"] .head-illu img { filter: drop-shadow(0 22px 30px rgba(0,0,0,.6)); }
 .home-speed-poster { aspect-ratio: 1149 / 1368; border-radius: 18px; }
+
+/* ================================================================ Mise en page : contenu centré et resserré sur grand écran */
+:root { --largeur: 1180px; --marge-centre: max(var(--gouttiere), calc((100% - var(--largeur)) / 2)); }
+.room-head, .room-body, .room-shelf, .next-rooms, .book-feature, .gallery-feature, .reseaux, .ecrin-portes, .now-section, .events, .story, .home-universes, .plan-section, .home-speed, .hall-hero, .site-footer, .site-header {
+  padding-left: var(--marge-centre) !important; padding-right: var(--marge-centre) !important; }
+.room-head { padding-top: clamp(48px, 6vw, 88px) !important; }
+.room-head h1 { font-size: clamp(36px, 4.2vw, 60px) !important; line-height: 1.08; max-width: 18ch; }
+.room-head .lead { font-size: clamp(17px, 1.3vw, 20px); }
+.head-arch { right: var(--marge-centre) !important; width: clamp(180px, 20vw, 280px) !important; }
+.head-illu, .room-head > .head-illu { right: var(--marge-centre) !important; }
+.room-head.with-image, .room-head.with-illu { min-height: clamp(360px, 32vw, 460px) !important; }
+.prose-lead { font-size: clamp(21px, 1.9vw, 26px); }
+.two-col { gap: clamp(28px, 5vw, 64px); }
+.ecrin-portes, .reseaux { max-width: none; }
+.banniere-salon { max-width: calc(var(--largeur) + 2 * var(--gouttiere)); }
+.lancement { max-width: var(--largeur); }
+.bal-deroule, .bal-code, .bal-note, .bal .member-panel { max-width: var(--largeur) !important; }
+.bal-hero-rich { padding-inline: var(--marge-centre) !important; }
+@media (max-width: 760px) { .head-arch { right: auto !important; } }
+.room-body > .prose-lead, .room-body .prose-lead { max-width: 62ch; }
+.room-head .lead { max-width: 52ch; }
