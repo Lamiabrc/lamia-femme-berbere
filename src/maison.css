@@ -1919,3 +1919,12 @@ body { background: var(--qvt-ivoire); }
 /* Les visuels finaux sont complets : plus de masque ni de trame ajoutés par-dessus. */
 .bal-hero-poster::before, .home-speed-poster::before, .venise-card-visual::before,
 .bal-hero-poster::after, .home-speed-poster::after { content: none; }
+
+/* Page Speed dating : hero équilibré (image et texte de même poids) */
+.bal-hero-rich { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; padding-block: clamp(36px, 5vw, 64px); }
+.bal-hero-rich .bal-hero-poster { width: 100%; max-width: 540px; justify-self: end; transform: none; }
+.bal-hero-rich h1 { font-size: clamp(38px, 4.4vw, 66px); line-height: 1.02; max-width: none; }
+.bal-hero-rich h1 span { white-space: nowrap; }
+.bal-hero-rich h1 span { display: block; }
+.bal-hero-rich .bal-hero-copy { max-width: 560px; }
+@media (max-width: 900px) { .bal-hero-rich { grid-template-columns: 1fr; } .bal-hero-rich .bal-hero-poster { justify-self: center; max-width: min(460px, 92vw); } .bal-hero-rich h1 { margin-inline: auto; } .bal-hero-rich .bal-hero-copy { margin-inline: auto; } }

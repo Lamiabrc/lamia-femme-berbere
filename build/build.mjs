@@ -554,7 +554,7 @@ page(
   </figure>
   <div class="bal-hero-copy">
     <p class="bal-kicker">Speed dating en ligne · animé par Lamia</p>
-    <h1>Le Boudoir<br><span>des Rencontres</span></h1>
+    <h1>Le Boudoir <span>des Rencontres</span></h1>
     <p class="bal-welcome">${esc(roomBySlug['speed-dating'].welcome)}</p>
     <p class="bal-lead">${esc(P.speedDating.intro)}</p>
     <div class="bal-facts" aria-label="En bref">
