@@ -672,8 +672,7 @@ page(
     noindex: true,
     scripts: ['/assets/espace.js'],
     body: `<section class="espace">
-  <img class="espace-illu" src="/images/marque/lamia-illu-ecrit-480.webp" width="480" height="601" alt="" aria-hidden="true">
-  <p class="room-name"><span class="pip" aria-hidden="true"></span>Mon espace · ma chambre dans la Maison</p>
+  <p class="room-name"><span class="pip" aria-hidden="true"></span>Mon espace</p>
 
   <div data-espace-out hidden>
     <h1>Se connecter</h1>
