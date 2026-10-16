@@ -2481,3 +2481,28 @@ body[data-ambiance="grenier"] .room-head::before { display: none; }
 .videos-haut .videos { margin-top: 0; }
 .videos-haut .video-cadre { min-height: 0; padding: 18px; }
 body[data-ambiance="salon"] .videos-haut h2 { color: #fff4e0; }
+
+/* Menu « La Maison » qui se déplie avec toutes les pièces */
+.maison-menu { position: relative; }
+.maison-menu summary { list-style: none; cursor: pointer; font-weight: 600; font-size: 15px; padding: 8px 14px; border-radius: 999px; border: 1px solid transparent; white-space: nowrap; }
+.maison-menu summary::-webkit-details-marker { display: none; }
+.maison-menu summary span { display: inline-block; font-size: 11px; transition: transform .2s; }
+.maison-menu[open] summary { border-color: var(--qvt-sable, #e8dcc8); background: #fff; }
+.maison-menu[open] summary span { transform: rotate(180deg); }
+.maison-menu-panneau { position: absolute; right: 0; top: calc(100% + 10px); z-index: 60; width: min(720px, 92vw); display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px 28px; padding: 22px 24px; background: #fffdf8; border: 1px solid var(--qvt-sable, #e8dcc8); border-radius: 18px; box-shadow: 0 30px 60px -30px rgba(40,25,10,.5); }
+.maison-menu-etage p { margin: 0 0 6px; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--rouge); font-weight: 700; }
+.maison-menu-etage ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.maison-menu-etage a { display: flex; justify-content: space-between; gap: 8px; padding: 7px 10px; border-radius: 10px; text-decoration: none; color: var(--encre); }
+.maison-menu-etage a:hover, .maison-menu-etage a[aria-current="page"] { background: var(--qvt-creme, #faf6ee); color: var(--rouge); }
+.maison-menu-etage strong { font-family: var(--serif); font-size: 18px; font-weight: 600; }
+.maison-menu-etage em { font-style: normal; font-size: 12px; color: var(--gris); align-self: center; }
+.maison-menu-etage .is-soon a { opacity: .6; }
+@media (max-width: 640px) {
+  .maison-menu-panneau { position: fixed; left: 12px; right: 12px; top: 70px; width: auto; grid-template-columns: 1fr; max-height: calc(100vh - 90px); overflow-y: auto; }
+  .maison-menu summary { padding: 6px 10px; font-size: 14px; }
+}
+.site-nav a, .brand span, .header-actions a { white-space: nowrap; }
+.site-nav { gap: 18px; }
+@media (max-width: 1280px) { .site-nav { display: none; } }
+.site-nav { margin-left: auto; }
+@media (max-width: 1400px) { .site-nav { display: none; } }

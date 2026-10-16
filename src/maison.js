@@ -547,3 +547,11 @@ renderSocials();
     bandeau();
   });
 })();
+
+// ---------------------------------------------------------------- menu « La Maison » : se referme en cliquant ailleurs ou avec Échap
+(function menuMaison() {
+  const m = document.querySelector('[data-maison-menu]');
+  if (!m) return;
+  document.addEventListener('click', (e) => { if (m.open && !m.contains(e.target)) m.open = false; });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && m.open) { m.open = false; m.querySelector('summary').focus(); } });
+})();

@@ -177,7 +177,13 @@ function header(room) {
     ${link('/salon/', 'Lives TikTok', 'salon')}
   </nav>
   <div class="header-actions">
-    <a class="plan-link" href="/#plan">La Maison</a>
+    <details class="maison-menu" data-maison-menu>
+      <summary>La Maison <span aria-hidden="true">▾</span></summary>
+      <div class="maison-menu-panneau">
+        ${floors.map((f) => `<div class="maison-menu-etage"><p>${esc(f.name)}</p><ul>${rooms.filter((r) => r.floor === f.level).map((r) => `<li${r.status === 'soon' ? ' class="is-soon"' : ''}><a href="${r.path}"${room?.slug === r.slug ? ' aria-current="page"' : ''}><strong>${esc(r.name)}</strong>${r.status === 'soon' ? '<em>bientôt</em>' : ''}</a></li>`).join('')}</ul></div>`).join('')}
+        <div class="maison-menu-etage"><p>Lamia</p><ul><li><a href="/lamia-brechet/"><strong>Qui est Lamia</strong></a></li><li><a href="/werdi-ouvre-les-yeux/"><strong>Le livre Werdi</strong></a></li><li><a href="/mon-espace/"><strong>Mon espace</strong></a></li><li><a href="/#plan"><strong>Le plan de la Maison</strong></a></li></ul></div>
+      </div>
+    </details>
     <a class="account-link" href="/mon-espace/" data-account-link>Se connecter</a>
     <a class="alert-link" href="/confidences/">Me confier</a>
   </div>
