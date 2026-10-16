@@ -2471,3 +2471,9 @@ body[data-ambiance="bibliotheque"] .head-illu img { filter: drop-shadow(0 22px 3
 @media (max-width: 760px) { .head-arch { right: auto !important; } }
 .room-body > .prose-lead, .room-body .prose-lead { max-width: 62ch; }
 .room-head .lead { max-width: 52ch; }
+
+/* Séparateurs : plus de bandes d'un bord à l'autre, un petit ornement centré à la place */
+.frise, .frise-fine, [data-ambiance] .frise-fine { width: min(240px, 50%) !important; margin: 26px auto !important; border-radius: 99px; opacity: .9; }
+body[data-room="hall"] .hall-hero::before, body[data-room="hall"] .hall-hero::after { display: none !important; }
+body[data-ambiance="bibliotheque"] .frise-fine { height: 22px !important; }
+body[data-ambiance="grenier"] .room-head::before { display: none; }
