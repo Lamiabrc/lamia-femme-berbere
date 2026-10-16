@@ -185,6 +185,8 @@ function render() {
   attach($('[data-video-moi]'), local?.tracks?.video?.persistentTrack);
   attach($('[data-video-autre]'), target?.tracks?.video?.state === 'playable' ? target.tracks.video.persistentTrack : null);
   attach($('[data-audio-autre]'), target?.tracks?.audio?.state === 'playable' ? target.tracks.audio.persistentTrack : null);
+  const accueil = $('[data-salle-accueil]');
+  if (accueil) accueil.hidden = Boolean(target?.tracks?.video?.state === 'playable');
   $('[data-autre-nom]').textContent = target ? (target.owner ? 'Lamia' : target.user_name || '') : (state?.where === 'tat' ? 'En attente de ton cavalier…' : 'Lamia arrive…');
   $('[data-salle-compte]').textContent = state?.where === 'tat' ? '' : `${others.length + 1} masque${others.length ? 's' : ''} au bal`;
   $('[data-micro]').setAttribute('aria-pressed', String(!call.localAudio()));

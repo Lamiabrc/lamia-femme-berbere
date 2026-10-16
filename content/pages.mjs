@@ -65,6 +65,8 @@ export const grenier = {
 };
 
 export const speedDating = {
+  salleAccueil:
+    'Bienvenue au bal. Installez-vous, ajustez votre masque : j’ouvre la soirée dans un instant.',
   intro:
     'Ici, on ne fait pas défiler des profils. On s’inscrit à une soirée pensée pour un public précis, on enchaîne des tête-à-tête rapides en visio, puis on repart avec, peut-être, l’envie de se revoir.',
   origin:

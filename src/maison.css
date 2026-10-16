@@ -1882,3 +1882,15 @@ body { background: var(--qvt-ivoire); }
 .home-speed-actions { display: flex; flex-wrap: wrap; gap: 12px; }
 .home-speed-live { background: transparent; color: #F3E0B9; border-color: rgba(243,224,185,.6); }
 .home-speed-live:hover { background: rgba(243,224,185,.12); color: #FAF6EE; }
+
+/* Salle du bal habillée à l'image de Lamia : décor, logo, mot d'accueil */
+.bal-salle-page { position: relative; isolation: isolate; }
+.bal-salle-page::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(18,13,26,.78), rgba(18,13,26,.93) 70%, #120d1a), var(--salle-decor) center 30% / cover no-repeat; }
+.salle-logo { position: absolute; right: 16px; bottom: 14px; width: 52px; height: 52px; border-radius: 50%; background: rgba(255,246,220,.85); padding: 3px; opacity: .8; pointer-events: none; z-index: 2; }
+.salle-accueil { position: absolute; inset: 0; z-index: 1; display: flex; align-items: center; justify-content: center; gap: clamp(14px, 3vw, 36px); padding: 24px 24px 70px; background: radial-gradient(ellipse at 50% 40%, rgba(92,20,36,.55), rgba(12,8,16,.92)); }
+.salle-accueil[hidden] { display: none !important; }
+.salle-accueil img { width: clamp(90px, 20%, 220px); height: auto; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 120px 120px 18px 18px; border: 2px solid var(--or, #e3bd6e); box-shadow: 0 0 40px rgba(227,189,110,.3); }
+.salle-accueil p { max-width: 34ch; margin: 0; font-family: var(--serif); font-style: italic; font-size: clamp(16px, 2.2vw, 26px); line-height: 1.35; color: #fff6dc; }
+.salle-accueil p span { display: block; margin-top: 8px; font-style: normal; font-size: 14px; letter-spacing: .14em; text-transform: uppercase; color: var(--or, #e3bd6e); }
+.salle-autre figcaption { z-index: 2; }
+@media (max-width: 560px) { .salle-accueil { flex-direction: column; padding-bottom: 60px; } .salle-accueil p { text-align: center; } .salle-logo { width: 38px; height: 38px; } }
