@@ -158,6 +158,21 @@
       <div class="tdb-raccourcis"><button class="btn btn-line" type="button" data-textes-enregistrer>Enregistrer</button><button class="btn btn-ink" type="button" data-textes-publier>Publier sur le site</button></div>
     </div>
     <p class="aide" data-textes-etat>Modifie un texte, enregistre, puis clique sur « Publier » : le site se met à jour en une minute environ.</p>
+    <form class="tdb-carte reglages" data-reseaux>
+      <h2>Mes réseaux</h2>
+      <p class="aide">Colle l’adresse complète de chaque page. Les réseaux laissés vides ne s’affichent pas sur le site. Les changements apparaissent tout de suite, sans « Publier ».</p>
+      <div class="champs">
+        <label>TikTok<input name="tiktok" placeholder="https://www.tiktok.com/@…"></label>
+        <label>Facebook<input name="facebook" placeholder="https://www.facebook.com/…"></label>
+        <label>Instagram<input name="instagram" placeholder="https://www.instagram.com/…"></label>
+        <label>YouTube<input name="youtube" placeholder="https://www.youtube.com/@…"></label>
+        <label>Identifiant de la chaîne YouTube <small>(commence par UC, pour afficher tes dernières vidéos)</small><input name="youtube_chaine" placeholder="UC…"></label>
+        <label>Snapchat<input name="snapchat" placeholder="https://www.snapchat.com/add/…"></label>
+        <label>WhatsApp <small>(chaîne ou lien wa.me)</small><input name="whatsapp" placeholder="https://whatsapp.com/channel/…"></label>
+      </div>
+      <p class="aide">L’identifiant de chaîne se trouve sur YouTube : ta photo › Paramètres › Paramètres avancés › « ID de la chaîne ».</p>
+      <div class="actions"><button class="btn btn-ink" type="submit">Enregistrer mes réseaux</button><p class="form-status" data-reseaux-status></p></div>
+    </form>
     <div data-textes></div>
   </section>
 

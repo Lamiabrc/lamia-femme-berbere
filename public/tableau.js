@@ -297,8 +297,27 @@ $('[data-produit-form]').addEventListener('submit', async (e) => {
 });
 
 // ---------------------------------------------------------------- textes et images
+// Mes réseaux
+const NOMS_RESEAUX = { tiktok: 'TikTok', facebook: 'Facebook', instagram: 'Instagram', youtube: 'YouTube', snapchat: 'Snapchat', whatsapp: 'WhatsApp' };
+async function chargerReseaux() {
+  try { const { reseaux } = await api({ action: 'reseaux' }); const f = $('[data-reseaux]'); for (const [k, v] of Object.entries(reseaux)) if (f.elements[k]) f.elements[k].value = v || ''; } catch { /* */ }
+}
+$('[data-reseaux]')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = e.target, st = $('[data-reseaux-status]');
+  const reseaux = Object.fromEntries([...Object.keys(NOMS_RESEAUX), 'youtube_chaine'].map((k) => [k, f.elements[k].value.trim()]));
+  try {
+    const r = await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ action: 'reseaux_save', reseaux }) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error === 'bad_link' ? `Le lien ${NOMS_RESEAUX[d.reseau] || d.reseau} ne semble pas être une adresse ${NOMS_RESEAUX[d.reseau] || ''} valide.` : 'L’enregistrement n’a pas fonctionné.');
+    for (const [k, v] of Object.entries(d.reseaux)) if (f.elements[k]) f.elements[k].value = v || '';
+    st.textContent = 'Réseaux enregistrés : ils apparaissent déjà sur le site.';
+  } catch (err) { st.textContent = err.message; }
+});
+
 let champs = null;
 async function chargerTextes() {
+  chargerReseaux();
   if (champs) return;
   try {
     const [ed, cur] = await Promise.all([fetch('/assets/editable.json').then((r) => r.json()), api({ action: 'content' })]);

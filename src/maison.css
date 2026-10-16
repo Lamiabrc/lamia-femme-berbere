@@ -2260,3 +2260,58 @@ body[data-ambiance="bibliotheque"] .next-rooms h2, body[data-ambiance="bibliothe
 body[data-ambiance="bibliotheque"] .next-rooms span:not(.pip) { color: #c2ae88; }
 body[data-ambiance="bibliotheque"] .next-rooms a { border-color: rgba(201,162,79,.25); }
 body[data-ambiance="bibliotheque"] .next-rooms a:hover strong { color: var(--or-livre); }
+
+/* ================================================================ Le Salon de Lamia : le salon du soir
+   Banquettes basses, coussins brodés safran et turquoise, tapis, thé à la menthe, lumière de lanternes. */
+body[data-ambiance="salon"] main {
+  --nuit-chaude: #24151c; --prune: #3a1f2c; --safran: #e2a43c; --turquoise: #2f9a93; --terre: #c0603b; --creme: #f5e8d2;
+  color: var(--creme);
+  background:
+    radial-gradient(circle at 12% 18%, rgba(255,190,100,.22), transparent 22%),
+    radial-gradient(circle at 88% 30%, rgba(255,190,100,.18), transparent 22%),
+    radial-gradient(ellipse 80% 40% at 50% 100%, rgba(192,96,59,.25), transparent 70%),
+    linear-gradient(180deg, var(--prune), var(--nuit-chaude) 60%, #1b1015);
+}
+body[data-ambiance="salon"] .room-head { background: radial-gradient(ellipse 40% 60% at 80% 35%, rgba(255,200,120,.3), transparent 70%), transparent; border-bottom: 0; }
+body[data-ambiance="salon"] .room-head h1, body[data-ambiance="salon"] h2, body[data-ambiance="salon"] h3 { color: #fff4e0; }
+body[data-ambiance="salon"] .room-head .lead, body[data-ambiance="salon"] .room-body { color: #e6d3b6; }
+body[data-ambiance="salon"] .room-name { color: var(--safran); }
+body[data-ambiance="salon"] .prose-lead { color: var(--creme); }
+/* La frise : un galon de coussin brodé */
+body[data-ambiance="salon"] .frise-fine { height: 24px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='24'%3E%3Crect width='40' height='24' fill='%23c0603b'/%3E%3Cpath d='M0 12 10 3 20 12 10 21Z' fill='%23e2a43c'/%3E%3Cpath d='M20 12 30 3 40 12 30 21Z' fill='%232f9a93'/%3E%3Ccircle cx='10' cy='12' r='2.5' fill='%23f5e8d2'/%3E%3Ccircle cx='30' cy='12' r='2.5' fill='%23f5e8d2'/%3E%3Crect width='40' height='2' fill='%2324151c'/%3E%3Crect y='22' width='40' height='2' fill='%2324151c'/%3E%3C/svg%3E") repeat-x center / auto 24px; }
+/* Le live : une banquette avec ses coussins */
+body[data-ambiance="salon"] .live-card { background: linear-gradient(180deg, rgba(255,240,215,.08), rgba(255,240,215,.03)); border: 1px solid rgba(226,164,60,.4); border-top: 6px solid var(--terre); border-radius: 18px; color: var(--creme); box-shadow: 0 30px 50px -30px rgba(0,0,0,.8); }
+body[data-ambiance="salon"] .live-when { color: var(--safran); }
+body[data-ambiance="salon"] .live-card .btn-ink, body[data-ambiance="salon"] .btn-gold { background: var(--safran); border-color: var(--safran); color: #2a1520; }
+body[data-ambiance="salon"] .side-note { background: rgba(255,240,215,.06); color: var(--creme); border-radius: 16px; border: 1px solid rgba(47,154,147,.35); }
+body[data-ambiance="salon"] .side-note li { color: #e6d3b6; }
+/* Mes réseaux */
+.reseaux { padding: clamp(32px, 5vw, 64px) var(--gouttiere); max-width: 1240px; margin: 0 auto; }
+.reseaux-intro { margin: 0 0 18px; color: var(--gris); }
+.reseaux-grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr)); gap: 14px; }
+.reseau { display: grid; grid-template-columns: auto 1fr; column-gap: 14px; align-items: center; padding: 18px; border-radius: 18px; text-decoration: none; border: 1px solid var(--ligne); background: #fff; color: var(--encre); transition: transform .2s, box-shadow .2s; }
+.reseau[hidden] { display: none !important; }
+.reseau svg { grid-row: span 2; width: 46px; height: 46px; padding: 8px; border-radius: 50%; }
+.reseau strong { font-family: var(--serif); font-size: 22px; }
+.reseau span { font-size: 14px; color: var(--gris); }
+.reseau:hover { transform: translateY(-3px); box-shadow: 0 20px 34px -24px rgba(0,0,0,.6); }
+.reseau-tiktok svg { background: #111; color: #fff; box-shadow: -2px -2px 0 #25f4ee, 2px 2px 0 #fe2c55; }
+.reseau-facebook svg { background: #1877f2; color: #fff; }
+.reseau-instagram svg { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285aeb 90%); color: #fff; }
+.reseau-youtube svg { background: #ff0000; color: #fff; }
+.reseau-snapchat svg { background: #fffc00; color: #111; }
+.reseau-whatsapp svg { background: #25d366; color: #fff; }
+.videos { margin-top: clamp(28px, 4vw, 48px); }
+.video-cadre { display: grid; place-items: center; gap: 10px; min-height: 220px; padding: 24px; border-radius: 20px; border: 1px dashed rgba(226,164,60,.5); text-align: center; }
+.video-cadre iframe { width: 100%; max-width: 900px; aspect-ratio: 16 / 9; border: 0; border-radius: 16px; }
+.video-cadre.is-tiktok { min-height: 160px; }
+.video-note { margin: 0; font-size: 13px; opacity: .75; }
+body[data-ambiance="salon"] .reseau { background: rgba(255,240,215,.07); border-color: rgba(226,164,60,.3); color: var(--creme); }
+body[data-ambiance="salon"] .reseau span, body[data-ambiance="salon"] .reseaux-intro { color: #d6c2a2; }
+body[data-ambiance="salon"] .reseau:hover { border-color: var(--safran); }
+body[data-ambiance="salon"] .next-rooms { background: rgba(0,0,0,.2); border-top: 1px solid rgba(226,164,60,.25); }
+body[data-ambiance="salon"] .next-rooms strong { color: var(--creme); }
+body[data-ambiance="salon"] .next-rooms span:not(.pip) { color: #c9b393; }
+body[data-ambiance="salon"] .next-rooms a { border-color: rgba(226,164,60,.2); }
+body[data-ambiance="salon"] .next-rooms a:hover strong, body[data-ambiance="salon"] a:not(.btn):not(.reseau):hover { color: var(--safran); }
+body[data-ambiance="salon"] .side-note a, body[data-ambiance="salon"] .room-body a:not(.btn) { color: var(--safran); }

@@ -340,10 +340,28 @@ async function renderSocials() {
   try {
     const [row] = await rest('platform_settings?select=value&key=eq.social_links');
     const links = row?.value || {};
-    slots.forEach((li) => {
-      const url = links[li.dataset.social];
-      if (url && /^https:\/\//.test(url)) { li.querySelector('a').href = url; li.hidden = false; }
+    slots.forEach((el) => {
+      const url = links[el.dataset.social];
+      const a = el.tagName === 'A' ? el : el.querySelector('a');
+      if (url && /^https:\/\//.test(url)) { a.href = url; el.hidden = false; }
+      else if (url === null && el.tagName === 'A') el.hidden = true;
     });
+    // Dernières vidéos YouTube (chargées seulement après un clic, sans cookie avant).
+    const yt = document.querySelector('[data-youtube-videos]');
+    if (yt && /^UC[\w-]{22}$/.test(links.youtube_chaine || '')) {
+      yt.hidden = false;
+      yt.querySelector('[data-youtube-charger]').addEventListener('click', () => {
+        yt.querySelector('[data-youtube-cadre]').innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/videoseries?list=UU${links.youtube_chaine.slice(2)}" title="Les dernières vidéos de Lamia sur YouTube" loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+      }, { once: true });
+    }
+    const tt = document.querySelector('[data-tiktok-videos]');
+    const tiktok = links.tiktok || 'https://www.tiktok.com/@lamiaberbere';
+    const pseudo = (tiktok.match(/@([\w.]+)/) || [])[1];
+    if (tt && !pseudo) tt.hidden = true;
+    tt?.querySelector('[data-tiktok-charger]')?.addEventListener('click', () => {
+      tt.querySelector('[data-tiktok-cadre]').innerHTML = `<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@${pseudo}" data-unique-id="${pseudo}" data-embed-type="creator" style="max-width: 780px; min-width: 288px;"><section><a target="_blank" rel="noopener" href="https://www.tiktok.com/@${pseudo}">@${pseudo}</a></section></blockquote>`;
+      const sc = document.createElement('script'); sc.async = true; sc.src = 'https://www.tiktok.com/embed.js'; document.body.appendChild(sc);
+    }, { once: true });
   } catch { /* liens absents */ }
 }
 
