@@ -188,7 +188,7 @@ function footer() {
       <li><a href="https://www.facebook.com/femmeberberes/" rel="noopener" target="_blank">Facebook Femme Berbère</a></li>
       <li data-social="youtube" hidden><a rel="noopener" target="_blank">YouTube</a></li>
     </ul>
-    <p class="footer-legal"><a href="/mentions-legales/">Mentions légales</a> · <a href="/cgv/">Conditions de vente</a> · <a href="/confidentialite/">Confidentialité</a></p>
+    <p class="footer-legal"><a href="/mentions-legales/">Mentions légales</a> · <a href="/cgv/">Conditions de vente</a> · <a href="/retours/">Livraison et retours</a> · <a href="/conditions-utilisation/">Charte des soirées</a> · <a href="/confidentialite/">Confidentialité et cookies</a></p>
   </div>
 </footer>`;
 }
@@ -698,6 +698,15 @@ page(
     <h1>Bonjour <span data-espace-nom></span></h1>
     <p class="espace-email">Connecté·e avec <strong data-espace-email></strong> </p>
     <p><button class="btn btn-line" type="button" data-espace-logout>Se déconnecter</button></p>
+    <details class="espace-mdp">
+      <summary>Modifier mon mot de passe</summary>
+      <form data-espace-mdp>
+        <label>Nouveau mot de passe (8 caractères minimum)<input name="password" type="password" autocomplete="new-password" minlength="8" required></label>
+        <label>Confirmer le nouveau mot de passe<input name="password2" type="password" autocomplete="new-password" minlength="8" required></label>
+        <button class="btn btn-ink" type="submit">Enregistrer</button>
+        <p class="form-status" role="status" data-mdp-status></p>
+      </form>
+    </details>
 
     <section class="espace-admin" data-espace-admin hidden>
       <h2>Espace administratrice</h2>
@@ -1168,7 +1177,7 @@ for (const lp of legalPages) {
       description: lp.title,
       path: lp.path,
       noindex: true,
-      body: `<article class="article legal"><p class="draft-banner">Brouillon : ce texte sera complété et relu avant l’ouverture des ventes.</p><h1>${esc(lp.title)}</h1>${lp.body.replace('{{LIVRAISON}}', livraisonTexte(BOUTIQUE.tarifs)).replace('{{TVA}}', tvaTexte(BOUTIQUE.tva))}</article>`,
+      body: `<article class="article legal"><p class="draft-banner">Brouillon : ce texte sera complété et relu avant l’ouverture des ventes.</p><h1>${esc(lp.title)}</h1>${lp.body.replaceAll('{{LIVRAISON}}', livraisonTexte(BOUTIQUE.tarifs)).replace('{{TVA}}', tvaTexte(BOUTIQUE.tva))}</article>`,
     })
   );
 }
@@ -1200,7 +1209,7 @@ await writeFile(join(DIST, 'assets', 'editable.json'), JSON.stringify({ fields: 
 for (const f of ['maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'bal.js', 'espace.js']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
 await cp(join(ROOT, 'content', 'shipping.mjs'), join(DIST, 'assets', 'shipping.mjs'));
 
-const indexable = pages.filter((p) => !p.path.endsWith('.html') && !['/produit/', '/speed-dating/merci/', '/speed-dating/souhaits/', '/cgv/', '/mentions-legales/', '/confidentialite/'].includes(p.path));
+const indexable = pages.filter((p) => !p.path.endsWith('.html') && !['/produit/', '/speed-dating/merci/', '/speed-dating/souhaits/', '/cgv/', '/mentions-legales/', '/confidentialite/', '/retours/', '/conditions-utilisation/'].includes(p.path));
 await writeFile(
   join(DIST, 'sitemap.xml'),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${indexable.map((p) => `<url><loc>${SITE_URL}${p.path}</loc></url>`).join('')}</urlset>\n`

@@ -81,6 +81,17 @@ $('[data-espace-logout]').addEventListener('click', async (e) => {
   location.replace('/mon-espace/');
 });
 
+$('[data-espace-mdp]').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = new FormData(e.target), st = $('[data-mdp-status]');
+  if (f.get('password') !== f.get('password2')) return say(st, 'Les deux mots de passe ne sont pas identiques.', true);
+  say(st, 'Un instant…');
+  const { error } = await supabase.auth.updateUser({ password: f.get('password') });
+  if (error) return say(st, /different|same/i.test(error.message) ? 'Choisis un mot de passe différent de l’actuel.' : /reauth|recent/i.test(error.message) ? 'Par sécurité, déconnecte-toi puis reconnecte-toi avant de changer ton mot de passe.' : 'Le mot de passe n’a pas été enregistré (8 caractères minimum).', true);
+  e.target.reset();
+  say(st, 'C’est enregistré : ton nouveau mot de passe est actif.');
+});
+
 $('[data-espace-signup]').addEventListener('submit', async (e) => {
   e.preventDefault();
   const f = new FormData(e.target), st = $('[data-signup-status]');

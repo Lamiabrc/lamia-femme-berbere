@@ -1894,3 +1894,11 @@ body { background: var(--qvt-ivoire); }
 .salle-accueil p span { display: block; margin-top: 8px; font-style: normal; font-size: 14px; letter-spacing: .14em; text-transform: uppercase; color: var(--or, #e3bd6e); }
 .salle-autre figcaption { z-index: 2; }
 @media (max-width: 560px) { .salle-accueil { flex-direction: column; padding-bottom: 60px; } .salle-accueil p { text-align: center; } .salle-logo { width: 38px; height: 38px; } }
+
+/* Mon espace : changer de mot de passe ; pages légales */
+.espace-mdp { margin: 0 0 24px; max-width: 460px; }
+.espace-mdp summary { cursor: pointer; font-weight: 600; color: var(--rouge); }
+.espace-mdp form { display: grid; gap: 12px; margin-top: 12px; }
+.espace-mdp label { display: grid; gap: 6px; font-weight: 600; }
+.espace-mdp input { min-height: 46px; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--qvt-sable, #ddd); font: 16px var(--sans); }
+.legal .modele { padding: 16px 20px; border: 1px dashed #c8a86d; border-radius: 12px; background: #fffaf0; }
