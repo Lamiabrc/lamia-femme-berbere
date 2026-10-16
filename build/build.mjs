@@ -162,7 +162,7 @@ function header(room) {
   <div class="header-actions">
     <a class="plan-link" href="/#plan">La Maison</a>
     <a class="account-link" href="/mon-espace/" data-account-link>Se connecter</a>
-    <a class="alert-link" href="/confidences/">Alerter Lamia</a>
+    <a class="alert-link" href="/confidences/">Me confier</a>
   </div>
 </header>`;
 }
@@ -609,7 +609,7 @@ page(
     <li><strong>Caméra allumée</strong>, dans un endroit calme, et aucun propos déplacé.</li>
     <li><strong>Lamia veille</strong> : l’accueil, l’animation et le suivi de chaque soirée.</li>
     <li><strong>Une ambiance</strong> : chaque soirée a son thème. Pour la première, masque vénitien, loup ou tenue élégante.</li>
-    <li><strong>Un souci ?</strong> <a href="/confidences/">Le Cabinet des Confidences</a> permet d’alerter Lamia en toute discrétion.</li>
+    <li><strong>Un souci ?</strong> <a href="/confidences/">Les Confidences avec Lamia</a> permettent de lui écrire ou de lui signaler un souci en toute discrétion.</li>
   </ul>
 </section>
 
@@ -718,7 +718,8 @@ page(
         <a href="/tableau-de-bord"><strong>Tableau de bord</strong><span>Ventes, produits, textes du site, visites, alertes</span></a>
         <a href="/admin-soirees/"><strong>Mes soirées et précommandes</strong><span>Inscrits, salons, précommandes du livre et du collier</span></a>
         <a href="/admin-bal.html"><strong>Maîtresse du bal</strong><span>Ouvrir les portes, lancer les tours, souhaits réciproques</span></a>
-        <a href="/admin.html"><strong>Alertes du Cabinet</strong><span>Signalements écrits et audio, suivi</span></a>
+        <a href="/confidences-lamia/"><strong>Confidences</strong><span>Lire et répondre, vocaux, notifications</span></a>
+        <a href="/admin.html"><strong>Signalements</strong><span>Profils signalés, écrits et audio</span></a>
         <a href="/pilotage.html"><strong>Pilotage</strong><span>Feuille de route et indicateurs</span></a>
       </div>
     </section>
@@ -820,7 +821,7 @@ page(
     <button class="btn bal-btn-line" type="button" data-camera aria-pressed="false">Caméra</button>
     <button class="btn bal-btn-line" type="button" data-flou aria-pressed="false" hidden>Flouter mon décor</button>
     <button class="btn bal-btn-line" type="button" data-musique aria-pressed="true">Musique douce</button>
-    <a class="btn bal-btn-line" href="/confidences/" target="_blank" rel="noopener">Signaler à Lamia</a>
+    <a class="btn bal-btn-line" href="/confidences/#signaler" target="_blank" rel="noopener">Signaler à Lamia</a>
     <button class="btn bal-btn-line" type="button" data-quitter>Quitter le bal</button>
   </div>
   <form class="souhaits" data-souhaits hidden>
@@ -895,21 +896,129 @@ page(
   })
 );
 
-// Le Cabinet des Confidences
+// Les Confidences avec Lamia : se confier par écrit, par la voix, ou en conversation privée ; signaler un profil.
+const recHtml = (id) => `<div class="rec" data-rec>
+        <div class="rec-ecran"><span class="rec-point" aria-hidden="true"></span><strong class="rec-temps" data-rec-time>0:00</strong><span class="rec-niveau" data-rec-meter aria-hidden="true"></span></div>
+        <p class="rec-etat" data-rec-state role="status">Prêt·e ? Appuie sur « Démarrer » quand tu veux.</p>
+        <div class="rec-boutons">
+          <button class="conf-btn conf-btn-plein" type="button" data-rec-start>● Démarrer</button>
+          <button class="conf-btn" type="button" data-rec-pause hidden>❚❚ Pause</button>
+          <button class="conf-btn" type="button" data-rec-resume hidden>● Reprendre</button>
+          <button class="conf-btn" type="button" data-rec-stop hidden>■ Arrêter</button>
+          <button class="conf-btn" type="button" data-rec-redo hidden>↺ Recommencer</button>
+        </div>
+        <audio class="conf-audio" data-rec-audio controls hidden></audio>
+        <label class="rec-import">Pas de micro ? <span>Importer un fichier audio</span><input type="file" accept="audio/*" data-rec-file id="${id}"></label>
+      </div>`;
+const identite = `<div class="conf-champs">
+        <label>Prénom ou pseudonyme<input name="name" autocomplete="given-name" maxlength="80" required></label>
+        <label>Email <small>(pour recevoir ma réponse)</small><input name="email" type="email" autocomplete="email" maxlength="254" required></label>
+        <label>Téléphone <small>(facultatif)</small><input name="phone" type="tel" autocomplete="tel" maxlength="40"></label>
+      </div>`;
+const consentement = `<label class="conf-accord"><input type="checkbox" name="consent" required> <span>J’accepte que mon message, mes fichiers et mes coordonnées soient conservés de façon privée pour que Lamia puisse me répondre. Seule Lamia y a accès. Je peux demander leur suppression à tout moment. <a href="/confidentialite/" target="_blank" rel="noopener">En savoir plus</a></span></label>
+      <input class="conf-piege" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">`;
 page(
   '/confidences/',
   layout({
-    title: 'Le Cabinet des Confidences · Alerter Lamia',
-    description: 'Alerter Lamia en toute confidentialité : faux profil, pression, comportement inquiétant.',
+    title: 'Les Confidences avec Lamia · Un mot, un doute, une histoire',
+    description: 'Confie-toi à Lamia par écrit, par message vocal ou en conversation privée. Lamia te répond personnellement dès qu’elle est disponible.',
     path: '/confidences/',
     room: roomBySlug.confidences,
-    scripts: ['/assets/membre.js'],
-    body: `${roomHead(roomBySlug.confidences)}
-<section class="room-body two-col">
-  <div>
-    <p class="prose-lead">${esc(P.confidences.intro)}</p>
+    scripts: ['/assets/membre.js', '/assets/confidences.js'],
+    body: `<div class="conf">
+<section class="conf-hero">
+  <img class="conf-logo" src="/images/marque/lamia-logo-600.webp" width="140" height="140" alt="Lamia Femme Berbère">
+  <p class="conf-sur">Le petit salon</p>
+  <h1>Les Confidences avec Lamia</h1>
+  <p class="conf-sous">« Un mot, un doute, une histoire… je t’écoute. »</p>
+  <p class="conf-promesse">Lamia te répond personnellement dès qu’elle est disponible.</p>
+</section>
+
+<section class="conf-choix" aria-label="Comment veux-tu te confier ?">
+  <button type="button" class="conf-carte" data-choix="ecrire" aria-expanded="false"><span class="conf-icone" aria-hidden="true">✎</span><strong>Je préfère écrire</strong><small>Un message, et si tu veux des photos ou des documents.</small></button>
+  <button type="button" class="conf-carte" data-choix="parler" aria-expanded="false"><span class="conf-icone" aria-hidden="true">🎙</span><strong>Je préfère parler</strong><small>Un message vocal, enregistré ici même.</small></button>
+  <button type="button" class="conf-carte" data-choix="conversation" aria-expanded="false"><span class="conf-icone" aria-hidden="true">❦</span><strong>Échanger avec Lamia</strong><small>Une conversation privée, que tu retrouves quand tu veux.</small></button>
+</section>
+
+<section class="conf-panneau" data-panneau="ecrire" hidden>
+  <form class="conf-form" data-conf-ecrit novalidate>
+    <h2>Je préfère écrire</h2>
+    ${identite}
+    <label>Ton message<textarea name="body" rows="7" maxlength="8000" placeholder="Prends ton temps. Écris comme tu parlerais à une amie."></textarea></label>
+    <div class="conf-fichiers">
+      <label class="conf-ajout">＋ Ajouter des fichiers <small>images, PDF, documents</small><input type="file" multiple accept="image/*,.pdf,.doc,.docx,.odt,.txt,application/pdf" data-fichiers></label>
+      <ul class="conf-liste" data-liste></ul>
+    </div>
+    ${consentement}
+    <button class="conf-btn conf-btn-plein conf-envoyer" type="submit">Confier mon message à Lamia</button>
+    <p class="conf-statut" role="status" data-statut></p>
+  </form>
+</section>
+
+<section class="conf-panneau" data-panneau="parler" hidden>
+  <form class="conf-form" data-conf-vocal novalidate>
+    <h2>Je préfère parler</h2>
+    <p class="conf-aide">Le micro ne s’allume que lorsque tu appuies sur « Démarrer ». Tu peux mettre en pause, réécouter et recommencer avant d’envoyer. 10 minutes au maximum.</p>
+    ${recHtml('import-vocal')}
+    ${identite}
+    <label>Un mot pour accompagner ton vocal <small>(facultatif)</small><textarea name="body" rows="3" maxlength="8000"></textarea></label>
+    ${consentement}
+    <button class="conf-btn conf-btn-plein conf-envoyer" type="submit">Envoyer mon message vocal</button>
+    <p class="conf-statut" role="status" data-statut></p>
+  </form>
+</section>
+
+<section class="conf-panneau" data-panneau="conversation" id="conversation" hidden>
+  <div class="conf-form" data-conv-connexion>
+    <h2>Échanger avec Lamia</h2>
+    <p>Une conversation privée, rien qu’entre toi et Lamia : textes, vocaux et images. C’est Lamia elle-même qui te répond, jamais un robot.</p>
+    <p>Pour retrouver ta conversation, pas de mot de passe : tu reçois un lien de connexion par email.</p>
+    <form class="conf-ligne" data-conv-lien>
+      <label>Ton email<input name="email" type="email" autocomplete="email" required></label>
+      <button class="conf-btn conf-btn-plein" type="submit">Recevoir mon lien</button>
+    </form>
+    <p class="conf-statut" role="status" data-conv-lien-statut></p>
+  </div>
+  <div class="conf-form conf-conv" data-conv hidden>
+    <div class="conf-conv-tete"><h2>Ma conversation avec Lamia</h2><p><small data-conv-email></small> · <button type="button" class="conf-lien" data-conv-sortir>Me déconnecter</button></p></div>
+    <div class="conf-fil" data-conv-fil aria-live="polite"></div>
+    <form class="conf-composer" data-conv-form novalidate>
+      <div data-conv-premier hidden>
+        <label>Prénom ou pseudonyme<input name="name" maxlength="80"></label>
+        ${consentement}
+      </div>
+      <label class="conf-visuel-cache" for="conv-texte">Ton message</label>
+      <textarea id="conv-texte" name="body" rows="3" maxlength="8000" placeholder="Écris à Lamia…"></textarea>
+      <div class="conf-composer-outils">
+        <label class="conf-btn conf-petit">🖼 Image<input type="file" accept="image/*" multiple data-conv-images hidden></label>
+        <button class="conf-btn conf-petit" type="button" data-conv-vocal-ouvrir>🎙 Vocal</button>
+        <button class="conf-btn conf-btn-plein" type="submit">Envoyer</button>
+      </div>
+      <ul class="conf-liste" data-conv-liste></ul>
+      <div data-conv-vocal hidden>${recHtml('import-conv')}</div>
+      <p class="conf-statut" role="status" data-conv-statut></p>
+    </form>
+    <p class="conf-petit-texte">Tu peux <button type="button" class="conf-lien" data-conv-supprimer>supprimer cette conversation</button> à tout moment : messages, vocaux et fichiers sont alors effacés.</p>
+  </div>
+</section>
+
+<section class="conf-donnees">
+  <h2>Tes confidences restent entre toi et Lamia</h2>
+  <ul>
+    <li>Tes messages, vocaux et fichiers sont gardés dans un espace privé : seules toi et Lamia y avez accès.</li>
+    <li>Lamia reçoit une simple alerte, sans le contenu, sur son téléphone.</li>
+    <li>Tu peux demander la suppression de tes données à tout moment, depuis ta conversation ou en écrivant à <a href="mailto:lamia.brechet@outlook.fr">lamia.brechet@outlook.fr</a>.</li>
+    <li>Lamia lit tout elle-même, mais ne peut pas promettre une réponse immédiate. Et internet ne garantit jamais un anonymat absolu : évite d’écrire ce que tu ne voudrais pas confier.</li>
+  </ul>
+  <p class="conf-urgence">${esc(P.confidences.emergency)}</p>
+</section>
+
+<section class="conf-signaler" id="signaler" aria-labelledby="signaler-titre">
+  <h2 id="signaler-titre">Signaler un profil ou un comportement</h2>
+  <p>Ce n’est pas une confidence mais une alerte : un faux profil, une personne déjà en couple, une pression, une arnaque ou un comportement inquiétant lors d’une soirée. La personne signalée ne sait jamais qui a envoyé l’alerte.</p>
+  <details class="conf-details">
+    <summary>Faire un signalement</summary>
     <form class="report-form" data-report hidden>
-      <h2>Alerter Lamia</h2>
       <label>Profil ou personne concernée<input name="reported_label" required maxlength="200"></label>
       <label>Pourquoi veux-tu m’alerter ?
         <select name="reason" required>
@@ -922,23 +1031,134 @@ page(
           <option value="other">Autre</option>
         </select>
       </label>
-      <label>Raconte-moi ce qui s’est passé<textarea name="written_details" rows="6" maxlength="5000"></textarea></label>
-      <div class="audio-row"><button class="btn btn-line" type="button" data-audio-start>Enregistrer un audio</button><button class="btn btn-line" type="button" data-audio-stop disabled>Arrêter</button><span data-audio-state></span></div>
-      <button class="btn btn-ink" type="submit">Envoyer l’alerte à Lamia</button>
+      <label>Raconte-moi ce qui s’est passé<textarea name="written_details" rows="5" maxlength="5000"></textarea></label>
+      <div class="audio-row"><button class="conf-btn" type="button" data-audio-start>Enregistrer un audio</button><button class="conf-btn" type="button" data-audio-stop disabled>Arrêter</button><span data-audio-state></span></div>
+      <button class="conf-btn conf-btn-plein" type="submit">Envoyer le signalement</button>
     </form>
     <div data-report-login>
-      <p>Pour envoyer une alerte, connecte-toi à ton espace membre. Cela permet à Lamia de te recontacter si besoin.</p>
-      <p><a class="btn btn-ink" href="/speed-dating/#member-title">Me connecter ou créer mon espace</a></p>
+      <p>Pour signaler un profil, connecte-toi à ton espace : Lamia pourra te recontacter si besoin.</p>
+      <p><a class="conf-btn" href="/mon-espace/">Me connecter</a></p>
     </div>
     <p class="form-status" role="status" data-report-status></p>
-  </div>
-  <aside class="side-note">
-    <h2>Ce que je te garantis</h2>
-    ${list(P.confidences.guarantees)}
-    <p class="urgent">${esc(P.confidences.emergency)}</p>
-  </aside>
-</section>`,
+  </details>
+</section>
+</div>`,
   })
+);
+
+// L'espace de Lamia pour les confidences : application installable sur son téléphone (notifications).
+page(
+  '/confidences-lamia/',
+  `<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Confidences · Lamia</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#a86f7b">
+<link rel="manifest" href="/confidences-lamia.webmanifest">
+<link rel="icon" href="/images/marque/confidences-icone-192.png" type="image/png">
+<link rel="apple-touch-icon" href="/images/marque/confidences-icone-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Confidences">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/confidences-lamia.css?v=${VERSION}">
+</head>
+<body class="cl">
+<header class="cl-haut">
+  <button class="cl-retour" type="button" data-retour hidden aria-label="Retour à la liste">‹</button>
+  <img src="/images/marque/confidences-icone-192.png" width="36" height="36" alt="">
+  <h1>Confidences <span data-total></span></h1>
+  <button class="cl-icone" type="button" data-ouvrir-reglages aria-label="Réglages des alertes">⚙︎</button>
+</header>
+
+<main class="cl-main">
+  <form class="cl-login" data-login hidden>
+    <h2>Bonjour Lamia</h2>
+    <p>Connecte-toi avec ton compte administratrice.</p>
+    <label>Email<input name="email" type="email" autocomplete="email" required></label>
+    <label>Mot de passe<input name="password" type="password" autocomplete="current-password" required></label>
+    <button class="cl-btn cl-plein" type="submit">Me connecter</button>
+    <p class="cl-statut" data-login-statut role="status"></p>
+  </form>
+
+  <section data-liste-vue hidden>
+    <nav class="cl-onglets" aria-label="Classement">
+      <button type="button" data-filtre="a_lire" aria-pressed="true">À lire <b data-n="a_lire"></b></button>
+      <button type="button" data-filtre="en_cours" aria-pressed="false">En cours <b data-n="en_cours"></b></button>
+      <button type="button" data-filtre="termine" aria-pressed="false">Terminé <b data-n="termine"></b></button>
+      <button type="button" data-filtre="tous" aria-pressed="false">Tout</button>
+    </nav>
+    <div class="cl-alerte" data-alerte-notif hidden></div>
+    <ul class="cl-liste" data-liste></ul>
+  </section>
+
+  <section class="cl-fil" data-fil-vue hidden>
+    <div class="cl-fil-tete">
+      <div><h2 data-fil-nom></h2><p class="cl-coord" data-fil-coord></p></div>
+      <label class="cl-statut-choix">Classement<select data-fil-statut><option value="a_lire">À lire</option><option value="en_cours">En cours</option><option value="termine">Terminé</option></select></label>
+    </div>
+    <div class="cl-messages" data-messages aria-live="polite"></div>
+    <form class="cl-repondre" data-repondre>
+      <textarea name="body" rows="3" maxlength="8000" placeholder="Ta réponse…" aria-label="Ta réponse"></textarea>
+      <ul class="cl-pj" data-pj></ul>
+      <div data-vocal hidden>
+        <div class="rec" data-rec>
+          <div class="rec-ecran"><span class="rec-point" aria-hidden="true"></span><strong class="rec-temps" data-rec-time>0:00</strong><span class="rec-niveau" data-rec-meter aria-hidden="true"></span></div>
+          <p class="rec-etat" data-rec-state role="status"></p>
+          <div class="rec-boutons">
+            <button class="cl-btn cl-plein" type="button" data-rec-start>● Démarrer</button>
+            <button class="cl-btn" type="button" data-rec-pause hidden>❚❚ Pause</button>
+            <button class="cl-btn" type="button" data-rec-resume hidden>● Reprendre</button>
+            <button class="cl-btn" type="button" data-rec-stop hidden>■ Arrêter</button>
+            <button class="cl-btn" type="button" data-rec-redo hidden>↺ Recommencer</button>
+          </div>
+          <audio data-rec-audio controls hidden></audio>
+          <label class="rec-import">Ou <span>importer un fichier audio</span><input type="file" accept="audio/*" data-rec-file></label>
+        </div>
+      </div>
+      <div class="cl-outils">
+        <label class="cl-btn cl-petit">🖼 Image<input type="file" accept="image/*" multiple data-images hidden></label>
+        <button class="cl-btn cl-petit" type="button" data-ouvrir-vocal>🎙 Vocal</button>
+        <button class="cl-btn cl-plein" type="submit">Envoyer</button>
+      </div>
+      <p class="cl-statut" data-rep-statut role="status"></p>
+    </form>
+    <p class="cl-bas"><button type="button" class="cl-lien" data-supprimer>Supprimer cette conversation</button> (à la demande de la personne)</p>
+  </section>
+
+  <section class="cl-reglages" data-reglages-vue hidden>
+    <h2>Alertes</h2>
+    <div class="cl-carte">
+      <h3>Notifications sur cet appareil</h3>
+      <p data-push-etat>…</p>
+      <p class="cl-aide" data-ios-aide hidden>Sur iPhone et iPad : ouvre cette page dans Safari, touche le bouton Partager <b>⎙</b>, puis <b>« Sur l’écran d’accueil »</b>. Ouvre ensuite « Confidences » depuis l’écran d’accueil et reviens ici pour activer les notifications (iOS 16.4 ou plus récent).</p>
+      <div class="cl-outils"><button class="cl-btn cl-plein" type="button" data-push-activer>Activer sur cet appareil</button><button class="cl-btn" type="button" data-push-couper hidden>Désactiver sur cet appareil</button><button class="cl-btn" type="button" data-push-test>Envoyer un test</button></div>
+      <p class="cl-statut" data-push-statut role="status"></p>
+    </div>
+    <form class="cl-carte" data-reglages>
+      <h3>Réglages</h3>
+      <label class="cl-case"><input type="checkbox" name="alertes_push"> Notifications sur mes appareils</label>
+      <label class="cl-case"><input type="checkbox" name="alertes_email"> Alerte email de secours</label>
+      <label>Adresse qui reçoit les alertes email<input name="email_alerte" type="email" placeholder="ton adresse email"></label>
+      <fieldset><legend>Ne pas me déranger (notifications coupées, emails maintenus)</legend>
+        <div class="cl-heures"><label>De<select name="silence_debut"></select></label><label>à<select name="silence_fin"></select></label></div>
+      </fieldset>
+      <label class="cl-case"><input type="checkbox" name="prevenir_visiteur"> Prévenir la personne par email quand je réponds</label>
+      <p class="cl-aide">Une seule alerte par conversation toutes les 10 minutes, même si la personne envoie plusieurs messages. Les notifications n’affichent jamais le contenu.</p>
+      <p class="cl-aide" data-email-etat></p>
+      <div class="cl-outils"><button class="cl-btn cl-plein" type="submit">Enregistrer</button><button class="cl-btn" type="button" data-email-test>Envoyer un email de test</button></div>
+      <p class="cl-statut" data-reglages-statut role="status"></p>
+    </form>
+    <p class="cl-bas"><a class="cl-lien" href="/admin.html">Signalements de profils</a> · <a class="cl-lien" href="/tableau-de-bord">Tableau de bord</a> · <button type="button" class="cl-lien" data-sortir>Me déconnecter</button></p>
+  </section>
+</main>
+<script type="module" src="/assets/confidences-lamia.js?v=${VERSION}"></script>
+</body>
+</html>`
 );
 
 // Le Patio
@@ -1069,7 +1289,7 @@ page(
     <p>Les lives m’ont également montré quelque chose : énormément de personnes veulent encore rencontrer quelqu’un sérieusement, mais ne se reconnaissent pas forcément dans les applications classiques.</p>
     <p>Alors j’ai commencé à créer des occasions de rencontre autour de la communauté. <strong>Pas un catalogue de profils à faire défiler.</strong> Des moments où des personnes viennent avec une véritable intention, discutent, rient, se découvrent et décident ensuite, librement, si elles souhaitent se revoir.</p>
     <p>C’est aujourd’hui <a class="text-link" href="/speed-dating/">le Boudoir des Rencontres</a> de La Maison.</p>
-    <p>Et parce qu’une rencontre doit rester respectueuse et sûre, j’ai aussi voulu <a class="text-link" href="/confidences/">un Cabinet des Confidences</a> : un endroit où quelqu’un peut venir me signaler discrètement un comportement inquiétant.</p>
+    <p>Et parce qu’une rencontre doit rester respectueuse et sûre, j’ai aussi voulu <a class="text-link" href="/confidences/">un espace de confidences</a> : un endroit où quelqu’un peut venir me signaler discrètement un comportement inquiétant.</p>
   </section>
 
   <section class="lamia-chapitre">
@@ -1098,7 +1318,7 @@ page(
       <li><a href="/bibliotheque/"><strong>La Bibliothèque de Yemma</strong> pour transmettre.</a></li>
       <li><a href="/ecrin/"><strong>L’Écrin</strong> pour créer et faire vivre les bijoux d’Ath Yenni.</a></li>
       <li><a href="/speed-dating/"><strong>Le Boudoir</strong> pour provoquer de vraies rencontres.</a></li>
-      <li><a href="/confidences/"><strong>Le Cabinet des Confidences</strong> pour protéger.</a></li>
+      <li><a href="/confidences/"><strong>Les Confidences avec Lamia</strong> pour protéger.</a></li>
       <li><a href="/grenier/"><strong>Le Grenier</strong> pour mes trouvailles et mes coups de cœur.</a></li>
       <li><a href="/patio/"><strong>Le Patio</strong> pour la communauté.</a></li>
     </ul>
@@ -1210,14 +1430,14 @@ await cp(join(ROOT, 'public'), DIST, { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await writeFile(join(DIST, 'assets', 'editable.json'), JSON.stringify({ fields: EDITABLE, defaults: DEFAULTS }));
-for (const f of ['maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'bal.js', 'espace.js']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
+for (const f of ['maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
 await cp(join(ROOT, 'content', 'shipping.mjs'), join(DIST, 'assets', 'shipping.mjs'));
 
-const indexable = pages.filter((p) => !p.path.endsWith('.html') && !['/produit/', '/speed-dating/merci/', '/speed-dating/souhaits/', '/cgv/', '/mentions-legales/', '/confidentialite/', '/retours/', '/conditions-utilisation/'].includes(p.path));
+const indexable = pages.filter((p) => !p.path.endsWith('.html') && !['/produit/', '/speed-dating/merci/', '/speed-dating/souhaits/', '/cgv/', '/mentions-legales/', '/confidentialite/', '/retours/', '/conditions-utilisation/', '/confidences-lamia/'].includes(p.path));
 await writeFile(
   join(DIST, 'sitemap.xml'),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${indexable.map((p) => `<url><loc>${SITE_URL}${p.path}</loc></url>`).join('')}</urlset>\n`
 );
-await writeFile(join(DIST, 'robots.txt'), `User-agent: *\nAllow: /\nDisallow: /admin.html\nDisallow: /pilotage.html\nDisallow: /admin-soirees.html\nDisallow: /speed-dating/merci/\nDisallow: /speed-dating/bal/\nDisallow: /mon-espace/\nDisallow: /tableau-de-bord\nDisallow: /admin-bal.html\nSitemap: ${SITE_URL}/sitemap.xml\n`);
+await writeFile(join(DIST, 'robots.txt'), `User-agent: *\nAllow: /\nDisallow: /admin.html\nDisallow: /pilotage.html\nDisallow: /admin-soirees.html\nDisallow: /speed-dating/merci/\nDisallow: /speed-dating/bal/\nDisallow: /mon-espace/\nDisallow: /tableau-de-bord\nDisallow: /admin-bal.html\nDisallow: /confidences-lamia/\nSitemap: ${SITE_URL}/sitemap.xml\n`);
 
 console.log(`Maison générée : ${pages.length} pages dans dist/`);

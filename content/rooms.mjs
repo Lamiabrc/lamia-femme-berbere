@@ -36,8 +36,8 @@ export const rooms = [
     summary: 'Des soirées en visio, des tête-à-tête rapides et un cadre chaleureux pensé pour des rencontres sérieuses.', status: 'open', accent: 'rouge' },
   { slug: 'bibliotheque', path: '/bibliotheque/', floor: 1, name: 'La Bibliothèque de Yemma', welcome: 'Ce que Yemma m’a transmis.', headline: 'Livres et guides de transmission, amour et culture kabyle',
     summary: 'Werdi, ouvre les yeux !, la collection Yemma Werdi, les ebooks et les conseils pour aimer avec les yeux ouverts.', status: 'open', accent: 'cobalt', productCategories: ['livres'] },
-  { slug: 'confidences', path: '/confidences/', floor: 1, name: 'Le Cabinet des Confidences', welcome: 'Ici, derrière les volets, tu peux tout me dire.',
-    summary: 'Alerter Lamia en toute confidentialité, être accompagnée, savoir comment la Maison te protège.', status: 'open', accent: 'cobalt' },
+  { slug: 'confidences', path: '/confidences/', floor: 1, name: 'Les Confidences avec Lamia', welcome: 'Un mot, un doute, une histoire… je t’écoute.',
+    summary: 'Se confier à Lamia par écrit, par message vocal ou en conversation privée, et lui signaler un profil en toute discrétion.', status: 'open', accent: 'cobalt' },
 
   // ---------- deuxième étage : trouvailles, galerie, atelier, communauté
   { slug: 'grenier', path: '/grenier/', floor: 2, name: 'Le Grenier des Trouvailles', welcome: 'Ce que j’ai déniché pour toi.', headline: 'Brocante, objets anciens et coups de cœur de Lamia',

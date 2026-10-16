@@ -61,6 +61,7 @@ Données stockées par Supabase, centre de données de Paris (Union européenne)
 <li><strong>Espace membre</strong> : prénom, adresse email et mot de passe (chiffré, la Maison ne le voit jamais), pour te connecter et suivre tes soirées et tes achats.</li>
 <li><strong>Soirées de rencontre</strong> : prénom, email, genre, date de naissance, ville, zone de recherche et salon choisi, pour te placer dans le bon salon et la bonne tranche d’âge ; l’état de ton inscription ; après la soirée, les personnes que tu souhaites revoir et ton avis, pour les mises en relation réciproques et l’amélioration des soirées. Base légale : ton inscription (exécution du service).</li>
 <li><strong>Vidéo des soirées</strong> : l’image et le son passent en direct par Daily, notre prestataire vidéo. <strong>Les soirées ne sont jamais enregistrées</strong>, ni par la Maison ni par Daily.</li>
+<li><strong>Confidences</strong> : ton prénom ou pseudonyme, ton email, ton téléphone si tu le donnes, tes messages, vocaux, images et documents, pour que Lamia puisse te lire et te répondre. Ils sont gardés dans un espace privé, accessible seulement à toi (après connexion par lien email) et à Lamia, jusqu’à ce que tu demandes leur suppression (bouton « supprimer cette conversation » ou email), et au plus 3 ans après le dernier message. Lamia reçoit une notification sans contenu et, si elle l’a activé, un email d’alerte.</li>
 <li><strong>Alertes</strong> : le contenu de ton alerte et l’éventuel message audio, pour assurer ta sécurité. La personne signalée ne connaît jamais ton identité.</li>
 <li><strong>Commandes et précommandes</strong> : nom, adresse de livraison, téléphone éventuel et email, pour livrer, facturer et te tenir informée. Les données de carte bancaire sont traitées uniquement par Stripe ; la Maison n’y a jamais accès.</li>
 </ul>
@@ -139,7 +140,7 @@ Signature (si envoi papier) : …</p>
 <li>une boutique : bijoux, objets, livres et brocante (les ventes sont régies par les <a href="/cgv/">conditions générales de vente</a>) ;</li>
 <li>des soirées de rencontre en visio (le Boudoir des Rencontres), régies par la charte ci-dessous ;</li>
 <li>un espace membre (« Mon espace ») ;</li>
-<li>le Cabinet des Confidences, pour alerter Lamia en toute discrétion ;</li>
+<li>les Confidences avec Lamia, pour alerter Lamia en toute discrétion ;</li>
 <li>des liens vers les lives et réseaux de Lamia (TikTok, Facebook…).</li>
 </ul>
 
@@ -160,11 +161,11 @@ Signature (si envoi papier) : …</p>
 <li>tenir des propos insultants, haineux, racistes, sexistes, menaçants ou à caractère sexuel ;</li>
 <li>usurper l’identité d’une autre personne ;</li>
 <li>harceler, démarcher, faire de la publicité ou demander de l’argent ;</li>
-<li>envoyer de fausses alertes au Cabinet des Confidences ;</li>
+<li>envoyer de fausses alertes aux Confidences avec Lamia ;</li>
 <li>tenter de perturber le fonctionnement du site ou d’accéder aux données d’autres personnes.</li>
 </ul>
 
-<h2>5. Le Cabinet des Confidences</h2>
+<h2>5. Les Confidences avec Lamia</h2>
 <p>Les alertes sont lues par Lamia seule. L’identité de la personne qui alerte n’est jamais communiquée à la personne signalée. Le Cabinet n’est pas un service d’urgence : <strong>en cas de danger immédiat, appelle le 17 (police) ou le 112</strong>.</p>
 
 <h2>6. Propriété intellectuelle</h2>
@@ -196,7 +197,7 @@ Signature (si envoi papier) : …</p>
 <h3>Après la soirée</h3>
 <p>Tes choix dans le carnet de bal sont privés. Si deux personnes souhaitent se revoir, Lamia les met en relation. Une personne qui n’a pas souhaité te revoir n’est jamais informée de ton choix, et inversement.</p>
 <h3>Signaler et exclure</h3>
-<p>Le bouton « Signaler à Lamia » et <a href="/confidences/">le Cabinet des Confidences</a> permettent d’alerter Lamia. Lamia peut exclure, pendant la soirée ou pour les suivantes, toute personne qui ne respecte pas cette charte, sans remboursement.</p>
+<p>Le bouton « Signaler à Lamia » et <a href="/confidences/">les Confidences avec Lamia</a> permettent d’alerter Lamia. Lamia peut exclure, pendant la soirée ou pour les suivantes, toute personne qui ne respecte pas cette charte, sans remboursement.</p>
 <h3>Prudence</h3>
 <p>Pour une première rencontre en vrai, choisis un lieu public, préviens un proche, et ne donne jamais d’argent à une personne rencontrée en ligne.</p>
 

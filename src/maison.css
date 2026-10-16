@@ -1954,3 +1954,122 @@ body { background: var(--qvt-ivoire); }
 .cookies a { color: var(--rouge); }
 .cookies div { display: flex; gap: 10px; }
 .cookies .btn { min-height: 42px; padding: 8px 18px; }
+
+/* ================================================================ Les Confidences avec Lamia : boudoir rose poudré */
+.conf {
+  --ivoire: #fbf6f1; --poudre: #f1dcd6; --poudre-fonce: #e6c4bd; --vieux-rose: #a86f7b; --vieux-rose-fonce: #8a5662;
+  --champagne: #d8bd91; --encre-douce: #3d3034; --gris-rose: #7d6a6e;
+  color: var(--encre-douce);
+  background:
+    radial-gradient(ellipse at 50% -10%, rgba(255,240,226,.95), transparent 55%),
+    radial-gradient(ellipse at 0% 40%, rgba(230,196,189,.55), transparent 50%),
+    radial-gradient(ellipse at 100% 70%, rgba(230,196,189,.5), transparent 50%),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.18) 0 2px, transparent 2px 46px),
+    linear-gradient(180deg, #f6e6e1 0%, #f3ded8 40%, #f8ece7 100%);
+  padding: 0 var(--gouttiere) clamp(48px, 7vw, 96px);
+}
+.conf h1, .conf h2 { color: var(--encre-douce); }
+.conf h2::after { display: none !important; }
+.conf a { color: var(--vieux-rose-fonce); }
+.conf-hero { max-width: 720px; margin: 0 auto; padding: clamp(36px, 6vw, 72px) 0 clamp(20px, 3vw, 32px); text-align: center; }
+.conf-logo { width: clamp(96px, 14vw, 140px); height: auto; border-radius: 50%; background: var(--ivoire); padding: 6px; box-shadow: 0 0 0 1px var(--champagne), 0 18px 40px -18px rgba(138,86,98,.45); }
+.conf-sur { margin: 18px 0 6px; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--vieux-rose); font-weight: 600; }
+.conf-hero h1 { margin: 0; font-size: clamp(34px, 5.4vw, 58px); line-height: 1.05; font-weight: 500; }
+.conf-sous { margin: 14px 0 0; font-family: var(--serif); font-style: italic; font-size: clamp(19px, 2.4vw, 26px); color: var(--vieux-rose-fonce); }
+.conf-promesse { margin: 14px auto 0; display: inline-block; padding: 8px 16px; border-radius: 999px; background: rgba(251,246,241,.75); border: 1px solid rgba(216,189,145,.7); font-size: 15px; }
+
+.conf-choix { max-width: 980px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.conf-carte { display: grid; gap: 6px; justify-items: center; text-align: center; padding: 26px 18px 22px; border-radius: 28px 28px 14px 14px; border: 1px solid rgba(216,189,145,.65); background: linear-gradient(180deg, rgba(251,246,241,.95), rgba(241,220,214,.85)); color: var(--encre-douce); font: inherit; cursor: pointer; box-shadow: 0 20px 40px -28px rgba(138,86,98,.55); transition: transform .2s, box-shadow .2s, border-color .2s; }
+.conf-carte:hover, .conf-carte:focus-visible { transform: translateY(-3px); border-color: var(--vieux-rose); }
+.conf-carte[aria-expanded="true"] { border-color: var(--vieux-rose); box-shadow: 0 0 0 2px rgba(168,111,123,.35), 0 24px 50px -28px rgba(138,86,98,.6); }
+.conf-icone { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 50%; background: var(--ivoire); border: 1px solid var(--champagne); font-size: 24px; color: var(--vieux-rose); }
+.conf-carte strong { font-family: var(--serif); font-size: 23px; font-weight: 600; }
+.conf-carte small { color: var(--gris-rose); font-size: 14px; line-height: 1.45; }
+
+.conf-panneau { max-width: 760px; margin: 22px auto 0; scroll-margin-top: 90px; }
+.conf-panneau[hidden], .conf [hidden] { display: none !important; }
+.conf-form { display: grid; gap: 14px; padding: clamp(20px, 4vw, 34px); border-radius: 26px; background: rgba(251,246,241,.92); border: 1px solid rgba(216,189,145,.6); box-shadow: 0 30px 60px -40px rgba(138,86,98,.6); }
+.conf-form h2 { margin: 0; font-size: clamp(26px, 3.4vw, 34px); font-weight: 500; }
+.conf-form label { display: grid; gap: 6px; font-weight: 600; font-size: 15px; }
+.conf-form label small { font-weight: 400; color: var(--gris-rose); }
+.conf-form input:not([type=checkbox]):not([type=file]), .conf-form textarea, .conf-form select { min-height: 48px; padding: 10px 14px; border-radius: 14px; border: 1px solid var(--poudre-fonce); background: #fff; font: 16px var(--sans); color: var(--encre-douce); box-sizing: border-box; width: 100%; }
+.conf-form textarea { line-height: 1.55; resize: vertical; }
+.conf-form input:focus, .conf-form textarea:focus { outline: 2px solid rgba(168,111,123,.45); outline-offset: 1px; border-color: var(--vieux-rose); }
+.conf-champs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr)); gap: 12px; }
+.conf-aide, .conf-petit-texte { margin: 0; color: var(--gris-rose); font-size: 15px; line-height: 1.55; }
+.conf-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 46px; padding: 10px 20px; border-radius: 999px; border: 1px solid var(--vieux-rose); background: transparent; color: var(--vieux-rose-fonce); font: 600 15px var(--sans); cursor: pointer; text-decoration: none; }
+.conf-btn:hover { background: rgba(168,111,123,.08); }
+.conf-btn-plein { background: var(--vieux-rose); color: #fff; border-color: var(--vieux-rose); }
+.conf-btn-plein:hover { background: var(--vieux-rose-fonce); }
+.conf-btn:disabled { opacity: .55; cursor: wait; }
+.conf-petit { min-height: 40px; padding: 6px 14px; font-size: 14px; }
+.conf-lien { background: none; border: 0; padding: 0; color: var(--vieux-rose-fonce); text-decoration: underline; font: inherit; cursor: pointer; }
+.conf-envoyer { justify-self: start; }
+.conf-statut { margin: 0; min-height: 1.4em; font-weight: 600; color: #5d7a5a; }
+.conf-statut.is-error { color: #a4434f; }
+.conf-accord { display: flex !important; gap: 10px; align-items: flex-start; font-weight: 400 !important; font-size: 14px !important; line-height: 1.5; color: var(--gris-rose); }
+.conf-accord input { margin-top: 3px; width: 18px; height: 18px; accent-color: var(--vieux-rose); flex: none; }
+.conf-piege { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.conf-visuel-cache { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+.conf-fichiers { display: grid; gap: 8px; }
+.conf-ajout { display: inline-flex !important; flex-wrap: wrap; align-items: baseline; gap: 6px !important; justify-self: start; padding: 10px 16px; border-radius: 14px; border: 1px dashed var(--vieux-rose); color: var(--vieux-rose-fonce); cursor: pointer; }
+.conf-ajout input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.conf-ajout:focus-within { outline: 2px solid rgba(168,111,123,.45); }
+.conf-liste { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.conf-liste li { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 8px 12px; border-radius: 12px; background: var(--poudre); font-size: 14px; word-break: break-word; }
+.conf-liste small { color: var(--gris-rose); }
+
+.rec { display: grid; gap: 12px; padding: 18px; border-radius: 20px; background: linear-gradient(180deg, #fff, var(--poudre)); border: 1px solid var(--poudre-fonce); }
+.rec-ecran { display: flex; align-items: center; gap: 12px; }
+.rec-point { width: 14px; height: 14px; border-radius: 50%; background: var(--poudre-fonce); flex: none; }
+.rec[data-rec-etat="enreg"] .rec-point { background: #c75b6c; animation: rec-pulse 1.2s ease-in-out infinite; }
+.rec[data-rec-etat="pause"] .rec-point { background: var(--champagne); }
+@keyframes rec-pulse { 50% { box-shadow: 0 0 0 8px rgba(199,91,108,.18); } }
+.rec-temps { font-family: var(--serif); font-size: 34px; font-variant-numeric: tabular-nums; min-width: 3.2ch; }
+.rec-niveau { flex: 1; height: 8px; border-radius: 999px; background: linear-gradient(90deg, var(--vieux-rose) calc(var(--niveau, 0) * 100%), rgba(168,111,123,.15) 0); transition: background .1s; }
+.rec-etat { margin: 0; font-size: 15px; color: var(--gris-rose); }
+.rec-boutons { display: flex; flex-wrap: wrap; gap: 8px; }
+.rec-import { display: flex !important; flex-wrap: wrap; gap: 6px !important; align-items: baseline; font-weight: 400 !important; font-size: 14px !important; color: var(--gris-rose); }
+.rec-import span { color: var(--vieux-rose-fonce); text-decoration: underline; cursor: pointer; }
+.rec-import input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.conf-audio { width: 100%; max-width: 420px; height: 44px; }
+
+.conf-ligne { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
+.conf-ligne label { flex: 1 1 240px; }
+.conf-conv-tete { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 16px; }
+.conf-conv-tete p { margin: 0; color: var(--gris-rose); }
+.conf-fil { display: grid; gap: 10px; max-height: min(60vh, 560px); overflow-y: auto; padding: 14px; border-radius: 18px; background: linear-gradient(180deg, #fffaf7, var(--poudre)); border: 1px solid var(--poudre-fonce); }
+.conf-bulle { max-width: 86%; padding: 10px 14px 12px; border-radius: 18px; display: grid; gap: 6px; }
+.conf-bulle.is-visiteur { justify-self: end; background: #fff; border: 1px solid var(--poudre-fonce); border-bottom-right-radius: 6px; }
+.conf-bulle.is-lamia { justify-self: start; background: #f4e3dc; border: 1px solid rgba(216,189,145,.7); border-bottom-left-radius: 6px; }
+.conf-bulle-qui { margin: 0; font-size: 12px; color: var(--gris-rose); font-weight: 600; }
+.conf-bulle-texte { margin: 0; white-space: pre-wrap; line-height: 1.55; overflow-wrap: anywhere; }
+.conf-image img { display: block; max-width: 240px; max-height: 240px; border-radius: 12px; object-fit: cover; }
+.conf-doc { display: inline-flex; gap: 6px; align-items: baseline; padding: 6px 10px; border-radius: 10px; background: rgba(255,255,255,.7); text-decoration: none; }
+.conf-vide { margin: 0; color: var(--gris-rose); text-align: center; padding: 18px 0; }
+.conf-composer { display: grid; gap: 10px; }
+.conf-composer-outils { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.conf-composer-outils .conf-btn-plein { margin-left: auto; }
+.conf-merci { text-align: center; display: grid; gap: 4px; }
+.conf-merci h2 { font-size: clamp(24px, 3vw, 32px); }
+
+.conf-donnees, .conf-signaler { max-width: 760px; margin: clamp(32px, 5vw, 56px) auto 0; }
+.conf-donnees h2, .conf-signaler h2 { font-size: clamp(24px, 3vw, 30px); font-weight: 500; margin: 0 0 10px; }
+.conf-donnees ul { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; line-height: 1.55; }
+.conf-urgence { margin: 16px 0 0; padding: 12px 16px; border-radius: 14px; background: rgba(251,246,241,.85); border-left: 3px solid var(--vieux-rose); font-weight: 600; }
+.conf-signaler { padding-top: clamp(24px, 4vw, 40px); border-top: 1px solid rgba(168,111,123,.3); }
+.conf-signaler > p { color: var(--gris-rose); line-height: 1.55; }
+.conf-details summary { cursor: pointer; font-weight: 600; color: var(--vieux-rose-fonce); padding: 8px 0; }
+.conf-details .report-form { display: grid; gap: 12px; margin-top: 10px; padding: 20px; border-radius: 20px; background: rgba(251,246,241,.9); border: 1px solid var(--poudre-fonce); }
+.conf-details .report-form label { display: grid; gap: 6px; font-weight: 600; }
+.conf-details .report-form input, .conf-details .report-form select, .conf-details .report-form textarea { min-height: 46px; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--poudre-fonce); font: 16px var(--sans); }
+.conf-details .report-form[hidden] { display: none !important; }
+@media (max-width: 760px) {
+  .conf-choix { grid-template-columns: 1fr; }
+  .conf-carte { grid-template-columns: auto 1fr; justify-items: start; text-align: left; column-gap: 14px; padding: 16px 18px; border-radius: 20px; }
+  .conf-carte .conf-icone { grid-row: span 2; width: 46px; height: 46px; font-size: 20px; }
+  .conf-carte strong { font-size: 20px; }
+  .conf-bulle { max-width: 94%; }
+  .conf-envoyer { justify-self: stretch; }
+}
