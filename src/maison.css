@@ -2315,3 +2315,82 @@ body[data-ambiance="salon"] .next-rooms span:not(.pip) { color: #c9b393; }
 body[data-ambiance="salon"] .next-rooms a { border-color: rgba(226,164,60,.2); }
 body[data-ambiance="salon"] .next-rooms a:hover strong, body[data-ambiance="salon"] a:not(.btn):not(.reseau):hover { color: var(--safran); }
 body[data-ambiance="salon"] .side-note a, body[data-ambiance="salon"] .room-body a:not(.btn) { color: var(--safran); }
+
+/* ================================================================ Le Grenier des Trouvailles : la soupente sous les poutres
+   Vieux bois, malles anciennes, papier kraft, étiquettes ficelées, la lumière poussiéreuse d'une lucarne. */
+body[data-ambiance="grenier"] main {
+  --vieux-bois: #6b4a2e; --poutre: #3e2a1a; --kraft: #e9d9b8; --kraft-fonce: #d8c094; --rouille: #a5562e; --encre-brune: #33241a;
+  color: var(--encre-brune);
+  background:
+    linear-gradient(115deg, transparent 30%, rgba(255,240,200,.35) 42%, rgba(255,240,200,.08) 55%, transparent 62%),
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,.18) 0 1px, transparent 2px) 0 0 / 46px 46px,
+    radial-gradient(circle at 70% 60%, rgba(255,255,255,.14) 0 1px, transparent 2px) 0 0 / 71px 71px,
+    repeating-linear-gradient(90deg, rgba(60,40,20,.05) 0 2px, transparent 2px 9px),
+    linear-gradient(180deg, #efe2c6, var(--kraft) 60%, #e2cfa8);
+}
+/* Les poutres en pente de la soupente */
+body[data-ambiance="grenier"] .room-head { border-bottom: 0; padding-top: clamp(80px, 9vw, 120px); background: linear-gradient(115deg, transparent 40%, rgba(255,244,210,.55) 52%, transparent 66%), transparent; }
+body[data-ambiance="grenier"] .room-head::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 64px; pointer-events: none; z-index: 1;
+  background: linear-gradient(180deg, var(--poutre), var(--vieux-bois)) 0 0 / 100% 22px no-repeat, repeating-linear-gradient(60deg, transparent 0 120px, var(--poutre) 120px 140px, transparent 140px 260px) 0 22px / 100% 42px no-repeat; -webkit-mask-image: linear-gradient(180deg, #000 60%, transparent); mask-image: linear-gradient(180deg, #000 60%, transparent); }
+body[data-ambiance="grenier"] .room-name { color: var(--rouille); }
+body[data-ambiance="grenier"] .room-head h1 { color: #2c1f15; }
+/* Planches du plancher en guise de frise */
+body[data-ambiance="grenier"] .frise-fine { height: 18px; background: repeating-linear-gradient(90deg, var(--vieux-bois) 0 140px, #50361f 140px 142px, #7a5636 142px 260px, #50361f 260px 262px); opacity: 1; box-shadow: inset 0 3px 0 rgba(255,255,255,.12); }
+body[data-ambiance="grenier"] .side-note { background: var(--kraft-fonce); border-radius: 4px; transform: rotate(-.6deg); box-shadow: 0 16px 28px -18px rgba(60,35,15,.6); }
+/* Chaque trouvaille porte une étiquette ficelée */
+body[data-ambiance="grenier"] .product-media { border: 8px solid #fbf4e4; border-bottom-width: 26px; border-radius: 2px; box-shadow: 0 18px 30px -18px rgba(60,35,15,.7); transform: rotate(-1deg); }
+body[data-ambiance="grenier"] .product-card:nth-child(even) .product-media { transform: rotate(1.2deg); }
+body[data-ambiance="grenier"] .product-card h3 { display: inline-block; align-self: flex-start; padding: 2px 12px 2px 18px; background: var(--kraft-fonce); border-radius: 3px 10px 10px 3px; position: relative; font-size: 20px; }
+body[data-ambiance="grenier"] .product-card h3::before { content: ''; position: absolute; left: 6px; top: 50%; width: 6px; height: 6px; margin-top: -3px; border-radius: 50%; background: #efe2c6; box-shadow: inset 0 0 0 1px rgba(0,0,0,.25); }
+body[data-ambiance="grenier"] .product-card:hover h3 { color: var(--rouille); }
+body[data-ambiance="grenier"] .next-rooms { background: rgba(62,42,26,.08); border-top: 1px solid rgba(107,74,46,.3); }
+
+/* ================================================================ Le Patio : la cour pavée en plein midi
+   Ciel bleu, murs blancs, zellige, oliviers et jarres, l'ombre d'une treille. */
+body[data-ambiance="patio"] main {
+  --ciel: #9fd0ee; --mur: #fbf8f1; --zellige-bleu: #1f6fa8; --zellige-vert: #2f8a5f; --ocre: #d49a46; --olive: #6f7d3c; --pave: #d9c9ad;
+  background: linear-gradient(180deg, var(--ciel) 0, #cfe8f5 160px, var(--mur) 340px, var(--mur) 70%, #efe6d3);
+}
+body[data-ambiance="patio"] .room-head { border-bottom: 0; background:
+  radial-gradient(ellipse 30% 40% at 85% 0%, rgba(255,250,220,.9), transparent 70%),
+  repeating-linear-gradient(135deg, rgba(60,80,30,.07) 0 14px, transparent 14px 40px) 0 0 / 100% 100%,
+  transparent; }
+body[data-ambiance="patio"] .room-name { color: var(--zellige-vert); }
+body[data-ambiance="patio"] .room-head h1 { color: #1f3a4a; }
+/* Une frise de zellige */
+body[data-ambiance="patio"] .frise-fine { height: 28px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Crect width='28' height='28' fill='%23fbf8f1'/%3E%3Cpath d='M14 1 18 10 27 14 18 18 14 27 10 18 1 14 10 10Z' fill='%231f6fa8'/%3E%3Cpath d='M14 8 16 12 20 14 16 16 14 20 12 16 8 14 12 12Z' fill='%23fbf8f1'/%3E%3Ccircle cx='14' cy='14' r='2' fill='%23d49a46'/%3E%3Cpath d='M0 0 5 0 0 5Z M28 0 23 0 28 5Z M0 28 5 28 0 23Z M28 28 23 28 28 23Z' fill='%232f8a5f'/%3E%3C/svg%3E") repeat-x center / auto 28px; opacity: 1; }
+/* Les annonces accrochées sous la treille, sur des carreaux de faïence */
+body[data-ambiance="patio"] .now-card { background: #fff; border: 1px solid #e5dccb; border-radius: 18px; box-shadow: 0 18px 30px -24px rgba(31,58,74,.5); position: relative; overflow: hidden; }
+body[data-ambiance="patio"] .now-card::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 8px; background: repeating-linear-gradient(90deg, var(--zellige-bleu) 0 14px, var(--mur) 14px 16px, var(--zellige-vert) 16px 30px, var(--mur) 30px 32px, var(--ocre) 32px 46px, var(--mur) 46px 48px); }
+body[data-ambiance="patio"] .now-room { color: var(--zellige-vert); }
+body[data-ambiance="patio"] .now-card a { color: var(--zellige-bleu); }
+/* Les pavés de la cour en bas de page */
+body[data-ambiance="patio"] .next-rooms { background: repeating-linear-gradient(90deg, transparent 0 58px, rgba(120,95,60,.18) 58px 60px), repeating-linear-gradient(0deg, transparent 0 28px, rgba(120,95,60,.18) 28px 30px), var(--pave); border-top: 0; }
+
+/* ================================================================ La Galerie : une salle de musée
+   Murs blancs, parquet clair, cadres dorés, la lumière précise d'un spot sur chaque œuvre, des cartels. */
+body[data-ambiance="galerie"] main {
+  --mur: #fbfaf7; --parquet: #d9c3a0; --or-cadre: #b8913e; --encre-musee: #1f1d1b;
+  background: linear-gradient(180deg, #fdfcfa, var(--mur) 80%, #f3eee5);
+}
+body[data-ambiance="galerie"] .room-head { border-bottom: 0; background: radial-gradient(ellipse 20% 60% at 82% 0%, rgba(255,246,220,.9), transparent 70%), transparent; }
+body[data-ambiance="galerie"] .room-head h1 { color: var(--encre-musee); font-weight: 500; letter-spacing: -.01em; }
+body[data-ambiance="galerie"] .room-name { color: var(--or-cadre); }
+/* La cimaise : une fine baguette dorée */
+body[data-ambiance="galerie"] .frise-fine { height: 6px; background: linear-gradient(180deg, #e2c47a, var(--or-cadre) 50%, #8c6c28); opacity: 1; margin: 0 var(--gouttiere); }
+/* L'œuvre dans son cadre doré, sous un spot, avec son cartel */
+body[data-ambiance="galerie"] .gallery-feature { position: relative; }
+body[data-ambiance="galerie"] .gallery-feature figure { position: relative; padding: 18px; background: linear-gradient(135deg, #e9cf86, #a8822f 30%, #f3dc98 50%, #9b762a 70%, #e3c376); box-shadow: 0 0 0 1px #7a5c1f, 0 40px 70px -30px rgba(0,0,0,.55); }
+body[data-ambiance="galerie"] .gallery-feature figure::before { content: ''; position: absolute; left: 10%; right: 10%; top: -120px; height: 160px; pointer-events: none; background: radial-gradient(ellipse 50% 100% at 50% 0%, rgba(255,246,215,.9), transparent 75%); }
+body[data-ambiance="galerie"] .gallery-feature figure img { display: block; border: 10px solid #f7f2e6; box-shadow: inset 0 0 0 1px rgba(0,0,0,.1); }
+body[data-ambiance="galerie"] .gallery-feature figcaption { position: absolute; right: -14px; bottom: -40px; padding: 8px 14px; background: #fff; border: 1px solid #ddd5c5; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: #6b6458; box-shadow: 0 8px 18px -12px rgba(0,0,0,.4); }
+body[data-ambiance="galerie"] .gallery-feature h2 { font-weight: 500; padding-left: 14px; border-left: 2px solid var(--or-cadre); }
+/* Le parquet clair du musée */
+body[data-ambiance="galerie"] .next-rooms { background: repeating-linear-gradient(90deg, rgba(120,90,50,.12) 0 1px, transparent 1px 90px), linear-gradient(180deg, #e8d6b8, var(--parquet)); border-top: 6px solid #efe6d6; }
+/* Retouches : la pente du toit du Grenier, une treille plus légère au Patio */
+body[data-ambiance="grenier"] .room-head::before { height: 100%; -webkit-mask-image: none; mask-image: none; z-index: 0;
+  background: linear-gradient(180deg, var(--poutre), var(--vieux-bois)) 0 0 / 100% 20px no-repeat,
+    linear-gradient(135deg, var(--vieux-bois) 0 70px, var(--poutre) 70px 86px, rgba(107,74,46,.25) 86px 150px, transparent 150px),
+    linear-gradient(225deg, var(--vieux-bois) 0 70px, var(--poutre) 70px 86px, rgba(107,74,46,.25) 86px 150px, transparent 150px); }
+body[data-ambiance="grenier"] .room-head > * { z-index: 1; }
+body[data-ambiance="patio"] .room-head { background: radial-gradient(ellipse 30% 40% at 85% 0%, rgba(255,250,220,.9), transparent 70%), repeating-linear-gradient(135deg, rgba(60,80,30,.035) 0 10px, transparent 10px 44px), transparent; }
