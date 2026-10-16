@@ -210,12 +210,12 @@ function cartDrawer() {
 
 // Image affichée dans l'arche de l'en-tête, quand la pièce en a une.
 const HEAD_IMAGES = {
-  ecrin: ['/images/collier/collier-kabyle-15g-porte-640.webp', 'Collier kabyle émaillé porté'],
-  galerie: ['/images/collier/collier-kabyle-15g-detail-640.webp', 'Détail d’un médaillon émaillé'],
-  bibliotheque: ['/images/marque/yemma-transmission-900.webp', 'Yemma transmet à sa fille, un livre à la main'],
+  ecrin: ['/images/collier/collier-mannequin-robe-kabyle-640.webp', 'Le collier kabyle émaillé porté avec une robe kabyle brodée'],
+  galerie: ['/images/collier/collier-mannequin-cou-640.webp', 'Le collier émaillé porté, médaillon et pampilles'],
+  bibliotheque: ['/images/marque/lamia-illu-ecrit-480.webp', 'Lamia assise en tailleur, écrivant dans un carnet', true],
   salon: ['/images/marque/lamia-portrait-reel-480.webp', 'Lamia Femme Berbère, portrait réel'],
   'speed-dating': ['/images/marque/lamia-portrait-reel-480.webp', 'Lamia Femme Berbère, hôte du Boudoir des Rencontres'],
-  boutique: ['/images/collier/collier-kabyle-15g-ecrin-640.webp', 'Collier kabyle dans son écrin'],
+  boutique: ['/images/collier/collier-mannequin-lanterne-640.webp', 'Le collier kabyle émaillé porté, à la lumière des lanternes'],
   patio: ['/images/marque/lamia-illu-debout-480.webp', 'Lamia en robe kabyle brodée, debout, la main sur le cœur', true],
   grenier: ['/images/marque/lamia-illu-pensive-480.webp', 'Lamia pensive, foulard kabyle et bracelets d’argent', true],
 };
@@ -316,7 +316,7 @@ page(
       <span class="apercu-info">Modèle de 1974, fabriqué à Ath Yenni<span data-prix="collier-kabyle-argente-emaille-15g"></span></span>
     </a>
     <a class="apercu" href="/bibliotheque/">
-      <img src="/images/marque/yemma-portrait-700.webp" width="700" height="1050" alt="" loading="lazy">
+      <img src="/images/marque/lamia-illu-banquette-560.webp" width="560" height="678" alt="" loading="lazy">
       <span class="apercu-kicker">La Bibliothèque · précommande</span>
       <strong>Werdi, ouvre les yeux !</strong>
       <span class="apercu-info" data-prix-werdi>Livre broché et ebook</span>
@@ -342,7 +342,7 @@ page(
 
 <section class="home-speed" aria-labelledby="home-speed-title">
   <a class="home-speed-visual home-speed-poster" href="/speed-dating/#events-title" aria-label="Le speed dating de Lamia Femme Berbère : réserver une place">
-    <img src="/images/lamia/boudoir-speed-dating-1024.webp" srcset="/images/lamia/boudoir-speed-dating-600.webp 600w, /images/lamia/boudoir-speed-dating-1024.webp 1024w" sizes="(max-width: 820px) 86vw, 430px" width="1024" height="1024" alt="Le Boudoir des Rencontres : salon de velours bordeaux, logo Lamia Femme Berbère, LF Virtual Speed Dating" loading="lazy">
+    <img src="/images/lamia/affiche-boudoir-venise-1149.webp" srcset="/images/lamia/affiche-boudoir-venise-560.webp 560w, /images/lamia/affiche-boudoir-venise-1149.webp 1149w" sizes="(max-width: 820px) 86vw, 430px" width="1149" height="1368" alt="Affiche : le Boudoir des Rencontres, spécial Bal masqué de Venise, speed dating sérieux en ligne avec Lamia" loading="lazy">
   </a>
   <div class="home-speed-copy">
     <p class="home-speed-kicker">Le Boudoir des Rencontres · speed dating kabyle</p>
@@ -457,7 +457,7 @@ page(
     room: roomBySlug.bibliotheque,
     body: `${roomHead(roomBySlug.bibliotheque)}
 <section class="book-feature">
-  ${cover('werdi', 'Couverture du livre Werdi, ouvre les yeux ! de Lamia Bréchet', 'book-cover') || '<figure><img src="/images/marque/yemma-portrait-700.webp" width="700" height="1050" loading="lazy" alt="Illustration : Yemma, la voix de la collection"></figure>'}
+  ${cover('werdi', 'Couverture du livre Werdi, ouvre les yeux ! de Lamia Bréchet', 'book-cover') || '<figure class="book-illu"><img src="/images/marque/lamia-illu-banquette-560.webp" width="560" height="1050" loading="lazy" alt="Illustration : Yemma, la voix de la collection"></figure>'}
   <div>
     <h2>${esc(P.bibliotheque.book.title)}</h2>
     <p class="book-sub">${esc(P.bibliotheque.book.subtitle)}</p>
@@ -467,8 +467,7 @@ page(
     <p><a class="btn btn-line" href="/werdi-ouvre-les-yeux/">Découvrir le livre</a></p>
   </div>
 </section>
-<section class="room-shelf has-illu" aria-labelledby="shelf-title">
-  <img class="shelf-illu" src="/images/marque/lamia-illu-banquette-560.webp" width="560" height="678" loading="lazy" alt="Lamia assise sur une banquette, écrivant dans un carnet">
+<section class="room-shelf" aria-labelledby="shelf-title">
   <h2 id="shelf-title">Sur les étagères</h2>
   ${productGrid(roomBySlug.bibliotheque.productCategories)}
 </section>
@@ -489,6 +488,17 @@ page(
   <p class="prose-lead">${esc(P.ecrin.intro)}</p>
   ${productGrid(roomBySlug.ecrin.productCategories)}
   <p class="fine">${esc(P.ecrin.note)}</p>
+</section>
+<section class="ecrin-portes" aria-labelledby="portes-titre">
+  <h2 id="portes-titre">Le collier, porté</h2>
+  <div class="ecrin-portes-grille">
+    <img src="/images/collier/collier-mannequin-noir-640.webp" width="640" height="800" loading="lazy" alt="Le collier kabyle émaillé porté sur une robe noire">
+    <img src="/images/collier/collier-mannequin-robe-kabyle-640.webp" width="640" height="800" loading="lazy" alt="Le collier porté avec une robe kabyle blanche brodée de rouge">
+    <img src="/images/collier/collier-mannequin-lanterne-640.webp" width="640" height="800" loading="lazy" alt="Le collier porté à la lumière des lanternes">
+    <img src="/images/collier/collier-mannequin-cou-640.webp" width="640" height="800" loading="lazy" alt="Le médaillon central, son corail et ses trois pampilles">
+  </div>
+  <figure class="ecrin-planche"><img src="/images/collier/collier-planche-presentation-1536.webp" srcset="/images/collier/collier-planche-presentation-900.webp 900w, /images/collier/collier-planche-presentation-1536.webp 1536w" sizes="(max-width: 1300px) 100vw, 1240px" width="1536" height="1024" loading="lazy" alt="Collier kabyle artisanal : argent véritable 15 g, émaillage traditionnel, fait main, livraison en France, emballage soigné"></figure>
+  <figure class="ecrin-planche"><img src="/images/collier/collier-planche-details-1536.webp" srcset="/images/collier/collier-planche-details-900.webp 900w, /images/collier/collier-planche-details-1536.webp 1536w" sizes="(max-width: 1300px) 100vw, 1240px" width="1536" height="1024" loading="lazy" alt="Les détails du collier : médaillons émaillés, corail, pampilles, fermoir, écrin cadeau"></figure>
 </section>
 <section class="room-body two-col">
   <div><h2>${esc(P.ecrin.athYenni.title)}</h2><p>${esc(P.ecrin.athYenni.text)}</p></div>

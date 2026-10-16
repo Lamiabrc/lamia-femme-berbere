@@ -156,7 +156,7 @@ function freeSoiree(s) {
   const venise = /venise/i.test(s.title);
   return `<article class="event-card soiree-card${venise ? ' is-venise' : ''}">
     ${venise ? `<figure class="venise-card-visual">
-      <img src="/images/lamia/lamia-venise-900.webp" width="900" height="506" alt="Lamia, masque vénitien à la main, sur le Grand Canal de Venise" loading="lazy">
+      <img src="/images/lamia/affiche-boudoir-venise-560.webp" width="560" height="667" alt="Affiche du Bal masqué de Venise, avec Lamia masquée" loading="lazy">
       <figcaption><span>Thème de la soirée</span><strong>Carnaval de Venise</strong><em>Masque, loup ou tenue élégante : le mystère fait partie du jeu.</em></figcaption>
     </figure>` : ''}
     <p class="event-date">${esc(when(s.starts_at))}</p>
