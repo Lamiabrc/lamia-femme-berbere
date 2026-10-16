@@ -95,7 +95,7 @@ const HOME_UNIVERSES = [
 
 // ---------------------------------------------------------------- gabarit commun
 
-function layout({ title, description, path, room, body, scripts = [], noindex = false, ogTitle, ogDescription, ogImage, ogImageAlt, ogImageWidth = 600, ogImageHeight = 600 }) {
+function layout({ title, description, path, room, body, scripts = [], noindex = false, ambiance, ogTitle, ogDescription, ogImage, ogImageAlt, ogImageWidth = 600, ogImageHeight = 600 }) {
   const canonical = SITE_URL + path;
   const accent = room?.accent || 'rouge';
   const socialTitle = ogTitle || title;
@@ -130,7 +130,7 @@ ${noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" hr
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/maison.css?v=${VERSION}">
 </head>
-<body data-room="${esc(room?.slug || '')}" data-accent="${esc(accent)}">
+<body data-room="${esc(room?.slug || '')}" data-ambiance="${esc(ambiance || room?.slug || '')}" data-accent="${esc(accent)}">
 <a class="skip" href="#contenu">Aller au contenu</a>
 ${header(room)}
 <main id="contenu">
@@ -656,10 +656,11 @@ page(
     description: 'Connecte-toi à ton espace de la Maison Lamia Femme Berbère.',
     path: '/mon-espace/',
     room: roomBySlug.hall,
+    ambiance: 'espace',
     noindex: true,
     scripts: ['/assets/espace.js'],
     body: `<section class="espace">
-  <p class="room-name"><span class="pip" aria-hidden="true"></span>Mon espace</p>
+  <p class="room-name"><span class="pip" aria-hidden="true"></span>Mon espace · ma chambre dans la Maison</p>
 
   <div data-espace-out hidden>
     <h1>Se connecter</h1>
@@ -746,7 +747,7 @@ page(
     <div class="espace-liens is-light">
       <a href="/speed-dating/bal/"><strong>Entrer au bal</strong><span>Le soir de la soirée</span></a>
       <a href="/speed-dating/souhaits/"><strong>Mon carnet de bal</strong><span>Qui aimerais-tu revoir ?</span></a>
-      <a href="/confidences/"><strong>Alerter Lamia</strong><span>En toute confidentialité</span></a>
+      <a href="/confidences/"><strong>Me confier à Lamia</strong><span>Écrire, laisser un vocal, échanger</span></a>
     </div>
   </div>
 </section>`,
