@@ -125,7 +125,7 @@ ${noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" hr
 <meta name="twitter:image" content="${esc(socialImage)}">
 <meta name="twitter:image:alt" content="${esc(socialImageAlt)}">
 <meta name="theme-color" content="#1B1A18">
-<link rel="icon" href="/images/marque/lamia-logo-160.webp" type="image/webp">
+<link rel="icon" href="/images/marque/lamia-logo-net-160.webp" type="image/webp">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/maison.css?v=${VERSION}">
@@ -148,7 +148,7 @@ function header(room) {
     `<a href="${href}"${room?.slug === slug ? ' aria-current="page"' : ''}>${label}</a>`;
   return `<header class="site-header">
   <a class="brand" href="/" aria-label="Lamia Femme Berbère, retour au Hall">
-    <img src="/images/marque/lamia-logo-160.webp" width="52" height="52" alt="">
+    <img src="/images/marque/lamia-logo-net-160.webp" width="52" height="52" alt="">
     <span><strong>Lamia</strong> Femme Berbère</span>
   </a>
   <nav class="site-nav" aria-label="Navigation principale">
@@ -216,13 +216,17 @@ const HEAD_IMAGES = {
   salon: ['/images/marque/lamia-portrait-reel-480.webp', 'Lamia Femme Berbère, portrait réel'],
   'speed-dating': ['/images/marque/lamia-portrait-reel-480.webp', 'Lamia Femme Berbère, hôte du Boudoir des Rencontres'],
   boutique: ['/images/collier/collier-kabyle-15g-ecrin-640.webp', 'Collier kabyle dans son écrin'],
+  patio: ['/images/marque/lamia-illu-debout-480.webp', 'Lamia en robe kabyle brodée, debout, la main sur le cœur', true],
+  grenier: ['/images/marque/lamia-illu-pensive-480.webp', 'Lamia pensive, foulard kabyle et bracelets d’argent', true],
 };
 function roomHead(room, extra = '') {
   const im = HEAD_IMAGES[room.slug];
-  const arch = im
+  const arch = im?.[2]
+    ? `<figure class="head-illu"><img src="${im[0]}" alt="${esc(im[1])}"></figure>`
+    : im
     ? `<figure class="head-arch has-image"><img src="${im[0]}" alt="${esc(im[1])}"${['salon', 'speed-dating'].includes(room.slug) ? ' class="is-lamia-photo"' : ''}></figure>`
     : '<span class="head-arch" aria-hidden="true"></span>';
-  return `<section class="room-head${im ? ' with-image' : ''}">${arch}
+  return `<section class="room-head${im ? ' with-image' : ''}${im?.[2] ? ' with-illu' : ''}">${arch}
   <p class="room-name"><span class="pip" aria-hidden="true"></span>${esc(room.name)}</p>
   <h1>${esc(room.headline || room.welcome)}</h1>
   <p class="lead">${esc(room.summary)}</p>
@@ -425,6 +429,7 @@ page(
     ${list(P.salon.rules)}
   </aside>
 </section>
+<figure class="banniere-salon"><img src="/images/lamia/banniere-lamia-berbere-1672.webp" srcset="/images/lamia/banniere-lamia-berbere-900.webp 900w, /images/lamia/banniere-lamia-berbere-1672.webp 1672w" sizes="(max-width: 1300px) 100vw, 1240px" width="1672" height="941" loading="lazy" alt="Lamia Berbère : humour, société, politique, contradictions du quotidien. Un regard berbère, kabyle, algérien, français et maghrébin."></figure>
 <section class="reseaux" aria-labelledby="reseaux-titre">
   <h2 id="reseaux-titre">Mes réseaux</h2>
   <p class="reseaux-intro">Où me retrouver, me suivre et me poser vos questions.</p>
@@ -462,7 +467,8 @@ page(
     <p><a class="btn btn-line" href="/werdi-ouvre-les-yeux/">Découvrir le livre</a></p>
   </div>
 </section>
-<section class="room-shelf" aria-labelledby="shelf-title">
+<section class="room-shelf has-illu" aria-labelledby="shelf-title">
+  <img class="shelf-illu" src="/images/marque/lamia-illu-banquette-560.webp" width="560" height="678" loading="lazy" alt="Lamia assise sur une banquette, écrivant dans un carnet">
   <h2 id="shelf-title">Sur les étagères</h2>
   ${productGrid(roomBySlug.bibliotheque.productCategories)}
 </section>
@@ -666,6 +672,7 @@ page(
     noindex: true,
     scripts: ['/assets/espace.js'],
     body: `<section class="espace">
+  <img class="espace-illu" src="/images/marque/lamia-illu-ecrit-480.webp" width="480" height="601" alt="" aria-hidden="true">
   <p class="room-name"><span class="pip" aria-hidden="true"></span>Mon espace · ma chambre dans la Maison</p>
 
   <div data-espace-out hidden>
@@ -815,7 +822,7 @@ page(
     <p class="salle-temps" data-salle-temps aria-live="off"></p>
   </header>
   <div class="salle-scene">
-    <figure class="salle-autre"><div class="salle-accueil" data-salle-accueil style="--accueil:url('${esc(imgOr('salle-accueil', '/images/lamia/lamia-venise-1672.webp'))}')" role="img" aria-label="Lamia vous accueille au Bal masqué de Venise"><p>« ${esc(P.speedDating.salleAccueil)} »<span>Lamia</span></p></div><video data-video-autre playsinline autoplay></video><img class="salle-logo" src="/images/marque/lamia-logo-160.webp" alt="" width="64" height="64"><figcaption data-autre-nom>Lamia arrive…</figcaption><span class="salle-cadre" aria-hidden="true"></span></figure>
+    <figure class="salle-autre"><div class="salle-accueil" data-salle-accueil style="--accueil:url('${esc(imgOr('salle-accueil', '/images/lamia/lamia-venise-1672.webp'))}')" role="img" aria-label="Lamia vous accueille au Bal masqué de Venise"><p>« ${esc(P.speedDating.salleAccueil)} »<span>Lamia</span></p></div><video data-video-autre playsinline autoplay></video><img class="salle-logo" src="/images/marque/lamia-logo-net-160.webp" alt="" width="64" height="64"><figcaption data-autre-nom>Lamia arrive…</figcaption><span class="salle-cadre" aria-hidden="true"></span></figure>
     <figure class="salle-moi"><video data-video-moi playsinline autoplay muted></video><figcaption>Toi</figcaption></figure>
     <audio data-audio-autre autoplay></audio>
   </div>
@@ -934,7 +941,7 @@ page(
     scripts: ['/assets/membre.js', '/assets/confidences.js'],
     body: `<div class="conf">
 <section class="conf-hero">
-  <img class="conf-logo" src="/images/marque/lamia-logo-600.webp" width="140" height="140" alt="Lamia Femme Berbère">
+  <img class="conf-logo" src="/images/marque/lamia-logo-net-600.webp" width="140" height="140" alt="Lamia Femme Berbère">
   <p class="conf-sur">Le petit salon</p>
   <h1>Les Confidences avec Lamia</h1>
   <p class="conf-sous">« Un mot, un doute, une histoire… je t’écoute. »</p>
