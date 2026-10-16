@@ -2073,3 +2073,65 @@ body { background: var(--qvt-ivoire); }
   .conf-bulle { max-width: 94%; }
   .conf-envoyer { justify-self: stretch; }
 }
+
+/* ================================================================ Le Hall : l'intérieur d'une maison kabyle
+   Murs passés à la chaux ocre, poutres de cèdre, frise peinte, tapis tissé au sol, lumière d'une lanterne. */
+body[data-room="hall"] {
+  --chaux: #ecdcc0; --chaux-claire: #f5ead6; --ocre: #c98f4e; --cedre: #4a2e1d; --cedre-clair: #6e4529;
+  --frise-rouge: #a8322d; --frise-jaune: #d9a23a; --frise-noir: #2a1d17;
+  --texture-chaux: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .32 0 0 0 0 .2 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --frise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='18'%3E%3Crect width='48' height='18' fill='%23f1e2c6'/%3E%3Cpath d='M0 18 12 4 24 18Z' fill='%23a8322d'/%3E%3Cpath d='M24 18 36 4 48 18Z' fill='%232a1d17'/%3E%3Cpath d='M12 9 15 12 12 15 9 12Z M36 9 39 12 36 15 33 12Z' fill='%23d9a23a'/%3E%3Crect y='0' width='48' height='2' fill='%232a1d17'/%3E%3C/svg%3E");
+  --tapis: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='28'%3E%3Crect width='64' height='28' fill='%238e2b26'/%3E%3Cpath d='M0 14 16 2 32 14 16 26Z' fill='%23d9a23a'/%3E%3Cpath d='M32 14 48 2 64 14 48 26Z' fill='%232a1d17'/%3E%3Cpath d='M16 9 21 14 16 19 11 14Z' fill='%23f1e2c6'/%3E%3Cpath d='M48 9 53 14 48 19 43 14Z' fill='%23d9a23a'/%3E%3Crect width='64' height='3' fill='%23f1e2c6'/%3E%3Crect y='25' width='64' height='3' fill='%23f1e2c6'/%3E%3C/svg%3E");
+}
+body[data-room="hall"] .hall-hero, body[data-room="hall"] .hall-hero[class] {
+  padding: clamp(84px, 9vw, 120px) var(--gouttiere) clamp(70px, 7vw, 100px);
+  background:
+    radial-gradient(ellipse 42% 38% at 78% 22%, rgba(255,214,140,.55), rgba(255,196,110,.18) 45%, transparent 72%),
+    radial-gradient(ellipse 60% 50% at 20% 100%, rgba(120,70,30,.16), transparent 70%),
+    radial-gradient(ellipse 120% 90% at 50% 40%, transparent 55%, rgba(90,52,25,.22) 100%),
+    var(--texture-chaux),
+    linear-gradient(180deg, #e6d2b2 0%, var(--chaux) 30%, var(--chaux-claire) 70%, #e9d5b5 100%);
+}
+/* Le plafond : poutres de cèdre, puis la frise peinte à la main */
+body[data-room="hall"] .hall-hero::before {
+  content: ''; display: block; position: absolute; left: 0; right: 0; top: 0; height: 52px; pointer-events: none; animation: none; opacity: 1; transform: none; -webkit-mask-image: none; mask-image: none; z-index: 1;
+  background:
+    var(--frise) 0 34px / 48px 18px repeat-x,
+    repeating-linear-gradient(90deg, transparent 0 150px, rgba(0,0,0,.35) 150px 152px, var(--cedre-clair) 152px 176px, rgba(0,0,0,.35) 176px 178px) 0 0 / 100% 34px no-repeat,
+    linear-gradient(180deg, #2f1d12, var(--cedre) 70%, #3a2416) 0 0 / 100% 34px no-repeat;
+  box-shadow: 0 10px 18px -12px rgba(40,20,10,.5);
+}
+/* Le sol : un tapis tissé kabyle */
+body[data-room="hall"] .hall-hero::after { filter: none; mix-blend-mode: normal; display: block; inset: auto 0 0 0; top: auto; animation: none; transform: none; opacity: 1; -webkit-mask-image: none; mask-image: none;
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 28px; pointer-events: none; z-index: 1;
+  background: var(--tapis) 0 0 / 64px 28px repeat-x; box-shadow: 0 -8px 16px -10px rgba(40,20,10,.45);
+}
+body[data-room="hall"] .hall-cue, body[data-room="hall"] .hall-cue[class] { position: relative; top: auto; bottom: auto; left: auto; transform: none; margin: 18px auto 0; color: var(--cedre); text-shadow: none; }
+body[data-room="hall"] .hall-cue span { background: rgba(245,234,214,.85); color: var(--cedre); border: 1px solid rgba(201,143,78,.5); }
+body[data-room="hall"] .hall-hero h2 { color: #2c1b12; }
+body[data-room="hall"] .hall-hero .lead { color: #4d3727; }
+body[data-room="hall"] .hall-hero .room-name { color: var(--frise-rouge); }
+/* Les aperçus deviennent des niches creusées dans le mur */
+body[data-room="hall"] .hall-apercus .apercu:not(.is-bal) { background: linear-gradient(180deg, #fbf3e4, #f3e4c9); border: 1px solid rgba(201,143,78,.45); border-radius: 22px 22px 10px 10px; box-shadow: inset 0 8px 14px -10px rgba(90,52,25,.35), 0 18px 30px -24px rgba(60,30,10,.6); }
+body[data-room="hall"] .home-reassurance { background: rgba(251,243,228,.8); border-color: rgba(201,143,78,.4); }
+/* La lanterne : une lueur qui respire doucement */
+body[data-room="hall"] .hall-stage::before { content: ''; position: absolute; inset: -12% -8% auto auto; width: 70%; aspect-ratio: 1; border-radius: 50%; pointer-events: none; z-index: 0;
+  background: radial-gradient(circle, rgba(255,206,120,.45), rgba(255,190,100,.12) 45%, transparent 70%); animation: lanterne 6s ease-in-out infinite alternate; }
+body[data-room="hall"] .hall-stage { position: relative; }
+body[data-room="hall"] .hall-stage > * { z-index: 1; }
+@keyframes lanterne { from { opacity: .65; transform: scale(.96); } to { opacity: 1; transform: scale(1.04); } }
+@media (prefers-reduced-motion: reduce) { body[data-room="hall"] .hall-stage::before { animation: none; } }
+
+/* Les portes de la Maison : des niches à arcade, sur le même mur de chaux */
+body[data-room="hall"] .home-universes { background: var(--texture-chaux), linear-gradient(180deg, #efe1c8, var(--chaux-claire)); border-top: 0; position: relative; }
+body[data-room="hall"] .home-universe-card { background: linear-gradient(180deg, rgba(255,250,240,.92), rgba(247,236,214,.92)); border: 1px solid rgba(201,143,78,.45); border-radius: 26px 26px 10px 10px; box-shadow: inset 0 10px 16px -12px rgba(90,52,25,.3), 0 20px 34px -28px rgba(60,30,10,.6); }
+body[data-room="hall"] .home-universe-card:hover { border-color: var(--ocre); transform: translateY(-3px); }
+body[data-room="hall"] .home-universe-card::before { border: 0; width: 100%; height: 6px; right: 0; left: 0; top: 0; transform: none; background: var(--frise) 0 -6px / 24px 9px repeat-x; opacity: .85; }
+body[data-room="hall"] .home-universe-room { color: var(--frise-rouge); }
+/* L'histoire de Lamia, au coin de la lanterne */
+body[data-room="hall"] .story-lamia { background: radial-gradient(circle at 20% 40%, rgba(255,206,120,.35), transparent 35%), var(--texture-chaux), linear-gradient(180deg, var(--chaux-claire), #ead8ba); border-top: 0; position: relative; }
+body[data-room="hall"] .story-lamia::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 18px; background: var(--frise) 0 0 / 48px 18px repeat-x; opacity: .9; }
+@media (max-width: 760px) {
+  body[data-room="hall"] .hall-hero::before { height: 40px; background: var(--frise) 0 26px / 32px 12px repeat-x, repeating-linear-gradient(90deg, transparent 0 90px, var(--cedre-clair) 90px 106px) 0 0 / 100% 26px no-repeat, linear-gradient(180deg, #2f1d12, var(--cedre)) 0 0 / 100% 26px no-repeat; }
+  body[data-room="hall"] .hall-hero, body[data-room="hall"] .hall-hero[class] { padding-top: 64px; }
+}
