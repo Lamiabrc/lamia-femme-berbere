@@ -2168,3 +2168,95 @@ body[data-ambiance="espace"] .espace .text-link, body[data-ambiance="espace"] .e
 body[data-ambiance="espace"] .espace-mdp summary { color: var(--sauge-fonce); }
 body[data-ambiance="espace"] .espace h2:not(.espace-card h2) { border-image: linear-gradient(180deg, transparent 0 1px, var(--bois) 1px 4px, var(--bois-fonce) 4px 6px) 1; }
 @media (min-width: 1100px) { body[data-ambiance="espace"] [data-espace-out] .espace-grid { grid-template-columns: repeat(3, 1fr); } }
+
+/* ================================================================ Ambiances des pièces : réglages communs */
+body[data-ambiance] main { --amb-texte: inherit; }
+[data-ambiance] .room-head, [data-ambiance] .room-body, [data-ambiance] .room-shelf, [data-ambiance] .book-feature, [data-ambiance] .next-rooms { position: relative; }
+
+/* ================================================================ L'Écrin : la vitrine d'un joaillier
+   Velours bleu nuit, argent, émaux bleu, vert et jaune, corail, et la lumière d'une vitrine. */
+body[data-ambiance="ecrin"] main {
+  --nuit: #0e1830; --nuit-2: #16244a; --argent: #c9ced8; --argent-clair: #eef0f4; --email-bleu: #2f6bc4; --email-vert: #3e9a5c; --email-jaune: #e8b745; --corail: #e06a4e; --ivoire: #f2ece0;
+  color: var(--ivoire);
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 0%, rgba(120,150,220,.22), transparent 70%),
+    repeating-linear-gradient(115deg, rgba(255,255,255,.012) 0 2px, transparent 2px 6px),
+    linear-gradient(180deg, var(--nuit-2), var(--nuit) 45%, #0a1224);
+}
+body[data-ambiance="ecrin"] .room-head { background: radial-gradient(ellipse 55% 70% at 78% 30%, rgba(200,215,255,.22), transparent 65%), radial-gradient(ellipse 40% 60% at 15% 100%, rgba(47,107,196,.25), transparent 70%), transparent; border-bottom: 0; }
+body[data-ambiance="ecrin"] .room-head h1, body[data-ambiance="ecrin"] h2, body[data-ambiance="ecrin"] h3 { color: #fff; }
+body[data-ambiance="ecrin"] .room-head .lead, body[data-ambiance="ecrin"] .room-body, body[data-ambiance="ecrin"] .fine { color: #cfd5e2; }
+body[data-ambiance="ecrin"] .room-name { color: var(--email-jaune); }
+body[data-ambiance="ecrin"] .prose-lead { color: var(--ivoire); }
+body[data-ambiance="ecrin"] .head-arch.has-image { background: linear-gradient(135deg, #f4f6fa, #9aa2b1 45%, #eef0f4 55%, #8d95a5); box-shadow: 0 0 0 1px rgba(255,255,255,.4), 0 30px 60px -20px rgba(0,0,0,.7), 0 0 60px rgba(160,190,255,.25); }
+body[data-ambiance="ecrin"] .head-arch.has-image img { border-color: #5d6577; }
+/* Frise émaillée : triangles bleu, vert, jaune sur argent */
+body[data-ambiance="ecrin"] .frise-fine { height: 22px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='22'%3E%3Crect width='60' height='22' fill='%23c9ced8'/%3E%3Cpath d='M0 20 10 4 20 20Z' fill='%232f6bc4'/%3E%3Cpath d='M20 20 30 4 40 20Z' fill='%233e9a5c'/%3E%3Cpath d='M40 20 50 4 60 20Z' fill='%23e8b745'/%3E%3Ccircle cx='10' cy='15' r='2' fill='%23e06a4e'/%3E%3Ccircle cx='30' cy='15' r='2' fill='%23e06a4e'/%3E%3Ccircle cx='50' cy='15' r='2' fill='%23e06a4e'/%3E%3Crect y='0' width='60' height='2' fill='%23868d9c'/%3E%3Crect y='20' width='60' height='2' fill='%23868d9c'/%3E%3C/svg%3E") repeat-x center / auto 22px; }
+/* Les bijoux posés dans des vitrines éclairées */
+body[data-ambiance="ecrin"] .product-media { background: radial-gradient(ellipse at 50% 20%, #26355e, #121c38 70%); border: 1px solid rgba(201,206,216,.45); border-radius: 14px; box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 26px 50px -24px rgba(0,0,0,.8); }
+body[data-ambiance="ecrin"] .product-card:hover .product-media { border-color: var(--argent-clair); box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 0 40px rgba(160,190,255,.25), 0 30px 60px -24px rgba(0,0,0,.85); }
+body[data-ambiance="ecrin"] .product-card h3 { color: #fff; }
+body[data-ambiance="ecrin"] .product-card:hover h3 { color: var(--email-jaune); }
+body[data-ambiance="ecrin"] .product-card, body[data-ambiance="ecrin"] .product-card p, body[data-ambiance="ecrin"] .product-card span { color: #cfd5e2; }
+body[data-ambiance="ecrin"] .side-note { background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); color: var(--ivoire); border: 1px solid rgba(201,206,216,.3); border-radius: 16px; }
+body[data-ambiance="ecrin"] .side-note::before { filter: saturate(1.2); }
+body[data-ambiance="ecrin"] .catalogue-vide, body[data-ambiance="ecrin"] .room-body [class*="empty"], body[data-ambiance="ecrin"] .room-body .notice { color: #cfd5e2; border-color: rgba(201,206,216,.35); background: rgba(255,255,255,.04); }
+body[data-ambiance="ecrin"] .next-rooms { background: #0a1224; border-top: 1px solid rgba(201,206,216,.2); }
+body[data-ambiance="ecrin"] .next-rooms strong { color: var(--argent-clair); }
+body[data-ambiance="ecrin"] .next-rooms span:not(.pip) { color: #9ea7ba; }
+body[data-ambiance="ecrin"] .next-rooms a { border-color: rgba(201,206,216,.2); }
+body[data-ambiance="ecrin"] .next-rooms a:hover strong { color: var(--email-jaune); }
+body[data-ambiance="ecrin"] a:not(.btn):not(.product-card) { color: var(--email-jaune); }
+
+/* ================================================================ La Boutique : une échoppe claire du souk
+   Lin et bois clair, étagères, paniers tressés, terre cuite et olive, un auvent rayé à l'entrée. */
+body[data-ambiance="boutique"] main {
+  --lin: #f6efe2; --bois: #c79a62; --bois-fonce: #8c6239; --terre: #b5603a; --olive: #747b3a; --sable: #e8dcc4;
+  background: repeating-linear-gradient(0deg, rgba(140,98,57,.03) 0 1px, transparent 1px 4px), linear-gradient(180deg, #faf5ec, var(--lin));
+}
+body[data-ambiance="boutique"] .room-head { background: radial-gradient(ellipse 50% 70% at 80% 40%, rgba(255,228,180,.6), transparent 65%), transparent; padding-top: clamp(78px, 9vw, 120px); border-bottom: 0; }
+/* L'auvent rayé, festonné */
+body[data-ambiance="boutique"] .room-head::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 46px; z-index: 1; pointer-events: none;
+  background: radial-gradient(circle at 20px -6px, transparent 21px, var(--lin) 22px) 0 26px / 40px 22px repeat-x, repeating-linear-gradient(90deg, var(--terre) 0 40px, #f3e6cf 40px 80px) 0 0 / 100% 30px no-repeat; filter: drop-shadow(0 6px 6px rgba(80,50,20,.18)); }
+body[data-ambiance="boutique"] .room-name { color: var(--terre); }
+body[data-ambiance="boutique"] .room-head h1 { color: #3a2614; }
+body[data-ambiance="boutique"] .frise-fine { height: 16px; background: repeating-linear-gradient(90deg, var(--bois-fonce) 0 3px, transparent 3px 16px), linear-gradient(180deg, var(--bois), var(--bois-fonce)); opacity: 1; }
+/* Les produits posés sur des étagères en bois */
+body[data-ambiance="boutique"] .product-grid { row-gap: 46px; }
+body[data-ambiance="boutique"] .product-card { position: relative; padding-bottom: 14px; }
+body[data-ambiance="boutique"] .product-card::after { content: ''; position: absolute; left: -14px; right: -14px; bottom: 0; height: 12px; border-radius: 3px; background: linear-gradient(180deg, #d7ad76, var(--bois) 40%, var(--bois-fonce)); box-shadow: 0 10px 14px -8px rgba(80,50,20,.45); }
+body[data-ambiance="boutique"] .product-media { background: #fffaf1; border: 1px solid var(--sable); border-radius: 10px; }
+body[data-ambiance="boutique"] .product-card:hover h3 { color: var(--terre); }
+body[data-ambiance="boutique"] .room-body h2, body[data-ambiance="boutique"] .shop-group h2 { color: #3a2614; display: inline-flex; align-items: center; gap: 10px; }
+body[data-ambiance="boutique"] .shop-group h2::before { content: ''; width: 26px; height: 18px; border-radius: 0 0 13px 13px; background: repeating-linear-gradient(45deg, var(--bois) 0 3px, var(--bois-fonce) 3px 6px); }
+body[data-ambiance="boutique"] .next-rooms { background: #efe4cf; }
+
+/* ================================================================ La Bibliothèque de Yemma : la bibliothèque ancienne
+   Bois sombre, dos de livres, papier vieilli, et la lueur verte d'une lampe de lecture. */
+body[data-ambiance="bibliotheque"] main {
+  --bois-sombre: #2a1b12; --bois: #4a3020; --papier: #f1e4c8; --papier-fonce: #e2cfa8; --lampe: #2f6b4f; --or-livre: #c9a24f; --encre: #2b2118;
+  background: linear-gradient(180deg, #32211a, var(--bois-sombre));
+}
+body[data-ambiance="bibliotheque"] .room-head { background: radial-gradient(ellipse 35% 55% at 82% 28%, rgba(255,214,140,.38), rgba(80,140,100,.12) 50%, transparent 72%), repeating-linear-gradient(90deg, rgba(0,0,0,.18) 0 2px, transparent 2px 120px), linear-gradient(180deg, #3b271a, #2d1e14); border-bottom: 0; color: var(--papier); }
+body[data-ambiance="bibliotheque"] .room-head h1 { color: #f6ecd6; }
+body[data-ambiance="bibliotheque"] .room-head .lead { color: #dccaa6; }
+body[data-ambiance="bibliotheque"] .room-name { color: var(--or-livre); }
+/* Une rangée de dos de livres en guise de frise */
+body[data-ambiance="bibliotheque"] .frise-fine { height: 54px; opacity: 1; background:
+  linear-gradient(180deg, transparent 0 46px, #1e130c 46px 54px),
+  repeating-linear-gradient(90deg, #6b2a24 0 22px, #1d1410 22px 24px, #2f5a44 24px 40px, #1d1410 40px 42px, #8a6a2c 42px 70px, #1d1410 70px 72px, #3a3f62 72px 88px, #1d1410 88px 90px, #7c4a2a 90px 116px, #1d1410 116px 118px, #5a2b3e 118px 132px, #1d1410 132px 134px),
+  linear-gradient(180deg, rgba(255,255,255,.12), transparent 30%); background-blend-mode: normal; }
+/* Les pages : papier vieilli posé sur le bureau, sous la lampe */
+body[data-ambiance="bibliotheque"] .book-feature, body[data-ambiance="bibliotheque"] .room-shelf { background: radial-gradient(ellipse 60% 50% at 75% 10%, rgba(255,226,160,.35), transparent 70%), repeating-linear-gradient(0deg, rgba(120,90,40,.04) 0 1px, transparent 1px 3px), linear-gradient(180deg, var(--papier), var(--papier-fonce)); color: var(--encre); margin: 0 clamp(0px, 3vw, 40px); border-radius: 6px; box-shadow: 0 30px 60px -30px rgba(0,0,0,.8), inset 0 0 60px rgba(120,80,30,.18); }
+body[data-ambiance="bibliotheque"] .room-shelf { margin-top: 28px; margin-bottom: 28px; }
+body[data-ambiance="bibliotheque"] .book-feature h2, body[data-ambiance="bibliotheque"] .room-shelf h2 { color: #2b1a10; }
+body[data-ambiance="bibliotheque"] .book-feature blockquote { border-left-color: var(--lampe); color: #3b2c1c; }
+body[data-ambiance="bibliotheque"] .book-feature .btn-line { border-color: var(--lampe); color: var(--lampe); }
+body[data-ambiance="bibliotheque"] .book-feature img, body[data-ambiance="bibliotheque"] .book-cover img { box-shadow: 0 30px 60px -18px rgba(40,20,5,.7), 6px 0 0 #d9c69c, 8px 0 0 #b9a273; }
+body[data-ambiance="bibliotheque"] .product-media { border-radius: 2px 8px 8px 2px; box-shadow: inset 6px 0 10px -6px rgba(0,0,0,.4), 0 20px 34px -20px rgba(40,20,5,.7); }
+body[data-ambiance="bibliotheque"] .product-card:hover h3 { color: var(--lampe); }
+body[data-ambiance="bibliotheque"] .next-rooms { background: transparent; border-top: 1px solid rgba(201,162,79,.25); color: var(--papier); }
+body[data-ambiance="bibliotheque"] .next-rooms h2, body[data-ambiance="bibliotheque"] .next-rooms strong { color: #f1e4c8; }
+body[data-ambiance="bibliotheque"] .next-rooms span:not(.pip) { color: #c2ae88; }
+body[data-ambiance="bibliotheque"] .next-rooms a { border-color: rgba(201,162,79,.25); }
+body[data-ambiance="bibliotheque"] .next-rooms a:hover strong { color: var(--or-livre); }
