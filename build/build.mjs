@@ -9,7 +9,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { rooms, roomBySlug, floors } from '../content/rooms.mjs';
 import * as P from '../content/pages.mjs';
-import { legalPages } from '../content/legal.mjs';
+import { legalPages, livraisonTexte, tvaTexte } from '../content/legal.mjs';
+import { reglagesPropres } from '../content/shipping.mjs';
 import { facade } from './facade.mjs';
 import { EDITABLE, defaults, applyOverrides } from '../content/editable.mjs';
 
@@ -33,6 +34,17 @@ async function loadOverrides() {
   } catch { return {}; }
 }
 IMG = applyOverrides(await loadOverrides());
+// Réglages de la boutique (frais d'envoi, TVA) pour les conditions de vente.
+async function loadBoutique() {
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY;
+  if (!key) return reglagesPropres();
+  try {
+    const h = { apikey: key, ...(key.startsWith('sb_secret_') ? {} : { Authorization: `Bearer ${key}` }) };
+    const r = await fetch('https://tybwvxinigahhntfeeur.supabase.co/rest/v1/platform_settings?key=eq.boutique&select=value', { headers: h, signal: AbortSignal.timeout(10000) });
+    return reglagesPropres(r.ok ? (await r.json())[0]?.value || {} : {});
+  } catch { return reglagesPropres(); }
+}
+const BOUTIQUE = await loadBoutique();
 const imgOr = (name, fallback) => IMG[name] || fallback;
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
@@ -290,7 +302,7 @@ page(
       <span class="apercu-mask" aria-hidden="true"><svg viewBox="0 0 64 32" width="64" height="32"><path d="M2 8c10-6 20-4 30 4C42 4 52 2 62 8c0 12-8 20-18 20-6 0-9-4-12-8-3 4-6 8-12 8C10 28 2 20 2 8Z" fill="none" stroke="currentColor" stroke-width="2.2"/><ellipse cx="19" cy="15" rx="6" ry="4" fill="currentColor"/><ellipse cx="45" cy="15" rx="6" ry="4" fill="currentColor"/></svg></span>
       <span class="apercu-kicker">Speed dating · gratuit</span>
       <strong>Bal masqué de Venise</strong>
-      <span class="apercu-info">Samedi 31 octobre, 21 h · en visio · salons France, Algérie, Canada, autres pays et tous âges · 20 personnes par salon</span>
+      <span class="apercu-info">Samedi 31 octobre, 21 h · en visio · salon Algérie–France, Europe, Olivier, Érables, Voyageurs et tous âges · 20 personnes par salon</span>
       <span class="apercu-cta">Réserver ma place →</span>
     </a>
     <a class="apercu" href="/produit/?p=collier-kabyle-argente-emaille-15g">
@@ -339,7 +351,7 @@ page(
       <li>En visio</li>
       <li>20 personnes maximum par salon</li>
     </ul>
-    <p class="home-speed-note">Salons France, Algérie, Canada, autres pays, tranches d’âge et salon tous âges / toutes zones.</p>
+    <p class="home-speed-note">Salon Algérie–France, Salon Europe, Salon de l’Olivier (Algérie), Salon des Érables (Canada et USA), Salon des Voyageurs, et un salon tous âges.</p>
     <p><a class="btn home-speed-cta" href="/speed-dating/#events-title">Réserver ma place</a></p>
   </div>
 </section>
@@ -563,7 +575,7 @@ page(
 <section class="bal-deroule" aria-labelledby="deroule-title">
   <h2 id="deroule-title">Le déroulé du bal</h2>
   <ol>
-    <li><strong>Vous réservez</strong><span>Choisissez votre salon (France, Algérie, Canada, autres pays ou tous âges) et réservez votre place en quelques instants.</span></li>
+    <li><strong>Vous réservez</strong><span>Choisissez votre salon (Algérie–France, Europe, Algérie, Canada et USA, autres pays ou tous âges) et réservez votre place en quelques instants.</span></li>
     <li><strong>Vous recevez l’invitation</strong><span>Les informations pratiques vous sont envoyées par e-mail avant la soirée.</span></li>
     <li><strong>Vous entrez dans le salon</strong><span>À 21 h, Lamia ouvre le bal et vous accueille dans la salle en visio.</span></li>
     <li><strong>Vous faites connaissance</strong><span>Les échanges se font en tête-à-tête de quelques minutes. Masque, loup ou déguisement : le mystère fait partie du jeu.</span></li>
@@ -1130,7 +1142,7 @@ for (const lp of legalPages) {
       description: lp.title,
       path: lp.path,
       noindex: true,
-      body: `<article class="article legal"><p class="draft-banner">Brouillon : ce texte sera complété et relu avant l’ouverture des ventes.</p><h1>${esc(lp.title)}</h1>${lp.body}</article>`,
+      body: `<article class="article legal"><p class="draft-banner">Brouillon : ce texte sera complété et relu avant l’ouverture des ventes.</p><h1>${esc(lp.title)}</h1>${lp.body.replace('{{LIVRAISON}}', livraisonTexte(BOUTIQUE.tarifs)).replace('{{TVA}}', tvaTexte(BOUTIQUE.tva))}</article>`,
     })
   );
 }

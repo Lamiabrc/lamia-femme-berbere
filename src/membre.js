@@ -137,7 +137,7 @@ function freeSoiree(s) {
   const maxBirth = new Date(Date.now() - 18 * 365.25 * 864e5).toISOString().slice(0, 10);
   // Les salons sont rangés par zone (« France · 25-39 ans ») : on choisit sa zone, l'âge choisit la tranche.
   const zoneOf = (ev) => (ev.audience || 'Salon unique').split(' · ')[0];
-  const ORDER = ['France', 'Algérie', 'Canada', 'Autres pays'];
+  const ORDER = ['Algérie–France', 'Europe', 'Algérie', 'Canada & USA', 'Autres pays'];
   const rank = (z) => (ORDER.includes(z) ? ORDER.indexOf(z) : /tous/i.test(z) ? 99 : 50);
   const zones = [...new Set(s.salons.map(zoneOf))].sort((a, b) => rank(a) - rank(b));
   SALONS[s.key] = s.salons.map((ev) => ({ id: ev.id, zone: zoneOf(ev), min: ev.min_age, max: ev.max_age, full: ev.status === 'sold_out', label: ev.audience }));
@@ -145,9 +145,10 @@ function freeSoiree(s) {
     const list = s.salons.filter((ev) => zoneOf(ev) === z);
     const tranches = list.map((ev) => (ev.audience || '').split(' · ')[1]).filter(Boolean).map((t) => t.replace(' ans', '').replace('plus de 50', '50+')).join(' · ');
     const allFull = list.every((ev) => ev.status === 'sold_out');
-    return `<label class="salon-choice${allFull ? ' is-full' : ''}${/tous/i.test(z) ? ' is-tous' : ''}">
+    const n = SALON_NOMS[z];
+    return `<label class="salon-choice${allFull ? ' is-full' : ''}${/tous/i.test(z) ? ' is-tous' : ''}${n?.vedette ? ' is-vedette' : ''}">
       <input type="radio" name="zone" value="${esc(z)}" ${allFull ? 'disabled' : ''} ${zones.length === 1 && i === 0 ? 'checked' : ''} required>
-      <span><strong>${esc(z === 'Salon unique' ? z : /tous/i.test(z) ? 'Salon Tous âges' : `Salon ${z}`)}</strong><small>${esc(/tous/i.test(z) ? 'Toutes zones, tous âges : pour celles et ceux pour qui l’âge n’est pas important' : tranches ? `${tranches} ans` : ages(list[0]))}${allFull ? ' · complet' : ''}</small></span>
+      <span>${n?.vedette ? `<em class="salon-vedette">${esc(n.vedette)}</em>` : ''}<strong>${esc(n?.nom || (z === 'Salon unique' ? z : /tous/i.test(z) ? 'Salon Tous âges' : `Salon ${z}`))}</strong><small class="salon-pour">${esc(n?.pour || '')}</small><small>${esc(/tous/i.test(z) ? 'Toutes zones, tous âges : pour celles et ceux pour qui l’âge n’est pas important' : tranches ? `${tranches} ans` : ages(list[0]))}${allFull ? ' · complet' : ''}</small></span>
     </label>`;
   }).join('');
   const many = zones.length > 1;
@@ -170,7 +171,7 @@ function freeSoiree(s) {
         <label>Je suis<select name="gender" required><option value="">Choisir</option><option value="femme">une femme</option><option value="homme">un homme</option></select></label>
         <label>Date de naissance<input name="birth_date" type="date" required max="${maxBirth}"></label>
         <label>Ma ville<input name="city" autocomplete="address-level2" required maxlength="80" placeholder="ex. Lyon, Tizi Ouzou, Montréal"></label>
-        <label>Je cherche quelqu’un<select name="search_zone" required><option value="">Choisir</option><option value="ville">dans ma ville et alentours</option><option value="region">dans ma région</option><option value="france">dans toute la France</option><option value="europe">en France ou en Europe</option><option value="canada">au Canada</option><option value="algerie">en Algérie</option><option value="monde">peu importe où</option></select></label>
+        <label>Je cherche quelqu’un<select name="search_zone" required><option value="">Choisir</option><option value="ville">dans ma ville et alentours</option><option value="region">dans ma région</option><option value="france">dans toute la France</option><option value="europe">en France ou en Europe</option><option value="canada">au Canada ou aux États-Unis</option><option value="algerie">en Algérie</option><option value="monde">peu importe où</option></select></label>
       </div></fieldset>
       <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
       <label class="check"><input type="checkbox" name="rules"><span>J’accepte les <a href="/cgv/" target="_blank" rel="noopener">règles de la soirée</a> : respect, sérieux, aucun propos déplacé. J’ai 18 ans ou plus.</span></label>
@@ -202,6 +203,15 @@ const ageAt = (birth, at) => {
   let a = d.getUTCFullYear() - b.getUTCFullYear();
   if (d.getUTCMonth() < b.getUTCMonth() || (d.getUTCMonth() === b.getUTCMonth() && d.getUTCDate() < b.getUTCDate())) a--;
   return a;
+};
+
+// Noms des salons du bal (choisis par Lamia). La clé est la zone enregistrée dans la soirée.
+const SALON_NOMS = {
+  'Algérie–France': { nom: 'Salon Algérie–France', pour: 'Pour échanger entre les deux rives, que tu vives en Algérie ou en France', vedette: 'Entre deux rives' },
+  Europe: { nom: 'Salon Europe', pour: 'France et pays d’Europe' },
+  Algérie: { nom: 'Salon de l’Olivier', pour: 'Algérie' },
+  'Canada & USA': { nom: 'Salon des Érables', pour: 'Canada et États-Unis' },
+  'Autres pays': { nom: 'Salon des Voyageurs', pour: 'Tous les autres pays' },
 };
 
 async function freeRegister(e) {

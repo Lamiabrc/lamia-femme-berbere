@@ -1,7 +1,11 @@
 // Données vivantes de la Maison : catalogue, fiche produit, panier, prochaine soirée.
 // Le navigateur n'utilise que la clé publique Supabase ; aucune donnée privée n'est lue ici.
 
-import { SHIPPING_METHODS, shippingFor, MAX_QTY } from '/assets/shipping.mjs';
+import { SHIPPING_METHODS, shippingFor, MAX_QTY, tvaIncluse, reglagesPropres } from '/assets/shipping.mjs';
+
+// Frais d'envoi et TVA réglés par Lamia (le serveur recalcule toujours à la commande).
+let REGLAGES = reglagesPropres();
+const reglagesPrets = fetch('/api/admin?action=boutique').then((r) => (r.ok ? r.json() : null)).then((v) => { if (v) REGLAGES = reglagesPropres(v); }).catch(() => {});
 
 export const SUPABASE_URL = 'https://tybwvxinigahhntfeeur.supabase.co';
 export const SUPABASE_KEY = 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc';
@@ -209,16 +213,18 @@ function wirePreorder(p, box) {
   const update = () => {
     const qty = Number(form.elements.qty.value) || 1;
     const method = form.elements.method ? form.querySelector('[name=method]:checked').value : 'email';
-    const ship = shippingFor(p, qty, method);
-    const col = shippingFor(p, qty, 'colissimo');
+    const ship = shippingFor(p, qty, method, REGLAGES.tarifs);
+    const col = shippingFor(p, qty, 'colissimo', REGLAGES.tarifs);
     const sp = $('[data-ship-price]', form);
     if (sp) sp.textContent = `(${money(col.cents)})`;
     const addr = $('[data-address]', form);
     if (addr) addr.hidden = ship.method !== 'colissimo';
-    $('[data-total]', form).textContent = `${money(p.price_cents * qty + ship.cents, p.currency)}${ship.cents ? ` dont ${money(ship.cents)} d’envoi` : ''}`;
+    const total = p.price_cents * qty + ship.cents, tva = tvaIncluse(total, REGLAGES.tva);
+    $('[data-total]', form).textContent = `${money(total, p.currency)}${ship.cents ? ` dont ${money(ship.cents)} d’envoi` : ''}${tva ? ` · dont TVA ${String(REGLAGES.tva.taux).replace('.', ',')} % : ${money(tva)}` : ''}`;
   };
   form.addEventListener('change', update);
   update();
+  reglagesPrets.then(update);
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const st = $('[data-preorder-status]', form);

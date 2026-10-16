@@ -76,6 +76,26 @@
     <div class="tdb-entete"><h1 class="tdb-titre">Produits</h1><button class="btn btn-ink" type="button" data-nouveau-produit>Ajouter un produit</button></div>
     <div class="produits-grille" data-produits></div>
 
+    <form class="tdb-carte reglages" data-reglages>
+      <h2>Livraison et TVA</h2>
+      <p class="aide">Ces montants s’appliquent tout de suite aux commandes. Les conditions de vente se mettent à jour quand tu cliques sur « Publier » (onglet Textes &amp; images).</p>
+      <div class="champs">
+        <label>Envoi livre ou objet, 1 exemplaire (€)<input name="colis_1" type="number" step="0.01" min="0"></label>
+        <label>2 ou 3 exemplaires (€)<input name="colis_2_3" type="number" step="0.01" min="0"></label>
+        <label>4 exemplaires et plus (€)<input name="colis_4_plus" type="number" step="0.01" min="0"></label>
+        <label>Envoi d’un bijou, suivi et assuré (€)<input name="bijou" type="number" step="0.01" min="0"></label>
+      </div>
+      <h3>TVA</h3>
+      <p class="aide">À activer seulement quand ton statut le prévoit (avec l’accord de ton comptable). Tes prix restent des prix TTC : le site affiche la part de TVA comprise.</p>
+      <div class="champs">
+        <label class="case"><input type="checkbox" name="tva_active"> Appliquer la TVA</label>
+        <label>Taux de TVA (%)<input name="tva_taux" type="number" step="0.1" min="0" max="30"></label>
+        <label class="large">Mention légale sur les prix (facultatif)<input name="tva_mention" maxlength="200" placeholder="Texte indiqué par ton comptable"></label>
+      </div>
+      <div class="actions"><button class="btn btn-ink" type="submit">Enregistrer</button></div>
+      <p class="form-status" data-reglages-status></p>
+    </form>
+
     <form class="tdb-carte produit-form" data-produit-form hidden>
       <div class="tdb-entete"><h2 data-produit-titre>Nouveau produit</h2><button class="link-button" type="button" data-produit-fermer>Fermer</button></div>
       <input type="hidden" name="id"><input type="hidden" name="slug">

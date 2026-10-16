@@ -32,7 +32,7 @@ function ouvrir(tab) {
   $$('[data-panel]').forEach((p) => { p.hidden = p.dataset.panel !== tab; });
   $$('[data-tab]').forEach((b) => b.setAttribute('aria-current', String(b.dataset.tab === tab)));
   try { history.replaceState(null, '', `#${tab}`); } catch { /* */ }
-  if (tab === 'produits' && !produits.length) chargerProduits();
+  if (tab === 'produits' && !produits.length) { chargerProduits(); chargerReglages(); }
   if (tab === 'textes') chargerTextes();
   if (tab === 'bilan') chargerBilan();
   scrollTo({ top: 0 });
@@ -147,6 +147,24 @@ async function chargerBilan() {
 $('[data-bilan-maj]')?.addEventListener('click', chargerBilan);
 
 // ---------------------------------------------------------------- produits
+// Livraison et TVA
+async function chargerReglages() {
+  try {
+    const r = await (await fetch('/api/admin?action=boutique', { cache: 'no-store' })).json();
+    const f = $('[data-reglages]');
+    for (const k of ['colis_1', 'colis_2_3', 'colis_4_plus', 'bijou']) f.elements[k].value = (r.tarifs[k] / 100).toFixed(2);
+    f.elements.tva_active.checked = r.tva.active; f.elements.tva_taux.value = r.tva.taux; f.elements.tva_mention.value = r.tva.mention || '';
+  } catch { /* */ }
+}
+$('[data-reglages]')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = e.target, st = $('[data-reglages-status]');
+  const c = (k) => Math.round(parseFloat(String(f.elements[k].value).replace(',', '.')) * 100);
+  try {
+    await api({ action: 'boutique_save', reglages: { tarifs: { colis_1: c('colis_1'), colis_2_3: c('colis_2_3'), colis_4_plus: c('colis_4_plus'), bijou: c('bijou') }, tva: { active: f.elements.tva_active.checked, taux: Number(f.elements.tva_taux.value), mention: f.elements.tva_mention.value } } });
+    st.textContent = 'Réglages enregistrés. Pense à « Publier » pour mettre à jour les conditions de vente.';
+  } catch (err) { st.textContent = err.message; }
+});
 async function chargerProduits() {
   try { ({ products: produits, categories } = await api({ action: 'products' })); } catch (e) { return message(e.message, true); }
   $('[data-categories]').innerHTML = categories.map((c) => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('');

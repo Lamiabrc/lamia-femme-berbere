@@ -1859,3 +1859,6 @@ body { background: var(--qvt-ivoire); }
 @media (prefers-reduced-motion: reduce) { .transition, .transition svg { transition: none; animation: none; } }
 .salle-boutons [data-musique][aria-pressed="true"], .salle-boutons [data-flou][aria-pressed="true"] { background: rgba(227,189,110,.15); border-color: var(--or, #e3bd6e); color: #fff1c9; }
 .appli-alerte [hidden] { display: none !important; }
+.salon-choice .salon-pour { color: var(--qvt-encre); font-weight: 500; }
+.salon-choice.is-vedette { grid-column: 1 / -1; border-color: #b08a4e; background: linear-gradient(135deg, #fffaf0, var(--qvt-champagne-clair)); }
+.salon-vedette { display: inline-block; margin-bottom: 4px; padding: 2px 10px; border-radius: 999px; background: #5c1424; color: #fff1c9; font-style: normal; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
