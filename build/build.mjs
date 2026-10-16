@@ -338,7 +338,7 @@ page(
 
 <section class="home-speed" aria-labelledby="home-speed-title">
   <a class="home-speed-visual home-speed-poster" href="/speed-dating/#events-title" aria-label="Le speed dating de Lamia Femme Berbère : réserver une place">
-    <img src="/images/lamia/lamia-salon-1122.webp" alt="Lamia Femme Berbère anime les soirées de speed dating kabyle" loading="lazy">
+    <img src="/images/lamia/boudoir-speed-dating-1024.webp" srcset="/images/lamia/boudoir-speed-dating-600.webp 600w, /images/lamia/boudoir-speed-dating-1024.webp 1024w" sizes="(max-width: 820px) 86vw, 430px" width="1024" height="1024" alt="Le Boudoir des Rencontres : salon de velours bordeaux, logo Lamia Femme Berbère, LF Virtual Speed Dating" loading="lazy">
   </a>
   <div class="home-speed-copy">
     <p class="home-speed-kicker">Le Boudoir des Rencontres · speed dating kabyle</p>
@@ -550,7 +550,7 @@ page(
 <section class="bal-hero bal-hero-rich">
   <span class="bal-paillettes" aria-hidden="true"></span>
   <figure class="bal-hero-poster">
-    <img src="/images/lamia/lamia-salon-1122.webp" alt="Lamia vous accueille dans le Boudoir des Rencontres" loading="eager">
+    <img src="/images/lamia/boudoir-speed-dating-1024.webp" srcset="/images/lamia/boudoir-speed-dating-600.webp 600w, /images/lamia/boudoir-speed-dating-1024.webp 1024w" sizes="(max-width: 900px) 92vw, 480px" width="1024" height="1024" alt="Le Boudoir des Rencontres : salon de velours bordeaux et logo Lamia Femme Berbère, LF Virtual Speed Dating" loading="eager">
   </figure>
   <div class="bal-hero-copy">
     <p class="bal-kicker">Speed dating en ligne · animé par Lamia</p>
@@ -642,7 +642,7 @@ page(
   <p>${esc(P.speedDating.origin)}</p>
 </section>
 </div>
-<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@type': 'Event', name: 'Bal masqué de Venise — soirée de lancement du speed dating de Lamia Femme Berbère', startDate: '2026-10-31T21:00:00+01:00', endDate: '2026-10-31T23:00:00+01:00', eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode', eventStatus: 'https://schema.org/EventScheduled', location: { '@type': 'VirtualLocation', url: SITE_URL + '/speed-dating/' }, image: SITE_URL + '/images/lamia/lamia-salon-1122.webp', description: 'Soirée de speed dating en visio, par salons et par âge, sur le thème du Carnaval de Venise. Offerte pour le lancement.', offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR', availability: 'https://schema.org/InStock', url: SITE_URL + '/speed-dating/' }, organizer: { '@type': 'Person', name: 'Lamia Bréchet Ighil', url: SITE_URL + '/lamia-brechet/' } })}</script>`,
+<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@type': 'Event', name: 'Bal masqué de Venise — soirée de lancement du speed dating de Lamia Femme Berbère', startDate: '2026-10-31T21:00:00+01:00', endDate: '2026-10-31T23:00:00+01:00', eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode', eventStatus: 'https://schema.org/EventScheduled', location: { '@type': 'VirtualLocation', url: SITE_URL + '/speed-dating/' }, image: SITE_URL + '/images/lamia/lamia-venise-1672.webp', description: 'Soirée de speed dating en visio, par salons et par âge, sur le thème du Carnaval de Venise. Offerte pour le lancement.', offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR', availability: 'https://schema.org/InStock', url: SITE_URL + '/speed-dating/' }, organizer: { '@type': 'Person', name: 'Lamia Bréchet Ighil', url: SITE_URL + '/lamia-brechet/' } })}</script>`,
   })
 );
 
@@ -759,7 +759,7 @@ page(
     path: '/speed-dating/bal/',
     room: roomBySlug['speed-dating'],
     noindex: true,
-    body: `<div class="bal bal-salle-page" style="--salle-decor:url('${esc(imgOr('salle-decor', '/images/lamia/lamia-venise-1672.webp'))}')">
+    body: `<div class="bal bal-salle-page" style="--salle-decor:url('${esc(imgOr('salle-decor', '/images/lamia/boudoir-speed-dating-1024.webp'))}')">
 <div class="appli-alerte" data-appli hidden role="alert">
   <p class="appli-titre">Ouvre cette page dans Safari ou Chrome</p>
   <p>Tu es dans le navigateur de <strong data-appli-nom>ton application</strong> : il bloque souvent la caméra et le micro.</p>

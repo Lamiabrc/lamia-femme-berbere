@@ -1321,7 +1321,7 @@ body { background: var(--qvt-ivoire); }
 
 /* ================================================================ Visuel Bal masqué de Venise */
 .home-speed-poster {
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 1;
   border-radius: 24px 24px 8px 8px;
   overflow: hidden;
   display: block;
@@ -1912,3 +1912,10 @@ body { background: var(--qvt-ivoire); }
 .lancement-texte { padding: 6px 10px 6px 0; }
 .lancement-texte p + p { margin-top: 14px; }
 @media (max-width: 860px) { .lancement { grid-template-columns: 1fr; padding: 12px; } .lancement-texte { padding: 4px 8px 10px; } }
+
+/* Image du Boudoir (carrée) */
+.bal-hero-poster img { aspect-ratio: 1; }
+.home-speed-poster img { object-position: center; }
+/* Les visuels finaux sont complets : plus de masque ni de trame ajoutés par-dessus. */
+.bal-hero-poster::before, .home-speed-poster::before, .venise-card-visual::before,
+.bal-hero-poster::after, .home-speed-poster::after { content: none; }
