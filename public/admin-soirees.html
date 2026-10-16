@@ -123,7 +123,7 @@ $('#login').addEventListener('submit', async (e) => {
 });
 $('#event').addEventListener('change', load);
 $('#refresh').addEventListener('click', load);
-$('#logout').addEventListener('click', async () => { await supabase.auth.signOut(); location.reload(); });
+$('#logout').addEventListener('click', async () => { try { await Promise.race([supabase.auth.signOut({ scope: 'local' }), new Promise((r) => setTimeout(r, 3000))]); } catch {} try { Object.keys(localStorage).filter((k) => k.startsWith('sb-')).forEach((k) => localStorage.removeItem(k)); } catch {} location.reload(); });
 $('#copy').addEventListener('click', async () => { try { await navigator.clipboard.writeText($('#emails').value); say('Adresses copiées.'); } catch { $('#emails').select(); say('Sélectionne et copie les adresses.'); } });
 boot();
 </script>

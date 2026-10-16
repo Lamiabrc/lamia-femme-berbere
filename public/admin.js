@@ -10,7 +10,7 @@ async function boot(){
  $('#loginBox').classList.add('hidden');$('#dashboard').classList.remove('hidden');await load();
 }
 $('#loginForm').addEventListener('submit',async e=>{e.preventDefault();const f=new FormData(e.target);const {error}=await supabase.auth.signInWithPassword({email:f.get('email'),password:f.get('password')});if(error){$('#loginStatus').textContent=error.message;return;}await boot();});
-$('#logout').addEventListener('click',async()=>{await supabase.auth.signOut();location.reload();});
+$('#logout').addEventListener('click',async()=>{try { await Promise.race([supabase.auth.signOut({ scope: 'local' }), new Promise((r) => setTimeout(r, 3000))]); } catch {} try { Object.keys(localStorage).filter((k) => k.startsWith('sb-')).forEach((k) => localStorage.removeItem(k)); } catch {}location.reload();});
 document.querySelectorAll('[data-sev]').forEach(b=>b.onclick=()=>{filter=b.dataset.sev;document.querySelectorAll('[data-sev]').forEach(x=>x.classList.toggle('active',x===b));render();});
 async function load(){
  const {data,error}=await supabase.from('safety_reports').select('id,reported_label,reason,severity,written_details,status,created_at').order('created_at',{ascending:false});

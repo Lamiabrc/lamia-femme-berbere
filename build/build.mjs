@@ -674,6 +674,15 @@ page(
         <button class="btn btn-line" type="submit">Recevoir le lien</button>
         <p class="form-status" role="status" data-reset-status></p>
       </form>
+      <form class="espace-card" data-espace-signup>
+        <h2>Créer mon espace</h2>
+        <p>Pour suivre tes soirées et tes achats.</p>
+        <label>Prénom<input name="first_name" autocomplete="given-name" maxlength="60" required></label>
+        <label>Email<input name="email" type="email" autocomplete="email" required></label>
+        <label>Mot de passe (8 caractères minimum)<input name="password" type="password" autocomplete="new-password" minlength="8" required></label>
+        <button class="btn btn-line" type="submit">Créer mon espace</button>
+        <p class="form-status" role="status" data-signup-status></p>
+      </form>
     </div>
     <p class="espace-note">Pour entrer au Bal masqué, pas besoin de compte : <a class="text-link" href="/speed-dating/bal/">la porte du bal</a> te demande seulement ton email et ta date de naissance.</p>
   </div>
@@ -687,7 +696,8 @@ page(
 
   <div data-espace-in hidden>
     <h1>Bonjour <span data-espace-nom></span></h1>
-    <p class="espace-email">Connecté·e avec <strong data-espace-email></strong> · <button class="link-button" type="button" data-espace-logout>Se déconnecter</button></p>
+    <p class="espace-email">Connecté·e avec <strong data-espace-email></strong> </p>
+    <p><button class="btn btn-line" type="button" data-espace-logout>Se déconnecter</button></p>
 
     <section class="espace-admin" data-espace-admin hidden>
       <h2>Espace administratrice</h2>

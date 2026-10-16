@@ -367,6 +367,6 @@ $('[data-login]').addEventListener('submit', async (e) => {
   if (error) { $('[data-login-status]').textContent = 'Email ou mot de passe incorrect.'; return; }
   demarrer();
 });
-$('[data-deconnexion]').addEventListener('click', async () => { await supabase.auth.signOut(); location.reload(); });
+$('[data-deconnexion]').addEventListener('click', async () => { try { await Promise.race([supabase.auth.signOut({ scope: 'local' }), new Promise((r) => setTimeout(r, 3000))]); } catch {} try { Object.keys(localStorage).filter((k) => k.startsWith('sb-')).forEach((k) => localStorage.removeItem(k)); } catch {} location.reload(); });
 supabase.auth.onAuthStateChange((ev, s) => { if (s?.access_token) token = s.access_token; });
 demarrer();

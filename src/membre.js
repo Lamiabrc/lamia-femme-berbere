@@ -79,8 +79,9 @@ $('[data-login]')?.addEventListener('submit', async (e) => {
 });
 
 $('[data-logout]')?.addEventListener('click', async () => {
-  await supabase.auth.signOut();
-  status($('[data-member-status]'), 'Tu es déconnectée.');
+  try { await Promise.race([supabase.auth.signOut({ scope: 'local' }), new Promise((r) => setTimeout(r, 3000))]); } catch { /* on nettoie quand même */ }
+  try { Object.keys(localStorage).filter((k) => k.startsWith('sb-')).forEach((k) => localStorage.removeItem(k)); } catch { /* stockage indisponible */ }
+  location.reload();
 });
 
 // ---------------------------------------------------------------- soirées

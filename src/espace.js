@@ -72,7 +72,25 @@ $('[data-espace-newpass]').addEventListener('submit', async (e) => {
   render();
 });
 
-$('[data-espace-logout]').addEventListener('click', async () => { await supabase.auth.signOut(); render(); });
+// Déconnexion fiable : on efface la session de ce navigateur même si le serveur ne répond pas.
+$('[data-espace-logout]').addEventListener('click', async (e) => {
+  e.target.disabled = true;
+  e.target.textContent = 'Déconnexion…';
+  try { await Promise.race([supabase.auth.signOut({ scope: 'local' }), new Promise((r) => setTimeout(r, 3000))]); } catch { /* on nettoie quand même */ }
+  try { Object.keys(localStorage).filter((k) => k.startsWith('sb-')).forEach((k) => localStorage.removeItem(k)); } catch { /* stockage indisponible */ }
+  location.replace('/mon-espace/');
+});
+
+$('[data-espace-signup]').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = new FormData(e.target), st = $('[data-signup-status]');
+  say(st, 'Un instant…');
+  const { data, error } = await supabase.auth.signUp({ email: f.get('email'), password: f.get('password'), options: { data: { first_name: String(f.get('first_name')).trim() }, emailRedirectTo: `${location.origin}/mon-espace/` } });
+  if (error) return say(st, /already registered|already exists/i.test(error.message) ? 'Un espace existe déjà avec cet email : connecte-toi, ou reçois un lien pour choisir ton mot de passe.' : /rate limit/i.test(error.message) ? 'Trop de demandes en ce moment. Réessaie dans une heure.' : /password/i.test(error.message) ? 'Mot de passe trop court (8 caractères minimum).' : 'La création n’a pas fonctionné. Réessaie.', true);
+  if (data.session) { say(st, ''); return render(); }
+  say(st, 'Ton espace est créé. Clique sur le lien reçu par email pour le confirmer (regarde aussi les courriers indésirables).');
+  e.target.reset();
+});
 
 supabase.auth.onAuthStateChange((event) => { if (event === 'PASSWORD_RECOVERY') recovering = true; render(); });
 render();
