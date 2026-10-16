@@ -175,7 +175,7 @@ function freeSoiree(s) {
         <label>Je cherche quelqu’un<select name="search_zone" required><option value="">Choisir</option><option value="ville">dans ma ville et alentours</option><option value="region">dans ma région</option><option value="france">dans toute la France</option><option value="europe">en France ou en Europe</option><option value="canada">au Canada ou aux États-Unis</option><option value="algerie">en Algérie</option><option value="monde">peu importe où</option></select></label>
       </div></fieldset>
       <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
-      <label class="check"><input type="checkbox" name="rules"><span>J’accepte la <a href="/conditions-utilisation/" target="_blank" rel="noopener">charte des soirées</a> : respect, sérieux, aucun propos déplacé. J’ai 18 ans ou plus.</span></label>
+      <label class="check"><input type="checkbox" name="rules"><span>J’accepte la <a href="/conditions-utilisation/#charte" target="_blank" rel="noopener">charte des soirées</a> et les <a href="/conditions-utilisation/" target="_blank" rel="noopener">conditions d’utilisation</a> : respect, sérieux, aucun propos déplacé. J’ai 18 ans ou plus.</span></label>
       <button class="btn btn-ink" type="submit">Je réserve ma place</button>
       <p class="form-status" role="status" data-free-status></p>
     </form>` : '<button class="btn btn-ink" type="button" disabled>Complet</button>'}

@@ -41,7 +41,7 @@ Données stockées par Supabase, centre de données de Paris (Union européenne)
 <h2>5. Livre numérique</h2>
 <p>Le fichier est mis à disposition dans l'espace membre dès la confirmation du paiement. En demandant ce téléchargement immédiat, la cliente donne son accord exprès et renonce à son droit de rétractation, conformément à l'article L221-28 du Code de la consommation.</p>
 <h2>6. Soirées</h2>
-<p>Une soirée est une prestation de loisirs fournie à une date déterminée : elle n'ouvre pas de droit de rétractation (article L221-28 du Code de la consommation). Le lien de la salle vidéo est envoyé par email avant la soirée. Les soirées sont réservées aux personnes majeures. La participation suppose le respect de la <a href="/conditions-utilisation/">charte des soirées</a> et des règles de la Maison : respect, sérieux de la démarche, aucun propos ou contenu déplacé. La Maison peut exclure une personne qui ne les respecte pas, sans remboursement.</p>
+<p>Une soirée est une prestation de loisirs fournie à une date déterminée : elle n'ouvre pas de droit de rétractation (article L221-28 du Code de la consommation). Le lien de la salle vidéo est envoyé par email avant la soirée. Les soirées sont réservées aux personnes majeures. La participation suppose le respect de la <a href="/conditions-utilisation/#charte">charte des soirées</a> et des règles de la Maison : respect, sérieux de la démarche, aucun propos ou contenu déplacé. La Maison peut exclure une personne qui ne les respecte pas, sans remboursement.</p>
 <p>Une place payée n'est pas remboursable, y compris en cas d'absence. Si la Maison annule une soirée, la place est remboursée intégralement. Les soirées gratuites ne donnent lieu à aucun paiement.</p>
 <h2>7. Droit de rétractation (bijoux, objets, livres papier)</h2>
 <p>La cliente dispose de 14 jours à compter de la réception pour se rétracter, sans avoir à se justifier, en écrivant à lamia.brechet@outlook.fr. Le produit est retourné à ses frais, complet et dans son état d'origine. Le remboursement intervient sous 14 jours après réception du retour. La marche à suivre et le modèle de formulaire de rétractation figurent sur la page <a href="/retours/">Livraison, retours et remboursements</a>.</p>
@@ -127,33 +127,80 @@ Signature (si envoi papier) : …</p>
   },
   {
     path: '/conditions-utilisation/',
-    title: 'Conditions d’utilisation et charte des soirées',
+    title: 'Conditions générales d’utilisation',
     body: `
-<p>En créant ton espace ou en t’inscrivant à une soirée, tu acceptes ces règles. Elles existent pour que chacune et chacun se sente en sécurité dans la Maison.</p>
-<h2>1. Qui peut participer</h2>
+<p>Ces conditions s’appliquent à tout le site lamia-femme-berbere.com (« la Maison »), édité par Lamia Bréchet Ighil. En naviguant sur le site, en créant ton espace, en passant commande ou en t’inscrivant à une soirée, tu les acceptes.</p>
+
+<h2>1. Ce que propose la Maison</h2>
+<ul>
+<li>des pages de présentation et de transmission autour de la culture berbère et kabyle ;</li>
+<li>une boutique : bijoux, objets, livres et brocante (les ventes sont régies par les <a href="/cgv/">conditions générales de vente</a>) ;</li>
+<li>des soirées de rencontre en visio (le Boudoir des Rencontres), régies par la charte ci-dessous ;</li>
+<li>un espace membre (« Mon espace ») ;</li>
+<li>le Cabinet des Confidences, pour alerter Lamia en toute discrétion ;</li>
+<li>des liens vers les lives et réseaux de Lamia (TikTok, Facebook…).</li>
+</ul>
+
+<h2>2. Accès au site</h2>
+<p>Le site est accessible gratuitement. La Maison fait de son mieux pour qu’il fonctionne en permanence, mais il peut être interrompu pour maintenance ou en cas de panne, sans que sa responsabilité soit engagée. Les rubriques marquées « bientôt » ne sont pas encore ouvertes.</p>
+
+<h2>3. Ton espace membre</h2>
+<ul>
+<li>Tu donnes des informations exactes et tu les tiens à jour.</li>
+<li>Ton mot de passe est personnel : ne le partage pas. Tu peux le modifier depuis <a href="/mon-espace/">Mon espace</a>.</li>
+<li>Tu peux demander la suppression de ton compte à tout moment par email.</li>
+<li>La Maison peut suspendre ou supprimer un compte en cas de non-respect de ces conditions, de fausse identité ou de comportement dangereux pour les autres.</li>
+</ul>
+
+<h2>4. Bon usage du site</h2>
+<p>Il est interdit d’utiliser le site pour :</p>
+<ul>
+<li>tenir des propos insultants, haineux, racistes, sexistes, menaçants ou à caractère sexuel ;</li>
+<li>usurper l’identité d’une autre personne ;</li>
+<li>harceler, démarcher, faire de la publicité ou demander de l’argent ;</li>
+<li>envoyer de fausses alertes au Cabinet des Confidences ;</li>
+<li>tenter de perturber le fonctionnement du site ou d’accéder aux données d’autres personnes.</li>
+</ul>
+
+<h2>5. Le Cabinet des Confidences</h2>
+<p>Les alertes sont lues par Lamia seule. L’identité de la personne qui alerte n’est jamais communiquée à la personne signalée. Le Cabinet n’est pas un service d’urgence : <strong>en cas de danger immédiat, appelle le 17 (police) ou le 112</strong>.</p>
+
+<h2>6. Propriété intellectuelle</h2>
+<p>Les textes, photographies, illustrations, vidéos, logos et la marque Lamia Femme Berbère appartiennent à leur autrice. Toute reproduction, même partielle, sans autorisation écrite est interdite. Tu peux partager les liens des pages librement.</p>
+
+<h2>7. Liens vers d’autres sites</h2>
+<p>Le site contient des liens vers TikTok, Facebook et d’autres services. La Maison n’est pas responsable de leur contenu ni de leurs pratiques ; leurs propres conditions s’appliquent.</p>
+
+<h2>8. Responsabilité</h2>
+<p>Les contenus du site sont donnés à titre d’information et de transmission culturelle. La Maison organise des rencontres mais ne vérifie pas l’identité des participants et ne peut pas garantir leurs intentions ni le résultat d’une rencontre.</p>
+
+<h2>9. Données personnelles</h2>
+<p>Voir la <a href="/confidentialite/">politique de confidentialité et cookies</a>.</p>
+
+<h2 id="charte">10. Charte des soirées de rencontre</h2>
+<h3>Qui peut participer</h3>
 <ul>
 <li>Les soirées sont réservées aux personnes <strong>majeures (18 ans et plus)</strong>.</li>
 <li>On vient pour une rencontre sérieuse, dans le respect des valeurs de la Maison.</li>
 <li>Tu donnes des informations exactes (prénom, âge, ville). Une fausse identité entraîne l’exclusion.</li>
 </ul>
-<h2>2. Pendant la soirée</h2>
+<h3>Pendant la soirée</h3>
 <ul>
 <li>Caméra allumée, dans un endroit calme, avec une tenue correcte.</li>
-<li>Respect, courtoisie et bienveillance : aucun propos insultant, raciste, sexiste, à caractère sexuel ou menaçant.</li>
+<li>Respect, courtoisie et bienveillance envers chacune et chacun.</li>
 <li><strong>Il est interdit d’enregistrer, de filmer ou de faire des captures d’écran</strong> des autres participants, et de diffuser leur image ou leurs propos.</li>
-<li>Pas de démarchage, de publicité ni de demande d’argent.</li>
 <li>Ne communique pas tes coordonnées (téléphone, réseaux sociaux) pendant les tête-à-tête : les mises en relation se font après la soirée, uniquement si le souhait est réciproque.</li>
 </ul>
-<h2>3. Après la soirée</h2>
+<h3>Après la soirée</h3>
 <p>Tes choix dans le carnet de bal sont privés. Si deux personnes souhaitent se revoir, Lamia les met en relation. Une personne qui n’a pas souhaité te revoir n’est jamais informée de ton choix, et inversement.</p>
-<h2>4. Signaler un problème</h2>
-<p>Pendant ou après une soirée, le bouton « Signaler à Lamia » et <a href="/confidences/">le Cabinet des Confidences</a> permettent d’alerter Lamia en toute discrétion. Lamia peut exclure, pendant la soirée ou pour les suivantes, toute personne qui ne respecte pas ces règles, sans remboursement.</p>
-<h2>5. Prudence</h2>
-<p>La Maison organise des rencontres, mais ne vérifie pas l’identité des participants et ne peut pas garantir leurs intentions. Pour une première rencontre en vrai, choisis un lieu public, préviens un proche, et ne donne jamais d’argent à une personne rencontrée en ligne.</p>
-<h2>6. Ton espace</h2>
-<p>Ton mot de passe est personnel. Tu peux le modifier depuis <a href="/mon-espace/">Mon espace</a>, et demander la suppression de ton compte à tout moment par email.</p>
-<h2>7. Contact</h2>
-<p><a href="mailto:lamia.brechet@outlook.fr">lamia.brechet@outlook.fr</a>. Voir aussi les <a href="/cgv/">conditions de vente</a> et la <a href="/confidentialite/">politique de confidentialité</a>.</p>`,
+<h3>Signaler et exclure</h3>
+<p>Le bouton « Signaler à Lamia » et <a href="/confidences/">le Cabinet des Confidences</a> permettent d’alerter Lamia. Lamia peut exclure, pendant la soirée ou pour les suivantes, toute personne qui ne respecte pas cette charte, sans remboursement.</p>
+<h3>Prudence</h3>
+<p>Pour une première rencontre en vrai, choisis un lieu public, préviens un proche, et ne donne jamais d’argent à une personne rencontrée en ligne.</p>
+
+<h2>11. Modification et droit applicable</h2>
+<p>Ces conditions peuvent évoluer ; la version en ligne est celle qui s’applique. Elles sont soumises au droit français. Contact : <a href="mailto:lamia.brechet@outlook.fr">lamia.brechet@outlook.fr</a>.</p>
+<p class="fine">Version 2026-10.</p>`,
   },
 ];
 

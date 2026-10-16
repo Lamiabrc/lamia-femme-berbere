@@ -188,7 +188,7 @@ function footer() {
       <li><a href="https://www.facebook.com/femmeberberes/" rel="noopener" target="_blank">Facebook Femme Berbère</a></li>
       <li data-social="youtube" hidden><a rel="noopener" target="_blank">YouTube</a></li>
     </ul>
-    <p class="footer-legal"><a href="/mentions-legales/">Mentions légales</a> · <a href="/cgv/">Conditions de vente</a> · <a href="/retours/">Livraison et retours</a> · <a href="/conditions-utilisation/">Charte des soirées</a> · <a href="/confidentialite/">Confidentialité et cookies</a></p>
+    <p class="footer-legal"><a href="/mentions-legales/">Mentions légales</a> · <a href="/cgv/">Conditions de vente</a> · <a href="/retours/">Livraison et retours</a> · <a href="/conditions-utilisation/">Conditions d’utilisation</a> · <a href="/confidentialite/">Confidentialité et cookies</a></p>
   </div>
 </footer>`;
 }
