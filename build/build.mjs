@@ -549,6 +549,8 @@ page(
     body: `<div class="bal">
 <section class="bal-hero bal-hero-rich">
   <span class="bal-paillettes" aria-hidden="true"></span>
+  <span class="boudoir-curtain boudoir-curtain-left hero-rideau" aria-hidden="true"></span>
+  <span class="boudoir-curtain boudoir-curtain-right hero-rideau" aria-hidden="true"></span>
   <figure class="bal-hero-poster">
     <img src="/images/lamia/boudoir-speed-dating-1024.webp" srcset="/images/lamia/boudoir-speed-dating-600.webp 600w, /images/lamia/boudoir-speed-dating-1024.webp 1024w" sizes="(max-width: 900px) 92vw, 480px" width="1024" height="1024" alt="Le Boudoir des Rencontres : salon de velours bordeaux et logo Lamia Femme Berbère, LF Virtual Speed Dating" loading="eager">
   </figure>

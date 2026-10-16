@@ -1928,3 +1928,22 @@ body { background: var(--qvt-ivoire); }
 .bal-hero-rich h1 span { display: block; }
 .bal-hero-rich .bal-hero-copy { max-width: 560px; }
 @media (max-width: 900px) { .bal-hero-rich { grid-template-columns: 1fr; } .bal-hero-rich .bal-hero-poster { justify-self: center; max-width: min(460px, 92vw); } .bal-hero-rich h1 { margin-inline: auto; } .bal-hero-rich .bal-hero-copy { margin-inline: auto; } }
+/* Hero du Boudoir : plus large et encadré de rideaux de velours sur grand écran */
+.bal-hero-rich { position: relative; overflow: hidden; padding-inline: max(var(--gouttiere), calc((100% - 1400px) / 2)); gap: clamp(28px, 4vw, 80px); }
+.bal-hero-rich > :not(.hero-rideau):not(.bal-paillettes) { position: relative; z-index: 2; }
+.bal-hero-rich .bal-hero-poster { max-width: 640px; }
+.bal-hero-rich .bal-hero-copy { max-width: 620px; }
+.bal-hero-rich h1 { font-size: clamp(38px, 4.6vw, 78px); }
+.hero-rideau { width: 14%; opacity: .75; z-index: 1; }
+.hero-rideau.boudoir-curtain-left { left: -5%; }
+.hero-rideau.boudoir-curtain-right { right: -5%; }
+@media (max-width: 1300px) { .hero-rideau { display: none; } }
+/* Page Speed dating plus large sur grand écran */
+@media (min-width: 1300px) {
+  .bal-deroule, .bal-code, .bal-note { max-width: 1320px; }
+  .lancement { max-width: 1320px; }
+  .bal .member-panel { max-width: 1320px; }
+  .bal-deroule strong { font-size: 24px; }
+  .bal-deroule span, .bal-code li { font-size: 16px; }
+  .bal-code ul { grid-template-columns: repeat(3, 1fr); }
+}
