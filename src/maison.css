@@ -2506,3 +2506,7 @@ body[data-ambiance="salon"] .videos-haut h2 { color: #fff4e0; }
 @media (max-width: 1280px) { .site-nav { display: none; } }
 .site-nav { margin-left: auto; }
 @media (max-width: 1400px) { .site-nav { display: none; } }
+
+/* Grenier : grande image d'ambiance */
+.banniere-grenier { margin-top: 8px; margin-bottom: clamp(24px, 4vw, 48px); }
+.banniere-grenier img { box-shadow: 0 0 0 8px #fbf4e4, 0 0 0 9px rgba(107,74,46,.35), 0 30px 50px -28px rgba(60,35,15,.7); border-radius: 6px; }

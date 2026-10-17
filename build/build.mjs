@@ -541,7 +541,9 @@ page(
     description: 'Les coups de cœur de brocante de Lamia : livres anciennes éditions, bibelots, cadres, sculptures, cartes postales, pièces uniques.',
     path: '/grenier/',
     room: roomBySlug.grenier,
+    ogImage: '/images/grenier/grenier-des-trouvailles-1672.webp', ogImageAlt: 'Le Grenier des Trouvailles de Lamia Femme Berbère', ogImageWidth: 1672, ogImageHeight: 941,
     body: `${roomHead(roomBySlug.grenier)}
+<figure class="banniere-salon banniere-grenier">${IMGT('image.grenier.banniere', 'Le Grenier', 'Grande image du Grenier', `<img src="/images/grenier/grenier-des-trouvailles-1672.webp" srcset="/images/grenier/grenier-des-trouvailles-900.webp 900w, /images/grenier/grenier-des-trouvailles-1672.webp 1672w" sizes="(max-width: 1300px) 100vw, 1240px" width="1672" height="941" fetchpriority="high" alt="Le Grenier des Trouvailles de Lamia Femme Berbère : platine et caisses de vinyles, livres anciens, bougeoirs, malle et poteries sous les poutres">`)}</figure>
 <section class="room-body two-col">
   <div><p class="prose-lead">${esc(P.grenier.intro)}</p></div>
   <aside class="side-note"><h2>Ce qu’on trouve au Grenier</h2>${list(P.grenier.families)}</aside>
