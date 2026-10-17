@@ -1428,6 +1428,19 @@ page(
   })
 );
 
+// Après le paiement d'un article de la boutique
+page(
+  '/commande/merci/',
+  layout({
+    title: 'Merci pour ton achat · Lamia Femme Berbère',
+    description: 'Confirmation de ton achat.',
+    path: '/commande/merci/',
+    room: roomBySlug.boutique,
+    noindex: true,
+    body: `<section class="room-head" data-merci-commande><p class="room-name"><span class="pip" aria-hidden="true"></span>La Boutique</p><h1>Vérification de ton paiement…</h1><p class="lead" data-merci-text>Un instant, je confirme ton achat auprès de la banque.</p><p class="bal-actions"><a class="btn btn-ink" href="/boutique/">Revenir à la Boutique</a><a class="btn btn-line" href="/mon-espace/">Mon espace</a></p></section>`,
+  })
+);
+
 // Souhaits après une soirée : le choix se fait directement dans la salle du bal.
 // La page autonome reste informative tant que la table dédiée n'a pas été validée.
 page(
@@ -1483,7 +1496,7 @@ await writeFile(join(DIST, 'assets', 'editable.json'), JSON.stringify({ fields: 
 for (const f of ['maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
 await cp(join(ROOT, 'content', 'shipping.mjs'), join(DIST, 'assets', 'shipping.mjs'));
 
-const indexable = pages.filter((p) => !p.path.endsWith('.html') && !['/produit/', '/speed-dating/merci/', '/speed-dating/souhaits/', '/cgv/', '/mentions-legales/', '/confidentialite/', '/retours/', '/conditions-utilisation/', '/confidences-lamia/'].includes(p.path));
+const indexable = pages.filter((p) => !p.path.endsWith('.html') && !['/produit/', '/speed-dating/merci/', '/commande/merci/', '/speed-dating/souhaits/', '/cgv/', '/mentions-legales/', '/confidentialite/', '/retours/', '/conditions-utilisation/', '/confidences-lamia/'].includes(p.path));
 await writeFile(
   join(DIST, 'sitemap.xml'),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${indexable.map((p) => `<url><loc>${SITE_URL}${p.path}</loc></url>`).join('')}</urlset>\n`

@@ -175,6 +175,10 @@ async function renderProductPage() {
     })
   );
   wirePreorder(p, box);
+  if (new URLSearchParams(location.search).get('paiement') === 'annule') {
+    const st = $('[data-preorder-status]', box);
+    if (st) st.textContent = 'Le paiement a été annulé : rien n’a été débité. Tu peux réessayer quand tu veux.';
+  }
 }
 
 // ---------------------------------------------------------------- précommande
@@ -182,8 +186,8 @@ async function renderProductPage() {
 // Délai annoncé selon la pièce : les bijoux sont faits par un artisan, le Grenier part tout de suite.
 function delaiLivraison(p) {
   const piece = roomOf(p).slug;
-  if (piece === 'ecrin') return '<strong>Délai :</strong> ce bijou est réalisé par un artisan. Le délai de livraison dépend de lui : <strong>entre 2 et 6 semaines</strong> après la validation de ta commande.';
-  if (piece === 'grenier') return '<strong>Délai :</strong> la pièce est déjà là, prête à partir. Elle est expédiée dès la validation de ta commande : compte <strong>le temps d’une livraison Colissimo</strong> (2 à 3 jours ouvrés en général).';
+  if (piece === 'ecrin') return '<strong>Délai :</strong> ce bijou est réalisé par un artisan. Le délai de livraison dépend de lui : <strong>entre 2 et 6 semaines</strong> après ton achat.';
+  if (piece === 'grenier') return '<strong>Délai :</strong> la pièce est déjà là, prête à partir. Elle est expédiée après ton achat : compte <strong>le temps d’une livraison Colissimo</strong> (2 à 3 jours ouvrés en général).';
   return '';
 }
 
@@ -192,8 +196,8 @@ function preorderForm(p) {
   const max = MAX_QTY(p);
   const delai = digital ? '' : delaiLivraison(p);
   return `<form class="preorder" data-preorder novalidate>
-    <h2>Commander</h2>
-    <p class="fine">${p.is_unique ? 'Pièce unique : la première commande la réserve.' : ''} Chaque commande est <strong>validée personnellement par Lamia</strong>. Rien n’est débité ici : après validation, tu reçois par email la confirmation et le lien de paiement.</p>
+    <h2>Acheter</h2>
+    ${p.is_unique ? '<p class="fine">Pièce unique : dès qu’elle est achetée, elle n’est plus disponible.</p>' : ''}
     ${delai ? `<p class="delai-livraison">${delai}</p>` : ''}
     ${max > 1 ? `<label>Quantité<select name="qty">${Array.from({ length: max }, (_, i) => `<option>${i + 1}</option>`).join('')}</select></label>` : '<input type="hidden" name="qty" value="1">'}
     ${digital ? '' : `<fieldset><legend>Livraison</legend>
@@ -210,9 +214,14 @@ function preorderForm(p) {
     </div>`}
     <label>Un mot pour Lamia (facultatif)<textarea name="message" rows="2" maxlength="600"></textarea></label>
     <input name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
-    <div class="preorder-total"><span>Total à régler après validation</span><strong data-total></strong></div>
-    <label class="check"><input type="checkbox" name="cgv"><span>J’accepte les <a href="/cgv/" target="_blank" rel="noopener">conditions de vente</a> (commande validée par Lamia, paiement après validation).</span></label>
-    <button class="btn btn-ink" type="submit">Envoyer ma commande</button>
+    <div class="preorder-total"><span>Total</span><strong data-total></strong></div>
+    <label class="check"><input type="checkbox" name="cgv"><span>J’accepte les <a href="/cgv/" target="_blank" rel="noopener">conditions de vente</a>.</span></label>
+    <button class="btn btn-ink btn-payer" type="submit">🔒 Payer en toute sécurité</button>
+    <div class="paiement-sur">
+      <p><strong>Paiement 100 % sécurisé</strong> par Stripe : carte bancaire, Apple Pay ou Google Pay, avec validation 3D Secure de ta banque.</p>
+      <p>Tes coordonnées bancaires sont saisies chez Stripe, sur une page chiffrée : Lamia ne les voit jamais.</p>
+      <p>Retour possible sous 14 jours · <a href="/retours/" target="_blank" rel="noopener">Livraison et retours</a></p>
+    </div>
     <p class="form-status" role="status" data-preorder-status></p>
   </form>`;
 }
@@ -242,7 +251,7 @@ function wirePreorder(p, box) {
     const say = (m, err) => { st.textContent = m; st.classList.toggle('is-error', !!err); };
     if (!f.cgv.checked) return say('Coche la case des conditions de vente pour continuer.', true);
     const btn = form.querySelector('[type=submit]');
-    btn.disabled = true; btn.textContent = 'Envoi…';
+    btn.disabled = true; btn.textContent = 'Ouverture du paiement sécurisé…';
     const body = {
       slug: p.slug, qty: f.qty.value, name: f.name.value, email: f.email.value, phone: f.phone.value,
       method: f.method ? form.querySelector('[name=method]:checked').value : 'email',
@@ -251,14 +260,20 @@ function wirePreorder(p, box) {
     };
     let r = {}, res;
     try { res = await fetch('/api/preorder', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); r = await res.json().catch(() => ({})); } catch { /* réseau */ }
-    btn.disabled = false; btn.textContent = 'Envoyer ma commande';
-    if (res?.ok && r.ok) {
-      window.lfbEvent?.('precommande');
-      form.innerHTML = `<h2>Merci, ta commande est bien arrivée.</h2><p>Numéro de commande : <strong>${esc(r.order_number)}</strong></p><p>${r.waitlist ? 'Cette pièce unique est déjà réservée : tu es inscrite en liste d’attente. Lamia te prévient si elle se libère.' : `Lamia valide ta commande et t’envoie par email la confirmation et le lien de paiement. Total : ${money(r.total_cents)}.${delaiLivraison(p) ? ` ${delaiLivraison(p).replace(/<[^>]+>/g, '')}` : ''}`}</p>`;
+    btn.disabled = false; btn.textContent = '🔒 Payer en toute sécurité';
+    if (res?.ok && r.ok && r.url) {
+      window.lfbEvent?.('paiement_ouvert');
+      btn.disabled = true; btn.textContent = 'Redirection vers le paiement…';
+      location.assign(r.url);
       return;
     }
-    const msg = { invalid_contact: 'Vérifie ton nom et ton adresse email.', invalid_address: 'Vérifie ton adresse : rue, code postal à 5 chiffres et ville.', product_unavailable: 'Cette pièce n’est plus disponible.' };
-    say(msg[r.error] || 'La commande n’est pas partie. Réessaie dans un instant.', true);
+    if (res?.ok && r.ok) {
+      window.lfbEvent?.('precommande');
+      form.innerHTML = `<h2>Merci, ta commande est enregistrée.</h2><p>Numéro de commande : <strong>${esc(r.order_number)}</strong></p><p>${r.waitlist ? 'Cette pièce unique est déjà réservée : tu es inscrite en liste d’attente. Lamia te prévient si elle se libère.' : `Lamia t’envoie par email le lien de paiement sécurisé. Total : ${money(r.total_cents)}.${delaiLivraison(p) ? ` ${delaiLivraison(p).replace(/<[^>]+>/g, '')}` : ''}`}</p>`;
+      return;
+    }
+    const msg = { invalid_contact: 'Vérifie ton nom et ton adresse email.', invalid_address: 'Vérifie ton adresse : rue, code postal à 5 chiffres et ville.', product_unavailable: 'Cette pièce vient d’être vendue, désolée.', paiement_en_cours: 'Quelqu’un est en train d’acheter cette pièce. Reviens dans 30 minutes : si le paiement n’aboutit pas, elle sera de nouveau disponible.', stock_insuffisant: `Il n’en reste que ${r.stock}. Choisis une quantité plus petite.`, paiement_indisponible: 'Le paiement sécurisé ne répond pas pour le moment. Réessaie dans un instant.' };
+    say(msg[r.error] || 'Le paiement n’a pas pu s’ouvrir. Réessaie dans un instant.', true);
   });
 }
 
@@ -564,4 +579,25 @@ renderSocials();
   if (!m) return;
   document.addEventListener('click', (e) => { if (m.open && !m.contains(e.target)) m.open = false; });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && m.open) { m.open = false; m.querySelector('summary').focus(); } });
+})();
+
+
+// ---------------------------------------------------------------- retour du paiement d'une commande
+(async () => {
+  const box = document.querySelector('[data-merci-commande]');
+  if (!box) return;
+  const id = new URLSearchParams(location.search).get('session_id') || '';
+  const titre = box.querySelector('h1'), texte = box.querySelector('[data-merci-text]');
+  const dire = (h, t) => { titre.textContent = h; texte.textContent = t; };
+  for (let essai = 0; essai < 6; essai++) {
+    let r = {};
+    try { r = await (await fetch(`/api/event-fulfill?type=commande&session_id=${encodeURIComponent(id)}`)).json(); } catch { /* réseau */ }
+    if (r.status === 'paid') {
+      window.lfbEvent?.('achat');
+      return dire('Merci, ton achat est confirmé !', `Commande n° ${r.order_number}. Tu reçois le reçu de paiement par email. Lamia prépare ton colis et te tient au courant de l’expédition.`);
+    }
+    if (r.status === 'invalid' || r.status === 'not_an_order') return dire('Lien de confirmation incomplet', 'Si tu viens de payer, pas d’inquiétude : ta commande est bien enregistrée et tu reçois le reçu par email.');
+    await new Promise((ok) => setTimeout(ok, 2000));
+  }
+  dire('Paiement en cours de vérification', 'Ta banque n’a pas encore confirmé le paiement. Tu recevras le reçu par email dès que c’est fait. Une question ? Écris à Lamia.');
 })();

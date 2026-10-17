@@ -2513,3 +2513,9 @@ body[data-ambiance="salon"] .videos-haut h2 { color: #fff4e0; }
 
 /* Délai de livraison annoncé sur la fiche */
 .delai-livraison { margin: 0 0 14px; padding: 10px 14px; border-left: 3px solid var(--rouille, #a5562e); background: rgba(216,192,148,.25); border-radius: 0 8px 8px 0; font-size: 15px; line-height: 1.5; }
+
+/* Achat direct : bouton de paiement et réassurance */
+.btn-payer { width: 100%; justify-content: center; font-size: 17px; padding-block: 14px; }
+.paiement-sur { margin-top: 12px; padding: 12px 14px; border: 1px solid rgba(46,125,80,.35); background: rgba(46,125,80,.06); border-radius: 10px; font-size: 14px; line-height: 1.5; }
+.paiement-sur p { margin: 0 0 6px; }
+.paiement-sur p:last-child { margin: 0; }

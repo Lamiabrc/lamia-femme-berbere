@@ -4,7 +4,7 @@
 // Le serveur recalcule toujours ces montants : le navigateur ne fait que les afficher.
 
 export const SHIPPING_METHODS = {
-  colissimo: { label: 'Envoi suivi Colissimo (France métropolitaine)', delay: 'Expédition sous 3 jours ouvrés après paiement, livraison en 2 à 3 jours.' },
+  colissimo: { label: 'Envoi suivi Colissimo (France métropolitaine)', delay: 'Numéro de suivi par email, livraison en 2 à 3 jours ouvrés après l’expédition.' },
   retrait: { label: 'Remise en main propre à Rennes', delay: 'Sur rendez-vous, gratuit.' },
   email: { label: 'Envoi par email', delay: 'Le fichier t’est envoyé dès sa sortie.' },
 };
