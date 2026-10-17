@@ -186,7 +186,7 @@ async function chargerReglages() {
   try {
     const r = await (await fetch('/api/admin?action=boutique', { cache: 'no-store' })).json();
     const f = $('[data-reglages]');
-    for (const k of ['colis_1', 'colis_2_3', 'colis_4_plus', 'bijou']) f.elements[k].value = (r.tarifs[k] / 100).toFixed(2);
+    for (const k of ['g250', 'g500', 'g750', 'g1000', 'g2000', 'g5000']) f.elements[k].value = (r.tarifs[k] / 100).toFixed(2);
     f.elements.tva_active.checked = r.tva.active; f.elements.tva_taux.value = r.tva.taux; f.elements.tva_mention.value = r.tva.mention || '';
   } catch { /* */ }
 }
@@ -195,7 +195,7 @@ $('[data-reglages]')?.addEventListener('submit', async (e) => {
   const f = e.target, st = $('[data-reglages-status]');
   const c = (k) => Math.round(parseFloat(String(f.elements[k].value).replace(',', '.')) * 100);
   try {
-    await api({ action: 'boutique_save', reglages: { tarifs: { colis_1: c('colis_1'), colis_2_3: c('colis_2_3'), colis_4_plus: c('colis_4_plus'), bijou: c('bijou') }, tva: { active: f.elements.tva_active.checked, taux: Number(f.elements.tva_taux.value), mention: f.elements.tva_mention.value } } });
+    await api({ action: 'boutique_save', reglages: { tarifs: Object.fromEntries(['g250', 'g500', 'g750', 'g1000', 'g2000', 'g5000'].map((k) => [k, c(k)])), tva: { active: f.elements.tva_active.checked, taux: Number(f.elements.tva_taux.value), mention: f.elements.tva_mention.value } } });
     st.textContent = 'Réglages enregistrés. Pense à « Publier » pour mettre à jour les conditions de vente.';
   } catch (err) { st.textContent = err.message; }
 });
@@ -228,6 +228,12 @@ function editer(p) {
     f.elements.is_unique.checked = !!p.is_unique; f.elements.featured.checked = !!p.featured;
     edition.photos = (Array.isArray(p.gallery) ? p.gallery : []).map((g) => (typeof g === 'string' ? { url: g } : g)).filter((g) => g.url);
     edition.metadata = p.metadata;
+    const m = p.metadata || {};
+    f.elements.poids_colis_g.value = m.poids_colis_g || '';
+    const t = Array.isArray(m.tailles) ? m.tailles : [];
+    f.elements.tailles.value = t.length ? `${Math.min(...t)}-${Math.max(...t)}` : '';
+    f.elements.supp_cents.value = m.supplement_taille?.cents ? (m.supplement_taille.cents / 100).toFixed(2) : '';
+    f.elements.supp_seuil.value = m.supplement_taille?.a_partir_de || '';
     // Le collier a des photos d'origine intégrées au site : on les propose pour pouvoir les réordonner ou les remplacer.
     if (!edition.photos.length && p.slug === 'collier-kabyle-argente-emaille-15g') edition.photos = ['hero', 'porte', 'detail', 'ecrin'].map((v) => ({ url: `/images/collier/collier-kabyle-15g-${v}-1120.webp` }));
     const voir = $('[data-produit-voir]'); voir.hidden = false; voir.href = `/produit/?p=${encodeURIComponent(p.slug)}`;
@@ -280,11 +286,18 @@ $('[data-produit-form]').addEventListener('submit', async (e) => {
   e.preventDefault();
   const f = e.target, st = $('[data-produit-status]');
   const val = (k) => f.elements[k].value;
+  // Poids d'envoi, tailles de bague et supplément : rangés dans les informations du produit.
+  const meta = { ...(edition.metadata || {}) };
+  const poids = parseInt(val('poids_colis_g'), 10); if (poids > 0) meta.poids_colis_g = poids; else delete meta.poids_colis_g;
+  const mt = String(val('tailles')).match(/(\d{2})\s*[-–à]\s*(\d{2})/);
+  if (mt) { const [a, b] = [Number(mt[1]), Number(mt[2])].sort((x, y) => x - y); meta.tailles = Array.from({ length: b - a + 1 }, (_, i) => a + i); } else delete meta.tailles;
+  const sc = Math.round(parseFloat(String(val('supp_cents')).replace(',', '.')) * 100), ss = parseInt(val('supp_seuil'), 10);
+  if (meta.tailles && sc > 0 && ss) meta.supplement_taille = { cents: sc, a_partir_de: ss }; else delete meta.supplement_taille;
   const product = {
     id: val('id') || undefined, slug: val('slug') || undefined, name: val('name'), subtitle: val('subtitle'), description: val('description'),
     price_cents: Math.round(parseFloat(val('price').replace(',', '.')) * 100), compare_at_price_cents: val('compare') ? Math.round(parseFloat(val('compare').replace(',', '.')) * 100) : null,
     stock_qty: Number(val('stock_qty')), category_id: val('category_id'), product_type: val('product_type'), status: val('status'),
-    is_unique: f.elements.is_unique.checked, featured: f.elements.featured.checked, gallery: edition.photos, metadata: edition.metadata,
+    is_unique: f.elements.is_unique.checked, featured: f.elements.featured.checked, gallery: edition.photos, metadata: meta,
   };
   st.textContent = 'Enregistrement…';
   try {

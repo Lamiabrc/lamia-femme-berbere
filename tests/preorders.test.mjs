@@ -26,9 +26,11 @@ const req = (b) => new Request('https://x/api/preorder', { method: 'POST', heade
 const base = { name: 'Nadia K', email: 'nadia@exemple.fr', cgv_accepted: true, method: 'colissimo', address: { line1: '1 rue A', postal_code: '35000', city: 'Rennes' } };
 
 test('frais d’envoi', () => {
-  assert.equal(shippingFor(PRODUCTS.broche, 1, 'colissimo').cents, 790);
-  assert.equal(shippingFor(PRODUCTS.broche, 3, 'colissimo').cents, 990);
-  assert.equal(shippingFor(PRODUCTS.collier, 1, 'colissimo').cents, 1090);
+  // Grille Colissimo 2026 selon le poids : livre 400 g → 500 g ; 3 livres 1,2 kg → 2 kg ; bijou 120 g → 250 g.
+  assert.equal(shippingFor(PRODUCTS.broche, 1, 'colissimo').cents, 759);
+  assert.equal(shippingFor(PRODUCTS.broche, 3, 'colissimo').cents, 1119);
+  assert.equal(shippingFor(PRODUCTS.collier, 1, 'colissimo').cents, 549);
+  assert.equal(shippingFor({ metadata: { poids_colis_g: 1800 } }, 1, 'colissimo').cents, 1119);
   assert.equal(shippingFor(PRODUCTS.collier, 1, 'retrait').cents, 0);
   assert.equal(shippingFor({ product_type: 'digital' }, 1, 'colissimo').cents, 0);
 });
@@ -38,7 +40,7 @@ test('précommande du livre : prix et frais recalculés côté serveur', async (
   const r = await createPreorder(req({ ...base, slug: 'broche', qty: 2, price: 1 }), { env, fetcher });
   const body = await r.json();
   assert.equal(r.status, 200);
-  assert.equal(body.total_cents, 1590 * 2 + 990);
+  assert.equal(body.total_cents, 1590 * 2 + 959);
   assert.equal(writes[0].status, 'pending');
   assert.equal(body.paiement, 'manuel');
 });
@@ -66,7 +68,7 @@ test('achat direct : page de paiement Stripe avec prix serveur, envoi et retour'
   const body = await r.json();
   assert.equal(body.url, 'https://checkout.stripe.com/c/pay/cs_test_1');
   const [a, o] = args;
-  assert.deepEqual(a.line_items.map((l) => [l.quantity, l.price_data.unit_amount]), [[2, 1590], [1, 990]]);
+  assert.deepEqual(a.line_items.map((l) => [l.quantity, l.price_data.unit_amount]), [[2, 1590], [1, 959]]);
   assert.equal(a.metadata.kind, 'product_order');
   assert.equal(a.metadata.order_id, 'o1');
   assert.match(a.success_url, /\/commande\/merci\/\?session_id=\{CHECKOUT_SESSION_ID\}$/);
@@ -100,4 +102,17 @@ test('retrait à Rennes : pas d’adresse exigée', async () => {
   const { fetcher } = fake('broche');
   const r = await createPreorder(req({ ...base, slug: 'broche', method: 'retrait', address: null }), { env, fetcher });
   assert.equal((await r.json()).total_cents, 1590);
+});
+
+test('bague : taille obligatoire, supplément grandes tailles calculé par le serveur', async () => {
+  PRODUCTS.bague = { id: 'p3', name: 'Alliance', price_cents: 2000, currency: 'EUR', product_type: 'physical', is_unique: false, stock_qty: 10, categories: { slug: 'bijoux' }, metadata: { poids_colis_g: 100, tailles: [50, 52, 60, 62], supplement_taille: { cents: 500, a_partir_de: 60 } } };
+  assert.equal((await (await createPreorder(req({ ...base, slug: 'bague' }), { env, fetcher: fake('bague').fetcher })).json()).error, 'taille_requise');
+  assert.equal((await (await createPreorder(req({ ...base, slug: 'bague', taille: 55 }), { env, fetcher: fake('bague').fetcher })).json()).error, 'taille_requise');
+  const petite = await (await createPreorder(req({ ...base, slug: 'bague', taille: 52 }), { env, fetcher: fake('bague').fetcher })).json();
+  assert.equal(petite.total_cents, 2000 + 549);
+  const { fetcher, writes } = fake('bague');
+  const grande = await (await createPreorder(req({ ...base, slug: 'bague', taille: 62 }), { env, fetcher })).json();
+  assert.equal(grande.total_cents, 2500 + 549);
+  assert.equal(writes[1].product_name, 'Alliance · taille 62');
+  assert.equal(writes[1].metadata.taille, 62);
 });

@@ -2519,3 +2519,6 @@ body[data-ambiance="salon"] .videos-haut h2 { color: #fff4e0; }
 .paiement-sur { margin-top: 12px; padding: 12px 14px; border: 1px solid rgba(46,125,80,.35); background: rgba(46,125,80,.06); border-radius: 10px; font-size: 14px; line-height: 1.5; }
 .paiement-sur p { margin: 0 0 6px; }
 .paiement-sur p:last-child { margin: 0; }
+.guide-taille { margin: -4px 0 14px; font-size: 14px; }
+.guide-taille summary { cursor: pointer; text-decoration: underline; }
+.guide-taille p { margin: 8px 0 0; line-height: 1.5; }

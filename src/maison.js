@@ -1,7 +1,7 @@
 // Données vivantes de la Maison : catalogue, fiche produit, panier, prochaine soirée.
 // Le navigateur n'utilise que la clé publique Supabase ; aucune donnée privée n'est lue ici.
 
-import { SHIPPING_METHODS, shippingFor, MAX_QTY, tvaIncluse, reglagesPropres } from '/assets/shipping.mjs';
+import { SHIPPING_METHODS, shippingFor, MAX_QTY, tvaIncluse, reglagesPropres, taillesDe, supplementTaille } from '/assets/shipping.mjs';
 
 // Frais d'envoi et TVA réglés par Lamia (le serveur recalcule toujours à la commande).
 let REGLAGES = reglagesPropres();
@@ -199,6 +199,8 @@ function preorderForm(p) {
     <h2>Acheter</h2>
     ${p.is_unique ? '<p class="fine">Pièce unique : dès qu’elle est achetée, elle n’est plus disponible.</p>' : ''}
     ${delai ? `<p class="delai-livraison">${delai}</p>` : ''}
+    ${taillesDe(p).length ? `<label>Taille de doigt<select name="taille" required><option value="">Choisis ta taille</option>${taillesDe(p).map((t) => `<option value="${t}">${t}${supplementTaille(p, t) ? ` (+${money(supplementTaille(p, t))})` : ''}</option>`).join('')}</select></label>
+    <details class="guide-taille"><summary>Comment connaître ta taille ?</summary><p>La taille française correspond au <strong>tour de ton doigt en millimètres</strong>. Entoure la base de ton doigt avec un fil ou une bande de papier, marque l’endroit où il se rejoint, puis mesure la longueur à plat : 54 mm = taille 54. Mesure en fin de journée, quand les doigts sont un peu plus gros, et en cas d’hésitation choisis la taille au-dessus.</p><p>Tu as déjà une bague qui te va ? Mesure son diamètre intérieur en mm et multiplie par 3,14 : c’est ta taille.</p></details>` : ''}
     ${max > 1 ? `<label>Quantité<select name="qty">${Array.from({ length: max }, (_, i) => `<option>${i + 1}</option>`).join('')}</select></label>` : '<input type="hidden" name="qty" value="1">'}
     ${digital ? '' : `<fieldset><legend>Livraison</legend>
       <label class="check"><input type="radio" name="method" value="colissimo" checked><span>${SHIPPING_METHODS.colissimo.label} <small data-ship-price></small><br><small>${SHIPPING_METHODS.colissimo.delay}</small></span></label>
@@ -238,7 +240,8 @@ function wirePreorder(p, box) {
     if (sp) sp.textContent = `(${money(col.cents)})`;
     const addr = $('[data-address]', form);
     if (addr) addr.hidden = ship.method !== 'colissimo';
-    const total = p.price_cents * qty + ship.cents, tva = tvaIncluse(total, REGLAGES.tva);
+    const unit = p.price_cents + (form.elements.taille ? supplementTaille(p, form.elements.taille.value) : 0);
+    const total = unit * qty + ship.cents, tva = tvaIncluse(total, REGLAGES.tva);
     $('[data-total]', form).textContent = `${money(total, p.currency)}${ship.cents ? ` dont ${money(ship.cents)} d’envoi` : ''}${tva ? ` · dont TVA ${String(REGLAGES.tva.taux).replace('.', ',')} % : ${money(tva)}` : ''}`;
   };
   form.addEventListener('change', update);
@@ -249,11 +252,12 @@ function wirePreorder(p, box) {
     const st = $('[data-preorder-status]', form);
     const f = form.elements;
     const say = (m, err) => { st.textContent = m; st.classList.toggle('is-error', !!err); };
+    if (f.taille && !f.taille.value) { f.taille.focus(); return say('Choisis ta taille de doigt pour continuer.', true); }
     if (!f.cgv.checked) return say('Coche la case des conditions de vente pour continuer.', true);
     const btn = form.querySelector('[type=submit]');
     btn.disabled = true; btn.textContent = 'Ouverture du paiement sécurisé…';
     const body = {
-      slug: p.slug, qty: f.qty.value, name: f.name.value, email: f.email.value, phone: f.phone.value,
+      slug: p.slug, qty: f.qty.value, taille: f.taille ? f.taille.value : undefined, name: f.name.value, email: f.email.value, phone: f.phone.value,
       method: f.method ? form.querySelector('[name=method]:checked').value : 'email',
       address: f.line1 ? { line1: f.line1.value, line2: f.line2.value, postal_code: f.postal_code.value, city: f.city.value } : null,
       message: f.message.value, website: f.website.value, cgv_accepted: true,
@@ -272,7 +276,7 @@ function wirePreorder(p, box) {
       form.innerHTML = `<h2>Merci, ta commande est enregistrée.</h2><p>Numéro de commande : <strong>${esc(r.order_number)}</strong></p><p>${r.waitlist ? 'Cette pièce unique est déjà réservée : tu es inscrite en liste d’attente. Lamia te prévient si elle se libère.' : `Lamia t’envoie par email le lien de paiement sécurisé. Total : ${money(r.total_cents)}.${delaiLivraison(p) ? ` ${delaiLivraison(p).replace(/<[^>]+>/g, '')}` : ''}`}</p>`;
       return;
     }
-    const msg = { invalid_contact: 'Vérifie ton nom et ton adresse email.', invalid_address: 'Vérifie ton adresse : rue, code postal à 5 chiffres et ville.', product_unavailable: 'Cette pièce vient d’être vendue, désolée.', paiement_en_cours: 'Quelqu’un est en train d’acheter cette pièce. Reviens dans 30 minutes : si le paiement n’aboutit pas, elle sera de nouveau disponible.', stock_insuffisant: `Il n’en reste que ${r.stock}. Choisis une quantité plus petite.`, paiement_indisponible: 'Le paiement sécurisé ne répond pas pour le moment. Réessaie dans un instant.' };
+    const msg = { invalid_contact: 'Vérifie ton nom et ton adresse email.', invalid_address: 'Vérifie ton adresse : rue, code postal à 5 chiffres et ville.', product_unavailable: 'Cette pièce vient d’être vendue, désolée.', paiement_en_cours: 'Quelqu’un est en train d’acheter cette pièce. Reviens dans 30 minutes : si le paiement n’aboutit pas, elle sera de nouveau disponible.', stock_insuffisant: `Il n’en reste que ${r.stock}. Choisis une quantité plus petite.`, paiement_indisponible: 'Le paiement sécurisé ne répond pas pour le moment. Réessaie dans un instant.', taille_requise: 'Choisis ta taille de doigt pour continuer.' };
     say(msg[r.error] || 'Le paiement n’a pas pu s’ouvrir. Réessaie dans un instant.', true);
   });
 }

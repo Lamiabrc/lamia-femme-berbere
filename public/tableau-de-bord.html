@@ -78,12 +78,14 @@
 
     <form class="tdb-carte reglages" data-reglages>
       <h2>Livraison et TVA</h2>
-      <p class="aide">Ces montants s’appliquent tout de suite aux commandes. Les conditions de vente se mettent à jour quand tu cliques sur « Publier » (onglet Textes &amp; images).</p>
+      <p class="aide">Envoi Colissimo suivi, sans signature, selon le poids du colis (grille La Poste 2026 par défaut). Le poids de chaque produit se règle dans sa fiche. Ces montants s’appliquent tout de suite aux commandes. Les conditions de vente se mettent à jour quand tu cliques sur « Publier » (onglet Textes &amp; images).</p>
       <div class="champs">
-        <label>Envoi livre ou objet, 1 exemplaire (€)<input name="colis_1" type="number" step="0.01" min="0"></label>
-        <label>2 ou 3 exemplaires (€)<input name="colis_2_3" type="number" step="0.01" min="0"></label>
-        <label>4 exemplaires et plus (€)<input name="colis_4_plus" type="number" step="0.01" min="0"></label>
-        <label>Envoi d’un bijou, suivi et assuré (€)<input name="bijou" type="number" step="0.01" min="0"></label>
+        <label>Colis jusqu’à 250 g (€)<input name="g250" type="number" step="0.01" min="0"></label>
+        <label>Colis jusqu’à 500 g (€)<input name="g500" type="number" step="0.01" min="0"></label>
+        <label>Colis jusqu’à 750 g (€)<input name="g750" type="number" step="0.01" min="0"></label>
+        <label>Colis jusqu’à 1 kg (€)<input name="g1000" type="number" step="0.01" min="0"></label>
+        <label>Colis jusqu’à 2 kg (€)<input name="g2000" type="number" step="0.01" min="0"></label>
+        <label>Colis jusqu’à 5 kg (€)<input name="g5000" type="number" step="0.01" min="0"></label>
       </div>
       <h3>TVA</h3>
       <p class="aide">À activer seulement quand ton statut le prévoit (avec l’accord de ton comptable). Tes prix restent des prix TTC : le site affiche la part de TVA comprise.</p>
@@ -109,6 +111,10 @@
         <label>Rayon<select name="category_id" data-categories></select></label>
         <label>Type<select name="product_type"><option value="physical">Objet à expédier</option><option value="digital">Numérique (ebook…)</option><option value="service">Service</option></select></label>
         <label>Visibilité<select name="status"><option value="active">En vente sur le site</option><option value="draft">Brouillon (caché)</option><option value="archived">Archivé</option></select></label>
+        <label>Poids du colis emballé (g)<input name="poids_colis_g" type="number" min="1" step="1" placeholder="ex. 120 pour un bijou"></label>
+        <label>Tailles de bague proposées<input name="tailles" placeholder="ex. 50-64 (vide si ce n’est pas une bague)"></label>
+        <label>Supplément grandes tailles (€)<input name="supp_cents" type="number" step="0.01" min="0" placeholder="ex. 5"></label>
+        <label>… à partir de la taille<input name="supp_seuil" type="number" min="40" max="75" step="1" placeholder="ex. 60"></label>
         <label class="case"><input type="checkbox" name="is_unique"> Pièce unique (un seul exemplaire)</label>
         <label class="case"><input type="checkbox" name="featured"> Mettre en avant</label>
       </div>

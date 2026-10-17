@@ -1,7 +1,8 @@
 // Frais d'envoi de la Maison (France métropolitaine), en centimes.
-// Base : tarifs La Poste 2026 (Colissimo 500 g 7,59 €, 750 g 9,29 €, 1 kg 9,59 € ;
-// option signature avec indemnisation 200 € : 5,00 €), arrondis pour couvrir l'emballage.
-// Le serveur recalcule toujours ces montants : le navigateur ne fait que les afficher.
+// Base : grille Colissimo 2026 de La Poste, livraison à domicile sans signature
+// (250 g 5,49 € ; 500 g 7,59 € ; 750 g 9,29 € ; 1 kg 9,59 € ; 2 kg 11,19 € ; 5 kg 17,39 €).
+// Le prix dépend du poids du colis : chaque produit a un poids emballé (metadata.poids_colis_g),
+// sinon une valeur par défaut selon sa famille. Le serveur recalcule toujours ces montants.
 
 export const SHIPPING_METHODS = {
   colissimo: { label: 'Envoi suivi Colissimo (France métropolitaine)', delay: 'Numéro de suivi par email, livraison en 2 à 3 jours ouvrés après l’expédition.' },
@@ -9,20 +10,30 @@ export const SHIPPING_METHODS = {
   email: { label: 'Envoi par email', delay: 'Le fichier t’est envoyé dès sa sortie.' },
 };
 
-// Tarifs par défaut, en centimes. Lamia les modifie depuis son tableau de bord
-// (rubrique Produits → Livraison et TVA) ; ceux-ci ne servent que si rien n'est enregistré.
-export const DEFAULT_TARIFS = { colis_1: 790, colis_2_3: 990, colis_4_plus: 1290, bijou: 1090 };
+// Tranches de poids Colissimo (grammes) et tarifs par défaut (centimes). Lamia les modifie
+// depuis son tableau de bord (Produits → Livraison et TVA).
+export const TRANCHES = [250, 500, 750, 1000, 2000, 5000];
+export const DEFAULT_TARIFS = { g250: 549, g500: 759, g750: 929, g1000: 959, g2000: 1119, g5000: 1739 };
 export const DEFAULT_TVA = { active: false, taux: 20, mention: '' };
+
+// Poids emballé par défaut, quand le produit n'en a pas.
+export function poidsColis(product) {
+  const m = product.metadata || {};
+  const g = Number(m.poids_colis_g);
+  if (Number.isFinite(g) && g > 0) return g;
+  const cat = product.categories?.slug || product.category_slug;
+  if (cat === 'bijoux') return 120;
+  if (cat === 'livres') return 400;
+  return 600;
+}
 
 export function shippingFor(product, qty, method, tarifs = DEFAULT_TARIFS) {
   const t = { ...DEFAULT_TARIFS, ...(tarifs || {}) };
   if (product.product_type === 'digital') return { method: 'email', cents: 0 };
   if (method === 'retrait') return { method: 'retrait', cents: 0 };
-  const cat = product.categories?.slug || product.category_slug;
-  if (cat === 'bijoux') return { method: 'colissimo', cents: t.bijou }; // suivi, signature, assuré
-  if (qty <= 1) return { method: 'colissimo', cents: t.colis_1 };
-  if (qty <= 3) return { method: 'colissimo', cents: t.colis_2_3 };
-  return { method: 'colissimo', cents: t.colis_4_plus };
+  const poids = poidsColis(product) * Math.max(1, qty);
+  const tranche = TRANCHES.find((g) => poids <= g) || TRANCHES.at(-1);
+  return { method: 'colissimo', cents: t[`g${tranche}`], poids_g: poids };
 }
 
 // Part de TVA comprise dans un prix TTC (0 si la TVA n'est pas activée).
@@ -38,9 +49,21 @@ export function reglagesPropres(r = {}) {
   const tv = r.tva || {};
   const taux = Number(tv.taux);
   return {
-    tarifs: { colis_1: cents(t.colis_1, DEFAULT_TARIFS.colis_1), colis_2_3: cents(t.colis_2_3, DEFAULT_TARIFS.colis_2_3), colis_4_plus: cents(t.colis_4_plus, DEFAULT_TARIFS.colis_4_plus), bijou: cents(t.bijou, DEFAULT_TARIFS.bijou) },
+    tarifs: Object.fromEntries(TRANCHES.map((g) => [`g${g}`, cents(t[`g${g}`], DEFAULT_TARIFS[`g${g}`])])),
     tva: { active: tv.active === true, taux: Number.isFinite(taux) && taux >= 0 && taux <= 30 ? taux : DEFAULT_TVA.taux, mention: String(tv.mention || '').slice(0, 200) },
   };
 }
 
 export const MAX_QTY = (product) => (product.is_unique || product.product_type === 'digital' ? 1 : 5);
+
+// Bagues : taille de doigt (taille française = tour de doigt en mm). Les grandes tailles
+// demandent plus d'argent : un supplément s'ajoute à partir d'une taille réglée par Lamia.
+export function taillesDe(product) {
+  const t = product?.metadata?.tailles;
+  return Array.isArray(t) ? t.map(Number).filter((n) => Number.isInteger(n) && n >= 40 && n <= 75) : [];
+}
+export function supplementTaille(product, taille) {
+  const s = product?.metadata?.supplement_taille || {};
+  const seuil = Number(s.a_partir_de), cents = Math.round(Number(s.cents));
+  return Number.isFinite(seuil) && cents > 0 && Number(taille) >= seuil ? cents : 0;
+}
