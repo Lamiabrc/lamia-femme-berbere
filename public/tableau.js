@@ -186,7 +186,7 @@ async function chargerReglages() {
   try {
     const r = await (await fetch('/api/admin?action=boutique', { cache: 'no-store' })).json();
     const f = $('[data-reglages]');
-    for (const k of ['g250', 'g500', 'g750', 'g1000', 'g2000', 'g5000']) f.elements[k].value = (r.tarifs[k] / 100).toFixed(2);
+    for (const k of ['g250', 'g500', 'g750', 'g1000', 'g2000', 'g5000', 'lettre20', 'lettre100']) f.elements[k].value = (r.tarifs[k] / 100).toFixed(2);
     f.elements.tva_active.checked = r.tva.active; f.elements.tva_taux.value = r.tva.taux; f.elements.tva_mention.value = r.tva.mention || '';
   } catch { /* */ }
 }
@@ -195,7 +195,7 @@ $('[data-reglages]')?.addEventListener('submit', async (e) => {
   const f = e.target, st = $('[data-reglages-status]');
   const c = (k) => Math.round(parseFloat(String(f.elements[k].value).replace(',', '.')) * 100);
   try {
-    await api({ action: 'boutique_save', reglages: { tarifs: Object.fromEntries(['g250', 'g500', 'g750', 'g1000', 'g2000', 'g5000'].map((k) => [k, c(k)])), tva: { active: f.elements.tva_active.checked, taux: Number(f.elements.tva_taux.value), mention: f.elements.tva_mention.value } } });
+    await api({ action: 'boutique_save', reglages: { tarifs: Object.fromEntries(['g250', 'g500', 'g750', 'g1000', 'g2000', 'g5000', 'lettre20', 'lettre100'].map((k) => [k, c(k)])), tva: { active: f.elements.tva_active.checked, taux: Number(f.elements.tva_taux.value), mention: f.elements.tva_mention.value } } });
     st.textContent = 'Réglages enregistrés. Pense à « Publier » pour mettre à jour les conditions de vente.';
   } catch (err) { st.textContent = err.message; }
 });
@@ -230,6 +230,7 @@ function editer(p) {
     edition.metadata = p.metadata;
     const m = p.metadata || {};
     f.elements.poids_colis_g.value = m.poids_colis_g || '';
+    f.elements.envoi_lettre.checked = m.envoi === 'lettre';
     const t = Array.isArray(m.tailles) ? m.tailles : [];
     f.elements.tailles.value = t.length ? `${Math.min(...t)}-${Math.max(...t)}` : '';
     f.elements.supp_cents.value = m.supplement_taille?.cents ? (m.supplement_taille.cents / 100).toFixed(2) : '';
@@ -289,6 +290,7 @@ $('[data-produit-form]').addEventListener('submit', async (e) => {
   // Poids d'envoi, tailles de bague et supplément : rangés dans les informations du produit.
   const meta = { ...(edition.metadata || {}) };
   const poids = parseInt(val('poids_colis_g'), 10); if (poids > 0) meta.poids_colis_g = poids; else delete meta.poids_colis_g;
+  if (f.elements.envoi_lettre.checked) meta.envoi = 'lettre'; else delete meta.envoi;
   const mt = String(val('tailles')).match(/(\d{2})\s*[-–à]\s*(\d{2})/);
   if (mt) { const [a, b] = [Number(mt[1]), Number(mt[2])].sort((x, y) => x - y); meta.tailles = Array.from({ length: b - a + 1 }, (_, i) => a + i); } else delete meta.tailles;
   const sc = Math.round(parseFloat(String(val('supp_cents')).replace(',', '.')) * 100), ss = parseInt(val('supp_seuil'), 10);

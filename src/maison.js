@@ -1,7 +1,7 @@
 // Données vivantes de la Maison : catalogue, fiche produit, panier, prochaine soirée.
 // Le navigateur n'utilise que la clé publique Supabase ; aucune donnée privée n'est lue ici.
 
-import { SHIPPING_METHODS, shippingFor, MAX_QTY, tvaIncluse, reglagesPropres, taillesDe, supplementTaille } from '/assets/shipping.mjs';
+import { SHIPPING_METHODS, shippingFor, MAX_QTY, tvaIncluse, reglagesPropres, taillesDe, supplementTaille, parLettre } from '/assets/shipping.mjs';
 
 // Frais d'envoi et TVA réglés par Lamia (le serveur recalcule toujours à la commande).
 let REGLAGES = reglagesPropres();
@@ -187,6 +187,7 @@ async function renderProductPage() {
 function delaiLivraison(p) {
   const piece = roomOf(p).slug;
   if (piece === 'ecrin') return '<strong>Délai :</strong> ce bijou est réalisé par un artisan. Le délai de livraison dépend de lui : <strong>entre 2 et 6 semaines</strong> après ton achat.';
+  if (piece === 'grenier' && parLettre(p)) return '<strong>Délai :</strong> la pièce est déjà là. Elle part par lettre après ton achat : compte <strong>2 à 4 jours ouvrés</strong>.';
   if (piece === 'grenier') return '<strong>Délai :</strong> la pièce est déjà là, prête à partir. Elle est expédiée après ton achat : compte <strong>le temps d’une livraison Colissimo</strong> (2 à 3 jours ouvrés en général).';
   return '';
 }
@@ -203,7 +204,7 @@ function preorderForm(p) {
     <details class="guide-taille"><summary>Comment connaître ta taille ?</summary><p>La taille française correspond au <strong>tour de ton doigt en millimètres</strong>. Entoure la base de ton doigt avec un fil ou une bande de papier, marque l’endroit où il se rejoint, puis mesure la longueur à plat : 54 mm = taille 54. Mesure en fin de journée, quand les doigts sont un peu plus gros, et en cas d’hésitation choisis la taille au-dessus.</p><p>Tu as déjà une bague qui te va ? Mesure son diamètre intérieur en mm et multiplie par 3,14 : c’est ta taille.</p></details>` : ''}
     ${max > 1 ? `<label>Quantité<select name="qty">${Array.from({ length: max }, (_, i) => `<option>${i + 1}</option>`).join('')}</select></label>` : '<input type="hidden" name="qty" value="1">'}
     ${digital ? '' : `<fieldset><legend>Livraison</legend>
-      <label class="check"><input type="radio" name="method" value="colissimo" checked><span>${SHIPPING_METHODS.colissimo.label} <small data-ship-price></small><br><small>${SHIPPING_METHODS.colissimo.delay}</small></span></label>
+      <label class="check"><input type="radio" name="method" value="colissimo" checked><span>${SHIPPING_METHODS[parLettre(p) ? 'lettre' : 'colissimo'].label} <small data-ship-price></small><br><small>${SHIPPING_METHODS[parLettre(p) ? 'lettre' : 'colissimo'].delay}</small></span></label>
       <label class="check"><input type="radio" name="method" value="retrait"><span>${SHIPPING_METHODS.retrait.label} <small>(gratuit)</small><br><small>${SHIPPING_METHODS.retrait.delay}</small></span></label>
     </fieldset>`}
     <label>Prénom et nom<input name="name" autocomplete="name" required maxlength="120"></label>
@@ -239,7 +240,7 @@ function wirePreorder(p, box) {
     const sp = $('[data-ship-price]', form);
     if (sp) sp.textContent = `(${money(col.cents)})`;
     const addr = $('[data-address]', form);
-    if (addr) addr.hidden = ship.method !== 'colissimo';
+    if (addr) addr.hidden = ship.method === 'retrait';
     const unit = p.price_cents + (form.elements.taille ? supplementTaille(p, form.elements.taille.value) : 0);
     const total = unit * qty + ship.cents, tva = tvaIncluse(total, REGLAGES.tva);
     $('[data-total]', form).textContent = `${money(total, p.currency)}${ship.cents ? ` dont ${money(ship.cents)} d’envoi` : ''}${tva ? ` · dont TVA ${String(REGLAGES.tva.taux).replace('.', ',')} % : ${money(tva)}` : ''}`;

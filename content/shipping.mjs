@@ -6,6 +6,7 @@
 
 export const SHIPPING_METHODS = {
   colissimo: { label: 'Envoi suivi Colissimo (France métropolitaine)', delay: 'Numéro de suivi par email, livraison en 2 à 3 jours ouvrés après l’expédition.' },
+  lettre: { label: 'Envoi par lettre (Lettre verte, La Poste)', delay: 'Livraison en 2 à 4 jours ouvrés, sans suivi.' },
   retrait: { label: 'Remise en main propre à Rennes', delay: 'Sur rendez-vous, gratuit.' },
   email: { label: 'Envoi par email', delay: 'Le fichier t’est envoyé dès sa sortie.' },
 };
@@ -13,7 +14,9 @@ export const SHIPPING_METHODS = {
 // Tranches de poids Colissimo (grammes) et tarifs par défaut (centimes). Lamia les modifie
 // depuis son tableau de bord (Produits → Livraison et TVA).
 export const TRANCHES = [250, 500, 750, 1000, 2000, 5000];
-export const DEFAULT_TARIFS = { g250: 549, g500: 759, g750: 929, g1000: 959, g2000: 1119, g5000: 1739 };
+export const DEFAULT_TARIFS = { g250: 549, g500: 759, g750: 929, g1000: 959, g2000: 1119, g5000: 1739, lettre20: 152, lettre100: 310 };
+// Petits objets plats (cartes postales…) : envoi en Lettre verte (tarifs La Poste 2026 : 20 g 1,52 € ; 100 g 3,10 €).
+export const parLettre = (product) => product?.metadata?.envoi === 'lettre';
 export const DEFAULT_TVA = { active: false, taux: 20, mention: '' };
 
 // Poids emballé par défaut, quand le produit n'en a pas.
@@ -32,6 +35,7 @@ export function shippingFor(product, qty, method, tarifs = DEFAULT_TARIFS) {
   if (product.product_type === 'digital') return { method: 'email', cents: 0 };
   if (method === 'retrait') return { method: 'retrait', cents: 0 };
   const poids = poidsColis(product) * Math.max(1, qty);
+  if (parLettre(product) && poids <= 100) return { method: 'lettre', cents: poids <= 20 ? t.lettre20 : t.lettre100, poids_g: poids };
   const tranche = TRANCHES.find((g) => poids <= g) || TRANCHES.at(-1);
   return { method: 'colissimo', cents: t[`g${tranche}`], poids_g: poids };
 }
@@ -49,7 +53,7 @@ export function reglagesPropres(r = {}) {
   const tv = r.tva || {};
   const taux = Number(tv.taux);
   return {
-    tarifs: Object.fromEntries(TRANCHES.map((g) => [`g${g}`, cents(t[`g${g}`], DEFAULT_TARIFS[`g${g}`])])),
+    tarifs: Object.fromEntries([...TRANCHES.map((g) => `g${g}`), 'lettre20', 'lettre100'].map((k) => [k, cents(t[k], DEFAULT_TARIFS[k])])),
     tva: { active: tv.active === true, taux: Number.isFinite(taux) && taux >= 0 && taux <= 30 ? taux : DEFAULT_TVA.taux, mention: String(tv.mention || '').slice(0, 200) },
   };
 }

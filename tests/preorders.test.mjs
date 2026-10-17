@@ -116,3 +116,10 @@ test('bague : taille obligatoire, supplément grandes tailles calculé par le se
   assert.equal(writes[1].product_name, 'Alliance · taille 62');
   assert.equal(writes[1].metadata.taille, 62);
 });
+
+test('carte postale : envoi par lettre (Lettre verte 2026), adresse exigée', async () => {
+  PRODUCTS.carte = { id: 'p4', name: 'Carte', price_cents: 400, currency: 'EUR', product_type: 'physical', is_unique: true, stock_qty: 1, categories: { slug: 'trouvailles' }, metadata: { envoi: 'lettre', poids_colis_g: 20 } };
+  assert.deepEqual([shippingFor(PRODUCTS.carte, 1, 'colissimo').method, shippingFor(PRODUCTS.carte, 1, 'colissimo').cents], ['lettre', 152]);
+  assert.equal((await createPreorder(req({ ...base, slug: 'carte', address: { line1: '', postal_code: '', city: '' } }), { env, fetcher: fake('carte').fetcher })).status, 400);
+  assert.equal((await (await createPreorder(req({ ...base, slug: 'carte' }), { env, fetcher: fake('carte').fetcher })).json()).total_cents, 552);
+});

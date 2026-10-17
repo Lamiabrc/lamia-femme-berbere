@@ -216,7 +216,7 @@ Signature (si envoi papier) : …</p>
 // Textes qui dépendent des réglages de la boutique (tableau de bord → Livraison et TVA).
 const eur = (c) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(c / 100);
 export function livraisonTexte(t) {
-  return `Envoi suivi Colissimo en France métropolitaine, sans signature, selon le poids du colis : jusqu’à 250 g ${eur(t.g250)}, 500 g ${eur(t.g500)}, 750 g ${eur(t.g750)}, 1 kg ${eur(t.g1000)}, 2 kg ${eur(t.g2000)}, 5 kg ${eur(t.g5000)}. Le montant exact est affiché avant le paiement.`;
+  return `Envoi suivi Colissimo en France métropolitaine, sans signature, selon le poids du colis : jusqu’à 250 g ${eur(t.g250)}, 500 g ${eur(t.g500)}, 750 g ${eur(t.g750)}, 1 kg ${eur(t.g1000)}, 2 kg ${eur(t.g2000)}, 5 kg ${eur(t.g5000)}. Les cartes postales et objets plats partent en Lettre verte : ${eur(t.lettre20)} jusqu’à 20 g, ${eur(t.lettre100)} jusqu’à 100 g. Le montant exact est affiché avant le paiement.`;
 }
 export function tvaTexte(tva) {
   if (tva?.active) return `Ils s’entendent toutes taxes comprises (TVA ${String(tva.taux).replace('.', ',')} % incluse).${tva.mention ? ` ${tva.mention}` : ''}`;
