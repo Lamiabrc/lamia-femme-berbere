@@ -2510,3 +2510,6 @@ body[data-ambiance="salon"] .videos-haut h2 { color: #fff4e0; }
 /* Grenier : grande image d'ambiance */
 .banniere-grenier { margin-top: 8px; margin-bottom: clamp(24px, 4vw, 48px); }
 .banniere-grenier img { box-shadow: 0 0 0 8px #fbf4e4, 0 0 0 9px rgba(107,74,46,.35), 0 30px 50px -28px rgba(60,35,15,.7); border-radius: 6px; }
+
+/* Délai de livraison annoncé sur la fiche */
+.delai-livraison { margin: 0 0 14px; padding: 10px 14px; border-left: 3px solid var(--rouille, #a5562e); background: rgba(216,192,148,.25); border-radius: 0 8px 8px 0; font-size: 15px; line-height: 1.5; }

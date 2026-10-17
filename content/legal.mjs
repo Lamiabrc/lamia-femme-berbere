@@ -34,10 +34,10 @@ Données stockées par Supabase, centre de données de Paris (Union européenne)
 <p>Les prix sont indiqués en euros. {{TVA}} Les frais de livraison sont indiqués avant la validation de la commande. Le prix des livres respecte la loi sur le prix unique du livre.</p>
 <h2>3. Commande et paiement</h2>
 <p>Le paiement se fait par carte bancaire via Stripe, prestataire de paiement sécurisé. La Maison n'a jamais accès aux données de carte. La commande est ferme après confirmation du paiement.</p>
-<h2>4. Précommandes</h2>
-<p>Une précommande réserve un article sans paiement immédiat. La Maison confirme la disponibilité par email et transmet le moyen de paiement. La vente est conclue à réception du paiement ; avant cela, la cliente peut annuler sa précommande par simple email, sans frais. Une pièce unique est réservée à la première précommande ; les suivantes sont inscrites en liste d'attente. Le livre broché en précommande est expédié dès réception des exemplaires imprimés.</p>
+<h2>4. Validation des commandes</h2>
+<p>Chaque commande passée sur le site est validée personnellement par Lamia. Aucun paiement n'est demandé au moment de la commande : la Maison confirme la disponibilité par email et transmet le lien de paiement. La vente est conclue à réception du paiement ; avant cela, la cliente peut annuler sa commande par simple email, sans frais. Une pièce unique est réservée à la première commande ; les suivantes sont inscrites en liste d'attente. Le livre broché en précommande est expédié dès réception des exemplaires imprimés.</p>
 <h2>4 bis. Livraison des bijoux, objets et livres papier</h2>
-<p>{{LIVRAISON}} Remise en main propre gratuite à Rennes, sur rendez-vous. Expédition sous 3 jours ouvrés après paiement. Pour une livraison hors de France métropolitaine, écrire à lamia.brechet@outlook.fr. Détails sur la page <a href="/retours/">Livraison, retours et remboursements</a>.</p>
+<p>{{LIVRAISON}} Remise en main propre gratuite à Rennes, sur rendez-vous. Délais : les bijoux sont réalisés par un artisan et le délai dépend de lui, entre 2 et 6 semaines après la validation de la commande ; les pièces du Grenier, déjà disponibles, sont expédiées dès la validation et livrées dans le délai habituel de Colissimo (2 à 3 jours ouvrés en général) ; les livres papier sont expédiés sous 3 jours ouvrés après paiement. Pour une livraison hors de France métropolitaine, écrire à lamia.brechet@outlook.fr. Détails sur la page <a href="/retours/">Livraison, retours et remboursements</a>.</p>
 <h2>5. Livre numérique</h2>
 <p>Le fichier est mis à disposition dans l'espace membre dès la confirmation du paiement. En demandant ce téléchargement immédiat, la cliente donne son accord exprès et renonce à son droit de rétractation, conformément à l'article L221-28 du Code de la consommation.</p>
 <h2>6. Soirées</h2>
@@ -97,7 +97,13 @@ Données stockées par Supabase, centre de données de Paris (Union européenne)
     title: 'Livraison, retours et remboursements',
     body: `
 <h2>Livraison</h2>
-<p>{{LIVRAISON}} Remise en main propre gratuite à Rennes, sur rendez-vous. Expédition sous 3 jours ouvrés après paiement, avec un numéro de suivi envoyé par email. Pour une livraison hors de France métropolitaine, écris à <a href="mailto:lamia.brechet@outlook.fr">lamia.brechet@outlook.fr</a> pour connaître le tarif.</p>
+<p>{{LIVRAISON}} Remise en main propre gratuite à Rennes, sur rendez-vous. Un numéro de suivi t’est envoyé par email à l’expédition.</p>
+<ul>
+<li><strong>Bijoux (L’Écrin)</strong> : chaque bijou est réalisé par un artisan. Le délai dépend de lui : <strong>entre 2 et 6 semaines</strong> après la validation de ta commande.</li>
+<li><strong>Trouvailles du Grenier</strong> : les pièces sont déjà là. Elles partent dès la validation de ta commande, le temps d’une livraison Colissimo (2 à 3 jours ouvrés en général).</li>
+<li><strong>Livres papier</strong> : expédiés sous 3 jours ouvrés après le paiement.</li>
+</ul>
+<p> Pour une livraison hors de France métropolitaine, écris à <a href="mailto:lamia.brechet@outlook.fr">lamia.brechet@outlook.fr</a> pour connaître le tarif.</p>
 <p>Un colis abîmé à la réception ? Note-le auprès du livreur si possible, prends une photo et écris-nous sous 48 heures : nous trouvons une solution.</p>
 <h2>Retourner un article (droit de rétractation)</h2>
 <p>Pour les bijoux, objets et livres papier, tu as <strong>14 jours après la réception</strong> pour changer d’avis, sans avoir à te justifier.</p>
@@ -114,8 +120,8 @@ Données stockées par Supabase, centre de données de Paris (Union européenne)
 </ul>
 <h2>Un article défectueux ?</h2>
 <p>Tu bénéficies de la garantie légale de conformité (2 ans) et de la garantie des vices cachés. Écris-nous avec une photo : réparation, remplacement ou remboursement, à nos frais.</p>
-<h2>Précommandes</h2>
-<p>Tant que tu n’as pas payé, tu peux annuler une précommande à tout moment par simple email, sans frais.</p>
+<h2>Commandes en attente de validation</h2>
+<p>Chaque commande est validée par Lamia avant le paiement. Tant que tu n’as pas payé, tu peux l’annuler à tout moment par simple email, sans frais.</p>
 <h2>Modèle de formulaire de rétractation</h2>
 <div class="modele">
 <p>À l’attention de Lamia Bréchet Ighil, Lamia Femme Berbère, ${todo('adresse postale')}, lamia.brechet@outlook.fr :</p>

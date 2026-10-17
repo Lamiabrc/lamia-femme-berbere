@@ -179,12 +179,22 @@ async function renderProductPage() {
 
 // ---------------------------------------------------------------- précommande
 
+// Délai annoncé selon la pièce : les bijoux sont faits par un artisan, le Grenier part tout de suite.
+function delaiLivraison(p) {
+  const piece = roomOf(p).slug;
+  if (piece === 'ecrin') return '<strong>Délai :</strong> ce bijou est réalisé par un artisan. Le délai de livraison dépend de lui : <strong>entre 2 et 6 semaines</strong> après la validation de ta commande.';
+  if (piece === 'grenier') return '<strong>Délai :</strong> la pièce est déjà là, prête à partir. Elle est expédiée dès la validation de ta commande : compte <strong>le temps d’une livraison Colissimo</strong> (2 à 3 jours ouvrés en général).';
+  return '';
+}
+
 function preorderForm(p) {
   const digital = p.product_type === 'digital';
   const max = MAX_QTY(p);
+  const delai = digital ? '' : delaiLivraison(p);
   return `<form class="preorder" data-preorder novalidate>
-    <h2>Précommander</h2>
-    <p class="fine">${p.is_unique ? 'Pièce unique : la première précommande la réserve.' : 'Réserve ton exemplaire dès maintenant.'} Rien n’est payé ici : Lamia te confirme ta précommande par email et t’envoie le moyen de paiement.</p>
+    <h2>Commander</h2>
+    <p class="fine">${p.is_unique ? 'Pièce unique : la première commande la réserve.' : ''} Chaque commande est <strong>validée personnellement par Lamia</strong>. Rien n’est débité ici : après validation, tu reçois par email la confirmation et le lien de paiement.</p>
+    ${delai ? `<p class="delai-livraison">${delai}</p>` : ''}
     ${max > 1 ? `<label>Quantité<select name="qty">${Array.from({ length: max }, (_, i) => `<option>${i + 1}</option>`).join('')}</select></label>` : '<input type="hidden" name="qty" value="1">'}
     ${digital ? '' : `<fieldset><legend>Livraison</legend>
       <label class="check"><input type="radio" name="method" value="colissimo" checked><span>${SHIPPING_METHODS.colissimo.label} <small data-ship-price></small><br><small>${SHIPPING_METHODS.colissimo.delay}</small></span></label>
@@ -200,9 +210,9 @@ function preorderForm(p) {
     </div>`}
     <label>Un mot pour Lamia (facultatif)<textarea name="message" rows="2" maxlength="600"></textarea></label>
     <input name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
-    <div class="preorder-total"><span>Total à régler à la confirmation</span><strong data-total></strong></div>
-    <label class="check"><input type="checkbox" name="cgv"><span>J’accepte les <a href="/cgv/" target="_blank" rel="noopener">conditions de vente</a> (précommande sans paiement immédiat).</span></label>
-    <button class="btn btn-ink" type="submit">Envoyer ma précommande</button>
+    <div class="preorder-total"><span>Total à régler après validation</span><strong data-total></strong></div>
+    <label class="check"><input type="checkbox" name="cgv"><span>J’accepte les <a href="/cgv/" target="_blank" rel="noopener">conditions de vente</a> (commande validée par Lamia, paiement après validation).</span></label>
+    <button class="btn btn-ink" type="submit">Envoyer ma commande</button>
     <p class="form-status" role="status" data-preorder-status></p>
   </form>`;
 }
@@ -241,14 +251,14 @@ function wirePreorder(p, box) {
     };
     let r = {}, res;
     try { res = await fetch('/api/preorder', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); r = await res.json().catch(() => ({})); } catch { /* réseau */ }
-    btn.disabled = false; btn.textContent = 'Envoyer ma précommande';
+    btn.disabled = false; btn.textContent = 'Envoyer ma commande';
     if (res?.ok && r.ok) {
       window.lfbEvent?.('precommande');
-      form.innerHTML = `<h2>Merci, ta précommande est enregistrée.</h2><p>Numéro de précommande : <strong>${esc(r.order_number)}</strong></p><p>${r.waitlist ? 'Cette pièce unique est déjà réservée : tu es inscrite en liste d’attente. Lamia te prévient si elle se libère.' : `Lamia te confirme ta précommande par email et t’envoie le moyen de paiement. Total : ${money(r.total_cents)}.`}</p>`;
+      form.innerHTML = `<h2>Merci, ta commande est bien arrivée.</h2><p>Numéro de commande : <strong>${esc(r.order_number)}</strong></p><p>${r.waitlist ? 'Cette pièce unique est déjà réservée : tu es inscrite en liste d’attente. Lamia te prévient si elle se libère.' : `Lamia valide ta commande et t’envoie par email la confirmation et le lien de paiement. Total : ${money(r.total_cents)}.${delaiLivraison(p) ? ` ${delaiLivraison(p).replace(/<[^>]+>/g, '')}` : ''}`}</p>`;
       return;
     }
     const msg = { invalid_contact: 'Vérifie ton nom et ton adresse email.', invalid_address: 'Vérifie ton adresse : rue, code postal à 5 chiffres et ville.', product_unavailable: 'Cette pièce n’est plus disponible.' };
-    say(msg[r.error] || 'La précommande n’est pas partie. Réessaie dans un instant.', true);
+    say(msg[r.error] || 'La commande n’est pas partie. Réessaie dans un instant.', true);
   });
 }
 

@@ -29,7 +29,7 @@ async function render() {
 }
 
 const money = (c, cur = 'EUR') => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: cur || 'EUR' }).format((c || 0) / 100);
-const STATUTS = { pending: 'Précommande enregistrée', paid: 'Payée', fulfilled: 'Expédiée', shipped: 'Expédiée', cancelled: 'Annulée', refunded: 'Remboursée' };
+const STATUTS = { pending: 'En attente de validation par Lamia', paid: 'Payée', fulfilled: 'Expédiée', shipped: 'Expédiée', cancelled: 'Annulée', refunded: 'Remboursée' };
 async function achats(session) {
   const box = $('[data-espace-achats]');
   try {
@@ -41,7 +41,7 @@ async function achats(session) {
           <h3>${(o.order_items || []).map((i) => `${esc(i.product_name)}${i.quantity > 1 ? ` × ${i.quantity}` : ''}`).join(', ') || 'Commande'}</h3></div>
           <div class="espace-achat-droite"><strong>${money(o.amount_total_cents, o.currency)}</strong><span class="statut is-${esc(o.status)}">${esc(STATUTS[o.status] || o.status)}</span></div>
         </article>`).join('')
-      : '<p>Pas encore d’achat. Les précommandes du livre et du collier apparaîtront ici. <a class="text-link" href="/boutique/">Voir la Boutique</a></p>';
+      : '<p>Pas encore d’achat. Tes commandes apparaîtront ici. <a class="text-link" href="/boutique/">Voir la Boutique</a></p>';
   } catch { box.innerHTML = '<p>Tes achats ne s’affichent pas pour le moment. Réessaie dans un instant.</p>'; }
 }
 

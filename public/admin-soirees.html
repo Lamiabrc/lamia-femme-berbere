@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Mes soirées et précommandes · Lamia Femme Berbère</title>
+<title>Mes soirées et commandes à valider · Lamia Femme Berbère</title>
 <link rel="stylesheet" href="/assets/maison.css">
 <style>
   .wrap { max-width: 1100px; margin: 0 auto; padding: 40px var(--gouttiere); }
@@ -20,7 +20,7 @@
 <body>
 <main class="wrap">
   <p class="room-name"><span class="pip" aria-hidden="true"></span>Espace privé de Lamia</p>
-  <h1>Mes soirées et précommandes</h1>
+  <h1>Mes soirées et commandes à valider</h1>
 
   <form id="login" class="auth-grid" style="max-width:480px">
     <div class="report-form" style="margin:0">
@@ -49,7 +49,7 @@
       <div id="wishes"></div>
     </div>
     <div class="box">
-      <h2 style="font-size:26px">Précommandes</h2>
+      <h2 style="font-size:26px">Commandes à valider</h2>
       <p>Pour chacune : confirme par email et envoie le moyen de paiement.</p>
       <table><thead><tr><th>N°</th><th>Date</th><th>Cliente</th><th>Article</th><th>Livraison</th><th>Total</th></tr></thead><tbody id="orders"></tbody></table>
     </div>
@@ -95,8 +95,8 @@ async function loadOrders() {
       const ship = a.method === 'colissimo' ? `Colissimo<br><small>${esc([a.line1, a.line2, a.postal_code, a.city].filter(Boolean).join(', '))}</small>` : a.method === 'retrait' ? 'Remise à Rennes' : 'Email';
       const items = (o.order_items || []).map((i) => `${esc(i.product_name)} × ${i.quantity}${i.metadata?.waitlist ? ' <strong>(liste d’attente)</strong>' : ''}`).join('<br>');
       return `<tr><td>${o.order_number}</td><td>${esc(when(o.created_at))}</td><td>${esc(o.customer_name)}<br><a href="mailto:${esc(o.customer_email)}">${esc(o.customer_email)}</a>${a.phone ? `<br>${esc(a.phone)}` : ''}</td><td>${items}</td><td>${ship}</td><td>${euro(o.amount_total_cents)}</td></tr>`;
-    }).join('') || '<tr><td colspan="6">Aucune précommande pour le moment.</td></tr>';
-  } catch { $('#orders').innerHTML = '<tr><td colspan="6">Les précommandes ne s’affichent pas pour le moment.</td></tr>'; }
+    }).join('') || '<tr><td colspan="6">Aucune commande à valider pour le moment.</td></tr>';
+  } catch { $('#orders').innerHTML = '<tr><td colspan="6">Les commandes ne s’affichent pas pour le moment.</td></tr>'; }
 }
 
 async function load() {
