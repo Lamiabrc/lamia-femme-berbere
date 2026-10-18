@@ -26,3 +26,16 @@ test('mes achats : connexion obligatoire, email confirmé', async () => {
   const r = await myOrders(req(), { env, fetcher: fetcherFor({ id: 'u', email: 'a@b.fr' }, [{ order_number: 1, customer_email: 'a@b.fr' }]) });
   assert.deepEqual((await r.json()).orders, []);
 });
+
+test('mes achats : lien de téléchargement seulement pour un livre numérique payé', async () => {
+  const item = (type) => ({ product_name: 'Werdi', quantity: 1, total_price_cents: 700, products: { product_type: type, metadata: { fichier: 'werdi/a.pdf' } } });
+  const rows = [
+    { order_number: 1, status: 'paid', customer_email: 'n@ex.fr', stripe_checkout_session_id: 'cs_live_A', order_items: [item('digital')] },
+    { order_number: 2, status: 'pending', customer_email: 'n@ex.fr', stripe_checkout_session_id: 'cs_live_B', order_items: [item('digital')] },
+    { order_number: 3, status: 'paid', customer_email: 'n@ex.fr', stripe_checkout_session_id: 'cs_live_C', order_items: [item('physical')] },
+  ];
+  const { orders } = await (await myOrders(req(), { env, fetcher: fetcherFor({ id: 'u', email: 'n@ex.fr', email_confirmed_at: 'x' }, rows) })).json();
+  assert.deepEqual(orders.map((o) => o.order_items[0].telechargement), ['/api/event-fulfill?type=telecharger&session_id=cs_live_A', null, null]);
+  assert.equal(orders[0].order_items[0].products, undefined);
+  assert.equal(orders[0].stripe_checkout_session_id, undefined);
+});

@@ -2522,3 +2522,4 @@ body[data-ambiance="salon"] .videos-haut h2 { color: #fff4e0; }
 .guide-taille { margin: -4px 0 14px; font-size: 14px; }
 .guide-taille summary { cursor: pointer; text-decoration: underline; }
 .guide-taille p { margin: 8px 0 0; line-height: 1.5; }
+.btn-telecharger { margin-top: 10px; }

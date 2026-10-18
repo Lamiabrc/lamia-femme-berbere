@@ -230,6 +230,7 @@ function editer(p) {
     edition.metadata = p.metadata;
     const m = p.metadata || {};
     f.elements.poids_colis_g.value = m.poids_colis_g || '';
+    $('[data-ebook-actuel]').textContent = m.fichier ? `Fichier en place : ${m.fichier.split('/').pop()}` : 'Aucun fichier pour l’instant.';
     f.elements.envoi_lettre.checked = m.envoi === 'lettre';
     const t = Array.isArray(m.tailles) ? m.tailles : [];
     f.elements.tailles.value = t.length ? `${Math.min(...t)}-${Math.max(...t)}` : '';
@@ -239,7 +240,7 @@ function editer(p) {
     if (!edition.photos.length && p.slug === 'collier-kabyle-argente-emaille-15g') edition.photos = ['hero', 'porte', 'detail', 'ecrin'].map((v) => ({ url: `/images/collier/collier-kabyle-15g-${v}-1120.webp` }));
     const voir = $('[data-produit-voir]'); voir.hidden = false; voir.href = `/produit/?p=${encodeURIComponent(p.slug)}`;
   } else {
-    f.elements.status.value = 'active'; f.elements.stock_qty.value = 1; $('[data-produit-voir]').hidden = true;
+    f.elements.status.value = 'active'; f.elements.stock_qty.value = 1; $('[data-produit-voir]').hidden = true; $('[data-ebook-actuel]').textContent = '';
     if (categories[0]) f.elements.category_id.value = categories[0].id;
   }
   photos();
@@ -280,6 +281,24 @@ $('[data-photo-input]').addEventListener('change', async (e) => {
     try { edition.photos.push({ url: await envoyer(file, 'produits') }); photos(); } catch (err) { st.textContent = err.message; }
   }
   st.textContent = '';
+  e.target.value = '';
+});
+
+// Fichier d'un livre numérique : envoyé directement dans le dossier privé, puis enregistré avec le produit.
+$('[data-ebook-input]')?.addEventListener('change', async (e) => {
+  const file = e.target.files?.[0]; const st = $('[data-produit-status]'), f = $('[data-produit-form]');
+  if (!file) return;
+  const type = file.type || (/\.epub$/i.test(file.name) ? 'application/epub+zip' : 'application/pdf');
+  if (file.size > 50 * 1024 * 1024) { st.textContent = 'Le fichier dépasse 50 Mo.'; return; }
+  try {
+    st.textContent = `Envoi de ${file.name}…`;
+    const { path, url } = await api({ action: 'ebook_url', slug: f.elements.slug.value || f.elements.name.value, content_type: type });
+    const r = await fetch(url, { method: 'PUT', headers: { apikey: 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc', 'Content-Type': type, 'x-upsert': 'false' }, body: file });
+    if (!r.ok) throw new Error('L’envoi du fichier n’a pas fonctionné.');
+    edition.metadata = { ...(edition.metadata || {}), fichier: path };
+    $('[data-ebook-actuel]').textContent = `Fichier prêt : ${file.name}. Clique sur « Enregistrer le produit » pour le mettre en vente.`;
+    st.textContent = '';
+  } catch (err) { st.textContent = err.message; }
   e.target.value = '';
 });
 

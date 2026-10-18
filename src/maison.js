@@ -599,6 +599,11 @@ renderSocials();
     try { r = await (await fetch(`/api/event-fulfill?type=commande&session_id=${encodeURIComponent(id)}`)).json(); } catch { /* réseau */ }
     if (r.status === 'paid') {
       window.lfbEvent?.('achat');
+      if (r.telechargements?.length) {
+        dire('Merci, ton livre est à toi !', `Commande n° ${r.order_number}. Tu reçois le reçu de paiement par email. Télécharge ton livre maintenant : tu le retrouveras aussi à tout moment dans « Mon espace », connectée avec la même adresse email.`);
+        texte.insertAdjacentHTML('afterend', r.telechargements.map((t) => `<p><a class="btn btn-ink btn-telecharger" href="${esc(t.url)}">⬇ Télécharger « ${esc(t.nom)} »</a></p>`).join(''));
+        return;
+      }
       return dire('Merci, ton achat est confirmé !', `Commande n° ${r.order_number}. Tu reçois le reçu de paiement par email. Lamia prépare ton colis et te tient au courant de l’expédition.`);
     }
     if (r.status === 'invalid' || r.status === 'not_an_order') return dire('Lien de confirmation incomplet', 'Si tu viens de payer, pas d’inquiétude : ta commande est bien enregistrée et tu reçois le reçu par email.');

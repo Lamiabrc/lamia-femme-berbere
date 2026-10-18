@@ -123,3 +123,21 @@ test('carte postale : envoi par lettre (Lettre verte 2026), adresse exigée', as
   assert.equal((await createPreorder(req({ ...base, slug: 'carte', address: { line1: '', postal_code: '', city: '' } }), { env, fetcher: fake('carte').fetcher })).status, 400);
   assert.equal((await (await createPreorder(req({ ...base, slug: 'carte' }), { env, fetcher: fake('carte').fetcher })).json()).total_cents, 552);
 });
+
+test('livre numérique : téléchargement seulement après un paiement vérifié, lien signé court', async () => {
+  const { telechargerDepuisSession } = await import('../lib/preorders.mjs');
+  const calls = [];
+  const fetcher = async (url, init = {}) => {
+    calls.push(url);
+    if (url.includes('/order_items?order_id=')) return { ok: true, json: async () => [{ product_name: 'Werdi, ouvre les yeux ! — ebook', products: { slug: 'werdi', product_type: 'digital', metadata: { fichier: 'werdi/2026-10-18-abc.pdf' } } }] };
+    if (url.includes('/storage/v1/object/sign/ebooks/werdi/2026-10-18-abc.pdf')) { assert.equal(JSON.parse(init.body).expiresIn, 900); return { ok: true, json: async () => ({ signedURL: '/object/sign/ebooks/werdi/2026-10-18-abc.pdf?token=t' }) }; }
+    throw new Error(url);
+  };
+  const e = { ...env, STRIPE_SECRET_KEY: 'sk_test_x' };
+  const s = { id: 'cs_test_1', livemode: false, payment_status: 'paid', metadata: { kind: 'product_order', order_id: '11111111-1111-1111-1111-111111111111' } };
+  assert.equal((await telechargerDepuisSession({ ...s, payment_status: 'unpaid' }, { env: e, fetcher })).status, 'unpaid');
+  assert.equal((await telechargerDepuisSession({ ...s, livemode: true }, { env: e, fetcher })).status, 'wrong_mode');
+  const r = await telechargerDepuisSession(s, { env: e, fetcher });
+  assert.equal(r.status, 'ok');
+  assert.match(r.url, /\/storage\/v1\/object\/sign\/ebooks\/.+token=t&download=Werdi-ouvre-les-yeux-ebook\.pdf$/);
+});
