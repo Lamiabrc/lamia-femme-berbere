@@ -2535,3 +2535,15 @@ body[data-ambiance="salon"] .videos-haut h2 { color: #fff4e0; }
 .renvoi-ebook { margin-top: 16px; font-size: 15px; }
 .renvoi-ebook summary { cursor: pointer; text-decoration: underline; }
 .renvoi-ebook form { margin-top: 10px; display: grid; gap: 10px; }
+
+/* Bibliothèque : la page du livre se lit sur une page de papier, lisible sur le fond boisé */
+body[data-ambiance="bibliotheque"] .article {
+  background: radial-gradient(ellipse 60% 40% at 75% 6%, rgba(255,226,160,.35), transparent 70%), linear-gradient(180deg, var(--papier, #f6ecd6), var(--papier-fonce, #ead9b6));
+  color: #2b1a10; border-radius: 6px; padding: clamp(24px, 5vw, 56px) clamp(18px, 5vw, 64px);
+  margin: clamp(16px, 4vw, 40px) auto; box-shadow: 0 30px 60px -30px rgba(0,0,0,.8), inset 0 0 60px rgba(120,80,30,.18);
+}
+body[data-ambiance="bibliotheque"] .article h1, body[data-ambiance="bibliotheque"] .article h2, body[data-ambiance="bibliotheque"] .article h3 { color: #2b1a10; }
+body[data-ambiance="bibliotheque"] .article p, body[data-ambiance="bibliotheque"] .article li, body[data-ambiance="bibliotheque"] .article .lead { color: #3b2c1c; }
+body[data-ambiance="bibliotheque"] .article blockquote { color: #3b2c1c; border-left-color: var(--lampe, #b8862e); }
+body[data-ambiance="bibliotheque"] .article a:not(.btn) { color: #8a2b1e; }
+body[data-ambiance="bibliotheque"] .article .room-name { color: #8a5a1e; }
