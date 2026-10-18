@@ -167,6 +167,7 @@ async function renderProductPage() {
         <div class="extrait-pages">${m.extrait.filter((u) => /^\/images\//.test(u)).map((u, i) => `<img src="${esc(u)}" alt="Extrait, page ${i + 1}" loading="lazy">`).join('')}</div>
         <p class="fine">La suite t’attend dans le livre complet.</p></details>` : ''}
       ${sold ? '<button class="btn btn-ink" type="button" disabled>Déjà partie</button>' : preorderForm(p)}
+      ${p.product_type === 'digital' ? renvoiForm() : ''}
     </div>`;
   $$('[data-thumb]', box).forEach((b) =>
     b.addEventListener('click', () => {
@@ -178,10 +179,35 @@ async function renderProductPage() {
     })
   );
   wirePreorder(p, box);
+  wireRenvoi(box);
   if (new URLSearchParams(location.search).get('paiement') === 'annule') {
     const st = $('[data-preorder-status]', box);
     if (st) st.textContent = 'Le paiement a été annulé : rien n’a été débité. Tu peux réessayer quand tu veux.';
   }
+}
+
+// ---------------------------------------------------------------- livre numérique non reçu
+function renvoiForm() {
+  return `<details class="renvoi-ebook"><summary>Tu as déjà acheté ce livre et tu ne l’as pas reçu ?</summary>
+    <form data-renvoi novalidate><p class="fine">Indique l’adresse email utilisée pour l’achat : on t’y renvoie ton lien de téléchargement.</p>
+    <label>Email de l’achat<input name="email" type="email" autocomplete="email" required></label>
+    <button class="btn btn-line" type="submit">Renvoyer mon livre</button><p class="form-status" role="status" data-renvoi-statut></p></form></details>`;
+}
+function wireRenvoi(box) {
+  const f = $('[data-renvoi]', box);
+  if (!f) return;
+  f.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const st = $('[data-renvoi-statut]', f), btn = f.querySelector('button');
+    btn.disabled = true; st.textContent = 'Un instant…';
+    let r = {};
+    try { r = await (await fetch('/api/preorder', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'renvoyer_ebook', email: f.elements.email.value }) })).json(); } catch { /* réseau */ }
+    btn.disabled = false;
+    if (r.error === 'invalid_contact') { st.textContent = 'Vérifie ton adresse email.'; return; }
+    st.textContent = r.email === false
+      ? 'L’envoi automatique n’est pas encore activé : écris à Lamia (lamia.brechet@outlook.fr) avec ton numéro de commande, elle te renvoie ton livre au plus vite.'
+      : 'C’est envoyé ! Si cette adresse a bien acheté le livre, tu reçois ton lien dans quelques minutes (pense aux courriers indésirables). Tu peux aussi le retrouver dans « Mon espace ».';
+  });
 }
 
 // ---------------------------------------------------------------- précommande

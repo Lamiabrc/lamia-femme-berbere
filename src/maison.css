@@ -2532,3 +2532,6 @@ body[data-ambiance="salon"] .videos-haut h2 { color: #fff4e0; }
 .extrait-pages { display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 14px; }
 .extrait-pages img { flex: 0 0 min(78%, 420px); height: auto; scroll-snap-align: center; border-radius: 4px; box-shadow: 0 8px 22px -12px rgba(0,0,0,.45); background: #fff; }
 .extrait-livre .fine { padding: 0 16px 14px; margin: 0; }
+.renvoi-ebook { margin-top: 16px; font-size: 15px; }
+.renvoi-ebook summary { cursor: pointer; text-decoration: underline; }
+.renvoi-ebook form { margin-top: 10px; display: grid; gap: 10px; }

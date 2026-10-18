@@ -141,3 +141,21 @@ test('livre numérique : téléchargement seulement après un paiement vérifié
   assert.equal(r.status, 'ok');
   assert.match(r.url, /\/storage\/v1\/object\/sign\/ebooks\/.+token=t&download=Werdi-ouvre-les-yeux-ebook\.pdf$/);
 });
+
+test('renvoi du livre numérique : lien envoyé seulement à l’adresse d’un achat payé, même réponse sinon', async () => {
+  const mails = [];
+  const fetcher = async (url, init = {}) => {
+    if (url.includes('/rest/v1/orders?customer_email=ilike.ali%40ex.fr')) return { ok: true, json: async () => [{ order_number: 3, customer_email: 'ali@ex.fr', stripe_checkout_session_id: 'cs_live_X', order_items: [{ product_name: 'Werdi ebook', products: { product_type: 'digital', metadata: { fichier: 'w/a.pdf' } } }] }] };
+    if (url.includes('/rest/v1/orders?')) return { ok: true, json: async () => [] };
+    if (url === 'https://api.resend.com/emails') { mails.push(JSON.parse(init.body)); return { ok: true }; }
+    throw new Error(url);
+  };
+  const e = { ...env, RESEND_API_KEY: 're_x' };
+  const a = await (await createPreorder(req({ action: 'renvoyer_ebook', email: 'Ali@ex.fr' }), { env: e, fetcher })).json();
+  const b = await (await createPreorder(req({ action: 'renvoyer_ebook', email: 'autre@ex.fr' }), { env: e, fetcher })).json();
+  assert.deepEqual(a, b);
+  assert.equal(mails.length, 1);
+  assert.deepEqual(mails[0].to, ['ali@ex.fr']);
+  assert.match(mails[0].html, /type=telecharger&amp;session_id=cs_live_X/);
+  assert.equal((await (await createPreorder(req({ action: 'renvoyer_ebook', email: 'ali@ex.fr' }), { env, fetcher })).json()).email, false);
+});
