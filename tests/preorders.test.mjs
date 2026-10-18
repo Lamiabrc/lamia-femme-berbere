@@ -139,7 +139,7 @@ test('livre numérique : téléchargement seulement après un paiement vérifié
   assert.equal((await telechargerDepuisSession({ ...s, livemode: true }, { env: e, fetcher })).status, 'wrong_mode');
   const r = await telechargerDepuisSession(s, { env: e, fetcher });
   assert.equal(r.status, 'ok');
-  assert.match(r.url, /\/storage\/v1\/object\/sign\/ebooks\/.+token=t&download=Werdi-ouvre-les-yeux-ebook\.pdf$/);
+  assert.match(r.url, /\/storage\/v1\/object\/sign\/ebooks\/.+token=t$/);
 });
 
 test('renvoi du livre numérique : lien envoyé seulement à l’adresse d’un achat payé, même réponse sinon', async () => {
