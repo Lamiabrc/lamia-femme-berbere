@@ -2523,3 +2523,12 @@ body[data-ambiance="salon"] .videos-haut h2 { color: #fff4e0; }
 .guide-taille summary { cursor: pointer; text-decoration: underline; }
 .guide-taille p { margin: 8px 0 0; line-height: 1.5; }
 .btn-telecharger { margin-top: 10px; }
+
+/* Extrait gratuit d'un livre : on feuillette les premières pages avant d'acheter */
+.extrait-livre { margin: 14px 0 18px; border: 1px solid rgba(165,40,50,.35); border-radius: 12px; background: #fffaf3; }
+.extrait-livre summary { cursor: pointer; padding: 14px 16px; font-weight: 600; color: #a5283a; list-style: none; }
+.extrait-livre summary::-webkit-details-marker { display: none; }
+.extrait-livre[open] summary { border-bottom: 1px solid rgba(165,40,50,.2); }
+.extrait-pages { display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 14px; }
+.extrait-pages img { flex: 0 0 min(78%, 420px); height: auto; scroll-snap-align: center; border-radius: 4px; box-shadow: 0 8px 22px -12px rgba(0,0,0,.45); background: #fff; }
+.extrait-livre .fine { padding: 0 16px 14px; margin: 0; }

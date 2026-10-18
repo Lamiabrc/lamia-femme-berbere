@@ -163,6 +163,9 @@ async function renderProductPage() {
       <p class="product-price">${p.compare_at_price_cents ? `<del>${money(p.compare_at_price_cents, p.currency)}</del>` : ''}${money(p.price_cents, p.currency)}</p>
       ${p.description ? `<p>${esc(p.description)}</p>` : ''}
       ${specs ? `<div class="specs">${specs}</div>` : ''}
+      ${Array.isArray(m.extrait) && m.extrait.length ? `<details class="extrait-livre" data-extrait><summary>📖 Lire gratuitement les premières pages <small>(${m.extrait.length} pages)</small></summary>
+        <div class="extrait-pages">${m.extrait.filter((u) => /^\/images\//.test(u)).map((u, i) => `<img src="${esc(u)}" alt="Extrait, page ${i + 1}" loading="lazy">`).join('')}</div>
+        <p class="fine">La suite t’attend dans le livre complet.</p></details>` : ''}
       ${sold ? '<button class="btn btn-ink" type="button" disabled>Déjà partie</button>' : preorderForm(p)}
     </div>`;
   $$('[data-thumb]', box).forEach((b) =>
@@ -218,12 +221,12 @@ function preorderForm(p) {
     <label>Un mot pour Lamia (facultatif)<textarea name="message" rows="2" maxlength="600"></textarea></label>
     <input name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
     <div class="preorder-total"><span>Total</span><strong data-total></strong></div>
-    <label class="check"><input type="checkbox" name="cgv"><span>J’accepte les <a href="/cgv/" target="_blank" rel="noopener">conditions de vente</a>.</span></label>
+    <label class="check"><input type="checkbox" name="cgv"><span>J’accepte les <a href="/cgv/" target="_blank" rel="noopener">conditions de vente</a>${digital ? ' et je demande l’accès immédiat au livre numérique : je renonce ainsi à mon droit de rétractation une fois le téléchargement possible' : ''}.</span></label>
     <button class="btn btn-ink btn-payer" type="submit">🔒 Payer en toute sécurité</button>
     <div class="paiement-sur">
       <p><strong>Paiement 100 % sécurisé</strong> par Stripe : carte bancaire, Apple Pay ou Google Pay, avec validation 3D Secure de ta banque.</p>
       <p>Tes coordonnées bancaires sont saisies chez Stripe, sur une page chiffrée : Lamia ne les voit jamais.</p>
-      <p>Retour possible sous 14 jours · <a href="/retours/" target="_blank" rel="noopener">Livraison et retours</a></p>
+      ${digital ? '<p>Téléchargement immédiat après le paiement, puis à tout moment dans « Mon espace ».</p>' : '<p>Retour possible sous 14 jours · <a href="/retours/" target="_blank" rel="noopener">Livraison et retours</a></p>'}
     </div>
     <p class="form-status" role="status" data-preorder-status></p>
   </form>`;
