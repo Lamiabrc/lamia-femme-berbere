@@ -80,11 +80,18 @@ function ventes() {
       <td><strong>${esc(o.customer_name || '')}</strong><br><a href="mailto:${esc(o.customer_email)}">${esc(o.customer_email)}</a></td>
       <td>${(o.order_items || []).map((x) => `${esc(x.product_name)}${x.quantity > 1 ? ` × ${x.quantity}` : ''}`).join('<br>')}</td>
       <td>${esc(livraison)}</td><td><strong>${money(o.amount_total_cents, o.currency)}</strong></td>
-      <td><select data-statut="${esc(o.id)}" class="statut-select is-${esc(o.status)}">${Object.entries(STATUTS).map(([k, l]) => `<option value="${k}" ${k === o.status ? 'selected' : ''}>${l}</option>`).join('')}</select></td>
+      <td>${['paid', 'fulfilled'].includes(o.status) && (o.order_items || []).some((x) => x.products?.product_type === 'digital') ? `<button class="btn btn-line" type="button" data-envoyer-ebook="${esc(o.id)}">📧 Envoyer le livre</button><br>` : ''}<select data-statut="${esc(o.id)}" class="statut-select is-${esc(o.status)}">${Object.entries(STATUTS).map(([k, l]) => `<option value="${k}" ${k === o.status ? 'selected' : ''}>${l}</option>`).join('')}</select></td>
     </tr>`;
   }).join('') || '<tr><td colspan="7">Aucune commande pour ce filtre.</td></tr>';
 }
 $('[data-filtre-ventes]').addEventListener('change', ventes);
+$('[data-ventes]').addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-envoyer-ebook]');
+  if (!b) return;
+  b.disabled = true; b.textContent = 'Envoi…';
+  try { await api({ action: 'envoyer_ebook', id: b.dataset.envoyerEbook }); b.textContent = '✓ Livre envoyé'; message('Le lien de téléchargement est parti par email.'); }
+  catch (err) { b.disabled = false; b.textContent = '📧 Envoyer le livre'; message(err.message, true); }
+});
 $('[data-ventes]').addEventListener('change', async (e) => {
   const sel = e.target.closest('[data-statut]');
   if (!sel) return;
