@@ -74,7 +74,7 @@ function card(p) {
   const badge = sold ? '<span class="badge is-sold">Déjà partie</span>' : p.is_unique ? '<span class="badge">Pièce unique</span>' : '';
   const visual = media ? img(media, '(max-width: 600px) 100vw, 320px', 'loading="lazy"') : `<div class="product-empty">Photo à venir</div>`;
   const price = `${p.compare_at_price_cents ? `<del>${money(p.compare_at_price_cents, p.currency)}</del>` : ''}${money(p.price_cents, p.currency)}`;
-  return `<a class="product-card${sold ? ' is-sold' : ''}" href="/produit/?p=${encodeURIComponent(p.slug)}" data-accent="${room.accent}">
+  return `<a class="product-card${sold ? ' is-sold' : ''}" href="/produit/${encodeURIComponent(p.slug)}/" data-accent="${room.accent}">
     <div class="product-media">${visual}${badge}</div>
     <h3>${esc(p.name)}</h3>
     <p class="product-price">${price}</p>
@@ -157,7 +157,7 @@ const SPECS = [
 async function renderProductPage() {
   const box = $('[data-product-page]');
   if (!box) return;
-  const slug = new URLSearchParams(location.search).get('p');
+  const slug = new URLSearchParams(location.search).get('p') || box.dataset.slug || (location.pathname.match(/^\/produit\/([a-z0-9-]+)\/?$/) || [])[1];
   let p;
   try {
     p = (await loadProducts()).find((x) => x.slug === slug);
@@ -188,7 +188,7 @@ async function renderProductPage() {
       <h1>${esc(p.name)}</h1>
       ${p.subtitle ? `<p class="lead">${esc(p.subtitle)}</p>` : ''}
       <p class="product-price">${p.compare_at_price_cents ? `<del>${money(p.compare_at_price_cents, p.currency)}</del>` : ''}${money(p.price_cents, p.currency)}</p>
-      ${p.description ? `<p>${esc(p.description)}</p>` : ''}
+      ${p.description ? `<div class="product-desc">${String(p.description).split(/\n\s*\n/).map((b) => `<p>${b.split('\n').map(esc).join('<br>')}</p>`).join('')}</div>` : ''}
       ${specs ? `<div class="specs">${specs}</div>` : ''}
       ${Array.isArray(m.extrait) && m.extrait.length ? `<details class="extrait-livre" data-extrait><summary>📖 Lire gratuitement les premières pages <small>(${m.extrait.length} pages)</small></summary>
         <div class="extrait-pages">${m.extrait.filter((u) => /^\/images\//.test(u)).map((u, i) => `<img src="${esc(u)}" alt="Extrait, page ${i + 1}" loading="lazy">`).join('')}</div>

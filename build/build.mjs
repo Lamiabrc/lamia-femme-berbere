@@ -332,7 +332,7 @@ page(
       <span class="apercu-info">Samedi 31 octobre, 21 h · en visio · salon Algérie–France, Europe, Olivier, Érables, Voyageurs et tous âges · 20 personnes par salon</span>
       <span class="apercu-cta">Réserver ma place →</span>
     </a>
-    <a class="apercu" href="/produit/?p=collier-kabyle-argente-emaille-15g">
+    <a class="apercu" href="/produit/collier-kabyle-argente-emaille-15g/">
       ${IMGT('image.hall.apercu-collier', 'Le Hall', 'Aperçu : collier', `<img src="/images/collier/collier-kabyle-15g-hero-320.webp" width="320" height="400" alt="" loading="lazy">`)}
       <span class="apercu-kicker">L’Écrin · précommande</span>
       <strong>Collier kabyle émaillé</strong>
@@ -576,6 +576,7 @@ page(
     title: 'Une pièce de la Maison · Lamia Femme Berbère',
     description: 'Une pièce de la Maison Lamia Femme Berbère.',
     path: '/produit/',
+    noindex: true,
     body: `<section class="product-page" data-product-page><p class="loading">La pièce arrive…</p></section>`,
   })
 );
@@ -1481,6 +1482,64 @@ page(
   })
 );
 
+
+// ---------------------------------------------------------------- une vraie page par pièce (référencement)
+// Chaque produit en vente reçoit sa propre adresse /produit/<slug>/, pré-remplie pour Google :
+// titre, description, image de partage, données Product (schema.org) et texte visible sans JavaScript.
+// Le catalogue est lu avec la clé publique, comme le fait le navigateur.
+async function loadCatalogue() {
+  try {
+    const r = await fetch('https://tybwvxinigahhntfeeur.supabase.co/rest/v1/products?select=slug,name,subtitle,description,price_cents,currency,stock_qty,is_unique,product_type,cover_image_url,gallery,metadata,updated_at,categories(slug)&status=eq.active', {
+      headers: { apikey: 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc' }, signal: AbortSignal.timeout(15000),
+    });
+    return r.ok ? await r.json() : [];
+  } catch { return []; }
+}
+const CATALOGUE = await loadCatalogue();
+const roomDeCategorie = (cat) => rooms.find((r) => r.slug !== 'boutique' && (r.productCategories || []).includes(cat)) || roomBySlug.boutique;
+const resume = (t, n = 158) => { const x = String(t || '').replace(/\s+/g, ' ').trim(); return x.length <= n ? x : x.slice(0, x.lastIndexOf(' ', n - 1)).replace(/[,;:·.\s]+$/, '') + '…'; };
+const paragraphes = (t) => String(t || '').split(/\n\s*\n/).map((b) => `<p>${b.split('\n').map(esc).join('<br>')}</p>`).join('');
+const PRODUITS_INDEXES = [];
+for (const prod of CATALOGUE) {
+  if (!prod.slug || !/^[a-z0-9-]+$/.test(prod.slug)) continue;
+  const room = roomDeCategorie(prod.categories?.slug);
+  const path = `/produit/${prod.slug}/`;
+  const prix = ((prod.price_cents || 0) / 100).toFixed(2);
+  const dispo = prod.stock_qty > 0 || !prod.is_unique;
+  const images = [prod.cover_image_url, ...(Array.isArray(prod.gallery) ? prod.gallery.map((g) => (typeof g === 'string' ? g : g?.url)) : [])].filter((u) => typeof u === 'string' && /^(\/images\/|https:\/\/)/.test(u));
+  const abs = (u) => (u.startsWith('http') ? u : SITE_URL + u);
+  const occasion = room.slug === 'grenier' || /anciens/.test(prod.metadata?.famille || '');
+  const ld = {
+    '@context': 'https://schema.org', '@type': 'Product', name: prod.name, description: resume(prod.description, 500) || prod.subtitle || prod.name,
+    image: [...new Set(images)].slice(0, 6).map(abs), sku: prod.slug, url: SITE_URL + path,
+    ...(occasion ? {} : { brand: { '@type': 'Brand', name: 'Lamia Femme Berbère' } }),
+    offers: { '@type': 'Offer', url: SITE_URL + path, priceCurrency: prod.currency || 'EUR', price: prix,
+      availability: dispo ? 'https://schema.org/InStock' : 'https://schema.org/SoldOut',
+      itemCondition: prod.metadata?.etat === 'neuf' || !occasion ? 'https://schema.org/NewCondition' : 'https://schema.org/UsedCondition',
+      seller: { '@type': 'Organization', name: 'La Maison Lamia Femme Berbère' } },
+  };
+  const titre = `${prod.name} — ${prix.replace('.', ',').replace(',00', '')} € · ${room.name}`;
+  page(path, layout({
+    title: titre.length > 70 ? `${prod.name} · Lamia Femme Berbère` : titre,
+    description: resume([prod.subtitle, prod.description].filter(Boolean).join('. ')),
+    path, room,
+    ogImage: images[0], ogImageAlt: prod.name,
+    body: `<section class="product-page" data-product-page data-slug="${esc(prod.slug)}">
+  <div class="gallery">${images[0] ? `<figure class="gallery-main"><img src="${esc(images[0])}" alt="${esc(prod.name)}" width="1120" height="1400" fetchpriority="high"></figure>` : ''}</div>
+  <div class="product-info">
+    <a class="back-room" href="${room.path}"><span class="pip" aria-hidden="true"></span>${esc(room.name)}</a>
+    <h1>${esc(prod.name)}</h1>
+    ${prod.subtitle ? `<p class="lead">${esc(prod.subtitle)}</p>` : ''}
+    <p class="product-price">${esc(prix.replace('.', ','))} €</p>
+    <div class="product-desc">${paragraphes(prod.description)}</div>
+  </div>
+</section>
+<script type="application/ld+json">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script>`,
+  }));
+  if (dispo) PRODUITS_INDEXES.push({ path, lastmod: String(prod.updated_at || '').slice(0, 10) });
+}
+console.log(`Pages produits : ${CATALOGUE.length}`);
+
 // ---------------------------------------------------------------- écriture
 
 await rm(DIST, { recursive: true, force: true });
@@ -1500,7 +1559,7 @@ await cp(join(ROOT, 'content', 'rubriques.mjs'), join(DIST, 'assets', 'rubriques
 const indexable = pages.filter((p) => !p.path.endsWith('.html') && !['/produit/', '/speed-dating/merci/', '/commande/merci/', '/speed-dating/souhaits/', '/cgv/', '/mentions-legales/', '/confidentialite/', '/retours/', '/conditions-utilisation/', '/confidences-lamia/'].includes(p.path));
 await writeFile(
   join(DIST, 'sitemap.xml'),
-  `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${indexable.map((p) => `<url><loc>${SITE_URL}${p.path}</loc></url>`).join('')}</urlset>\n`
+  `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${indexable.filter((p) => !p.path.startsWith('/produit/')).map((p) => `<url><loc>${SITE_URL}${p.path}</loc></url>`).join('')}${PRODUITS_INDEXES.map((p) => `<url><loc>${SITE_URL}${p.path}</loc>${p.lastmod ? `<lastmod>${p.lastmod}</lastmod>` : ''}</url>`).join('')}</urlset>\n`
 );
 await writeFile(join(DIST, 'robots.txt'), `User-agent: *\nAllow: /\nDisallow: /admin.html\nDisallow: /pilotage.html\nDisallow: /admin-soirees.html\nDisallow: /speed-dating/merci/\nDisallow: /speed-dating/bal/\nDisallow: /mon-espace/\nDisallow: /tableau-de-bord\nDisallow: /admin-bal.html\nDisallow: /confidences-lamia/\nSitemap: ${SITE_URL}/sitemap.xml\n`);
 

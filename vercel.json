@@ -175,5 +175,11 @@
         }
       ]
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/produit/:slug/",
+      "destination": "/produit/"
+    }
   ]
 }

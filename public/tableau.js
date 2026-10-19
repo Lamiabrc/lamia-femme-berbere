@@ -247,7 +247,7 @@ function editer(p) {
     f.elements.supp_seuil.value = m.supplement_taille?.a_partir_de || '';
     // Le collier a des photos d'origine intégrées au site : on les propose pour pouvoir les réordonner ou les remplacer.
     if (!edition.photos.length && p.slug === 'collier-kabyle-argente-emaille-15g') edition.photos = ['hero', 'porte', 'detail', 'ecrin'].map((v) => ({ url: `/images/collier/collier-kabyle-15g-${v}-1120.webp` }));
-    const voir = $('[data-produit-voir]'); voir.hidden = false; voir.href = `/produit/?p=${encodeURIComponent(p.slug)}`;
+    const voir = $('[data-produit-voir]'); voir.hidden = false; voir.href = `/produit/${encodeURIComponent(p.slug)}/`;
   } else {
     f.elements.status.value = 'active'; f.elements.stock_qty.value = 1; $('[data-produit-voir]').hidden = true; $('[data-ebook-actuel]').textContent = '';
     if (categories[0]) f.elements.category_id.value = categories[0].id;
@@ -335,7 +335,7 @@ $('[data-produit-form]').addEventListener('submit', async (e) => {
     const { product: saved } = await api({ action: 'product_save', product });
     st.textContent = 'Produit enregistré. Il apparaît tout de suite sur le site.';
     f.elements.id.value = saved.id; f.elements.slug.value = saved.slug;
-    const voir = $('[data-produit-voir]'); voir.hidden = false; voir.href = `/produit/?p=${encodeURIComponent(saved.slug)}`;
+    const voir = $('[data-produit-voir]'); voir.hidden = false; voir.href = `/produit/${encodeURIComponent(saved.slug)}/`;
     await chargerProduits();
   } catch (err) { st.textContent = err.message; }
 });
