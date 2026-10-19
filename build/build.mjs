@@ -260,7 +260,7 @@ function roomHead(room, extra = '') {
 }
 
 const productGrid = (categories, opts = {}) =>
-  `<div class="product-grid" data-products="${esc(categories.join(','))}"${opts.sold ? ' data-show-sold' : ''}${opts.group ? ' data-group-by-room' : ''}>
+  `<div class="product-grid" data-products="${esc(categories.join(','))}"${opts.sold ? ' data-show-sold' : ''}${opts.group ? ' data-group-by-room' : ''}${opts.rubriques ? ' data-rubriques' : ''}>
   <p class="loading">Les pièces arrivent…</p>
 </div>`;
 
@@ -550,7 +550,7 @@ page(
 </section>
 <section class="room-shelf" aria-labelledby="finds-title">
   <h2 id="finds-title">Les trouvailles du moment</h2>
-  ${productGrid(roomBySlug.grenier.productCategories, { sold: true })}
+  ${productGrid(roomBySlug.grenier.productCategories, { sold: true, rubriques: true })}
 </section>
 ${otherRooms('grenier')}`,
   })
@@ -1495,6 +1495,7 @@ await mkdir(join(DIST, 'assets'), { recursive: true });
 await writeFile(join(DIST, 'assets', 'editable.json'), JSON.stringify({ fields: [...EDITABLE, ...REGISTRE], defaults: DEFAULTS }));
 for (const f of ['maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
 await cp(join(ROOT, 'content', 'shipping.mjs'), join(DIST, 'assets', 'shipping.mjs'));
+await cp(join(ROOT, 'content', 'rubriques.mjs'), join(DIST, 'assets', 'rubriques.mjs'));
 
 const indexable = pages.filter((p) => !p.path.endsWith('.html') && !['/produit/', '/speed-dating/merci/', '/commande/merci/', '/speed-dating/souhaits/', '/cgv/', '/mentions-legales/', '/confidentialite/', '/retours/', '/conditions-utilisation/', '/confidences-lamia/'].includes(p.path));
 await writeFile(

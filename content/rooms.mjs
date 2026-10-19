@@ -41,7 +41,7 @@ export const rooms = [
 
   // ---------- deuxième étage : trouvailles, galerie, atelier, communauté
   { slug: 'grenier', path: '/grenier/', floor: 2, name: 'Le Grenier des Trouvailles', welcome: 'Ce que j’ai déniché pour toi.', headline: 'Brocante, objets anciens et coups de cœur de Lamia',
-    summary: 'Livres anciens, objets français, souvenirs kabyles, décoration, cadres, bibelots et pièces chinées : le Grenier rassemble mes trouvailles au fil des brocantes et des voyages.', status: 'open', accent: 'safran', productCategories: ['trouvailles'] },
+    summary: 'Disques, cartes postales, objets français, souvenirs kabyles, décoration, cadres, bibelots et pièces chinées : le Grenier rassemble mes trouvailles au fil des brocantes et des voyages.', status: 'open', accent: 'safran', productCategories: ['trouvailles'] },
   { slug: 'galerie', path: '/galerie/', floor: 2, name: 'La Galerie', welcome: 'Regarder, comprendre, transmettre.',
     summary: 'Le patrimoine des bijoux kabyles, l’émail, les symboles, et les créations de la Maison.', status: 'open', accent: 'safran' },
   { slug: 'atelier', path: '/atelier/', floor: 2, name: 'L’Atelier', welcome: 'Là où naissent les pièces.',

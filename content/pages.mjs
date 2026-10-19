@@ -51,16 +51,16 @@ export const ecrin = {
 
 export const grenier = {
   intro:
-    'Le Grenier, c’est ma brocante personnelle. J’y rassemble des objets français, kabyles ou algériens, des livres, de la décoration et des curiosités chinées au fil de mes coups de cœur.',
+    'Le Grenier, c’est ma brocante personnelle. J’y rassemble des objets français, kabyles ou algériens, de la musique, de la décoration et des curiosités chinées au fil de mes coups de cœur.',
   families: [
-    'Livres anciens et anciennes éditions',
+    'Disques, cassettes, partitions et films',
     'Objets français de brocante',
     'Cartes postales et souvenirs',
     'Bibelots, vaisselle et décoration',
     'Cadres, images, sculptures et statuettes',
     'Objets kabyles et algériens',
     'Bijoux anciens chinés',
-    'Et toutes les trouvailles qui ne rentrent dans aucune case',
+    'Et toutes les trouvailles qui ne rentrent dans aucune case (les livres anciens, eux, sont rangés dans la Bibliothèque)',
   ],
 };
 

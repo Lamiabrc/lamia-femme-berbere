@@ -1,4 +1,5 @@
 // Tableau de bord de Lamia : ventes, produits, soirées, alertes, textes du site, visites.
+import { FAMILLES } from '/assets/rubriques.mjs';
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm';
 
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc');
@@ -237,6 +238,7 @@ function editer(p) {
     edition.metadata = p.metadata;
     const m = p.metadata || {};
     f.elements.poids_colis_g.value = m.poids_colis_g || '';
+    f.elements.famille.value = m.famille || '';
     $('[data-ebook-actuel]').textContent = m.fichier ? `Fichier en place : ${m.fichier.split('/').pop()}` : 'Aucun fichier pour l’instant.';
     f.elements.envoi_lettre.checked = m.envoi === 'lettre';
     const t = Array.isArray(m.tailles) ? m.tailles : [];
@@ -317,6 +319,7 @@ $('[data-produit-form]').addEventListener('submit', async (e) => {
   const meta = { ...(edition.metadata || {}) };
   const poids = parseInt(val('poids_colis_g'), 10); if (poids > 0) meta.poids_colis_g = poids; else delete meta.poids_colis_g;
   if (f.elements.envoi_lettre.checked) meta.envoi = 'lettre'; else delete meta.envoi;
+  if (val('famille')) meta.famille = val('famille'); else delete meta.famille;
   const mt = String(val('tailles')).match(/(\d{2})\s*[-–à]\s*(\d{2})/);
   if (mt) { const [a, b] = [Number(mt[1]), Number(mt[2])].sort((x, y) => x - y); meta.tailles = Array.from({ length: b - a + 1 }, (_, i) => a + i); } else delete meta.tailles;
   const sc = Math.round(parseFloat(String(val('supp_cents')).replace(',', '.')) * 100), ss = parseInt(val('supp_seuil'), 10);
@@ -430,3 +433,6 @@ $('[data-login]').addEventListener('submit', async (e) => {
 $('[data-deconnexion]').addEventListener('click', async () => { try { await Promise.race([supabase.auth.signOut({ scope: 'local' }), new Promise((r) => setTimeout(r, 3000))]); } catch {} try { Object.keys(localStorage).filter((k) => k.startsWith('sb-')).forEach((k) => localStorage.removeItem(k)); } catch {} location.reload(); });
 supabase.auth.onAuthStateChange((ev, s) => { if (s?.access_token) token = s.access_token; });
 demarrer();
+
+// Liste des rubriques du Grenier dans la fiche produit.
+{ const sel = $('[data-familles]'); if (sel) sel.insertAdjacentHTML('beforeend', FAMILLES.map(([v, l]) => `<option value="${v}">${l}</option>`).join('')); }

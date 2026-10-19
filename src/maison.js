@@ -2,6 +2,7 @@
 // Le navigateur n'utilise que la clé publique Supabase ; aucune donnée privée n'est lue ici.
 
 import { SHIPPING_METHODS, shippingFor, MAX_QTY, tvaIncluse, reglagesPropres, taillesDe, supplementTaille, parLettre } from '/assets/shipping.mjs';
+import { RUBRIQUES, rubriqueDe } from '/assets/rubriques.mjs';
 
 // Frais d'envoi et TVA réglés par Lamia (le serveur recalcule toujours à la commande).
 let REGLAGES = reglagesPropres();
@@ -80,6 +81,31 @@ function card(p) {
   </a>`;
 }
 
+// Sous-rubriques du Grenier : une rangée de boutons au-dessus de la grille.
+// Le choix est gardé dans l'adresse (#musique…) pour pouvoir partager le lien.
+function rubriques(g, items) {
+  const ids = items.map(rubriqueDe);
+  [...g.children].forEach((el, i) => (el.dataset.rubrique = ids[i]));
+  const presentes = RUBRIQUES.filter((r) => ids.includes(r.id));
+  if (presentes.length < 2) return;
+  const dispo = (id) => items.filter((p, i) => ids[i] === id && (p.stock_qty > 0 || !p.is_unique)).length;
+  const nav = document.createElement('nav');
+  nav.className = 'rubriques';
+  nav.setAttribute('aria-label', 'Rubriques du Grenier');
+  const total = items.filter((p) => p.stock_qty > 0 || !p.is_unique).length;
+  nav.innerHTML = `<button type="button" data-r="">Tout <span>${total}</span></button>` + presentes.map((r) => `<button type="button" data-r="${r.id}">${esc(r.nom)} <span>${dispo(r.id)}</span></button>`).join('');
+  g.before(nav);
+  const choisir = (id, garder) => {
+    if (!presentes.some((r) => r.id === id)) id = '';
+    nav.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.r === id)));
+    [...g.children].forEach((el) => (el.hidden = !!id && el.dataset.rubrique !== id));
+    if (garder) history.replaceState(null, '', id ? `#${id}` : location.pathname + location.search);
+  };
+  nav.addEventListener('click', (e) => { const b = e.target.closest('button[data-r]'); if (b) choisir(b.dataset.r, true); });
+  window.addEventListener('hashchange', () => choisir(location.hash.slice(1)));
+  choisir(location.hash.slice(1));
+}
+
 async function renderGrids() {
   const grids = $$('[data-products]');
   if (!grids.length) return;
@@ -111,6 +137,7 @@ async function renderGrids() {
       // Les pièces vendues passent après celles disponibles.
       items.sort((a, b) => (a.stock_qty <= 0) - (b.stock_qty <= 0));
       g.innerHTML = items.map(card).join('');
+      if (g.hasAttribute('data-rubriques')) rubriques(g, items);
     }
   }
 }

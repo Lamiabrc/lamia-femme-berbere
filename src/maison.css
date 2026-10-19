@@ -2547,3 +2547,12 @@ body[data-ambiance="bibliotheque"] .article p, body[data-ambiance="bibliotheque"
 body[data-ambiance="bibliotheque"] .article blockquote { color: #3b2c1c; border-left-color: var(--lampe, #b8862e); }
 body[data-ambiance="bibliotheque"] .article a:not(.btn) { color: #8a2b1e; }
 body[data-ambiance="bibliotheque"] .article .room-name { color: #8a5a1e; }
+
+/* Rubriques du Grenier */
+.rubriques { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 22px; }
+.rubriques button { font: inherit; font-size: .95rem; padding: 8px 14px; border-radius: 999px; border: 1px solid color-mix(in srgb, currentColor 25%, transparent); background: transparent; color: inherit; cursor: pointer; }
+.rubriques button span { opacity: .6; font-size: .85em; margin-left: 2px; }
+.rubriques button:hover { border-color: currentColor; }
+.rubriques button[aria-pressed="true"] { background: var(--safran, #c98a1b); border-color: var(--safran, #c98a1b); color: #fff; }
+.rubriques button[aria-pressed="true"] span { opacity: .85; }
+.product-grid > [hidden] { display: none; }
