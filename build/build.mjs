@@ -329,7 +329,7 @@ page(
       <span class="apercu-mask" aria-hidden="true"><svg viewBox="0 0 64 32" width="64" height="32"><path d="M2 8c10-6 20-4 30 4C42 4 52 2 62 8c0 12-8 20-18 20-6 0-9-4-12-8-3 4-6 8-12 8C10 28 2 20 2 8Z" fill="none" stroke="currentColor" stroke-width="2.2"/><ellipse cx="19" cy="15" rx="6" ry="4" fill="currentColor"/><ellipse cx="45" cy="15" rx="6" ry="4" fill="currentColor"/></svg></span>
       <span class="apercu-kicker">Speed dating · gratuit</span>
       <strong>Bal masqué de Venise</strong>
-      <span class="apercu-info">Samedi 31 octobre, 21 h · en visio · salon Algérie–France, Europe, Olivier, Érables, Voyageurs et tous âges · 20 personnes par salon</span>
+      <span class="apercu-info">Samedi 31 octobre, 21 h · en visio · deux salons par âge, toutes zones réunies · 20 personnes par salon</span>
       <span class="apercu-cta">Réserver ma place →</span>
     </a>
     <a class="apercu" href="/produit/collier-kabyle-argente-emaille-15g/">
@@ -375,7 +375,7 @@ page(
     <h3 class="home-speed-pourquoi">Pourquoi choisir nos soirées ?</h3>
     <ul class="home-speed-raisons">
       <li><strong>Une connexion authentique</strong> : pas de profils fantômes, on échange en direct et en tête-à-tête, caméra allumée.</li>
-      <li><strong>La tradition et la modernité</strong> : des salons par pays et par âge (Algérie–France, Europe, Algérie, Canada et USA…) pour rencontrer les bonnes personnes.</li>
+      <li><strong>La tradition et la modernité</strong> : deux salons par âge (25-39 ans et 40 ans et plus), qui réunissent l’Algérie, la France, l’Europe et le Canada, pour rencontrer les bonnes personnes.</li>
       <li><strong>Une communauté engagée</strong> : des participants motivés par la même recherche de stabilité et de mariage, et Lamia qui veille sur chaque soirée.</li>
     </ul>
     <ul class="home-speed-meta" aria-label="Prochaine soirée">
@@ -586,12 +586,12 @@ page(
   '/speed-dating/',
   layout({
     title: 'Speed dating en ligne sérieux — Le Boudoir des Rencontres | Lamia Femme Berbère',
-    description: 'Des soirées de speed dating en visio pour des rencontres sérieuses, par salons (Algérie–France, Europe, Algérie, Canada et USA…) et par âge, animées par Lamia. Pour le lancement, la première soirée est offerte : le Bal masqué de Venise, le 31 octobre à 21 h.',
+    description: 'Des soirées de speed dating en visio pour des rencontres sérieuses, en deux salons par âge, de l’Algérie à la France et au Canada, animées par Lamia. Pour le lancement, la première soirée est offerte : le Bal masqué de Venise, le 31 octobre à 21 h.',
     path: '/speed-dating/',
     room: roomBySlug['speed-dating'],
     scripts: ['/assets/membre.js'],
     ogTitle: 'Le speed dating de Lamia Femme Berbère — première soirée offerte',
-    ogDescription: 'Rencontres sérieuses en visio, par salons et par âge, animées par Lamia. Pour le lancement, le Bal masqué de Venise du 31 octobre est gratuit.',
+    ogDescription: 'Rencontres sérieuses en visio, en deux salons par âge, animées par Lamia. Pour le lancement, le Bal masqué de Venise du 31 octobre est gratuit.',
     ogImage: '/images/lamia/lamia-venise-1672.webp',
     ogImageAlt: 'Lamia Femme Berbère, masque vénitien à la main, sur le Grand Canal de Venise',
     ogImageWidth: 1672,
@@ -610,7 +610,7 @@ page(
     <p class="bal-welcome">${esc(roomBySlug['speed-dating'].welcome)}</p>
     <p class="bal-lead">${esc(P.speedDating.intro)}</p>
     <div class="bal-facts" aria-label="En bref">
-      <span>En visio, depuis chez vous</span><span>Salons par pays et par âge</span><span>20 personnes max par salon</span><span>Lamia veille</span>
+      <span>En visio, depuis chez vous</span><span>Deux salons par âge</span><span>20 personnes max par salon</span><span>Lamia veille</span>
     </div>
     <p class="bal-actions"><a class="btn btn-gold" href="#events-title">Voir les prochaines soirées</a><a class="btn bal-btn-line" href="/speed-dating/salle/">Tester ma caméra</a></p>
   </div>
@@ -640,16 +640,12 @@ page(
 </section>
 
 <section class="bal-code" aria-labelledby="salons-title">
-  <h2 id="salons-title">Des salons pour se retrouver</h2>
+  <h2 id="salons-title">Le Grand Salon, en deux tranches d’âge</h2>
   <ul>
-    <li><strong>Salon Algérie–France</strong> : pour échanger entre les deux rives, que vous viviez en Algérie ou en France.</li>
-    <li><strong>Salon Europe</strong> : France et pays d’Europe.</li>
-    <li><strong>Salon de l’Olivier</strong> : Algérie.</li>
-    <li><strong>Salon des Érables</strong> : Canada et États-Unis.</li>
-    <li><strong>Salon des Voyageurs</strong> : tous les autres pays.</li>
-    <li><strong>Salon Tous âges</strong> : pour celles et ceux pour qui l’âge n’est pas important.</li>
+    <li><strong>Grand Salon 25-39 ans</strong></li>
+    <li><strong>Grand Salon 40 ans et plus</strong></li>
   </ul>
-  <p class="bal-note">Chaque salon est divisé en trois tranches d’âge (25-39, 40-50, plus de 50 ans), avec 20 personnes au maximum, pour garder des échanges de qualité.</p>
+  <p class="bal-note">Toutes les zones sont réunies : Algérie, France, Europe, Canada et ailleurs. Votre salon est choisi automatiquement d’après votre date de naissance, avec 20 personnes au maximum par salon, pour garder des échanges de qualité.</p>
 </section>
 
 <section class="bal-code" aria-labelledby="code-title">
@@ -694,7 +690,7 @@ page(
   <p>${esc(P.speedDating.origin)}</p>
 </section>
 </div>
-<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@type': 'Event', name: 'Bal masqué de Venise — soirée de lancement du speed dating de Lamia Femme Berbère', startDate: '2026-10-31T21:00:00+01:00', endDate: '2026-10-31T23:00:00+01:00', eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode', eventStatus: 'https://schema.org/EventScheduled', location: { '@type': 'VirtualLocation', url: SITE_URL + '/speed-dating/' }, image: SITE_URL + '/images/lamia/lamia-venise-1672.webp', description: 'Soirée de speed dating en visio, par salons et par âge, sur le thème du Carnaval de Venise. Offerte pour le lancement.', offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR', availability: 'https://schema.org/InStock', url: SITE_URL + '/speed-dating/' }, organizer: { '@type': 'Person', name: 'Lamia Bréchet Ighil', url: SITE_URL + '/lamia-brechet/' } })}</script>`,
+<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@type': 'Event', name: 'Bal masqué de Venise — soirée de lancement du speed dating de Lamia Femme Berbère', startDate: '2026-10-31T21:00:00+01:00', endDate: '2026-10-31T23:00:00+01:00', eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode', eventStatus: 'https://schema.org/EventScheduled', location: { '@type': 'VirtualLocation', url: SITE_URL + '/speed-dating/' }, image: SITE_URL + '/images/lamia/lamia-venise-1672.webp', description: 'Soirée de speed dating en visio, en deux salons par âge, sur le thème du Carnaval de Venise. Offerte pour le lancement.', offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR', availability: 'https://schema.org/InStock', url: SITE_URL + '/speed-dating/' }, organizer: { '@type': 'Person', name: 'Lamia Bréchet Ighil', url: SITE_URL + '/lamia-brechet/' } })}</script>`,
   })
 );
 

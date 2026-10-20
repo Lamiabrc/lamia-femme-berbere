@@ -24,7 +24,7 @@ async function render() {
     .neq('attendance_status', 'cancelled');
   const rows = (data || []).filter((r) => r.speed_dating_events).sort((a, b) => a.speed_dating_events.starts_at.localeCompare(b.speed_dating_events.starts_at));
   $('[data-espace-soirees]').innerHTML = rows.length
-    ? rows.map((r) => `<article class="espace-soiree"><p class="event-date">${esc(when(r.speed_dating_events.starts_at))}</p><h3>${esc(r.speed_dating_events.title)}</h3>${r.speed_dating_events.audience ? `<p>Salon ${esc(r.speed_dating_events.audience)}</p>` : ''}</article>`).join('')
+    ? rows.map((r) => `<article class="espace-soiree"><p class="event-date">${esc(when(r.speed_dating_events.starts_at))}</p><h3>${esc(r.speed_dating_events.title)}</h3>${r.speed_dating_events.audience ? `<p>${/^grand salon/i.test(r.speed_dating_events.audience) ? '' : 'Salon '}${esc(r.speed_dating_events.audience)}</p>` : ''}</article>`).join('')
     : '<p>Tu n’as pas encore réservé de soirée. <a class="text-link" href="/speed-dating/#events-title">Voir le Bal masqué</a></p>';
 }
 

@@ -138,13 +138,13 @@ function freeSoiree(s) {
   const maxBirth = new Date(Date.now() - 18 * 365.25 * 864e5).toISOString().slice(0, 10);
   // Les salons sont rangés par zone (« France · 25-39 ans ») : on choisit sa zone, l'âge choisit la tranche.
   const zoneOf = (ev) => (ev.audience || 'Salon unique').split(' · ')[0];
-  const ORDER = ['Algérie–France', 'Europe', 'Algérie', 'Canada & USA', 'Autres pays'];
+  const ORDER = ['Grand salon', 'Algérie–France', 'Europe', 'Algérie', 'Canada & USA', 'Autres pays'];
   const rank = (z) => (ORDER.includes(z) ? ORDER.indexOf(z) : /tous/i.test(z) ? 99 : 50);
   const zones = [...new Set(s.salons.map(zoneOf))].sort((a, b) => rank(a) - rank(b));
   SALONS[s.key] = s.salons.map((ev) => ({ id: ev.id, zone: zoneOf(ev), min: ev.min_age, max: ev.max_age, full: ev.status === 'sold_out', label: ev.audience }));
   const salons = zones.map((z, i) => {
     const list = s.salons.filter((ev) => zoneOf(ev) === z);
-    const tranches = list.map((ev) => (ev.audience || '').split(' · ')[1]).filter(Boolean).map((t) => t.replace(' ans', '').replace('plus de 50', '50+')).join(' · ');
+    const tranches = list.map((ev) => (ev.audience || '').split(' · ')[1]).filter(Boolean).map((t) => t.replace(/ ans et plus$/, '+').replace(' ans', '').replace('plus de 50', '50+')).join(' · ');
     const allFull = list.every((ev) => ev.status === 'sold_out');
     const n = SALON_NOMS[z];
     return `<label class="salon-choice${allFull ? ' is-full' : ''}${/tous/i.test(z) ? ' is-tous' : ''}${n?.vedette ? ' is-vedette' : ''}">
@@ -208,6 +208,7 @@ const ageAt = (birth, at) => {
 
 // Noms des salons du bal (choisis par Lamia). La clé est la zone enregistrée dans la soirée.
 const SALON_NOMS = {
+  'Grand salon': { nom: 'Le Grand Salon', pour: 'Toutes les zones réunies : Algérie, France, Europe, Canada et ailleurs' },
   'Algérie–France': { nom: 'Salon Algérie–France', pour: 'Pour échanger entre les deux rives, que tu vives en Algérie ou en France', vedette: 'Entre deux rives' },
   Europe: { nom: 'Salon Europe', pour: 'France et pays d’Europe' },
   Algérie: { nom: 'Salon de l’Olivier', pour: 'Algérie' },

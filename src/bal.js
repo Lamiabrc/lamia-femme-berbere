@@ -118,7 +118,7 @@ function decor() {
   $('[data-salle-titre]').textContent = titre;
   message(texte);
   $('[data-salle-tour]').textContent = s.round ? `· tour ${s.round}` : '';
-  const NOMS = { 'Algérie–France': 'Salon Algérie–France', Europe: 'Salon Europe', Algérie: 'Salon de l’Olivier', 'Canada & USA': 'Salon des Érables', 'Autres pays': 'Salon des Voyageurs' };
+  const NOMS = { 'Grand salon': 'Le Grand Salon', 'Algérie–France': 'Salon Algérie–France', Europe: 'Salon Europe', Algérie: 'Salon de l’Olivier', 'Canada & USA': 'Salon des Érables', 'Autres pays': 'Salon des Voyageurs' };
   const [zone, tranche] = String(s.salon || '').split(' · ');
   $('[data-salle-salon]').textContent = s.salon ? (/tous/i.test(zone) ? 'Salon Tous âges' : `${NOMS[zone] || `Salon ${zone}`}${tranche ? ` · ${tranche}` : ''}`) : 'Le Bal masqué';
   $('[data-demasque]').hidden = !(s.where === 'tat' && s.demasque);
