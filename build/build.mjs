@@ -838,7 +838,7 @@ page(
 
 <section class="bal-step" data-step="pret" hidden>
   <div class="bal-hero is-short">
-    <p class="bal-kicker" data-pret-salon></p>
+    <p class="bal-kicker" data-pret-salon></p><p class="salon-phrase" data-salon-phrase hidden></p>
     <h1>Bonsoir <span data-pret-nom></span></h1>
   </div>
   <div class="ante">
@@ -855,7 +855,7 @@ page(
   <div class="planb" data-planb hidden role="alert"><p><strong>La salle a un souci ?</strong> Lamia a ouvert une salle de secours.</p><a class="btn btn-gold" data-planb-lien target="_blank" rel="noopener">Rejoindre la salle de secours</a></div>
   <div class="transition" data-transition hidden aria-live="polite"><div><svg viewBox="0 0 64 32" width="120" height="60" aria-hidden="true"><path d="M2 8c10-6 20-4 30 4C42 4 52 2 62 8c0 12-8 20-18 20-6 0-9-4-12-8-3 4-6 8-12 8C10 28 2 20 2 8Z" fill="#e3bd6e" stroke="#fff6dc" stroke-width="1.2"/><ellipse cx="19" cy="15" rx="6" ry="4" fill="#120d1a"/><ellipse cx="45" cy="15" rx="6" ry="4" fill="#120d1a"/></svg><p class="transition-titre" data-transition-titre>Le prochain masque vous invite…</p><p class="transition-nom" data-transition-nom></p></div></div>
   <header class="salle-haut">
-    <div><p class="bal-kicker"><span data-salle-salon></span> <span data-salle-tour></span></p><h1 data-salle-titre>Le grand salon</h1></div>
+    <div><p class="bal-kicker"><span data-salle-salon></span> <span data-salle-tour></span></p><h1 data-salle-titre>Le grand salon</h1><p class="salon-phrase" data-salon-phrase hidden></p></div>
     <p class="salle-temps" data-salle-temps aria-live="off"></p>
   </header>
   <div class="salle-scene">

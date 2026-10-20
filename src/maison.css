@@ -2601,3 +2601,10 @@ body[data-ambiance="ecrin"] del { color: #b4bccd; }
 .salon-tuile.is-mine { border-color: #b0162e; box-shadow: 0 0 0 3px rgba(176,22,46,.18); transform: translateY(-2px); }
 .salon-tuile.is-full { opacity: .5; }
 @media (max-width: 420px) { .salon-tuiles { grid-template-columns: 1fr 1fr; } }
+
+/* Salle du bal : chaque salon a son décor et ses couleurs. */
+.bal-salle-page .salon-phrase { margin: 4px 0 0; font-family: var(--serif); font-style: italic; font-size: 19px; color: var(--or-clair); }
+.bal-salle-page[data-theme="petillant"] { --or: #f2c3a6; --or-clair: #fff0e6; --bordeaux: #6e1631; }
+.bal-salle-page[data-theme="petillant"]::before { background: linear-gradient(180deg, rgba(40,12,24,.35), rgba(30,10,20,.8) 80%, #1c0a14), var(--salle-decor) center 40% / cover no-repeat; filter: blur(3px); }
+.bal-salle-page[data-theme="ambre"] { --or: #e0a84a; --or-clair: #fbe6bf; --bordeaux: #5a1a14; }
+.bal-salle-page[data-theme="ambre"]::before { background: linear-gradient(180deg, rgba(28,14,8,.35), rgba(22,11,6,.8) 80%, #160b06), var(--salle-decor) center 40% / cover no-repeat; filter: blur(3px); }

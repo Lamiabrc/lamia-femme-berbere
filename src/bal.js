@@ -5,6 +5,7 @@
 import Daily from 'https://cdn.jsdelivr.net/npm/@daily-co/daily-js@0.89.1/+esm';
 
 const $ = (s, r = document) => r.querySelector(s);
+const $$ = (q, r = document) => [...r.querySelectorAll(q)];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
 const store = {
   get() { try { return JSON.parse(sessionStorage.getItem('bal-pass') || 'null'); } catch { return null; } },
@@ -43,12 +44,30 @@ $('[data-bal-entree]')?.addEventListener('submit', async (e) => {
   pret();
 });
 
+// ---------------------------------------------------------------- décor propre à chaque salon
+// Chaque tranche d'âge a sa salle : son image en fond, ses couleurs, son nom et sa petite phrase.
+const THEMES = {
+  '25-39 ans': { id: 'petillant', nom: 'Le Salon Pétillant', phrase: 'Champagne rosé, masques ivoire et rires : le bal des 25-39 ans.', decor: '/images/lamia/salon-25-39-ans-800.webp' },
+  '40 ans et plus': { id: 'ambre', nom: 'Le Salon de l’Ambre', phrase: 'Thé à la menthe et lueur des bougies : le bal des 40 ans et plus.', decor: '/images/lamia/salon-40-ans-et-plus-800.webp' },
+};
+function themeSalon(salon) {
+  const tranche = String(salon || '').split(' · ')[1];
+  const t = THEMES[tranche];
+  const page = $('.bal-salle-page');
+  if (!page) return t;
+  if (t) { page.dataset.theme = t.id; page.style.setProperty('--salle-decor', `url('${t.decor}')`); }
+  else delete page.dataset.theme;
+  $$('[data-salon-phrase]').forEach((e) => { e.textContent = t?.phrase || ''; e.hidden = !t; });
+  return t;
+}
+
 // ---------------------------------------------------------------- 2. devant la porte : aperçu caméra
 let preview = null;
 async function pret() {
   show('pret');
   $('[data-pret-nom]').textContent = me.name;
-  $('[data-pret-salon]').textContent = me.salon ? `Salon ${me.salon}` : '';
+  const th = themeSalon(me.salon);
+  $('[data-pret-salon]').textContent = th ? th.nom : me.salon ? `Salon ${me.salon}` : '';
   try {
     preview = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
     $('[data-pret-video]').srcObject = preview;
@@ -120,7 +139,8 @@ function decor() {
   $('[data-salle-tour]').textContent = s.round ? `· tour ${s.round}` : '';
   const NOMS = { 'Grand salon': 'Le Grand Salon', 'Algérie–France': 'Salon Algérie–France', Europe: 'Salon Europe', Algérie: 'Salon de l’Olivier', 'Canada & USA': 'Salon des Érables', 'Autres pays': 'Salon des Voyageurs' };
   const [zone, tranche] = String(s.salon || '').split(' · ');
-  $('[data-salle-salon]').textContent = s.salon ? (/tous/i.test(zone) ? 'Salon Tous âges' : `${NOMS[zone] || `Salon ${zone}`}${tranche ? ` · ${tranche}` : ''}`) : 'Le Bal masqué';
+  const th = themeSalon(s.salon);
+  $('[data-salle-salon]').textContent = th ? `${th.nom} · ${tranche}` : s.salon ? (/tous/i.test(zone) ? 'Salon Tous âges' : `${NOMS[zone] || `Salon ${zone}`}${tranche ? ` · ${tranche}` : ''}`) : 'Le Bal masqué';
   $('[data-demasque]').hidden = !(s.where === 'tat' && s.demasque);
   const pb = $('[data-planb]');
   pb.hidden = !s.planb;
