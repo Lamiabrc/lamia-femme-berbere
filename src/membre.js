@@ -170,7 +170,7 @@ function freeSoiree(s) {
     ? `<input type="hidden" name="zone" value="${esc(zones[0])}"><p class="salon-pour-tout">${esc(SALON_NOMS[zones[0]]?.pour || '')}</p><div class="salon-tuiles">${[...s.salons].sort((a, b) => (a.min_age || 0) - (b.min_age || 0)).map((ev) => {
         const tranche = (ev.audience || '').split(' · ')[1] || ages(ev);
         const img = SALON_IMAGES[tranche] || SALON_IMAGES.defaut;
-        return `<figure class="salon-tuile${ev.status === 'sold_out' ? ' is-full' : ''}" data-min="${ev.min_age ?? ''}" data-max="${ev.max_age ?? ''}"><img src="${img}" width="400" height="400" alt="${esc(`${nomSalon}, ${tranche}`)}" loading="lazy"><figcaption><strong>${esc(nomSalon)}</strong><span>${esc(tranche)}${ev.status === 'sold_out' ? ' · complet' : ''}</span></figcaption></figure>`;
+        return `<figure class="salon-tuile${ev.status === 'sold_out' ? ' is-full' : ''}" data-min="${ev.min_age ?? ''}" data-max="${ev.max_age ?? ''}"><img src="${img}" srcset="${img} 400w, ${img.replace('-400.', '-800.')} 800w" sizes="190px" width="400" height="400" alt="${esc(`${nomSalon}, ${tranche}`)}" loading="lazy"><figcaption><strong>${esc(nomSalon)}</strong><span>${esc(tranche)}${ev.status === 'sold_out' ? ' · complet' : ''}</span></figcaption></figure>`;
       }).join('')}</div>`
     : `<div class="salon-grid">${salons}</div>`;
   const many = zones.length > 1;
@@ -229,8 +229,8 @@ const ageAt = (birth, at) => {
 
 // Images des tranches d'âge (carrées). Remplacer par les images définitives de Lamia.
 const SALON_IMAGES = {
-  '25-39 ans': '/images/lamia/boudoir-speed-dating-600.webp',
-  '40 ans et plus': '/images/lamia/affiche-boudoir-venise-560.webp',
+  '25-39 ans': '/images/lamia/salon-25-39-ans-400.webp',
+  '40 ans et plus': '/images/lamia/salon-40-ans-et-plus-400.webp',
   defaut: '/images/lamia/boudoir-speed-dating-600.webp',
 };
 
