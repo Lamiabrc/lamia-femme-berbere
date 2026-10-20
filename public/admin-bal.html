@@ -70,6 +70,7 @@
         </div>
         <p id="last" style="color:#b8a98f;font-size:14px"></p>
         <div class="tat" id="tat"></div>
+        <p style="font-size:14px;color:#b8a98f">Pendant un tour, clique sur un couple pour lui rendre visite (nouvel onglet). Tu entres caméra et micro coupés : ils voient « Lamia » arriver dans la salle. Allume ta caméra ou ton micro si tu veux leur parler, puis ferme l’onglet pour repartir.</p>
       </div>
 
       <div class="box">
@@ -135,7 +136,7 @@ function paint(d) {
   $('#presents').textContent = `${d.present} masque${d.present > 1 ? 's' : ''} au bal`;
   $('#salons').innerHTML = d.salons.map((x) => `<tr><td>${esc(x.label)}</td><td>${x.inscrits}</td><td>${x.presents}</td><td>${x.femmes}</td><td>${x.hommes}</td></tr>`).join('');
   $('#last').textContent = s.last_round ? `Dernier tour : ${s.last_round.pairs} tête-à-tête${s.last_round.waiting.length ? ` · en attente : ${s.last_round.waiting.join(', ')}` : ''}` : '';
-  $('#tat').innerHTML = s.phase === 'tour' ? d.tat.map((t, i) => `<button class="btn btn-out" type="button" data-room="${esc(t.room)}">Voir le tête-à-tête ${i + 1}</button>`).join('') : '';
+  $('#tat').innerHTML = s.phase === 'tour' ? d.tat.map((t, i) => `<button class="btn btn-out" type="button" data-room="${esc(t.room)}">Rendre visite : ${t.noms?.length ? esc(t.noms.join(' et ')) : `tête-à-tête ${i + 1}`}</button>`).join('') : '';
   $('#wishes').textContent = `${d.wishes_count} personne${d.wishes_count > 1 ? 's ont' : ' a'} envoyé ses souhaits.`;
   $('#mutual').innerHTML = d.mutual.map(([a, b]) => `<tr><td>${esc(a.name)} et ${esc(b.name)}</td><td>${esc(a.email || '')} · ${esc(b.email || '')}</td></tr>`).join('') || '<tr><td colspan="2">Pas encore de souhait réciproque.</td></tr>';
 }

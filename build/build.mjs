@@ -657,7 +657,7 @@ page(
   <ul>
     <li><strong>Des rencontres sérieuses</strong> : on vient pour rencontrer quelqu’un, pas pour faire défiler des profils.</li>
     <li><strong>Caméra allumée</strong>, dans un endroit calme, et aucun propos déplacé.</li>
-    <li><strong>Lamia veille</strong> : l’accueil, l’animation et le suivi de chaque soirée.</li>
+    <li><strong>Lamia veille</strong> : l’accueil, l’animation et le suivi de chaque soirée. Elle peut passer saluer un tête-à-tête pendant le bal : son nom s’affiche quand elle entre.</li>
     <li><strong>Une ambiance</strong> : chaque soirée a son thème. Pour la première, masque vénitien, loup ou tenue élégante.</li>
     <li><strong>Un souci ?</strong> <a href="/confidences/">Les Confidences avec Lamia</a> permettent de lui écrire ou de lui signaler un souci en toute discrétion.</li>
   </ul>
