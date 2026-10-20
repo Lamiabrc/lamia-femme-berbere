@@ -144,12 +144,12 @@ function freeSoiree(s) {
   SALONS[s.key] = s.salons.map((ev) => ({ id: ev.id, zone: zoneOf(ev), min: ev.min_age, max: ev.max_age, full: ev.status === 'sold_out', label: ev.audience }));
   const salons = zones.map((z, i) => {
     const list = s.salons.filter((ev) => zoneOf(ev) === z);
-    const tranches = list.map((ev) => (ev.audience || '').split(' · ')[1]).filter(Boolean).map((t) => t.replace(/ ans et plus$/, '+').replace(' ans', '').replace('plus de 50', '50+')).join(' · ');
+    const tranches = [...list].sort((a, b) => (a.min_age || 0) - (b.min_age || 0)).map((ev) => (ev.audience || '').split(' · ')[1]).filter(Boolean).join(' · ');
     const allFull = list.every((ev) => ev.status === 'sold_out');
     const n = SALON_NOMS[z];
     return `<label class="salon-choice${allFull ? ' is-full' : ''}${/tous/i.test(z) ? ' is-tous' : ''}${n?.vedette ? ' is-vedette' : ''}">
       <input type="radio" name="zone" value="${esc(z)}" ${allFull ? 'disabled' : ''} ${zones.length === 1 && i === 0 ? 'checked' : ''} required>
-      <span>${n?.vedette ? `<em class="salon-vedette">${esc(n.vedette)}</em>` : ''}<strong>${esc(n?.nom || (z === 'Salon unique' ? z : /tous/i.test(z) ? 'Salon Tous âges' : `Salon ${z}`))}</strong><small class="salon-pour">${esc(n?.pour || '')}</small><small>${esc(/tous/i.test(z) ? 'Toutes zones, tous âges : pour celles et ceux pour qui l’âge n’est pas important' : tranches ? `${tranches} ans` : ages(list[0]))}${allFull ? ' · complet' : ''}</small></span>
+      <span>${n?.vedette ? `<em class="salon-vedette">${esc(n.vedette)}</em>` : ''}<strong>${esc(n?.nom || (z === 'Salon unique' ? z : /tous/i.test(z) ? 'Salon Tous âges' : `Salon ${z}`))}</strong><small class="salon-pour">${esc(n?.pour || '')}</small><small>${esc(/tous/i.test(z) ? 'Toutes zones, tous âges : pour celles et ceux pour qui l’âge n’est pas important' : tranches ? `${list.length > 1 ? 'Tranches d’âge : ' : ''}${tranches}` : ages(list[0]))}${allFull ? ' · complet' : ''}</small></span>
     </label>`;
   }).join('');
   const many = zones.length > 1;

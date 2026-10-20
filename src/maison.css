@@ -2586,3 +2586,6 @@ body:is([data-ambiance="grenier"], [data-ambiance="patio"], [data-ambiance="gale
 body[data-ambiance="ecrin"] del { color: #b4bccd; }
 .conf { --gris-rose: #5e4b50; --vieux-rose-fonce: #6e3d49; }
 .conf :is(.conf-sur, .conf-icone) { color: #84495a; }
+
+/* Un seul salon : la carte prend toute la largeur. */
+.salon-grid:has(> .salon-choice:only-child) { grid-template-columns: 1fr; }
