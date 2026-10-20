@@ -2564,3 +2564,25 @@ body[data-ambiance] :is(.preorder, .renvoi-ebook) :is(small, .fine) { color: #4a
 body[data-ambiance] :is(.preorder, .renvoi-ebook, .paiement-sur, .delai-livraison) a { color: #8a1024; text-decoration: underline; }
 body[data-ambiance] .paiement-sur :is(p, strong, span, li) { color: #1f4d33; }
 body[data-ambiance] :is(.preorder, .renvoi-ebook) :is(input, select, textarea) { color: #1c1517; background: #fff; }
+
+/* ================================================================ Contraste (WCAG AA) : corrections d'ensemble
+   Textes trop pâles sur fonds clairs, ou trop sombres sur fonds sombres, relevés page par page. */
+:root { --qvt-taupe: #574d40; }
+.footer-sign { color: #e8697c; }
+.hall-arch-lamia figcaption { left: 0; right: 0; bottom: 0; padding: 48px 22px 18px 76px; background: linear-gradient(180deg, transparent, rgba(20,16,14,.82) 55%); text-shadow: 0 1px 3px rgba(0,0,0,.6); text-align: right; }
+.lamia-signature span { color: #5e3f17; }
+.plan-section .room-index .is-soon strong, .plan-section .room-index .is-soon span:not(.pip) { color: #b8ab94; }
+body[data-ambiance="boutique"] .room-name { color: #8a4020; }
+body[data-ambiance="grenier"] .room-name { color: #7a3a1a; }
+body[data-ambiance="patio"] :is(.room-name, .now-room) { color: #1c6644; }
+body[data-ambiance="galerie"] .room-name { color: #74561a; }
+body[data-ambiance="espace"] .espace .room-name, body[data-ambiance="espace"] .room-name { color: #46603f; }
+body[data-ambiance="bibliotheque"] .article .room-name { color: #6e440e; }
+body[data-ambiance="bibliotheque"] .book-feature .btn-line { color: #1d4a35; border-color: currentColor; }
+body:is([data-ambiance="grenier"], [data-ambiance="patio"], [data-ambiance="galerie"]) .next-rooms strong { color: var(--encre); }
+body:is([data-ambiance="grenier"], [data-ambiance="patio"], [data-ambiance="galerie"]) .next-rooms span:not(.pip) { color: #3a3128; }
+.rubriques button span, .rubriques button[aria-pressed="true"] span { opacity: 1; }
+.rubriques button[aria-pressed="true"] { background: #7f5310; border-color: #7f5310; color: #fff; }
+body[data-ambiance="ecrin"] del { color: #b4bccd; }
+.conf { --gris-rose: #5e4b50; --vieux-rose-fonce: #6e3d49; }
+.conf :is(.conf-sur, .conf-icone) { color: #84495a; }
