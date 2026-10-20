@@ -600,7 +600,10 @@ page(
     ogImageAlt: 'Lamia Femme Berbère, masque vénitien à la main, sur le Grand Canal de Venise',
     ogImageWidth: 1672,
     ogImageHeight: 941,
-    body: `<div class="bal">
+    body: `<div class="bal boudoir-immersif">
+<span class="boudoir-scene" aria-hidden="true"></span>
+<span class="boudoir-rideau-fixe boudoir-rideau-gauche" aria-hidden="true"></span>
+<span class="boudoir-rideau-fixe boudoir-rideau-droit" aria-hidden="true"></span>
 <section class="bal-hero bal-hero-rich">
   <span class="bal-paillettes" aria-hidden="true"></span>
   <span class="boudoir-curtain boudoir-curtain-left hero-rideau" aria-hidden="true"></span>
@@ -620,6 +623,7 @@ page(
   </div>
 </section>
 
+<div class="boudoir-plateau">
 <section class="lancement" aria-labelledby="lancement-title">
   <figure class="lancement-image">
     ${IMGT('image.speed.lancement', 'Le Boudoir des Rencontres', 'Image de la soirée de lancement', `<img src="/images/lamia/lamia-venise-1672.webp" srcset="/images/lamia/lamia-venise-900.webp 900w, /images/lamia/lamia-venise-1672.webp 1672w" sizes="(max-width: 860px) 100vw, 560px" width="1672" height="941" alt="Lamia, masque vénitien à la main, sur le Grand Canal de Venise à la tombée de la nuit" loading="lazy">`)}
@@ -632,6 +636,28 @@ page(
   </div>
 </section>
 
+<section class="boudoir-reservation" aria-labelledby="events-title">
+  <span class="boudoir-curtain boudoir-curtain-left" aria-hidden="true"></span>
+  <span class="boudoir-curtain boudoir-curtain-right" aria-hidden="true"></span>
+  <div class="boudoir-reservation-head">
+    <p class="bal-kicker">Prenez place dans le salon</p>
+    <h2 id="events-title">Les prochaines soirées</h2>
+    <p>Pour le lancement, la première soirée est offerte, sur inscription. Les places sont limitées afin de préserver la qualité des échanges.</p>
+  </div>
+  <div class="boudoir-reservation-stage">
+    <aside class="boudoir-side-note">
+      <span class="boudoir-side-icon" aria-hidden="true">✦</span>
+      <strong>Soirée de lancement</strong>
+      <span>Samedi 31 octobre · 21 h</span>
+      <span>En visio · offerte</span>
+      <span>20 personnes maximum par salon</span>
+    </aside>
+    <div class="events">
+      <div class="event-grid" data-events><p class="loading">Les soirées arrivent…</p></div>
+    </div>
+  </div>
+</section>
+</div>
 <section class="bal-deroule" aria-labelledby="deroule-title">
   <h2 id="deroule-title">Comment se passe une soirée</h2>
   <ol>
@@ -663,27 +689,6 @@ page(
   </ul>
 </section>
 
-<section class="boudoir-reservation" aria-labelledby="events-title">
-  <span class="boudoir-curtain boudoir-curtain-left" aria-hidden="true"></span>
-  <span class="boudoir-curtain boudoir-curtain-right" aria-hidden="true"></span>
-  <div class="boudoir-reservation-head">
-    <p class="bal-kicker">Prenez place dans le salon</p>
-    <h2 id="events-title">Les prochaines soirées</h2>
-    <p>Pour le lancement, la première soirée est offerte, sur inscription. Les places sont limitées afin de préserver la qualité des échanges.</p>
-  </div>
-  <div class="boudoir-reservation-stage">
-    <aside class="boudoir-side-note">
-      <span class="boudoir-side-icon" aria-hidden="true">✦</span>
-      <strong>Soirée de lancement</strong>
-      <span>Samedi 31 octobre · 21 h</span>
-      <span>En visio · offerte</span>
-      <span>20 personnes maximum par salon</span>
-    </aside>
-    <div class="events">
-      <div class="event-grid" data-events><p class="loading">Les soirées arrivent…</p></div>
-    </div>
-  </div>
-</section>
 <section class="member-panel bal-espace" aria-labelledby="member-title">
   <h2 id="member-title">Le soir de la soirée</h2>
   <p>Pas besoin de compte : inscrivez-vous juste au-dessus, puis le soir venu, entrez par la porte de la salle avec votre email et votre date de naissance. À la fin, votre <strong>carnet de bal</strong> vous permet d’indiquer, en privé, qui vous aimeriez revoir.</p>

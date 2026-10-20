@@ -2608,3 +2608,45 @@ body[data-ambiance="ecrin"] del { color: #b4bccd; }
 .bal-salle-page[data-theme="petillant"]::before { background: linear-gradient(180deg, rgba(40,12,24,.35), rgba(30,10,20,.8) 80%, #1c0a14), var(--salle-decor) center 40% / cover no-repeat; filter: blur(3px); }
 .bal-salle-page[data-theme="ambre"] { --or: #e0a84a; --or-clair: #fbe6bf; --bordeaux: #5a1a14; }
 .bal-salle-page[data-theme="ambre"]::before { background: linear-gradient(180deg, rgba(28,14,8,.35), rgba(22,11,6,.8) 80%, #160b06), var(--salle-decor) center 40% / cover no-repeat; filter: blur(3px); }
+
+/* ================================================================ Boudoir immersif : une seule pièce, du haut en bas
+   Le décor (velours, lumière, rideaux) reste fixe pendant qu'on fait défiler : on est dans le salon. */
+.boudoir-immersif { position: relative; isolation: isolate; clip-path: inset(0); background: #140b12; }
+.boudoir-scene { position: fixed; inset: -20px; z-index: -2; pointer-events: none;
+  background: radial-gradient(ellipse 70% 55% at 50% 28%, rgba(227,189,110,.2), transparent 65%),
+    linear-gradient(180deg, rgba(22,8,16,.62) 0%, rgba(22,8,16,.8) 55%, rgba(16,6,12,.92) 100%),
+    url('/images/lamia/boudoir-speed-dating-1024.webp') center 30% / cover no-repeat;
+  filter: blur(5px) saturate(1.1); }
+.boudoir-rideau-fixe { position: fixed; top: 0; bottom: 0; z-index: -1; width: clamp(34px, 8vw, 150px); pointer-events: none;
+  background: linear-gradient(90deg, rgba(48,4,16,.98), rgba(110,18,38,.9) 40%, rgba(62,6,20,.95) 70%, rgba(30,3,10,.0)),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.07) 0 9px, rgba(0,0,0,.12) 9px 22px);
+  box-shadow: inset -20px 0 40px rgba(0,0,0,.45); }
+.boudoir-rideau-gauche { left: 0; }
+.boudoir-rideau-droit { right: 0; transform: scaleX(-1); }
+.boudoir-immersif > :is(section, div):not(.boudoir-scene) { position: relative; z-index: 1; }
+/* Les bandeaux disparaissent : tout est posé dans la même pièce. */
+.boudoir-immersif .bal-hero { background: transparent; }
+.boudoir-immersif .bal-hero::after, .boudoir-immersif .hero-rideau, .boudoir-immersif .boudoir-reservation .boudoir-curtain, .boudoir-immersif .boudoir-reservation::before { display: none; }
+.boudoir-immersif .boudoir-reservation { background: transparent; border: 0; }
+.boudoir-immersif .member-panel { background: rgba(18,10,16,.55); border: 1px solid rgba(227,189,110,.28); border-radius: 22px; backdrop-filter: blur(6px); }
+.boudoir-immersif .origin { border-top: 0; }
+.boudoir-immersif .bal-deroule li { background: rgba(28,10,20,.6); backdrop-filter: blur(4px); }
+@media (min-width: 1100px) {
+  .boudoir-immersif .bal-hero-rich { min-height: calc(100vh - 74px); padding-block: 40px; }
+  /* La soirée offerte à gauche (elle reste à l'écran), la réservation à droite. */
+  .boudoir-plateau { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); gap: 36px; align-items: start; max-width: 1240px; margin: 0 auto; padding: 24px max(var(--gouttiere), 80px) 40px; }
+  .boudoir-plateau .lancement { position: sticky; top: 96px; grid-template-columns: 1fr; margin: 0; max-width: none; background: rgba(22,10,18,.62); backdrop-filter: blur(6px); }
+  .boudoir-plateau .boudoir-reservation { padding: 0; overflow: visible; }
+  .boudoir-plateau .boudoir-reservation-head { text-align: left; margin: 0 0 18px; }
+  .boudoir-plateau .boudoir-reservation-head h2 { font-size: 44px; }
+  .boudoir-plateau .boudoir-reservation-head p:last-child { margin: 0; }
+  .boudoir-plateau .boudoir-reservation-stage { grid-template-columns: 1fr; max-width: none; }
+  .boudoir-plateau .boudoir-side-note { display: none; }
+  .boudoir-immersif .boudoir-plateau .events { --marge-centre: 0px; padding: 0; max-width: none; }
+  .boudoir-plateau .event-grid { margin-top: 0; }
+  .boudoir-plateau .event-card { padding-inline: 0; }
+  .boudoir-plateau .event-card > :not(.venise-card-visual) { margin-inline: 28px; }
+  .boudoir-plateau .venise-card-visual img { max-height: 300px; object-fit: cover; }
+  .boudoir-immersif .bal-deroule, .boudoir-immersif .bal-code { max-width: 1240px; padding-inline: max(var(--gouttiere), 80px); }
+}
+@media (max-width: 700px) { .boudoir-rideau-fixe { width: 14px; } }
