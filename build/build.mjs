@@ -143,6 +143,9 @@ ${noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" hr
 <meta name="twitter:image:alt" content="${esc(socialImageAlt)}">
 <meta name="theme-color" content="#1B1A18">
 <link rel="icon" href="/images/marque/lamia-logo-net-160.webp" type="image/webp">
+<link rel="manifest" href="/maison.webmanifest">
+<link rel="apple-touch-icon" href="/images/marque/maison-icone-180.png">
+<meta name="apple-mobile-web-app-title" content="Maison Lamia">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/maison.css?v=${VERSION}">
@@ -206,6 +209,7 @@ function footer() {
     <ul>
       <li><a href="/lamia-brechet/">Qui est Lamia</a></li>
       <li><a href="/werdi-ouvre-les-yeux/">Le livre Werdi</a></li>
+      <li><a href="/application/" data-installer>L’application de la Maison</a></li>
       <li><a href="https://www.tiktok.com/@lamiaberbere" rel="noopener" target="_blank">TikTok @lamiaberbere</a></li>
       <li data-social="instagram" hidden><a rel="noopener" target="_blank">Instagram</a></li>
       <li><a href="https://www.facebook.com/femmeberberes/" rel="noopener" target="_blank">Facebook Femme Berbère</a></li>
@@ -1452,6 +1456,33 @@ page(
   })
 );
 
+// L'application installable
+page(
+  '/application/',
+  layout({
+    title: 'L’application de la Maison Lamia Femme Berbère',
+    description: 'Installe la Maison Lamia Femme Berbère sur ton téléphone : la boutique, le Grenier, la Bibliothèque et les soirées de rencontre à portée de doigt.',
+    path: '/application/',
+    room: roomBySlug.boutique,
+    body: `<section class="room-head"><p class="room-name"><span class="pip" aria-hidden="true"></span>L’application</p><h1>La Maison dans ta poche</h1><p class="lead">Installe la Maison Lamia Femme Berbère sur ton téléphone : une icône sur ton écran d’accueil, la boutique, le Grenier et les soirées en plein écran, sans rien télécharger de lourd.</p>
+<p class="bal-actions"><button type="button" class="btn btn-ink" data-installer-bouton hidden>Installer l’application</button><span data-installee hidden>✓ L’application est déjà installée sur cet appareil.</span></p></section>
+<section class="article"><h2>Sur Android</h2><ol><li>Ouvre lamia-femme-berbere.com dans Chrome.</li><li>Touche le bouton « Installer l’application » ci-dessus, ou le menu ⋮ puis « Installer l’application ».</li><li>Confirme : l’icône de la Maison apparaît sur ton écran d’accueil.</li></ol>
+<h2>Sur iPhone</h2><ol><li>Ouvre lamia-femme-berbere.com dans Safari.</li><li>Touche le bouton Partager (le carré avec une flèche vers le haut).</li><li>Choisis « Sur l’écran d’accueil », puis « Ajouter ».</li></ol>
+<p>L’application se met à jour toute seule, en même temps que le site. Tes paiements restent sécurisés de la même façon.</p></section>`,
+  })
+);
+
+page(
+  '/hors-ligne/',
+  layout({
+    title: 'Pas de connexion · Lamia Femme Berbère',
+    description: 'Pas de connexion internet pour le moment.',
+    path: '/hors-ligne/',
+    noindex: true,
+    body: `<section class="room-head"><p class="room-name"><span class="pip" aria-hidden="true"></span>La Maison</p><h1>Pas de connexion pour l’instant</h1><p class="lead">La Maison a besoin d’internet pour t’ouvrir ses portes. Vérifie ta connexion, puis réessaie.</p><p><a class="btn btn-ink" href="/">Réessayer</a></p></section>`,
+  })
+);
+
 // Pages légales (brouillons)
 for (const lp of legalPages) {
   page(
@@ -1552,7 +1583,7 @@ for (const f of ['maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'bal.
 await cp(join(ROOT, 'content', 'shipping.mjs'), join(DIST, 'assets', 'shipping.mjs'));
 await cp(join(ROOT, 'content', 'rubriques.mjs'), join(DIST, 'assets', 'rubriques.mjs'));
 
-const indexable = pages.filter((p) => !p.path.endsWith('.html') && !['/produit/', '/speed-dating/merci/', '/commande/merci/', '/speed-dating/souhaits/', '/cgv/', '/mentions-legales/', '/confidentialite/', '/retours/', '/conditions-utilisation/', '/confidences-lamia/'].includes(p.path));
+const indexable = pages.filter((p) => !p.path.endsWith('.html') && !['/produit/', '/speed-dating/merci/', '/commande/merci/', '/speed-dating/souhaits/', '/cgv/', '/mentions-legales/', '/confidentialite/', '/retours/', '/conditions-utilisation/', '/confidences-lamia/', '/hors-ligne/'].includes(p.path));
 await writeFile(
   join(DIST, 'sitemap.xml'),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${indexable.filter((p) => !p.path.startsWith('/produit/')).map((p) => `<url><loc>${SITE_URL}${p.path}</loc></url>`).join('')}${PRODUITS_INDEXES.map((p) => `<url><loc>${SITE_URL}${p.path}</loc>${p.lastmod ? `<lastmod>${p.lastmod}</lastmod>` : ''}</url>`).join('')}</urlset>\n`

@@ -667,3 +667,26 @@ renderSocials();
   }
   dire('Paiement en cours de vérification', 'Ta banque n’a pas encore confirmé le paiement. Tu recevras le reçu par email dès que c’est fait. Une question ? Écris à Lamia.');
 })();
+
+// ---------------------------------------------------------------- application installable
+(() => {
+  if (!('serviceWorker' in navigator)) return;
+  addEventListener('load', () => { navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {}); });
+  const installee = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  if (installee) { document.querySelectorAll('[data-installee]').forEach((e) => { e.hidden = false; }); return; }
+  let invite = null;
+  addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault(); invite = e;
+    document.querySelectorAll('[data-installer-bouton]').forEach((b) => { b.hidden = false; });
+  });
+  document.addEventListener('click', async (e) => {
+    const b = e.target.closest('[data-installer-bouton], a[data-installer]');
+    if (!b || !invite) return;
+    e.preventDefault();
+    invite.prompt();
+    const { outcome } = await invite.userChoice.catch(() => ({}));
+    invite = null;
+    if (outcome === 'accepted') document.querySelectorAll('[data-installer-bouton]').forEach((x) => { x.hidden = true; });
+  });
+  addEventListener('appinstalled', () => { document.querySelectorAll('[data-installer-bouton]').forEach((x) => { x.hidden = true; }); document.querySelectorAll('[data-installee]').forEach((x) => { x.hidden = false; }); });
+})();
