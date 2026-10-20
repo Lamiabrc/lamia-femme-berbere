@@ -2589,3 +2589,15 @@ body[data-ambiance="ecrin"] del { color: #b4bccd; }
 
 /* Un seul salon : la carte prend toute la largeur. */
 .salon-grid:has(> .salon-choice:only-child) { grid-template-columns: 1fr; }
+
+/* Tranches d'âge d'un salon : petites cartes carrées illustrées. */
+.salon-pour-tout { margin: 0 0 12px; font-size: 14px; font-weight: 500; color: var(--qvt-encre, #1b1a18); }
+.salon-tuiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 190px)); gap: 14px; }
+.salon-tuile { margin: 0; border: 1.5px solid var(--qvt-sable, #e8dcc8); border-radius: 16px; overflow: hidden; background: #fff; transition: border-color .2s, box-shadow .2s, transform .2s; }
+.salon-tuile img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
+.salon-tuile figcaption { padding: 8px 12px 10px; line-height: 1.25; }
+.salon-tuile strong { display: block; font-size: 14px; color: var(--qvt-encre, #1b1a18); }
+.salon-tuile span { display: block; font-size: 15px; font-weight: 600; color: #7a1426; }
+.salon-tuile.is-mine { border-color: #b0162e; box-shadow: 0 0 0 3px rgba(176,22,46,.18); transform: translateY(-2px); }
+.salon-tuile.is-full { opacity: .5; }
+@media (max-width: 420px) { .salon-tuiles { grid-template-columns: 1fr 1fr; } }

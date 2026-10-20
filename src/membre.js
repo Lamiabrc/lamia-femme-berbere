@@ -112,7 +112,17 @@ async function renderEvents() {
     s.salons.push(ev);
   }
   box.innerHTML = soirees.map((s) => (s.free ? freeSoiree(s) : s.salons.map(paidCard).join(''))).join('');
-  $$('[data-free-form]', box).forEach((f) => f.addEventListener('submit', freeRegister));
+  $$('[data-free-form]', box).forEach((f) => {
+    f.addEventListener('submit', freeRegister);
+    // La date de naissance allume la carte de sa tranche d'âge.
+    f.elements.birth_date?.addEventListener('change', () => {
+      const age = ageAt(f.elements.birth_date.value, f.dataset.starts);
+      $$('.salon-tuile', f).forEach((t) => {
+        const min = t.dataset.min === '' ? 0 : +t.dataset.min, max = t.dataset.max === '' ? 200 : +t.dataset.max;
+        t.classList.toggle('is-mine', Number.isFinite(age) && age >= min && age <= max);
+      });
+    });
+  });
   const prices = Object.fromEntries(data.map((ev) => [ev.id, ev.ticket_price_cents]));
   $$('[data-reserve]', box).forEach((b) => b.addEventListener('click', () => reserve(b.dataset.reserve, b, prices[b.dataset.reserve] > 0)));
 }
@@ -152,6 +162,17 @@ function freeSoiree(s) {
       <span>${n?.vedette ? `<em class="salon-vedette">${esc(n.vedette)}</em>` : ''}<strong>${esc(n?.nom || (z === 'Salon unique' ? z : /tous/i.test(z) ? 'Salon Tous âges' : `Salon ${z}`))}</strong><small class="salon-pour">${esc(n?.pour || '')}</small><small>${esc(/tous/i.test(z) ? 'Toutes zones, tous âges : pour celles et ceux pour qui l’âge n’est pas important' : tranches ? `${list.length > 1 ? 'Tranches d’âge : ' : ''}${tranches}` : ages(list[0]))}${allFull ? ' · complet' : ''}</small></span>
     </label>`;
   }).join('');
+  // Un seul salon découpé en tranches d'âge : chaque tranche devient une petite carte illustrée,
+  // et la date de naissance allume la bonne toute seule.
+  const tuiles = zones.length === 1 && s.salons.length > 1;
+  const nomSalon = SALON_NOMS[zones[0]]?.nom || zones[0];
+  const salonsHtml = tuiles
+    ? `<input type="hidden" name="zone" value="${esc(zones[0])}"><p class="salon-pour-tout">${esc(SALON_NOMS[zones[0]]?.pour || '')}</p><div class="salon-tuiles">${[...s.salons].sort((a, b) => (a.min_age || 0) - (b.min_age || 0)).map((ev) => {
+        const tranche = (ev.audience || '').split(' · ')[1] || ages(ev);
+        const img = SALON_IMAGES[tranche] || SALON_IMAGES.defaut;
+        return `<figure class="salon-tuile${ev.status === 'sold_out' ? ' is-full' : ''}" data-min="${ev.min_age ?? ''}" data-max="${ev.max_age ?? ''}"><img src="${img}" width="400" height="400" alt="${esc(`${nomSalon}, ${tranche}`)}" loading="lazy"><figcaption><strong>${esc(nomSalon)}</strong><span>${esc(tranche)}${ev.status === 'sold_out' ? ' · complet' : ''}</span></figcaption></figure>`;
+      }).join('')}</div>`
+    : `<div class="salon-grid">${salons}</div>`;
   const many = zones.length > 1;
   const venise = /venise/i.test(s.title);
   return `<article class="event-card soiree-card${venise ? ' is-venise' : ''}">
@@ -164,7 +185,7 @@ function freeSoiree(s) {
     ${s.description ? `<p>${esc(s.description)}</p>` : ''}
     <div class="event-meta"><span>Gratuit</span><span>En visio</span>${many ? `<span>${zones.length} salons</span>` : ''}<span>20 personnes par salon</span></div>
     ${open.length ? `<form class="free-form" data-free-form data-soiree="${esc(s.key)}" data-starts="${esc(s.starts_at)}" novalidate>
-      <fieldset class="salons"><legend>${many ? '1. Choisissez votre salon' : 'Votre salon'}</legend><p class="salon-hint">Votre tranche d’âge est choisie automatiquement d’après votre date de naissance.</p><div class="salon-grid">${salons}</div></fieldset>
+      <fieldset class="salons"><legend>${many ? '1. Choisissez votre salon' : 'Votre salon'}</legend><p class="salon-hint">Votre tranche d’âge est choisie automatiquement d’après votre date de naissance.</p>${salonsHtml}</fieldset>
       <fieldset class="about"><legend>${many ? '2. Présentez-vous' : 'Présentez-vous'}</legend>
       <div class="free-grid">
         <label>Prénom<input name="first_name" autocomplete="given-name" required maxlength="60"></label>
@@ -204,6 +225,13 @@ const ageAt = (birth, at) => {
   let a = d.getUTCFullYear() - b.getUTCFullYear();
   if (d.getUTCMonth() < b.getUTCMonth() || (d.getUTCMonth() === b.getUTCMonth() && d.getUTCDate() < b.getUTCDate())) a--;
   return a;
+};
+
+// Images des tranches d'âge (carrées). Remplacer par les images définitives de Lamia.
+const SALON_IMAGES = {
+  '25-39 ans': '/images/lamia/boudoir-speed-dating-600.webp',
+  '40 ans et plus': '/images/lamia/affiche-boudoir-venise-560.webp',
+  defaut: '/images/lamia/boudoir-speed-dating-600.webp',
 };
 
 // Noms des salons du bal (choisis par Lamia). La clé est la zone enregistrée dans la soirée.
