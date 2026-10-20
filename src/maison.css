@@ -2650,3 +2650,13 @@ body[data-ambiance="ecrin"] del { color: #b4bccd; }
   .boudoir-immersif .bal-deroule, .boudoir-immersif .bal-code { max-width: 1240px; padding-inline: max(var(--gouttiere), 80px); }
 }
 @media (max-width: 700px) { .boudoir-rideau-fixe { width: 14px; } }
+
+/* Fiches produit dans les pièces sombres (Bibliothèque, Écrin, Salon) : texte clair sur le décor,
+   les formulaires gardent leur fond clair et leur texte foncé. */
+body:is([data-ambiance="bibliotheque"], [data-ambiance="ecrin"], [data-ambiance="salon"]) .product-info > :is(h1, h2, .product-price, .product-desc, p:not(.lead)) { color: #f6eedf; }
+body:is([data-ambiance="bibliotheque"], [data-ambiance="ecrin"], [data-ambiance="salon"]) .product-info .product-desc :is(p, li, strong, em) { color: inherit; }
+body:is([data-ambiance="bibliotheque"], [data-ambiance="ecrin"], [data-ambiance="salon"]) .product-info > :is(.lead, .back-room) { color: #dccdb0; }
+body:is([data-ambiance="bibliotheque"], [data-ambiance="ecrin"], [data-ambiance="salon"]) .product-info .specs span { color: #c3cadb; }
+body[data-ambiance="bibliotheque"] .product-info .specs span { color: #d9c9a8; }
+body[data-ambiance] .product-info :is(.preorder, .renvoi-ebook, .paiement-sur, .delai-livraison) a { color: #8a1024; }
+body[data-ambiance] .renvoi-ebook { background: #fffaf2; border: 1px solid #e3d3b5; border-radius: 12px; padding: 10px 14px; }
