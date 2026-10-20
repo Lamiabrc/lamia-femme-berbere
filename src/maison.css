@@ -2556,3 +2556,11 @@ body[data-ambiance="bibliotheque"] .article .room-name { color: #8a5a1e; }
 .rubriques button[aria-pressed="true"] { background: var(--safran, #c98a1b); border-color: var(--safran, #c98a1b); color: #fff; }
 .rubriques button[aria-pressed="true"] span { opacity: .85; }
 .product-grid > [hidden] { display: none; }
+
+/* Formulaires clairs posés sur des pièces sombres : texte toujours foncé et lisible. */
+body[data-ambiance] :is(.preorder, .renvoi-ebook, .paiement-sur, .delai-livraison, .guide-taille) { color: #1c1517; }
+body[data-ambiance] :is(.preorder, .renvoi-ebook) :is(h2, h3, label, legend, p, span, strong, li, summary, .preorder-total) { color: #1c1517; }
+body[data-ambiance] :is(.preorder, .renvoi-ebook) :is(small, .fine) { color: #4a4146; }
+body[data-ambiance] :is(.preorder, .renvoi-ebook, .paiement-sur, .delai-livraison) a { color: #8a1024; text-decoration: underline; }
+body[data-ambiance] .paiement-sur :is(p, strong, span, li) { color: #1f4d33; }
+body[data-ambiance] :is(.preorder, .renvoi-ebook) :is(input, select, textarea) { color: #1c1517; background: #fff; }
