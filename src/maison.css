@@ -2660,3 +2660,11 @@ body:is([data-ambiance="bibliotheque"], [data-ambiance="ecrin"], [data-ambiance=
 body[data-ambiance="bibliotheque"] .product-info .specs span { color: #d9c9a8; }
 body[data-ambiance] .product-info :is(.preorder, .renvoi-ebook, .paiement-sur, .delai-livraison) a { color: #8a1024; }
 body[data-ambiance] .renvoi-ebook { background: #fffaf2; border: 1px solid #e3d3b5; border-radius: 12px; padding: 10px 14px; }
+
+/* Achat : erreurs bien visibles, case des conditions à cocher mise en avant. */
+body .preorder .form-status.is-error, body[data-ambiance] .preorder .form-status.is-error { color: #b0162e; }
+.preorder label.check.a-cocher { outline: 2px solid #b0162e; outline-offset: 4px; border-radius: 8px; background: #fbecee; }
+.appli-paiement { margin: 10px 0 14px; padding: 12px 14px; border: 1px solid #e3c9a1; border-radius: 12px; background: #fff7e8; font-size: 14px; color: #3a2a12; }
+.appli-paiement p { margin: 0 0 8px; color: #3a2a12 !important; }
+.appli-paiement .appli-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
+.appli-paiement .btn { font-size: 14px; padding: 8px 14px; color: #1c1517 !important; }

@@ -272,7 +272,7 @@ function preorderForm(p) {
       <div class="two"><label>Code postal<input name="postal_code" inputmode="numeric" autocomplete="postal-code" maxlength="5"></label><label>Ville<input name="city" autocomplete="address-level2" maxlength="80"></label></div>
     </div>`}
     <label>Un mot pour Lamia (facultatif)<textarea name="message" rows="2" maxlength="600"></textarea></label>
-    <input name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <input name="zz_hp" class="hp" tabindex="-1" autocomplete="new-password" aria-hidden="true">
     <div class="preorder-total"><span>Total</span><strong data-total></strong></div>
     <label class="check"><input type="checkbox" name="cgv"><span>J’accepte les <a href="/cgv/" target="_blank" rel="noopener">conditions de vente</a>${digital ? ' et je demande l’accès immédiat au livre numérique : je renonce ainsi à mon droit de rétractation une fois le téléchargement possible' : ''}.</span></label>
     <button class="btn btn-ink btn-payer" type="submit">🔒 Payer en toute sécurité</button>
@@ -309,15 +309,25 @@ function wirePreorder(p, box) {
     const st = $('[data-preorder-status]', form);
     const f = form.elements;
     const say = (m, err) => { st.textContent = m; st.classList.toggle('is-error', !!err); };
-    if (f.taille && !f.taille.value) { f.taille.focus(); return say('Choisis ta taille de doigt pour continuer.', true); }
-    if (!f.cgv.checked) return say('Coche la case des conditions de vente pour continuer.', true);
+    const montre = (el) => { try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch { /* */ } };
+    window.lfbEvent?.('clic_payer');
+    if (f.taille && !f.taille.value) { f.taille.focus(); montre(f.taille); return say('Choisis ta taille de doigt pour continuer.', true); }
+    const nom = f.name.value.trim(), mail = f.email.value.trim();
+    if (nom.length < 2) { window.lfbEvent?.('payer_contact_invalide'); f.name.focus(); montre(f.name); return say('Indique ton prénom et ton nom pour continuer.', true); }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mail)) { window.lfbEvent?.('payer_contact_invalide'); f.email.focus(); montre(f.email); return say('Vérifie ton adresse email : elle doit ressembler à prenom@exemple.fr.', true); }
+    if (!f.cgv.checked) {
+      window.lfbEvent?.('payer_sans_cgv');
+      const lab = f.cgv.closest('label'); lab?.classList.add('a-cocher'); montre(lab || f.cgv); f.cgv.focus();
+      f.cgv.addEventListener('change', () => lab?.classList.remove('a-cocher'), { once: true });
+      return say('Coche d’abord la case des conditions de vente (juste au-dessus du bouton), puis appuie de nouveau sur « Payer ».', true);
+    }
     const btn = form.querySelector('[type=submit]');
     btn.disabled = true; btn.textContent = 'Ouverture du paiement sécurisé…';
     const body = {
-      slug: p.slug, qty: f.qty.value, taille: f.taille ? f.taille.value : undefined, name: f.name.value, email: f.email.value, phone: f.phone.value,
+      slug: p.slug, qty: f.qty.value, taille: f.taille ? f.taille.value : undefined, name: f.name.value.trim(), email: f.email.value.trim(), phone: f.phone.value,
       method: f.method ? form.querySelector('[name=method]:checked').value : 'email',
       address: f.line1 ? { line1: f.line1.value, line2: f.line2.value, postal_code: f.postal_code.value, city: f.city.value } : null,
-      message: f.message.value, website: f.website.value, cgv_accepted: true,
+      message: f.message.value, website: f.zz_hp ? f.zz_hp.value : '', cgv_accepted: true,
     };
     let r = {}, res;
     try { res = await fetch('/api/preorder', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); r = await res.json().catch(() => ({})); } catch { /* réseau */ }
@@ -334,8 +344,24 @@ function wirePreorder(p, box) {
       return;
     }
     const msg = { invalid_contact: 'Vérifie ton nom et ton adresse email.', invalid_address: 'Vérifie ton adresse : rue, code postal à 5 chiffres et ville.', product_unavailable: 'Cette pièce vient d’être vendue, désolée.', paiement_en_cours: 'Quelqu’un est en train d’acheter cette pièce. Reviens dans 30 minutes : si le paiement n’aboutit pas, elle sera de nouveau disponible.', stock_insuffisant: `Il n’en reste que ${r.stock}. Choisis une quantité plus petite.`, paiement_indisponible: 'Le paiement sécurisé ne répond pas pour le moment. Réessaie dans un instant.', taille_requise: 'Choisis ta taille de doigt pour continuer.', fichier_absent: 'Le livre numérique arrive très bientôt : reviens dans quelques heures.' };
-    say(msg[r.error] || 'Le paiement n’a pas pu s’ouvrir. Réessaie dans un instant.', true);
+    window.lfbEvent?.('paiement_erreur');
+    say(msg[r.error] || (res ? 'Le paiement n’a pas pu s’ouvrir. Réessaie dans un instant.' : 'Pas de connexion avec le site : vérifie ton réseau, ou ouvre cette page dans Chrome ou Safari, puis réessaie.'), true);
+    montre(st);
   });
+  // Navigateur intégré (Facebook, Instagram, TikTok…) : le paiement y échoue parfois, on propose d'ouvrir la page ailleurs.
+  const ua = navigator.userAgent || '';
+  const appli = [[/musical_ly|BytedanceWebview|TikTok|trill/i, 'TikTok'], [/Instagram/i, 'Instagram'], [/FBAN|FBAV|FB_IAB|FBIOS|Messenger/i, 'Facebook'], [/Snapchat/i, 'Snapchat']].find(([re]) => re.test(ua));
+  if (appli) {
+    const android = /Android/i.test(ua);
+    const note = document.createElement('div');
+    note.className = 'appli-paiement';
+    note.innerHTML = `<p>Tu es dans le navigateur de <strong>${esc(appli[1])}</strong>. Si le paiement ne s’ouvre pas, ouvre cette page dans ${android ? 'Chrome' : 'Safari'} : ${android ? 'menu ⋮ en haut à droite, puis « Ouvrir dans Chrome »' : 'bouton … ou Partager, puis « Ouvrir dans le navigateur »'}.</p><p class="appli-actions">${android ? `<a class="btn btn-line" href="intent://${location.host}${location.pathname}#Intent;scheme=https;package=com.android.chrome;end">Ouvrir dans Chrome</a>` : ''}<button type="button" class="btn btn-line" data-copier-lien>Copier le lien</button></p>`;
+    form.querySelector('.btn-payer')?.before(note);
+    note.querySelector('[data-copier-lien]').addEventListener('click', async (e) => {
+      try { await navigator.clipboard.writeText(location.href); } catch { const t = document.createElement('textarea'); t.value = location.href; document.body.append(t); t.select(); try { document.execCommand('copy'); } catch { /* */ } t.remove(); }
+      e.target.textContent = 'Lien copié : colle-le dans ton navigateur';
+    });
+  }
 }
 
 // ---------------------------------------------------------------- panier (local au navigateur)
