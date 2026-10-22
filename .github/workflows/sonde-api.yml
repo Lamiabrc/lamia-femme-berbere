@@ -6,7 +6,4 @@ jobs:
     steps:
       - run: |
           t() { r=$(curl -sS -L -m 30 -X POST -H 'Content-Type: application/json' -d "$2" -w ' HTTP %{http_code}' https://lamia-femme-berbere.com/api/$1 2>&1 | tr '\n' ' ' | cut -c1-300); echo "::warning title=$1 $3::$r"; }
-          t preorder '{}' vide
-          t event-register '{}' vide
-          t preorder '{"cgv_accepted":true,"slug":"werdi-ouvre-les-yeux"}' sanscontact
-          t admin-orders '{}' get
+          t preorder '{"cgv_accepted":true,"slug":"werdi-ouvre-les-yeux","qty":"1","name":"Test technique Claude","email":"sabullelam@gmail.com","method":"email","address":null,"message":"TEST technique, a annuler","website":""}' ebook
