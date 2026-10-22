@@ -12,6 +12,7 @@ import * as P from '../content/pages.mjs';
 import { legalPages, livraisonTexte, tvaTexte } from '../content/legal.mjs';
 import { reglagesPropres } from '../content/shipping.mjs';
 import { facade } from './facade.mjs';
+import { pageAnglaise, pageFrancaise, produitAnglais, enPath, FR_ONLY, STRINGS, MANQUANTS } from './english.mjs';
 import { EDITABLE, defaults, applyOverrides } from '../content/editable.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -280,6 +281,7 @@ function otherRooms(current) {
 
 const pages = [];
 const page = (path, html) => pages.push({ path, html });
+globalThis.__pageFr = page;
 
 // Le Hall
 page(
@@ -1532,10 +1534,12 @@ const roomDeCategorie = (cat) => rooms.find((r) => r.slug !== 'boutique' && (r.p
 const resume = (t, n = 158) => { const x = String(t || '').replace(/\s+/g, ' ').trim(); return x.length <= n ? x : x.slice(0, x.lastIndexOf(' ', n - 1)).replace(/[,;:·.\s]+$/, '') + '…'; };
 const paragraphes = (t) => String(t || '').split(/\n\s*\n/).map((b) => `<p>${b.split('\n').map(esc).join('<br>')}</p>`).join('');
 const PRODUITS_INDEXES = [];
-for (const prod of CATALOGUE) {
+const PAGES_PRODUITS_EN = [];
+for (const [prod, lang] of CATALOGUE.flatMap((x) => [[x, 'fr'], [produitAnglais(x), 'en']])) {
   if (!prod.slug || !/^[a-z0-9-]+$/.test(prod.slug)) continue;
   const room = roomDeCategorie(prod.categories?.slug);
-  const path = `/produit/${prod.slug}/`;
+  const path = `${lang === 'en' ? '/en' : ''}/produit/${prod.slug}/`;
+  const page = lang === 'en' ? (pth, html) => PAGES_PRODUITS_EN.push({ path: pth, html, fr: `/produit/${prod.slug}/` }) : globalThis.__pageFr;
   const prix = ((prod.price_cents || 0) / 100).toFixed(2);
   const dispo = prod.stock_qty > 0 || !prod.is_unique;
   const images = [prod.cover_image_url, ...(Array.isArray(prod.gallery) ? prod.gallery.map((g) => (typeof g === 'string' ? g : g?.url)) : [])].filter((u) => typeof u === 'string' && /^(\/images\/|https:\/\/)/.test(u));
@@ -1550,7 +1554,7 @@ for (const prod of CATALOGUE) {
       itemCondition: prod.metadata?.etat === 'neuf' || !occasion ? 'https://schema.org/NewCondition' : 'https://schema.org/UsedCondition',
       seller: { '@type': 'Organization', name: 'La Maison Lamia Femme Berbère' } },
   };
-  const titre = `${prod.name} — ${prix.replace('.', ',').replace(',00', '')} € · ${room.name}`;
+  const titre = lang === 'en' ? `${prod.name} — €${prix.replace('.00', '')} · ${STRINGS[room.name] || room.name}` : `${prod.name} — ${prix.replace('.', ',').replace(',00', '')} € · ${room.name}`;
   page(path, layout({
     title: titre.length > 70 ? `${prod.name} · Lamia Femme Berbère` : titre,
     description: resume([prod.subtitle, prod.description].filter(Boolean).join('. ')),
@@ -1562,15 +1566,27 @@ for (const prod of CATALOGUE) {
     <a class="back-room" href="${room.path}"><span class="pip" aria-hidden="true"></span>${esc(room.name)}</a>
     <h1>${esc(prod.name)}</h1>
     ${prod.subtitle ? `<p class="lead">${esc(prod.subtitle)}</p>` : ''}
-    <p class="product-price">${esc(prix.replace('.', ','))} €</p>
+    <p class="product-price">${lang === 'en' ? `€${esc(prix)}` : `${esc(prix.replace('.', ','))} €`}</p>
     <div class="product-desc">${paragraphes(prod.description)}</div>
   </div>
 </section>
 <script type="application/ld+json">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script>`,
   }));
-  if (dispo) PRODUITS_INDEXES.push({ path, lastmod: String(prod.updated_at || '').slice(0, 10) });
+  if (dispo && lang === 'fr') PRODUITS_INDEXES.push({ path, lastmod: String(prod.updated_at || '').slice(0, 10) });
 }
 console.log(`Pages produits : ${CATALOGUE.length}`);
+
+// ---------------------------------------------------------------- version anglaise (/en/…)
+
+const pagesFr = pages.filter((p) => !FR_ONLY.test(p.path));
+const PAGES_EN = new Set(pagesFr.filter((p) => !p.path.endsWith('.html') && !p.path.startsWith('/produit/')).map((p) => p.path));
+const pagesEn = [
+  ...pagesFr.filter((p) => !/^\/produit\/./.test(p.path)).map((p) => ({ path: enPath(p.path), html: pageAnglaise(p.html, p.path, SITE_URL, PAGES_EN) })),
+  ...PAGES_PRODUITS_EN.map((p) => ({ path: p.path, html: pageAnglaise(p.html, p.fr, SITE_URL, PAGES_EN, { signaler: false }) })),
+];
+for (const p of pagesFr) p.html = pageFrancaise(p.html, p.path, SITE_URL);
+if (MANQUANTS.size) console.log(`Version anglaise : ${MANQUANTS.size} texte(s) sans traduction, laissés en français :\n  - ${[...MANQUANTS].slice(0, 40).join('\n  - ')}`);
+pages.push(...pagesEn);
 
 // ---------------------------------------------------------------- écriture
 
@@ -1587,12 +1603,17 @@ await writeFile(join(DIST, 'assets', 'editable.json'), JSON.stringify({ fields: 
 for (const f of ['maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
 await cp(join(ROOT, 'content', 'shipping.mjs'), join(DIST, 'assets', 'shipping.mjs'));
 await cp(join(ROOT, 'content', 'rubriques.mjs'), join(DIST, 'assets', 'rubriques.mjs'));
+await cp(join(ROOT, 'src', 'i18n.js'), join(DIST, 'assets', 'i18n.js'));
+await mkdir(join(DIST, 'assets', 'i18n'), { recursive: true });
+await cp(join(ROOT, 'content', 'en', 'products.json'), join(DIST, 'assets', 'i18n', 'products-en.json'));
+const MOTIFS_EN = JSON.parse(await readFile(join(ROOT, 'content', 'en', 'patterns.json'), 'utf8'));
+await writeFile(join(DIST, 'assets', 'i18n', 'en.json'), JSON.stringify({ strings: STRINGS, pages: [...PAGES_EN], motifs: MOTIFS_EN.motifs, noms: MOTIFS_EN.noms }));
 
-const indexable = pages.filter((p) => !p.path.endsWith('.html') && !['/produit/', '/speed-dating/merci/', '/commande/merci/', '/speed-dating/souhaits/', '/cgv/', '/mentions-legales/', '/confidentialite/', '/retours/', '/conditions-utilisation/', '/confidences-lamia/', '/hors-ligne/'].includes(p.path));
+const indexable = pages.filter((p) => !p.path.endsWith('.html') && !p.path.startsWith('/en/produit/') && !['/produit/', '/speed-dating/merci/', '/commande/merci/', '/speed-dating/souhaits/', '/cgv/', '/mentions-legales/', '/confidentialite/', '/retours/', '/conditions-utilisation/', '/confidences-lamia/', '/hors-ligne/'].includes(p.path.replace(/^\/en\//, '/')));
 await writeFile(
   join(DIST, 'sitemap.xml'),
-  `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${indexable.filter((p) => !p.path.startsWith('/produit/')).map((p) => `<url><loc>${SITE_URL}${p.path}</loc></url>`).join('')}${PRODUITS_INDEXES.map((p) => `<url><loc>${SITE_URL}${p.path}</loc>${p.lastmod ? `<lastmod>${p.lastmod}</lastmod>` : ''}</url>`).join('')}</urlset>\n`
+  `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${indexable.filter((p) => !p.path.startsWith('/produit/')).map((p) => `<url><loc>${SITE_URL}${p.path}</loc></url>`).join('')}${PRODUITS_INDEXES.map((p) => `<url><loc>${SITE_URL}${p.path}</loc>${p.lastmod ? `<lastmod>${p.lastmod}</lastmod>` : ''}</url><url><loc>${SITE_URL}/en${p.path}</loc>${p.lastmod ? `<lastmod>${p.lastmod}</lastmod>` : ''}</url>`).join('')}</urlset>\n`
 );
-await writeFile(join(DIST, 'robots.txt'), `User-agent: *\nAllow: /\nDisallow: /admin.html\nDisallow: /pilotage.html\nDisallow: /admin-soirees.html\nDisallow: /speed-dating/merci/\nDisallow: /speed-dating/bal/\nDisallow: /mon-espace/\nDisallow: /tableau-de-bord\nDisallow: /admin-bal.html\nDisallow: /confidences-lamia/\nSitemap: ${SITE_URL}/sitemap.xml\n`);
+await writeFile(join(DIST, 'robots.txt'), `User-agent: *\nAllow: /\nDisallow: /admin.html\nDisallow: /pilotage.html\nDisallow: /admin-soirees.html\nDisallow: /speed-dating/merci/\nDisallow: /speed-dating/bal/\nDisallow: /mon-espace/\nDisallow: /tableau-de-bord\nDisallow: /admin-bal.html\nDisallow: /confidences-lamia/\nDisallow: /en/speed-dating/merci/\nDisallow: /en/speed-dating/bal/\nDisallow: /en/mon-espace/\nSitemap: ${SITE_URL}/sitemap.xml\n`);
 
 console.log(`Maison générée : ${pages.length} pages dans dist/`);

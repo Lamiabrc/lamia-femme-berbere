@@ -180,6 +180,10 @@
     {
       "source": "/produit/:slug/",
       "destination": "/produit/"
+    },
+    {
+      "source": "/en/produit/:slug/",
+      "destination": "/en/produit/"
     }
   ]
 }

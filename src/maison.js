@@ -14,7 +14,7 @@ export const SUPABASE_KEY = 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc';
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => [...root.querySelectorAll(s)];
 export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
-export const money = (cents, currency = 'EUR') => new Intl.NumberFormat('fr-FR', { style: 'currency', currency }).format((cents || 0) / 100);
+export const money = (cents, currency = 'EUR') => new Intl.NumberFormat((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { style: 'currency', currency }).format((cents || 0) / 100);
 
 const ROOMS = {
   bijoux: { slug: 'ecrin', name: 'L’Écrin', path: '/ecrin/', accent: 'vert' },
@@ -57,11 +57,22 @@ async function rest(path) {
   return res.json();
 }
 
+// Version anglaise (/en/…) : les fiches sont traduites depuis /assets/i18n/products-en.json.
+const EN = document.documentElement.lang === 'en';
+const enProduit = (p, t) => {
+  if (!t) return p;
+  const gallery = Array.isArray(p.gallery) ? p.gallery.map((g, i) => (g && typeof g === 'object' && t.alts?.[i] ? { ...g, alt: t.alts[i] } : g)) : p.gallery;
+  const metadata = { ...(p.metadata || {}) };
+  for (const k of ['craft', 'origin', 'designers']) if (t[k] && metadata[k]) metadata[k] = t[k];
+  return { ...p, name: t.name || p.name, subtitle: p.subtitle && (t.subtitle || p.subtitle), description: p.description && (t.description || p.description), gallery, metadata };
+};
+
 let productsPromise;
 export function loadProducts() {
-  productsPromise ||= rest(
-    'products?select=id,slug,name,subtitle,description,price_cents,compare_at_price_cents,currency,stock_qty,is_unique,product_type,featured,cover_image_url,gallery,metadata,categories(name,slug)&status=eq.active&order=featured.desc,created_at.desc'
-  );
+  productsPromise ||= Promise.all([
+    rest('products?select=id,slug,name,subtitle,description,price_cents,compare_at_price_cents,currency,stock_qty,is_unique,product_type,featured,cover_image_url,gallery,metadata,categories(name,slug)&status=eq.active&order=featured.desc,created_at.desc'),
+    EN ? fetch('/assets/i18n/products-en.json').then((r) => (r.ok ? r.json() : {})).catch(() => ({})) : {},
+  ]).then(([ps, tr]) => (EN ? ps.map((p) => enProduit(p, tr[p.slug])) : ps));
   return productsPromise;
 }
 
@@ -157,7 +168,7 @@ const SPECS = [
 async function renderProductPage() {
   const box = $('[data-product-page]');
   if (!box) return;
-  const slug = new URLSearchParams(location.search).get('p') || box.dataset.slug || (location.pathname.match(/^\/produit\/([a-z0-9-]+)\/?$/) || [])[1];
+  const slug = new URLSearchParams(location.search).get('p') || box.dataset.slug || (location.pathname.match(/^(?:\/en)?\/produit\/([a-z0-9-]+)\/?$/) || [])[1];
   let p;
   try {
     p = (await loadProducts()).find((x) => x.slug === slug);
@@ -327,7 +338,7 @@ function wirePreorder(p, box) {
       slug: p.slug, qty: f.qty.value, taille: f.taille ? f.taille.value : undefined, name: f.name.value.trim(), email: f.email.value.trim(), phone: f.phone.value,
       method: f.method ? form.querySelector('[name=method]:checked').value : 'email',
       address: f.line1 ? { line1: f.line1.value, line2: f.line2.value, postal_code: f.postal_code.value, city: f.city.value } : null,
-      message: f.message.value, website: f.zz_hp ? f.zz_hp.value : '', cgv_accepted: true,
+      message: f.message.value, website: f.zz_hp ? f.zz_hp.value : '', cgv_accepted: true, lang: EN ? 'en' : 'fr',
     };
     let r = {}, res;
     try { res = await fetch('/api/preorder', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); r = await res.json().catch(() => ({})); } catch { /* réseau */ }
@@ -431,7 +442,7 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeCart(
 export async function loadEvents() {
   return rest('speed_dating_events?select=id,title,description,starts_at,min_age,max_age,capacity,ticket_price_cents,currency,status&status=in.(published,sold_out)&order=starts_at');
 }
-export const eventDate = (iso) => new Date(iso).toLocaleString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
+export const eventDate = (iso) => new Date(iso).toLocaleString((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
 
 async function renderNextEvent() {
   const cards = $$('[data-next-event]');
@@ -716,3 +727,9 @@ renderSocials();
   });
   addEventListener('appinstalled', () => { document.querySelectorAll('[data-installer-bouton]').forEach((x) => { x.hidden = true; }); document.querySelectorAll('[data-installee]').forEach((x) => { x.hidden = false; }); });
 })();
+
+// Lien FR / EN : garde la même pièce (utile pour les fiches produits servies par la page générique).
+document.querySelectorAll('.lang-link').forEach((a) => {
+  const ici = location.pathname.replace(/^\/en(?=\/)/, '');
+  a.setAttribute('href', `${a.hreflang === 'en' ? '/en' : ''}${ici}${location.search}${location.hash}`);
+});

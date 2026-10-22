@@ -2668,3 +2668,9 @@ body .preorder .form-status.is-error, body[data-ambiance] .preorder .form-status
 .appli-paiement p { margin: 0 0 8px; color: #3a2a12 !important; }
 .appli-paiement .appli-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
 .appli-paiement .btn { font-size: 14px; padding: 8px 14px; color: #1c1517 !important; }
+
+/* Choix de la langue (FR / EN) */
+.lang-link { font-weight: 600; font-size: 13px; letter-spacing: .06em; text-decoration: none; color: var(--encre); padding: 7px 10px; border-radius: 999px; }
+.lang-link:hover, .lang-link:focus-visible { background: var(--encre); color: #fff; }
+.lang-note { font-size: 14px; font-style: italic; opacity: .8; }
+@media (max-width: 520px) { .lang-link { font-size: 12px; padding: 6px 8px; } }

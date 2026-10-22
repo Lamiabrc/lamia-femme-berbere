@@ -21,6 +21,16 @@ la validation explicite de Lamia.
 
 Vercel lit `vercel.json` : commande `node build/build.mjs`, dossier publié `dist/`.
 
+## Version anglaise (/en/)
+
+- Chaque page publique existe aussi en anglais sous `/en/…`, avec un bouton FR / EN dans l'en-tête.
+- `content/en/strings.json` : dictionnaire français → anglais des textes des pages et de l'interface.
+- `content/en/products.json` : traduction des fiches produits (par slug). Une fiche absente reste en français.
+- `content/en/patterns.json` : messages avec des valeurs variables (totaux, numéros de commande…).
+- `build/english.mjs` traduit les pages à la construction ; `src/i18n.js` traduit dans le navigateur ce qui s'affiche ensuite (catalogue, panier, espace membre).
+- Un texte modifié depuis le tableau de bord, ou une nouvelle fiche produit, reste en français tant qu'il n'est pas ajouté au dictionnaire : la construction affiche la liste des textes à traduire.
+- Les outils privés de Lamia (tableau de bord, administration, confidences côté Lamia) restent uniquement en français. Les emails envoyés restent en français.
+
 ## Sécurité
 
 - Le navigateur n'utilise que la clé Supabase publique. Aucune clé secrète (Stripe, service-role) n'est dans le code.

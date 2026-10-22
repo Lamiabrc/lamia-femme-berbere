@@ -1,0 +1,126 @@
+{
+ "motifs": [
+  [
+   "^(.+?) dont (.+?) d’envoi · dont TVA (.+?) % : (.+)$",
+   "$1 incl. $2 shipping · incl. VAT $3%: $4"
+  ],
+  [
+   "^(.+?) dont (.+?) d’envoi$",
+   "$1 incl. $2 shipping"
+  ],
+  [
+   "^(.+?) · dont TVA (.+?) % : (.+)$",
+   "$1 · incl. VAT $2%: $3"
+  ],
+  [
+   "^Il n’en reste que (\\d+)\\. Choisis une quantité plus petite\\.$",
+   "Only $1 left. Please choose a smaller quantity."
+  ],
+  [
+   "^Livre broché (.+)$",
+   "Paperback $1"
+  ],
+  [
+   "^Commande n° (\\S+)\\. Tu reçois le reçu de paiement par email\\. Lamia prépare ton colis et te tient au courant de l’expédition\\.$",
+   "Order no. $1. Your payment receipt is on its way by email. Lamia is preparing your parcel and will keep you posted on shipping."
+  ],
+  [
+   "^Commande n° (\\S+)\\. Tu reçois le reçu de paiement par email\\. Télécharge ton livre maintenant : tu le retrouveras aussi à tout moment dans « Mon espace », connectée avec la même adresse email\\.?(.*)$",
+   "Order no. $1. Your payment receipt is on its way by email. Download your book now: you can also find it any time in “My space”, signed in with the same email address.$2"
+  ],
+  [
+   "^Numéro de commande :$",
+   "Order number:"
+  ],
+  [
+   "^(\\d+) à (\\d+) ans$",
+   "Ages $1 to $2"
+  ],
+  [
+   "^Tranches d’âge : (.+)$",
+   "Age groups: $1"
+  ],
+  [
+   "^Salon (.+)$",
+   "Lounge $1"
+  ],
+  [
+   "^Le salon (.+) est complet\\.$",
+   "The $1 lounge is full."
+  ],
+  [
+   "^Tête-à-tête avec ton cavalier$",
+   "One-to-one date with your partner"
+  ],
+  [
+   "^Tête-à-tête avec (.+)$",
+   "One-to-one date with $1"
+  ],
+  [
+   "^· tour (\\d+)$",
+   "· round $1"
+  ],
+  [
+   "^(\\d+) masques? au bal$",
+   "$1 mask(s) at the ball"
+  ],
+  [
+   "^Envoi des fichiers \\((\\d+)/(\\d+)\\)…$",
+   "Sending files ($1/$2)…"
+  ],
+  [
+   "^Extrait, page (\\d+)$",
+   "Excerpt, page $1"
+  ],
+  [
+   "^\\((\\d+) pages\\)$",
+   "($1 pages)"
+  ]
+ ],
+ "noms": [
+  [
+   "La Maison Lamia Femme Berbère",
+   "La Maison Lamia Femme Berbère"
+  ],
+  [
+   "Le Salon du Speed Dating",
+   "The Speed Dating Lounge"
+  ],
+  [
+   "Le Cabinet des Confidences",
+   "The Confidences Room"
+  ],
+  [
+   "Le Grenier des Trouvailles",
+   "The Attic of Finds"
+  ],
+  [
+   "La Bibliothèque de Yemma",
+   "Yemma’s Library"
+  ],
+  [
+   "La Salle de bain de Lamia",
+   "Lamia’s Bathroom"
+  ],
+  [
+   "La Coiffeuse de Lamia",
+   "Lamia’s Dressing Table"
+  ],
+  [
+   "Le Salon de Lamia",
+   "Lamia’s Lounge"
+  ],
+  [
+   "L’Écrin",
+   "The Jewel Box"
+  ],
+  [
+   "La Boutique",
+   "The Shop"
+  ],
+  [
+   "Mon espace",
+   "My space"
+  ]
+ ]
+}

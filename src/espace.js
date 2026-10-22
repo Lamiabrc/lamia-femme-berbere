@@ -4,7 +4,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc');
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
-const when = (iso) => new Date(iso).toLocaleString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
+const when = (iso) => new Date(iso).toLocaleString((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
 const say = (el, msg, err = false) => { el.textContent = msg; el.classList.toggle('is-error', err); };
 let recovering = false;
 
@@ -28,7 +28,7 @@ async function render() {
     : '<p>Tu n’as pas encore réservé de soirée. <a class="text-link" href="/speed-dating/#events-title">Voir le Bal masqué</a></p>';
 }
 
-const money = (c, cur = 'EUR') => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: cur || 'EUR' }).format((c || 0) / 100);
+const money = (c, cur = 'EUR') => new Intl.NumberFormat((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { style: 'currency', currency: cur || 'EUR' }).format((c || 0) / 100);
 const STATUTS = { pending: 'Paiement en attente', paid: 'Payée', fulfilled: 'Expédiée', shipped: 'Expédiée', cancelled: 'Annulée', refunded: 'Remboursée' };
 async function achats(session) {
   const box = $('[data-espace-achats]');
@@ -37,7 +37,7 @@ async function achats(session) {
     const { orders = [] } = await r.json();
     box.innerHTML = orders.length
       ? orders.map((o) => `<article class="espace-achat">
-          <div><p class="event-date">${esc(new Date(o.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }))} · n° ${esc(o.order_number)}</p>
+          <div><p class="event-date">${esc(new Date(o.created_at).toLocaleDateString((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { day: 'numeric', month: 'long', year: 'numeric' }))} · n° ${esc(o.order_number)}</p>
           <h3>${(o.order_items || []).map((i) => `${esc(i.product_name)}${i.quantity > 1 ? ` × ${i.quantity}` : ''}`).join(', ') || 'Commande'}</h3>
           ${(o.order_items || []).filter((i) => i.telechargement).map((i) => `<a class="btn btn-ink btn-telecharger" href="${esc(i.telechargement)}">⬇ Télécharger mon livre numérique</a>`).join('')}</div>
           <div class="espace-achat-droite"><strong>${money(o.amount_total_cents, o.currency)}</strong><span class="statut is-${esc(o.status)}">${esc(STATUTS[o.status] || o.status)}</span></div>
@@ -59,7 +59,7 @@ $('[data-espace-login]').addEventListener('submit', async (e) => {
 $('[data-espace-reset]').addEventListener('submit', async (e) => {
   e.preventDefault();
   const f = new FormData(e.target), st = $('[data-reset-status]');
-  const { error } = await supabase.auth.resetPasswordForEmail(f.get('email'), { redirectTo: `${location.origin}/mon-espace/` });
+  const { error } = await supabase.auth.resetPasswordForEmail(f.get('email'), { redirectTo: `${location.origin}${document.documentElement.lang === 'en' ? '/en' : ''}/mon-espace/` });
   if (error) return say(st, /rate limit/i.test(error.message) ? 'Trop de demandes en ce moment. Réessaie dans une heure.' : 'L’envoi n’a pas fonctionné. Réessaie plus tard.', true);
   say(st, 'Si un espace existe avec cet email, un lien vient de partir. Pense à regarder tes courriers indésirables.');
 });
@@ -79,7 +79,7 @@ $('[data-espace-logout]').addEventListener('click', async (e) => {
   e.target.textContent = 'Déconnexion…';
   try { await Promise.race([supabase.auth.signOut({ scope: 'local' }), new Promise((r) => setTimeout(r, 3000))]); } catch { /* on nettoie quand même */ }
   try { Object.keys(localStorage).filter((k) => k.startsWith('sb-')).forEach((k) => localStorage.removeItem(k)); } catch { /* stockage indisponible */ }
-  location.replace('/mon-espace/');
+  location.replace(`${document.documentElement.lang === 'en' ? '/en' : ''}/mon-espace/`);
 });
 
 $('[data-espace-mdp]').addEventListener('submit', async (e) => {

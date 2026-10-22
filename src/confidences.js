@@ -147,7 +147,7 @@ $('[data-conv-supprimer]')?.addEventListener('click', async () => {
 $('[data-conv-sortir]')?.addEventListener('click', async () => {
   try { await Promise.race([supabase.auth.signOut({ scope: 'local' }), new Promise((r) => setTimeout(r, 3000))]); } catch { /* */ }
   try { Object.keys(localStorage).filter((k) => k.startsWith('sb-')).forEach((k) => localStorage.removeItem(k)); } catch { /* */ }
-  location.replace('/confidences/#conversation'); location.reload();
+  location.replace(`${document.documentElement.lang === 'en' ? '/en' : ''}/confidences/#conversation`); location.reload();
 });
 
 // Arrivée par le lien de connexion, ou par un lien direct vers la conversation.
