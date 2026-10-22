@@ -1,0 +1,13 @@
+name: sonde-api
+on: workflow_dispatch
+jobs:
+  sonde:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          for p in preorder event-register; do
+            echo "== POST /api/$p (corps vide)"
+            curl -sS -m 30 -X POST -H 'Content-Type: application/json' -d '{}' -w '\nHTTP %{http_code}\n' https://lamia-femme-berbere.com/api/$p || true
+          done
+          echo "== POST /api/preorder (cgv ok, sans contact)"
+          curl -sS -m 30 -X POST -H 'Content-Type: application/json' -d '{"cgv_accepted":true,"slug":"werdi-ouvre-les-yeux"}' -w '\nHTTP %{http_code}\n' https://lamia-femme-berbere.com/api/preorder || true
