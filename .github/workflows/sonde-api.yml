@@ -5,9 +5,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          for p in preorder event-register; do
-            echo "== POST /api/$p (corps vide)"
-            curl -sS -m 30 -X POST -H 'Content-Type: application/json' -d '{}' -w '\nHTTP %{http_code}\n' https://lamia-femme-berbere.com/api/$p || true
-          done
-          echo "== POST /api/preorder (cgv ok, sans contact)"
-          curl -sS -m 30 -X POST -H 'Content-Type: application/json' -d '{"cgv_accepted":true,"slug":"werdi-ouvre-les-yeux"}' -w '\nHTTP %{http_code}\n' https://lamia-femme-berbere.com/api/preorder || true
+          t() { r=$(curl -sS -m 30 -X POST -H 'Content-Type: application/json' -d "$2" -w ' HTTP %{http_code}' https://lamia-femme-berbere.com/api/$1 2>&1 | tr '\n' ' ' | cut -c1-300); echo "::warning title=$1 $3::$r"; }
+          t preorder '{}' vide
+          t event-register '{}' vide
+          t preorder '{"cgv_accepted":true,"slug":"werdi-ouvre-les-yeux"}' sanscontact
+          t admin-orders '{}' get
