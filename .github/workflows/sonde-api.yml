@@ -1,9 +1,0 @@
-name: sonde-api
-on: workflow_dispatch
-jobs:
-  sonde:
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
-          t() { r=$(curl -sS -L -m 30 -X POST -H 'Content-Type: application/json' -d "$2" -w ' HTTP %{http_code}' https://lamia-femme-berbere.com/api/$1 2>&1 | tr '\n' ' ' | cut -c1-300); echo "::warning title=$1 $3::$r"; }
-          t preorder '{"cgv_accepted":true,"slug":"werdi-ouvre-les-yeux","qty":"1","name":"Test technique Claude","email":"sabullelam@gmail.com","method":"email","address":null,"message":"TEST technique, a annuler","website":""}' ebook
