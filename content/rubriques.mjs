@@ -5,6 +5,7 @@
 export const RUBRIQUES = [
   { id: 'musique', nom: 'Musique', familles: ['disques', 'cassettes', 'cd', 'partitions'] },
   { id: 'films', nom: 'Films', familles: ['dvd', 'vhs'] },
+  { id: 'livres', nom: 'Livres anciens', familles: ['livres-anciens'] },
   { id: 'cartes', nom: 'Cartes postales', familles: ['cartes-postales', 'papiers'] },
   { id: 'bibelots', nom: 'Bibelots & déco', familles: ['objets', 'bibelots', 'decoration', 'cadres'] },
   { id: 'vaisselle', nom: 'Vaisselle', familles: ['vaisselle'] },
@@ -20,6 +21,7 @@ export const FAMILLES = [
   ['partitions', 'Partitions et méthodes de musique'],
   ['dvd', 'DVD'],
   ['vhs', 'Cassettes VHS'],
+  ['livres-anciens', 'Livres anciens et éditions rares'],
   ['cartes-postales', 'Cartes postales'],
   ['papiers', 'Vieux papiers, affiches, images'],
   ['objets', 'Objets et bibelots'],
