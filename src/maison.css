@@ -3048,3 +3048,4 @@ a.po-btn { display: inline-block; text-decoration: none; }
 .espace-suivi ul { margin: 0 0 .8rem; padding-left: 1.1rem; }
 .espace-suivi li { margin: .25rem 0; }
 .espace-photo { margin: .6rem 0; }
+.espace-photo-match { display: block; max-width: 260px; width: 100%; border-radius: 14px; margin: .4rem 0; -webkit-user-drag: none; }

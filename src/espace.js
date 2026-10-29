@@ -108,10 +108,16 @@ async function suivi(el, p) {
     `<li><strong>Mises en relation offertes</strong> : ${offertesRestantes} sur ${p.offertes || 1} restante(s)</li>`,
     q ? `<li><strong>Formule ${esc(q.nom)}</strong> : ${s.mises_mois} mise(s) en relation ce mois-ci${q.mises ? ` sur ${q.mises}` : ' (sans limite)'} · ${q.sd} speed dating inclus par mois</li>`
       : `<li><strong>Formule Découverte</strong> (gratuite) · <a class="text-link" href="/abonnement/">voir les formules</a></li>`,
+    q && q.nom !== 'Cœur' ? '<li><strong>📷 Photo de ton match</strong> : incluse dans ta formule, si ton match l’accepte</li>' : '<li><strong>📷 Photo de ton match</strong> : incluse à partir de la formule Passion · <a class="text-link" href="/abonnement/?formule=passion">en savoir plus</a></li>',
     u.mise_en_relation || u.speed_dating ? `<li><strong>Achetés à l’unité</strong> : ${u.mise_en_relation || 0} mise(s) en relation · ${u.speed_dating || 0} place(s) de speed dating</li>` : '',
   ].filter(Boolean).join('');
   const demandes = (p.interets || []).map((i) => `<li>Profil n° ${esc(i.cible_ref)} · ${esc(ETAT_DEMANDE[i.statut] || i.statut)}${i.date ? ` <small>(${esc(new Date(i.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' }))})</small>` : ''}</li>`).join('');
-  el.innerHTML = `<h3>Mon suivi</h3><ul>${lignes}</ul>
+  const pm = p.photo_match;
+  const blocPhoto = !pm ? '' : pm.url ? `<h3>📷 La photo de ton match (profil n° ${esc(pm.ref)})</h3><img class="espace-photo-match" src="${esc(pm.url)}" alt="Photo de ton match" loading="lazy"><p><small>Pour toi seule : merci de ne pas la partager.</small></p>`
+    : !pm.inclus ? '<h3>📷 La photo de ton match</h3><p>Elle est incluse à partir de la formule <a class="text-link" href="/abonnement/?formule=passion">Passion</a>, si ton match accepte de la transmettre.</p>'
+    : pm.accepte === false ? '<h3>📷 La photo de ton match</h3><p>Ton match n’a pas (encore) accepté de transmettre sa photo.</p>'
+    : '<h3>📷 La photo de ton match</h3><p>Lamia te la transmet dès que possible.</p>';
+  el.innerHTML = `<h3>Mon suivi</h3><ul>${lignes}</ul>${blocPhoto}
     <h3>Mes demandes de match</h3>${demandes ? `<ul>${demandes}</ul>` : '<p>Aucune pour l’instant. <a class="text-link" href="/rencontres/#profils-anonymes">Voir les profils</a></p>'}`;
 }
 

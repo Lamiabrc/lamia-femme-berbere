@@ -9,11 +9,11 @@ export const FORMULES = [
     avantages: ['Jusqu’à 3 mises en relation par mois', '1 speed dating par mois inclus', 'Tout ce que contient Découverte'],
     mises: 3, speedDatings: 1 },
   { id: 'passion', nom: 'Passion', mois: 2990, accroche: 'Le choix de la plupart des cœurs sérieux', vedette: true,
-    avantages: ['Mises en relation sans limite, dès qu’il y a une vraie compatibilité', '2 speed datings par mois inclus', 'Ton profil passe en priorité dans le matching'],
-    mises: null, speedDatings: 2, prioritaire: true },
+    avantages: ['Mises en relation sans limite, dès qu’il y a une vraie compatibilité', '📷 La photo de ton match, s’il ou elle l’accepte', '2 speed datings par mois inclus', 'Ton profil passe en priorité dans le matching'],
+    mises: null, speedDatings: 2, prioritaire: true, photoMatch: true },
   { id: 'prestige', nom: 'Prestige', mois: 5900, accroche: 'L’accompagnement personnel de Lamia',
     avantages: ['Tout ce que contient Passion', '1 échange en visio par mois avec Lamia : conseils et travail de ton profil', 'Ton annonce présentée en priorité en live'],
-    mises: null, speedDatings: 2, prioritaire: true, visio: 1, live: true },
+    mises: null, speedDatings: 2, prioritaire: true, visio: 1, live: true, photoMatch: true },
 ];
 // À l'année : 2 mois offerts (on paie 10 mois).
 export const prixAnnuel = (f) => f.mois * 10;
