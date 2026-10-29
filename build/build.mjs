@@ -466,7 +466,7 @@ page(
     <p class="prose-lead">${esc(P.salon.intro)}</p>
     ${P.salon.lives
       .map(
-        (l) => `<article class="live-card">${cover('live', 'Couverture du Live Mariage Kabyle de Lamia', 'live-cover')}<h2>${esc(l.name)}</h2><p class="live-when">${esc(l.when)}</p><p>${esc(l.text)}</p><a class="btn btn-ink" href="#reseaux-titre">Choisir ma plateforme</a> <a class="btn btn-gold" href="#outil-live">Mon outil de matching en live</a></article>`
+        (l) => `<article class="live-card">${cover('live', 'Couverture du Live Mariage Kabyle de Lamia', 'live-cover')}<h2>${esc(l.name)}</h2><p class="live-when">${esc(l.when)}</p><p>${esc(l.text)}</p><a class="btn btn-ink" href="#reseaux-titre">Choisir ma plateforme</a> <a class="btn btn-gold" href="#coeur-direct">Les débats et mes outils</a></article>`
       )
       .join('')}
   </div>
@@ -476,6 +476,35 @@ page(
   </aside>
 </section>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,500&display=swap">
+<section class="po-app outil-live" id="coeur-direct" aria-labelledby="coeur-direct-titre">
+  <div class="outil-live-tete">
+    <img src="/images/lamia/lamia-portrait-tatouages-rond-480.webp" alt="" width="120" height="120" loading="lazy">
+    <div>
+      <p class="po-eyebrow">Ma salle de rédaction · chaque soir</p>
+      <h2 id="coeur-direct-titre">Le Cœur en Direct, mon outil pour préparer le live</h2>
+      <p>Avant chaque live, je passe par ma salle de rédaction, Le Cœur en Direct. C’est là que je prépare l’émission du soir : le thème, les débats, les questions et les animations. L’amour, le couple, le mariage, la famille, et nos cultures kabyle, algérienne, française et maghrébine.</p>
+    </div>
+  </div>
+  <div class="patio-etapes">
+    <h2>Comment je choisis les débats</h2>
+    <ol>
+      <li><strong>Un thème par soir</strong><span>L’outil me propose une thématique principale. C’est moi qui la valide ou la refuse, et je prépare les animations qui vont avec.</span></li>
+      <li><strong>Des questions neuves</strong><span>Chaque soir, de nouvelles questions dans le même esprit, jamais celles de la veille. On ne tourne pas en rond.</span></li>
+      <li><strong>Du concret qui fait réagir</strong><span>L’argent dans le couple, le 50/50, les exigences des hommes et des femmes, le bled ou la France, le contrôle, la belle-famille, le mariage gris : des situations vraies, posées sans détour.</span></li>
+      <li><strong>Vos réactions comptent</strong><span>L’outil retient les sujets qui vous ont fait le plus réagir, pour que les prochains lives vous ressemblent encore plus.</span></li>
+    </ol>
+  </div>
+  <div class="patio-etapes">
+    <h2>Le déroulé d’un live</h2>
+    <ol>
+      <li><strong>Le débat du soir</strong><span>On ouvre sur le thème du jour. Chacun donne son avis, avec respect, sur toutes les plateformes à la fois.</span></li>
+      <li><strong>Les invités</strong><span>Sur TikTok, je fais monter des invités en direct pour témoigner ou débattre.</span></li>
+      <li><strong>Les annonces de mariage</strong><span>Je présente à l’écran les annonces de mon outil de matching, sans nom ni contact.</span></li>
+      <li><strong>Bientôt</strong><span>« Débats sans filtre », avec « Mariage sans filtre » et « Les questions qui dérangent », et le « Duel hommes / femmes ».</span></li>
+    </ol>
+    <p class="po-actions"><a class="po-btn" href="#reseaux-titre">Choisir ma plateforme pour ce soir</a><a class="po-btn-verre" href="#outil-live">Mon outil de matching en live</a></p>
+  </div>
+</section>
 <section class="po-app outil-live" id="outil-live" aria-labelledby="outil-live-titre">
   <div class="outil-live-tete">
     <img src="/images/lamia/lamia-portrait-tatouages-rond-480.webp" alt="Lamia Femme Berbère" width="120" height="120" loading="lazy">
