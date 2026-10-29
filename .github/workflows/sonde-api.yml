@@ -1,8 +1,0 @@
-name: sonde-api
-on: workflow_dispatch
-jobs:
-  sonde:
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
-          r=$(curl -sS -m 30 -X OPTIONS -H 'Origin: http://127.0.0.1:18080' -H 'Access-Control-Request-Method: POST' -H 'Access-Control-Request-Headers: content-type' -D - -o /dev/null https://lamia-femme-berbere.com/api/confidences/ | grep -i "access-control\|HTTP/\|location" | tr '\r\n' '  '); echo "::warning title=preflight::$r"
