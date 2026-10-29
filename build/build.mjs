@@ -211,7 +211,7 @@ function footer() {
       <li><a href="/lamia-brechet/">Qui est Lamia</a></li>
       <li><a href="/werdi-ouvre-les-yeux/">Le livre Werdi</a></li>
       <li><a href="/application/" data-installer>L’application de la Maison</a></li>
-      <li><a href="https://www.tiktok.com/@lamiaberbere" rel="noopener" target="_blank">TikTok @lamiaberbere</a></li>
+      <li><a href="https://www.tiktok.com/@lamiafemmeberbere" rel="noopener" target="_blank">TikTok @lamiafemmeberbere</a></li>
       <li data-social="instagram" hidden><a rel="noopener" target="_blank">Instagram</a></li>
       <li><a href="https://www.facebook.com/femmeberberes/" rel="noopener" target="_blank">Facebook Femme Berbère</a></li>
       <li data-social="youtube" hidden><a rel="noopener" target="_blank">YouTube</a></li>
@@ -241,8 +241,8 @@ const HEAD_IMAGES = {
   ecrin: ['/images/collier/collier-mannequin-robe-kabyle-640.webp', 'Le collier kabyle émaillé porté avec une robe kabyle brodée'],
   galerie: ['/images/collier/collier-mannequin-cou-640.webp', 'Le collier émaillé porté, médaillon et pampilles'],
   bibliotheque: ['/images/marque/lamia-illu-ecrit-480.webp', 'Lamia assise en tailleur, écrivant dans un carnet', true],
-  salon: ['/images/lamia/lamia-portrait-pro-480.webp', 'Lamia Femme Berbère, portrait réel'],
-  'speed-dating': ['/images/lamia/lamia-portrait-pro-480.webp', 'Lamia Femme Berbère, hôte du Boudoir des Rencontres'],
+  salon: ['/images/lamia/lamia-portrait-tatouages-noir-480.webp', 'Lamia Femme Berbère, portrait réel'],
+  'speed-dating': ['/images/lamia/lamia-portrait-sourire-rose-480.webp', 'Lamia Femme Berbère, hôte du Boudoir des Rencontres'],
   boutique: ['/images/collier/collier-mannequin-lanterne-640.webp', 'Le collier kabyle émaillé porté, à la lumière des lanternes'],
   patio: ['/images/marque/lamia-illu-debout-480.webp', 'Lamia en robe kabyle brodée, debout, la main sur le cœur', true],
   grenier: ['/images/marque/lamia-illu-pensive-480.webp', 'Lamia pensive, foulard kabyle et bracelets d’argent', true],
@@ -332,7 +332,7 @@ page(
     <span class="arch-shadow" aria-hidden="true"></span>
     <figure class="hall-arch hall-arch-lamia">
       <picture>
-        ${IMGT('image.hall.portrait', 'Le Hall', 'Portrait de Lamia dans l’arche', `<img src="/images/lamia/lamia-portrait-pro-480.webp" width="480" height="600" loading="eager" alt="Lamia Femme Berbère, portrait réel">`)}
+        ${IMGT('image.hall.portrait', 'Le Hall', 'Portrait de Lamia dans l’arche', `<img src="/images/lamia/lamia-portrait-tatouages-creme-480.webp" width="480" height="600" loading="eager" alt="Lamia Femme Berbère, portrait réel">`)}
       </picture>
       <figcaption><strong>Lamia</strong><span>Je vous ouvre la porte de ma Maison.</span></figcaption>
     </figure>
@@ -362,7 +362,7 @@ page(
       <span class="apercu-info" data-prix-werdi>Livre broché et ebook</span>
     </a>
     <a class="apercu" href="/salon/">
-      ${IMGT('image.hall.apercu-live', 'Le Hall', 'Aperçu : live TikTok', `<img src="/images/lamia/lamia-portrait-pro-320.webp" width="320" height="400" alt="Lamia Femme Berbère" loading="lazy" class="is-lamia">`)}
+      ${IMGT('image.hall.apercu-live', 'Le Hall', 'Aperçu : live TikTok', `<img src="/images/lamia/lamia-portrait-tatouages-noir-320.webp" width="320" height="400" alt="Lamia Femme Berbère" loading="lazy" class="is-lamia">`)}
       <span class="apercu-kicker">Le Salon · chaque soir</span>
       <strong>Live Mariage Kabyle</strong>
       <span class="apercu-info">De 21 h à 23 h, en multistream sur toutes les plateformes</span>
@@ -401,7 +401,7 @@ page(
       <li>Samedi 31 octobre · 21 h</li>
       <li>En visio</li>
     </ul>
-    <p class="home-speed-actions"><a class="btn home-speed-cta" href="/speed-dating/#events-title">Je m’inscris au prochain speed dating</a><a class="btn home-speed-live" href="https://www.tiktok.com/@lamiaberbere" rel="noopener" target="_blank">Rejoindre le live</a></p>
+    <p class="home-speed-actions"><a class="btn home-speed-cta" href="/speed-dating/#events-title">Je m’inscris au prochain speed dating</a><a class="btn home-speed-live" href="https://www.tiktok.com/@lamiafemmeberbere" rel="noopener" target="_blank">Rejoindre le live</a></p>
   </div>
 </section>
 
@@ -436,7 +436,7 @@ page(
 </section>
 
 <section class="story story-lamia" aria-labelledby="story-title">
-  <figure class="story-lamia-portrait">${IMGT('image.hall.histoire', 'Le Hall', 'Portrait à côté de mon histoire', `<img src="/images/lamia/lamia-portrait-pro-480.webp" width="480" height="600" loading="lazy" alt="Lamia Femme Berbère">`)}</figure>
+  <figure class="story-lamia-portrait">${IMGT('image.hall.histoire', 'Le Hall', 'Portrait à côté de mon histoire', `<img src="/images/lamia/lamia-portrait-carnet-480.webp" width="480" height="600" loading="lazy" alt="Lamia Femme Berbère">`)}</figure>
   <div>
     <h2 id="story-title">${esc(P.hall.story.title)}</h2>
     ${P.hall.story.paragraphs.map((p) => `<p>${esc(p)}</p>`).join('')}
@@ -454,15 +454,9 @@ page(
     description: 'Les lives de Lamia Femme Berbère : couple, célibat, engagement, humour et culture kabyle, tous les soirs de 21 h à 23 h.',
     path: '/salon/',
     room: roomBySlug.salon,
-    body: `${roomHead(roomBySlug.salon)}
-<section class="videos-haut">
-  <div class="videos" data-youtube-videos hidden>
-    <h2>Mes dernières vidéos YouTube</h2>
-    <div class="video-cadre" data-youtube-cadre><button class="btn btn-gold" type="button" data-youtube-charger>▶ Afficher mes vidéos</button><p class="video-note">En affichant les vidéos, YouTube peut déposer ses propres cookies.</p></div>
-  </div>
-</section>
-<section class="room-body two-col">
-  <div>
+    body: `${roomHead(roomBySlug.salon, '<p class="patio-actions"><a class="ame-soeur-btn" href="#ce-soir">🔴 Ce soir en live</a><a class="salon-ancre" href="#coeur-direct">Les débats</a><a class="salon-ancre" href="#outil-live">Le matching en live</a><a class="salon-ancre" href="#replays">Les replays</a></p>')}
+<section class="room-body salon-ce-soir" id="ce-soir" aria-labelledby="ce-soir-titre">
+  <div class="salon-live">
     <p class="prose-lead">${esc(P.salon.intro)}</p>
     ${P.salon.lives
       .map(
@@ -474,6 +468,11 @@ page(
     <h2>Les règles du Salon</h2>
     ${list(P.salon.rules)}
   </aside>
+</section>
+<section class="reseaux salon-plateformes" aria-labelledby="reseaux-titre">
+  <h2 id="reseaux-titre">Choisis ta plateforme</h2>
+  <p class="reseaux-intro">Le même live, au même moment, partout. Suis-moi là où tu es le plus à l’aise.</p>
+  <div class="reseaux-grille"><a class="reseau reseau-tiktok" data-social="tiktok" href="https://www.tiktok.com/@lamiafemmeberbere" rel="noopener" target="_blank"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" fill="currentColor"><path d="M16.6 5.8a4.3 4.3 0 0 1-3.4-3.8h-3v12.4a2.6 2.6 0 1 1-2.6-2.6c.3 0 .5 0 .8.1V8.8a5.7 5.7 0 1 0 4.8 5.6V8.1a7.3 7.3 0 0 0 4.3 1.4v-3c-.3 0-.6-.1-.9-.7Z"/></svg><strong>TikTok</strong><span>Le live, avec mes invités en direct</span></a><a class="reseau reseau-facebook" data-social="facebook" href="https://www.facebook.com/femmeberberes/" rel="noopener" target="_blank"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" fill="currentColor"><path d="M13.5 22v-8h2.7l.4-3.2h-3.1V8.8c0-.9.3-1.5 1.6-1.5h1.7V4.5c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.1v2.3H7.7V14h2.7v8h3.1Z"/></svg><strong>Facebook</strong><span>La page Femme Berbère</span></a><a class="reseau reseau-instagram" data-social="instagram" hidden rel="noopener" target="_blank"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" fill="currentColor"><path d="M12 7.2a4.8 4.8 0 1 0 0 9.6 4.8 4.8 0 0 0 0-9.6Zm0 7.9a3.1 3.1 0 1 1 0-6.2 3.1 3.1 0 0 1 0 6.2Zm5-8.1a1.1 1.1 0 1 1-2.2 0 1.1 1.1 0 0 1 2.2 0ZM12 3.6c2.7 0 3 0 4.1.1 2.7.1 4 1.4 4.1 4.1.1 1.1.1 1.4.1 4.1s0 3-.1 4.1c-.1 2.7-1.4 4-4.1 4.1-1.1.1-1.4.1-4.1.1s-3 0-4.1-.1c-2.7-.1-4-1.4-4.1-4.1C3.7 15 3.6 14.7 3.6 12s0-3 .1-4.1C3.8 5.2 5.1 3.8 7.9 3.7 9 3.6 9.3 3.6 12 3.6Z"/></svg><strong>Instagram</strong><span>Le live, les coulisses et les bijoux</span></a><a class="reseau reseau-youtube" data-social="youtube" hidden rel="noopener" target="_blank"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" fill="currentColor"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4a2.5 2.5 0 0 0-1.8 1.8C2 8.8 2 12 2 12s0 3.2.4 4.8a2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8c.4-1.6.4-4.8.4-4.8s0-3.2-.4-4.8ZM10 15V9l5.2 3L10 15Z"/></svg><strong>YouTube</strong><span>Mes vidéos et mes lives en replay</span></a><a class="reseau reseau-twitch" data-social="twitch" hidden rel="noopener" target="_blank"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" fill="currentColor"><path d="M4.3 3 3 6.4v13.1h4.5V22h2.5l2.5-2.5h3.7l4.8-4.8V3H4.3Zm15.1 10.9-2.8 2.8h-4.5l-2.4 2.4v-2.4H5.9V4.7h13.5v9.2Zm-2.8-5.7v4.9h-1.7V8.2h1.7Zm-4.5 0v4.9h-1.7V8.2h1.7Z"/></svg><strong>Twitch</strong><span>Le live, aussi sur Twitch</span></a><a class="reseau reseau-snapchat" data-social="snapchat" hidden rel="noopener" target="_blank"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" fill="currentColor"><path d="M12 3c2.9 0 4.9 2.1 4.9 5v2.1l1.3-.4c.6-.1 1 .6.5 1l-1.6 1c.6 1.9 2 3.2 3.6 3.6.4.1.4.6 0 .8-.7.3-1.5.5-2.2.6-.1.4-.2.9-.4 1.2-1.1-.2-2.2 0-3.1.7-.9.6-2 .9-3 .9s-2.1-.3-3-.9c-.9-.7-2-.9-3.1-.7-.2-.3-.3-.8-.4-1.2-.7-.1-1.5-.3-2.2-.6-.4-.2-.4-.7 0-.8 1.6-.4 3-1.7 3.6-3.6l-1.6-1c-.5-.4-.1-1.1.5-1l1.3.4V8c0-2.9 2-5 4.9-5Z"/></svg><strong>Snapchat</strong><span>Le quotidien, au plus près</span></a><a class="reseau reseau-whatsapp" data-social="whatsapp" hidden rel="noopener" target="_blank"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" fill="currentColor"><path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.6-1.2A9 9 0 1 0 12 3Zm4.9 12.6c-.2.6-1.2 1.2-1.7 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.6-.4.8-.4h.6c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .6l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.7-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.3Z"/></svg><strong>WhatsApp</strong><span>La chaîne des nouvelles de la Maison</span></a></div>
 </section>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,500&display=swap">
 <section class="po-app outil-live" id="coeur-direct" aria-labelledby="coeur-direct-titre">
@@ -536,16 +535,20 @@ page(
     <p class="po-actions"><a class="po-btn" href="/patio/">💌 Je confie mon profil à Lamia</a><a class="po-btn-verre" href="/patio/#profils-anonymes">Voir les profils anonymes</a></p>
   </div>
 </section>
-<figure class="banniere-salon">${IMGT('image.salon.banniere', 'Le Salon de Lamia', 'Grande bannière', `<img src="/images/lamia/banniere-lamia-berbere-1672.webp" srcset="/images/lamia/banniere-lamia-berbere-900.webp 900w, /images/lamia/banniere-lamia-berbere-1672.webp 1672w" sizes="(max-width: 1300px) 100vw, 1240px" width="1672" height="941" loading="lazy" alt="Lamia Berbère : humour, société, politique, contradictions du quotidien. Un regard berbère, kabyle, algérien, français et maghrébin.">`)}</figure>
-<section class="reseaux" aria-labelledby="reseaux-titre">
-  <h2 id="reseaux-titre">Mes réseaux</h2>
-  <p class="reseaux-intro">Où me retrouver, me suivre et me poser vos questions.</p>
-  <div class="reseaux-grille"><a class="reseau reseau-tiktok" data-social="tiktok" href="https://www.tiktok.com/@lamiaberbere" rel="noopener" target="_blank"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" fill="currentColor"><path d="M16.6 5.8a4.3 4.3 0 0 1-3.4-3.8h-3v12.4a2.6 2.6 0 1 1-2.6-2.6c.3 0 .5 0 .8.1V8.8a5.7 5.7 0 1 0 4.8 5.6V8.1a7.3 7.3 0 0 0 4.3 1.4v-3c-.3 0-.6-.1-.9-.7Z"/></svg><strong>TikTok</strong><span>Le live, avec mes invités en direct</span></a><a class="reseau reseau-facebook" data-social="facebook" href="https://www.facebook.com/femmeberberes/" rel="noopener" target="_blank"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" fill="currentColor"><path d="M13.5 22v-8h2.7l.4-3.2h-3.1V8.8c0-.9.3-1.5 1.6-1.5h1.7V4.5c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.1v2.3H7.7V14h2.7v8h3.1Z"/></svg><strong>Facebook</strong><span>La page Femme Berbère</span></a><a class="reseau reseau-instagram" data-social="instagram" hidden rel="noopener" target="_blank"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" fill="currentColor"><path d="M12 7.2a4.8 4.8 0 1 0 0 9.6 4.8 4.8 0 0 0 0-9.6Zm0 7.9a3.1 3.1 0 1 1 0-6.2 3.1 3.1 0 0 1 0 6.2Zm5-8.1a1.1 1.1 0 1 1-2.2 0 1.1 1.1 0 0 1 2.2 0ZM12 3.6c2.7 0 3 0 4.1.1 2.7.1 4 1.4 4.1 4.1.1 1.1.1 1.4.1 4.1s0 3-.1 4.1c-.1 2.7-1.4 4-4.1 4.1-1.1.1-1.4.1-4.1.1s-3 0-4.1-.1c-2.7-.1-4-1.4-4.1-4.1C3.7 15 3.6 14.7 3.6 12s0-3 .1-4.1C3.8 5.2 5.1 3.8 7.9 3.7 9 3.6 9.3 3.6 12 3.6Z"/></svg><strong>Instagram</strong><span>Le live, les coulisses et les bijoux</span></a><a class="reseau reseau-youtube" data-social="youtube" hidden rel="noopener" target="_blank"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" fill="currentColor"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4a2.5 2.5 0 0 0-1.8 1.8C2 8.8 2 12 2 12s0 3.2.4 4.8a2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8c.4-1.6.4-4.8.4-4.8s0-3.2-.4-4.8ZM10 15V9l5.2 3L10 15Z"/></svg><strong>YouTube</strong><span>Mes vidéos et mes lives en replay</span></a><a class="reseau reseau-twitch" data-social="twitch" hidden rel="noopener" target="_blank"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" fill="currentColor"><path d="M4.3 3 3 6.4v13.1h4.5V22h2.5l2.5-2.5h3.7l4.8-4.8V3H4.3Zm15.1 10.9-2.8 2.8h-4.5l-2.4 2.4v-2.4H5.9V4.7h13.5v9.2Zm-2.8-5.7v4.9h-1.7V8.2h1.7Zm-4.5 0v4.9h-1.7V8.2h1.7Z"/></svg><strong>Twitch</strong><span>Le live, aussi sur Twitch</span></a><a class="reseau reseau-snapchat" data-social="snapchat" hidden rel="noopener" target="_blank"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" fill="currentColor"><path d="M12 3c2.9 0 4.9 2.1 4.9 5v2.1l1.3-.4c.6-.1 1 .6.5 1l-1.6 1c.6 1.9 2 3.2 3.6 3.6.4.1.4.6 0 .8-.7.3-1.5.5-2.2.6-.1.4-.2.9-.4 1.2-1.1-.2-2.2 0-3.1.7-.9.6-2 .9-3 .9s-2.1-.3-3-.9c-.9-.7-2-.9-3.1-.7-.2-.3-.3-.8-.4-1.2-.7-.1-1.5-.3-2.2-.6-.4-.2-.4-.7 0-.8 1.6-.4 3-1.7 3.6-3.6l-1.6-1c-.5-.4-.1-1.1.5-1l1.3.4V8c0-2.9 2-5 4.9-5Z"/></svg><strong>Snapchat</strong><span>Le quotidien, au plus près</span></a><a class="reseau reseau-whatsapp" data-social="whatsapp" hidden rel="noopener" target="_blank"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" fill="currentColor"><path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.6-1.2A9 9 0 1 0 12 3Zm4.9 12.6c-.2.6-1.2 1.2-1.7 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.6-.4.8-.4h.6c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .6l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.7-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.3Z"/></svg><strong>WhatsApp</strong><span>La chaîne des nouvelles de la Maison</span></a></div>
+<section class="salon-replays" id="replays" aria-labelledby="replays-titre">
+  <h2 id="replays-titre">Revoir les lives et mes vidéos</h2>
+  <div class="videos-haut">
+  <div class="videos" data-youtube-videos hidden>
+    <h2>Mes dernières vidéos YouTube</h2>
+    <div class="video-cadre" data-youtube-cadre><button class="btn btn-gold" type="button" data-youtube-charger>▶ Afficher mes vidéos</button><p class="video-note">En affichant les vidéos, YouTube peut déposer ses propres cookies.</p></div>
+  </div>
+</div>
   <div class="videos" data-tiktok-videos>
     <h2>Mes vidéos TikTok</h2>
     <div class="video-cadre is-tiktok" data-tiktok-cadre><button class="btn btn-gold" type="button" data-tiktok-charger>▶ Afficher mes vidéos TikTok</button><p class="video-note">En affichant les vidéos, TikTok peut déposer ses propres cookies.</p></div>
   </div>
 </section>
+<figure class="banniere-salon">${IMGT('image.salon.banniere', 'Le Salon de Lamia', 'Grande bannière', `<img src="/images/lamia/banniere-lamia-berbere-1672.webp" srcset="/images/lamia/banniere-lamia-berbere-900.webp 900w, /images/lamia/banniere-lamia-berbere-1672.webp 1672w" sizes="(max-width: 1300px) 100vw, 1240px" width="1672" height="941" loading="lazy" alt="Lamia Berbère : humour, société, politique, contradictions du quotidien. Un regard berbère, kabyle, algérien, français et maghrébin.">`)}</figure>
 ${otherRooms('salon')}`,
   })
 );
@@ -1423,7 +1426,7 @@ for (const r of soonRooms) {
   <p class="room-name"><span class="pip" aria-hidden="true"></span>${esc(r.name)}</p>
   <h1>${esc(r.welcome)}</h1>
   <p class="lead">${esc(r.summary)}</p>
-  <p class="door-ajar">Cette porte est encore entrouverte. Pour être prévenue de son ouverture, suis Lamia sur <a href="https://www.tiktok.com/@lamiaberbere" rel="noopener" target="_blank">TikTok</a>.</p>
+  <p class="door-ajar">Cette porte est encore entrouverte. Pour être prévenue de son ouverture, suis Lamia sur <a href="https://www.tiktok.com/@lamiafemmeberbere" rel="noopener" target="_blank">TikTok</a>.</p>
 </section>
 ${otherRooms(r.slug)}`,
     })
@@ -1540,7 +1543,7 @@ page(
     <p class="lamia-boutons"><a class="btn btn-ink" href="/#hall">Entrer dans la Maison</a><a class="btn btn-line" href="/werdi-ouvre-les-yeux/">Découvrir Werdi</a><a class="btn btn-line" href="/salon/">Retrouver mes lives</a></p>
   </footer>
 </article>
-<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@type': 'Person', name: 'Lamia Bréchet Ighil', alternateName: 'Lamia Femme Berbère', url: SITE_URL + '/lamia-brechet/', image: SITE_URL + '/images/lamia/lamia-salon-900.webp', sameAs: ['https://www.tiktok.com/@lamiaberbere', 'https://www.facebook.com/femmeberberes/'] })}</script>`,
+<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@type': 'Person', name: 'Lamia Bréchet Ighil', alternateName: 'Lamia Femme Berbère', url: SITE_URL + '/lamia-brechet/', image: SITE_URL + '/images/lamia/lamia-salon-900.webp', sameAs: ['https://www.tiktok.com/@lamiafemmeberbere', 'https://www.facebook.com/femmeberberes/'] })}</script>`,
   })
 );
 

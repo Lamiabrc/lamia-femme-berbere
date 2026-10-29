@@ -480,7 +480,7 @@ async function renderSocials() {
       try { if (localStorage.getItem('lfb-cookies') === 'oui') yt.querySelector('[data-youtube-charger]').click(); } catch { /* */ }
     }
     const tt = document.querySelector('[data-tiktok-videos]');
-    const tiktok = links.tiktok || 'https://www.tiktok.com/@lamiaberbere';
+    const tiktok = links.tiktok || 'https://www.tiktok.com/@lamiafemmeberbere';
     const pseudo = (tiktok.match(/@([\w.]+)/) || [])[1];
     if (tt && !pseudo) tt.hidden = true;
     tt?.querySelector('[data-tiktok-charger]')?.addEventListener('click', () => {
