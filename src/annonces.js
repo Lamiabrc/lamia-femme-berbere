@@ -109,9 +109,8 @@ export function formulaireHtml() {
     <div class="annonce-grille">
       <label>Ton email<input name="email" type="email" autocomplete="email" required></label>
       <label>Ton lien TikTok, Instagram ou Facebook <small>(obligatoire)</small><input name="contactReseau" maxlength="200" placeholder="https://www.tiktok.com/@tonpseudo" required></label>
-      <label>Ton téléphone <small>(facultatif)</small><input name="phone" type="tel" autocomplete="tel" maxlength="40"></label>
     </div>
-    <p class="annonce-aide">Le lien vers ton réseau social est obligatoire : c’est par là que Lamia te contactera pour une mise en relation. Il n’est jamais affiché.</p>
+    <p class="annonce-aide">Le lien vers ton réseau social est obligatoire : c’est par là que Lamia te contactera. Il n’est jamais affiché sur le site. Ton numéro de téléphone ne t’est demandé que plus tard, par Lamia elle-même, si un match te convient ; il reste chez elle.</p>
     <p class="annonce-aide">Tes coordonnées ne sont jamais affichées ni transmises : c’est Lamia qui te contacte pour une mise en relation.</p>
   </div>
   <label class="annonce-case"><input type="checkbox" name="majeur"> <span>J’ai 18 ans ou plus et cette annonce est sincère : je cherche une vraie rencontre.</span></label>
@@ -193,7 +192,7 @@ export function monterFormulaire(box) {
           for (const n of ['kabyleUniquement', 'accepteDivorce', 'accepteVeuf', 'accepteEnfants']) m[n] = f[n].checked;
           return m;
         })(),
-        age_min: f.age_min.value, age_max: f.age_max.value, email: f.email.value.trim(), phone: f.phone.value,
+        age_min: f.age_min.value, age_max: f.age_max.value, email: f.email.value.trim(),
         majeur: true, publication: true, identite_ok: true, website: f.zz_site.value, anonyme_ok: f.anonyme_ok.checked, interet_ref: f.interet_ref.value,
         medias: fichiers.map((x) => ({ role: x.role, type: typeDe(x.blob), size: x.blob.size })),
       });

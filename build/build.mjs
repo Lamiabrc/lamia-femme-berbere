@@ -1216,6 +1216,13 @@ page(
     <h2>Annonces de rencontre</h2>
     <p class="cl-aide">Les profils ne sont jamais publiés. 1) Vérifie le profil et la pièce d’identité, puis « Valider » : la pièce d’identité est supprimée. 2) Exporte vers ton outil et fais le matching. 3) Indique le nombre de profils compatibles et « Envoyer le résultat » : la personne reçoit ce nombre par email (sans savoir qui), avec l’invitation à t’écrire (première mise en relation offerte, ensuite abonnement).</p>
     <div class="cl-carte cl-export">
+      <h3>🔗 Liaison avec mon outil de matching</h3>
+      <p class="cl-aide">Ton outil récupère tout seul les profils validés et les matchs demandés grâce à une clé secrète. Crée la clé une fois, colle-la dans l’écran « Le site » de ton outil. Si tu crées une nouvelle clé, l’ancienne ne marche plus.</p>
+      <div class="cl-outils"><button class="cl-btn cl-plein" type="button" data-outil-cle>Créer une clé de liaison</button></div>
+      <div data-outil-zone hidden><input data-outil-valeur readonly style="width:100%;font-family:monospace"> <button class="cl-btn" type="button" data-outil-copier>Copier</button></div>
+      <p class="cl-statut" role="status" data-outil-statut></p>
+    </div>
+    <div class="cl-carte cl-export">
       <h3>💌 Matchs demandés <span data-n-demandes></span></h3>
       <p class="cl-aide">Quand quelqu’un clique sur « Ce profil m’intéresse » dans le Patio puis crée son profil, la demande arrive ici (et tu reçois une alerte). Personne d’autre ne la voit. Elle est aussi notée dans la fiche exportée vers ton outil.</p>
       <div data-demandes></div>

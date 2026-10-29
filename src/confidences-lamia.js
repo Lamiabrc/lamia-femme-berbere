@@ -325,3 +325,15 @@ document.addEventListener('change', async (e) => {
   if (!sel) return;
   try { await api({ action: 'match_demande_statut', id: sel.closest('[data-demande]').dataset.demande, statut: sel.value }, await jetonFrais()); chargerDemandes(); } catch { /* */ }
 });
+
+// ---------------------------------------------------------------- clé de liaison avec l'outil de matching
+$('[data-outil-cle]')?.addEventListener('click', async () => {
+  const st = $('[data-outil-statut]');
+  if (!confirm('Créer une nouvelle clé de liaison ? L’ancienne clé ne fonctionnera plus dans ton outil.')) return;
+  try {
+    const { cle } = await api({ action: 'outil_cle' }, await jetonFrais());
+    $('[data-outil-valeur]').value = cle; $('[data-outil-zone]').hidden = false;
+    say(st, 'Copie cette clé et colle-la dans ton outil (écran « Le site »). Elle ne sera plus affichée ensuite.');
+  } catch (err) { say(st, erreur(err.code), true); }
+});
+$('[data-outil-copier]')?.addEventListener('click', async () => { try { await navigator.clipboard.writeText($('[data-outil-valeur]').value); say($('[data-outil-statut]'), 'Clé copiée.'); } catch { $('[data-outil-valeur]').select(); } });
