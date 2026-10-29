@@ -1,4 +1,4 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm';
+import { createClient } from '/vendor/supabase.mjs';
 const supabase=createClient('https://tybwvxinigahhntfeeur.supabase.co','sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc');
 const $=s=>document.querySelector(s);const esc=s=>String(s??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 let rows=[],filter='all';

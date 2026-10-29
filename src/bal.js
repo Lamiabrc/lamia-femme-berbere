@@ -2,7 +2,7 @@
 // Vidéo : Daily (mode « call object ») ; l'interface est celle de la Maison.
 // Le serveur décide où chacun doit être (grand salon, tête-à-tête, attente, fin du bal).
 
-import Daily from 'https://cdn.jsdelivr.net/npm/@daily-co/daily-js@0.89.1/+esm';
+import Daily from '/vendor/daily.mjs';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (q, r = document) => [...r.querySelectorAll(q)];

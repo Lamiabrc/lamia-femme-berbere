@@ -72,12 +72,14 @@ Données stockées par Supabase, centre de données de Paris (Union européenne)
 <li><strong>Confidences</strong> : ton prénom ou pseudonyme, ton email, ton téléphone si tu le donnes, tes messages, vocaux, images et documents, pour que Lamia puisse te lire et te répondre. Ils sont gardés dans un espace privé, accessible seulement à toi (après connexion par lien email) et à Lamia, jusqu’à ce que tu demandes leur suppression (bouton « supprimer cette conversation » ou email), et au plus 3 ans après le dernier message. Lamia reçoit une notification sans contenu et, si elle l’a activé, un email d’alerte.</li>
 <li><strong>Alertes</strong> : le contenu de ton alerte et l’éventuel message audio, pour assurer ta sécurité. La personne signalée ne connaît jamais ton identité.</li>
 <li><strong>Commandes et précommandes</strong> : nom, adresse de livraison, téléphone éventuel et email, pour livrer, facturer et te tenir informée. Les données de carte bancaire sont traitées uniquement par Stripe ; la Maison n’y a jamais accès.</li>
+<li><strong>Abonnements et achats à l’unité</strong> : nom, email, formule choisie, statut et dates de l’abonnement, achats à l’unité et leur utilisation, pour fournir le service et le facturer (base : le contrat). La carte bancaire et la résiliation sont gérées par Stripe ; la Maison n’a jamais accès aux données de carte.</li>
 </ul>
 <p>Le salon que tu choisis (par exemple Algérie–France) peut laisser deviner une origine. Cette information sert uniquement à organiser les soirées : elle n’est jamais publiée, vendue ni utilisée pour de la publicité.</p>
 <h2>Profils confiés à Lamia (trouver son âme sœur)</h2>
 <p>Quand tu confies ton profil, nous recevons ton prénom, ton genre, ta date de naissance, ta ville et ton pays, tes réponses sur ta situation, tes études, tes valeurs et la personne que tu cherches, tes textes, tes photos ou ta vidéo, ton email et ton téléphone ou ton réseau social, ainsi qu’une photo de ta pièce d’identité dont le numéro est caché par ta main, si tu choisis de la donner (elle est facultative et donne au profil le badge « vérifié avec pièce d’identité »). Ces données servent uniquement à vérifier ton profil, à le passer dans l’outil de matching de Lamia et à te proposer des mises en relation (base : ton consentement).</p>
 <p><strong>Ton profil n’est jamais publié avec ton identité.</strong> Seule Lamia le voit en entier. Si tu l’acceptes (case facultative), Lamia peut l’afficher <strong>anonymement</strong> dans les Rencontres du site : âge, pays, situation, textes et caractéristiques, sans prénom, photo, ville ni contact. Quand quelqu’un clique sur « Ce profil m’intéresse », seule Lamia le sait. L’outil de matching fonctionne sur son ordinateur ; tu reçois seulement le nombre de profils qui pourraient te correspondre, sans connaître leur identité, et aucune autre personne ne sait avec qui tu pourrais correspondre. <strong>La photo de la pièce d’identité est supprimée dès que Lamia valide ou refuse ton profil.</strong></p>
 <p>Tu peux retirer ton profil à tout moment grâce au lien reçu par email, ou en écrivant à Lamia : tes textes, photos et vidéo sont alors effacés du site, et Lamia le retire de son outil.</p>
+<p><strong>Profils venus de l’outil de Lamia.</strong> Certains profils anonymes viennent des personnes que Lamia accompagne en live ou en message privé, avec leur accord. Pour eux, seuls sont affichés l’âge, la ville, le village d’origine, le pays, le secteur recherché, la situation, les caractéristiques et quelques mots-clés : jamais le prénom, la photo, le pseudo, le téléphone ni les notes de Lamia. Une personne peut demander à tout moment le retrait de sa fiche à Lamia ; elle disparaît du site à la publication suivante.</p>
 <h2>Qui y a accès</h2>
 <p>Seule Lamia, et les prestataires techniques ci-dessous dans la limite de leur mission. Les autres participantes et participants ne voient que ton prénom pendant la soirée. Ton email n’est communiqué à une autre personne qu’en cas de souhait réciproque, et seulement avec ton accord.</p>
 <h2>Prestataires et lieux de stockage</h2>
@@ -85,14 +87,18 @@ Données stockées par Supabase, centre de données de Paris (Union européenne)
 <li>Supabase : base de données, hébergée à Paris (Union européenne).</li>
 <li>Vercel : hébergement du site (États-Unis, avec garanties contractuelles de la Commission européenne).</li>
 <li>Daily : vidéo en direct des soirées (États-Unis, avec garanties contractuelles), sans enregistrement.</li>
-<li>Stripe : paiement sécurisé.</li>
+<li>Stripe : paiement sécurisé et gestion des abonnements.</li>
+<li>Resend : envoi des emails du site (confirmations, résultats, alertes).</li>
 <li>Google Analytics (Google Ireland) : mesure d’audience, <strong>uniquement si tu l’acceptes</strong>.</li>
 </ul>
+<p>Les polices de caractères et les bibliothèques techniques sont hébergées sur le site lui-même : ta visite n’envoie aucune donnée à Google Fonts ni à un autre service tiers tant que tu n’as rien accepté.</p>
 <h2>Durée de conservation</h2>
 <ul>
 <li>Compte membre : jusqu’à sa suppression, ou 3 ans après ta dernière connexion.</li>
 <li>Inscriptions et souhaits des soirées : 1 an après la soirée.</li>
 <li>Alertes : 3 ans, puis suppression.</li>
+<li>Profils confiés à Lamia : jusqu’à ce que tu les retires, et au plus 2 ans sans nouvelle de ta part. La photo de pièce d’identité est supprimée dès la validation ou le refus du profil.</li>
+<li>Abonnements : pendant l’abonnement, puis 3 ans après sa fin.</li>
 <li>Commandes et factures : 10 ans (obligation comptable).</li>
 <li>Mesure d’audience : 13 mois.</li>
 </ul>
@@ -102,7 +108,7 @@ Données stockées par Supabase, centre de données de Paris (Union européenne)
 <p>Mesure d’audience interne, sans cookie : pour savoir quelles pages sont lues et d’où viennent les visites, le site compte les pages vues sans cookie. Il enregistre la page, la provenance (réseau social, lien direct…), le type d’appareil, l’heure, ainsi que le pays, la région et la ville approximatifs déduits du réseau internet. L’adresse IP n’est jamais enregistrée, et l’empreinte technique utilisée pour compter les visiteurs change chaque jour : elle ne permet pas de suivre une personne dans le temps.</p>
 <h2>Tes droits</h2>
 <p>Tu peux accéder à tes données, les corriger, les supprimer, en obtenir une copie, ou t’opposer à leur traitement en écrivant à <a href="mailto:lamia.brechet@outlook.fr">lamia.brechet@outlook.fr</a>. Réponse sous un mois. Tu peux aussi saisir la CNIL (<a href="https://www.cnil.fr" rel="noopener" target="_blank">cnil.fr</a>).</p>
-<p class="fine">Version 2026-10.</p>`,
+<p class="fine">Version du 29 octobre 2026.</p>`,
   },
   {
     path: '/retours/',
@@ -221,7 +227,7 @@ Signature (si envoi papier) : …</p>
 
 <h2>11. Modification et droit applicable</h2>
 <p>Ces conditions peuvent évoluer ; la version en ligne est celle qui s’applique. Elles sont soumises au droit français. Contact : <a href="mailto:lamia.brechet@outlook.fr">lamia.brechet@outlook.fr</a>.</p>
-<p class="fine">Version 2026-10.</p>`,
+<p class="fine">Version du 29 octobre 2026.</p>`,
   },
 ];
 

@@ -1,6 +1,6 @@
 // Tableau de bord de Lamia : ventes, produits, soirées, alertes, textes du site, visites.
 import { FAMILLES } from '/assets/rubriques.mjs';
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm';
+import { createClient } from '/vendor/supabase.mjs';
 
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc');
 const $ = (s, r = document) => r.querySelector(s);

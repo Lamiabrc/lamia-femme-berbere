@@ -1,5 +1,5 @@
 // Les Confidences avec Lamia : écrire, parler (vocal), ou échanger en conversation privée.
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm';
+import { createClient } from '/vendor/supabase.mjs';
 import { api, envoyer, erreur, esc, taille, quand, piecesHtml, PUBLIC_KEY } from './confidences-commun.js';
 import { monterEnregistreur } from './enregistreur.js';
 

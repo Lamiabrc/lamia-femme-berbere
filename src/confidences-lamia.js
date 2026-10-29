@@ -1,5 +1,5 @@
 // Espace de Lamia : conversations, lecture des confidences, réponses (texte, vocal, images), alertes.
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm';
+import { createClient } from '/vendor/supabase.mjs';
 import { api, envoyer, erreur, esc, taille, quand, piecesHtml, PUBLIC_KEY } from './confidences-commun.js';
 import { monterEnregistreur } from './enregistreur.js';
 import { versOutil, lib } from './matching-options.mjs';

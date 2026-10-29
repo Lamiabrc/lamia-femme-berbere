@@ -2,7 +2,7 @@
 // Reprend les tables existantes (event_registrations, safety_reports, report_evidence)
 // et la protection serveur (RLS) déjà en place côté Supabase.
 
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm';
+import { createClient } from '/vendor/supabase.mjs';
 
 const SUPABASE_URL = 'https://tybwvxinigahhntfeeur.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc';
