@@ -242,7 +242,7 @@ async function chargerAnnonces() {
         ${a.status !== 'publiee' ? '<button class="cl-btn cl-plein" type="button" data-decision="publier">✓ Valider le profil</button>' : ''}
         ${a.status !== 'refusee' ? `<button class="cl-btn" type="button" data-decision="refuser">${a.status === 'publiee' ? 'Retirer le profil' : 'Refuser'}</button>` : ''}
         ${a.status === 'publiee' ? '<button class="cl-btn" type="button" data-exporter-une>↪ Fiche pour l’outil de matching</button>' : ''}
-        ${a.status === 'publiee' && a.anonyme_ok ? `<button class="cl-btn" type="button" data-decision="${a.visible_anonyme ? 'masquer' : 'afficher'}">${a.visible_anonyme ? 'Retirer du Patio' : '👁 Afficher anonymement dans le Patio'}</button>` : ''}
+        ${a.status === 'publiee' ? `<span class="cl-aide">${a.visible_anonyme ? '👁 Affiché anonymement dans le Patio' : a.anonyme_ok ? 'Pour l’afficher dans le Patio : ton outil, écran « Le site » → Publier' : 'La personne n’a pas accepté l’affichage anonyme'}</span>${a.visible_anonyme ? ' <button class="cl-btn" type="button" data-decision="masquer">Retirer du Patio</button>' : ''}` : ''}
         <button class="cl-btn" type="button" data-decision="supprimer">Supprimer définitivement</button>
       </div>
       <p class="cl-statut" role="status" data-annonce-statut></p>
@@ -336,7 +336,7 @@ async function chargerDemandes() {
     if (!demandes.length) { box.innerHTML = '<p class="cl-vide">Aucune demande pour le moment.</p>'; return; }
     const qui = (p) => p?.prenom ? `n° ${p.ref} · ${esc(p.prenom)}, ${p.age} ans, ${esc(p.ville)} (${esc(lib(p.pays))})${p.contact ? `<br><small>${esc(p.contact)}</small>` : ''}` : `n° ${p?.ref} <small>(profil retiré ou inconnu)</small>`;
     box.innerHTML = demandes.map((d) => `<article class="cl-carte cl-demande" data-demande="${d.id}">
-      <p class="cl-coord">${quand(d.created_at)} · <b>${STATUT_DEMANDE[d.statut]}</b></p>
+      <p class="cl-coord">${quand(d.created_at)} · <b>${STATUT_DEMANDE[d.statut]}</b>${d.demandeur?.status && d.demandeur.status !== 'publiee' ? ' · <b class="cl-a-verifier">⏳ profil pas encore vérifié : valide-le d’abord dans la liste ci-dessus</b>' : ''}</p>
       <div class="cl-demande-duo"><div><small>S’intéresse à</small><br>${qui(d.demandeur)}</div><div class="cl-demande-coeur">💌 →</div><div><small>Profil choisi</small><br>${qui(d.cible)}</div></div>
       <label>Statut<select data-demande-statut>${Object.entries(STATUT_DEMANDE).map(([k, v]) => `<option value="${k}"${k === d.statut ? ' selected' : ''}>${v}</option>`).join('')}</select></label>
     </article>`).join('');
