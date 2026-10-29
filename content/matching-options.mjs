@@ -95,15 +95,19 @@ export function choixPropres(m = {}) {
 // Fiche au format de l'outil de matching (import « JSON » de la liste des profils, en fusion).
 export function versOutil(a, { photoDataUrl = '', aujourdHui = new Date() } = {}) {
   const m = a.matching || {};
-  const reseau = m.contactReseau || '';
-  const tiktok = /tiktok\.com/i.test(reseau) ? reseau : '';
+  const reseau = String(m.contactReseau || '').trim();
+  // TikTok (lien ou @pseudo) dans la case TikTok de l'outil ; Instagram / Facebook dans « autre contact » ; l'email dans les notes.
+  const pseudoTT = (v) => { const t = String(v || '').trim().toLowerCase(); const x = t.match(/tiktok\.com\/@([\w.]{2,30})/) || (/(instagram|facebook|fb)\.com/.test(t) ? null : t.match(/^@?([\w.]{2,30})$/)); return x ? x[1].replace(/\.+$/, '') : ''; };
+  const pseudo = pseudoTT(m.tiktokLive) || pseudoTT(reseau);
+  const autreReseau = pseudoTT(reseau) ? '' : reseau;
   return {
     id: `site-annonce-${a.ref}`,
     dateAjout: (a.submitted_at || aujourdHui.toISOString()).slice(0, 16).replace('T', ' '),
     prenom: a.prenom,
-    tiktokUrl: tiktok,
+    tiktokUrl: pseudo ? `https://www.tiktok.com/@${pseudo}` : '',
+    tiktokAccountId: pseudo,
     telephone: a.phone || '',
-    contactAutre: [tiktok ? '' : reseau, a.email ? `Email : ${a.email}` : ''].filter(Boolean).join(' · '),
+    contactAutre: autreReseau,
     sexe: a.genre === 'femme' ? 'Femme' : 'Homme',
     recherche: a.genre === 'femme' ? 'Homme' : 'Femme',
     age: a.age,
@@ -151,7 +155,7 @@ export function versOutil(a, { photoDataUrl = '', aujourdHui = new Date() } = {}
     plateformeSaisie: 'Autre',
     canalSaisie: 'Message privé',
     photoDataUrl,
-    notes: `${a.status === 'a_verifier' ? '⏳ À VÉRIFIER : profil pas encore validé sur le site (teste-le, puis valide-le). ' : ''}Annonce n° ${a.ref} déposée sur lamia-femme-berbere.com${a.identite_verifiee_at ? `, vérifié AVEC pièce d’identité le ${String(a.identite_verifiee_at).slice(0, 10)}` : ', vérifié sans pièce d’identité'}.${(a.interets || []).length ? ` MATCH DEMANDÉ : intéressé(e) par le profil ${a.interets.map((r) => `site-annonce-${r}`).join(', ')}.` : ''}`,
+    notes: `${a.status === 'a_verifier' ? '⏳ À VÉRIFIER : profil pas encore validé sur le site (teste-le, puis valide-le). ' : ''}${a.email ? `Email : ${a.email}. ` : ''}Annonce n° ${a.ref} déposée sur lamia-femme-berbere.com${a.identite_verifiee_at ? `, vérifié AVEC pièce d’identité le ${String(a.identite_verifiee_at).slice(0, 10)}` : ', vérifié sans pièce d’identité'}.${(a.interets || []).length ? ` MATCH DEMANDÉ : intéressé(e) par le profil ${a.interets.map((r) => `site-annonce-${r}`).join(', ')}.` : ''}`,
     statut: 'Nouveau',
     source_record_id: `site-annonce-${a.ref}`,
     status_import: 'site',
