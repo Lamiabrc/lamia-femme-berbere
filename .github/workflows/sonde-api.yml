@@ -7,7 +7,7 @@ jobs:
       - run: |
           B=https://lamia-femme-berbere.com
           echo "::warning::page $(curl -s -o /dev/null -w '%{http_code}' $B/abonnement/)"
-          R=$(curl -s -X POST $B/api/preorder -H 'Content-Type: application/json' -d '{"action":"abonnement_payer","cgv_accepted":true,"nom":"Sonde technique","email":"sonde.technique@example.com","formule":"coeur","periode":"mois"}')
+          R=$(curl -s -X POST $B/api/preorder/ -H 'Content-Type: application/json' -d '{"action":"abonnement_payer","cgv_accepted":true,"nom":"Sonde technique","email":"sonde.technique@example.com","formule":"coeur","periode":"mois"}')
           echo "::warning::abo $(echo "$R" | sed -E 's#(https://checkout\.stripe\.com/[^/]+/[a-z_]{0,12}).*#\1…#' | head -c 200)"
-          R=$(curl -s -X POST $B/api/preorder -H 'Content-Type: application/json' -d '{"action":"abonnement_payer","cgv_accepted":true,"nom":"Sonde technique","email":"sonde.technique@example.com","unite":"speed_dating","quantite":1}')
+          R=$(curl -s -X POST $B/api/preorder/ -H 'Content-Type: application/json' -d '{"action":"abonnement_payer","cgv_accepted":true,"nom":"Sonde technique","email":"sonde.technique@example.com","unite":"speed_dating","quantite":1}')
           echo "::warning::unite $(echo "$R" | sed -E 's#(https://checkout\.stripe\.com/[^/]+/[a-z_]{0,12}).*#\1…#' | head -c 200)"
