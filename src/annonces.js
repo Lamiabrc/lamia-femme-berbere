@@ -236,7 +236,18 @@ export async function monterListe(box) {
   try {
     const { annonces } = await api({ action: 'annonces_publiques' });
     if (!annonces.length) { box.innerHTML = '<p class="annonce-vide">Les premiers profils anonymes arrivent très bientôt. Et si le premier, c’était le tien ?</p>'; return; }
-    box.innerHTML = annonces.map(carte).join('');
+    // Deux catégories séparées, comme dans l'outil : les femmes, les hommes.
+    const groupes = { femme: annonces.filter((a) => a.genre === 'femme'), homme: annonces.filter((a) => a.genre === 'homme') };
+    const onglets = document.createElement('div');
+    onglets.className = 'annonce-onglets'; onglets.setAttribute('role', 'tablist'); onglets.setAttribute('aria-label', 'Catégories de profils');
+    onglets.innerHTML = [['femme', '👩 Les femmes'], ['homme', '👨 Les hommes']].map(([g, t]) => `<button type="button" role="tab" data-genre="${g}">${t} <b>${groupes[g].length}</b></button>`).join('');
+    box.before(onglets);
+    const montrer = (g) => {
+      onglets.querySelectorAll('[data-genre]').forEach((x) => x.setAttribute('aria-selected', String(x.dataset.genre === g)));
+      box.innerHTML = groupes[g].length ? groupes[g].map(carte).join('') : `<p class="annonce-vide">Pas encore de profil dans cette catégorie. Et si le premier, c’était le tien ?</p>`;
+    };
+    onglets.addEventListener('click', (e) => { const x = e.target.closest('[data-genre]'); if (x) montrer(x.dataset.genre); });
+    montrer(groupes.femme.length || !groupes.homme.length ? 'femme' : 'homme');
   } catch { box.innerHTML = '<p class="annonce-vide">Les annonces n’ont pas pu s’afficher. Recharge la page dans un instant.</p>'; }
 }
 
