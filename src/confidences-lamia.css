@@ -87,3 +87,4 @@ legend { font-size: 14px; font-weight: 600; padding: 0 4px; }
 .cl-annonce label { display: grid; gap: 4px; }
 .cl-annonce input { padding: 9px 11px; border-radius: 10px; border: 1px solid #e0cfc8; font: inherit; }
 .cl-export { border: 2px solid #d9b25f; background: #fffaf0; margin-bottom: 16px; }
+.cl-resultat { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; padding: 10px; border-radius: 12px; background: #fff4e5; border: 1px solid #e3cf9f; } .cl-resultat label { flex: 1; min-width: 200px; }

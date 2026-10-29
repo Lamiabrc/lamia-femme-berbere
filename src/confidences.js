@@ -157,11 +157,11 @@ $('[data-conv-sortir]')?.addEventListener('click', async () => {
 // Arrivée par le lien de connexion, ou par un lien direct vers la conversation.
 supabase.auth.onAuthStateChange((event) => { if (event === 'SIGNED_IN' && location.hash.includes('conversation')) setTimeout(() => ouvrir('conversation', false), 0); });
 // Venue d'une annonce du Patio : message à Lamia déjà commencé.
-const refAnnonce = new URLSearchParams(location.search).get('annonce');
+const refAnnonce = new URLSearchParams(location.search).get('profil');
 if (/^\d{1,6}$/.test(refAnnonce || '')) {
   ouvrir('ecrire', false);
   const t = document.querySelector('[data-conf-ecrit] textarea[name=body]');
-  if (t && !t.value) t.value = `Bonjour Lamia, l’annonce n° ${refAnnonce} du Patio m’a touché(e). J’aimerais faire connaissance avec cette personne. Voici quelques mots sur moi : `;
+  if (t && !t.value) t.value = `Bonjour Lamia, je suis le profil n° ${refAnnonce}. J’aimerais découvrir les personnes qui pourraient me correspondre. `;
   setTimeout(() => $('[data-panneau="ecrire"]')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
 } else if (location.hash === '#annonce') ouvrir('annonce', false);
 else if (location.hash.startsWith('#conversation') || /access_token|type=magiclink/.test(location.hash)) ouvrir('conversation', false);

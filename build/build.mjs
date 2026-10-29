@@ -301,7 +301,7 @@ page(
     <div class="entree-text">
       <a class="entree-ame-carte" href="/patio/#annonces">
         <span class="entree-lamia">${IMGT('image.hall.entree-portrait', 'Le Hall', 'Portrait de Lamia à l’entrée du site', `<img src="/images/lamia/lamia-tatouages-240.webp" srcset="/images/lamia/lamia-tatouages-240.webp 240w, /images/lamia/lamia-tatouages-480.webp 480w" sizes="110px" width="240" height="300" alt="Lamia Femme Berbère" fetchpriority="high">`)}</span>
-        <span class="entree-ame-texte"><span class="entree-ame">${esc(T('hall.ame-soeur', 'Le Hall', 'Phrase sous le portrait de Lamia', 'Trouve ton âme sœur avec Lamia et son outil de matching IA'))}</span><span class="entree-ame-btn">💌 Je dépose mon annonce</span></span>
+        <span class="entree-ame-texte"><span class="entree-ame">${esc(T('hall.ame-soeur', 'Le Hall', 'Phrase sous le portrait de Lamia', 'Trouve ton âme sœur avec Lamia et son outil de matching IA'))}</span><span class="entree-ame-btn">💌 Je confie mon profil</span></span>
       </a>
       <p class="entree-kicker">La Maison franco-kabyle</p>
       <h1 class="entree-title">Lamia Femme Berbère<span class="entree-title-sous">${esc(T('hall.titre-sous', 'Le Hall', 'Sous-titre du grand titre', 'Speed Dating & Rencontres Célibataires Kabyles'))}</span></h1>
@@ -317,10 +317,10 @@ page(
 <section class="ame-soeur" id="ame-soeur" aria-labelledby="ame-soeur-titre">
   <figure class="ame-soeur-portrait"><img src="/images/lamia/lamia-tatouages-480.webp" width="480" height="600" alt="Lamia Femme Berbère" loading="lazy"></figure>
   <div class="ame-soeur-texte">
-    <p class="ame-soeur-kicker">Annonces de rencontre vérifiées</p>
+    <p class="ame-soeur-kicker">Profils vérifiés et confidentiels</p>
     <h2 id="ame-soeur-titre">${esc(T('hall.ame-soeur', 'Le Hall', 'Phrase sous le portrait de Lamia', 'Trouve ton âme sœur avec Lamia et son outil de matching IA'))}</h2>
-    <p>Dépose ton annonce : ton portrait, une ou deux photos, et la personne que tu espères rencontrer. Lamia vérifie chaque profil, puis le fait passer dans son outil de matching pour te proposer les personnes qui te correspondent vraiment. Tes coordonnées restent privées : c’est Lamia qui fait le lien.</p>
-    <p class="ame-soeur-actions"><a class="ame-soeur-btn" href="/patio/#annonces">💌 Je dépose mon annonce</a><a class="ame-soeur-lien" href="/patio/#annonces-liste">Voir les annonces</a><a class="ame-soeur-lien" href="/speed-dating/">Le speed dating</a></p>
+    <p>Confie ton profil à Lamia : ton portrait, une ou deux photos, et la personne que tu espères rencontrer. Rien n’est publié. Lamia vérifie ton identité, passe ton profil dans son outil de matching et te dit avec combien de personnes tu pourrais correspondre. Pour les découvrir, tu lui écris : c’est elle qui fait le lien, en toute discrétion. La première mise en relation est offerte.</p>
+    <p class="ame-soeur-actions"><a class="ame-soeur-btn" href="/patio/#annonces">💌 Je confie mon profil à Lamia</a><a class="ame-soeur-lien" href="/confidences/">Écrire à Lamia</a><a class="ame-soeur-lien" href="/speed-dating/">Le speed dating</a></p>
   </div>
 </section>
 
@@ -1010,13 +1010,13 @@ page(
   <button type="button" class="conf-carte" data-choix="ecrire" aria-expanded="false"><span class="conf-icone" aria-hidden="true">✎</span><strong>Je préfère écrire</strong><small>Un message, et si tu veux des photos ou des documents.</small></button>
   <button type="button" class="conf-carte" data-choix="parler" aria-expanded="false"><span class="conf-icone" aria-hidden="true">🎙</span><strong>Je préfère parler</strong><small>Un message vocal, enregistré ici même.</small></button>
   <button type="button" class="conf-carte" data-choix="conversation" aria-expanded="false"><span class="conf-icone" aria-hidden="true">❦</span><strong>Échanger avec Lamia</strong><small>Une conversation privée, que tu retrouves quand tu veux.</small></button>
-  <button type="button" class="conf-carte" data-choix="annonce" aria-expanded="false"><span class="conf-icone" aria-hidden="true">💌</span><strong>Déposer mon annonce</strong><small>Ton portrait et la personne que tu cherches, vérifiés par Lamia.</small></button>
+  <button type="button" class="conf-carte" data-choix="annonce" aria-expanded="false"><span class="conf-icone" aria-hidden="true">💌</span><strong>Trouver mon âme sœur</strong><small>Ton profil, confié à Lamia et à son outil de matching.</small></button>
 </section>
 
 <section class="conf-panneau" data-panneau="annonce" id="annonce" hidden>
   <div class="conf-form">
-    <h2>Déposer mon annonce de rencontre</h2>
-    <p>Tu cherches quelqu’un de sérieux pour construire ta vie ? Présente-toi avec ton cœur, dis-nous qui tu aimerais rencontrer, et Lamia s’occupe du reste. Elle lit chaque annonce elle-même, vérifie que la personne est bien réelle, puis la publie dans le Patio. Quand quelqu’un s’intéresse à toi, c’est elle qui fait le lien : tes coordonnées restent privées.</p>
+    <h2>Trouver mon âme sœur avec Lamia</h2>
+    <p>Tu cherches quelqu’un de sérieux pour construire ta vie ? Présente-toi avec ton cœur et dis qui tu aimerais rencontrer. Ton profil n’est jamais publié : Lamia le vérifie, le passe dans son outil de matching et te dit avec combien de personnes tu pourrais correspondre. Pour les découvrir, tu lui écris. La première mise en relation est offerte.</p>
     <div data-annonce-box></div>
   </div>
 </section>
@@ -1214,7 +1214,7 @@ page(
 
   <section class="cl-reglages" data-annonces-vue hidden>
     <h2>Annonces de rencontre</h2>
-    <p class="cl-aide">Vérifie chaque annonce et la pièce d’identité. En publiant, la pièce d’identité est supprimée automatiquement et la personne reçoit un email.</p>
+    <p class="cl-aide">Les profils ne sont jamais publiés. 1) Vérifie le profil et la pièce d’identité, puis « Valider » : la pièce d’identité est supprimée. 2) Exporte vers ton outil et fais le matching. 3) Indique le nombre de profils compatibles et « Envoyer le résultat » : la personne reçoit ce nombre par email (sans savoir qui), avec l’invitation à t’écrire (première mise en relation offerte, ensuite abonnement).</p>
     <div class="cl-carte cl-export">
       <h3>↪ Vers mon outil de matching</h3>
       <p class="cl-aide">Les réponses du formulaire suivent exactement les champs de ton outil. Télécharge le fichier, puis dans l’outil : la liste des profils, bouton « Import CSV/JSON », et choisis ce fichier. Les profils déjà importés ne sont pas dupliqués.</p>
@@ -1260,8 +1260,8 @@ page(
 page(
   '/patio/',
   layout({
-    title: 'Annonces de rencontre sérieuses · Le Patio de Lamia Femme Berbère',
-    description: 'Annonces de rencontre vérifiées par Lamia : dépose ton portrait et la personne que tu cherches, en vue du mariage. Identité contrôlée, coordonnées jamais affichées.',
+    title: 'Trouve ton âme sœur avec Lamia · Le Patio de Lamia Femme Berbère',
+    description: 'Confie ton profil à Lamia : elle le vérifie et le passe dans son outil de matching pour te dire avec combien de personnes tu pourrais correspondre. Profils jamais publiés, mise en relation par Lamia, la première offerte.',
     path: '/patio/',
     room: roomBySlug.patio,
     scripts: ['/assets/annonces.js'],
@@ -1270,16 +1270,15 @@ page(
   <p class="prose-lead">${esc(P.patio.intro)}</p>
   <div class="annonce-intro" id="annonces">
     <div>
-      <p class="now-room">Les annonces de la communauté</p>
+      <p class="now-room">Trouve ton âme sœur avec Lamia</p>
       <h2>Et si ta belle rencontre commençait ici ?</h2>
-      <p>Dans le Patio, chacune et chacun peut déposer son annonce : un portrait sincère, une ou deux photos (ou une petite vidéo), et la personne qu’on espère rencontrer. Lamia lit chaque annonce elle-même et vérifie l’identité de chaque personne avant de la publier. Tes coordonnées ne sont jamais affichées : quand une annonce te touche, tu écris à Lamia, et c’est elle qui fait le lien, avec douceur et discrétion.</p>
-      <p><button type="button" class="btn btn-ink" data-annonce-ouvrir aria-expanded="false">💌 Je dépose mon annonce</button> <a class="btn btn-line" href="#annonces-liste">Voir les annonces</a></p>
+      <p>Confie ton profil à Lamia : ton portrait, une ou deux photos (ou une petite vidéo), et la personne que tu espères rencontrer. Ton profil n’est <strong>jamais publié</strong> : il reste chez Lamia, qui vérifie ton identité puis le passe dans son outil de matching.</p>
+      <p>Tu reçois ensuite le nombre de personnes avec qui tu pourrais correspondre, sans savoir qui elles sont : personne ne sait qui matche avec qui, sauf Lamia. Écris-lui pour en prendre connaissance. <strong>Ta première mise en relation est offerte</strong> ; pour en découvrir d’autres, Lamia propose un abonnement.</p>
+      <p><button type="button" class="btn btn-ink" data-annonce-ouvrir aria-expanded="false">💌 Je confie mon profil à Lamia</button></p>
     </div>
   </div>
   <div class="annonce-retrait" data-annonce-retrait hidden></div>
   <div class="annonce-box" data-annonce-box hidden></div>
-  <h2 class="annonces-titre" id="annonces-liste">Les annonces vérifiées par Lamia</h2>
-  <div class="annonces-liste" data-annonces-liste><p class="annonce-vide">Les annonces arrivent…</p></div>
   <div class="now-grid">
     <article class="now-card" data-accent="rouge"><p class="now-room">Chaque soir</p><h3>Live Mariage Kabyle</h3><p>De 21 h à 23 h, sur TikTok.</p><a href="https://www.tiktok.com/@lamiaberbere" rel="noopener" target="_blank">Rejoindre le live</a></article>
     <article class="now-card" data-accent="rouge" data-next-event><p class="now-room">Le Boudoir des Rencontres</p><h3>Prochaine soirée</h3><p>Les prochaines soirées arrivent.</p><a href="/speed-dating/">Voir les soirées</a></article>

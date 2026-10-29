@@ -112,13 +112,13 @@ export function formulaireHtml() {
       <label>Ton TikTok, Instagram ou Facebook <small>(lien ou pseudo)</small><input name="contactReseau" maxlength="200" placeholder="@tonpseudo ou lien"></label>
     </div>
     <p class="annonce-aide">Laisse au moins ton téléphone ou un réseau social : c’est par là que Lamia te contactera pour une mise en relation.</p>
-    <p class="annonce-aide">Tes coordonnées ne sont jamais affichées. Quand quelqu’un s’intéresse à ton annonce, c’est Lamia qui reçoit le message et qui fait le lien, en douceur.</p>
+    <p class="annonce-aide">Tes coordonnées ne sont jamais affichées ni transmises : c’est Lamia qui te contacte pour une mise en relation.</p>
   </div>
   <label class="annonce-case"><input type="checkbox" name="majeur"> <span>J’ai 18 ans ou plus et cette annonce est sincère : je cherche une vraie rencontre.</span></label>
-  <label class="annonce-case"><input type="checkbox" name="publication"> <span>J’accepte que mon prénom, mon âge, ma ville, mes textes et mes photos ou ma vidéo soient publiés dans le Patio après vérification par Lamia. Je peux retirer mon annonce à tout moment.</span></label>
-  <label class="annonce-case"><input type="checkbox" name="identite_ok"> <span>J’accepte que Lamia voie la photo de ma pièce d’identité pour vérifier mon annonce, sachant qu’elle est supprimée juste après. <a href="/confidentialite/" target="_blank" rel="noopener">Confidentialité</a></span></label>
+  <label class="annonce-case"><input type="checkbox" name="publication"> <span>Je confie mon profil à Lamia : il n’est publié nulle part, seule Lamia le voit et l’utilise dans son outil de matching pour me proposer des mises en relation. Je peux le retirer et faire effacer mes données à tout moment.</span></label>
+  <label class="annonce-case"><input type="checkbox" name="identite_ok"> <span>J’accepte que Lamia voie la photo de ma pièce d’identité pour vérifier mon profil, sachant qu’elle est supprimée juste après. <a href="/confidentialite/" target="_blank" rel="noopener">Confidentialité</a></span></label>
   <input class="hp" name="zz_site" tabindex="-1" autocomplete="off" aria-hidden="true">
-  <button class="btn btn-ink annonce-envoyer" type="submit">💌 Envoyer mon annonce à Lamia</button>
+  <button class="btn btn-ink annonce-envoyer" type="submit">💌 Confier mon profil à Lamia</button>
   <p class="form-status" role="status" data-annonce-statut></p>
 </form>`;
 }
@@ -201,7 +201,7 @@ export function monterFormulaire(box) {
       }
       const fin = res.annonce_id ? await api({ action: 'annonce_finaliser', annonce_id: res.annonce_id, token: res.token }) : {};
       window.lfbEvent?.('annonce_deposee');
-      box.innerHTML = `<div class="annonce-merci"><p class="annonce-coeur" aria-hidden="true">💌</p><h3>Merci ${esc(f.prenom.value.trim())}, ton annonce est bien arrivée${fin.ref ? ` (n° ${fin.ref})` : ''} !</h3><p>Lamia la lit elle-même et vérifie ta pièce d’identité, puis la publie dans le Patio. Tu reçois un email dès qu’elle est en ligne, avec un lien pour la retirer quand tu veux.</p><p>En attendant, tu peux <a href="/speed-dating/">t’inscrire à la prochaine soirée</a> ou <a href="/confidences/">écrire à Lamia</a>.</p></div>`;
+      box.innerHTML = `<div class="annonce-merci"><p class="annonce-coeur" aria-hidden="true">💌</p><h3>Merci ${esc(f.prenom.value.trim())}, ton profil est bien arrivé chez Lamia${fin.ref ? ` (n° ${fin.ref})` : ''} !</h3><p>Il n’est publié nulle part. Lamia vérifie ton identité, puis passe ton profil dans son outil de matching. Tu recevras par email le nombre de personnes avec qui tu pourrais correspondre, et tu pourras lui écrire pour les découvrir. Ta première mise en relation est offerte.</p><p>En attendant, tu peux <a href="/speed-dating/">t’inscrire à la prochaine soirée</a> ou <a href="/confidences/">écrire à Lamia</a>.</p></div>`;
     } catch (err) {
       btn.disabled = false;
       say(st, ERR[err.code] || 'L’envoi n’a pas abouti. Vérifie ta connexion et réessaie dans un instant.', true);
@@ -247,16 +247,14 @@ export async function retraitDepuisLien() {
   const zone = document.querySelector('[data-annonce-retrait]');
   if (!zone) return;
   zone.hidden = false;
-  zone.innerHTML = '<p>Tu veux retirer ton annonce du Patio ? Tes textes, tes photos et ta vidéo seront effacés.</p><p><button type="button" class="btn btn-ink" data-retirer-ok>Oui, retirer mon annonce</button></p><p class="form-status" data-retrait-statut></p>';
+  zone.innerHTML = '<p>Tu veux retirer ton profil ? Tes textes, tes photos et ta vidéo seront effacés.</p><p><button type="button" class="btn btn-ink" data-retirer-ok>Oui, retirer mon profil</button></p><p class="form-status" data-retrait-statut></p>';
   zone.querySelector('[data-retirer-ok]').addEventListener('click', async () => {
-    try { await api({ action: 'annonce_retirer', annonce_id: id, token }); zone.innerHTML = '<p>C’est fait : ton annonce est retirée et tes photos sont effacées. Lamia te souhaite le meilleur 💛</p>'; }
+    try { await api({ action: 'annonce_retirer', annonce_id: id, token }); zone.innerHTML = '<p>C’est fait : ton profil est retiré et tes photos sont effacées. Lamia te souhaite le meilleur 💛</p>'; }
     catch { say(zone.querySelector('[data-retrait-statut]'), 'Ce lien ne fonctionne pas. Écris à Lamia dans les Confidences, elle retirera ton annonce.', true); }
   });
 }
 
 // Montage automatique sur les pages qui ont les emplacements (Patio).
-const liste = document.querySelector('[data-annonces-liste]');
-if (liste) monterListe(liste);
 retraitDepuisLien();
 document.querySelectorAll('[data-annonce-ouvrir]').forEach((b) => b.addEventListener('click', () => {
   const box = document.querySelector('[data-annonce-box]');

@@ -211,7 +211,7 @@ supabase.auth.onAuthStateChange((event) => { if (event === 'SIGNED_OUT') vue('lo
 demarrer();
 
 // ---------------------------------------------------------------- annonces de rencontre à vérifier
-const STATUT_ANNONCE = { a_verifier: 'À vérifier', publiee: 'En ligne', refusee: 'Refusée' };
+const STATUT_ANNONCE = { a_verifier: 'À vérifier', publiee: 'Validé', refusee: 'Refusé' };
 let dernieresAnnonces = [];
 async function chargerAnnonces() {
   const box = $('[data-annonces]');
@@ -234,10 +234,11 @@ async function chargerAnnonces() {
       ${a.exportee_at ? `<p class="cl-aide">↪ Exportée vers l’outil de matching le ${quand(a.exportee_at)}</p>` : ''}
       <p><b>Qui je suis</b><br>${esc(a.profil)}</p>
       <p><b>Qui je cherche</b>${a.age_min || a.age_max ? ` (${a.age_min || 18}-${a.age_max || 99} ans)` : ''}<br>${esc(a.recherche)}</p>
-      <label>Un mot pour la personne <small>(envoyé par email en cas de refus)</small><input data-note maxlength="600" value="${esc(a.note_lamia || '')}"></label>
+      ${a.status === 'publiee' ? `<div class="cl-resultat"><label>Profils compatibles trouvés dans ton outil<input data-nb type="number" min="0" max="9999" inputmode="numeric" value="${a.nb_compatibles ?? ''}"></label><button class="cl-btn cl-plein" type="button" data-decision="resultat">Envoyer le résultat</button>${a.resultat_envoye_at ? `<small>Envoyé le ${quand(a.resultat_envoye_at)} (${a.nb_compatibles} profil(s))</small>` : ''}</div>` : ''}
+      <label>Un mot pour la personne <small>(ajouté à l’email de résultat ou de refus)</small><input data-note maxlength="600" value="${esc(a.note_lamia || '')}"></label>
       <div class="cl-outils">
-        ${a.status !== 'publiee' ? '<button class="cl-btn cl-plein" type="button" data-decision="publier">✓ Publier</button>' : ''}
-        ${a.status !== 'refusee' ? `<button class="cl-btn" type="button" data-decision="refuser">${a.status === 'publiee' ? 'Retirer du site' : 'Refuser'}</button>` : ''}
+        ${a.status !== 'publiee' ? '<button class="cl-btn cl-plein" type="button" data-decision="publier">✓ Valider le profil</button>' : ''}
+        ${a.status !== 'refusee' ? `<button class="cl-btn" type="button" data-decision="refuser">${a.status === 'publiee' ? 'Retirer le profil' : 'Refuser'}</button>` : ''}
         ${a.status === 'publiee' ? '<button class="cl-btn" type="button" data-exporter-une>↪ Fiche pour l’outil de matching</button>' : ''}
         <button class="cl-btn" type="button" data-decision="supprimer">Supprimer définitivement</button>
       </div>
@@ -251,9 +252,10 @@ document.addEventListener('click', async (e) => {
   const carte = b.closest('[data-id]'), st = carte.querySelector('[data-annonce-statut]');
   const d = b.dataset.decision;
   if (d === 'supprimer' && !confirm('Supprimer définitivement cette annonce et ses fichiers ?')) return;
-  if (d === 'refuser' && !confirm('Refuser cette annonce ? Les photos et la pièce d’identité seront supprimées et la personne prévenue par email.')) return;
+  if (d === 'refuser' && !confirm('Refuser ce profil ? Les photos et la pièce d’identité seront supprimées et la personne prévenue par email.')) return;
+  if (d === 'resultat') { const nb = carte.querySelector('[data-nb]')?.value; if (nb === '' || nb == null) return say(st, 'Indique le nombre de profils compatibles.', true); if (!confirm(`Envoyer à cette personne : ${nb} profil(s) compatible(s) ?`)) return; }
   say(st, 'Un instant…');
-  try { await api({ action: 'annonce_moderer', annonce_id: carte.dataset.id, decision: d, note: carte.querySelector('[data-note]').value }, await jetonFrais()); await chargerAnnonces(); }
+  try { await api({ action: 'annonce_moderer', annonce_id: carte.dataset.id, decision: d, note: carte.querySelector('[data-note]').value, nb: carte.querySelector('[data-nb]')?.value }, await jetonFrais()); await chargerAnnonces(); }
   catch (err) { say(st, erreur(err.code), true); }
 });
 $('[data-ouvrir-annonces]')?.addEventListener('click', () => { location.hash = 'annonces'; });
