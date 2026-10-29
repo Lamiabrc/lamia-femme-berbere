@@ -15,7 +15,7 @@ export const floors = [
 
 export const rooms = [
   // ---------- rez-de-chaussée : la vente
-  { slug: 'hall', path: '/', floor: 0, name: 'Le Hall', welcome: 'Bienvenue chez Lamia.', headline: 'Entrez dans l’univers de Lamia Femme Berbère',
+  { slug: 'hall', path: '/', floor: 0, name: 'Le Hall', welcome: 'Bienvenue chez Lamia.', headline: 'Trouve ton âme sœur kabyle, avec Lamia',
     summary: 'Bijoux kabyles, livres, brocante, rencontres, lives et créations : la Maison réunit l’univers de Lamia entre Kabylie, Algérie et France.', status: 'open', accent: 'rouge' },
   { slug: 'ecrin', path: '/ecrin/', floor: 0, name: 'L’Écrin', welcome: 'Les bijoux qui racontent d’où l’on vient.', headline: 'Bijoux kabyles artisanaux et créations d’Ath Yenni',
     summary: 'La collection exclusive de bijoux kabyles de la Maison, fabriquée à Ath Yenni par ses artisans bijoutiers.', status: 'open', accent: 'vert', productCategories: ['bijoux'] },
@@ -26,7 +26,7 @@ export const rooms = [
   { slug: 'coiffeuse', path: '/coiffeuse/', floor: 0, name: 'La Coiffeuse de Lamia', welcome: 'Le rouge, les bijoux, les gestes qui nous ressemblent.',
     summary: 'Le rouge à lèvres signature de Lamia et le maquillage. En préparation.', status: 'soon', accent: 'rouge' },
 
-  { slug: 'patio', path: '/patio/', floor: 0, name: 'Le Patio', welcome: 'La cour de la Maison, où l’on se retrouve.', headline: 'Trouve ton âme sœur avec Lamia',
+  { slug: 'patio', path: '/rencontres/', floor: 0, name: 'Les Rencontres', welcome: 'Trouver l’âme sœur, en confiance.', headline: 'Rencontres kabyles sérieuses, profils vérifiés',
     summary: 'Confie ton profil à Lamia, découvre des profils vérifiés et anonymes, et laisse-la faire le lien, en toute discrétion.', status: 'open', accent: 'vert' },
 
   // ---------- premier étage : rencontres, parole, lecture
@@ -40,7 +40,7 @@ export const rooms = [
     summary: 'Se confier à Lamia par écrit, par message vocal ou en conversation privée, et lui signaler un profil en toute discrétion.', status: 'open', accent: 'cobalt' },
 
   // ---------- deuxième étage : trouvailles, galerie, atelier, communauté
-  { slug: 'grenier', path: '/grenier/', floor: 2, name: 'Le Grenier des Trouvailles', welcome: 'Ce que j’ai déniché pour toi.', headline: 'Brocante, objets anciens et coups de cœur de Lamia',
+  { slug: 'grenier', path: '/grenier/', floor: 2, name: 'Trouvailles vintage', welcome: 'Ce que j’ai déniché pour toi.', headline: 'Brocante, objets anciens et coups de cœur de Lamia',
     summary: 'Disques, cartes postales, objets français, souvenirs kabyles, décoration, cadres, bibelots et pièces chinées : le Grenier rassemble mes trouvailles au fil des brocantes et des voyages.', status: 'open', accent: 'safran', productCategories: ['trouvailles'] },
   { slug: 'galerie', path: '/galerie/', floor: 2, name: 'La Galerie', welcome: 'Regarder, comprendre, transmettre.',
     summary: 'Le patrimoine des bijoux kabyles, l’émail, les symboles, et les créations de la Maison.', status: 'open', accent: 'safran' },

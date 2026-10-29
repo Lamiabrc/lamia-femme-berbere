@@ -2996,3 +2996,38 @@ a.po-btn { display: inline-block; text-decoration: none; }
 .abo-form[hidden] { display: none !important; }
 /* En-tête plus large sur grand écran, pour que « Annonces de mariage » tienne dans le menu */
 @media (min-width: 1361px) { .site-header { padding-left: max(24px, calc((100% - 1480px) / 2)) !important; padding-right: max(24px, calc((100% - 1480px) / 2)) !important; } .site-header .site-nav { gap: 16px; } }
+
+/* ================= Refonte : un message, peu de clics ================= */
+.cta-profil { display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: 999px; background: linear-gradient(90deg, #92283f, #b23a52); color: #fff !important; font-weight: 700; font-size: 14px; text-decoration: none; white-space: nowrap; box-shadow: 0 6px 16px rgba(146,40,63,.28); }
+.cta-profil:hover { filter: brightness(1.08); }
+@media (max-width: 640px) { .header-actions .account-link { display: none; } .cta-profil { padding: 8px 12px; font-size: 13px; } }
+@media (max-width: 374px) { .cta-profil { font-size: 0; gap: 0; padding: 8px 12px; } .cta-profil::after { content: 'Mon profil'; font-size: 13px; margin-left: 4px; } }
+/* Accueil */
+.accueil-hero { padding-top: 84px; }
+.accueil-hero h1 { font-size: clamp(36px, 5.4vw, 64px); }
+.accueil-preuves { list-style: none; margin: 22px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.accueil-preuves li { color: #ffe9d2; font-size: 14px; font-weight: 500; text-shadow: 0 1px 6px rgba(0,0,0,.7); }
+.accueil-corps { display: grid; gap: 30px; }
+.accueil-bloc .annonces-titre { margin-top: 0; }
+.accueil-bloc .po-actions, .accueil-corps .patio-etapes .po-actions { justify-content: center; }
+.abo-mini { text-decoration: none; gap: 8px; }
+.abo-mini h3 { font-size: 22px; }
+.abo-mini .abo-prix { font-size: 24px; margin: 0; }
+.abo-mini .po-btn { text-align: center; margin-top: 4px; }
+.abo-mini:hover { transform: translateY(-3px); transition: transform .2s; }
+.accueil-duo { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 16px; }
+.accueil-carte { text-decoration: none; }
+.accueil-carte h3 { font-size: 24px; }
+.accueil-carte p { margin: 0; flex: 1; color: #f3ddd4 !important; }
+.accueil-carte .po-btn-verre { text-align: center; }
+.accueil-univers { max-width: 1180px; margin: 0 auto; padding: clamp(40px, 6vw, 72px) var(--gouttiere) 10px; }
+.accueil-univers h2 { margin: 0 0 18px; }
+.accueil-univers-grille { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: 18px; }
+.accueil-univers-carte { display: grid; grid-template-columns: 120px 1fr; gap: 16px; align-items: center; padding: 14px; border-radius: 18px; background: #fffaf2; border: 1px solid #ead9bd; text-decoration: none; color: #2a2024; }
+.accueil-univers-carte img { width: 120px; height: 150px; object-fit: cover; border-radius: 12px; }
+.accueil-univers-carte strong { display: block; font-family: var(--serif); font-size: 22px; margin-bottom: 6px; color: #2a2024; }
+.accueil-univers-carte span { color: #4a3b40; line-height: 1.5; }
+.accueil-univers-carte:hover { border-color: #c9a24f; }
+@media (min-width: 1340px) { .site-header .site-nav { display: flex !important; } .site-header .plan-link { display: none; } .site-header { padding-left: max(20px, calc((100% - 1480px) / 2)) !important; padding-right: max(20px, calc((100% - 1480px) / 2)) !important; } }
+@media (max-width: 760px) { .accueil-hero .po-lamia { order: 0; } .accueil-hero .po-lamia img { width: 120px; } .accueil-hero { padding-top: 64px; } }
+.passerelle { margin-top: 22px; padding: 12px 16px; border-radius: 12px; background: #fff5f0; border: 1px solid #ecd2c4; font-size: 14px; color: #4a3b40; } .passerelle a { color: #92283f; font-weight: 600; }

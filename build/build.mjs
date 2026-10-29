@@ -174,24 +174,24 @@ function header(room) {
     <span><strong>Lamia</strong> Femme Berbère</span>
   </a>
   <nav class="site-nav" aria-label="Navigation principale">
-    ${link('/', 'Accueil', 'hall')}
-    ${link('/patio/', 'Annonces de mariage', 'patio')}
-    ${link('/boutique/', 'Boutique', 'boutique')}
-    ${link('/ecrin/', 'Bijoux kabyles', 'ecrin')}
-    ${link('/bibliotheque/', 'Livres', 'bibliotheque')}
-    ${link('/speed-dating/', 'Speed Dating', 'speed-dating')}
+    ${link('/rencontres/', 'Rencontres', 'patio')}
+    ${link('/speed-dating/', 'Speed dating', 'speed-dating')}
+    ${link('/abonnement/', 'Formules', 'abonnement')}
     ${link('/salon/', 'Lives', 'salon')}
+    ${link('/ecrin/', 'Bijoux kabyles', 'ecrin')}
+    ${link('/bibliotheque/', 'Livre', 'bibliotheque')}
   </nav>
   <div class="header-actions">
     <details class="maison-menu" data-maison-menu>
-      <summary>La Maison <span aria-hidden="true">▾</span></summary>
+      <summary>Menu <span aria-hidden="true">▾</span></summary>
       <div class="maison-menu-panneau">
-        ${floors.map((f) => `<div class="maison-menu-etage"><p>${esc(f.name)}</p><ul>${rooms.filter((r) => r.floor === f.level).map((r) => `<li${r.status === 'soon' ? ' class="is-soon"' : ''}><a href="${r.path}"${room?.slug === r.slug ? ' aria-current="page"' : ''}><strong>${esc(r.name)}</strong>${r.status === 'soon' ? '<em>bientôt</em>' : ''}</a></li>`).join('')}</ul></div>`).join('')}
-        <div class="maison-menu-etage"><p>Lamia</p><ul><li><a href="/lamia-brechet/"><strong>Qui est Lamia</strong></a></li><li><a href="/abonnement/"><strong>Les formules âme sœur</strong></a></li><li><a href="/werdi-ouvre-les-yeux/"><strong>Le livre Werdi</strong></a></li><li><a href="/mon-espace/"><strong>Mon espace</strong></a></li><li><a href="/#plan"><strong>Le plan de la Maison</strong></a></li></ul></div>
+        <div class="maison-menu-etage"><p>Rencontres</p><ul><li><a href="/rencontres/#profils-anonymes"><strong>Les profils</strong></a></li><li><a href="/rencontres/#confier"><strong>Confier mon profil</strong></a></li><li><a href="/speed-dating/"><strong>Speed dating</strong></a></li><li><a href="/abonnement/"><strong>Les formules</strong></a></li><li><a href="/salon/"><strong>Le live</strong></a></li><li><a href="/confidences/"><strong>Écrire à Lamia</strong></a></li></ul></div>
+        <div class="maison-menu-etage"><p>L’univers de Lamia</p><ul><li><a href="/lamia-brechet/"><strong>Qui est Lamia</strong></a></li><li><a href="/ecrin/"><strong>Bijoux kabyles</strong></a></li><li><a href="/werdi-ouvre-les-yeux/"><strong>Le livre Werdi</strong></a></li><li><a href="/boutique/"><strong>La boutique</strong></a></li><li><a href="/galerie/"><strong>La galerie</strong></a></li></ul></div>
+        <div class="maison-menu-etage"><p>Mon compte</p><ul><li><a href="/mon-espace/"><strong>Mon espace</strong></a></li><li><a href="/application/"><strong>L’application</strong></a></li></ul></div>
       </div>
     </details>
     <a class="account-link" href="/mon-espace/" data-account-link>Se connecter</a>
-    <a class="alert-link" href="/confidences/">Me confier</a>
+    <a class="cta-profil" href="/rencontres/#confier">💌 Confier mon profil</a>
   </div>
 </header>`;
 }
@@ -201,11 +201,13 @@ function footer() {
 <footer class="site-footer">
   <div class="footer-house">
     <p class="footer-sign">ⵣ</p>
-    <p>La Maison Lamia Femme Berbère<br>Mémoire, transmission, création.</p>
+    <p>Lamia Femme Berbère<br>Les rencontres sérieuses de Lamia, marieuse kabyle.</p>
   </div>
-  <nav aria-label="Toutes les pièces">
-    <p class="footer-title">Les pièces</p>
-    <ul>${rooms.map((r) => `<li><a href="${r.path}">${esc(r.name)}${r.status === 'soon' ? ' <small>(bientôt)</small>' : ''}</a></li>`).join('')}</ul>
+  <nav aria-label="Rencontres">
+    <p class="footer-title">Rencontres</p>
+    <ul><li><a href="/rencontres/">Rencontres kabyles sérieuses</a></li><li><a href="/rencontres/#confier">Confier mon profil</a></li><li><a href="/speed-dating/">Speed dating</a></li><li><a href="/abonnement/">Les formules</a></li><li><a href="/salon/">Le live chaque soir</a></li><li><a href="/confidences/">Écrire à Lamia</a></li></ul>
+    <p class="footer-title">Boutique</p>
+    <ul><li><a href="/ecrin/">Bijoux kabyles d’Ath Yenni</a></li><li><a href="/bibliotheque/">Le livre Werdi</a></li><li><a href="/grenier/">Trouvailles vintage</a></li></ul>
   </nav>
   <div>
     <p class="footer-title">Lamia</p>
@@ -289,151 +291,84 @@ globalThis.__pageFr = page;
 page(
   '/',
   layout({
-    title: 'Lamia Femme Berbère | Speed Dating & Rencontre Célibataire Kabyle',
-    description: 'Découvrez Lamia Femme Berbère, pour des rencontres sérieuses entre célibataires kabyles et maghrébins. Participez à nos soirées de speed dating en visio pour trouver l’amour et le mariage.',
+    title: 'Rencontre kabyle sérieuse en vue du mariage · Lamia, marieuse kabyle',
+    description: 'Trouve ton âme sœur kabyle avec Lamia : profils vérifiés par pièce d’identité, mises en relation faites par Lamia, speed dating en ligne et live chaque soir. Première mise en relation offerte.',
     path: '/',
     room: roomBySlug.hall,
-    body: `<section class="entree" data-entree aria-label="Entrer dans la Maison">
-  <div class="entree-scene">
-    <div class="entree-cam" data-entree-cam>
-      <a class="porte-ame" href="/patio/" data-porte-ame><span class="porte-ame-texte">${esc(T('hall.ame-soeur', 'Le Hall', 'Phrase sous le portrait de Lamia', 'Trouve ton âme sœur avec Lamia et son outil de matching IA'))}</span><span class="porte-ame-btn">💌 J’entre</span></a>
-      ${IMGT('image.hall.entree', 'Le Hall', 'Image de la maison (entrée du site)', `<img class="entree-img" src="/images/maison/maison-kabyle-1376.webp" srcset="/images/maison/maison-kabyle-800.webp 800w, /images/maison/maison-kabyle-1200.webp 1200w, /images/maison/maison-kabyle-1376.webp 1376w" sizes="(max-width: 700px) 200vw, 100vw" width="1376" height="768" alt="La Maison de Lamia en Kabylie, sa porte ouverte et lumineuse" fetchpriority="high" decoding="async">`)}
+    scripts: ['/assets/annonces.js'],
+    body: `<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,500&display=swap">
+<div class="po-app accueil">
+<section class="po-hero accueil-hero" aria-labelledby="accueil-titre">
+  <div class="po-fond" aria-hidden="true"></div>
+  <div class="po-garland" aria-hidden="true">
+    <svg viewBox="0 0 1000 40" preserveAspectRatio="none"><path d="M0,3 Q500,23 1000,3" fill="none" stroke="#cdb372" stroke-width="2.2" vector-effect="non-scaling-stroke"/></svg>
+    ${['j6','j3','j5','j7','j3','j5','j6','j7','j3'].map((k, i, a) => { const t = (i + 1) / (a.length + 1); return `<span class="po-gj" style="left:${(t * 100).toFixed(1)}%;top:${(7 + 40 * t * (1 - t)).toFixed(1)}px;--d:${(2.6 + ((i * 37) % 17) / 10).toFixed(1)}s;--l:-${(((i * 53) % 30) / 10).toFixed(1)}s"><img src="/images/outil/${k}.webp" alt=""></span>`; }).join('')}
+  </div>
+  <div class="po-hero-grid">
+    <div class="po-hero-texte">
+      <p class="po-eyebrow">${esc(T('accueil.surtitre', 'Accueil', 'Petite ligne au-dessus du titre', 'La marieuse kabyle · rencontres sérieuses'))}</p>
+      <h1 id="accueil-titre">${esc(T('accueil.titre', 'Accueil', 'Grand titre', 'Trouve ton âme sœur kabyle, avec Lamia'))}</h1>
+      <p class="po-sub">${esc(T('accueil.sous-titre', 'Accueil', 'Phrase sous le titre', 'Profils vérifiés. Mises en relation faites par Lamia. En vue du mariage.'))}</p>
+      <p class="po-actions"><a class="po-btn" href="/rencontres/#confier">💌 Je confie mon profil</a><a class="po-btn-verre" href="/rencontres/#profils-anonymes">Voir les profils</a></p>
+      <ul class="accueil-preuves">
+        <li>✓ Identité vérifiée pour chaque profil</li>
+        <li>✓ 1re mise en relation offerte</li>
+        <li>✓ Live chaque soir, 21 h</li>
+        <li>✓ France, Algérie, Canada, Europe</li>
+      </ul>
     </div>
-    <span class="entree-stars" aria-hidden="true"></span>
-    <span class="entree-glow" aria-hidden="true"></span>
-    <div class="entree-text">
-      <p class="entree-kicker">La Maison franco-kabyle</p>
-      <h1 class="entree-title">Lamia Femme Berbère<span class="entree-title-sous">${esc(T('hall.titre-sous', 'Le Hall', 'Sous-titre du grand titre', 'Speed Dating & Rencontres Célibataires Kabyles'))}</span></h1>
-      <p class="entree-subtitle">${esc(T('hall.phrase', 'Le Hall', 'Phrase sous le grand titre', 'Trouvez l’amour et le mariage sérieux grâce à l’alliance de la tradition berbère et de la modernité.', true))}</p>
-      <p class="entree-hint">Faites défiler pour pousser la porte</p>
-      <svg width="22" height="34" viewBox="0 0 22 34" aria-hidden="true"><path d="M2 4l9 9 9-9M2 17l9 9 9-9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </div>
-    <span class="entree-lumiere" aria-hidden="true"></span>
-    <a class="entree-skip" href="#hall">Entrer directement</a>
-  </div>
-</section>
-
-<section class="ame-soeur" id="ame-soeur" aria-labelledby="ame-soeur-titre">
-  <figure class="ame-soeur-portrait"><img src="/images/lamia/lamia-tatouages-480.webp" width="480" height="600" alt="Lamia Femme Berbère" loading="lazy"></figure>
-  <div class="ame-soeur-texte">
-    <p class="ame-soeur-kicker">Profils vérifiés et confidentiels</p>
-    <h2 id="ame-soeur-titre">${esc(T('hall.ame-soeur', 'Le Hall', 'Phrase sous le portrait de Lamia', 'Trouve ton âme sœur avec Lamia et son outil de matching IA'))}</h2>
-    <p>Confie ton profil à Lamia : ton portrait, une ou deux photos, et la personne que tu espères rencontrer. Rien n’est publié. Lamia vérifie ton identité, passe ton profil dans son outil de matching et te dit avec combien de personnes tu pourrais correspondre. Pour les découvrir, tu lui écris : c’est elle qui fait le lien, en toute discrétion. La première mise en relation est offerte.</p>
-    <p class="ame-soeur-actions"><a class="ame-soeur-btn" href="/patio/#annonces">💌 Je confie mon profil à Lamia</a><a class="ame-soeur-lien" href="/confidences/">Écrire à Lamia</a><a class="ame-soeur-lien" href="/speed-dating/">Le speed dating</a></p>
-  </div>
-</section>
-
-<section class="hall-hero" id="hall">
-  <div class="hall-copy">
-    <p class="room-name"><span class="pip" aria-hidden="true"></span>Le Hall</p>
-    <h2>Le Hall — Entrez dans l’univers de Lamia Femme Berbère</h2>
-    <p class="lead">Bijoux kabyles, livres, brocante, speed dating, lives et créations : cette Maison rassemble l’univers de Lamia entre Kabylie, Algérie et France.</p>
-    <p class="hall-actions"><a class="btn btn-ink" href="#plan">Visiter la Maison</a><a class="btn btn-line" href="/lamia-brechet/">Qui est Lamia</a></p>
-  </div>
-  <div class="hall-stage">
-    <span class="arch-shadow" aria-hidden="true"></span>
-    <figure class="hall-arch hall-arch-lamia">
-      <picture>
-        ${IMGT('image.hall.portrait', 'Le Hall', 'Portrait de Lamia dans l’arche', `<img src="/images/lamia/lamia-portrait-tatouages-creme-480.webp" width="480" height="600" loading="eager" alt="Lamia Femme Berbère, portrait réel">`)}
-      </picture>
-      <figcaption><strong>Lamia</strong><span>Je vous ouvre la porte de ma Maison.</span></figcaption>
+    <figure class="po-lamia">
+      <img src="/images/lamia/lamia-portrait-tatouages-rond-480.webp" alt="Lamia Femme Berbère, marieuse kabyle" width="240" height="240" fetchpriority="high">
+      <figcaption>Lamia · ta marieuse</figcaption>
     </figure>
-    <figure class="hall-medal">
-      <img src="${esc(imgOr('hall-medal', '/images/collier/collier-kabyle-15g-detail-320.webp'))}" width="320" height="400" alt="Médaillon kabyle émaillé bleu, vert et jaune, corail au centre">
-    </figure>
-    <a class="yemma-signature lamia-signature" href="/lamia-brechet/">Lamia Femme Berbère <span>Découvrir mon histoire →</span></a>
-  </div>
-  <div class="hall-apercus" aria-label="En ce moment dans la Maison">
-    <a class="apercu is-bal" href="/speed-dating/#events-title">
-      <span class="apercu-mask" aria-hidden="true"><svg viewBox="0 0 64 32" width="64" height="32"><path d="M2 8c10-6 20-4 30 4C42 4 52 2 62 8c0 12-8 20-18 20-6 0-9-4-12-8-3 4-6 8-12 8C10 28 2 20 2 8Z" fill="none" stroke="currentColor" stroke-width="2.2"/><ellipse cx="19" cy="15" rx="6" ry="4" fill="currentColor"/><ellipse cx="45" cy="15" rx="6" ry="4" fill="currentColor"/></svg></span>
-      <span class="apercu-kicker">Speed dating · gratuit</span>
-      <strong>Bal masqué de Venise</strong>
-      <span class="apercu-info">Samedi 31 octobre, 21 h · en visio · deux salons par âge, toutes zones réunies · 20 personnes par salon</span>
-      <span class="apercu-cta">Réserver ma place →</span>
-    </a>
-    <a class="apercu" href="/produit/collier-kabyle-argente-emaille-15g/">
-      ${IMGT('image.hall.apercu-collier', 'Le Hall', 'Aperçu : collier', `<img src="/images/collier/collier-kabyle-15g-hero-320.webp" width="320" height="400" alt="" loading="lazy">`)}
-      <span class="apercu-kicker">L’Écrin · précommande</span>
-      <strong>Collier kabyle émaillé</strong>
-      <span class="apercu-info">Modèle de 1974, fabriqué à Ath Yenni<span data-prix="collier-kabyle-argente-emaille-15g"></span></span>
-    </a>
-    <a class="apercu" href="/bibliotheque/">
-      ${IMGT('image.hall.apercu-werdi', 'Le Hall', 'Aperçu : livre Werdi', `<img src="/images/marque/lamia-illu-banquette-560.webp" width="560" height="678" alt="" loading="lazy">`)}
-      <span class="apercu-kicker">La Bibliothèque · précommande</span>
-      <strong>Werdi, ouvre les yeux !</strong>
-      <span class="apercu-info" data-prix-werdi>Livre broché et ebook</span>
-    </a>
-    <a class="apercu" href="/salon/">
-      ${IMGT('image.hall.apercu-live', 'Le Hall', 'Aperçu : live TikTok', `<img src="/images/lamia/lamia-portrait-tatouages-noir-320.webp" width="320" height="400" alt="Lamia Femme Berbère" loading="lazy" class="is-lamia">`)}
-      <span class="apercu-kicker">Le Salon · chaque soir</span>
-      <strong>Live Mariage Kabyle</strong>
-      <span class="apercu-info">De 21 h à 23 h, en multistream sur toutes les plateformes</span>
-    </a>
-  </div>
-
-  <aside class="home-reassurance" aria-label="Informations de commande">
-    <strong>Achetez en toute confiance.</strong>
-    <span>Paiement sécurisé</span>
-    <span>Précommandes suivies avec soin</span>
-    <span>Vous êtes informé(e) par e-mail de l’avancement</span>
-    <span>Livraison depuis la France</span>
-  </aside>
-
-  <a class="hall-cue" href="#univers"><span>Découvrir les univers de la Maison</span><svg width="22" height="34" viewBox="0 0 22 34" aria-hidden="true"><path d="M2 4l9 9 9-9M2 17l9 9 9-9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-</section>
-
-<section class="home-speed" aria-labelledby="home-speed-title">
-  <a class="home-speed-visual home-speed-poster" href="/speed-dating/#events-title" aria-label="Le speed dating de Lamia Femme Berbère : réserver une place">
-    ${IMGT('image.hall.affiche-rencontres', 'Le Hall', 'Affiche du speed dating (partie rencontres)', `<img src="/images/lamia/affiche-boudoir-venise-1149.webp" srcset="/images/lamia/affiche-boudoir-venise-560.webp 560w, /images/lamia/affiche-boudoir-venise-1149.webp 1149w" sizes="(max-width: 820px) 86vw, 430px" width="1149" height="1368" alt="Affiche : le Boudoir des Rencontres, spécial Bal masqué de Venise, speed dating sérieux en ligne avec Lamia" loading="lazy">`)}
-  </a>
-  <div class="home-speed-copy">
-    <p class="home-speed-kicker">Le Boudoir des Rencontres · speed dating kabyle</p>
-    <h2 id="home-speed-title">${esc(T('hall.rencontres-titre', 'Le Hall', 'Partie rencontres : titre', 'Trouvez l’amour et le mariage sérieux'))}</h2>
-    <p class="home-speed-lead">${esc(T('hall.rencontres-texte', 'Le Hall', 'Partie rencontres : premier paragraphe', 'Bienvenue sur Lamia Femme Berbère, un espace dédié aux rencontres sérieuses au sein de la communauté kabyle et maghrébine. Marre des discussions virtuelles sans lendemain sur les applications de rencontre classiques ? Ici, l’humain et l’authenticité reviennent au cœur de la rencontre.', true))}</p>
-    <p class="home-speed-note">${esc(T('hall.rencontres-texte2', 'Le Hall', 'Partie rencontres : deuxième paragraphe', 'À travers nos soirées de speed dating kabyle en visio et nos lives, nous offrons aux célibataires un espace bienveillant, sécurisé et chaleureux pour faire des rencontres authentiques. Notre objectif : vous accompagner pas à pas vers un mariage sérieux et durable, dans le respect des valeurs culturelles et familiales berbères.', true))}</p>
-    <h3 class="home-speed-pourquoi">Pourquoi choisir nos soirées ?</h3>
-    <ul class="home-speed-raisons">
-      <li><strong>Une connexion authentique</strong> : pas de profils fantômes, on échange en direct et en tête-à-tête, caméra allumée.</li>
-      <li><strong>La tradition et la modernité</strong> : deux salons par âge (25-39 ans et 40 ans et plus), qui réunissent l’Algérie, la France, l’Europe et le Canada, pour rencontrer les bonnes personnes.</li>
-      <li><strong>Une communauté engagée</strong> : des participants motivés par la même recherche de stabilité et de mariage, et Lamia qui veille sur chaque soirée.</li>
-    </ul>
-    <ul class="home-speed-meta" aria-label="Prochaine soirée">
-      <li><strong>Première soirée offerte</strong></li>
-      <li>Bal masqué de Venise</li>
-      <li>Samedi 31 octobre · 21 h</li>
-      <li>En visio</li>
-    </ul>
-    <p class="home-speed-actions"><a class="btn home-speed-cta" href="/speed-dating/#events-title">Je m’inscris au prochain speed dating</a><a class="btn home-speed-live" href="https://www.tiktok.com/@lamiafemmeberbere" rel="noopener" target="_blank">Rejoindre le live</a></p>
   </div>
 </section>
 
-<section class="home-universes" id="univers" aria-labelledby="univers-title">
-  <div class="home-universes-intro">
-    <p class="room-name"><span class="pip" aria-hidden="true"></span>Les pièces essentielles</p>
-    <h2 id="univers-title">Que souhaitez-vous découvrir ?</h2>
-    <p>La Maison garde ses pièces et son histoire. Ces cinq portes vous permettent simplement d’aller directement à l’essentiel.</p>
+<section class="po-corps accueil-corps">
+  <div class="patio-etapes">
+    <h2>Comment ça marche</h2>
+    <ol>
+      <li><strong>Tu confies ton profil</strong><span>En 5 minutes : qui tu es, qui tu cherches, une photo. Rien n’est publié avec ton nom.</span></li>
+      <li><strong>Lamia vérifie</strong><span>Elle contrôle ton identité. Les faux profils n’entrent pas.</span></li>
+      <li><strong>Elle cherche pour toi</strong><span>Son outil de matching compare les profils, et Lamia choisit avec son regard.</span></li>
+      <li><strong>Elle vous présente</strong><span>Si vous êtes d’accord tous les deux, elle vous met en contact. La première fois, c’est offert.</span></li>
+    </ol>
+    <p class="po-actions"><a class="po-btn" href="/rencontres/#confier">💌 Je confie mon profil</a></p>
   </div>
-  <div class="home-universes-grid">
-    ${HOME_UNIVERSES.map((u) => `<a class="home-universe-card${u.featured ? ' is-featured' : ''}" href="${u.href}">
-      <span class="home-universe-room">${esc(u.room)}</span>
-      <h3>${esc(u.room)} — ${esc(u.title)}</h3>
-      <p>${esc(u.text)}</p>
-      <span class="home-universe-cta">Découvrir →</span>
-    </a>`).join('')}
+
+  <div class="accueil-bloc">
+    <h2 class="annonces-titre">Ils et elles cherchent aussi</h2>
+    <p class="annonces-sous">Des profils vérifiés, anonymes. Un profil te touche ? Dis-le, Lamia regarde si vous pouvez correspondre.</p>
+    <div class="annonces-liste" data-annonces-liste data-limite="6"><p class="annonce-vide">Les profils arrivent…</p></div>
+    <p class="po-actions"><a class="po-btn-verre" href="/rencontres/#profils-anonymes">Voir tous les profils</a></p>
+  </div>
+
+  <div class="accueil-bloc">
+    <h2 class="annonces-titre">Les formules</h2>
+    <p class="annonces-sous">Sans engagement. La première mise en relation est toujours offerte.</p>
+    <div class="abo-grille">${FORMULES.map((f) => `<a class="abo-carte abo-mini${f.vedette ? ' is-vedette' : ''}" href="${f.mois ? `/abonnement/?formule=${f.id}` : '/rencontres/#confier'}">${f.vedette ? '<span class="abo-ruban">Le plus choisi</span>' : ''}<h3>${esc(f.nom)}</h3><p class="abo-prix">${f.mois ? `${eurosAbo(f.mois)}<small> / mois</small>` : 'Gratuit'}</p><ul>${f.avantages.slice(0, 2).map((a) => `<li>${esc(a)}</li>`).join('')}</ul><span class="po-btn">${f.mois ? `Choisir ${esc(f.nom)}` : 'Commencer'}</span></a>`).join('')}</div>
+  </div>
+
+  <div class="accueil-duo">
+    <a class="abo-carte accueil-carte" href="/speed-dating/">
+      <h3>Speed dating en ligne</h3>
+      <p data-prochaine-soiree>Des soirées en visio par tranche d’âge : quelques minutes de tête-à-tête, caméra allumée, Lamia qui veille.</p>
+      <span class="po-btn-verre">Voir les prochaines soirées</span>
+    </a>
+    <a class="abo-carte accueil-carte" href="/salon/">
+      <h3>Le live, chaque soir à 21 h</h3>
+      <p>Débats, invités et annonces de mariage en direct, sur TikTok, YouTube, Facebook, Instagram et Twitch.</p>
+      <span class="po-btn-verre">Le live et mes outils</span>
+    </a>
   </div>
 </section>
+</div>
 
-<section class="plan-section" id="plan" aria-labelledby="plan-title">
-  <div class="plan-intro">
-    <h2 id="plan-title">Une Maison entre Kabylie et France</h2>
-    <p>Les bijoux et la boutique au rez-de-chaussée, les rencontres, les lives et les livres au premier, les trouvailles tout en haut. Chaque pièce garde son caractère.</p>
-  </div>
-  ${facade(rooms)}
-  <div class="floors">
-    ${[...floors].reverse().map((f) => `<section class="floor" aria-labelledby="etage-${f.level}">
-      <h3 id="etage-${f.level}">${esc(f.name)}<span>${esc(f.theme)}</span></h3>
-      <ul class="room-index">${rooms.filter((r) => r.floor === f.level && r.slug !== 'hall').map((r) => `<li class="${r.status === 'soon' ? 'is-soon' : ''}" data-accent="${r.accent}"><a href="${r.path}"><span class="pip" aria-hidden="true"></span><span class="room-index-copy"><strong>${esc(r.name)}</strong><span>${r.status === 'soon' ? 'Bientôt' : esc(r.welcome)}</span></span></a></li>`).join('')}</ul>
-    </section>`).join('')}
+<section class="accueil-univers" aria-labelledby="univers-titre">
+  <h2 id="univers-titre">L’univers de Lamia</h2>
+  <div class="accueil-univers-grille">
+    <a class="accueil-univers-carte" href="/ecrin/"><img src="/images/collier/collier-kabyle-15g-hero-320.webp" width="320" height="400" alt="Collier kabyle en argent émaillé d’Ath Yenni" loading="lazy"><span><strong>Bijoux kabyles d’Ath Yenni</strong>Argent émaillé et corail, faits main par les artisans du village.</span></a>
+    <a class="accueil-univers-carte" href="/werdi-ouvre-les-yeux/"><img src="/images/marque/lamia-illu-banquette-560.webp" width="560" height="678" alt="Werdi, ouvre les yeux !, le livre de Lamia" loading="lazy"><span><strong>Le livre Werdi, ouvre les yeux !</strong>Les conseils d’une maman kabyle pour aimer avec les yeux ouverts.</span></a>
   </div>
 </section>
 
@@ -442,7 +377,7 @@ page(
   <div>
     <h2 id="story-title">${esc(P.hall.story.title)}</h2>
     ${P.hall.story.paragraphs.map((p) => `<p>${esc(p)}</p>`).join('')}
-    <p><a class="text-link" href="/lamia-brechet/">Rencontrer Lamia et découvrir sa démarche</a></p>
+    <p><a class="text-link" href="/lamia-brechet/">Mon histoire et ma démarche</a></p>
   </div>
 </section>`,
   })
@@ -518,9 +453,9 @@ page(
   <div class="patio-etapes">
     <h2>Comment j’utilise l’outil</h2>
     <ol>
-      <li><strong>Ta fiche est créée</strong><span>En live comme invité, en message privé ou sur le site dans le Patio. Je note ce qui compte : âge, ville, village d’origine, situation, enfants, études, pratique, valeurs, et la personne que tu cherches.</span></li>
+      <li><strong>Ta fiche est créée</strong><span>En live comme invité, en message privé ou sur le site, dans les Rencontres. Je note ce qui compte : âge, ville, village d’origine, situation, enfants, études, pratique, valeurs, et la personne que tu cherches.</span></li>
       <li><strong>Je vérifie</strong><span>Caméra en direct, vidéo, photo ou vocal : un profil n’entre dans le matching qu’une fois vérifié. Les profils douteux sont bloqués.</span></li>
-      <li><strong>L’annonce passe en live</strong><span>Si tu es d’accord, je présente ton annonce à l’écran, sans ton nom ni tes contacts. Les personnes intéressées se signalent, en live ou dans le Patio du site.</span></li>
+      <li><strong>L’annonce passe en live</strong><span>Si tu es d’accord, je présente ton annonce à l’écran, sans ton nom ni tes contacts. Les personnes intéressées se signalent, en live ou dans les Rencontres du site.</span></li>
       <li><strong>Le suivi</strong><span>Chaque fiche a un statut : en attente de match, en match, en stand-by, en couple. Rien ne se perd, et personne n’est proposé à deux personnes en même temps.</span></li>
     </ol>
   </div>
@@ -534,7 +469,7 @@ page(
       <li><strong>La mise en relation</strong><span>Si vous êtes d’accord tous les deux, je vous mets en contact. Ton numéro reste chez moi jusque-là. La première mise en relation est offerte, les suivantes avec une <a href="/abonnement/">formule</a>.</span></li>
       <li><strong>Je vous suis</strong><span>Je prends des nouvelles après la rencontre. Si ça ne colle pas, on clôt le match avec respect et ton profil revient en attente pour une nouvelle chance.</span></li>
     </ol>
-    <p class="po-actions"><a class="po-btn" href="/patio/">💌 Je confie mon profil à Lamia</a><a class="po-btn-verre" href="/patio/#profils-anonymes">Voir les profils anonymes</a></p>
+    <p class="po-actions"><a class="po-btn" href="/rencontres/">💌 Je confie mon profil à Lamia</a><a class="po-btn-verre" href="/rencontres/#profils-anonymes">Voir les profils anonymes</a></p>
   </div>
 </section>
 <section class="salon-replays" id="replays" aria-labelledby="replays-titre">
@@ -620,7 +555,7 @@ ${otherRooms('ecrin')}`,
 page(
   '/grenier/',
   layout({
-    title: 'Le Grenier des Trouvailles · Brocante de Lamia',
+    title: 'Trouvailles vintage : brocante, VHS, verrerie et livres anciens · Lamia',
     description: 'Les coups de cœur de brocante de Lamia : livres anciennes éditions, bibelots, cadres, sculptures, cartes postales, pièces uniques.',
     path: '/grenier/',
     room: roomBySlug.grenier,
@@ -1297,7 +1232,7 @@ page(
     </div>
     <div class="cl-carte cl-export">
       <h3>💌 Matchs demandés <span data-n-demandes></span></h3>
-      <p class="cl-aide">Quand quelqu’un clique sur « Ce profil m’intéresse » dans le Patio puis crée son profil, la demande arrive ici (et tu reçois une alerte). Personne d’autre ne la voit. Elle est aussi notée dans la fiche exportée vers ton outil.</p>
+      <p class="cl-aide">Quand quelqu’un clique sur « Ce profil m’intéresse » dans les Rencontres puis crée son profil, la demande arrive ici (et tu reçois une alerte). Personne d’autre ne la voit. Elle est aussi notée dans la fiche exportée vers ton outil.</p>
       <div data-demandes></div>
     </div>
     <div class="cl-carte cl-export">
@@ -1343,11 +1278,11 @@ page(
 
 // Le Patio
 page(
-  '/patio/',
+  '/rencontres/',
   layout({
-    title: 'Trouve ton âme sœur avec Lamia · Le Patio de Lamia Femme Berbère',
-    description: 'Confie ton profil à Lamia : elle le vérifie et le passe dans son outil de matching pour te dire avec combien de personnes tu pourrais correspondre. Profils jamais publiés, mise en relation par Lamia, la première offerte.',
-    path: '/patio/',
+    title: 'Rencontre kabyle sérieuse : profils vérifiés · Les Rencontres de Lamia',
+    description: 'Rencontre kabyle sérieuse en vue du mariage : confie ton profil à Lamia, marieuse kabyle. Profils vérifiés par pièce d’identité, profils anonymes, mise en relation par Lamia, la première offerte.',
+    path: '/rencontres/',
     room: roomBySlug.patio,
     scripts: ['/assets/annonces.js'],
     body: `<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,500&display=swap">
@@ -1361,47 +1296,42 @@ page(
   </div>
   <div class="po-hero-grid">
     <div class="po-hero-texte">
-      <p class="po-eyebrow">Matching kabyle IA · par Lamia</p>
-      <h1 id="po-titre">${esc(roomBySlug.patio.headline || 'Trouve ton âme sœur avec Lamia')}</h1>
-      <p class="po-sub">L’outil de matching de Lamia, au service des cœurs sincères.</p>
-      <p class="po-lead">${esc(roomBySlug.patio.summary)}</p>
-      <p class="po-actions"><button type="button" class="po-btn" data-annonce-ouvrir aria-expanded="false">💌 Je confie mon profil à Lamia</button><a class="po-btn-verre" href="#profils-anonymes">Voir les profils anonymes</a></p>
+      <p class="po-eyebrow">Les Rencontres de Lamia</p>
+      <h1 id="po-titre">Rencontres kabyles sérieuses, profils vérifiés</h1>
+      <p class="po-sub">Tu confies ton profil, Lamia vérifie, cherche et vous présente.</p>
+      <p class="po-actions"><button type="button" class="po-btn" data-annonce-ouvrir aria-expanded="false">💌 Je confie mon profil</button><a class="po-btn-verre" href="#profils-anonymes">Voir les profils</a></p>
     </div>
     <figure class="po-lamia">
-      <img src="/images/lamia/lamia-portrait-tatouages-rond-480.webp" alt="Lamia Femme Berbère, tatouages berbères et bijoux kabyles" width="240" height="240">
-      <figcaption>Lamia · ton entremetteuse</figcaption>
+      <img src="/images/lamia/lamia-portrait-tatouages-rond-480.webp" alt="Lamia Femme Berbère, marieuse kabyle" width="240" height="240">
+      <figcaption>Lamia · ta marieuse</figcaption>
     </figure>
   </div>
-  <ol class="po-track" aria-label="Les étapes">
-    <li><b></b><span>Ton profil</span></li><li><b></b><span>Vérification</span></li><li><b></b><span>Matching IA</span></li><li><b></b><span>Mise en relation</span></li>
-  </ol>
 </section>
 <section class="room-body patio-body po-corps">
   <div class="annonce-retrait" data-annonce-retrait hidden></div>
-  <div class="annonce-box" data-annonce-box hidden></div>
+  <div class="annonce-box" id="confier" data-annonce-box hidden></div>
   <div class="patio-etapes po-panel" id="annonces">
     <h2>Comment ça marche</h2>
     <ol>
-      <li><strong>Tu confies ton profil</strong><span>Ton portrait, une ou deux photos et la personne que tu espères rencontrer. Ton identité n’est jamais publiée.</span></li>
+      <li><strong>Tu confies ton profil</strong><span>En 5 minutes : qui tu es, qui tu cherches, une photo. Ton identité n’est jamais publiée.</span></li>
       <li><strong>Lamia vérifie</strong><span>Elle contrôle ton identité, puis passe ton profil dans son outil de matching.</span></li>
-      <li><strong>Tu découvres tes correspondances</strong><span>Tu reçois le nombre de personnes qui pourraient te correspondre, sans savoir qui. Personne ne sait qui matche avec qui.</span></li>
-      <li><strong>Lamia fait le lien</strong><span>Si un match te convient, elle te demande ton numéro, qui reste chez elle. La première mise en relation est offerte, les suivantes avec un abonnement.</span></li>
+      <li><strong>Tu sais combien te correspondent</strong><span>Lamia te dit avec combien de personnes tu pourrais correspondre. Personne ne sait qui matche avec qui.</span></li>
+      <li><strong>Lamia vous présente</strong><span>Si vous êtes d’accord tous les deux, elle vous met en contact. Ton numéro reste chez elle jusque-là. La première fois, c’est offert.</span></li>
     </ol>
-    <p class="po-actions"><button type="button" class="po-btn" data-annonce-ouvrir aria-expanded="false">💌 Je confie mon profil à Lamia</button><a class="po-btn-verre" href="/abonnement/">Voir les formules</a></p>
+    <p class="po-actions"><button type="button" class="po-btn" data-annonce-ouvrir aria-expanded="false">💌 Je confie mon profil</button></p>
   </div>
-  <h2 class="annonces-titre" id="profils-anonymes">Des profils vérifiés, en toute discrétion</h2>
-  <p class="annonces-sous">Ni prénom, ni photo, ni contact : seulement des cœurs qui se racontent. Un profil te touche ? Clique sur « Ce profil m’intéresse », crée ton profil, et Lamia regarde si vous pouvez correspondre. Personne ne sait qui s’intéresse à qui.</p>
+  <h2 class="annonces-titre" id="profils-anonymes">Les profils vérifiés</h2>
+  <p class="annonces-sous">Ni prénom, ni photo, ni contact. Un profil te touche ? Clique sur « Ce profil m’intéresse » : Lamia regarde si vous pouvez correspondre. Personne ne sait qui s’intéresse à qui.</p>
   <div class="annonces-liste" data-annonces-liste><p class="annonce-vide">Les profils arrivent…</p></div>
-  <h2 class="annonces-titre">Dans la cour de la Maison</h2>
-  <p class="annonces-sous">${esc(P.patio.intro)}</p>
-  <div class="now-grid">
-    <article class="now-card" data-accent="rouge"><p class="now-room">Chaque soir</p><h3>Live Mariage Kabyle</h3><p>De 21 h à 23 h, en multistream sur toutes les plateformes.</p><a href="/salon/#outil-live">Le live et l’outil de matching</a></article>
-    <article class="now-card" data-accent="rouge" data-next-event><p class="now-room">Le Boudoir des Rencontres</p><h3>Prochaine soirée</h3><p>Les prochaines soirées arrivent.</p><a href="/speed-dating/">Voir les soirées</a></article>
-    <article class="now-card" data-accent="vert"><p class="now-room">Bientôt</p><h3>Vos témoignages</h3><p>Le mur des célébrations et des témoignages ouvrira avec les premiers récits de la communauté.</p></article>
+  <h2 class="annonces-titre">Les formules</h2>
+  <p class="annonces-sous">Sans engagement. La première mise en relation est toujours offerte.</p>
+  <div class="abo-grille">${FORMULES.map((f) => `<a class="abo-carte abo-mini${f.vedette ? ' is-vedette' : ''}" href="${f.mois ? `/abonnement/?formule=${f.id}` : '#confier'}">${f.vedette ? '<span class="abo-ruban">Le plus choisi</span>' : ''}<h3>${esc(f.nom)}</h3><p class="abo-prix">${f.mois ? `${eurosAbo(f.mois)}<small> / mois</small>` : 'Gratuit'}</p><ul>${f.avantages.slice(0, 2).map((x) => `<li>${esc(x)}</li>`).join('')}</ul><span class="po-btn">${f.mois ? `Choisir ${esc(f.nom)}` : 'Commencer'}</span></a>`).join('')}</div>
+  <div class="accueil-duo">
+    <a class="abo-carte accueil-carte" href="/speed-dating/"><h3>Speed dating en ligne</h3><p>Des soirées en visio par tranche d’âge, caméra allumée, avec Lamia qui veille.</p><span class="po-btn-verre">Voir les prochaines soirées</span></a>
+    <a class="abo-carte accueil-carte" href="/salon/"><h3>Le live, chaque soir à 21 h</h3><p>Les annonces de mariage présentées en direct, sur toutes les plateformes.</p><span class="po-btn-verre">Le live et mes outils</span></a>
   </div>
 </section>
-</div>
-${otherRooms('patio')}`,
+</div>`,
   })
 );
 
@@ -1412,7 +1342,7 @@ const carteFormule = (f) => `<article class="abo-carte${f.vedette ? ' is-vedette
   <p class="abo-accroche">${esc(f.accroche)}</p>
   <p class="abo-prix">${f.mois ? `<span data-prix-mois>${eurosAbo(f.mois)}<small> / mois</small></span><span data-prix-an hidden>${eurosAbo(prixAnnuel(f))}<small> / an</small><em>soit 2 mois offerts</em></span>` : 'Gratuit'}</p>
   <ul>${f.avantages.map((a) => `<li>${esc(a)}</li>`).join('')}</ul>
-  ${f.mois ? `<button type="button" class="po-btn" data-choisir="${f.id}">Choisir ${esc(f.nom)}</button>` : '<a class="po-btn-verre" href="/patio/#annonces">Confier mon profil</a>'}
+  ${f.mois ? `<button type="button" class="po-btn" data-choisir="${f.id}">Choisir ${esc(f.nom)}</button>` : '<a class="po-btn-verre" href="/rencontres/#confier">Confier mon profil</a>'}
 </article>`;
 page(
   '/abonnement/',
@@ -1482,7 +1412,7 @@ page(
   <p class="po-eyebrow">Merci</p><h1>Bienvenue, ton cœur est entre de bonnes mains</h1>
   <p class="abo-alerte" data-abo-confirmation>Vérification du paiement…</p>
   <p class="po-lead">Ton paiement est bien reçu. Tu reçois un reçu par email, et Lamia est prévenue. Si ce n’est pas encore fait, confie ton profil à Lamia pour qu’elle puisse chercher la bonne personne.</p>
-  <p class="po-actions"><a class="po-btn" href="/patio/#annonces">💌 Confier mon profil</a><a class="po-btn-verre" href="/mon-espace/">Mon espace</a></p>
+  <p class="po-actions"><a class="po-btn" href="/rencontres/#confier">💌 Confier mon profil</a><a class="po-btn-verre" href="/mon-espace/">Mon espace</a></p>
 </section></div>`,
   })
 );
@@ -1515,6 +1445,7 @@ for (const r of soonRooms) {
       title: `${r.name} · Bientôt dans la Maison`,
       description: r.summary,
       path: r.path,
+      noindex: true,
       room: r,
       body: `<section class="room-head is-soon">
   <p class="room-name"><span class="pip" aria-hidden="true"></span>${esc(r.name)}</p>
@@ -1625,7 +1556,7 @@ page(
       <li><a href="/speed-dating/"><strong>Le Boudoir</strong> pour provoquer de vraies rencontres.</a></li>
       <li><a href="/confidences/"><strong>Les Confidences avec Lamia</strong> pour protéger.</a></li>
       <li><a href="/grenier/"><strong>Le Grenier</strong> pour mes trouvailles et mes coups de cœur.</a></li>
-      <li><a href="/patio/"><strong>Le Patio</strong> pour la communauté.</a></li>
+      <li><a href="/rencontres/"><strong>Les Rencontres</strong> pour trouver l’âme sœur.</a></li>
     </ul>
     <p>Et d’autres portes s’ouvriront encore.</p>
     <p>Parce que cette Maison n’a pas été pensée comme une boutique dans laquelle on vient seulement acheter quelque chose. <strong>Elle a été pensée comme un endroit où l’on vient retrouver Lamia.</strong></p>
@@ -1634,7 +1565,7 @@ page(
   <footer class="lamia-fin">
     <blockquote>« Tu peux être profondément attachée à ce que l’on t’a transmis et rester totalement libre de décider de ce que tu veux en faire. »</blockquote>
     <p class="lamia-bienvenue">Bienvenue chez moi. Bienvenue à la Maison.</p>
-    <p class="lamia-boutons"><a class="btn btn-ink" href="/#hall">Entrer dans la Maison</a><a class="btn btn-line" href="/werdi-ouvre-les-yeux/">Découvrir Werdi</a><a class="btn btn-line" href="/salon/">Retrouver mes lives</a></p>
+    <p class="lamia-boutons"><a class="btn btn-ink" href="/rencontres/">Les Rencontres de Lamia</a><a class="btn btn-line" href="/werdi-ouvre-les-yeux/">Découvrir Werdi</a><a class="btn btn-line" href="/salon/">Retrouver mes lives</a></p>
   </footer>
 </article>
 <script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@type': 'Person', name: 'Lamia Bréchet Ighil', alternateName: 'Lamia Femme Berbère', url: SITE_URL + '/lamia-brechet/', image: SITE_URL + '/images/lamia/lamia-salon-900.webp', sameAs: ['https://www.tiktok.com/@lamiafemmeberbere', 'https://www.facebook.com/femmeberberes/'] })}</script>`,
@@ -1759,7 +1690,7 @@ page(
     description: 'Cette page n’existe pas.',
     path: '/404.html',
     noindex: true,
-    body: `<section class="room-head"><p class="room-name"><span class="pip" aria-hidden="true"></span>Porte introuvable</p><h1>Cette porte ne mène nulle part.</h1><p class="lead">La page a peut-être changé de pièce. Reviens au Hall pour retrouver ton chemin.</p><p><a class="btn btn-ink" href="/#plan">Revenir à la Maison</a></p></section>`,
+    body: `<section class="room-head"><p class="room-name"><span class="pip" aria-hidden="true"></span>Porte introuvable</p><h1>Cette porte ne mène nulle part.</h1><p class="lead">La page a peut-être changé d’adresse.</p><p><a class="btn btn-ink" href="/">Revenir à l’accueil</a> <a class="btn btn-line" href="/rencontres/">Les Rencontres</a></p></section>`,
   })
 );
 
@@ -1815,6 +1746,7 @@ for (const [prod, lang] of CATALOGUE.flatMap((x) => [[x, 'fr'], [produitAnglais(
     ${prod.subtitle ? `<p class="lead">${esc(prod.subtitle)}</p>` : ''}
     <p class="product-price">${lang === 'en' ? `€${esc(prix)}` : `${esc(prix.replace('.', ','))} €`}</p>
     <div class="product-desc">${paragraphes(prod.description)}</div>
+    ${room.slug === 'grenier' && lang === 'fr' ? '<p class="passerelle">Ce grenier est celui de Lamia, marieuse kabyle. <a href="/rencontres/">Découvrir ses rencontres sérieuses</a></p>' : ''}
   </div>
 </section>
 <script type="application/ld+json">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script>`,
@@ -1857,7 +1789,7 @@ await cp(join(ROOT, 'content', 'en', 'products.json'), join(DIST, 'assets', 'i18
 const MOTIFS_EN = JSON.parse(await readFile(join(ROOT, 'content', 'en', 'patterns.json'), 'utf8'));
 await writeFile(join(DIST, 'assets', 'i18n', 'en.json'), JSON.stringify({ strings: STRINGS, pages: [...PAGES_EN], motifs: MOTIFS_EN.motifs, noms: MOTIFS_EN.noms }));
 
-const indexable = pages.filter((p) => !p.path.endsWith('.html') && !p.path.startsWith('/en/produit/') && !['/produit/', '/speed-dating/merci/', '/commande/merci/', '/abonnement/merci/', '/speed-dating/souhaits/', '/cgv/', '/mentions-legales/', '/confidentialite/', '/retours/', '/conditions-utilisation/', '/confidences-lamia/', '/hors-ligne/'].includes(p.path.replace(/^\/en\//, '/')));
+const indexable = pages.filter((p) => !soonRooms.some((r) => p.path.replace(/^\/en\//, '/') === r.path) && !p.path.endsWith('.html') && !p.path.startsWith('/en/produit/') && !['/produit/', '/speed-dating/merci/', '/commande/merci/', '/abonnement/merci/', '/speed-dating/souhaits/', '/cgv/', '/mentions-legales/', '/confidentialite/', '/retours/', '/conditions-utilisation/', '/confidences-lamia/', '/hors-ligne/'].includes(p.path.replace(/^\/en\//, '/')));
 await writeFile(
   join(DIST, 'sitemap.xml'),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${indexable.filter((p) => !p.path.startsWith('/produit/')).map((p) => `<url><loc>${SITE_URL}${p.path}</loc></url>`).join('')}${PRODUITS_INDEXES.map((p) => `<url><loc>${SITE_URL}${p.path}</loc>${p.lastmod ? `<lastmod>${p.lastmod}</lastmod>` : ''}</url><url><loc>${SITE_URL}/en${p.path}</loc>${p.lastmod ? `<lastmod>${p.lastmod}</lastmod>` : ''}</url>`).join('')}</urlset>\n`

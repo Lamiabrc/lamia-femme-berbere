@@ -16,6 +16,16 @@
       ],
       "destination": "https://lamia-femme-berbere.com/$1",
       "permanent": true
+    },
+    {
+      "source": "/patio/:path*",
+      "destination": "/rencontres/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/patio",
+      "destination": "/rencontres/",
+      "permanent": true
     }
   ],
   "headers": [

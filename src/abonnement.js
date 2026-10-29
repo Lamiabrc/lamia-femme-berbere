@@ -50,6 +50,10 @@ form.addEventListener('submit', async (e) => {
   } catch (err) { st.textContent = err.message; st.classList.add('is-error'); btn.disabled = false; }
 });
 
+// Venue d'une carte « Choisir … » ailleurs sur le site : le formulaire de cette formule s'ouvre.
+const voulue = new URLSearchParams(location.search).get('formule');
+if (voulue && document.querySelector(`[data-choisir="${CSS.escape(voulue)}"]`)) ouvrir({ formule: voulue });
+
 if (new URLSearchParams(location.search).get('paiement') === 'annule') {
   const a = $('[data-abo-alerte]'); a.textContent = 'Le paiement a été annulé : rien n’a été débité. Tu peux choisir à nouveau quand tu veux.'; a.hidden = false;
 }

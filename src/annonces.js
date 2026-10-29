@@ -116,7 +116,7 @@ export function formulaireHtml() {
   <label class="annonce-case"><input type="checkbox" name="majeur"> <span>J’ai 18 ans ou plus et cette annonce est sincère : je cherche une vraie rencontre.</span></label>
   <label class="annonce-case"><input type="checkbox" name="publication"> <span>Je confie mon profil à Lamia : il n’est publié nulle part, seule Lamia le voit et l’utilise dans son outil de matching pour me proposer des mises en relation. Je peux le retirer et faire effacer mes données à tout moment.</span></label>
   <label class="annonce-case"><input type="checkbox" name="identite_ok"> <span>J’accepte que Lamia voie la photo de ma pièce d’identité pour vérifier mon profil, sachant qu’elle est supprimée juste après. <a href="/confidentialite/" target="_blank" rel="noopener">Confidentialité</a></span></label>
-  <label class="annonce-case"><input type="checkbox" name="anonyme_ok"> <span>Facultatif : j’accepte que Lamia affiche mon profil <strong>anonymement</strong> dans le Patio (âge, pays, textes et caractéristiques, <strong>sans prénom, photo, ville ni contact</strong>), pour que d’autres puissent dire qu’il les intéresse.</span></label>
+  <label class="annonce-case"><input type="checkbox" name="anonyme_ok"> <span>Facultatif : j’accepte que Lamia affiche mon profil <strong>anonymement</strong> dans les Rencontres du site (âge, pays, textes et caractéristiques, <strong>sans prénom, photo, ville ni contact</strong>), pour que d’autres puissent dire qu’il les intéresse.</span></label>
   <input type="hidden" name="interet_ref" value="">
   <p class="annonce-interet" data-interet-info hidden></p>
   <input class="hp" name="zz_site" tabindex="-1" autocomplete="off" aria-hidden="true">
@@ -243,7 +243,8 @@ export async function monterListe(box) {
     onglets.innerHTML = [['femme', '👩 Les femmes'], ['homme', '👨 Les hommes']].map(([g, t]) => `<button type="button" role="tab" data-genre="${g}">${t} <b>${groupes[g].length}</b></button>`).join('');
     box.before(onglets);
     // 20 profils par page.
-    const PAR_PAGE = 20;
+    const limite = Number(box.dataset.limite) || 0;
+    const PAR_PAGE = limite || 20;
     const pages = document.createElement('nav');
     pages.className = 'annonce-pages'; pages.setAttribute('aria-label', 'Pages de profils');
     box.after(pages);
@@ -253,7 +254,7 @@ export async function monterListe(box) {
       onglets.querySelectorAll('[data-genre]').forEach((x) => x.setAttribute('aria-selected', String(x.dataset.genre === g)));
       const liste = groupes[g], n = Math.ceil(liste.length / PAR_PAGE);
       box.innerHTML = liste.length ? liste.slice((page - 1) * PAR_PAGE, page * PAR_PAGE).map(carte).join('') : `<p class="annonce-vide">Pas encore de profil dans cette catégorie. Et si le premier, c’était le tien ?</p>`;
-      pages.innerHTML = n > 1 ? [
+      pages.innerHTML = n > 1 && !limite ? [
         `<button type="button" data-page="${page - 1}" ${page === 1 ? 'disabled' : ''} aria-label="Page précédente">‹</button>`,
         ...Array.from({ length: n }, (_, i) => `<button type="button" data-page="${i + 1}" ${i + 1 === page ? 'aria-current="page"' : ''}>${i + 1}</button>`),
         `<button type="button" data-page="${page + 1}" ${page === n ? 'disabled' : ''} aria-label="Page suivante">›</button>`,
@@ -305,3 +306,7 @@ document.querySelectorAll('[data-annonce-ouvrir]').forEach((b) => b.addEventList
 document.addEventListener('click', (e) => { const b = e.target.closest('[data-interet]'); if (b) ouvrirFormulaire(b.dataset.interet); });
 const liste = document.querySelector('[data-annonces-liste]');
 if (liste) monterListe(liste);
+// « Confier mon profil » (bouton du haut, liens #confier) : le formulaire s'ouvre directement.
+const viaAncre = () => { if (location.hash === '#confier' && document.querySelector('[data-annonce-box]')) ouvrirFormulaire(); };
+viaAncre();
+addEventListener('hashchange', viaAncre);

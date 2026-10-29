@@ -233,7 +233,7 @@ async function chargerAnnonces() {
       ${a.matching && Object.keys(a.matching).length ? `<p class="cl-coord">${[a.matching.situation, a.matching.enfants === 'Oui' ? `${a.matching.nbEnfants || ''} enfant(s)` : a.matching.enfants === 'Non' ? 'sans enfant' : '', a.matching.niveauEtudeDetail || a.matching.niveauEtudeCategorie, a.matching.profession, a.matching.religion, a.matching.pratique, ...(a.matching.origineTags || [])].filter(Boolean).map(lib).map(esc).join(' · ')}${a.matching.contactReseau ? `<br>Réseau : ${esc(a.matching.contactReseau)}` : ''}</p>` : ''}
       ${a.exportee_at ? `<p class="cl-aide">↪ Exportée vers l’outil de matching le ${quand(a.exportee_at)}</p>` : ''}
       ${(a.interets || []).length ? `<p class="cl-match-demande">💌 Match demandé : intéressé(e) par le profil n° ${a.interets.join(', ')}</p>` : ''}
-      <p class="cl-aide">${a.anonyme_ok ? (a.visible_anonyme ? '👁 Affiché anonymement dans le Patio' : 'Accepte d’être affiché(e) anonymement') : 'N’a pas accepté l’affichage anonyme'}</p>
+      <p class="cl-aide">${a.anonyme_ok ? (a.visible_anonyme ? '👁 Affiché anonymement dans les Rencontres' : 'Accepte d’être affiché(e) anonymement') : 'N’a pas accepté l’affichage anonyme'}</p>
       <p><b>Qui je suis</b><br>${esc(a.profil)}</p>
       <p><b>Qui je cherche</b>${a.age_min || a.age_max ? ` (${a.age_min || 18}-${a.age_max || 99} ans)` : ''}<br>${esc(a.recherche)}</p>
       ${a.status === 'publiee' ? `<div class="cl-resultat"><label>Profils compatibles trouvés dans ton outil<input data-nb type="number" min="0" max="9999" inputmode="numeric" value="${a.nb_compatibles ?? ''}"></label><button class="cl-btn cl-plein" type="button" data-decision="resultat">Envoyer le résultat</button>${a.resultat_envoye_at ? `<small>Envoyé le ${quand(a.resultat_envoye_at)} (${a.nb_compatibles} profil(s))</small>` : ''}</div>` : ''}
@@ -242,7 +242,7 @@ async function chargerAnnonces() {
         ${a.status !== 'publiee' ? '<button class="cl-btn cl-plein" type="button" data-decision="publier">✓ Valider le profil</button>' : ''}
         ${a.status !== 'refusee' ? `<button class="cl-btn" type="button" data-decision="refuser">${a.status === 'publiee' ? 'Retirer le profil' : 'Refuser'}</button>` : ''}
         ${a.status === 'publiee' ? '<button class="cl-btn" type="button" data-exporter-une>↪ Fiche pour l’outil de matching</button>' : ''}
-        ${a.status === 'publiee' ? `<span class="cl-aide">${a.visible_anonyme ? '👁 Affiché anonymement dans le Patio' : a.anonyme_ok ? 'Pour l’afficher dans le Patio : ton outil, écran « Le site » → Publier' : 'La personne n’a pas accepté l’affichage anonyme'}</span>${a.visible_anonyme ? ' <button class="cl-btn" type="button" data-decision="masquer">Retirer du Patio</button>' : ''}` : ''}
+        ${a.status === 'publiee' ? `<span class="cl-aide">${a.visible_anonyme ? '👁 Affiché anonymement dans les Rencontres' : a.anonyme_ok ? 'Pour l’afficher dans les Rencontres : ton outil, écran « Le site » → Publier' : 'La personne n’a pas accepté l’affichage anonyme'}</span>${a.visible_anonyme ? ' <button class="cl-btn" type="button" data-decision="masquer">Retirer du Patio</button>' : ''}` : ''}
         <button class="cl-btn" type="button" data-decision="supprimer">Supprimer définitivement</button>
       </div>
       <p class="cl-statut" role="status" data-annonce-statut></p>
