@@ -3032,3 +3032,12 @@ a.po-btn { display: inline-block; text-decoration: none; }
 @media (max-width: 760px) { .accueil-hero .po-lamia { order: 0; } .accueil-hero .po-lamia img { width: 120px; } .accueil-hero { padding-top: 64px; } }
 .passerelle { margin-top: 22px; padding: 12px 16px; border-radius: 12px; background: #fff5f0; border: 1px solid #ecd2c4; font-size: 14px; color: #4a3b40; } .passerelle a { color: #92283f; font-weight: 600; }
 .po-app .annonce-ref.is-piece { background: rgba(255,210,122,.18) !important; border-color: #ffd27a !important; color: #ffe3a8 !important; }
+/* Profil : option live, message d'intérêt, match en cours */
+.annonce-live { background: rgba(255,210,122,.08); border-radius: 14px; padding: 14px 16px 16px; }
+.annonce-form.is-live [data-optionnel-live] { opacity: .78; }
+.annonce-form.is-live [data-optionnel-live] h3::after { content: ' (facultatif)'; font: 500 14px var(--po-body, sans-serif); color: #9ff0cf; }
+.annonce-flash { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 90; max-width: min(560px, calc(100% - 32px)); padding: 14px 18px; border-radius: 14px; background: #2a0a14; color: #fff4ec; border: 1px solid #ffd27a; box-shadow: 0 14px 40px rgba(0,0,0,.4); font: 500 15px/1.5 Inter, system-ui, sans-serif; }
+.annonce-flash.is-error { border-color: #ff7a62; }
+.annonce-flash[hidden] { display: none; }
+.espace-match { color: #92283f; font-weight: 600; }
+.espace-achat-droite { display: flex; flex-direction: column; gap: 8px; }

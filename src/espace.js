@@ -19,6 +19,7 @@ async function render() {
   $('[data-espace-nom]').textContent = u.user_metadata?.first_name || '';
   $('[data-espace-admin]').hidden = u.app_metadata?.role !== 'admin';
   achats(session);
+  monProfil(session);
   const { data } = await supabase.from('event_registrations')
     .select('attendance_status, speed_dating_events(title, audience, starts_at)')
     .neq('attendance_status', 'cancelled');
@@ -45,6 +46,42 @@ async function achats(session) {
         </article>`).join('')
       : '<p>Pas encore d’achat. Tes commandes apparaîtront ici. <a class="text-link" href="/boutique/">Voir la Boutique</a></p>';
   } catch { box.innerHTML = '<p>Tes achats ne s’affichent pas pour le moment. Réessaie dans un instant.</p>'; }
+}
+
+// Profil confié à Lamia : état, avantages, modification, fin d'un match en cours.
+const ETAT_PROFIL = { a_verifier: '⏳ En cours de vérification par Lamia', publiee: '✓ Vérifié par Lamia', refusee: 'Non retenu pour le moment' };
+async function appelProfil(body, session) {
+  const r = await fetch('/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` }, body: JSON.stringify(body) });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok || d.error) throw Object.assign(new Error(d.error || 'erreur'), { code: d.error });
+  return d;
+}
+async function monProfil(session) {
+  const box = document.querySelector('[data-espace-profil]');
+  if (!box) return;
+  try {
+    const { profil: p } = await appelProfil({ action: 'annonce_mon_profil' }, session);
+    if (!p) { box.innerHTML = '<p>Tu n’as pas encore de profil chez Lamia. <a class="text-link" href="/rencontres/#confier">Confier mon profil</a> (la première mise en relation est offerte).</p>'; return; }
+    box.innerHTML = `<article class="espace-achat"><div><p class="event-date">Profil n° ${esc(p.ref)}</p><h3>${esc(ETAT_PROFIL[p.status] || p.status)}${p.status === 'publiee' && p.piece_identite ? ' · 🛡 avec pièce d’identité' : ''}</h3>
+      ${p.live ? `<p>🎥 Profil créé en live avec Lamia${p.live_retrouve ? '' : ' (Lamia vérifie ta fiche)'} : <strong>tes 3 premières mises en relation sont offertes</strong>.</p>` : '<p>Ta première mise en relation est offerte.</p>'}
+      ${p.nb_compatibles !== null && p.nb_compatibles !== undefined ? `<p>D’après l’outil de Lamia, tu pourrais correspondre à ${esc(p.nb_compatibles)} personne(s).</p>` : ''}
+      ${p.en_match ? '<p class="espace-match">💞 Tu as un match en cours. Tant qu’il dure, tu ne peux pas matcher avec d’autres profils.</p>' : ''}</div>
+      <div class="espace-achat-droite"><button class="btn btn-ink" type="button" data-profil-modifier>Modifier mon profil</button>${p.en_match ? '<button class="btn btn-line" type="button" data-profil-dematcher>Mettre fin à mon match</button>' : ''}</div></article>
+      <p class="form-status" data-profil-statut></p><div data-profil-edition hidden></div>`;
+    box.querySelector('[data-profil-modifier]').addEventListener('click', async () => {
+      const zone = box.querySelector('[data-profil-edition]');
+      zone.hidden = false;
+      const { monterFormulaire } = await import('/assets/annonces.js');
+      monterFormulaire(zone, { existant: p, token: session.access_token });
+      zone.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    box.querySelector('[data-profil-dematcher]')?.addEventListener('click', async (e) => {
+      if (!confirm('Mettre fin à ton match en cours ? Lamia sera prévenue, et ton profil pourra de nouveau matcher.')) return;
+      e.target.disabled = true;
+      try { await appelProfil({ action: 'annonce_dematcher' }, session); monProfil(session); }
+      catch { box.querySelector('[data-profil-statut]').textContent = 'Ça n’a pas fonctionné. Réessaie, ou écris à Lamia.'; e.target.disabled = false; }
+    });
+  } catch { box.innerHTML = '<p>Ton profil ne s’affiche pas pour le moment. Réessaie dans un instant.</p>'; }
 }
 
 // Abonnement « Trouve ton âme sœur » : formule en cours, achats à l'unité, gestion (résiliation) chez Stripe.

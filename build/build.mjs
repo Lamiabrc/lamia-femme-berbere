@@ -792,6 +792,11 @@ page(
     </section>
 
     <section>
+      <h2>Mon profil âme sœur</h2>
+      <div class="espace-profil" data-espace-profil><p class="loading">Un instant…</p></div>
+    </section>
+
+    <section>
       <h2>Mon abonnement âme sœur</h2>
       <div class="espace-achats" data-espace-abonnement><p class="loading">Un instant…</p></div>
     </section>
