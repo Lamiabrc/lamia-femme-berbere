@@ -342,7 +342,7 @@ $('[data-produit-form]').addEventListener('submit', async (e) => {
 
 // ---------------------------------------------------------------- textes et images
 // Mes réseaux
-const NOMS_RESEAUX = { tiktok: 'TikTok', facebook: 'Facebook', instagram: 'Instagram', youtube: 'YouTube', snapchat: 'Snapchat', whatsapp: 'WhatsApp' };
+const NOMS_RESEAUX = { tiktok: 'TikTok', facebook: 'Facebook', instagram: 'Instagram', youtube: 'YouTube', snapchat: 'Snapchat', whatsapp: 'WhatsApp', twitch: 'Twitch' };
 async function chargerReseaux() {
   try { const { reseaux } = await api({ action: 'reseaux' }); const f = $('[data-reseaux]'); for (const [k, v] of Object.entries(reseaux)) if (f.elements[k]) f.elements[k].value = v || ''; } catch { /* */ }
 }

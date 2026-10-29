@@ -18,7 +18,7 @@ export const salon = {
   intro:
     'Le Salon, c’est là où je prends la parole. Tous les soirs en live, en multistream sur toutes les plateformes en même temps, on parle de couple, de célibat, d’engagement, d’humour et de culture kabyle, avec sérieux et chaleur. Et on y présente, en direct, les annonces de mariage de mon outil de matching.',
   lives: [
-    { name: 'Le Live Mariage Kabyle', when: 'Tous les soirs, de 21 h à 23 h · en multistream sur toutes les plateformes', text: 'Un seul live, diffusé en même temps sur TikTok, YouTube, Facebook, Twitch… Choisis ta plateforme préférée : tu retrouves le même direct, les mêmes annonces de mariage et les mêmes échanges autour du couple, du célibat et de la culture kabyle.' },
+    { name: 'Le Live Mariage Kabyle', when: 'Tous les soirs, de 21 h à 23 h · en multistream sur toutes les plateformes', text: 'Un seul live, diffusé en même temps sur TikTok, YouTube, Facebook, Instagram et Twitch Choisis ta plateforme préférée : tu retrouves le même direct, les mêmes annonces de mariage et les mêmes échanges autour du couple, du célibat et de la culture kabyle.' },
   ],
   rules: [
     'On vient pour échanger avec respect.',
