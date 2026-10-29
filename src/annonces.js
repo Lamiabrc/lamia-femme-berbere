@@ -33,6 +33,7 @@ const ERR = {
   mot_de_passe: 'Choisis un mot de passe d’au moins 8 caractères.',
   compte_existant: 'Un compte existe déjà avec cet email, mais le mot de passe ne correspond pas. Mets ton mot de passe, ou réinitialise-le dans « Mon espace ».',
   deja_profil: 'Tu as déjà un profil chez Lamia : modifie-le dans « Mon espace ».',
+  deja_profil_lien: 'Un profil existe déjà avec ce lien de réseau social. Connecte-toi avec le compte qui l’a créé (« Mon espace »), ou écris à Lamia si ce n’est pas toi.',
   tiktok_live: 'Indique le pseudo ou le lien TikTok que tu avais en live, pour que Lamia retrouve ta fiche.',
   en_match: 'Tu as un match en cours : pour en découvrir d’autres, mets d’abord fin à ce match dans « Mon espace ».',
 };

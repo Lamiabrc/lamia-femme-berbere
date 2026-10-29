@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { handleAnnonces, pseudoTikTok, empreinteTikTok } from '../lib/annonces.mjs';
+import { handleAnnonces, pseudoTikTok, normLien, empreinteLien } from '../lib/annonces.mjs';
 
 // Petite base en mémoire, juste assez pour les actions testées.
 function monde({ compte = true, tiktok = {} } = {}) {
-  const db = { annonces: [], annonce_interets: [] }, alertes = [];
+  const db = { annonces: [], annonce_interets: [], annonce_files: [] }, alertes = [];
   const json = async (x) => ({ ok: true, json: async () => x });
   const call = async (u, o = {}) => {
     if (u.includes('/rpc/compte_existe')) return json(compte);
@@ -12,7 +12,8 @@ function monde({ compte = true, tiktok = {} } = {}) {
     return json([]);
   };
   const read = async (u) => {
-    const h = u.match(/outil_tiktok\?h=eq\.([0-9a-f]+)/); if (h) return tiktok[h[1]] ? [{ outil_id: tiktok[h[1]] }] : [];
+    const h = u.match(/outil_tiktok\?h=in\.\(([0-9a-f,]+)\)/); if (h) { const f = h[1].split(',').find((x) => tiktok[x]); return f ? [{ outil_id: tiktok[f] }] : []; }
+    if (u.includes('lien_h=eq.')) { const x = u.match(/lien_h=eq\.([0-9a-f]+)/)[1]; return db.annonces.filter((a) => a.lien_h === x && ['a_verifier', 'publiee'].includes(a.status)); }
     if (u.includes('/annonce_interets?id=eq.')) { const id = u.match(/id=eq\.([^&]+)/)[1]; const i = db.annonce_interets.find((x) => x.id === id); return i ? [{ cible_ref: i.cible_ref, annonces: db.annonces.find((a) => a.id === i.demandeur_id) }] : []; }
     if (u.startsWith('/rest/v1/annonces?or=')) { const id = u.match(/user_id\.eq\.([^,]+)/)[1]; return db.annonces.filter((a) => a.user_id === id); }
     if (u.startsWith('/rest/v1/annonces?email=eq.')) return db.annonces.filter((a) => ['a_verifier', 'publiee'].includes(a.status) && u.includes(encodeURIComponent(a.email)));
@@ -30,7 +31,9 @@ test('pseudo TikTok lu dans un lien ou un @pseudo', () => {
   assert.equal(pseudoTikTok('https://www.tiktok.com/@Nina.Kab?lang=fr'), 'nina.kab');
   assert.equal(pseudoTikTok('@nina_75'), 'nina_75');
   assert.equal(pseudoTikTok('pas un lien tiktok'), '');
-  assert.match(empreinteTikTok('nina'), /^[0-9a-f]{64}$/);
+  assert.equal(normLien('https://www.instagram.com/Nina.K/'), 'instagram:nina.k');
+  assert.equal(normLien('https://facebook.com/nina.kab'), 'facebook:nina.kab');
+  assert.match(empreinteLien('tiktok:nina'), /^[0-9a-f]{64}$/);
 });
 test('sans compte, pas de profil', async () => {
   const { ctx } = monde({ compte: false });
@@ -38,7 +41,7 @@ test('sans compte, pas de profil', async () => {
   assert.equal((await r.json()).error, 'compte_requis');
 });
 test('profil créé en live : formulaire allégé, fiche retrouvée par empreinte TikTok', async () => {
-  const { ctx, db } = monde({ tiktok: { [empreinteTikTok('nina.kab')]: 'outil-42' } });
+  const { ctx, db } = monde({ tiktok: { [empreinteLien('tiktok:nina.kab')]: 'outil-42' } });
   const r = await handleAnnonces('annonce_deposer', { ...base, live: true, tiktok_live: '@nina.kab' }, ctx());
   assert.equal(r.status, 200);
   assert.equal(db.annonces[0].live_declare, true);
@@ -60,4 +63,15 @@ test('match actif : plus de nouvel intérêt jusqu’au dématch', async () => {
   r = await handleAnnonces('annonce_interet', { ref: 9 }, ctx(user));
   assert.equal(r.status, 200);
   assert.equal(db.annonce_interets[0].cible_ref, 9);
+});
+
+test('lien déjà connu : relié à la fiche de l’outil, et pas de doublon sur le site', async () => {
+  const { ctx, db } = monde({ tiktok: { [empreinteLien('instagram:nina.k')]: 'outil-7' } });
+  const insta = { ...complet, matching: { contactReseau: 'https://instagram.com/nina.k' } };
+  let r = await handleAnnonces('annonce_deposer', insta, ctx());
+  assert.equal(r.status, 200);
+  assert.equal(db.annonces[0].outil_id, 'outil-7');
+  db.annonces[0].status = 'a_verifier';
+  r = await handleAnnonces('annonce_deposer', { ...insta, email: 'autre@example.com' }, ctx());
+  assert.equal((await r.json()).error, 'deja_profil_lien');
 });
