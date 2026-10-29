@@ -502,7 +502,7 @@ renderSocials();
   const a = document.querySelector('[data-porte-ame]');
   if (!a) return;
   const scene = a.closest('.entree-scene');
-  const OUV = { l: 596, t: 560, r: 786 }; // plaque posée sur le seuil, sous la porte (image 1376 × 768)
+  const OUV = { l: 560, t: 552, r: 822 }; // plaque posée sur le seuil, sous la porte (image 1376 × 768)
   const place = () => {
     const vw = scene.clientWidth, vh = scene.clientHeight;
     const k = Math.max(vw / 1376, vh / 768), W = 1376 * k, H = 768 * k;

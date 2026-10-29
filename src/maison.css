@@ -2814,10 +2814,11 @@ body .preorder .form-status.is-error, body[data-ambiance] .preorder .form-status
 .patio-etapes li { align-content: start; }
 
 /* Encart « âme sœur » dans l'ouverture de la porte */
-.porte-ame { position: absolute; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 7px 10px; box-sizing: border-box; border-radius: 6px 6px 2px 2px; background: linear-gradient(180deg, rgba(92,15,34,.93), rgba(60,10,25,.95)); border: 2px solid #e3bd6e; box-shadow: 0 6px 18px rgba(0,0,0,.45); text-align: center; text-decoration: none; }
-.porte-ame:hover { background: linear-gradient(180deg, rgba(120,20,44,.95), rgba(80,12,32,.96)); }
-.porte-ame-texte { font-family: var(--serif); font-weight: 600; font-size: clamp(12px, calc(var(--pw, 160px) * .068), 16px); line-height: 1.2; color: #fff1c9; }
-.porte-ame-btn { padding: .35em .8em; border-radius: 999px; background: linear-gradient(180deg, #f0d08a, #d4a64e); color: #3a0a16; font-weight: 700; font-size: clamp(11px, calc(var(--pw, 160px) * .056), 14px); white-space: nowrap; }
+.porte-ame { position: absolute; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 6px 18px; box-sizing: border-box; text-align: center; text-decoration: none; background: radial-gradient(ellipse 60% 55% at 50% 50%, rgba(25,8,12,.62), rgba(25,8,12,0) 100%); }
+.porte-ame::before { content: ""; width: 46%; height: 1px; background: linear-gradient(90deg, transparent, #e3bd6e, transparent); }
+.porte-ame-texte { font-family: var(--serif); font-style: italic; font-weight: 600; font-size: clamp(15px, calc(var(--pw, 160px) * .085), 22px); line-height: 1.2; color: #fbe8bd; text-wrap: balance; text-shadow: 0 1px 2px rgba(0,0,0,.9), 0 0 18px rgba(0,0,0,.7); }
+.porte-ame-btn { margin-top: 2px; padding: .45em 1.3em; border-radius: 999px; border: 1px solid rgba(240,208,138,.9); background: rgba(40,10,18,.35); backdrop-filter: blur(3px); color: #f6dc9c; font-family: var(--serif); font-weight: 600; letter-spacing: .06em; font-size: clamp(13px, calc(var(--pw, 160px) * .062), 17px); white-space: nowrap; box-shadow: 0 0 16px rgba(240,208,138,.25); transition: background .25s, color .25s; }
+.porte-ame:hover .porte-ame-btn, .porte-ame:focus-visible .porte-ame-btn { background: linear-gradient(180deg, #f0d08a, #d4a64e); color: #3a0a16; }
 /* En-tête : le nom de la Maison ne chevauche jamais le menu */
 .site-header .brand { flex: none; }
 .site-header .site-nav { min-width: 0; }
