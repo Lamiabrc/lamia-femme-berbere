@@ -337,16 +337,16 @@ page(
   </div>
 
   <div class="accueil-bloc">
+    <h2 class="annonces-titre">Les formules</h2>
+    <p class="annonces-sous">Sans engagement. La première mise en relation est toujours offerte.</p>
+    <div class="abo-grille">${FORMULES.map((f) => `<a class="abo-carte abo-mini${f.vedette ? ' is-vedette' : ''}" href="${f.mois ? `/abonnement/?formule=${f.id}` : '/rencontres/#confier'}">${f.vedette ? '<span class="abo-ruban">Le plus choisi</span>' : ''}<h3>${esc(f.nom)}</h3><p class="abo-prix">${f.mois ? `${eurosAbo(f.mois)}<small> / mois</small>` : 'Gratuit'}</p><ul>${f.avantages.slice(0, 2).map((a) => `<li>${esc(a)}</li>`).join('')}</ul><span class="po-btn">${f.mois ? `Choisir ${esc(f.nom)}` : 'Commencer'}</span></a>`).join('')}</div>
+  </div>
+
+  <div class="accueil-bloc">
     <h2 class="annonces-titre">Ils et elles cherchent aussi</h2>
     <p class="annonces-sous">Des profils vérifiés, anonymes. Un profil te touche ? Dis-le, Lamia regarde si vous pouvez correspondre.</p>
     <div class="annonces-liste" data-annonces-liste data-limite="6"><p class="annonce-vide">Les profils arrivent…</p></div>
     <p class="po-actions"><a class="po-btn-verre" href="/rencontres/#profils-anonymes">Voir tous les profils</a></p>
-  </div>
-
-  <div class="accueil-bloc">
-    <h2 class="annonces-titre">Les formules</h2>
-    <p class="annonces-sous">Sans engagement. La première mise en relation est toujours offerte.</p>
-    <div class="abo-grille">${FORMULES.map((f) => `<a class="abo-carte abo-mini${f.vedette ? ' is-vedette' : ''}" href="${f.mois ? `/abonnement/?formule=${f.id}` : '/rencontres/#confier'}">${f.vedette ? '<span class="abo-ruban">Le plus choisi</span>' : ''}<h3>${esc(f.nom)}</h3><p class="abo-prix">${f.mois ? `${eurosAbo(f.mois)}<small> / mois</small>` : 'Gratuit'}</p><ul>${f.avantages.slice(0, 2).map((a) => `<li>${esc(a)}</li>`).join('')}</ul><span class="po-btn">${f.mois ? `Choisir ${esc(f.nom)}` : 'Commencer'}</span></a>`).join('')}</div>
   </div>
 
   <div class="accueil-duo">
@@ -1320,12 +1320,12 @@ page(
     </ol>
     <p class="po-actions"><button type="button" class="po-btn" data-annonce-ouvrir aria-expanded="false">💌 Je confie mon profil</button></p>
   </div>
-  <h2 class="annonces-titre" id="profils-anonymes">Les profils vérifiés</h2>
-  <p class="annonces-sous">Ni prénom, ni photo, ni contact. Un profil te touche ? Clique sur « Ce profil m’intéresse » : Lamia regarde si vous pouvez correspondre. Personne ne sait qui s’intéresse à qui.</p>
-  <div class="annonces-liste" data-annonces-liste><p class="annonce-vide">Les profils arrivent…</p></div>
   <h2 class="annonces-titre">Les formules</h2>
   <p class="annonces-sous">Sans engagement. La première mise en relation est toujours offerte.</p>
   <div class="abo-grille">${FORMULES.map((f) => `<a class="abo-carte abo-mini${f.vedette ? ' is-vedette' : ''}" href="${f.mois ? `/abonnement/?formule=${f.id}` : '#confier'}">${f.vedette ? '<span class="abo-ruban">Le plus choisi</span>' : ''}<h3>${esc(f.nom)}</h3><p class="abo-prix">${f.mois ? `${eurosAbo(f.mois)}<small> / mois</small>` : 'Gratuit'}</p><ul>${f.avantages.slice(0, 2).map((x) => `<li>${esc(x)}</li>`).join('')}</ul><span class="po-btn">${f.mois ? `Choisir ${esc(f.nom)}` : 'Commencer'}</span></a>`).join('')}</div>
+  <h2 class="annonces-titre" id="profils-anonymes">Les profils vérifiés</h2>
+  <p class="annonces-sous">Ni prénom, ni photo, ni contact. Un profil te touche ? Clique sur « Ce profil m’intéresse » : Lamia regarde si vous pouvez correspondre. Personne ne sait qui s’intéresse à qui.</p>
+  <div class="annonces-liste" data-annonces-liste><p class="annonce-vide">Les profils arrivent…</p></div>
   <div class="accueil-duo">
     <a class="abo-carte accueil-carte" href="/speed-dating/"><h3>Speed dating en ligne</h3><p>Des soirées en visio par tranche d’âge, caméra allumée, avec Lamia qui veille.</p><span class="po-btn-verre">Voir les prochaines soirées</span></a>
     <a class="abo-carte accueil-carte" href="/salon/"><h3>Le live, chaque soir à 21 h</h3><p>Les annonces de mariage présentées en direct, sur toutes les plateformes.</p><span class="po-btn-verre">Le live et mes outils</span></a>
