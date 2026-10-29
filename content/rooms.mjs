@@ -26,8 +26,8 @@ export const rooms = [
   { slug: 'coiffeuse', path: '/coiffeuse/', floor: 0, name: 'La Coiffeuse de Lamia', welcome: 'Le rouge, les bijoux, les gestes qui nous ressemblent.',
     summary: 'Le rouge à lèvres signature de Lamia et le maquillage. En préparation.', status: 'soon', accent: 'rouge' },
 
-  { slug: 'patio', path: '/patio/', floor: 0, name: 'Le Patio', welcome: 'La cour de la Maison, où l’on se retrouve.', headline: 'Communauté et actualités de la Maison',
-    summary: 'Devant la Maison, la cour pavée : annonces, célébrations, témoignages et rendez-vous de la communauté.', status: 'open', accent: 'vert' },
+  { slug: 'patio', path: '/patio/', floor: 0, name: 'Le Patio', welcome: 'La cour de la Maison, où l’on se retrouve.', headline: 'Trouve ton âme sœur avec Lamia',
+    summary: 'Confie ton profil à Lamia, découvre des profils vérifiés et anonymes, et laisse-la faire le lien, en toute discrétion.', status: 'open', accent: 'vert' },
 
   // ---------- premier étage : rencontres, parole, lecture
   { slug: 'salon', path: '/salon/', floor: 1, name: 'Le Salon de Lamia', welcome: 'Installe-toi, on parle vrai.', headline: 'Lives TikTok, débats et mariage kabyle',

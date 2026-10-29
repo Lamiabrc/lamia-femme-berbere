@@ -2795,3 +2795,20 @@ body .preorder .form-status.is-error, body[data-ambiance] .preorder .form-status
 .annonce-sceau span { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 50%; background: #fff6e6; border: 2px solid #d9b25f; color: #7d1530; font-size: 24px; font-weight: 700; }
 .annonce-anonyme h3 { font-size: 24px; }
 .annonce-interet { margin: 0; padding: 12px 14px; border-radius: 12px; background: #fbf1df; border: 1px solid #e3cf9f; color: #5c0f22 !important; font-weight: 600; }
+
+/* Patio : page « âme sœur » */
+.patio-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin: 18px 0 0; }
+.patio-actions .ame-soeur-btn { border: 2px solid #d9b25f; cursor: pointer; font: inherit; font-weight: 700; box-shadow: 0 10px 24px -14px rgba(74,11,27,.7); }
+.patio-lien { color: #5c0f22; font-weight: 600; text-underline-offset: 3px; }
+.patio-etapes { margin: 0 0 34px; padding: clamp(20px, 3vw, 34px); border-radius: 24px; background: radial-gradient(ellipse 70% 80% at 90% 0%, rgba(227,189,110,.25), transparent 60%), linear-gradient(135deg, #5c0f22, #7d1530 55%, #4a0b1b); border: 2px solid #d9b25f; box-shadow: 0 0 0 6px rgba(217,178,95,.15); color: #fff6e6; }
+.patio-etapes[hidden] { display: none; }
+.patio-etapes h2 { margin: 0 0 16px; background: linear-gradient(90deg, #fff1c9, #e3bd6e 60%, #f0d08a); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.patio-etapes ol { list-style: none; counter-reset: e; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr)); gap: 14px; }
+.patio-etapes li { counter-increment: e; display: grid; gap: 6px; padding: 16px; border-radius: 16px; background: rgba(255,246,230,.08); border: 1px solid rgba(227,189,110,.4); }
+.patio-etapes li::before { content: counter(e); width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; background: linear-gradient(180deg, #f0d08a, #d4a64e); color: #3a0a16; font-weight: 700; }
+.patio-etapes strong { color: #fff1c9; font-family: var(--serif); font-size: 21px; }
+.patio-etapes span { color: #fff6e6; font-size: 15px; line-height: 1.55; }
+.patio-etapes .ame-soeur-btn { background: linear-gradient(180deg, #f0d08a, #d4a64e); color: #3a0a16; }
+.patio-body .annonce-box { margin-top: 0; }
+.room-head .patio-actions .ame-soeur-btn { background: linear-gradient(180deg, #7d1530, #5c0f22); color: #fff6e6 !important; }
+.patio-etapes li { align-content: start; }

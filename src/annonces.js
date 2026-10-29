@@ -260,6 +260,7 @@ function ouvrirFormulaire(ref) {
   if (!box) return;
   if (!box.dataset.monte) { monterFormulaire(box); box.dataset.monte = '1'; }
   box.hidden = false;
+  document.querySelector('.patio-etapes')?.setAttribute('hidden', '');
   const form = box.querySelector('[data-annonce-form]');
   if (form && ref) {
     form.elements.interet_ref.value = ref;

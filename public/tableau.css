@@ -121,3 +121,5 @@
 .entonnoir em { font-style: normal; font-size: 12px; color: var(--qvt-bronze); min-width: 40px; text-align: right; }
 .barres.heures { height: 110px; }
 .classement small { font-weight: 400; color: var(--qvt-taupe); }
+.tdb-onglet-lien { margin-left: auto; padding: 8px 14px; border-radius: 999px; background: #7d1530; border: 1px solid #e3bd6e; color: #fff6e6; font: 700 14px var(--sans); text-decoration: none; }
+.tdb-onglet-lien:hover { background: #5c0f22; }
