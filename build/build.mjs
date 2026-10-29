@@ -1274,11 +1274,36 @@ page(
     path: '/patio/',
     room: roomBySlug.patio,
     scripts: ['/assets/annonces.js'],
-    body: `${roomHead(roomBySlug.patio, '<p class="patio-actions"><button type="button" class="ame-soeur-btn" data-annonce-ouvrir aria-expanded="false">💌 Je confie mon profil à Lamia</button><a class="patio-lien" href="#profils-anonymes">Voir les profils anonymes</a></p>')}
-<section class="room-body patio-body">
+    body: `<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,500&display=swap">
+<div class="po-app">
+<section class="po-hero" aria-labelledby="po-titre">
+  <div class="po-fond" aria-hidden="true"></div>
+  <div class="po-garland" aria-hidden="true">
+    <svg viewBox="0 0 1000 40" preserveAspectRatio="none"><path d="M0,3 Q500,23 1000,3" fill="none" stroke="#cdb372" stroke-width="2.2" vector-effect="non-scaling-stroke"/><path d="M0,3 Q500,23 1000,3" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="1" stroke-dasharray="1 7" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>
+    ${['j6','j3','j5','j7','j3','j5','j6','j7','j3'].map((k, i, a) => { const t = (i + 1) / (a.length + 1); return `<span class="po-gj" style="left:${(t * 100).toFixed(1)}%;top:${(7 + 40 * t * (1 - t)).toFixed(1)}px;--d:${(2.6 + ((i * 37) % 17) / 10).toFixed(1)}s;--l:-${(((i * 53) % 30) / 10).toFixed(1)}s"><img src="/images/outil/${k}.webp" alt=""></span>`; }).join('')}
+    <span class="po-gcorner"><img src="/images/outil/j0.webp" alt=""></span>
+  </div>
+  <div class="po-hero-grid">
+    <div class="po-hero-texte">
+      <p class="po-eyebrow">Matching kabyle IA · par Lamia</p>
+      <h1 id="po-titre">${esc(roomBySlug.patio.headline || 'Trouve ton âme sœur avec Lamia')}</h1>
+      <p class="po-sub">L’outil de matching de Lamia, au service des cœurs sincères.</p>
+      <p class="po-lead">${esc(roomBySlug.patio.summary)}</p>
+      <p class="po-actions"><button type="button" class="po-btn" data-annonce-ouvrir aria-expanded="false">💌 Je confie mon profil à Lamia</button><a class="po-btn-verre" href="#profils-anonymes">Voir les profils anonymes</a></p>
+    </div>
+    <figure class="po-lamia">
+      <img src="/images/lamia/lamia-portrait-tatouages-rond-480.webp" alt="Lamia Femme Berbère, tatouages berbères et bijoux kabyles" width="240" height="240">
+      <figcaption>Lamia · ton entremetteuse</figcaption>
+    </figure>
+  </div>
+  <ol class="po-track" aria-label="Les étapes">
+    <li><b></b><span>Ton profil</span></li><li><b></b><span>Vérification</span></li><li><b></b><span>Matching IA</span></li><li><b></b><span>Mise en relation</span></li>
+  </ol>
+</section>
+<section class="room-body patio-body po-corps">
   <div class="annonce-retrait" data-annonce-retrait hidden></div>
   <div class="annonce-box" data-annonce-box hidden></div>
-  <div class="patio-etapes" id="annonces">
+  <div class="patio-etapes po-panel" id="annonces">
     <h2>Comment ça marche</h2>
     <ol>
       <li><strong>Tu confies ton profil</strong><span>Ton portrait, une ou deux photos et la personne que tu espères rencontrer. Ton identité n’est jamais publiée.</span></li>
@@ -1286,7 +1311,7 @@ page(
       <li><strong>Tu découvres tes correspondances</strong><span>Tu reçois le nombre de personnes qui pourraient te correspondre, sans savoir qui. Personne ne sait qui matche avec qui.</span></li>
       <li><strong>Lamia fait le lien</strong><span>Si un match te convient, elle te demande ton numéro, qui reste chez elle. La première mise en relation est offerte, les suivantes avec un abonnement.</span></li>
     </ol>
-    <p class="patio-actions"><button type="button" class="ame-soeur-btn" data-annonce-ouvrir aria-expanded="false">💌 Je confie mon profil à Lamia</button></p>
+    <p class="po-actions"><button type="button" class="po-btn" data-annonce-ouvrir aria-expanded="false">💌 Je confie mon profil à Lamia</button></p>
   </div>
   <h2 class="annonces-titre" id="profils-anonymes">Des profils vérifiés, en toute discrétion</h2>
   <p class="annonces-sous">Ni prénom, ni photo, ni contact : seulement des cœurs qui se racontent. Un profil te touche ? Clique sur « Ce profil m’intéresse », crée ton profil, et Lamia regarde si vous pouvez correspondre. Personne ne sait qui s’intéresse à qui.</p>
@@ -1299,6 +1324,7 @@ page(
     <article class="now-card" data-accent="vert"><p class="now-room">Bientôt</p><h3>Vos témoignages</h3><p>Le mur des célébrations et des témoignages ouvrira avec les premiers récits de la communauté.</p></article>
   </div>
 </section>
+</div>
 ${otherRooms('patio')}`,
   })
 );

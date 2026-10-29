@@ -2823,3 +2823,96 @@ body .preorder .form-status.is-error, body[data-ambiance] .preorder .form-status
 .site-header .brand { flex: none; }
 .site-header .site-nav { min-width: 0; }
 @media (max-width: 1360px) { .site-header .site-nav { display: none; } .site-header .plan-link { display: inline; } }
+
+/* ================= Patio = l'outil de matching de Lamia (thème « nuit » kabyle de l'outil) ================= */
+.po-app { --po-fg: #fff4ec; --po-muted: #e6cbc2; --po-coral: #ff7a62; --po-gold: #ffd27a; --po-card: rgba(52,9,22,.72); --po-border: rgba(255,235,210,.18); --po-input: rgba(255,235,210,.30);
+  --po-title: "Playfair Display", Georgia, serif; --po-body: Inter, system-ui, sans-serif;
+  position: relative; color-scheme: dark; color: var(--po-fg); font-family: var(--po-body); padding: clamp(12px, 2vw, 24px) clamp(10px, 3vw, 40px) 40px;
+  background: linear-gradient(180deg, rgba(32,4,12,.90), rgba(25,3,8,.94)), url(/images/outil/fond-kabyle.webp) center / cover fixed; }
+.po-app :is(h1, h2, h3) { font-family: var(--po-title); font-weight: 600; color: var(--po-fg); }
+.po-app p { color: var(--po-muted); }
+/* bandeau d'accueil, comme l'écran d'accueil de l'outil */
+.po-hero { position: relative; isolation: isolate; overflow: hidden; border-radius: 24px; max-width: 1280px; margin: 0 auto 28px; padding: 92px clamp(18px, 4vw, 56px) 34px; background: #1a0608; box-shadow: 0 18px 50px rgba(60,6,20,.35); }
+.po-fond { position: absolute; inset: -40px; z-index: -2; background: url(/images/outil/fond-kabyle.webp) center / cover; animation: po-kb 40s ease-in-out infinite alternate; }
+.po-hero::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(35,4,12,.82) 0%, rgba(35,4,12,.45) 30%, rgba(35,4,12,.2) 55%), linear-gradient(0deg, rgba(25,3,8,.85) 0%, rgba(25,3,8,0) 40%), linear-gradient(90deg, rgba(25,3,8,.7), rgba(25,3,8,0) 70%); }
+@keyframes po-kb { from { transform: scale(1.02) translate(10px, 0); } to { transform: scale(1.12) translate(-24px, -8px); } }
+.po-garland { position: absolute; left: 0; right: 0; top: 0; height: 80px; pointer-events: none; }
+.po-garland svg { position: absolute; left: 0; top: 0; width: 100%; height: 40px; overflow: visible; }
+.po-gj { position: absolute; width: clamp(14px, 1.8vw, 22px); margin-left: -10px; transform-origin: 50% 0; animation: po-sw var(--d, 3s) ease-in-out infinite alternate; animation-delay: var(--l, 0s); filter: drop-shadow(0 3px 4px rgba(0,0,0,.5)); }
+.po-gj img, .po-gcorner img { display: block; width: 100%; height: auto; }
+.po-gcorner { position: absolute; right: 14px; top: -6px; width: clamp(40px, 5vw, 62px); transform-origin: 50% 8%; animation: po-sw 4.6s ease-in-out infinite alternate; filter: drop-shadow(0 6px 8px rgba(0,0,0,.55)); }
+@keyframes po-sw { from { transform: rotate(-9deg); } to { transform: rotate(9deg); } }
+.po-hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 28px; align-items: center; }
+.po-eyebrow { margin: 0 0 10px; font-size: 12px; letter-spacing: .45em; text-transform: uppercase; color: #ffe9d2 !important; text-shadow: 0 2px 10px rgba(0,0,0,.8); }
+.po-hero h1 { margin: 0; font-size: clamp(34px, 5vw, 58px); line-height: 1.12; background: linear-gradient(100deg, #fff 0%, #ffe0a8 22%, #ff8a6a 45%, #fff 62%, #ffd27a 82%, #fff 100%); background-size: 260% 100%; -webkit-background-clip: text; background-clip: text; color: transparent !important; animation: po-sh 7s linear infinite; filter: drop-shadow(0 3px 10px rgba(60,0,10,.8)); }
+@keyframes po-sh { to { background-position: -260% 0; } }
+.po-sub { margin: 10px 0 0; font-family: var(--po-title); font-style: italic; font-size: clamp(17px, 2vw, 21px); color: #ffe3d6 !important; text-shadow: 0 2px 12px rgba(80,0,10,.9); }
+.po-lead { max-width: 58ch; margin: 14px 0 0; font-size: 16px; line-height: 1.6; color: #f3ddd4 !important; text-shadow: 0 1px 6px rgba(0,0,0,.7); }
+.po-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin: 22px 0 0; }
+.po-btn { border: 0; border-radius: 12px; padding: 13px 22px; font: 600 15px var(--po-body); color: #2a0610; background: linear-gradient(90deg, #ff7a62, #ffb07a); box-shadow: 0 8px 24px rgba(255,110,80,.35); cursor: pointer; transition: transform .2s, box-shadow .2s; }
+.po-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(255,110,80,.5); }
+.po-btn-verre { display: inline-block; border-radius: 12px; padding: 12px 20px; font: 600 15px var(--po-body); color: #fff4ec; text-decoration: none; background: rgba(255,255,255,.08); border: 1px solid rgba(255,210,122,.45); backdrop-filter: blur(8px); }
+.po-btn-verre:hover { background: linear-gradient(90deg, rgba(255,90,74,.34), rgba(255,210,122,.14)); }
+.po-lamia { margin: 0; display: grid; justify-items: center; gap: 12px; }
+.po-lamia img { width: clamp(150px, 18vw, 230px); height: auto; aspect-ratio: 1; border-radius: 50%; object-fit: cover; border: 3px solid #ffd27a; box-shadow: 0 0 0 4px rgba(255,210,122,.25), 0 0 28px rgba(255,190,90,.45); animation: po-ring 4s ease-in-out infinite; }
+@keyframes po-ring { 50% { box-shadow: 0 0 0 7px rgba(255,210,122,.4), 0 0 40px rgba(255,190,90,.65); } }
+.po-lamia figcaption { padding: 5px 16px; border-radius: 17px; background: rgba(40,6,14,.82); border: 1.5px solid #ffd27a; font: 600 15px var(--po-title); color: #ffe9c2; box-shadow: 0 0 24px rgba(255,190,90,.45); white-space: nowrap; }
+.po-track { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); list-style: none; margin: 34px auto 0; padding: 0; max-width: 820px; }
+.po-track::before { content: ""; position: absolute; left: 12.5%; right: 12.5%; top: 8px; height: 2px; background: linear-gradient(90deg, #ff5a4a, #ffd27a); box-shadow: 0 0 12px #ffb25a; }
+.po-track li { position: relative; display: grid; justify-items: center; gap: 8px; }
+.po-track b { width: 18px; height: 18px; border-radius: 50%; background: #3a0a17; border: 2.5px solid #ffd27a; box-shadow: 0 0 12px rgba(255,200,100,.7); }
+.po-track span { font: 600 clamp(12px, 1.4vw, 15px) var(--po-title); color: #fff2ea; text-shadow: 0 2px 8px rgba(0,0,0,.9); text-align: center; }
+/* corps : cartes en verre bordeaux */
+.po-corps { max-width: 1280px; margin: 0 auto; padding: 0; background: transparent; }
+.po-app .patio-etapes, .po-app .annonce-carte, .po-app .now-card, .po-app .annonce-form, .po-app .annonce-merci, .po-app .annonce-vide, .po-app .annonce-retrait, .po-app .annonce-intro { background: var(--po-card) !important; color: var(--po-fg) !important; border: 1px solid var(--po-border) !important; border-radius: 18px; box-shadow: 0 14px 40px rgba(20,2,6,.35) !important; backdrop-filter: blur(10px); }
+.po-app .patio-etapes h2, .po-app .annonces-titre { color: var(--po-fg) !important; }
+.po-app .annonces-sous { color: var(--po-muted) !important; max-width: 75ch; }
+.po-app .patio-etapes li strong { color: #ffd27a !important; }
+.po-app .patio-etapes li span { color: var(--po-muted) !important; }
+.po-app .patio-etapes li::before { background: linear-gradient(90deg, #ff7a62, #ffb07a) !important; color: #2a0610 !important; border: 0 !important; }
+/* profils anonymes, comme les fiches de l'outil */
+.po-app .annonce-carte { grid-template-rows: none; grid-template-columns: auto minmax(0, 1fr); gap: 0 4px; padding: 18px 16px 18px 18px; transition: transform .2s, box-shadow .2s; }
+.po-app .annonce-carte:hover { transform: translateY(-3px); box-shadow: 0 20px 50px rgba(20,2,6,.5) !important; }
+.po-app .annonce-sceau { width: 74px; height: 74px; margin: 4px 6px 0 0; border-radius: 50%; overflow: hidden; border: 2.5px solid #ffd27a; box-shadow: 0 0 0 2px rgba(255,210,122,.25), 0 0 18px rgba(255,190,90,.35); background: #3a0d1b; animation: po-ring 4s ease-in-out infinite; }
+.po-app .annonce-sceau img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.po-app .annonce-texte { padding: 0; }
+.po-app .annonce-texte :is(h3, p) { color: var(--po-fg) !important; }
+.po-app .annonce-texte h3 { font-size: 24px; }
+.po-app .annonce-texte h4 { color: #ffd27a !important; }
+.po-app .annonce-texte p { color: #f3ddd4 !important; }
+.po-app .annonce-ref { font-size: 11px !important; display: inline-block; justify-self: start; padding: 3px 10px; border-radius: 999px; background: rgba(44,160,120,.2); border: 1px solid #4fd1a1; color: #9ff0cf !important; }
+.po-app .annonce-lieu { color: var(--po-muted) !important; }
+.po-app .annonce-tags span { background: rgba(255,255,255,.08) !important; color: #ffe3d6 !important; border: 1px solid rgba(255,235,210,.22) !important; }
+.po-app .annonce-texte .btn, .po-app .annonce-envoyer, .po-app .annonce-form .btn { border: 0; border-radius: 12px; font-family: var(--po-body); font-weight: 600; color: #2a0610 !important; background: linear-gradient(90deg, #ff7a62, #ffb07a) !important; box-shadow: 0 8px 24px rgba(255,110,80,.3); }
+/* formulaire, comme la fiche profil de l'outil */
+.po-app .annonce-form :is(label, legend, span, small, h3, p) { color: var(--po-fg) !important; }
+.po-app .annonce-form small, .po-app .annonce-aide { color: var(--po-muted) !important; }
+.po-app .annonce-etape { border-bottom-color: var(--po-border); }
+.po-app .annonce-etape h3 span { background: linear-gradient(90deg, #ff7a62, #ffb07a) !important; color: #2a0610 !important; }
+.po-app .annonce-form :is(input:not([type=checkbox]):not([type=radio]):not([type=file]), select, textarea) { background: rgba(255,255,255,.07) !important; color: var(--po-fg) !important; border: 1px solid var(--po-input) !important; border-radius: 10px; }
+.po-app .annonce-form ::placeholder { color: rgba(255,235,220,.55); }
+.po-app .annonce-form option, .po-app .annonce-form optgroup { background: #3a0d1b; color: #fff4ec; }
+.po-app .annonce-puces span { background: rgba(255,255,255,.07) !important; border-color: rgba(255,235,210,.3) !important; color: #fff4ec !important; }
+.po-app .annonce-puces span:hover { background: rgba(255,122,98,.22) !important; }
+.po-app .annonce-puces input:checked + span { background: linear-gradient(90deg, rgba(255,90,74,.5), rgba(255,210,122,.22)) !important; border-color: #ffd27a !important; color: #fff !important; }
+.po-app .annonce-case input, .po-app .annonce-choix input { accent-color: #ff7a62; }
+.po-app .annonce-case a, .po-app .annonce-merci a { color: #ffd27a !important; }
+.po-app .annonce-id { background: rgba(255,200,90,.12) !important; border: 1px solid rgba(255,210,122,.4); }
+.po-app .annonce-depot { background: rgba(255,255,255,.06) !important; border-color: #ffd27a !important; color: #ffd27a !important; }
+.po-app .annonce-apercu img, .po-app .annonce-ico { background: rgba(255,255,255,.08); }
+.po-app .annonce-intro :is(h2, p) { color: var(--po-fg) !important; }
+.po-app .annonce-intro h2 { -webkit-text-fill-color: currentColor; background: none; font-family: var(--po-title); }
+.po-app .form-status.is-error { color: #ffb3bc !important; }
+.po-app .now-card :is(h3, p) { color: var(--po-fg) !important; }
+.po-app .now-card .now-room { color: #ffd27a !important; }
+.po-app .now-card a { color: #ff9f8a !important; }
+@media (max-width: 760px) {
+  .po-hero { padding-top: 74px; }
+  .po-app { background-attachment: scroll; }
+  .po-eyebrow { letter-spacing: .22em; font-size: 11px; }
+  .po-hero-grid { grid-template-columns: 1fr; }
+  .po-lamia { order: -1; }
+  .po-app .annonce-carte { grid-template-columns: 1fr; }
+  .po-app .annonce-sceau { margin-bottom: 10px; }
+}
+@media (prefers-reduced-motion: reduce) { .po-app * { animation: none !important; } }

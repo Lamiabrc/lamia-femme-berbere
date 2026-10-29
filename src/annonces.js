@@ -216,7 +216,7 @@ function carte(a) {
   const tags = [...(a.origine || []), ...(a.caracteristiques || [])];
   const infos = [a.genre === 'femme' ? 'Une femme' : 'Un homme', `${a.age} ans`, lib(a.pays), a.situation && lib(a.situation), a.enfants === 'Oui' ? 'avec enfant(s)' : a.enfants === 'Non' ? 'sans enfant' : '', a.etudes && `études : ${lib(a.etudes).toLowerCase()}`].filter(Boolean);
   return `<article class="annonce-carte annonce-anonyme">
-    <div class="annonce-sceau" aria-hidden="true"><span>${a.genre === 'femme' ? '♀' : '♂'}</span></div>
+    <div class="annonce-sceau" aria-hidden="true"><img src="/images/outil/${a.genre === 'femme' ? 'h_femme' : 'h_man'}.webp" alt="" width="80" height="80"></div>
     <div class="annonce-texte">
       <p class="annonce-ref">Profil n° ${a.ref} · ✓ vérifié par Lamia · anonyme</p>
       <h3>${esc(infos.slice(0, 2).join(', '))}</h3>
