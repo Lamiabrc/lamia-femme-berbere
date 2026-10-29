@@ -14,6 +14,10 @@ function ouvrir(nom, scroll = true) {
   const p = $(`[data-panneau="${nom}"]`);
   if (scroll && p) p.scrollIntoView({ behavior: 'smooth', block: 'start' });
   if (nom === 'conversation') chargerConversation();
+  if (nom === 'annonce') {
+    const box = $('[data-annonce-box]');
+    if (box && !box.dataset.monte) { box.dataset.monte = '1'; import('./annonces.js').then((m) => m.monterFormulaire(box)); }
+  }
 }
 document.querySelectorAll('[data-choix]').forEach((b) => b.addEventListener('click', () => ouvrir(b.dataset.choix)));
 
@@ -152,5 +156,13 @@ $('[data-conv-sortir]')?.addEventListener('click', async () => {
 
 // Arrivée par le lien de connexion, ou par un lien direct vers la conversation.
 supabase.auth.onAuthStateChange((event) => { if (event === 'SIGNED_IN' && location.hash.includes('conversation')) setTimeout(() => ouvrir('conversation', false), 0); });
-if (location.hash.startsWith('#conversation') || /access_token|type=magiclink/.test(location.hash)) ouvrir('conversation', false);
+// Venue d'une annonce du Patio : message à Lamia déjà commencé.
+const refAnnonce = new URLSearchParams(location.search).get('annonce');
+if (/^\d{1,6}$/.test(refAnnonce || '')) {
+  ouvrir('ecrire', false);
+  const t = document.querySelector('[data-conf-ecrit] textarea[name=body]');
+  if (t && !t.value) t.value = `Bonjour Lamia, l’annonce n° ${refAnnonce} du Patio m’a touché(e). J’aimerais faire connaissance avec cette personne. Voici quelques mots sur moi : `;
+  setTimeout(() => $('[data-panneau="ecrire"]')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
+} else if (location.hash === '#annonce') ouvrir('annonce', false);
+else if (location.hash.startsWith('#conversation') || /access_token|type=magiclink/.test(location.hash)) ouvrir('conversation', false);
 else if (location.hash === '#signaler') { const d = $('.conf-details'); if (d) d.open = true; }

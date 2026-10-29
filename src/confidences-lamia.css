@@ -77,3 +77,12 @@ legend { font-size: 14px; font-weight: 600; padding: 0 4px; }
 .rec-import { display: flex !important; gap: 6px; font-weight: 400 !important; color: var(--gris); }
 .rec-import span { color: var(--vieux-rose-fonce); text-decoration: underline; }
 .rec-import input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.cl-annonce { display: grid; gap: 10px; margin-bottom: 16px; }
+.cl-annonce h3 { margin: 0; }
+.cl-annonce-medias { display: flex; flex-wrap: wrap; gap: 8px; }
+.cl-annonce-medias img, .cl-annonce-medias video { width: 150px; height: 190px; object-fit: cover; border-radius: 12px; }
+.cl-annonce-id { padding: 10px; border-radius: 12px; background: #fff4e5; }
+.cl-annonce-id img { max-width: 100%; max-height: 260px; border-radius: 10px; }
+.cl-annonce p { white-space: pre-line; margin: 0; }
+.cl-annonce label { display: grid; gap: 4px; }
+.cl-annonce input { padding: 9px 11px; border-radius: 10px; border: 1px solid #e0cfc8; font: inherit; }

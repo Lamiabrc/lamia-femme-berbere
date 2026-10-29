@@ -66,6 +66,10 @@ Données stockées par Supabase, centre de données de Paris (Union européenne)
 <li><strong>Commandes et précommandes</strong> : nom, adresse de livraison, téléphone éventuel et email, pour livrer, facturer et te tenir informée. Les données de carte bancaire sont traitées uniquement par Stripe ; la Maison n’y a jamais accès.</li>
 </ul>
 <p>Le salon que tu choisis (par exemple Algérie–France) peut laisser deviner une origine. Cette information sert uniquement à organiser les soirées : elle n’est jamais publiée, vendue ni utilisée pour de la publicité.</p>
+<h2>Annonces de rencontre du Patio</h2>
+<p>Quand tu déposes une annonce, nous recevons ton prénom, ton genre, ta date de naissance, ta ville et ton pays, ta situation, tes textes, tes photos ou ta vidéo, ton email et éventuellement ton téléphone, ainsi qu’une photo de ta pièce d’identité dont le numéro est caché par ta main. Ces données servent uniquement à vérifier et publier ton annonce et à te mettre en relation (base : ton consentement).</p>
+<p>Après vérification par Lamia, seuls ton prénom, ton âge (jamais ta date de naissance), ta ville, ton pays, ta situation, tes textes et tes photos ou ta vidéo sont publiés. Ton email, ton téléphone et ta pièce d’identité ne sont jamais publiés. <strong>La photo de la pièce d’identité est supprimée dès que Lamia publie ou refuse l’annonce.</strong> Les fichiers sont conservés dans un stockage privé et affichés par des liens temporaires.</p>
+<p>Tu peux retirer ton annonce à tout moment grâce au lien reçu par email, ou en écrivant à Lamia : tes textes, photos et vidéo sont alors effacés.</p>
 <h2>Qui y a accès</h2>
 <p>Seule Lamia, et les prestataires techniques ci-dessous dans la limite de leur mission. Les autres participantes et participants ne voient que ton prénom pendant la soirée. Ton email n’est communiqué à une autre personne qu’en cas de souhait réciproque, et seulement avec ton accord.</p>
 <h2>Prestataires et lieux de stockage</h2>

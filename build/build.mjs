@@ -996,6 +996,15 @@ page(
   <button type="button" class="conf-carte" data-choix="ecrire" aria-expanded="false"><span class="conf-icone" aria-hidden="true">✎</span><strong>Je préfère écrire</strong><small>Un message, et si tu veux des photos ou des documents.</small></button>
   <button type="button" class="conf-carte" data-choix="parler" aria-expanded="false"><span class="conf-icone" aria-hidden="true">🎙</span><strong>Je préfère parler</strong><small>Un message vocal, enregistré ici même.</small></button>
   <button type="button" class="conf-carte" data-choix="conversation" aria-expanded="false"><span class="conf-icone" aria-hidden="true">❦</span><strong>Échanger avec Lamia</strong><small>Une conversation privée, que tu retrouves quand tu veux.</small></button>
+  <button type="button" class="conf-carte" data-choix="annonce" aria-expanded="false"><span class="conf-icone" aria-hidden="true">💌</span><strong>Déposer mon annonce</strong><small>Ton portrait et la personne que tu cherches, vérifiés par Lamia.</small></button>
+</section>
+
+<section class="conf-panneau" data-panneau="annonce" id="annonce" hidden>
+  <div class="conf-form">
+    <h2>Déposer mon annonce de rencontre</h2>
+    <p>Tu cherches quelqu’un de sérieux pour construire ta vie ? Présente-toi avec ton cœur, dis-nous qui tu aimerais rencontrer, et Lamia s’occupe du reste. Elle lit chaque annonce elle-même, vérifie que la personne est bien réelle, puis la publie dans le Patio. Quand quelqu’un s’intéresse à toi, c’est elle qui fait le lien : tes coordonnées restent privées.</p>
+    <div data-annonce-box></div>
+  </div>
 </section>
 
 <section class="conf-panneau" data-panneau="ecrire" hidden>
@@ -1149,6 +1158,7 @@ page(
       <button type="button" data-filtre="en_cours" aria-pressed="false">En cours <b data-n="en_cours"></b></button>
       <button type="button" data-filtre="termine" aria-pressed="false">Terminé <b data-n="termine"></b></button>
       <button type="button" data-filtre="tous" aria-pressed="false">Tout</button>
+      <button type="button" data-ouvrir-annonces>💌 Annonces <b data-n-annonces></b></button>
     </nav>
     <div class="cl-alerte" data-alerte-notif hidden></div>
     <ul class="cl-liste" data-liste></ul>
@@ -1188,6 +1198,12 @@ page(
     <p class="cl-bas"><button type="button" class="cl-lien" data-supprimer>Supprimer cette conversation</button> (à la demande de la personne)</p>
   </section>
 
+  <section class="cl-reglages" data-annonces-vue hidden>
+    <h2>Annonces de rencontre</h2>
+    <p class="cl-aide">Vérifie chaque annonce et la pièce d’identité. En publiant, la pièce d’identité est supprimée automatiquement et la personne reçoit un email.</p>
+    <div data-annonces></div>
+  </section>
+
   <section class="cl-reglages" data-reglages-vue hidden>
     <h2>Alertes</h2>
     <div class="cl-carte">
@@ -1223,13 +1239,26 @@ page(
 page(
   '/patio/',
   layout({
-    title: 'Le Patio · Communauté Lamia Femme Berbère',
-    description: 'Annonces, célébrations, témoignages et rendez-vous de la communauté Lamia Femme Berbère.',
+    title: 'Annonces de rencontre sérieuses · Le Patio de Lamia Femme Berbère',
+    description: 'Annonces de rencontre vérifiées par Lamia : dépose ton portrait et la personne que tu cherches, en vue du mariage. Identité contrôlée, coordonnées jamais affichées.',
     path: '/patio/',
     room: roomBySlug.patio,
+    scripts: ['/assets/annonces.js'],
     body: `${roomHead(roomBySlug.patio)}
 <section class="room-body">
   <p class="prose-lead">${esc(P.patio.intro)}</p>
+  <div class="annonce-intro" id="annonces">
+    <div>
+      <p class="now-room">Les annonces de la communauté</p>
+      <h2>Et si ta belle rencontre commençait ici ?</h2>
+      <p>Dans le Patio, chacune et chacun peut déposer son annonce : un portrait sincère, une ou deux photos (ou une petite vidéo), et la personne qu’on espère rencontrer. Lamia lit chaque annonce elle-même et vérifie l’identité de chaque personne avant de la publier. Tes coordonnées ne sont jamais affichées : quand une annonce te touche, tu écris à Lamia, et c’est elle qui fait le lien, avec douceur et discrétion.</p>
+      <p><button type="button" class="btn btn-ink" data-annonce-ouvrir aria-expanded="false">💌 Je dépose mon annonce</button> <a class="btn btn-line" href="#annonces-liste">Voir les annonces</a></p>
+    </div>
+  </div>
+  <div class="annonce-retrait" data-annonce-retrait hidden></div>
+  <div class="annonce-box" data-annonce-box hidden></div>
+  <h2 class="annonces-titre" id="annonces-liste">Les annonces vérifiées par Lamia</h2>
+  <div class="annonces-liste" data-annonces-liste><p class="annonce-vide">Les annonces arrivent…</p></div>
   <div class="now-grid">
     <article class="now-card" data-accent="rouge"><p class="now-room">Chaque soir</p><h3>Live Mariage Kabyle</h3><p>De 21 h à 23 h, sur TikTok.</p><a href="https://www.tiktok.com/@lamiaberbere" rel="noopener" target="_blank">Rejoindre le live</a></article>
     <article class="now-card" data-accent="rouge" data-next-event><p class="now-room">Le Boudoir des Rencontres</p><h3>Prochaine soirée</h3><p>Les prochaines soirées arrivent.</p><a href="/speed-dating/">Voir les soirées</a></article>
@@ -1600,7 +1629,7 @@ await cp(join(ROOT, 'public'), DIST, { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await writeFile(join(DIST, 'assets', 'editable.json'), JSON.stringify({ fields: [...EDITABLE, ...REGISTRE], defaults: DEFAULTS }));
-for (const f of ['maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
+for (const f of ['maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'annonces.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
 await cp(join(ROOT, 'content', 'shipping.mjs'), join(DIST, 'assets', 'shipping.mjs'));
 await cp(join(ROOT, 'content', 'rubriques.mjs'), join(DIST, 'assets', 'rubriques.mjs'));
 await cp(join(ROOT, 'src', 'i18n.js'), join(DIST, 'assets', 'i18n.js'));

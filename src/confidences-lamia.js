@@ -12,8 +12,8 @@ let session = null, threads = [], filtre = 'a_lire', courant = null, minuteur = 
 async function jetonFrais() { ({ data: { session } } = await supabase.auth.getSession()); return session?.access_token; }
 
 function vue(nom) {
-  for (const [k, sel] of [['login', '[data-login]'], ['liste', '[data-liste-vue]'], ['fil', '[data-fil-vue]'], ['reglages', '[data-reglages-vue]']]) $(sel).hidden = k !== nom;
-  $('[data-retour]').hidden = !['fil', 'reglages'].includes(nom);
+  for (const [k, sel] of [['login', '[data-login]'], ['liste', '[data-liste-vue]'], ['fil', '[data-fil-vue]'], ['reglages', '[data-reglages-vue]'], ['annonces', '[data-annonces-vue]']]) $(sel).hidden = k !== nom;
+  $('[data-retour]').hidden = !['fil', 'reglages', 'annonces'].includes(nom);
   $('[data-ouvrir-reglages]').hidden = nom === 'login';
   window.scrollTo(0, 0);
 }
@@ -23,6 +23,7 @@ async function demarrer() {
   ({ data: { session } } = await supabase.auth.getSession());
   if (session?.user?.app_metadata?.role !== 'admin') { vue('login'); if (session) say($('[data-login-statut]'), 'Ce compte n’a pas le rôle administratrice.', true); return; }
   await chargerListe();
+  api({ action: 'annonces_admin' }, await jetonFrais()).then(({ annonces }) => { const n = annonces.filter((a) => a.status === 'a_verifier').length; $('[data-n-annonces]').textContent = n || ''; }).catch(() => {});
   router();
   clearInterval(minuteur);
   minuteur = setInterval(() => { if (document.visibilityState === 'visible') (courant ? rafraichirFil() : chargerListe()); }, 30000);
@@ -120,6 +121,7 @@ function router() {
   if (!session) return;
   const h = location.hash.slice(1);
   if (h === 'reglages') { courant = null; vue('reglages'); chargerReglages(); return; }
+  if (h === 'annonces') { courant = null; vue('annonces'); chargerAnnonces(); return; }
   if (/^[0-9a-f-]{36}$/i.test(h)) return ouvrirFil(h);
   courant = null; vue('liste'); rendreListe();
 }
@@ -206,3 +208,44 @@ $('[data-email-test]').addEventListener('click', async () => {
 
 supabase.auth.onAuthStateChange((event) => { if (event === 'SIGNED_OUT') vue('login'); });
 demarrer();
+
+// ---------------------------------------------------------------- annonces de rencontre à vérifier
+const STATUT_ANNONCE = { a_verifier: 'À vérifier', publiee: 'En ligne', refusee: 'Refusée' };
+async function chargerAnnonces() {
+  const box = $('[data-annonces]');
+  box.innerHTML = '<p class="cl-vide">Chargement…</p>';
+  try {
+    const { annonces } = await api({ action: 'annonces_admin' }, await jetonFrais());
+    const n = annonces.filter((a) => a.status === 'a_verifier').length;
+    $('[data-n-annonces]').textContent = n || '';
+    if (!annonces.length) { box.innerHTML = '<p class="cl-vide">Aucune annonce pour le moment.</p>'; return; }
+    box.innerHTML = annonces.map((a) => `<article class="cl-carte cl-annonce" data-id="${a.id}">
+      <p class="cl-coord"><b>N° ${a.ref}</b> · ${STATUT_ANNONCE[a.status] || a.status}${a.submitted_at ? ` · reçue le ${quand(a.submitted_at)}` : ''}</p>
+      <h3>${esc(a.prenom)}, ${a.age} ans · ${a.genre === 'femme' ? 'femme' : 'homme'}</h3>
+      <p class="cl-coord">${esc(a.ville)}, ${esc(a.pays)}${a.situation ? ` · ${esc(a.situation)}` : ''} · né(e) le ${esc(a.birth_date)}<br>${esc(a.email)}${a.phone ? ` · ${esc(a.phone)}` : ''}</p>
+      <div class="cl-annonce-medias">${a.medias.map((m) => !m.url ? '' : m.kind === 'video' ? `<video src="${esc(m.url)}" controls playsinline preload="metadata"></video>` : `<a href="${esc(m.url)}" target="_blank" rel="noopener"><img src="${esc(m.url)}" alt="Photo"></a>`).join('')}</div>
+      ${a.identite?.url ? `<div class="cl-annonce-id"><p><b>Pièce d’identité</b> (vérifie le prénom, l’âge et que le numéro est caché) :</p>${a.identite.mime === 'application/pdf' ? `<a class="cl-btn" href="${esc(a.identite.url)}" target="_blank" rel="noopener">Ouvrir le PDF</a>` : `<a href="${esc(a.identite.url)}" target="_blank" rel="noopener"><img src="${esc(a.identite.url)}" alt="Pièce d’identité"></a>`}</div>` : a.identite_verifiee_at ? `<p class="cl-aide">✓ Identité vérifiée le ${quand(a.identite_verifiee_at)} (pièce supprimée).</p>` : ''}
+      <p><b>Qui je suis</b><br>${esc(a.profil)}</p>
+      <p><b>Qui je cherche</b>${a.age_min || a.age_max ? ` (${a.age_min || 18}-${a.age_max || 99} ans)` : ''}<br>${esc(a.recherche)}</p>
+      <label>Un mot pour la personne <small>(envoyé par email en cas de refus)</small><input data-note maxlength="600" value="${esc(a.note_lamia || '')}"></label>
+      <div class="cl-outils">
+        ${a.status !== 'publiee' ? '<button class="cl-btn cl-plein" type="button" data-decision="publier">✓ Publier</button>' : ''}
+        ${a.status !== 'refusee' ? `<button class="cl-btn" type="button" data-decision="refuser">${a.status === 'publiee' ? 'Retirer du site' : 'Refuser'}</button>` : ''}
+        <button class="cl-btn" type="button" data-decision="supprimer">Supprimer définitivement</button>
+      </div>
+      <p class="cl-statut" role="status" data-annonce-statut></p>
+    </article>`).join('');
+  } catch (err) { box.innerHTML = `<p class="cl-vide">${esc(erreur(err.code))}</p>`; }
+}
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-decision]');
+  if (!b) return;
+  const carte = b.closest('[data-id]'), st = carte.querySelector('[data-annonce-statut]');
+  const d = b.dataset.decision;
+  if (d === 'supprimer' && !confirm('Supprimer définitivement cette annonce et ses fichiers ?')) return;
+  if (d === 'refuser' && !confirm('Refuser cette annonce ? Les photos et la pièce d’identité seront supprimées et la personne prévenue par email.')) return;
+  say(st, 'Un instant…');
+  try { await api({ action: 'annonce_moderer', annonce_id: carte.dataset.id, decision: d, note: carte.querySelector('[data-note]').value }, await jetonFrais()); await chargerAnnonces(); }
+  catch (err) { say(st, erreur(err.code), true); }
+});
+$('[data-ouvrir-annonces]')?.addEventListener('click', () => { location.hash = 'annonces'; });
