@@ -13,7 +13,7 @@ const ZONES = {
   atelier: [917, 288, 951, 341],
   grenier: [1032, 240, 1121, 282],
   bibliotheque: [1063, 302, 1174, 394],
-  patio: [427, 302, 534, 346],
+  patio: [800, 572, 1000, 700], // la cour pavée devant la Maison, le banc et le livre
   hall: [610, 371, 774, 578],
   ecrin: [785, 394, 850, 477],
   coiffeuse: [1043, 422, 1151, 493],

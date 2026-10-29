@@ -605,7 +605,7 @@ mark.todo { background: #fff3c4; color: var(--encre); padding: 0 4px; font-weigh
 }
 .plan-section, .plan-section[class] { background: linear-gradient(180deg, var(--nuit-photo) 0%, #2c2950 50%, var(--nuit-profonde) 100%); }
 .f-spot.is-pergola { border-radius: 10px; }
-.f-spot.is-pergola::before { inset: -10%; background: radial-gradient(ellipse at 50% 60%, rgba(255,214,140,.55), rgba(255,170,80,.2) 50%, transparent 75%); }
+.f-spot.is-pergola::before { inset: -10%; background: radial-gradient(ellipse at 50% 60%, rgba(255,214,140,.55), rgba(255,170,80,.2) 50%, transparent 75%); opacity: .45; animation: piece-light 4s ease-in-out infinite; }
 .f-spot:not(.is-door):not(.is-pergola) { border-radius: 999px 999px 6px 6px; }
 @media (max-width: 900px) {
   .hall-hero, .hall-hero[class] { background:
