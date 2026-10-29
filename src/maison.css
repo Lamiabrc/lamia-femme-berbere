@@ -2732,3 +2732,35 @@ body .preorder .form-status.is-error, body[data-ambiance] .preorder .form-status
 .annonce-retrait p { color: #2a2024; }
 .conf .annonce-form { box-shadow: none; }
 .annonce-form .annonce-choix label { display: inline-flex; white-space: nowrap; width: auto; }
+
+/* Annonces : mise en avant bordeaux et or */
+.annonce-intro { position: relative; overflow: hidden; background: radial-gradient(ellipse 80% 70% at 85% 0%, rgba(227,189,110,.28), transparent 60%), linear-gradient(135deg, #5c0f22 0%, #7d1530 55%, #4a0b1b 100%); border: 2px solid #d9b25f; box-shadow: 0 0 0 6px rgba(217,178,95,.18), 0 30px 60px -30px rgba(74,11,27,.7); color: #fff6e6; }
+.annonce-intro::before { content: '❦'; position: absolute; right: 22px; top: 10px; font-size: 90px; line-height: 1; color: rgba(227,189,110,.22); pointer-events: none; }
+.annonce-intro :is(h2, p) { color: #fff6e6 !important; }
+.annonce-intro h2 { font-size: clamp(30px, 4vw, 46px); background: linear-gradient(90deg, #fff1c9, #e3bd6e 60%, #c9944a); -webkit-background-clip: text; background-clip: text; color: transparent !important; }
+.annonce-intro .now-room { color: #e3bd6e !important; letter-spacing: .14em; text-transform: uppercase; }
+.annonce-intro .btn-ink { background: linear-gradient(180deg, #f0d08a, #d4a64e); color: #3a0a16 !important; border-color: #f0d08a; font-weight: 700; }
+.annonce-intro .btn-line { color: #fff1c9 !important; border-color: rgba(227,189,110,.8); }
+.annonce-form { border: 2px solid #d9b25f; box-shadow: 0 0 0 5px rgba(217,178,95,.15); }
+.annonce-etape h3 { color: #5c0f22 !important; }
+.annonce-etape h3 span { background: linear-gradient(180deg, #7d1530, #5c0f22); box-shadow: 0 0 0 2px #d9b25f; }
+.annonce-sous { margin: 6px 0 0; font-weight: 600; font-size: 15px; color: #2a2024; }
+.annonce-puces { display: flex; flex-wrap: wrap; gap: 8px; }
+.annonce-puces label { display: inline-flex !important; align-items: center; gap: 0 !important; font-weight: 500 !important; }
+.annonce-puces input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.annonce-puces span { padding: 7px 13px; border-radius: 999px; border: 1px solid #d9c7a8; background: #fffaf2; color: #3d3034 !important; font-size: 14px; cursor: pointer; transition: all .15s; }
+.annonce-puces input:checked + span { background: linear-gradient(180deg, #7d1530, #5c0f22); border-color: #d9b25f; color: #fff6e6 !important; }
+.annonce-puces input:focus-visible + span { outline: 2px solid #b0162e; outline-offset: 2px; }
+.annonce-ages { display: grid !important; grid-template-columns: auto 74px auto 74px auto; gap: 8px; align-items: center; align-self: end; }
+.annonce-form .annonce-envoyer { background: linear-gradient(180deg, #7d1530, #5c0f22); border: 2px solid #d9b25f; color: #fff6e6; font-size: 17px; padding: 14px 26px; justify-self: start; }
+.annonce-carte { border: 2px solid #d9b25f; }
+.annonce-texte .btn { background: linear-gradient(180deg, #7d1530, #5c0f22); border-color: #d9b25f; color: #fff6e6; }
+.annonce-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.annonce-tags span { padding: 3px 10px; border-radius: 999px; background: #fbf1df; border: 1px solid #e3cf9f; font-size: 12px; color: #5c0f22; }
+.annonces-titre { color: #5c0f22; }
+/* Carte « Déposer mon annonce » des Confidences : bordeaux et or */
+.conf-carte[data-choix="annonce"] { background: linear-gradient(135deg, #5c0f22, #7d1530); border: 2px solid #d9b25f; box-shadow: 0 0 0 4px rgba(217,178,95,.2); }
+.conf-carte[data-choix="annonce"] :is(strong, small) { color: #fff6e6 !important; }
+.conf-carte[data-choix="annonce"] .conf-icone { background: #fff6e6; border-color: #d9b25f; }
+.annonce-form [hidden], .annonce-box[hidden], .annonce-retrait[hidden] { display: none !important; }
+.annonce-intro::before { top: auto; bottom: 8px; right: 16px; font-size: 110px; }

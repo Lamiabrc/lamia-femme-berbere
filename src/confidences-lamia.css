@@ -86,3 +86,4 @@ legend { font-size: 14px; font-weight: 600; padding: 0 4px; }
 .cl-annonce p { white-space: pre-line; margin: 0; }
 .cl-annonce label { display: grid; gap: 4px; }
 .cl-annonce input { padding: 9px 11px; border-radius: 10px; border: 1px solid #e0cfc8; font: inherit; }
+.cl-export { border: 2px solid #d9b25f; background: #fffaf0; margin-bottom: 16px; }

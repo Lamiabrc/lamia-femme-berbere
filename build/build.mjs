@@ -1201,6 +1201,13 @@ page(
   <section class="cl-reglages" data-annonces-vue hidden>
     <h2>Annonces de rencontre</h2>
     <p class="cl-aide">Vérifie chaque annonce et la pièce d’identité. En publiant, la pièce d’identité est supprimée automatiquement et la personne reçoit un email.</p>
+    <div class="cl-carte cl-export">
+      <h3>↪ Vers mon outil de matching</h3>
+      <p class="cl-aide">Les réponses du formulaire suivent exactement les champs de ton outil. Télécharge le fichier, puis dans l’outil : la liste des profils, bouton « Import CSV/JSON », et choisis ce fichier. Les profils déjà importés ne sont pas dupliqués.</p>
+      <p class="cl-aide" data-export-info></p>
+      <div class="cl-outils"><button class="cl-btn cl-plein" type="button" data-exporter-nouvelles>Exporter les nouvelles annonces</button><button class="cl-btn" type="button" data-exporter-toutes>Tout réexporter</button></div>
+      <p class="cl-statut" role="status" data-export-statut></p>
+    </div>
     <div data-annonces></div>
   </section>
 
@@ -1632,6 +1639,7 @@ await writeFile(join(DIST, 'assets', 'editable.json'), JSON.stringify({ fields: 
 for (const f of ['maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'annonces.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
 await cp(join(ROOT, 'content', 'shipping.mjs'), join(DIST, 'assets', 'shipping.mjs'));
 await cp(join(ROOT, 'content', 'rubriques.mjs'), join(DIST, 'assets', 'rubriques.mjs'));
+await cp(join(ROOT, 'content', 'matching-options.mjs'), join(DIST, 'assets', 'matching-options.mjs'));
 await cp(join(ROOT, 'src', 'i18n.js'), join(DIST, 'assets', 'i18n.js'));
 await mkdir(join(DIST, 'assets', 'i18n'), { recursive: true });
 await cp(join(ROOT, 'content', 'en', 'products.json'), join(DIST, 'assets', 'i18n', 'products-en.json'));

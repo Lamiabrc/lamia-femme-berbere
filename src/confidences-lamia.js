@@ -2,6 +2,7 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm';
 import { api, envoyer, erreur, esc, taille, quand, piecesHtml, PUBLIC_KEY } from './confidences-commun.js';
 import { monterEnregistreur } from './enregistreur.js';
+import { versOutil, lib } from './matching-options.mjs';
 
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', PUBLIC_KEY);
 const $ = (s) => document.querySelector(s);
@@ -211,6 +212,7 @@ demarrer();
 
 // ---------------------------------------------------------------- annonces de rencontre à vérifier
 const STATUT_ANNONCE = { a_verifier: 'À vérifier', publiee: 'En ligne', refusee: 'Refusée' };
+let dernieresAnnonces = [];
 async function chargerAnnonces() {
   const box = $('[data-annonces]');
   box.innerHTML = '<p class="cl-vide">Chargement…</p>';
@@ -219,18 +221,24 @@ async function chargerAnnonces() {
     const n = annonces.filter((a) => a.status === 'a_verifier').length;
     $('[data-n-annonces]').textContent = n || '';
     if (!annonces.length) { box.innerHTML = '<p class="cl-vide">Aucune annonce pour le moment.</p>'; return; }
+    dernieresAnnonces = annonces;
+    const aExporter = annonces.filter((a) => a.status === 'publiee' && !a.exportee_at).length;
+    $('[data-export-info]').textContent = aExporter ? `${aExporter} annonce(s) publiée(s) pas encore dans l’outil.` : 'Toutes les annonces publiées sont déjà dans l’outil.';
     box.innerHTML = annonces.map((a) => `<article class="cl-carte cl-annonce" data-id="${a.id}">
       <p class="cl-coord"><b>N° ${a.ref}</b> · ${STATUT_ANNONCE[a.status] || a.status}${a.submitted_at ? ` · reçue le ${quand(a.submitted_at)}` : ''}</p>
       <h3>${esc(a.prenom)}, ${a.age} ans · ${a.genre === 'femme' ? 'femme' : 'homme'}</h3>
       <p class="cl-coord">${esc(a.ville)}, ${esc(a.pays)}${a.situation ? ` · ${esc(a.situation)}` : ''} · né(e) le ${esc(a.birth_date)}<br>${esc(a.email)}${a.phone ? ` · ${esc(a.phone)}` : ''}</p>
       <div class="cl-annonce-medias">${a.medias.map((m) => !m.url ? '' : m.kind === 'video' ? `<video src="${esc(m.url)}" controls playsinline preload="metadata"></video>` : `<a href="${esc(m.url)}" target="_blank" rel="noopener"><img src="${esc(m.url)}" alt="Photo"></a>`).join('')}</div>
       ${a.identite?.url ? `<div class="cl-annonce-id"><p><b>Pièce d’identité</b> (vérifie le prénom, l’âge et que le numéro est caché) :</p>${a.identite.mime === 'application/pdf' ? `<a class="cl-btn" href="${esc(a.identite.url)}" target="_blank" rel="noopener">Ouvrir le PDF</a>` : `<a href="${esc(a.identite.url)}" target="_blank" rel="noopener"><img src="${esc(a.identite.url)}" alt="Pièce d’identité"></a>`}</div>` : a.identite_verifiee_at ? `<p class="cl-aide">✓ Identité vérifiée le ${quand(a.identite_verifiee_at)} (pièce supprimée).</p>` : ''}
+      ${a.matching && Object.keys(a.matching).length ? `<p class="cl-coord">${[a.matching.situation, a.matching.enfants === 'Oui' ? `${a.matching.nbEnfants || ''} enfant(s)` : a.matching.enfants === 'Non' ? 'sans enfant' : '', a.matching.niveauEtudeDetail || a.matching.niveauEtudeCategorie, a.matching.profession, a.matching.religion, a.matching.pratique, ...(a.matching.origineTags || [])].filter(Boolean).map(lib).map(esc).join(' · ')}${a.matching.contactReseau ? `<br>Réseau : ${esc(a.matching.contactReseau)}` : ''}</p>` : ''}
+      ${a.exportee_at ? `<p class="cl-aide">↪ Exportée vers l’outil de matching le ${quand(a.exportee_at)}</p>` : ''}
       <p><b>Qui je suis</b><br>${esc(a.profil)}</p>
       <p><b>Qui je cherche</b>${a.age_min || a.age_max ? ` (${a.age_min || 18}-${a.age_max || 99} ans)` : ''}<br>${esc(a.recherche)}</p>
       <label>Un mot pour la personne <small>(envoyé par email en cas de refus)</small><input data-note maxlength="600" value="${esc(a.note_lamia || '')}"></label>
       <div class="cl-outils">
         ${a.status !== 'publiee' ? '<button class="cl-btn cl-plein" type="button" data-decision="publier">✓ Publier</button>' : ''}
         ${a.status !== 'refusee' ? `<button class="cl-btn" type="button" data-decision="refuser">${a.status === 'publiee' ? 'Retirer du site' : 'Refuser'}</button>` : ''}
+        ${a.status === 'publiee' ? '<button class="cl-btn" type="button" data-exporter-une>↪ Fiche pour l’outil de matching</button>' : ''}
         <button class="cl-btn" type="button" data-decision="supprimer">Supprimer définitivement</button>
       </div>
       <p class="cl-statut" role="status" data-annonce-statut></p>
@@ -249,3 +257,42 @@ document.addEventListener('click', async (e) => {
   catch (err) { say(st, erreur(err.code), true); }
 });
 $('[data-ouvrir-annonces]')?.addEventListener('click', () => { location.hash = 'annonces'; });
+
+// ---------------------------------------------------------------- export vers l'outil local de matching (fichier JSON à importer)
+async function photoReduite(url) {
+  if (!url) return '';
+  try {
+    const blob = await (await fetch(url)).blob();
+    const img = await createImageBitmap(blob);
+    const k = Math.min(1, 480 / Math.max(img.width, img.height));
+    const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    return c.toDataURL('image/jpeg', 0.82);
+  } catch { return ''; }
+}
+async function exporter(liste) {
+  const st = $('[data-export-statut]');
+  if (!liste.length) return say(st, 'Rien à exporter : publie d’abord une annonce.', true);
+  say(st, `Préparation de ${liste.length} fiche(s)…`);
+  const profiles = [];
+  for (const a of liste) {
+    const photo = (a.medias || []).find((m) => m.kind === 'photo');
+    profiles.push(versOutil(a, { photoDataUrl: await photoReduite(photo?.url) }));
+  }
+  const fichier = new Blob([JSON.stringify({ source: 'lamia-femme-berbere.com', exporte_le: new Date().toISOString(), profiles }, null, 2)], { type: 'application/json' });
+  const lien = document.createElement('a');
+  lien.href = URL.createObjectURL(fichier);
+  lien.download = `annonces-site-pour-matching-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.append(lien); lien.click(); lien.remove();
+  try { await api({ action: 'annonces_exportees', ids: liste.map((a) => a.id) }, await jetonFrais()); } catch { /* */ }
+  say(st, `Fichier téléchargé (${profiles.length} fiche(s)). Dans ton outil de matching : la liste des profils, bouton « Import CSV/JSON », puis ce fichier.`);
+  chargerAnnonces();
+}
+$('[data-exporter-nouvelles]')?.addEventListener('click', () => exporter(dernieresAnnonces.filter((a) => a.status === 'publiee' && !a.exportee_at)));
+$('[data-exporter-toutes]')?.addEventListener('click', () => exporter(dernieresAnnonces.filter((a) => a.status === 'publiee')));
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-exporter-une]');
+  if (!b) return;
+  const a = dernieresAnnonces.find((x) => x.id === b.closest('[data-id]').dataset.id);
+  if (a) exporter([a]);
+});

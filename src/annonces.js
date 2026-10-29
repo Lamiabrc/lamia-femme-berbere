@@ -1,10 +1,10 @@
 // Annonces de rencontre : dépôt (Patio et Confidences) et affichage des annonces vérifiées par Lamia.
 import { api, esc, PUBLIC_KEY } from './confidences-commun.js';
+import { O, lib } from './matching-options.mjs';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const say = (el, m, err = false) => { if (!el) return; el.textContent = m; el.classList.toggle('is-error', err); };
-const PAYS = ['France', 'Algérie', 'Belgique', 'Suisse', 'Canada', 'États-Unis', 'Royaume-Uni', 'Allemagne', 'Espagne', 'Italie', 'Maroc', 'Tunisie', 'Autre pays'];
 const ERR = {
   consent_required: 'Coche les trois cases en bas du formulaire pour continuer.',
   missing_name: 'Indique ton prénom (ou un petit nom).',
@@ -21,7 +21,10 @@ const ERR = {
   file_size: 'Un fichier est trop lourd : 12 Mo par photo, 50 Mo pour la vidéo.',
   rate_limited: 'Tu as déjà déposé plusieurs annonces aujourd’hui : réessaie demain.',
   upload_failed: 'Les photos ne sont pas toutes arrivées. Vérifie ta connexion et réessaie.',
+  contact_requis: 'Laisse un numéro de téléphone ou le lien de ton TikTok, Instagram ou Facebook : Lamia en a besoin pour la mise en relation.',
 };
+const opts = (list, vide = 'Choisis…') => `<option value="">${vide}</option>${list.map((v) => `<option value="${esc(v)}">${esc(lib(v))}</option>`).join('')}`;
+const puces = (name, list) => `<div class="annonce-puces">${list.map((v) => `<label><input type="checkbox" name="${name}" value="${esc(v)}"><span>${esc(lib(v))}</span></label>`).join('')}</div>`;
 const PAR_EXT = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp', heic: 'image/heic', heif: 'image/heif', mp4: 'video/mp4', mov: 'video/quicktime', webm: 'video/webm', pdf: 'application/pdf' };
 const typeDe = (f) => (f.type && f.type !== 'application/octet-stream' ? f.type : PAR_EXT[String(f.name || '').split('.').pop().toLowerCase()] || 'application/octet-stream');
 const maxNaissance = () => { const d = new Date(); d.setFullYear(d.getFullYear() - 18); return d.toISOString().slice(0, 10); };
@@ -37,19 +40,56 @@ export function formulaireHtml() {
         <label><input type="radio" name="genre" value="homme"> un homme</label>
       </fieldset>
       <label>Ta date de naissance <small>(seul ton âge sera affiché)</small><input name="birth_date" type="date" max="${maxNaissance()}" required></label>
-      <label>Ta situation<select name="situation"><option value="">Je préfère ne pas dire</option><option>Célibataire</option><option>Divorcé(e)</option><option>Veuf / veuve</option><option>Séparé(e)</option></select></label>
       <label>Ta ville<input name="ville" maxlength="80" autocomplete="address-level2" required></label>
-      <label>Ton pays<select name="pays">${PAYS.map((p) => `<option>${p}</option>`).join('')}</select></label>
+      <label>Ton pays de résidence<select name="pays">${opts(O.pays)}</select></label>
+      <label>Ton village ou ta région d’origine <small>(facultatif)</small><input name="villageOrigine" maxlength="80"></label>
+      <label>Les langues que tu parles<input name="langue" maxlength="80" placeholder="Kabyle, français…"></label>
     </div>
+    <p class="annonce-sous">Tes origines</p>${puces('origineTags', O.origine)}
   </div>
   <div class="annonce-etape">
-    <h3><span>2</span> Ton profil</h3>
-    <label>Parle-nous de toi <small>(ton caractère, tes valeurs, ce que tu aimes, ta vie aujourd’hui)</small><textarea name="profil" rows="5" maxlength="1500" placeholder="Écris comme si tu te présentais à une amie de Lamia, avec le cœur."></textarea></label>
+    <h3><span>2</span> Ta vie aujourd’hui</h3>
+    <div class="annonce-grille">
+      <label>Ta situation<select name="situation">${opts(O.situation)}</select></label>
+      <label>As-tu des enfants ?<select name="enfants">${opts(O.enfants)}</select></label>
+      <label data-si-enfants hidden>Combien ?<input name="nbEnfants" type="number" min="0" max="15" inputmode="numeric"></label>
+      <label data-si-enfants hidden>Leurs âges<input name="ageEnfants" maxlength="60" placeholder="3 et 7 ans"></label>
+      <label>Souhaites-tu des enfants ?<select name="desirEnfants">${opts(O.desirEnfants)}</select></label>
+      <label>Ton niveau d’études<select name="niveauEtudeCategorie">${opts(O.etudeCategorie)}</select></label>
+      <label>Ton diplôme<select name="niveauEtudeDetail"><option value="">Choisis d’abord ton niveau</option></select></label>
+      <label>Diplôme obtenu en<select name="etudesPaysObtention">${opts(O.etudesPaysObtention)}</select></label>
+      <label>Ta profession<input name="profession" maxlength="80"></label>
+      <label>Ta taille <small>(en cm, facultatif)</small><input name="tailleCm" type="number" min="120" max="230" inputmode="numeric" placeholder="170"></label>
+      <label>Ta religion <small>(facultatif)</small><select name="religion">${opts(O.religion, 'Je préfère ne pas dire')}</select></label>
+      <label>Ta pratique <small>(facultatif)</small><select name="pratique">${opts(O.pratique, 'Je préfère ne pas dire')}</select></label>
+      <label>Bouger pour l’amour ?<select name="mobiliteGeographique">${opts(O.mobilite)}</select></label>
+      <label data-vision>Le travail dans le couple<select name="visionFinanciere"><option value="">Choisis d’abord femme ou homme</option></select></label>
+      <label>Tabac<select name="fumeur">${opts(O.fumeur)}</select></label>
+      <label>Sport<select name="sport">${opts(O.sport)}</select></label>
+      <label>Alcool<select name="alcool">${opts(O.alcool)}</select></label>
+    </div>
+    <p class="annonce-sous">Ce qui te ressemble <small>(jusqu’à 6)</small></p>${puces('caracteristiques', O.caracteristiques)}
+    <label>Parle-nous de toi avec ton cœur <small>(ton caractère, tes valeurs, ce que tu aimes)</small><textarea name="profil" rows="5" maxlength="1500" placeholder="Écris comme si tu te présentais à une amie de Lamia."></textarea></label>
   </div>
   <div class="annonce-etape">
     <h3><span>3</span> La personne que tu cherches</h3>
-    <label>Qui aimerais-tu rencontrer ? <small>(son caractère, vos projets, ce qui compte pour toi)</small><textarea name="recherche" rows="5" maxlength="1500" placeholder="Mariage, valeurs, région, enfants… dis ce qui est important pour toi."></textarea></label>
-    <div class="annonce-grille annonce-ages"><label>Âge de</label><input name="age_min" type="number" min="18" max="99" inputmode="numeric" aria-label="Âge minimum" placeholder="25"><label>à</label><input name="age_max" type="number" min="18" max="99" inputmode="numeric" aria-label="Âge maximum" placeholder="40"><span>ans</span></div>
+    <div class="annonce-grille">
+      <div class="annonce-ages"><label>Âge de</label><input name="age_min" type="number" min="18" max="99" inputmode="numeric" aria-label="Âge minimum" placeholder="25"><label>à</label><input name="age_max" type="number" min="18" max="99" inputmode="numeric" aria-label="Âge maximum" placeholder="40"><span>ans</span></div>
+      <label>Où doit-elle vivre ?<select name="zoneGeo">${opts(O.zoneGeo)}</select></label>
+      <label>Sa religion<select name="religionRecherche">${opts(O.religionRecherche)}</select></label>
+      <label>Sa pratique<select name="pratiqueRecherche">${opts(O.pratiqueRecherche)}</select></label>
+      <label>Son niveau d’études<select name="etudesRecherche">${opts(O.etudesRecherche)}</select></label>
+      <label data-hidjab hidden>Qu’elle porte le hijab ?<select name="rechercheFemmeHidjabiste">${opts(O.hidjab)}</select></label>
+    </div>
+    <p class="annonce-sous">Ses origines <small>(laisse vide si peu importe)</small></p>${puces('origineRechercheTags', O.origine)}
+    <div class="annonce-puces annonce-accepte">
+      <label><input type="checkbox" name="kabyleUniquement"><span>Uniquement kabyle</span></label>
+      <label><input type="checkbox" name="accepteDivorce"><span>J’accepte une personne divorcée</span></label>
+      <label><input type="checkbox" name="accepteVeuf"><span>J’accepte une personne veuve</span></label>
+      <label><input type="checkbox" name="accepteEnfants"><span>J’accepte une personne qui a des enfants</span></label>
+    </div>
+    <p class="annonce-sous">Son caractère <small>(jusqu’à 6)</small></p>${puces('caracteristiquesRecherche', O.caracteristiques)}
+    <label>Dis-nous qui tu aimerais rencontrer <small>(vos projets, ce qui compte pour toi)</small><textarea name="recherche" rows="4" maxlength="1500" placeholder="Mariage, valeurs, région… dis ce qui est important pour toi."></textarea></label>
   </div>
   <div class="annonce-etape">
     <h3><span>4</span> Tes photos ou ta vidéo</h3>
@@ -68,8 +108,10 @@ export function formulaireHtml() {
     <h3><span>6</span> Pour que Lamia te réponde</h3>
     <div class="annonce-grille">
       <label>Ton email<input name="email" type="email" autocomplete="email" required></label>
-      <label>Ton téléphone <small>(facultatif)</small><input name="phone" type="tel" autocomplete="tel" maxlength="40"></label>
+      <label>Ton téléphone<input name="phone" type="tel" autocomplete="tel" maxlength="40"></label>
+      <label>Ton TikTok, Instagram ou Facebook <small>(lien ou pseudo)</small><input name="contactReseau" maxlength="200" placeholder="@tonpseudo ou lien"></label>
     </div>
+    <p class="annonce-aide">Laisse au moins ton téléphone ou un réseau social : c’est par là que Lamia te contactera pour une mise en relation.</p>
     <p class="annonce-aide">Tes coordonnées ne sont jamais affichées. Quand quelqu’un s’intéresse à ton annonce, c’est Lamia qui reçoit le message et qui fait le lien, en douceur.</p>
   </div>
   <label class="annonce-case"><input type="checkbox" name="majeur"> <span>J’ai 18 ans ou plus et cette annonce est sincère : je cherche une vraie rencontre.</span></label>
@@ -104,6 +146,18 @@ export function monterFormulaire(box) {
     majMedias();
   });
   $('[data-identite]', form).addEventListener('change', (e) => { identite = [...e.target.files].slice(0, 1); e.target.value = ''; majId(); });
+  // Champs qui dépendent d'autres réponses (comme dans l'outil de matching).
+  const F = form.elements;
+  F.enfants.addEventListener('change', () => $$('[data-si-enfants]', form).forEach((l) => { l.hidden = F.enfants.value !== 'Oui'; }));
+  F.niveauEtudeCategorie.addEventListener('change', () => { const d = O.etudeDetail[F.niveauEtudeCategorie.value] || []; F.niveauEtudeDetail.innerHTML = d.length ? opts(d) : '<option value="">Choisis d’abord ton niveau</option>'; });
+  form.addEventListener('change', (e) => {
+    if (e.target.name === 'genre') {
+      const femme = e.target.value === 'femme';
+      F.visionFinanciere.innerHTML = opts(femme ? O.visionFemme : O.visionHomme);
+      $('[data-hidjab]', form).hidden = femme;
+    }
+    if (['caracteristiques', 'caracteristiquesRecherche'].includes(e.target.name) && e.target.checked && $$(`[name=${e.target.name}]:checked`, form).length > 6) { e.target.checked = false; say(st, 'Six choix au maximum : garde ceux qui te ressemblent le plus.'); }
+  });
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -114,12 +168,13 @@ export function monterFormulaire(box) {
     if (!form.querySelector('[name=genre]:checked')) return stop('missing_genre', form.querySelector('[name=genre]'));
     if (!f.birth_date.value) return stop('invalid_birth_date', f.birth_date);
     if (f.birth_date.value > maxNaissance()) return stop('mineur', f.birth_date);
-    if (!f.ville.value.trim()) return stop('missing_lieu', f.ville);
+    if (!f.ville.value.trim() || !f.pays.value) return stop('missing_lieu', f.ville.value.trim() ? f.pays : f.ville);
     if (f.profil.value.trim().length < 20) return stop('textes_courts', f.profil);
     if (f.recherche.value.trim().length < 20) return stop('textes_courts', f.recherche);
     if (!medias.length) return stop('medias_requis', $('[data-medias]', form).closest('label'));
     if (!identite.length) return stop('identite_requise', $('[data-identite]', form).closest('label'));
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(f.email.value.trim())) return stop('invalid_email', f.email);
+    if (!f.phone.value.trim() && !f.contactReseau.value.trim()) return stop('contact_requis', f.phone);
     if (!f.majeur.checked || !f.publication.checked || !f.identite_ok.checked) return stop('consent_required', f.majeur.closest('label'));
     const btn = $('.annonce-envoyer', form); btn.disabled = true;
     const fichiers = [...medias.map((x) => ({ blob: x, role: 'media' })), ...identite.map((x) => ({ blob: x, role: 'identite' }))];
@@ -127,7 +182,14 @@ export function monterFormulaire(box) {
       say(st, 'Envoi de ton annonce…');
       const res = await api({
         action: 'annonce_deposer', prenom: f.prenom.value, genre: form.querySelector('[name=genre]:checked').value, birth_date: f.birth_date.value,
-        situation: f.situation.value, ville: f.ville.value, pays: f.pays.value, profil: f.profil.value, recherche: f.recherche.value,
+        ville: f.ville.value, pays: f.pays.value, profil: f.profil.value, recherche: f.recherche.value,
+        matching: (() => {
+          const m = {};
+          for (const n of ['villageOrigine', 'langue', 'situation', 'enfants', 'nbEnfants', 'ageEnfants', 'desirEnfants', 'niveauEtudeCategorie', 'niveauEtudeDetail', 'etudesPaysObtention', 'profession', 'tailleCm', 'religion', 'pratique', 'mobiliteGeographique', 'visionFinanciere', 'fumeur', 'sport', 'alcool', 'zoneGeo', 'religionRecherche', 'pratiqueRecherche', 'etudesRecherche', 'rechercheFemmeHidjabiste', 'contactReseau']) m[n] = f[n]?.value || '';
+          for (const n of ['origineTags', 'caracteristiques', 'origineRechercheTags', 'caracteristiquesRecherche']) m[n] = $$(`[name=${n}]:checked`, form).map((x) => x.value);
+          for (const n of ['kabyleUniquement', 'accepteDivorce', 'accepteVeuf', 'accepteEnfants']) m[n] = f[n].checked;
+          return m;
+        })(),
         age_min: f.age_min.value, age_max: f.age_max.value, email: f.email.value.trim(), phone: f.phone.value,
         majeur: true, publication: true, identite_ok: true, website: f.zz_site.value,
         medias: fichiers.map((x) => ({ role: x.role, type: typeDe(x.blob), size: x.blob.size })),
@@ -159,7 +221,8 @@ function carte(a) {
     <div class="annonce-texte">
       <p class="annonce-ref">Annonce n° ${a.ref} · ✓ vérifiée par Lamia</p>
       <h3>${esc(a.prenom)}, ${a.age} ans</h3>
-      <p class="annonce-lieu">${a.genre === 'femme' ? 'Une femme' : 'Un homme'} · ${esc(a.ville)}, ${esc(a.pays)}${a.situation ? ` · ${esc(a.situation)}` : ''}</p>
+      <p class="annonce-lieu">${a.genre === 'femme' ? 'Une femme' : 'Un homme'} · ${esc(a.ville)}, ${esc(lib(a.pays))}${a.situation ? ` · ${esc(lib(a.situation))}` : ''}</p>
+      ${[...(a.origine || []), ...(a.caracteristiques || [])].length ? `<p class="annonce-tags">${[...(a.origine || []), ...(a.caracteristiques || [])].map((t) => `<span>${esc(lib(t))}</span>`).join('')}</p>` : ''}
       <h4>Qui je suis</h4><p>${esc(a.profil)}</p>
       <h4>Qui je cherche${ages}</h4><p>${esc(a.recherche)}</p>
       <a class="btn btn-ink" href="/confidences/?annonce=${a.ref}#ecrire">💌 Cette annonce me touche : écrire à Lamia</a>
