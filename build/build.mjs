@@ -14,6 +14,7 @@ import { reglagesPropres } from '../content/shipping.mjs';
 import { facade } from './facade.mjs';
 import { pageAnglaise, pageFrancaise, produitAnglais, enPath, FR_ONLY, STRINGS, MANQUANTS } from './english.mjs';
 import { EDITABLE, defaults, applyOverrides } from '../content/editable.mjs';
+import { FORMULES, UNITES, prixAnnuel, euros as eurosAbo } from '../content/abonnements.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = join(ROOT, 'dist');
@@ -185,7 +186,7 @@ function header(room) {
       <summary>La Maison <span aria-hidden="true">▾</span></summary>
       <div class="maison-menu-panneau">
         ${floors.map((f) => `<div class="maison-menu-etage"><p>${esc(f.name)}</p><ul>${rooms.filter((r) => r.floor === f.level).map((r) => `<li${r.status === 'soon' ? ' class="is-soon"' : ''}><a href="${r.path}"${room?.slug === r.slug ? ' aria-current="page"' : ''}><strong>${esc(r.name)}</strong>${r.status === 'soon' ? '<em>bientôt</em>' : ''}</a></li>`).join('')}</ul></div>`).join('')}
-        <div class="maison-menu-etage"><p>Lamia</p><ul><li><a href="/lamia-brechet/"><strong>Qui est Lamia</strong></a></li><li><a href="/werdi-ouvre-les-yeux/"><strong>Le livre Werdi</strong></a></li><li><a href="/mon-espace/"><strong>Mon espace</strong></a></li><li><a href="/#plan"><strong>Le plan de la Maison</strong></a></li></ul></div>
+        <div class="maison-menu-etage"><p>Lamia</p><ul><li><a href="/lamia-brechet/"><strong>Qui est Lamia</strong></a></li><li><a href="/abonnement/"><strong>Les formules âme sœur</strong></a></li><li><a href="/werdi-ouvre-les-yeux/"><strong>Le livre Werdi</strong></a></li><li><a href="/mon-espace/"><strong>Mon espace</strong></a></li><li><a href="/#plan"><strong>Le plan de la Maison</strong></a></li></ul></div>
       </div>
     </details>
     <a class="account-link" href="/mon-espace/" data-account-link>Se connecter</a>
@@ -529,7 +530,7 @@ page(
       <li><strong>Trois niveaux</strong><span><b>Prioritaire</b> : score élevé, âge et secteur cohérents, rien à négocier. <b>Prometteur</b> : bon score, aucune condition enfreinte. <b>À explorer</b> : possible, sans blocage, à discuter.</span></li>
       <li><strong>Les blocages sont respectés</strong><span>Ce qui est rédhibitoire pour toi (un divorce, des enfants, une distance…) écarte le profil d’office, même avec un bon score.</span></li>
       <li><strong>Moi, je décide</strong><span>L’outil propose, c’est moi qui valide. Je relis les deux fiches, je vous parle, et je ne propose un match que si j’y crois vraiment.</span></li>
-      <li><strong>La mise en relation</strong><span>Si vous êtes d’accord tous les deux, je vous mets en contact. Ton numéro reste chez moi jusque-là. La première mise en relation est offerte.</span></li>
+      <li><strong>La mise en relation</strong><span>Si vous êtes d’accord tous les deux, je vous mets en contact. Ton numéro reste chez moi jusque-là. La première mise en relation est offerte, les suivantes avec une <a href="/abonnement/">formule</a>.</span></li>
       <li><strong>Je vous suis</strong><span>Je prends des nouvelles après la rencontre. Si ça ne colle pas, on clôt le match avec respect et ton profil revient en attente pour une nouvelle chance.</span></li>
     </ol>
     <p class="po-actions"><a class="po-btn" href="/patio/">💌 Je confie mon profil à Lamia</a><a class="po-btn-verre" href="/patio/#profils-anonymes">Voir les profils anonymes</a></p>
@@ -855,6 +856,11 @@ page(
         <a href="/admin.html"><strong>Signalements</strong><span>Profils signalés, écrits et audio</span></a>
         <a href="/pilotage.html"><strong>Pilotage</strong><span>Feuille de route et indicateurs</span></a>
       </div>
+    </section>
+
+    <section>
+      <h2>Mon abonnement âme sœur</h2>
+      <div class="espace-achats" data-espace-abonnement><p class="loading">Un instant…</p></div>
     </section>
 
     <section>
@@ -1284,6 +1290,11 @@ page(
       <p class="cl-statut" role="status" data-outil-statut></p>
     </div>
     <div class="cl-carte cl-export">
+      <h3>💳 Abonnés et achats à l’unité <span data-n-abonnes></span></h3>
+      <p class="cl-aide">Les formules payées sur la page Abonnement. Quand tu fais une mise en relation ou inscris quelqu’un à un speed dating payé à l’unité, clique « Utiliser 1 » pour le décompter. Les résiliations se font par la personne depuis son espace.</p>
+      <div data-abonnes></div>
+    </div>
+    <div class="cl-carte cl-export">
       <h3>💌 Matchs demandés <span data-n-demandes></span></h3>
       <p class="cl-aide">Quand quelqu’un clique sur « Ce profil m’intéresse » dans le Patio puis crée son profil, la demande arrive ici (et tu reçois une alerte). Personne d’autre ne la voit. Elle est aussi notée dans la fiche exportée vers ton outil.</p>
       <div data-demandes></div>
@@ -1375,7 +1386,7 @@ page(
       <li><strong>Tu découvres tes correspondances</strong><span>Tu reçois le nombre de personnes qui pourraient te correspondre, sans savoir qui. Personne ne sait qui matche avec qui.</span></li>
       <li><strong>Lamia fait le lien</strong><span>Si un match te convient, elle te demande ton numéro, qui reste chez elle. La première mise en relation est offerte, les suivantes avec un abonnement.</span></li>
     </ol>
-    <p class="po-actions"><button type="button" class="po-btn" data-annonce-ouvrir aria-expanded="false">💌 Je confie mon profil à Lamia</button></p>
+    <p class="po-actions"><button type="button" class="po-btn" data-annonce-ouvrir aria-expanded="false">💌 Je confie mon profil à Lamia</button><a class="po-btn-verre" href="/abonnement/">Voir les formules</a></p>
   </div>
   <h2 class="annonces-titre" id="profils-anonymes">Des profils vérifiés, en toute discrétion</h2>
   <p class="annonces-sous">Ni prénom, ni photo, ni contact : seulement des cœurs qui se racontent. Un profil te touche ? Clique sur « Ce profil m’intéresse », crée ton profil, et Lamia regarde si vous pouvez correspondre. Personne ne sait qui s’intéresse à qui.</p>
@@ -1390,6 +1401,86 @@ page(
 </section>
 </div>
 ${otherRooms('patio')}`,
+  })
+);
+
+// Abonnement « Trouve ton âme sœur »
+const carteFormule = (f) => `<article class="abo-carte${f.vedette ? ' is-vedette' : ''}" data-formule="${f.id}">
+  ${f.vedette ? '<p class="abo-ruban">Le plus choisi</p>' : ''}
+  <h3>${esc(f.nom)}</h3>
+  <p class="abo-accroche">${esc(f.accroche)}</p>
+  <p class="abo-prix">${f.mois ? `<span data-prix-mois>${eurosAbo(f.mois)}<small> / mois</small></span><span data-prix-an hidden>${eurosAbo(prixAnnuel(f))}<small> / an</small><em>soit 2 mois offerts</em></span>` : 'Gratuit'}</p>
+  <ul>${f.avantages.map((a) => `<li>${esc(a)}</li>`).join('')}</ul>
+  ${f.mois ? `<button type="button" class="po-btn" data-choisir="${f.id}">Choisir ${esc(f.nom)}</button>` : '<a class="po-btn-verre" href="/patio/#annonces">Confier mon profil</a>'}
+</article>`;
+page(
+  '/abonnement/',
+  layout({
+    title: 'Abonnement · Trouve ton âme sœur avec Lamia',
+    description: 'Les formules de Lamia pour trouver ton âme sœur : Découverte gratuite, Cœur, Passion et Prestige. Mises en relation, speed datings inclus, sans engagement.',
+    path: '/abonnement/',
+    room: roomBySlug.patio,
+    scripts: ['/assets/abonnement.js'],
+    body: `<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,500&display=swap">
+<div class="po-app">
+<section class="po-hero abo-hero" aria-labelledby="abo-titre">
+  <div class="po-fond" aria-hidden="true"></div>
+  <div class="po-hero-grid">
+    <div class="po-hero-texte">
+      <p class="po-eyebrow">Matching kabyle IA · par Lamia</p>
+      <h1 id="abo-titre">Choisis ta formule</h1>
+      <p class="po-sub">La première mise en relation est toujours offerte.</p>
+      <p class="po-lead">Ensuite, choisis le rythme qui te ressemble : plus de mises en relation, des speed datings inclus, et l’accompagnement de Lamia. Sans engagement, résiliable en un clic depuis ton espace.</p>
+    </div>
+    <figure class="po-lamia"><img src="/images/lamia/lamia-portrait-tatouages-rond-480.webp" alt="Lamia Femme Berbère" width="200" height="200"><figcaption>Lamia · ton entremetteuse</figcaption></figure>
+  </div>
+</section>
+<section class="po-corps abo-corps">
+  <p class="abo-alerte" data-abo-alerte hidden></p>
+  <div class="abo-periode" role="radiogroup" aria-label="Paiement">
+    <button type="button" role="radio" aria-checked="true" data-periode="mois">Au mois</button>
+    <button type="button" role="radio" aria-checked="false" data-periode="an">À l’année <b>2 mois offerts</b></button>
+  </div>
+  <div class="abo-grille">${FORMULES.map(carteFormule).join('')}</div>
+  <h2 class="annonces-titre">Sans abonnement, à l’unité</h2>
+  <div class="abo-unites">${UNITES.map((u) => `<article class="abo-carte abo-unite"><h3>${esc(u.nom)}</h3><p class="abo-prix">${eurosAbo(u.prix)}</p><p>${esc(u.texte)}</p><button type="button" class="po-btn-verre" data-unite="${u.id}">Acheter</button></article>`).join('')}</div>
+  <form class="abo-form annonce-form" data-abo-form hidden>
+    <h2 data-abo-titre>Ta formule</h2>
+    <p class="annonce-aide" data-abo-resume></p>
+    <div class="annonce-grille">
+      <label>Ton prénom et ton nom<input name="nom" autocomplete="name" required minlength="2"></label>
+      <label>Ton email<input name="email" type="email" autocomplete="email" required><small>Utilise l’email de ton profil confié à Lamia.</small></label>
+      <label data-abo-qte hidden>Quantité<select name="quantite">${[1, 2, 3, 4, 5].map((n) => `<option>${n}</option>`).join('')}</select></label>
+    </div>
+    <label class="annonce-case"><input type="checkbox" name="cgv" required> <span>J’accepte les <a href="/cgv/#abonnement" target="_blank">conditions de vente</a>, et je demande que le service commence tout de suite.</span></label>
+    <p class="po-actions"><button class="po-btn" type="submit">Payer en toute sécurité</button><button class="po-btn-verre" type="button" data-abo-annuler>Annuler</button></p>
+    <p class="form-status" role="status" data-abo-statut></p>
+  </form>
+  <div class="patio-etapes">
+    <h2>Questions fréquentes</h2>
+    <ol>
+      <li><strong>C’est quoi, une mise en relation ?</strong><span>Lamia te propose une personne qui te correspond vraiment. Si vous êtes d’accord tous les deux, elle vous met en contact. Ton numéro reste chez elle jusque-là.</span></li>
+      <li><strong>Et les speed datings inclus ?</strong><span>Ta place aux soirées de speed dating en ligne de ton salon, dans la limite indiquée chaque mois. Lamia la note quand tu t’inscris.</span></li>
+      <li><strong>Je peux arrêter quand je veux ?</strong><span>Oui. Dans ton espace, « Gérer mon abonnement » : tu résilies en un clic. Ton abonnement reste actif jusqu’à la fin de la période payée.</span></li>
+      <li><strong>Lamia garantit-elle un mariage ?</strong><span>Personne ne peut le promettre. Lamia s’engage sur le sérieux : profils vérifiés, matching soigné, et un vrai suivi.</span></li>
+    </ol>
+  </div>
+</section>
+</div>`,
+  })
+);
+page(
+  '/abonnement/merci/',
+  layout({
+    title: 'Merci · Abonnement',
+    description: 'Ton paiement est bien reçu.',
+    path: '/abonnement/merci/',
+    room: roomBySlug.patio,
+    body: `<div class="po-app"><section class="po-hero abo-hero"><div class="po-fond" aria-hidden="true"></div>
+  <p class="po-eyebrow">Merci</p><h1>Bienvenue, ton cœur est entre de bonnes mains</h1>
+  <p class="po-lead">Ton paiement est bien reçu. Tu reçois un reçu par email, et Lamia est prévenue. Si ce n’est pas encore fait, confie ton profil à Lamia pour qu’elle puisse chercher la bonne personne.</p>
+  <p class="po-actions"><a class="po-btn" href="/patio/#annonces">💌 Confier mon profil</a><a class="po-btn-verre" href="/mon-espace/">Mon espace</a></p>
+</section></div>`,
   })
 );
 
@@ -1753,7 +1844,7 @@ await cp(join(ROOT, 'public'), DIST, { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await writeFile(join(DIST, 'assets', 'editable.json'), JSON.stringify({ fields: [...EDITABLE, ...REGISTRE], defaults: DEFAULTS }));
-for (const f of ['maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'annonces.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
+for (const f of ['abonnement.js', 'maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'annonces.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
 await cp(join(ROOT, 'content', 'shipping.mjs'), join(DIST, 'assets', 'shipping.mjs'));
 await cp(join(ROOT, 'content', 'rubriques.mjs'), join(DIST, 'assets', 'rubriques.mjs'));
 await cp(join(ROOT, 'content', 'matching-options.mjs'), join(DIST, 'assets', 'matching-options.mjs'));
@@ -1763,7 +1854,7 @@ await cp(join(ROOT, 'content', 'en', 'products.json'), join(DIST, 'assets', 'i18
 const MOTIFS_EN = JSON.parse(await readFile(join(ROOT, 'content', 'en', 'patterns.json'), 'utf8'));
 await writeFile(join(DIST, 'assets', 'i18n', 'en.json'), JSON.stringify({ strings: STRINGS, pages: [...PAGES_EN], motifs: MOTIFS_EN.motifs, noms: MOTIFS_EN.noms }));
 
-const indexable = pages.filter((p) => !p.path.endsWith('.html') && !p.path.startsWith('/en/produit/') && !['/produit/', '/speed-dating/merci/', '/commande/merci/', '/speed-dating/souhaits/', '/cgv/', '/mentions-legales/', '/confidentialite/', '/retours/', '/conditions-utilisation/', '/confidences-lamia/', '/hors-ligne/'].includes(p.path.replace(/^\/en\//, '/')));
+const indexable = pages.filter((p) => !p.path.endsWith('.html') && !p.path.startsWith('/en/produit/') && !['/produit/', '/speed-dating/merci/', '/commande/merci/', '/abonnement/merci/', '/speed-dating/souhaits/', '/cgv/', '/mentions-legales/', '/confidentialite/', '/retours/', '/conditions-utilisation/', '/confidences-lamia/', '/hors-ligne/'].includes(p.path.replace(/^\/en\//, '/')));
 await writeFile(
   join(DIST, 'sitemap.xml'),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${indexable.filter((p) => !p.path.startsWith('/produit/')).map((p) => `<url><loc>${SITE_URL}${p.path}</loc></url>`).join('')}${PRODUITS_INDEXES.map((p) => `<url><loc>${SITE_URL}${p.path}</loc>${p.lastmod ? `<lastmod>${p.lastmod}</lastmod>` : ''}</url><url><loc>${SITE_URL}/en${p.path}</loc>${p.lastmod ? `<lastmod>${p.lastmod}</lastmod>` : ''}</url>`).join('')}</urlset>\n`

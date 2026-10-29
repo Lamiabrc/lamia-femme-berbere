@@ -122,7 +122,7 @@ function router() {
   if (!session) return;
   const h = location.hash.slice(1);
   if (h === 'reglages') { courant = null; vue('reglages'); chargerReglages(); return; }
-  if (h === 'annonces') { courant = null; vue('annonces'); chargerAnnonces(); chargerDemandes(); return; }
+  if (h === 'annonces') { courant = null; vue('annonces'); chargerAnnonces(); chargerDemandes(); chargerAbonnes(); return; }
   if (/^[0-9a-f-]{36}$/i.test(h)) return ouvrirFil(h);
   courant = null; vue('liste'); rendreListe();
 }
@@ -301,6 +301,28 @@ document.addEventListener('click', (e) => {
   const a = dernieresAnnonces.find((x) => x.id === b.closest('[data-id]').dataset.id);
   if (a) exporter([a]);
 });
+
+// ---------------------------------------------------------------- abonnés et achats à l'unité
+const FORMULES_NOMS = { coeur: 'Cœur · 14,90 €', passion: 'Passion · 29,90 €', prestige: 'Prestige · 59 €' };
+const ETATS = { actif: 'actif', impaye: 'paiement en retard', resilie: 'résilié', en_attente: 'en attente', suspendu: 'suspendu' };
+async function chargerAbonnes() {
+  const box = $('[data-abonnes]');
+  if (!box) return;
+  try {
+    const { abonnes = [], unites = [] } = await api({ action: 'annonce_abonnes' }, await jetonFrais());
+    const actifs = abonnes.filter((a) => ['actif', 'impaye'].includes(a.statut));
+    $('[data-n-abonnes]').textContent = actifs.length ? `(${actifs.length})` : '';
+    const d = (x) => x ? new Date(x).toLocaleDateString('fr-FR') : '';
+    box.innerHTML = (abonnes.length || unites.length ? '' : '<p class="cl-vide">Pas encore d’abonné.</p>')
+      + abonnes.map((a) => `<p class="cl-coord"><b>${esc(FORMULES_NOMS[a.formule] || a.formule)}</b>${a.periode === 'an' ? ' (annuel)' : ''} · ${esc(a.nom || '')} · ${esc(a.email)} · ${esc(ETATS[a.statut] || a.statut)}${a.resiliation_prevue ? ' · se termine' : ''}${a.fin_periode ? ` le ${d(a.fin_periode)}` : ''}</p>`).join('')
+      + unites.map((u) => `<p class="cl-coord">${u.type === 'speed_dating' ? '🎟 Speed dating' : '🤝 Mise en relation'} · ${esc(u.nom || '')} · ${esc(u.email)} · ${u.quantite - u.utilisees}/${u.quantite} restant(es) · ${d(u.created_at)} ${u.utilisees < u.quantite ? `<button type="button" class="cl-btn cl-petit" data-unite-utiliser="${u.id}">Utiliser 1</button>` : ''}</p>`).join('');
+    box.querySelectorAll('[data-unite-utiliser]').forEach((b) => b.addEventListener('click', async () => {
+      b.disabled = true;
+      try { await api({ action: 'annonce_unite_utiliser', id: b.dataset.uniteUtiliser }, await jetonFrais()); } catch { /* */ }
+      chargerAbonnes();
+    }));
+  } catch { box.innerHTML = '<p class="cl-vide">Les abonnés n’ont pas pu s’afficher.</p>'; }
+}
 
 // ---------------------------------------------------------------- matchs demandés (« ce profil m'intéresse »)
 const STATUT_DEMANDE = { a_traiter: 'À traiter', mis_en_relation: 'Mis en relation', pas_compatible: 'Pas compatible' };

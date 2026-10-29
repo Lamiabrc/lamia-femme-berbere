@@ -28,7 +28,8 @@ Données stockées par Supabase, centre de données de Paris (Union européenne)
 <ul>
 <li>des bijoux et objets (pièces uniques ou en petite série) ;</li>
 <li>le livre <em>Werdi, ouvre les yeux !</em> en version papier et en version numérique ;</li>
-<li>des places pour des soirées de rencontre en ligne (« soirées »).</li>
+<li>des places pour des soirées de rencontre en ligne (« soirées ») ;</li>
+<li>des abonnements et des achats à l’unité « Trouve ton âme sœur » (mises en relation, speed datings).</li>
 </ul>
 <h2>2. Prix</h2>
 <p>Les prix sont indiqués en euros. {{TVA}} Les frais de livraison sont indiqués avant la validation de la commande. Le prix des livres respecte la loi sur le prix unique du livre.</p>
@@ -43,6 +44,13 @@ Données stockées par Supabase, centre de données de Paris (Union européenne)
 <h2>6. Soirées</h2>
 <p>Une soirée est une prestation de loisirs fournie à une date déterminée : elle n'ouvre pas de droit de rétractation (article L221-28 du Code de la consommation). Le lien de la salle vidéo est envoyé par email avant la soirée. Les soirées sont réservées aux personnes majeures. La participation suppose le respect de la <a href="/conditions-utilisation/#charte">charte des soirées</a> et des règles de la Maison : respect, sérieux de la démarche, aucun propos ou contenu déplacé. La Maison peut exclure une personne qui ne les respecte pas, sans remboursement.</p>
 <p>Une place payée n'est pas remboursable, y compris en cas d'absence. Si la Maison annule une soirée, la place est remboursée intégralement. Les soirées gratuites ne donnent lieu à aucun paiement.</p>
+<h2 id="abonnement">6 bis. Abonnements « Trouve ton âme sœur »</h2>
+<p><strong>Les formules.</strong> Découverte (gratuite) ; Cœur (14,90 € par mois) ; Passion (29,90 € par mois) ; Prestige (59 € par mois). À l’année, le prix correspond à 10 mois (2 mois offerts). Le contenu de chaque formule est décrit sur la page <a href="/abonnement/">Abonnement</a>. Achats à l’unité : une mise en relation 9,90 € ; une place de speed dating 9 €.</p>
+<p><strong>Le service.</strong> Lamia vérifie les profils, les passe dans son outil de matching et propose des mises en relation entre personnes compatibles qui sont d’accord toutes les deux. Une mise en relation consiste à transmettre à chacune des deux personnes le moyen de contacter l’autre. Lamia ne peut garantir ni une rencontre, ni un mariage : elle s’engage sur le sérieux de la vérification, du matching et du suivi. Les quantités incluses (mises en relation, speed datings) valent pour chaque mois d’abonnement et ne se reportent pas d’un mois sur l’autre. Les achats à l’unité n’expirent pas.</p>
+<p><strong>Durée et résiliation.</strong> L’abonnement est sans engagement. Il se renouvelle automatiquement à chaque échéance (mois ou année) jusqu’à résiliation. La résiliation se fait à tout moment, en un clic, depuis l’espace membre (« Gérer mon abonnement ») ou en écrivant à lamia.brechet@outlook.fr ; elle prend effet à la fin de la période déjà payée, sans autre frais. Un abonnement annuel peut être résilié à tout moment pour l’échéance suivante.</p>
+<p><strong>Paiement.</strong> Par carte bancaire via Stripe, prélevée à la souscription puis à chaque échéance. En cas d’échec de paiement, les mises en relation sont suspendues jusqu’à régularisation.</p>
+<p><strong>Droit de rétractation.</strong> La cliente dispose de 14 jours à compter de la souscription pour se rétracter, en écrivant à lamia.brechet@outlook.fr. En cochant la case prévue, elle demande que le service commence immédiatement : si elle se rétracte, elle paie la part du service déjà fournie jusqu’à sa rétractation (article L221-25 du Code de la consommation). Une mise en relation déjà réalisée est un service pleinement exécuté et n’ouvre plus droit à rétractation (article L221-28).</p>
+<p><strong>Comportement.</strong> Les règles de la Maison et la <a href="/conditions-utilisation/#charte">charte des rencontres</a> s’appliquent. En cas de manquement grave (fausse identité, propos déplacés, demande d’argent), Lamia peut mettre fin à l’abonnement sans remboursement de la période en cours.</p>
 <h2>7. Droit de rétractation (bijoux, objets, livres papier)</h2>
 <p>La cliente dispose de 14 jours à compter de la réception pour se rétracter, sans avoir à se justifier, en écrivant à lamia.brechet@outlook.fr. Le produit est retourné à ses frais, complet et dans son état d'origine. Le remboursement intervient sous 14 jours après réception du retour. La marche à suivre et le modèle de formulaire de rétractation figurent sur la page <a href="/retours/">Livraison, retours et remboursements</a>.</p>
 <h2>8. Garanties</h2>
