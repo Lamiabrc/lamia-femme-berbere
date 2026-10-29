@@ -242,10 +242,25 @@ export async function monterListe(box) {
     onglets.className = 'annonce-onglets'; onglets.setAttribute('role', 'tablist'); onglets.setAttribute('aria-label', 'Catégories de profils');
     onglets.innerHTML = [['femme', '👩 Les femmes'], ['homme', '👨 Les hommes']].map(([g, t]) => `<button type="button" role="tab" data-genre="${g}">${t} <b>${groupes[g].length}</b></button>`).join('');
     box.before(onglets);
-    const montrer = (g) => {
+    // 20 profils par page.
+    const PAR_PAGE = 20;
+    const pages = document.createElement('nav');
+    pages.className = 'annonce-pages'; pages.setAttribute('aria-label', 'Pages de profils');
+    box.after(pages);
+    let genre = 'femme';
+    const montrer = (g, page = 1, defiler = false) => {
+      genre = g;
       onglets.querySelectorAll('[data-genre]').forEach((x) => x.setAttribute('aria-selected', String(x.dataset.genre === g)));
-      box.innerHTML = groupes[g].length ? groupes[g].map(carte).join('') : `<p class="annonce-vide">Pas encore de profil dans cette catégorie. Et si le premier, c’était le tien ?</p>`;
+      const liste = groupes[g], n = Math.ceil(liste.length / PAR_PAGE);
+      box.innerHTML = liste.length ? liste.slice((page - 1) * PAR_PAGE, page * PAR_PAGE).map(carte).join('') : `<p class="annonce-vide">Pas encore de profil dans cette catégorie. Et si le premier, c’était le tien ?</p>`;
+      pages.innerHTML = n > 1 ? [
+        `<button type="button" data-page="${page - 1}" ${page === 1 ? 'disabled' : ''} aria-label="Page précédente">‹</button>`,
+        ...Array.from({ length: n }, (_, i) => `<button type="button" data-page="${i + 1}" ${i + 1 === page ? 'aria-current="page"' : ''}>${i + 1}</button>`),
+        `<button type="button" data-page="${page + 1}" ${page === n ? 'disabled' : ''} aria-label="Page suivante">›</button>`,
+      ].join('') : '';
+      if (defiler) onglets.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
+    pages.addEventListener('click', (e) => { const x = e.target.closest('[data-page]'); if (x && !x.disabled) montrer(genre, Number(x.dataset.page), true); });
     onglets.addEventListener('click', (e) => { const x = e.target.closest('[data-genre]'); if (x) montrer(x.dataset.genre); });
     montrer(groupes.femme.length || !groupes.homme.length ? 'femme' : 'homme');
   } catch { box.innerHTML = '<p class="annonce-vide">Les annonces n’ont pas pu s’afficher. Recharge la page dans un instant.</p>'; }
