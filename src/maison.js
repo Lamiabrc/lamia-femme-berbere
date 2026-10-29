@@ -497,6 +497,25 @@ renderNextEvent();
 renderSocials();
 
 // ---------------------------------------------------------------- l'entrée dans la Maison (effet de défilement)
+// Encart « âme sœur » posé dans l'ouverture de la grande porte (calé sur la photo, quelle que soit la taille d'écran).
+(function porteAme() {
+  const a = document.querySelector('[data-porte-ame]');
+  if (!a) return;
+  const scene = a.closest('.entree-scene');
+  const OUV = { l: 622, t: 362, r: 760, b: 548 }; // ouverture de la porte sur l'image 1376 × 768
+  const place = () => {
+    const vw = scene.clientWidth, vh = scene.clientHeight;
+    const k = Math.max(vw / 1376, vh / 768), W = 1376 * k, H = 768 * k;
+    const ox = (vw - W) * 0.43, oy = (vh - H) / 2;
+    a.style.left = `${ox + OUV.l * k}px`; a.style.top = `${oy + OUV.t * k}px`;
+    a.style.width = `${(OUV.r - OUV.l) * k}px`; a.style.height = `${(OUV.b - OUV.t) * k}px`;
+    a.style.setProperty('--pw', `${(OUV.r - OUV.l) * k}px`);
+    a.hidden = false;
+  };
+  place();
+  addEventListener('resize', place);
+})();
+
 (function entree() {
   const box = document.querySelector('[data-entree]');
   if (!box || matchMedia('(prefers-reduced-motion: reduce)').matches) return;

@@ -294,15 +294,12 @@ page(
     body: `<section class="entree" data-entree aria-label="Entrer dans la Maison">
   <div class="entree-scene">
     <div class="entree-cam" data-entree-cam>
+      <a class="porte-ame" href="/patio/" data-porte-ame><span class="porte-ame-texte">${esc(T('hall.ame-soeur', 'Le Hall', 'Phrase sous le portrait de Lamia', 'Trouve ton âme sœur avec Lamia et son outil de matching IA'))}</span><span class="porte-ame-btn">💌 J’entre</span></a>
       ${IMGT('image.hall.entree', 'Le Hall', 'Image de la maison (entrée du site)', `<img class="entree-img" src="/images/maison/maison-kabyle-1376.webp" srcset="/images/maison/maison-kabyle-800.webp 800w, /images/maison/maison-kabyle-1200.webp 1200w, /images/maison/maison-kabyle-1376.webp 1376w" sizes="(max-width: 700px) 200vw, 100vw" width="1376" height="768" alt="La Maison de Lamia en Kabylie, sa porte ouverte et lumineuse" fetchpriority="high" decoding="async">`)}
     </div>
     <span class="entree-stars" aria-hidden="true"></span>
     <span class="entree-glow" aria-hidden="true"></span>
     <div class="entree-text">
-      <a class="entree-ame-carte" href="/patio/#annonces">
-        <span class="entree-lamia">${IMGT('image.hall.entree-portrait', 'Le Hall', 'Portrait de Lamia à l’entrée du site', `<img src="/images/lamia/lamia-tatouages-240.webp" srcset="/images/lamia/lamia-tatouages-240.webp 240w, /images/lamia/lamia-tatouages-480.webp 480w" sizes="110px" width="240" height="300" alt="Lamia Femme Berbère" fetchpriority="high">`)}</span>
-        <span class="entree-ame-texte"><span class="entree-ame">${esc(T('hall.ame-soeur', 'Le Hall', 'Phrase sous le portrait de Lamia', 'Trouve ton âme sœur avec Lamia et son outil de matching IA'))}</span><span class="entree-ame-btn">💌 Je confie mon profil</span></span>
-      </a>
       <p class="entree-kicker">La Maison franco-kabyle</p>
       <h1 class="entree-title">Lamia Femme Berbère<span class="entree-title-sous">${esc(T('hall.titre-sous', 'Le Hall', 'Sous-titre du grand titre', 'Speed Dating & Rencontres Célibataires Kabyles'))}</span></h1>
       <p class="entree-subtitle">${esc(T('hall.phrase', 'Le Hall', 'Phrase sous le grand titre', 'Trouvez l’amour et le mariage sérieux grâce à l’alliance de la tradition berbère et de la modernité.', true))}</p>
