@@ -155,7 +155,7 @@ export function versOutil(a, { photoDataUrl = '', aujourdHui = new Date() } = {}
     plateformeSaisie: 'Autre',
     canalSaisie: 'Message privé',
     photoDataUrl,
-    notes: `${a.status === 'a_verifier' ? '⏳ À VÉRIFIER : profil pas encore validé sur le site (teste-le, puis valide-le). ' : ''}${a.email ? `Email : ${a.email}. ` : ''}Annonce n° ${a.ref} déposée sur lamia-femme-berbere.com${a.identite_verifiee_at ? `, vérifié AVEC pièce d’identité le ${String(a.identite_verifiee_at).slice(0, 10)}` : ', vérifié sans pièce d’identité'}.${(a.interets || []).length ? ` MATCH DEMANDÉ : intéressé(e) par le profil ${a.interets.map((r) => `site-annonce-${r}`).join(', ')}.` : ''}`,
+    notes: `${a.status === 'a_verifier' ? '⏳ À VÉRIFIER : profil pas encore validé sur le site (teste-le, puis valide-le). ' : ''}${a.email ? `Email : ${a.email}. ` : ''}${a.photo_partage ? '📷 Photo transmissible à son match : OUI. ' : '📷 Photo transmissible à son match : NON. '}Annonce n° ${a.ref} déposée sur lamia-femme-berbere.com${a.identite_verifiee_at ? `, vérifié AVEC pièce d’identité le ${String(a.identite_verifiee_at).slice(0, 10)}` : ', vérifié sans pièce d’identité'}.${(a.interets || []).length ? ` MATCH DEMANDÉ : intéressé(e) par le profil ${a.interets.map((r) => `site-annonce-${r}`).join(', ')}.` : ''}`,
     statut: 'Nouveau',
     source_record_id: `site-annonce-${a.ref}`,
     status_import: 'site',

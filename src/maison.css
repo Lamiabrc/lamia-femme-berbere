@@ -3041,3 +3041,10 @@ a.po-btn { display: inline-block; text-decoration: none; }
 .annonce-flash[hidden] { display: none; }
 .espace-match { color: #92283f; font-weight: 600; }
 .espace-achat-droite { display: flex; flex-direction: column; gap: 8px; }
+
+/* Mon espace : suivi du profil */
+.espace-suivi { margin: 1rem 0; padding: 1rem 1.2rem; border: 1px solid rgba(201,162,39,.35); border-radius: 14px; }
+.espace-suivi h3 { font-size: 1.05rem; margin: .2rem 0 .5rem; }
+.espace-suivi ul { margin: 0 0 .8rem; padding-left: 1.1rem; }
+.espace-suivi li { margin: .25rem 0; }
+.espace-photo { margin: .6rem 0; }

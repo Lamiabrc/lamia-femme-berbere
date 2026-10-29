@@ -31,11 +31,14 @@ async function render() {
 
 const money = (c, cur = 'EUR') => new Intl.NumberFormat((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { style: 'currency', currency: cur || 'EUR' }).format((c || 0) / 100);
 const STATUTS = { pending: 'Paiement en attente', paid: 'Payée', fulfilled: 'Expédiée', shipped: 'Expédiée', cancelled: 'Annulée', refunded: 'Remboursée' };
+// L'état de l'abonnement sert aussi au suivi du profil (quotas du mois).
+let aboPret; const etatAbo = new Promise((r) => { aboPret = r; });
 async function achats(session) {
   const box = $('[data-espace-achats]');
   try {
     const r = await fetch('/api/mes-achats', { headers: { Authorization: `Bearer ${session.access_token}` } });
     const { orders = [], abonnement = null } = await r.json();
+    aboPret(abonnement);
     monAbonnement(abonnement, session);
     box.innerHTML = orders.length
       ? orders.map((o) => `<article class="espace-achat">
@@ -45,7 +48,7 @@ async function achats(session) {
           <div class="espace-achat-droite"><strong>${money(o.amount_total_cents, o.currency)}</strong><span class="statut is-${esc(o.status)}">${esc(STATUTS[o.status] || o.status)}</span></div>
         </article>`).join('')
       : '<p>Pas encore d’achat. Tes commandes apparaîtront ici. <a class="text-link" href="/boutique/">Voir la Boutique</a></p>';
-  } catch { box.innerHTML = '<p>Tes achats ne s’affichent pas pour le moment. Réessaie dans un instant.</p>'; }
+  } catch { aboPret(null); box.innerHTML = '<p>Tes achats ne s’affichent pas pour le moment. Réessaie dans un instant.</p>'; }
 }
 
 // Profil confié à Lamia : état, avantages, modification, fin d'un match en cours.
@@ -67,7 +70,16 @@ async function monProfil(session) {
       ${p.nb_compatibles !== null && p.nb_compatibles !== undefined ? `<p>D’après l’outil de Lamia, tu pourrais correspondre à ${esc(p.nb_compatibles)} personne(s).</p>` : ''}
       ${p.en_match ? '<p class="espace-match">💞 Tu as un match en cours. Tant qu’il dure, tu ne peux pas matcher avec d’autres profils.</p>' : ''}</div>
       <div class="espace-achat-droite"><button class="btn btn-ink" type="button" data-profil-modifier>Modifier mon profil</button>${p.en_match ? '<button class="btn btn-line" type="button" data-profil-dematcher>Mettre fin à mon match</button>' : ''}</div></article>
+      <div class="espace-suivi" data-profil-suivi></div>
+      <label class="annonce-case espace-photo"><input type="checkbox" data-profil-photo${p.photo_partage ? ' checked' : ''}> <span>Si un match me convient, Lamia peut transmettre <strong>ma photo</strong> à la personne avec qui elle me met en relation (et à elle seule).</span></label>
       <p class="form-status" data-profil-statut></p><div data-profil-edition hidden></div>`;
+    suivi(box.querySelector('[data-profil-suivi]'), p);
+    box.querySelector('[data-profil-photo]').addEventListener('change', async (e) => {
+      const st = box.querySelector('[data-profil-statut]'); e.target.disabled = true;
+      try { await appelProfil({ action: 'annonce_photo_partage', photo_partage: e.target.checked }, session); st.textContent = e.target.checked ? 'C’est noté : ta photo pourra être transmise à ton match.' : 'C’est noté : ta photo ne sera transmise à personne.'; }
+      catch { e.target.checked = !e.target.checked; st.textContent = 'Ça n’a pas été enregistré. Réessaie.'; }
+      e.target.disabled = false;
+    });
     box.querySelector('[data-profil-modifier]').addEventListener('click', async () => {
       const zone = box.querySelector('[data-profil-edition]');
       zone.hidden = false;
@@ -82,6 +94,25 @@ async function monProfil(session) {
       catch { box.querySelector('[data-profil-statut]').textContent = 'Ça n’a pas fonctionné. Réessaie, ou écris à Lamia.'; e.target.disabled = false; }
     });
   } catch { box.innerHTML = '<p>Ton profil ne s’affiche pas pour le moment. Réessaie dans un instant.</p>'; }
+}
+
+// Suivi : mises en relation offertes et du mois, speed datings inclus, demandes envoyées.
+const QUOTAS = { coeur: { nom: 'Cœur', mises: 3, sd: 1 }, passion: { nom: 'Passion', mises: null, sd: 2 }, prestige: { nom: 'Prestige', mises: null, sd: 2 } };
+const ETAT_DEMANDE = { a_traiter: '⏳ Lamia étudie la compatibilité', mis_en_relation: '💞 Mise en relation faite', pas_compatible: 'Pas compatible, désolée', dematche: 'Match terminé' };
+async function suivi(el, p) {
+  const etat = await etatAbo;
+  const a = etat?.abonnement, q = a ? QUOTAS[a.formule] : null, u = etat?.unites || {};
+  const s = p.suivi || { mises_total: 0, mises_mois: 0 };
+  const offertesRestantes = Math.max(0, (p.offertes || 1) - s.mises_total);
+  const lignes = [
+    `<li><strong>Mises en relation offertes</strong> : ${offertesRestantes} sur ${p.offertes || 1} restante(s)</li>`,
+    q ? `<li><strong>Formule ${esc(q.nom)}</strong> : ${s.mises_mois} mise(s) en relation ce mois-ci${q.mises ? ` sur ${q.mises}` : ' (sans limite)'} · ${q.sd} speed dating inclus par mois</li>`
+      : `<li><strong>Formule Découverte</strong> (gratuite) · <a class="text-link" href="/abonnement/">voir les formules</a></li>`,
+    u.mise_en_relation || u.speed_dating ? `<li><strong>Achetés à l’unité</strong> : ${u.mise_en_relation || 0} mise(s) en relation · ${u.speed_dating || 0} place(s) de speed dating</li>` : '',
+  ].filter(Boolean).join('');
+  const demandes = (p.interets || []).map((i) => `<li>Profil n° ${esc(i.cible_ref)} · ${esc(ETAT_DEMANDE[i.statut] || i.statut)}${i.date ? ` <small>(${esc(new Date(i.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' }))})</small>` : ''}</li>`).join('');
+  el.innerHTML = `<h3>Mon suivi</h3><ul>${lignes}</ul>
+    <h3>Mes demandes de match</h3>${demandes ? `<ul>${demandes}</ul>` : '<p>Aucune pour l’instant. <a class="text-link" href="/rencontres/#profils-anonymes">Voir les profils</a></p>'}`;
 }
 
 // Abonnement « Trouve ton âme sœur » : formule en cours, achats à l'unité, gestion (résiliation) chez Stripe.

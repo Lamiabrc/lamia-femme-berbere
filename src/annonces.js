@@ -143,6 +143,7 @@ export function formulaireHtml() {
   <label class="annonce-case" data-consent-depot><input type="checkbox" name="publication"> <span>Je confie mon profil à Lamia : il n’est publié nulle part, seule Lamia le voit et l’utilise dans son outil de matching pour me proposer des mises en relation. Je peux le retirer et faire effacer mes données à tout moment.</span></label>
   <label class="annonce-case" data-identite-accord hidden><input type="checkbox" name="identite_ok"> <span>J’accepte que Lamia voie la photo de ma pièce d’identité pour vérifier mon profil, sachant qu’elle est supprimée juste après. <a href="/confidentialite/" target="_blank" rel="noopener">Confidentialité</a></span></label>
   <label class="annonce-case"><input type="checkbox" name="anonyme_ok"> <span>Facultatif : j’accepte que Lamia affiche mon profil <strong>anonymement</strong> dans les Rencontres du site (âge, pays, textes et caractéristiques, <strong>sans prénom, photo, ville ni contact</strong>), pour que d’autres puissent dire qu’il les intéresse.</span></label>
+  <label class="annonce-case"><input type="checkbox" name="photo_partage"> <span>Facultatif : si un match me convient, j’accepte que Lamia transmette <strong>ma photo</strong> à la personne avec qui elle me met en relation, et à elle seule. Jamais sur le site, jamais à quelqu’un d’autre. Je peux changer d’avis à tout moment depuis mon espace.</span></label>
   <input type="hidden" name="interet_ref" value="">
   <p class="annonce-interet" data-interet-info hidden></p>
   <input class="hp" name="zz_site" tabindex="-1" autocomplete="off" aria-hidden="true">
@@ -245,7 +246,7 @@ export function monterFormulaire(box, { existant = null, token = null } = {}) {
         ville: f.ville.value, pays: f.pays.value, profil: f.profil.value, recherche: f.recherche.value,
         matching: lireMatching(form),
         age_min: f.age_min.value, age_max: f.age_max.value, email: f.email.value.trim(),
-        majeur: true, publication: true, identite_ok: Boolean(identite.length && f.identite_ok.checked), website: f.zz_site.value, anonyme_ok: f.anonyme_ok.checked, interet_ref: f.interet_ref.value,
+        majeur: true, publication: true, identite_ok: Boolean(identite.length && f.identite_ok.checked), website: f.zz_site.value, anonyme_ok: f.anonyme_ok.checked, photo_partage: f.photo_partage.checked, interet_ref: f.interet_ref.value,
         medias: fichiers.map((x) => ({ role: x.role, type: typeDe(x.blob), size: x.blob.size })),
       }, session?.access_token);
       for (const [i, up] of (res.uploads || []).entries()) {
@@ -290,6 +291,7 @@ function monterEdition(form, st, p, token) {
   for (const n of LISTES) for (const v of m[n] || []) { const c = form.querySelector(`[name=${n}][value="${CSS.escape(v)}"]`); if (c) c.checked = true; }
   for (const n of CASES) F[n].checked = Boolean(m[n]);
   F.anonyme_ok.checked = Boolean(p.anonyme_ok);
+  F.photo_partage.checked = Boolean(p.photo_partage);
   const btn = $('.annonce-envoyer', form); btn.textContent = 'Enregistrer mes modifications';
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -297,7 +299,7 @@ function monterEdition(form, st, p, token) {
     if (!F.contactReseau.value.trim()) return say(st, ERR.contact_requis, true);
     btn.disabled = true; say(st, 'Enregistrement…');
     try {
-      await api({ action: 'annonce_modifier', prenom: F.prenom.value, ville: F.ville.value, pays: F.pays.value, profil: F.profil.value, recherche: F.recherche.value, age_min: F.age_min.value, age_max: F.age_max.value, anonyme_ok: F.anonyme_ok.checked, matching: lireMatching(form) }, token);
+      await api({ action: 'annonce_modifier', prenom: F.prenom.value, ville: F.ville.value, pays: F.pays.value, profil: F.profil.value, recherche: F.recherche.value, age_min: F.age_min.value, age_max: F.age_max.value, anonyme_ok: F.anonyme_ok.checked, photo_partage: F.photo_partage.checked, matching: lireMatching(form) }, token);
       say(st, '✓ Ton profil est à jour. Lamia est prévenue.');
     } catch (err) { say(st, ERR[err.code] || 'L’enregistrement n’a pas abouti. Réessaie dans un instant.', true); }
     btn.disabled = false;
