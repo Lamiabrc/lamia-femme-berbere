@@ -502,13 +502,13 @@ renderSocials();
   const a = document.querySelector('[data-porte-ame]');
   if (!a) return;
   const scene = a.closest('.entree-scene');
-  const OUV = { l: 622, t: 362, r: 760, b: 548 }; // ouverture de la porte sur l'image 1376 × 768
+  const OUV = { l: 596, t: 560, r: 786 }; // plaque posée sur le seuil, sous la porte (image 1376 × 768)
   const place = () => {
     const vw = scene.clientWidth, vh = scene.clientHeight;
     const k = Math.max(vw / 1376, vh / 768), W = 1376 * k, H = 768 * k;
     const ox = (vw - W) * 0.43, oy = (vh - H) / 2;
-    a.style.left = `${ox + OUV.l * k}px`; a.style.top = `${oy + OUV.t * k}px`;
-    a.style.width = `${(OUV.r - OUV.l) * k}px`; a.style.height = `${(OUV.b - OUV.t) * k}px`;
+    const w = (OUV.r - OUV.l) * k; a.style.left = `${Math.min(Math.max(8, ox + OUV.l * k), vw - w - 8)}px`; a.style.top = `${oy + OUV.t * k}px`;
+    a.style.width = `${(OUV.r - OUV.l) * k}px`; a.style.height = 'auto';
     a.style.setProperty('--pw', `${(OUV.r - OUV.l) * k}px`);
     a.hidden = false;
   };
