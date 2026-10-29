@@ -6,7 +6,8 @@ const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const say = (el, m, err = false) => { if (!el) return; el.textContent = m; el.classList.toggle('is-error', err); };
 const ERR = {
-  consent_required: 'Coche les trois cases en bas du formulaire pour continuer.',
+  consent_required: 'Coche les cases obligatoires en bas du formulaire pour continuer.',
+  identite_trop: 'Une seule photo de pièce d’identité suffit.',
   missing_name: 'Indique ton prénom (ou un petit nom).',
   missing_genre: 'Dis-nous si tu es une femme ou un homme.',
   invalid_birth_date: 'Vérifie ta date de naissance.',
@@ -98,8 +99,8 @@ export function formulaireHtml() {
     <ul class="annonce-apercu" data-medias-liste></ul>
   </div>
   <div class="annonce-etape annonce-id">
-    <h3><span>5</span> Ta pièce d’identité, pour la confiance de toutes et tous</h3>
-    <p class="annonce-aide">Prends en photo ta carte d’identité, ton passeport ou ton titre de séjour, <strong>en posant ta main (ou un doigt) sur le numéro du document</strong> pour le cacher. Lamia vérifie seulement que la personne de l’annonce existe vraiment et qu’elle est majeure.</p>
+    <h3><span>5</span> Facultatif : ta pièce d’identité, pour un profil encore plus sûr</h3>
+    <p class="annonce-aide">Ce n’est pas obligatoire. Mais un profil vérifié <strong>avec pièce d’identité</strong> porte un badge renforcé dans les annonces et inspire davantage confiance. Prends en photo ta carte d’identité, ton passeport ou ton titre de séjour, <strong>en posant ta main (ou un doigt) sur le numéro du document</strong> pour le cacher. Lamia vérifie seulement que la personne de l’annonce existe vraiment et qu’elle est majeure.</p>
     <p class="annonce-aide">🔒 Cette photo n’est <strong>jamais publiée</strong>. Seule Lamia la voit, et elle est <strong>supprimée dès la vérification faite</strong>.</p>
     <label class="annonce-depot">＋ Ajouter la photo de ma pièce d’identité<input type="file" accept="image/*,.pdf,application/pdf" data-identite></label>
     <ul class="annonce-apercu" data-identite-liste></ul>
@@ -115,7 +116,7 @@ export function formulaireHtml() {
   </div>
   <label class="annonce-case"><input type="checkbox" name="majeur"> <span>J’ai 18 ans ou plus et cette annonce est sincère : je cherche une vraie rencontre.</span></label>
   <label class="annonce-case"><input type="checkbox" name="publication"> <span>Je confie mon profil à Lamia : il n’est publié nulle part, seule Lamia le voit et l’utilise dans son outil de matching pour me proposer des mises en relation. Je peux le retirer et faire effacer mes données à tout moment.</span></label>
-  <label class="annonce-case"><input type="checkbox" name="identite_ok"> <span>J’accepte que Lamia voie la photo de ma pièce d’identité pour vérifier mon profil, sachant qu’elle est supprimée juste après. <a href="/confidentialite/" target="_blank" rel="noopener">Confidentialité</a></span></label>
+  <label class="annonce-case" data-identite-accord hidden><input type="checkbox" name="identite_ok"> <span>J’accepte que Lamia voie la photo de ma pièce d’identité pour vérifier mon profil, sachant qu’elle est supprimée juste après. <a href="/confidentialite/" target="_blank" rel="noopener">Confidentialité</a></span></label>
   <label class="annonce-case"><input type="checkbox" name="anonyme_ok"> <span>Facultatif : j’accepte que Lamia affiche mon profil <strong>anonymement</strong> dans les Rencontres du site (âge, pays, textes et caractéristiques, <strong>sans prénom, photo, ville ni contact</strong>), pour que d’autres puissent dire qu’il les intéresse.</span></label>
   <input type="hidden" name="interet_ref" value="">
   <p class="annonce-interet" data-interet-info hidden></p>
@@ -136,7 +137,7 @@ export function monterFormulaire(box) {
   const form = $('[data-annonce-form]', box), st = $('[data-annonce-statut]', form);
   let medias = [], identite = [];
   const majMedias = () => apercu($('[data-medias-liste]', form), medias, (i) => { medias.splice(i, 1); majMedias(); });
-  const majId = () => apercu($('[data-identite-liste]', form), identite, (i) => { identite.splice(i, 1); majId(); });
+  const majId = () => { apercu($('[data-identite-liste]', form), identite, (i) => { identite.splice(i, 1); majId(); }); const acc = $('[data-identite-accord]', form); if (acc) acc.hidden = !identite.length; };
   $('[data-medias]', form).addEventListener('change', (e) => {
     const nouveaux = [...e.target.files]; e.target.value = '';
     const tous = [...medias, ...nouveaux];
@@ -174,10 +175,9 @@ export function monterFormulaire(box) {
     if (f.profil.value.trim().length < 20) return stop('textes_courts', f.profil);
     if (f.recherche.value.trim().length < 20) return stop('textes_courts', f.recherche);
     if (!medias.length) return stop('medias_requis', $('[data-medias]', form).closest('label'));
-    if (!identite.length) return stop('identite_requise', $('[data-identite]', form).closest('label'));
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(f.email.value.trim())) return stop('invalid_email', f.email);
     if (!f.contactReseau.value.trim()) return stop('contact_requis', f.contactReseau);
-    if (!f.majeur.checked || !f.publication.checked || !f.identite_ok.checked) return stop('consent_required', f.majeur.closest('label'));
+    if (!f.majeur.checked || !f.publication.checked || (identite.length && !f.identite_ok.checked)) return stop('consent_required', identite.length && !f.identite_ok.checked ? f.identite_ok.closest('label') : f.majeur.closest('label'));
     const btn = $('.annonce-envoyer', form); btn.disabled = true;
     const fichiers = [...medias.map((x) => ({ blob: x, role: 'media' })), ...identite.map((x) => ({ blob: x, role: 'identite' }))];
     try {
@@ -193,7 +193,7 @@ export function monterFormulaire(box) {
           return m;
         })(),
         age_min: f.age_min.value, age_max: f.age_max.value, email: f.email.value.trim(),
-        majeur: true, publication: true, identite_ok: true, website: f.zz_site.value, anonyme_ok: f.anonyme_ok.checked, interet_ref: f.interet_ref.value,
+        majeur: true, publication: true, identite_ok: Boolean(identite.length && f.identite_ok.checked), website: f.zz_site.value, anonyme_ok: f.anonyme_ok.checked, interet_ref: f.interet_ref.value,
         medias: fichiers.map((x) => ({ role: x.role, type: typeDe(x.blob), size: x.blob.size })),
       });
       for (const [i, up] of (res.uploads || []).entries()) {
@@ -218,7 +218,7 @@ function carte(a) {
   return `<article class="annonce-carte annonce-anonyme">
     <div class="annonce-sceau" aria-hidden="true"><img src="/images/outil/${a.genre === 'femme' ? 'h_femme' : 'h_man'}.webp" alt="" width="80" height="80"></div>
     <div class="annonce-texte">
-      <p class="annonce-ref">Profil n° ${a.ref} · ✓ vérifié par Lamia · anonyme</p>
+      <p class="annonce-ref${a.piece_identite ? ' is-piece' : ''}">Profil n° ${a.ref} · ${a.piece_identite ? '🛡 vérifié avec pièce d’identité' : '✓ profil vérifié'}</p>
       <h3>${esc(infos.slice(0, 2).join(', '))}</h3>
       <p class="annonce-lieu">${esc([a.ville && `📍 ${a.ville}`, ...infos.slice(2)].filter(Boolean).join(' · '))}</p>
       ${a.village ? `<p class="annonce-lieu">🏡 Originaire de ${esc(a.village)}</p>` : ''}

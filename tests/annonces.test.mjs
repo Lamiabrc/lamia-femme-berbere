@@ -6,8 +6,9 @@ const photo = { role: 'media', type: 'image/jpeg', size: 1000 };
 const video = { role: 'media', type: 'video/mp4', size: 1000 };
 const id = { role: 'identite', type: 'image/jpeg', size: 1000 };
 
-test('médias : photos ou vidéo, et pièce d’identité obligatoire', () => {
-  assert.equal(verifierMedias([photo]).error, 'identite_requise');
+test('médias : photos ou vidéo ; pièce d’identité facultative (une seule)', () => {
+  assert.deepEqual(verifierMedias([photo]).files.map((f) => f.kind), ['photo']);
+  assert.equal(verifierMedias([photo, id, id]).error, 'identite_trop');
   assert.equal(verifierMedias([id]).error, 'medias_requis');
   assert.equal(verifierMedias([photo, photo, photo, id]).error, 'medias_trop');
   assert.equal(verifierMedias([photo, video, id]).error, 'medias_trop');

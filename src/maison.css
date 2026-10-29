@@ -3031,3 +3031,4 @@ a.po-btn { display: inline-block; text-decoration: none; }
 @media (min-width: 1340px) { .site-header .site-nav { display: flex !important; } .site-header .plan-link { display: none; } .site-header { padding-left: max(20px, calc((100% - 1480px) / 2)) !important; padding-right: max(20px, calc((100% - 1480px) / 2)) !important; } }
 @media (max-width: 760px) { .accueil-hero .po-lamia { order: 0; } .accueil-hero .po-lamia img { width: 120px; } .accueil-hero { padding-top: 64px; } }
 .passerelle { margin-top: 22px; padding: 12px 16px; border-radius: 12px; background: #fff5f0; border: 1px solid #ecd2c4; font-size: 14px; color: #4a3b40; } .passerelle a { color: #92283f; font-weight: 600; }
+.po-app .annonce-ref.is-piece { background: rgba(255,210,122,.18) !important; border-color: #ffd27a !important; color: #ffe3a8 !important; }

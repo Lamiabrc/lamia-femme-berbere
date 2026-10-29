@@ -292,7 +292,7 @@ page(
   '/',
   layout({
     title: 'Rencontre kabyle sérieuse en vue du mariage · Lamia, marieuse kabyle',
-    description: 'Trouve ton âme sœur kabyle avec Lamia : profils vérifiés par pièce d’identité, mises en relation faites par Lamia, speed dating en ligne et live chaque soir. Première mise en relation offerte.',
+    description: 'Trouve ton âme sœur kabyle avec Lamia : chaque profil vérifié, badge renforcé avec pièce d’identité, mises en relation faites par Lamia, speed dating en ligne et live chaque soir. Première mise en relation offerte.',
     path: '/',
     room: roomBySlug.hall,
     scripts: ['/assets/annonces.js'],
@@ -311,7 +311,7 @@ page(
       <p class="po-sub">${esc(T('accueil.sous-titre', 'Accueil', 'Phrase sous le titre', 'Profils vérifiés. Mises en relation faites par Lamia. En vue du mariage.'))}</p>
       <p class="po-actions"><a class="po-btn" href="/rencontres/#confier">💌 Je confie mon profil</a><a class="po-btn-verre" href="/rencontres/#profils-anonymes">Voir les profils</a></p>
       <ul class="accueil-preuves">
-        <li>✓ Identité vérifiée pour chaque profil</li>
+        <li>✓ Chaque profil vérifié par Lamia</li>
         <li>✓ 1re mise en relation offerte</li>
         <li>✓ Live chaque soir, 21 h</li>
         <li>✓ France, Algérie, Canada, Europe</li>
@@ -329,7 +329,7 @@ page(
     <h2>Comment ça marche</h2>
     <ol>
       <li><strong>Tu confies ton profil</strong><span>En 5 minutes : qui tu es, qui tu cherches, une photo. Rien n’est publié avec ton nom.</span></li>
-      <li><strong>Lamia vérifie</strong><span>Elle contrôle ton identité. Les faux profils n’entrent pas.</span></li>
+      <li><strong>Lamia vérifie</strong><span>Les faux profils n’entrent pas. Avec ta pièce d’identité (facultative), ton profil gagne le badge « vérifié avec pièce d’identité ».</span></li>
       <li><strong>Elle cherche pour toi</strong><span>Son outil de matching compare les profils, et Lamia choisit avec son regard.</span></li>
       <li><strong>Elle vous présente</strong><span>Si vous êtes d’accord tous les deux, elle vous met en contact. La première fois, c’est offert.</span></li>
     </ol>
@@ -1217,7 +1217,7 @@ page(
 
   <section class="cl-reglages" data-annonces-vue hidden>
     <h2>Annonces de rencontre</h2>
-    <p class="cl-aide">Les profils ne sont jamais publiés. 1) Vérifie le profil et la pièce d’identité, puis « Valider » : la pièce d’identité est supprimée. 2) Exporte vers ton outil et fais le matching. 3) Indique le nombre de profils compatibles et « Envoyer le résultat » : la personne reçoit ce nombre par email (sans savoir qui), avec l’invitation à t’écrire (première mise en relation offerte, ensuite abonnement).</p>
+    <p class="cl-aide">Les profils ne sont jamais publiés. 1) Vérifie le profil (et la pièce d’identité si la personne l’a donnée : elle est facultative), puis « Valider » : la pièce est supprimée, et le profil garde le badge « vérifié avec pièce d’identité ». 2) Exporte vers ton outil et fais le matching. 3) Indique le nombre de profils compatibles et « Envoyer le résultat » : la personne reçoit ce nombre par email (sans savoir qui), avec l’invitation à t’écrire (première mise en relation offerte, ensuite abonnement).</p>
     <div class="cl-carte cl-export">
       <h3>🔗 Liaison avec mon outil de matching</h3>
       <p class="cl-aide">Ton outil récupère tout seul les profils validés et les matchs demandés grâce à une clé secrète. Crée la clé une fois, colle-la dans l’écran « Le site » de ton outil. Si tu crées une nouvelle clé, l’ancienne ne marche plus.</p>
@@ -1281,7 +1281,7 @@ page(
   '/rencontres/',
   layout({
     title: 'Rencontre kabyle sérieuse : profils vérifiés · Les Rencontres de Lamia',
-    description: 'Rencontre kabyle sérieuse en vue du mariage : confie ton profil à Lamia, marieuse kabyle. Profils vérifiés par pièce d’identité, profils anonymes, mise en relation par Lamia, la première offerte.',
+    description: 'Rencontre kabyle sérieuse en vue du mariage : confie ton profil à Lamia, marieuse kabyle. Profils vérifiés (badge renforcé avec pièce d’identité), profils anonymes, mise en relation par Lamia, la première offerte.',
     path: '/rencontres/',
     room: roomBySlug.patio,
     scripts: ['/assets/annonces.js'],
@@ -1314,7 +1314,7 @@ page(
     <h2>Comment ça marche</h2>
     <ol>
       <li><strong>Tu confies ton profil</strong><span>En 5 minutes : qui tu es, qui tu cherches, une photo. Ton identité n’est jamais publiée.</span></li>
-      <li><strong>Lamia vérifie</strong><span>Elle contrôle ton identité, puis passe ton profil dans son outil de matching.</span></li>
+      <li><strong>Lamia vérifie</strong><span>Elle vérifie ton profil, puis le passe dans son outil de matching. Ta pièce d’identité est facultative : si tu la donnes, ton profil porte le badge renforcé.</span></li>
       <li><strong>Tu sais combien te correspondent</strong><span>Lamia te dit avec combien de personnes tu pourrais correspondre. Personne ne sait qui matche avec qui.</span></li>
       <li><strong>Lamia vous présente</strong><span>Si vous êtes d’accord tous les deux, elle vous met en contact. Ton numéro reste chez elle jusque-là. La première fois, c’est offert.</span></li>
     </ol>
