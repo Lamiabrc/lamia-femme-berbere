@@ -64,3 +64,15 @@ test('état : crédits à l’unité restants', async () => {
   assert.deepEqual(e.unites, { mise_en_relation: 2, speed_dating: 0 });
   assert.equal(e.abonnement, null);
 });
+test('retour de paiement : la session est relue chez Stripe puis enregistrée', async () => {
+  const ecrits = [];
+  const fetcher = async (u, o = {}) => { ecrits.push([u, o.method]); return { ok: true, json: async () => (u.includes('on_conflict') ? [{}] : []) }; };
+  const stripe = { checkout: { sessions: { retrieve: async () => ({ id: 'cs_test_1', status: 'complete', payment_status: 'paid', livemode: false, subscription: 'sub_9', customer: 'cus_9', customer_email: 'a@b.fr', metadata: { kind: 'abonnement', formule: 'coeur', periode: 'mois' } }) } }, subscriptions: { retrieve: async () => ({ id: 'sub_9', status: 'active', items: { data: [{ current_period_end: 1800000000 }] }, metadata: { kind: 'abonnement' } }) } };
+  const r = await actionAbonnement({ action: 'abonnement_confirmer', session_id: 'cs_test_1' }, req, { env, fetcher, stripe });
+  const d = await r.json();
+  assert.equal(d.statut, 'paye'); assert.equal(d.nom, 'Cœur');
+  assert(ecrits.some(([u]) => u.includes('abonnements?on_conflict')));
+  assert(ecrits.some(([u, m]) => u.includes('stripe_subscription_id=eq.sub_9') && m === 'PATCH'));
+  const faux = await actionAbonnement({ action: 'abonnement_confirmer', session_id: 'pas_une_session' }, req, { env, fetcher, stripe });
+  assert.equal(faux.status, 400);
+});

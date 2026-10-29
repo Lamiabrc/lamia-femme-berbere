@@ -1476,8 +1476,10 @@ page(
     description: 'Ton paiement est bien reçu.',
     path: '/abonnement/merci/',
     room: roomBySlug.patio,
+    scripts: ['/assets/abonnement-merci.js'],
     body: `<div class="po-app"><section class="po-hero abo-hero"><div class="po-fond" aria-hidden="true"></div>
   <p class="po-eyebrow">Merci</p><h1>Bienvenue, ton cœur est entre de bonnes mains</h1>
+  <p class="abo-alerte" data-abo-confirmation>Vérification du paiement…</p>
   <p class="po-lead">Ton paiement est bien reçu. Tu reçois un reçu par email, et Lamia est prévenue. Si ce n’est pas encore fait, confie ton profil à Lamia pour qu’elle puisse chercher la bonne personne.</p>
   <p class="po-actions"><a class="po-btn" href="/patio/#annonces">💌 Confier mon profil</a><a class="po-btn-verre" href="/mon-espace/">Mon espace</a></p>
 </section></div>`,
@@ -1844,7 +1846,7 @@ await cp(join(ROOT, 'public'), DIST, { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await writeFile(join(DIST, 'assets', 'editable.json'), JSON.stringify({ fields: [...EDITABLE, ...REGISTRE], defaults: DEFAULTS }));
-for (const f of ['abonnement.js', 'maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'annonces.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
+for (const f of ['abonnement.js', 'abonnement-merci.js', 'maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'annonces.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
 await cp(join(ROOT, 'content', 'shipping.mjs'), join(DIST, 'assets', 'shipping.mjs'));
 await cp(join(ROOT, 'content', 'rubriques.mjs'), join(DIST, 'assets', 'rubriques.mjs'));
 await cp(join(ROOT, 'content', 'matching-options.mjs'), join(DIST, 'assets', 'matching-options.mjs'));

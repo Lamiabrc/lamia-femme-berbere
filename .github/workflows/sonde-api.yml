@@ -1,0 +1,9 @@
+name: sonde-api
+on: workflow_dispatch
+jobs:
+  sonde:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "::warning::webhook $(curl -sL https://lamia-femme-berbere.com/api/stripe-webhook/ | head -c 200)"
+          echo "::warning::merci $(curl -s -o /dev/null -w '%{http_code}' https://lamia-femme-berbere.com/abonnement/merci/)"
