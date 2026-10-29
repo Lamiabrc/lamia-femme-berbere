@@ -18,13 +18,8 @@
       "permanent": true
     },
     {
-      "source": "/patio/:path*",
-      "destination": "/rencontres/:path*",
-      "permanent": true
-    },
-    {
-      "source": "/patio",
-      "destination": "/rencontres/",
+      "source": "/patio(.*)",
+      "destination": "/rencontres$1",
       "permanent": true
     }
   ],
