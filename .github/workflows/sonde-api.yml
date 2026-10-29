@@ -1,9 +1,0 @@
-name: sonde-api
-on: workflow_dispatch
-jobs:
-  sonde:
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
-          B=https://lamia-femme-berbere.com
-          for u in /patio/ /patio "/patio/?retirer=x"; do echo "::warning::$u $(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' "$B$u")"; done
