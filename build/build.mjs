@@ -299,9 +299,10 @@ page(
     <span class="entree-stars" aria-hidden="true"></span>
     <span class="entree-glow" aria-hidden="true"></span>
     <div class="entree-text">
-      <figure class="entree-lamia">${IMGT('image.hall.entree-portrait', 'Le Hall', 'Portrait de Lamia à l’entrée du site', `<img src="/images/lamia/lamia-portrait-pro-480.webp" srcset="/images/lamia/lamia-portrait-pro-320.webp 320w, /images/lamia/lamia-portrait-pro-480.webp 480w" sizes="200px" width="480" height="600" alt="Lamia Femme Berbère" fetchpriority="high">`)}</figure>
-      <p class="entree-ame">${esc(T('hall.ame-soeur', 'Le Hall', 'Phrase sous le portrait de Lamia', 'Trouve ton âme sœur avec Lamia et son outil de matching IA'))}</p>
-      <p class="entree-ame-actions"><a class="entree-ame-btn" href="/patio/#annonces">💌 Je dépose mon annonce</a></p>
+      <a class="entree-ame-carte" href="/patio/#annonces">
+        <span class="entree-lamia">${IMGT('image.hall.entree-portrait', 'Le Hall', 'Portrait de Lamia à l’entrée du site', `<img src="/images/lamia/lamia-tatouages-240.webp" srcset="/images/lamia/lamia-tatouages-240.webp 240w, /images/lamia/lamia-tatouages-480.webp 480w" sizes="110px" width="240" height="300" alt="Lamia Femme Berbère" fetchpriority="high">`)}</span>
+        <span class="entree-ame-texte"><span class="entree-ame">${esc(T('hall.ame-soeur', 'Le Hall', 'Phrase sous le portrait de Lamia', 'Trouve ton âme sœur avec Lamia et son outil de matching IA'))}</span><span class="entree-ame-btn">💌 Je dépose mon annonce</span></span>
+      </a>
       <p class="entree-kicker">La Maison franco-kabyle</p>
       <h1 class="entree-title">Lamia Femme Berbère<span class="entree-title-sous">${esc(T('hall.titre-sous', 'Le Hall', 'Sous-titre du grand titre', 'Speed Dating & Rencontres Célibataires Kabyles'))}</span></h1>
       <p class="entree-subtitle">${esc(T('hall.phrase', 'Le Hall', 'Phrase sous le grand titre', 'Trouvez l’amour et le mariage sérieux grâce à l’alliance de la tradition berbère et de la modernité.', true))}</p>
@@ -310,6 +311,16 @@ page(
     </div>
     <span class="entree-lumiere" aria-hidden="true"></span>
     <a class="entree-skip" href="#hall">Entrer directement</a>
+  </div>
+</section>
+
+<section class="ame-soeur" id="ame-soeur" aria-labelledby="ame-soeur-titre">
+  <figure class="ame-soeur-portrait"><img src="/images/lamia/lamia-tatouages-480.webp" width="480" height="600" alt="Lamia Femme Berbère" loading="lazy"></figure>
+  <div class="ame-soeur-texte">
+    <p class="ame-soeur-kicker">Annonces de rencontre vérifiées</p>
+    <h2 id="ame-soeur-titre">${esc(T('hall.ame-soeur', 'Le Hall', 'Phrase sous le portrait de Lamia', 'Trouve ton âme sœur avec Lamia et son outil de matching IA'))}</h2>
+    <p>Dépose ton annonce : ton portrait, une ou deux photos, et la personne que tu espères rencontrer. Lamia vérifie chaque profil, puis le fait passer dans son outil de matching pour te proposer les personnes qui te correspondent vraiment. Tes coordonnées restent privées : c’est Lamia qui fait le lien.</p>
+    <p class="ame-soeur-actions"><a class="ame-soeur-btn" href="/patio/#annonces">💌 Je dépose mon annonce</a><a class="ame-soeur-lien" href="/patio/#annonces-liste">Voir les annonces</a><a class="ame-soeur-lien" href="/speed-dating/">Le speed dating</a></p>
   </div>
 </section>
 

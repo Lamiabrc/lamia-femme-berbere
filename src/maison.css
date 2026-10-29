@@ -2765,13 +2765,25 @@ body .preorder .form-status.is-error, body[data-ambiance] .preorder .form-status
 .annonce-form [hidden], .annonce-box[hidden], .annonce-retrait[hidden] { display: none !important; }
 .annonce-intro::before { top: auto; bottom: 8px; right: 16px; font-size: 110px; }
 
-/* Entrée du site : portrait de Lamia et invitation à trouver son âme sœur */
-.entree-text { top: 7vh; }
-.entree-lamia { margin: 0 0 4px; width: clamp(130px, 18vw, 200px); aspect-ratio: 4 / 5; border-radius: 999px 999px 24px 24px; overflow: hidden; border: 3px solid #e3bd6e; box-shadow: 0 0 0 6px rgba(227,189,110,.25), 0 24px 50px -16px rgba(0,0,0,.7); background: #5c0f22; }
-.entree-lamia img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; display: block; }
-.entree-ame { margin: 6px 0 2px; max-width: 22ch; font-family: var(--serif); font-weight: 600; font-size: clamp(24px, 3.4vw, 40px); line-height: 1.12; background: linear-gradient(90deg, #fff1c9, #e3bd6e 55%, #f0d08a); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; filter: drop-shadow(0 2px 8px rgba(0,0,0,.55)); }
-.entree-ame-actions { margin: 4px 0 10px; }
-.entree-ame-btn { display: inline-block; padding: 11px 22px; border-radius: 999px; background: linear-gradient(180deg, #7d1530, #5c0f22); border: 2px solid #e3bd6e; color: #fff6e6; font-weight: 700; text-decoration: none; box-shadow: 0 12px 26px -12px rgba(0,0,0,.7); }
-.entree-ame-btn:hover { background: linear-gradient(180deg, #8e1a38, #6a1228); color: #fff; }
-@media (max-width: 700px) { .entree-text { top: 4vh; } .entree-title { font-size: clamp(32px, 9vw, 48px); } }
-.entree-text::before { content: ''; position: absolute; z-index: -1; left: 50%; top: -2vh; width: min(1000px, 100%); height: 100%; transform: translateX(-50%); background: radial-gradient(ellipse 50% 48% at 50% 44%, rgba(20,8,12,.62), rgba(20,8,12,.35) 55%, transparent 80%); pointer-events: none; }
+/* Entrée du site : carte « âme sœur » (cliquable), petite pour ne rien cacher de la façade */
+.entree-text { top: 9vh; }
+.entree-ame-carte { pointer-events: auto; display: flex; align-items: center; gap: 14px; margin: 0 0 14px; padding: 10px 18px 10px 10px; max-width: 560px; border-radius: 22px; background: linear-gradient(135deg, rgba(92,15,34,.92), rgba(125,21,48,.88)); border: 2px solid #e3bd6e; box-shadow: 0 0 0 5px rgba(227,189,110,.2), 0 20px 40px -18px rgba(0,0,0,.8); text-decoration: none; text-align: left; text-shadow: none; }
+.entree-ame-carte:hover { background: linear-gradient(135deg, rgba(110,18,40,.96), rgba(140,26,56,.92)); }
+.entree-lamia { flex: none; width: 92px; aspect-ratio: 4 / 5; border-radius: 999px 999px 14px 14px; overflow: hidden; border: 2px solid #e3bd6e; }
+.entree-lamia img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.entree-ame-texte { display: grid; gap: 8px; }
+.entree-ame { font-family: var(--serif); font-weight: 600; font-size: clamp(19px, 2.2vw, 26px); line-height: 1.15; color: #fff1c9; }
+.entree-ame-btn { justify-self: start; padding: 7px 14px; border-radius: 999px; background: linear-gradient(180deg, #f0d08a, #d4a64e); color: #3a0a16; font-weight: 700; font-size: 14px; }
+@media (max-width: 700px) { .entree-text { top: 3vh; } .entree-lamia { width: 70px; } .entree-ame { font-size: 17px; } .entree-ame-carte { gap: 10px; padding: 8px 12px 8px 8px; } .entree-title { font-size: clamp(32px, 9vw, 48px); } }
+
+/* Encart « âme sœur » en tête du Hall : bordeaux et or */
+.ame-soeur { display: grid; grid-template-columns: minmax(150px, 230px) 1fr; gap: clamp(20px, 4vw, 48px); align-items: center; margin: clamp(24px, 4vw, 48px) auto; max-width: 1120px; padding: clamp(20px, 3vw, 36px); border-radius: 26px; background: radial-gradient(ellipse 70% 80% at 90% 0%, rgba(227,189,110,.25), transparent 60%), linear-gradient(135deg, #5c0f22, #7d1530 55%, #4a0b1b); border: 2px solid #d9b25f; box-shadow: 0 0 0 7px rgba(217,178,95,.16), 0 30px 60px -30px rgba(74,11,27,.8); color: #fff6e6; }
+.ame-soeur-portrait { margin: 0; border-radius: 999px 999px 20px 20px; overflow: hidden; border: 3px solid #e3bd6e; aspect-ratio: 4 / 5; }
+.ame-soeur-portrait img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ame-soeur-kicker { margin: 0 0 6px; font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: #e3bd6e; }
+.ame-soeur h2 { margin: 0 0 12px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.08; background: linear-gradient(90deg, #fff1c9, #e3bd6e 60%, #f0d08a); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.ame-soeur p { color: #fff6e6; max-width: 62ch; }
+.ame-soeur-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin: 16px 0 0; }
+.ame-soeur-btn { display: inline-block; padding: 12px 22px; border-radius: 999px; background: linear-gradient(180deg, #f0d08a, #d4a64e); color: #3a0a16 !important; font-weight: 700; text-decoration: none; }
+.ame-soeur-lien { color: #fff1c9 !important; text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 640px) { .ame-soeur { grid-template-columns: 1fr; justify-items: center; text-align: center; margin-inline: var(--gouttiere); } .ame-soeur-portrait { width: 130px; } .ame-soeur-actions { justify-content: center; } }
