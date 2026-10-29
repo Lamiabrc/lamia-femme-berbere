@@ -2994,3 +2994,5 @@ a.po-btn { display: inline-block; text-decoration: none; }
 .abo-alerte { margin: 0; padding: 14px 18px; border-radius: 14px; background: rgba(255,200,90,.12); border: 1px solid rgba(255,210,122,.4); color: #ffe3a8 !important; }
 .abo-form { scroll-margin-top: 100px; }
 .abo-form[hidden] { display: none !important; }
+/* En-tête plus large sur grand écran, pour que « Annonces de mariage » tienne dans le menu */
+@media (min-width: 1361px) { .site-header { padding-left: max(24px, calc((100% - 1480px) / 2)) !important; padding-right: max(24px, calc((100% - 1480px) / 2)) !important; } .site-header .site-nav { gap: 16px; } }

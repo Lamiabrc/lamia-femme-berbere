@@ -175,6 +175,7 @@ function header(room) {
   </a>
   <nav class="site-nav" aria-label="Navigation principale">
     ${link('/', 'Accueil', 'hall')}
+    ${link('/patio/', 'Annonces de mariage', 'patio')}
     ${link('/boutique/', 'Boutique', 'boutique')}
     ${link('/ecrin/', 'Bijoux kabyles', 'ecrin')}
     ${link('/bibliotheque/', 'Livres', 'bibliotheque')}
