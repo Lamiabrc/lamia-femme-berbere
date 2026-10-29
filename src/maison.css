@@ -2927,3 +2927,13 @@ body .preorder .form-status.is-error, body[data-ambiance] .preorder .form-status
 .annonce-pages button[aria-current="page"] { background: linear-gradient(90deg, #ff7a62, #ffb07a); color: #2a0610; border-color: transparent; }
 .annonce-pages button:disabled { opacity: .35; cursor: default; }
 .annonce-onglets { scroll-margin-top: 90px; }
+/* Salon : l'outil de matching en live (même habillage que le Patio) */
+.outil-live { max-width: 1240px; margin: 30px auto; border-radius: 24px; padding: clamp(20px, 4vw, 44px); display: grid; gap: 22px; scroll-margin-top: 90px; }
+.outil-live-tete { display: flex; gap: 22px; align-items: center; }
+.outil-live-tete img { width: clamp(84px, 11vw, 120px); height: auto; aspect-ratio: 1; border-radius: 50%; object-fit: cover; border: 3px solid #ffd27a; box-shadow: 0 0 0 4px rgba(255,210,122,.25), 0 0 28px rgba(255,190,90,.45); flex: none; }
+.outil-live-tete h2 { margin: 0 0 8px; font-size: clamp(28px, 4vw, 42px); }
+.outil-live-tete p { margin: 0; max-width: 75ch; line-height: 1.65; }
+.outil-live .patio-etapes { margin: 0; }
+.outil-live .patio-etapes b { color: #ffd27a; }
+a.po-btn { display: inline-block; text-decoration: none; }
+@media (max-width: 640px) { .outil-live-tete { flex-direction: column; align-items: flex-start; } }

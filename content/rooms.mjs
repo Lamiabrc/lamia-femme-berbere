@@ -30,7 +30,7 @@ export const rooms = [
     summary: 'Confie ton profil à Lamia, découvre des profils vérifiés et anonymes, et laisse-la faire le lien, en toute discrétion.', status: 'open', accent: 'vert' },
 
   // ---------- premier étage : rencontres, parole, lecture
-  { slug: 'salon', path: '/salon/', floor: 1, name: 'Le Salon de Lamia', welcome: 'Installe-toi, on parle vrai.', headline: 'Lives TikTok, débats et mariage kabyle',
+  { slug: 'salon', path: '/salon/', floor: 1, name: 'Le Salon de Lamia', welcome: 'Installe-toi, on parle vrai.', headline: 'Lives en multistream, débats et mariage kabyle',
     summary: 'Les lives, les débats et les prises de parole de Lamia sur l’amour, le mariage, la transmission et la société.', status: 'open', accent: 'rouge' },
   { slug: 'speed-dating', path: '/speed-dating/', floor: 1, name: 'Le Boudoir des Rencontres', welcome: 'Des rencontres vraies, dans un cadre sûr.', headline: 'Speed dating sérieux en ligne',
     summary: 'Des soirées en visio, des tête-à-tête rapides et un cadre chaleureux pensé pour des rencontres sérieuses.', status: 'open', accent: 'rouge' },
