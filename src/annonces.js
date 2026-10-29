@@ -220,10 +220,12 @@ function carte(a) {
     <div class="annonce-texte">
       <p class="annonce-ref">Profil n° ${a.ref} · ✓ vérifié par Lamia · anonyme</p>
       <h3>${esc(infos.slice(0, 2).join(', '))}</h3>
-      <p class="annonce-lieu">${esc(infos.slice(2).join(' · '))}</p>
+      <p class="annonce-lieu">${esc([a.ville && `📍 ${a.ville}`, ...infos.slice(2)].filter(Boolean).join(' · '))}</p>
+      ${a.village ? `<p class="annonce-lieu">🏡 Originaire de ${esc(a.village)}</p>` : ''}
       ${tags.length ? `<p class="annonce-tags">${tags.map((t) => `<span>${esc(lib(t))}</span>`).join('')}</p>` : ''}
       <h4>Qui je suis</h4><p>${esc(a.profil)}</p>
       <h4>Qui je cherche${ages}</h4><p>${esc(a.recherche)}</p>
+      ${a.secteur ? `<p class="annonce-lieu">🧭 Secteur recherché : ${esc(a.secteur)}</p>` : ''}
       <button type="button" class="btn btn-ink" data-interet="${a.ref}">💌 Ce profil m’intéresse</button>
     </div>
   </article>`;
