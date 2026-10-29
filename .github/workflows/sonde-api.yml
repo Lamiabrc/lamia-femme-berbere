@@ -1,0 +1,10 @@
+name: sonde-api
+on: workflow_dispatch
+jobs:
+  sonde:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          r=$(curl -sSL -m 30 -X OPTIONS -H 'Origin: http://127.0.0.1:18080' -H 'Access-Control-Request-Method: POST' -D - -o /dev/null https://lamia-femme-berbere.com/api/confidences | grep -i "access-control-allow-origin\|HTTP/" | tr '\r\n' '  '); echo "::warning title=preflight::$r"
+          r=$(curl -sSL -m 30 -X POST -H 'Origin: http://127.0.0.1:18080' -H 'Content-Type: application/json' -d '{"action":"outil_synchro","cle":"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"}' -w ' HTTP %{http_code}' https://lamia-femme-berbere.com/api/confidences); echo "::warning title=synchro::$r"
+          r=$(curl -sSL -m 30 -X POST -H 'Content-Type: application/json' -d '{"action":"annonces_publiques"}' -w ' HTTP %{http_code}' https://lamia-femme-berbere.com/api/confidences); echo "::warning title=publiques::$r"
