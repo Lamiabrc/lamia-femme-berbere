@@ -1216,6 +1216,11 @@ page(
     <h2>Annonces de rencontre</h2>
     <p class="cl-aide">Les profils ne sont jamais publiés. 1) Vérifie le profil et la pièce d’identité, puis « Valider » : la pièce d’identité est supprimée. 2) Exporte vers ton outil et fais le matching. 3) Indique le nombre de profils compatibles et « Envoyer le résultat » : la personne reçoit ce nombre par email (sans savoir qui), avec l’invitation à t’écrire (première mise en relation offerte, ensuite abonnement).</p>
     <div class="cl-carte cl-export">
+      <h3>💌 Matchs demandés <span data-n-demandes></span></h3>
+      <p class="cl-aide">Quand quelqu’un clique sur « Ce profil m’intéresse » dans le Patio puis crée son profil, la demande arrive ici (et tu reçois une alerte). Personne d’autre ne la voit. Elle est aussi notée dans la fiche exportée vers ton outil.</p>
+      <div data-demandes></div>
+    </div>
+    <div class="cl-carte cl-export">
       <h3>↪ Vers mon outil de matching</h3>
       <p class="cl-aide">Les réponses du formulaire suivent exactement les champs de ton outil. Télécharge le fichier, puis dans l’outil : la liste des profils, bouton « Import CSV/JSON », et choisis ce fichier. Les profils déjà importés ne sont pas dupliqués.</p>
       <p class="cl-aide" data-export-info></p>
@@ -1272,13 +1277,16 @@ page(
     <div>
       <p class="now-room">Trouve ton âme sœur avec Lamia</p>
       <h2>Et si ta belle rencontre commençait ici ?</h2>
-      <p>Confie ton profil à Lamia : ton portrait, une ou deux photos (ou une petite vidéo), et la personne que tu espères rencontrer. Ton profil n’est <strong>jamais publié</strong> : il reste chez Lamia, qui vérifie ton identité puis le passe dans son outil de matching.</p>
+      <p>Confie ton profil à Lamia : ton portrait, une ou deux photos (ou une petite vidéo), et la personne que tu espères rencontrer. Ton identité n’est <strong>jamais publiée</strong> : Lamia vérifie qui tu es, puis passe ton profil dans son outil de matching. Si tu le souhaites, il peut apparaître ici de façon anonyme, sans prénom, photo ni contact.</p>
       <p>Tu reçois ensuite le nombre de personnes avec qui tu pourrais correspondre, sans savoir qui elles sont : personne ne sait qui matche avec qui, sauf Lamia. Écris-lui pour en prendre connaissance. <strong>Ta première mise en relation est offerte</strong> ; pour en découvrir d’autres, Lamia propose un abonnement.</p>
-      <p><button type="button" class="btn btn-ink" data-annonce-ouvrir aria-expanded="false">💌 Je confie mon profil à Lamia</button></p>
+      <p><button type="button" class="btn btn-ink" data-annonce-ouvrir aria-expanded="false">💌 Je confie mon profil à Lamia</button> <a class="btn btn-line" href="#profils-anonymes">Voir les profils anonymes</a></p>
     </div>
   </div>
   <div class="annonce-retrait" data-annonce-retrait hidden></div>
   <div class="annonce-box" data-annonce-box hidden></div>
+  <h2 class="annonces-titre" id="profils-anonymes">Des profils vérifiés, en toute discrétion</h2>
+  <p class="annonces-sous">Ni prénom, ni photo, ni contact : seulement des cœurs qui se racontent. Un profil te touche ? Clique sur « Ce profil m’intéresse », crée ton profil, et Lamia regarde si vous pouvez correspondre. Personne ne sait qui s’intéresse à qui.</p>
+  <div class="annonces-liste" data-annonces-liste><p class="annonce-vide">Les profils arrivent…</p></div>
   <div class="now-grid">
     <article class="now-card" data-accent="rouge"><p class="now-room">Chaque soir</p><h3>Live Mariage Kabyle</h3><p>De 21 h à 23 h, sur TikTok.</p><a href="https://www.tiktok.com/@lamiaberbere" rel="noopener" target="_blank">Rejoindre le live</a></article>
     <article class="now-card" data-accent="rouge" data-next-event><p class="now-room">Le Boudoir des Rencontres</p><h3>Prochaine soirée</h3><p>Les prochaines soirées arrivent.</p><a href="/speed-dating/">Voir les soirées</a></article>

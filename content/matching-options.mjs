@@ -150,7 +150,7 @@ export function versOutil(a, { photoDataUrl = '', aujourdHui = new Date() } = {}
     plateformeSaisie: 'Autre',
     canalSaisie: 'Message privé',
     photoDataUrl,
-    notes: `Annonce n° ${a.ref} déposée sur lamia-femme-berbere.com${a.identite_verifiee_at ? `, identité vérifiée le ${String(a.identite_verifiee_at).slice(0, 10)}` : ''}.`,
+    notes: `Annonce n° ${a.ref} déposée sur lamia-femme-berbere.com${a.identite_verifiee_at ? `, identité vérifiée le ${String(a.identite_verifiee_at).slice(0, 10)}` : ''}.${(a.interets || []).length ? ` MATCH DEMANDÉ : intéressé(e) par le profil ${a.interets.map((r) => `site-annonce-${r}`).join(', ')}.` : ''}`,
     statut: 'Nouveau',
     source_record_id: `site-annonce-${a.ref}`,
     status_import: 'site',

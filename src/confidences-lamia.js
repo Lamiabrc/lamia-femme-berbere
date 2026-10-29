@@ -122,7 +122,7 @@ function router() {
   if (!session) return;
   const h = location.hash.slice(1);
   if (h === 'reglages') { courant = null; vue('reglages'); chargerReglages(); return; }
-  if (h === 'annonces') { courant = null; vue('annonces'); chargerAnnonces(); return; }
+  if (h === 'annonces') { courant = null; vue('annonces'); chargerAnnonces(); chargerDemandes(); return; }
   if (/^[0-9a-f-]{36}$/i.test(h)) return ouvrirFil(h);
   courant = null; vue('liste'); rendreListe();
 }
@@ -232,6 +232,8 @@ async function chargerAnnonces() {
       ${a.identite?.url ? `<div class="cl-annonce-id"><p><b>Pièce d’identité</b> (vérifie le prénom, l’âge et que le numéro est caché) :</p>${a.identite.mime === 'application/pdf' ? `<a class="cl-btn" href="${esc(a.identite.url)}" target="_blank" rel="noopener">Ouvrir le PDF</a>` : `<a href="${esc(a.identite.url)}" target="_blank" rel="noopener"><img src="${esc(a.identite.url)}" alt="Pièce d’identité"></a>`}</div>` : a.identite_verifiee_at ? `<p class="cl-aide">✓ Identité vérifiée le ${quand(a.identite_verifiee_at)} (pièce supprimée).</p>` : ''}
       ${a.matching && Object.keys(a.matching).length ? `<p class="cl-coord">${[a.matching.situation, a.matching.enfants === 'Oui' ? `${a.matching.nbEnfants || ''} enfant(s)` : a.matching.enfants === 'Non' ? 'sans enfant' : '', a.matching.niveauEtudeDetail || a.matching.niveauEtudeCategorie, a.matching.profession, a.matching.religion, a.matching.pratique, ...(a.matching.origineTags || [])].filter(Boolean).map(lib).map(esc).join(' · ')}${a.matching.contactReseau ? `<br>Réseau : ${esc(a.matching.contactReseau)}` : ''}</p>` : ''}
       ${a.exportee_at ? `<p class="cl-aide">↪ Exportée vers l’outil de matching le ${quand(a.exportee_at)}</p>` : ''}
+      ${(a.interets || []).length ? `<p class="cl-match-demande">💌 Match demandé : intéressé(e) par le profil n° ${a.interets.join(', ')}</p>` : ''}
+      <p class="cl-aide">${a.anonyme_ok ? (a.visible_anonyme ? '👁 Affiché anonymement dans le Patio' : 'Accepte d’être affiché(e) anonymement') : 'N’a pas accepté l’affichage anonyme'}</p>
       <p><b>Qui je suis</b><br>${esc(a.profil)}</p>
       <p><b>Qui je cherche</b>${a.age_min || a.age_max ? ` (${a.age_min || 18}-${a.age_max || 99} ans)` : ''}<br>${esc(a.recherche)}</p>
       ${a.status === 'publiee' ? `<div class="cl-resultat"><label>Profils compatibles trouvés dans ton outil<input data-nb type="number" min="0" max="9999" inputmode="numeric" value="${a.nb_compatibles ?? ''}"></label><button class="cl-btn cl-plein" type="button" data-decision="resultat">Envoyer le résultat</button>${a.resultat_envoye_at ? `<small>Envoyé le ${quand(a.resultat_envoye_at)} (${a.nb_compatibles} profil(s))</small>` : ''}</div>` : ''}
@@ -240,6 +242,7 @@ async function chargerAnnonces() {
         ${a.status !== 'publiee' ? '<button class="cl-btn cl-plein" type="button" data-decision="publier">✓ Valider le profil</button>' : ''}
         ${a.status !== 'refusee' ? `<button class="cl-btn" type="button" data-decision="refuser">${a.status === 'publiee' ? 'Retirer le profil' : 'Refuser'}</button>` : ''}
         ${a.status === 'publiee' ? '<button class="cl-btn" type="button" data-exporter-une>↪ Fiche pour l’outil de matching</button>' : ''}
+        ${a.status === 'publiee' && a.anonyme_ok ? `<button class="cl-btn" type="button" data-decision="${a.visible_anonyme ? 'masquer' : 'afficher'}">${a.visible_anonyme ? 'Retirer du Patio' : '👁 Afficher anonymement dans le Patio'}</button>` : ''}
         <button class="cl-btn" type="button" data-decision="supprimer">Supprimer définitivement</button>
       </div>
       <p class="cl-statut" role="status" data-annonce-statut></p>
@@ -297,4 +300,28 @@ document.addEventListener('click', (e) => {
   if (!b) return;
   const a = dernieresAnnonces.find((x) => x.id === b.closest('[data-id]').dataset.id);
   if (a) exporter([a]);
+});
+
+// ---------------------------------------------------------------- matchs demandés (« ce profil m'intéresse »)
+const STATUT_DEMANDE = { a_traiter: 'À traiter', mis_en_relation: 'Mis en relation', pas_compatible: 'Pas compatible' };
+async function chargerDemandes() {
+  const box = $('[data-demandes]');
+  if (!box) return;
+  try {
+    const { demandes } = await api({ action: 'matchs_demandes' }, await jetonFrais());
+    const n = demandes.filter((d) => d.statut === 'a_traiter').length;
+    $('[data-n-demandes]').textContent = n ? `(${n})` : '';
+    if (!demandes.length) { box.innerHTML = '<p class="cl-vide">Aucune demande pour le moment.</p>'; return; }
+    const qui = (p) => p?.prenom ? `n° ${p.ref} · ${esc(p.prenom)}, ${p.age} ans, ${esc(p.ville)} (${esc(lib(p.pays))})${p.contact ? `<br><small>${esc(p.contact)}</small>` : ''}` : `n° ${p?.ref} <small>(profil retiré ou inconnu)</small>`;
+    box.innerHTML = demandes.map((d) => `<article class="cl-carte cl-demande" data-demande="${d.id}">
+      <p class="cl-coord">${quand(d.created_at)} · <b>${STATUT_DEMANDE[d.statut]}</b></p>
+      <div class="cl-demande-duo"><div><small>S’intéresse à</small><br>${qui(d.demandeur)}</div><div class="cl-demande-coeur">💌 →</div><div><small>Profil choisi</small><br>${qui(d.cible)}</div></div>
+      <label>Statut<select data-demande-statut>${Object.entries(STATUT_DEMANDE).map(([k, v]) => `<option value="${k}"${k === d.statut ? ' selected' : ''}>${v}</option>`).join('')}</select></label>
+    </article>`).join('');
+  } catch (err) { box.innerHTML = `<p class="cl-vide">${esc(erreur(err.code))}</p>`; }
+}
+document.addEventListener('change', async (e) => {
+  const sel = e.target.closest('[data-demande-statut]');
+  if (!sel) return;
+  try { await api({ action: 'match_demande_statut', id: sel.closest('[data-demande]').dataset.demande, statut: sel.value }, await jetonFrais()); chargerDemandes(); } catch { /* */ }
 });

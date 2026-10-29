@@ -2787,3 +2787,11 @@ body .preorder .form-status.is-error, body[data-ambiance] .preorder .form-status
 .ame-soeur-btn { display: inline-block; padding: 12px 22px; border-radius: 999px; background: linear-gradient(180deg, #f0d08a, #d4a64e); color: #3a0a16 !important; font-weight: 700; text-decoration: none; }
 .ame-soeur-lien { color: #fff1c9 !important; text-decoration: underline; text-underline-offset: 3px; }
 @media (max-width: 640px) { .ame-soeur { grid-template-columns: 1fr; justify-items: center; text-align: center; margin-inline: var(--gouttiere); } .ame-soeur-portrait { width: 130px; } .ame-soeur-actions { justify-content: center; } }
+
+/* Profils anonymes du Patio */
+.annonces-sous { max-width: 70ch; color: #3d3034; margin: -6px 0 18px; }
+.annonce-anonyme { grid-template-rows: auto; }
+.annonce-sceau { display: grid; place-items: center; height: 74px; background: linear-gradient(135deg, #5c0f22, #7d1530); border-bottom: 2px solid #d9b25f; }
+.annonce-sceau span { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 50%; background: #fff6e6; border: 2px solid #d9b25f; color: #7d1530; font-size: 24px; font-weight: 700; }
+.annonce-anonyme h3 { font-size: 24px; }
+.annonce-interet { margin: 0; padding: 12px 14px; border-radius: 12px; background: #fbf1df; border: 1px solid #e3cf9f; color: #5c0f22 !important; font-weight: 600; }

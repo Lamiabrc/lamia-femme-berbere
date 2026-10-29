@@ -21,7 +21,7 @@ const ERR = {
   file_size: 'Un fichier est trop lourd : 12 Mo par photo, 50 Mo pour la vidéo.',
   rate_limited: 'Tu as déjà déposé plusieurs annonces aujourd’hui : réessaie demain.',
   upload_failed: 'Les photos ne sont pas toutes arrivées. Vérifie ta connexion et réessaie.',
-  contact_requis: 'Laisse un numéro de téléphone ou le lien de ton TikTok, Instagram ou Facebook : Lamia en a besoin pour la mise en relation.',
+  contact_requis: 'Indique le lien de ton TikTok, Instagram ou Facebook : Lamia en a besoin pour la mise en relation.',
 };
 const opts = (list, vide = 'Choisis…') => `<option value="">${vide}</option>${list.map((v) => `<option value="${esc(v)}">${esc(lib(v))}</option>`).join('')}`;
 const puces = (name, list) => `<div class="annonce-puces">${list.map((v) => `<label><input type="checkbox" name="${name}" value="${esc(v)}"><span>${esc(lib(v))}</span></label>`).join('')}</div>`;
@@ -108,15 +108,18 @@ export function formulaireHtml() {
     <h3><span>6</span> Pour que Lamia te réponde</h3>
     <div class="annonce-grille">
       <label>Ton email<input name="email" type="email" autocomplete="email" required></label>
-      <label>Ton téléphone<input name="phone" type="tel" autocomplete="tel" maxlength="40"></label>
-      <label>Ton TikTok, Instagram ou Facebook <small>(lien ou pseudo)</small><input name="contactReseau" maxlength="200" placeholder="@tonpseudo ou lien"></label>
+      <label>Ton lien TikTok, Instagram ou Facebook <small>(obligatoire)</small><input name="contactReseau" maxlength="200" placeholder="https://www.tiktok.com/@tonpseudo" required></label>
+      <label>Ton téléphone <small>(facultatif)</small><input name="phone" type="tel" autocomplete="tel" maxlength="40"></label>
     </div>
-    <p class="annonce-aide">Laisse au moins ton téléphone ou un réseau social : c’est par là que Lamia te contactera pour une mise en relation.</p>
+    <p class="annonce-aide">Le lien vers ton réseau social est obligatoire : c’est par là que Lamia te contactera pour une mise en relation. Il n’est jamais affiché.</p>
     <p class="annonce-aide">Tes coordonnées ne sont jamais affichées ni transmises : c’est Lamia qui te contacte pour une mise en relation.</p>
   </div>
   <label class="annonce-case"><input type="checkbox" name="majeur"> <span>J’ai 18 ans ou plus et cette annonce est sincère : je cherche une vraie rencontre.</span></label>
   <label class="annonce-case"><input type="checkbox" name="publication"> <span>Je confie mon profil à Lamia : il n’est publié nulle part, seule Lamia le voit et l’utilise dans son outil de matching pour me proposer des mises en relation. Je peux le retirer et faire effacer mes données à tout moment.</span></label>
   <label class="annonce-case"><input type="checkbox" name="identite_ok"> <span>J’accepte que Lamia voie la photo de ma pièce d’identité pour vérifier mon profil, sachant qu’elle est supprimée juste après. <a href="/confidentialite/" target="_blank" rel="noopener">Confidentialité</a></span></label>
+  <label class="annonce-case"><input type="checkbox" name="anonyme_ok"> <span>Facultatif : j’accepte que Lamia affiche mon profil <strong>anonymement</strong> dans le Patio (âge, pays, textes et caractéristiques, <strong>sans prénom, photo, ville ni contact</strong>), pour que d’autres puissent dire qu’il les intéresse.</span></label>
+  <input type="hidden" name="interet_ref" value="">
+  <p class="annonce-interet" data-interet-info hidden></p>
   <input class="hp" name="zz_site" tabindex="-1" autocomplete="off" aria-hidden="true">
   <button class="btn btn-ink annonce-envoyer" type="submit">💌 Confier mon profil à Lamia</button>
   <p class="form-status" role="status" data-annonce-statut></p>
@@ -174,7 +177,7 @@ export function monterFormulaire(box) {
     if (!medias.length) return stop('medias_requis', $('[data-medias]', form).closest('label'));
     if (!identite.length) return stop('identite_requise', $('[data-identite]', form).closest('label'));
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(f.email.value.trim())) return stop('invalid_email', f.email);
-    if (!f.phone.value.trim() && !f.contactReseau.value.trim()) return stop('contact_requis', f.phone);
+    if (!f.contactReseau.value.trim()) return stop('contact_requis', f.contactReseau);
     if (!f.majeur.checked || !f.publication.checked || !f.identite_ok.checked) return stop('consent_required', f.majeur.closest('label'));
     const btn = $('.annonce-envoyer', form); btn.disabled = true;
     const fichiers = [...medias.map((x) => ({ blob: x, role: 'media' })), ...identite.map((x) => ({ blob: x, role: 'identite' }))];
@@ -191,7 +194,7 @@ export function monterFormulaire(box) {
           return m;
         })(),
         age_min: f.age_min.value, age_max: f.age_max.value, email: f.email.value.trim(), phone: f.phone.value,
-        majeur: true, publication: true, identite_ok: true, website: f.zz_site.value,
+        majeur: true, publication: true, identite_ok: true, website: f.zz_site.value, anonyme_ok: f.anonyme_ok.checked, interet_ref: f.interet_ref.value,
         medias: fichiers.map((x) => ({ role: x.role, type: typeDe(x.blob), size: x.blob.size })),
       });
       for (const [i, up] of (res.uploads || []).entries()) {
@@ -210,22 +213,19 @@ export function monterFormulaire(box) {
 }
 
 function carte(a) {
-  const media = a.medias[0];
-  const visuel = !media?.url ? '<div class="annonce-sans-photo" aria-hidden="true">❦</div>'
-    : media.kind === 'video' ? `<video src="${esc(media.url)}" controls playsinline preload="metadata"></video>`
-    : `<img src="${esc(media.url)}" alt="Photo de ${esc(a.prenom)}" loading="lazy">`;
-  const autres = a.medias.slice(1).filter((m) => m.url && m.kind === 'photo').map((m) => `<img src="${esc(m.url)}" alt="Autre photo de ${esc(a.prenom)}" loading="lazy">`).join('');
   const ages = a.age_min || a.age_max ? ` · ${a.age_min || 18} à ${a.age_max || 99} ans` : '';
-  return `<article class="annonce-carte">
-    <div class="annonce-visuel">${visuel}${autres ? `<div class="annonce-mini">${autres}</div>` : ''}</div>
+  const tags = [...(a.origine || []), ...(a.caracteristiques || [])];
+  const infos = [a.genre === 'femme' ? 'Une femme' : 'Un homme', `${a.age} ans`, lib(a.pays), a.situation && lib(a.situation), a.enfants === 'Oui' ? 'avec enfant(s)' : a.enfants === 'Non' ? 'sans enfant' : '', a.etudes && `études : ${lib(a.etudes).toLowerCase()}`].filter(Boolean);
+  return `<article class="annonce-carte annonce-anonyme">
+    <div class="annonce-sceau" aria-hidden="true"><span>${a.genre === 'femme' ? '♀' : '♂'}</span></div>
     <div class="annonce-texte">
-      <p class="annonce-ref">Annonce n° ${a.ref} · ✓ vérifiée par Lamia</p>
-      <h3>${esc(a.prenom)}, ${a.age} ans</h3>
-      <p class="annonce-lieu">${a.genre === 'femme' ? 'Une femme' : 'Un homme'} · ${esc(a.ville)}, ${esc(lib(a.pays))}${a.situation ? ` · ${esc(lib(a.situation))}` : ''}</p>
-      ${[...(a.origine || []), ...(a.caracteristiques || [])].length ? `<p class="annonce-tags">${[...(a.origine || []), ...(a.caracteristiques || [])].map((t) => `<span>${esc(lib(t))}</span>`).join('')}</p>` : ''}
+      <p class="annonce-ref">Profil n° ${a.ref} · ✓ vérifié par Lamia · anonyme</p>
+      <h3>${esc(infos.slice(0, 2).join(', '))}</h3>
+      <p class="annonce-lieu">${esc(infos.slice(2).join(' · '))}</p>
+      ${tags.length ? `<p class="annonce-tags">${tags.map((t) => `<span>${esc(lib(t))}</span>`).join('')}</p>` : ''}
       <h4>Qui je suis</h4><p>${esc(a.profil)}</p>
       <h4>Qui je cherche${ages}</h4><p>${esc(a.recherche)}</p>
-      <a class="btn btn-ink" href="/confidences/?annonce=${a.ref}#ecrire">💌 Cette annonce me touche : écrire à Lamia</a>
+      <button type="button" class="btn btn-ink" data-interet="${a.ref}">💌 Ce profil m’intéresse</button>
     </div>
   </article>`;
 }
@@ -234,7 +234,7 @@ export async function monterListe(box) {
   if (!box) return;
   try {
     const { annonces } = await api({ action: 'annonces_publiques' });
-    if (!annonces.length) { box.innerHTML = '<p class="annonce-vide">Les premières annonces vérifiées arrivent très bientôt. Et si la première, c’était la tienne ?</p>'; return; }
+    if (!annonces.length) { box.innerHTML = '<p class="annonce-vide">Les premiers profils anonymes arrivent très bientôt. Et si le premier, c’était le tien ?</p>'; return; }
     box.innerHTML = annonces.map(carte).join('');
   } catch { box.innerHTML = '<p class="annonce-vide">Les annonces n’ont pas pu s’afficher. Recharge la page dans un instant.</p>'; }
 }
@@ -256,11 +256,24 @@ export async function retraitDepuisLien() {
 
 // Montage automatique sur les pages qui ont les emplacements (Patio).
 retraitDepuisLien();
-document.querySelectorAll('[data-annonce-ouvrir]').forEach((b) => b.addEventListener('click', () => {
+function ouvrirFormulaire(ref) {
   const box = document.querySelector('[data-annonce-box]');
   if (!box) return;
   if (!box.dataset.monte) { monterFormulaire(box); box.dataset.monte = '1'; }
   box.hidden = false;
-  b.setAttribute('aria-expanded', 'true');
+  const form = box.querySelector('[data-annonce-form]');
+  if (form && ref) {
+    form.elements.interet_ref.value = ref;
+    const info = form.querySelector('[data-interet-info]');
+    form.prepend(info);
+    info.hidden = false;
+    info.textContent = `💌 Le profil n° ${ref} t’intéresse : crée ton profil ci-dessous. Lamia est prévenue et regarde si vous pouvez correspondre. Personne d’autre ne le saura.`;
+    window.lfbEvent?.('interet_profil');
+  }
+  document.querySelectorAll('[data-annonce-ouvrir]').forEach((b) => b.setAttribute('aria-expanded', 'true'));
   box.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}));
+}
+document.querySelectorAll('[data-annonce-ouvrir]').forEach((b) => b.addEventListener('click', () => ouvrirFormulaire()));
+document.addEventListener('click', (e) => { const b = e.target.closest('[data-interet]'); if (b) ouvrirFormulaire(b.dataset.interet); });
+const liste = document.querySelector('[data-annonces-liste]');
+if (liste) monterListe(liste);
