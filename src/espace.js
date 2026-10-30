@@ -20,6 +20,8 @@ async function render() {
   $('[data-espace-admin]').hidden = u.app_metadata?.role !== 'admin';
   achats(session);
   monProfil(session);
+  mesFiches(session);
+  interetsRecus(session);
   const { data } = await supabase.from('event_registrations')
     .select('attendance_status, speed_dating_events(title, audience, starts_at)')
     .neq('attendance_status', 'cancelled');
@@ -64,7 +66,7 @@ async function monProfil(session) {
   if (!box) return;
   try {
     const { profil: p } = await appelProfil({ action: 'annonce_mon_profil' }, session);
-    if (!p) { box.innerHTML = '<p>Tu n’as pas encore de profil chez Lamia. <a class="text-link" href="/rencontres/#confier">Confier mon profil</a> (la première mise en relation est offerte).</p>'; return; }
+    if (!p) { box.innerHTML = '<p data-sans-profil>Tu n’as pas encore de profil chez Lamia. <a class="text-link" href="/rencontres/#confier">Confier mon profil</a> (la première mise en relation est offerte).</p>'; return; }
     box.innerHTML = `<article class="espace-achat"><div><p class="event-date">Profil n° ${esc(p.ref)}</p><h3>${esc(ETAT_PROFIL[p.status] || p.status)}${p.status === 'publiee' && p.piece_identite ? ' · 🛡 avec pièce d’identité' : ''}</h3>
       ${p.live ? `<p>🎥 Profil créé en live avec Lamia${p.live_retrouve ? '' : ' (Lamia vérifie ta fiche)'} : <strong>tes 3 premières mises en relation sont offertes</strong>.</p>` : '<p>Ta première mise en relation est offerte.</p>'}
       ${p.nb_compatibles !== null && p.nb_compatibles !== undefined ? `<p>D’après l’outil de Lamia, tu pourrais correspondre à ${esc(p.nb_compatibles)} personne(s).</p>` : ''}
@@ -211,3 +213,49 @@ $('[data-espace-signup]').addEventListener('submit', async (e) => {
 
 supabase.auth.onAuthStateChange((event) => { if (event === 'PASSWORD_RECOVERY') recovering = true; render(); });
 render();
+
+// Fiche créée en live avec Lamia, reliée à ce compte depuis le lien personnel.
+const ETAT_FICHE = { confirmee: '✅ Confirmée : visible sur le site, anonyme', en_attente: '⏳ Visible sur le site, en attente de ta confirmation', a_modifier: '✏️ Lamia corrige ta fiche', retiree: 'Retirée du site' };
+async function mesFiches(session) {
+  const box = document.querySelector('[data-espace-fiches]');
+  if (!box) return;
+  try {
+    const { fiches = [] } = await appelProfil({ action: 'annonce_mes_fiches_outil' }, session);
+    // Fiche créée en live reliée à ce compte : pas besoin d'inviter à « confier un profil ».
+    if (fiches.length) { const sans = document.querySelector('[data-sans-profil]'); if (sans) sans.remove(); else setTimeout(() => document.querySelector('[data-sans-profil]')?.remove(), 1500); }
+    box.innerHTML = fiches.map((f) => `<article class="espace-achat"><div><p class="event-date">Fiche n° ${esc(f.ref)} · créée en live avec Lamia</p><h3>${esc(ETAT_FICHE[f.etat] || f.etat)}</h3>
+      <p>${esc([f.age && `${f.age} ans`, f.ville, f.pays].filter(Boolean).join(' · '))}</p>
+      <p>💌 <strong>${esc(f.interets.total)}</strong> personne(s) intéressée(s)${f.interets.mis_en_relation ? ` · 💞 ${esc(f.interets.mis_en_relation)} mise(s) en relation` : ''}${f.interets.dernier ? ` · dernier intérêt le ${esc(new Date(f.interets.dernier).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' }))}` : ''}</p></div>
+      <div class="espace-achat-droite"><a class="btn btn-ink" href="${esc(f.lien)}">Voir ma fiche</a></div></article>`).join('');
+  } catch { box.innerHTML = ''; }
+}
+
+// Intérêts reçus : fiche anonyme de la personne intéressée, et réponse oui / non.
+async function interetsRecus(session) {
+  const box = document.querySelector('[data-espace-interets]');
+  if (!box) return;
+  let liste = [];
+  const carte = (i) => {
+    const f = i.fiche;
+    const infos = [f.genre === 'femme' ? 'Une femme' : 'Un homme', f.age && `${f.age} ans`, f.ville, f.pays, f.situation].filter(Boolean);
+    const ages = f.age_min || f.age_max ? ` · ${f.age_min || 18} à ${f.age_max || 99} ans` : '';
+    const rep = i.reponse === 'oui' ? '<p class="espace-match">💞 Tu as dit oui : c’est réciproque, Lamia est prévenue.</p>'
+      : i.reponse === 'non' ? '<p>Tu as répondu : pas pour moi.</p>'
+      : `<p class="interet-boutons"><button type="button" class="btn btn-ink" data-repondre="oui" data-id="${esc(i.id)}">💞 Ça m’intéresse aussi</button><button type="button" class="btn btn-line" data-repondre="non" data-id="${esc(i.id)}">Pas pour moi</button></p>`;
+    return `<article class="espace-achat interet-recu"><div><p class="event-date">Profil n° ${esc(f.ref)} · intéressé·e par ta fiche n° ${esc(i.pour)} · le ${esc(new Date(i.le).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' }))}</p>
+      <h3>${esc(infos.join(' · '))}</h3>
+      ${f.profil ? `<p><strong>Qui je suis :</strong> ${esc(f.profil)}</p>` : ''}
+      ${f.recherche ? `<p><strong>Qui je cherche${esc(ages)} :</strong> ${esc(f.recherche)}</p>` : ''}
+      ${rep}</div></article>`;
+  };
+  const afficher = () => { box.innerHTML = liste.length ? liste.map(carte).join('') : '<p>Personne pour le moment. Dès qu’une personne s’intéresse à ton profil, sa fiche apparaît ici et tu reçois un email.</p>'; };
+  try { ({ interets: liste = [] } = await appelProfil({ action: 'annonce_interets_recus' }, session)); afficher(); }
+  catch { box.innerHTML = '<p>Les intérêts reçus ne s’affichent pas pour le moment. Réessaie dans un instant.</p>'; return; }
+  box.addEventListener('click', async (e) => {
+    const b = e.target.closest('[data-repondre]');
+    if (!b) return;
+    b.parentElement.querySelectorAll('button').forEach((x) => { x.disabled = true; });
+    try { await appelProfil({ action: 'annonce_repondre_interet', id: b.dataset.id, reponse: b.dataset.repondre }, session); liste = liste.map((x) => (x.id === b.dataset.id ? { ...x, reponse: b.dataset.repondre } : x)); afficher(); }
+    catch { b.parentElement.querySelectorAll('button').forEach((x) => { x.disabled = false; }); }
+  });
+}

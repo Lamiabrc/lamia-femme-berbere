@@ -3205,3 +3205,8 @@ label.is-manquant { outline: 2px solid #c0263f; outline-offset: 3px; border-radi
 .confirmer-modif textarea { width: 100%; border-radius: 12px; border: 1px solid rgba(255,210,122,.45); background: rgba(255,255,255,.06); color: #fff4ec; padding: 10px 12px; font: inherit; }
 .confirmer-modif .po-btn { justify-self: start; }
 .confirmer-lien { background: none; border: 0; padding: 0; color: #ffd27a; text-decoration: underline; cursor: pointer; font: inherit; }
+.confirmer-acces { margin-top: 26px; padding: 18px 20px; border-radius: 18px; border: 1px solid rgba(255,210,122,.45); background: rgba(255,255,255,.05); }
+.confirmer-acces h2 { margin: 0 0 6px; font-size: 20px; color: #ffd27a; }
+.confirmer-modif input { width: 100%; border-radius: 12px; border: 1px solid rgba(255,210,122,.45); background: rgba(255,255,255,.06); color: #fff4ec; padding: 10px 12px; font: inherit; }
+.po-btn-verre.is-on { background: linear-gradient(90deg, rgba(255,90,74,.34), rgba(255,210,122,.14)); }
+.interet-boutons { display: flex; flex-wrap: wrap; gap: 10px; }

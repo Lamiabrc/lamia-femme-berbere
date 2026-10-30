@@ -806,6 +806,13 @@ page(
       <h2>Mon profil âme sœur</h2>
       <p><button type="button" class="btn btn-line btn-installer" data-installer-bouton>📲 Installer l’application sur mon téléphone</button></p>
       <div class="espace-profil" data-espace-profil><p class="loading">Un instant…</p></div>
+      <div class="espace-profil" data-espace-fiches></div>
+    </section>
+
+    <section id="interets">
+      <h2>Intérêts reçus</h2>
+      <p>Les personnes qui ont dit que ton profil les intéresse. Leur fiche est anonyme, comme sur le site. Si l’une t’intéresse aussi, c’est réciproque : Lamia vous met en relation.</p>
+      <div class="espace-interets" data-espace-interets><p class="loading">Un instant…</p></div>
     </section>
 
     <section>
