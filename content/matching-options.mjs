@@ -26,6 +26,7 @@ export const O = {
   fumeur: ['Fumeur: non', 'Fumeur: occasionnel', 'Fumeur: oui'],
   sport: ['Sport: oui', 'Sport: occasionnel', 'Sport: non'],
   alcool: ['Alcool: non', 'Alcool: occasionnel', 'Alcool: oui'],
+  chemma: ['Chemma: non', 'Chemma: oui'],
   // Recherche
   zoneGeo: ['France', 'Algerie', 'Autre que Algerie', 'Europe', 'Canada', 'USA', 'Amerique', 'Autre', "N'importe ou"],
   religionRecherche: ['Pas important', 'Islam', 'Chretienne', 'Agnostique', 'Athee', 'Autre'],
@@ -46,7 +47,7 @@ export const LIBELLE = {
   'Oui - France': 'Oui, en France', 'Oui - region': 'Oui, dans ma région', 'Oui - international': 'Oui, à l’international', 'A discuter': 'À discuter',
   'Homme: femme ne travaille pas': 'Je préfère que ma femme ne travaille pas', 'Homme: femme travaille pour son epanouissement': 'Ma femme travaille pour son épanouissement', 'Homme: femme travaille pour aider': 'Ma femme travaille pour aider le foyer', 'Homme: femme travaille en 50/50': 'On partage les charges à 50/50',
   'Femme: ne veut pas travailler': 'Je ne souhaite pas travailler', 'Femme: veut travailler obligatoirement': 'Je veux absolument travailler', 'Femme: veut travailler si necessaire': 'Je travaillerai si nécessaire', 'Femme: veut travailler pour mon epanouissement': 'Je travaille pour mon épanouissement',
-  'Fumeur: non': 'Non-fumeur', 'Fumeur: occasionnel': 'Fumeur occasionnel', 'Fumeur: oui': 'Fumeur', 'Sport: oui': 'Sport régulier', 'Sport: occasionnel': 'Sport de temps en temps', 'Sport: non': 'Pas de sport', 'Alcool: non': 'Pas d’alcool', 'Alcool: occasionnel': 'Alcool occasionnel', 'Alcool: oui': 'Alcool',
+  'Fumeur: non': 'Non-fumeur', 'Fumeur: occasionnel': 'Fumeur occasionnel', 'Fumeur: oui': 'Fumeur', 'Sport: oui': 'Sport régulier', 'Sport: occasionnel': 'Sport de temps en temps', 'Sport: non': 'Pas de sport', 'Alcool: non': 'Pas d’alcool', 'Alcool: occasionnel': 'Alcool occasionnel', 'Alcool: oui': 'Alcool', 'Chemma: non': 'Sans chique (chemma)', 'Chemma: oui': 'Chique (chemma)',
 };
 export const lib = (v) => LIBELLE[v] || v;
 
@@ -83,10 +84,13 @@ export function choixPropres(m = {}) {
     tailleCm: int(m.tailleCm, 120, 230),
     religion: un(m.religion, O.religion),
     pratique: un(m.pratique, O.pratique),
+    religionTexte: txt(m.religionTexte, 300),
+    autresModeVie: txt(m.autresModeVie, 300),
+    fumeur: un(m.fumeur, O.fumeur), sport: un(m.sport, O.sport), alcool: un(m.alcool, O.alcool), chemma: un(m.chemma, O.chemma),
     caracteristiques: plusieurs(m.caracteristiques, O.caracteristiques, 6),
     mobiliteGeographique: un(m.mobiliteGeographique, O.mobilite),
     visionFinanciere: un(m.visionFinanciere, [...O.visionHomme, ...O.visionFemme]),
-    hygieneVie: [un(m.fumeur, O.fumeur), un(m.sport, O.sport), un(m.alcool, O.alcool)].filter(Boolean),
+    hygieneVie: [un(m.fumeur, O.fumeur), un(m.sport, O.sport), un(m.alcool, O.alcool), un(m.chemma, O.chemma)].filter(Boolean),
     zoneGeo: un(m.zoneGeo, O.zoneGeo),
     origineRechercheTags: plusieurs(m.origineRechercheTags, O.origine, 7),
     religionRecherche: un(m.religionRecherche, O.religionRecherche),
@@ -165,9 +169,20 @@ export function versOutil(a, { photoDataUrl = '', aujourdHui = new Date() } = {}
     plateformeSaisie: 'Autre',
     canalSaisie: 'Message privé',
     photoDataUrl,
-    notes: `${a.status === 'a_verifier' ? '⏳ À VÉRIFIER : profil pas encore validé sur le site (teste-le, puis valide-le). ' : ''}${a.email ? `Email : ${a.email}. ` : ''}${a.photo_partage ? '📷 Photo transmissible à son match : OUI. ' : '📷 Photo transmissible à son match : NON. '}Annonce n° ${a.ref} déposée sur lamia-femme-berbere.com${a.identite_verifiee_at ? `, vérifié AVEC pièce d’identité le ${String(a.identite_verifiee_at).slice(0, 10)}` : ', vérifié sans pièce d’identité'}.${(a.interets || []).length ? ` MATCH DEMANDÉ : intéressé(e) par le profil ${a.interets.map((r) => `site-annonce-${r}`).join(', ')}.` : ''}`,
+    notes: `${a.status === 'a_verifier' ? '⏳ À VÉRIFIER : profil pas encore validé sur le site (teste-le, puis valide-le). ' : ''}${a.email ? `Email : ${a.email}. ` : ''}${a.photo_partage ? '📷 Photo transmissible à son match : OUI. ' : '📷 Photo transmissible à son match : NON. '}${m.religionTexte ? `Foi et pratique : ${m.religionTexte}. ` : ''}${m.autresModeVie ? `Mode de vie : ${m.autresModeVie}. ` : ''}Annonce n° ${a.ref} déposée sur lamia-femme-berbere.com${a.identite_verifiee_at ? `, vérifié AVEC pièce d’identité le ${String(a.identite_verifiee_at).slice(0, 10)}` : ', vérifié sans pièce d’identité'}.${(a.interets || []).length ? ` MATCH DEMANDÉ : intéressé(e) par le profil ${a.interets.map((r) => `site-annonce-${r}`).join(', ')}.` : ''}`,
     statut: 'Nouveau',
     source_record_id: `site-annonce-${a.ref}`,
     status_import: 'site',
   };
+}
+
+// Religion, pratique et mode de vie (tabac, alcool, chique, sport, le reste en quelques mots).
+export function foiEtVie(a) {
+  const esc = (x) => String(x ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+  const foi = [a.religion && lib(a.religion), a.pratique && lib(a.pratique).toLowerCase()].filter(Boolean).join(', ');
+  const vie = (a.mode_vie || []).map((x) => lib(x));
+  if (!foi && !a.religion_texte && !vie.length && !a.autres) return '';
+  return `<h4>Religion et mode de vie</h4>
+    ${foi ? `<p>🕊 ${esc(foi.charAt(0).toUpperCase() + foi.slice(1))}</p>` : ''}${a.religion_texte ? `<p>${esc(a.religion_texte)}</p>` : ''}
+    ${vie.length ? `<p class="annonce-tags">${vie.map((t) => `<span>${esc(t)}</span>`).join('')}</p>` : ''}${a.autres ? `<p>${esc(a.autres)}</p>` : ''}`;
 }

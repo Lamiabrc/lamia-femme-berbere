@@ -1,7 +1,7 @@
 // Swipe des profils vérifiés : à droite « ça m'intéresse », à gauche « pas pour moi ».
 // Personne ne sait qui a choisi qui ; quand deux personnes se choisissent, Lamia est alertée et fait la mise en relation.
 import { api, esc, PUBLIC_KEY } from './confidences-commun.js';
-import { lib } from './matching-options.mjs';
+import { lib, foiEtVie } from './matching-options.mjs';
 import { createClient } from '/vendor/supabase.mjs';
 
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', PUBLIC_KEY);
@@ -26,6 +26,7 @@ function carte(a) {
       ${tags.length ? `<p class="annonce-tags">${tags.map((t) => `<span>${esc(lib(t))}</span>`).join('')}</p>` : ''}
       ${a.profil ? `<h3>Qui je suis</h3><p>${esc(a.profil)}</p>` : ''}
       ${a.recherche ? `<h3>Qui je cherche${ages}</h3><p>${esc(a.recherche)}</p>` : ''}
+      ${foiEtVie(a).replace(/<h4>/g, '<h3>').replace(/<\/h4>/g, '</h3>')}
       ${a.secteur ? `<p class="annonce-lieu">🧭 Secteur recherché : ${esc(a.secteur)}</p>` : ''}
     </div>
   </article>`;

@@ -3084,3 +3084,4 @@ a.po-btn { display: inline-block; text-decoration: none; }
 .swipe-carte .annonce-lieu, .swipe-carte .annonce-tags span, .swipe-carte .annonce-ref { color: #5a3a2a !important; opacity: 1 !important; }
 .swipe-carte .annonce-tags span { background: #fbefdc !important; border: 1px solid #e6cf9f !important; }
 .swipe-carte .annonce-sceau { display: flex !important; justify-content: center !important; align-items: center !important; }
+.annonce-large { grid-column: 1 / -1; }
