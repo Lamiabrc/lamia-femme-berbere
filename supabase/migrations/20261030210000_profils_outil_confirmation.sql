@@ -1,0 +1,6 @@
+-- Confirmation des fiches de l'outil par les personnes elles-mêmes (lien personnel envoyé par Lamia).
+-- Une fiche n'apparaît dans les profils anonymes qu'une fois confirmée ; « ne plus apparaître » la masque définitivement.
+alter table public.profils_outil
+  add column if not exists confirme_at timestamptz,
+  add column if not exists retire_at timestamptz;
+create index if not exists profils_outil_confirme_idx on public.profils_outil (confirme_at) where confirme_at is not null;

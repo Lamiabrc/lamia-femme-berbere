@@ -3186,3 +3186,17 @@ label.is-manquant { outline: 2px solid #c0263f; outline-offset: 3px; border-radi
 @keyframes swipe-arrivee { from { transform: scale(.95) translateY(12px); } }
 .swipe-info.is-plein { background: rgba(176,122,24,.22); border-color: #e3b45c; }
 @media (prefers-reduced-motion: reduce) { .swipe-eclat, .swipe-match-coeurs, .swipe-carte:last-child, .swipe-toast, .swipe-fenetre-boite { animation: none !important; } }
+
+/* Confirmation d'une fiche créée en live */
+.confirmer-app { max-width: 640px; margin: 0 auto; padding: 8px 16px 48px; color: #fff4ec; }
+.confirmer-intro, .confirmer-etat p, .confirmer-note { line-height: 1.6; }
+.confirmer-app .confirmer-fiche { margin: 18px 0; padding: 20px 22px; border-radius: 18px; border: 2px solid #d9b25f; background: rgba(60,8,22,.85); }
+.confirmer-fiche p { margin: 4px 0; line-height: 1.55; }
+.confirmer-app .confirmer-fiche h3 { margin: 16px 0 4px; font-size: 16px; color: #ffd27a; }
+.confirmer-num { margin: 0; font-weight: 700; letter-spacing: .02em; }
+.confirmer-infos { margin: 4px 0 0; opacity: .9; }
+.confirmer-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 14px; }
+.confirmer-actions .po-btn, .confirmer-actions .po-btn-verre { text-decoration: none; }
+.confirmer-note { font-size: 14px; opacity: .85; }
+.confirmer-note a { color: #ffd27a; }
+.confirmer-erreur { padding: 18px; border-radius: 14px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,210,122,.45); }
