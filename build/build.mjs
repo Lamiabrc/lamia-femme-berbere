@@ -1694,7 +1694,7 @@ page(
     scripts: ['/assets/confirmer.js'],
     body: `<div class="po-app"><section class="po-hero"><div class="po-fond" aria-hidden="true"></div>
   <p class="po-eyebrow">Les Rencontres de Lamia</p><h1>Ta fiche est prête</h1>
-  <p class="po-lead">Tu es passé·e en live avec Lamia : ta fiche est dans son outil de matching. Avant qu’elle apparaisse sur le site, Lamia te demande ton accord.</p>
+  <p class="po-lead">Tu es passé·e en live avec Lamia : ta fiche est dans son outil de matching et apparaît sur le site, anonyme, en attente de ta confirmation.</p>
 </section>
 <section class="confirmer-app" data-confirmer><p class="annonce-vide">Ta fiche arrive…</p></section></div>`,
   })

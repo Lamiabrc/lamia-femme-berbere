@@ -429,7 +429,7 @@ function carte(a) {
   return `<article class="annonce-carte annonce-anonyme">
     <div class="annonce-sceau" aria-hidden="true"><img src="/images/outil/${a.genre === 'femme' ? 'h_femme' : 'h_man'}.webp" alt="" width="80" height="80"></div>
     <div class="annonce-texte">
-      <p class="annonce-ref${a.piece_identite ? ' is-piece' : ''}">Profil n° ${a.ref} · ${a.piece_identite ? '🛡 vérifié avec pièce d’identité' : '✓ profil vérifié'}</p>
+      <p class="annonce-ref${a.piece_identite ? ' is-piece' : ''}">Profil n° ${a.ref} · ${a.piece_identite ? '🛡 vérifié avec pièce d’identité' : a.outil ? (a.confirme ? '✓ vérifié par Lamia · ✅ confirmé' : '✓ vérifié par Lamia · ⏳ en attente de confirmation') : '✓ profil vérifié'}</p>
       <h3>${esc(infos.slice(0, 2).join(', '))}</h3>
       <p class="annonce-lieu">${esc([a.ville && `📍 ${a.ville}`, ...infos.slice(2)].filter(Boolean).join(' · '))}</p>
       ${a.village ? `<p class="annonce-lieu">🏡 Originaire de ${esc(a.village)}</p>` : ''}

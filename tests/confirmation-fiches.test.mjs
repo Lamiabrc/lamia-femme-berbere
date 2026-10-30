@@ -17,10 +17,13 @@ function monde() {
   return { fiches, alertes, patches, ctx, jeton: jetonAnnonce(env, 'outil-5020', 'confirmer') };
 }
 
-test('une fiche non confirmée n’apparaît pas dans les profils anonymes', async () => {
+test('une fiche non confirmée reste affichée, marquée « en attente de confirmation »', async () => {
   const { ctx } = monde();
   const r = await (await handleAnnonces('annonces_publiques', {}, ctx)).json();
-  assert.equal(r.annonces.filter((a) => a.ref === 5020).length, 0);
+  const f = r.annonces.find((a) => a.ref === 5020);
+  assert.equal(f.confirme, false);
+  assert.equal(f.outil, true);
+  assert.equal('confirme_at' in f, false);
 });
 test('sans le bon jeton, impossible de voir ou de confirmer la fiche', async () => {
   const { ctx, fiches } = monde();
@@ -30,7 +33,7 @@ test('sans le bon jeton, impossible de voir ou de confirmer la fiche', async () 
   }
   assert.equal(fiches[0].confirme_at, null);
 });
-test('la personne confirme : la fiche apparaît et Lamia est prévenue', async () => {
+test('la personne confirme : la fiche est marquée « confirmé » et Lamia est prévenue', async () => {
   const { ctx, jeton, alertes } = monde();
   let d = await (await handleAnnonces('annonce_fiche_outil', { n: '5020', t: jeton }, ctx)).json();
   assert.equal(d.confirme, false);
@@ -39,7 +42,7 @@ test('la personne confirme : la fiche apparaît et Lamia est prévenue', async (
   assert.equal(d.confirme, true);
   assert.equal(alertes.length, 1);
   const r = await (await handleAnnonces('annonces_publiques', {}, ctx)).json();
-  assert.equal(r.annonces.filter((a) => a.ref === 5020).length, 1);
+  assert.equal(r.annonces.find((a) => a.ref === 5020).confirme, true);
 });
 test('« je ne veux plus apparaître » masque la fiche, même confirmée', async () => {
   const { ctx, jeton, fiches } = monde();
