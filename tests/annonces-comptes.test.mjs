@@ -79,7 +79,7 @@ test('match actif : plus de nouvel intérêt jusqu’au dématch', async () => {
   const user = { id: 'u1', email: 'nina@example.com' };
   db.annonces.push({ id: 'a1', ref: 7, user_id: 'u1', email: 'nina@example.com', status: 'publiee', prenom: 'Nina', en_match: true });
   let r = await handleAnnonces('annonce_interet', { ref: 9 }, ctx(user));
-  assert.equal((await r.json()).error, 'en_match');
+  assert.equal((await r.json()).error, 'limite_matchs');
   r = await handleAnnonces('annonce_dematcher', {}, ctx(user));
   assert.equal(db.annonces[0].en_match, false);
   r = await handleAnnonces('annonce_interet', { ref: 9 }, ctx(user));
@@ -114,15 +114,22 @@ test('swipe : deux personnes qui se choisissent → intérêt réciproque et ale
   assert.equal(db.annonce_passes[0].cible_ref, 99);
 });
 
-test('swipe : 10 profils par jour en Découverte, sans limite en Passion', async () => {
+test('swipe sans limite ; matchs : 1 à la fois en Découverte, 3 avec une formule, +1 offert en live', async () => {
   const { ctx, db } = monde();
-  db.annonces.push({ id: 'a1', ref: 21, user_id: 'u1', email: 'nina@example.com', status: 'publiee', prenom: 'Nina', genre: 'femme', en_match: false });
+  db.annonces.push({ id: 'a1', ref: 21, user_id: 'u1', email: 'nina@example.com', status: 'publiee', prenom: 'Nina', genre: 'femme', en_match: false, matchs_bonus: 0 });
   const nina = { id: 'u1', email: 'nina@example.com' };
-  const oldRead = ctx().read;
-  const c = (formule, deja) => ({ ...ctx(nina, formule), read: async (u) => (u.includes('annonce_passes?demandeur_id=eq.a1&created_at=gte.') ? Array.from({ length: deja }, () => ({ id: 'x' })) : oldRead(u)) });
-  let r = await handleAnnonces('annonce_swipe', { ref: 30, choix: 'non' }, c('decouverte', 10));
-  assert.equal(r.status, 429);
-  assert.equal((await r.json()).error, 'quota_swipe');
-  r = await handleAnnonces('annonce_swipe', { ref: 30, choix: 'non' }, c('passion', 500));
+  const base = ctx().read;
+  const c = (formule, enCours) => ({ ...ctx(nina, formule), read: async (u) => (u.includes('reciproque=eq.true&statut=in.') ? Array.from({ length: enCours }, (_, i) => ({ id: 'm' + i })) : base(u)) });
+  let r = await handleAnnonces('annonce_swipe', { ref: 30, choix: 'non' }, c('decouverte', 1));
+  assert.equal(r.status, 200);
+  r = await handleAnnonces('annonce_swipe', { ref: 31, choix: 'oui' }, c('decouverte', 1));
+  assert.equal(r.status, 409);
+  assert.equal((await r.json()).error, 'limite_matchs');
+  r = await handleAnnonces('annonce_swipe', { ref: 31, choix: 'oui' }, c('passion', 1));
+  assert.equal(r.status, 200);
+  r = await handleAnnonces('annonce_swipe', { ref: 32, choix: 'oui' }, c('coeur', 3));
+  assert.equal(r.status, 409);
+  db.annonces[0].matchs_bonus = 1;
+  r = await handleAnnonces('annonce_swipe', { ref: 33, choix: 'oui' }, c('decouverte', 1));
   assert.equal(r.status, 200);
 });

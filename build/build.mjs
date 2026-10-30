@@ -1429,15 +1429,15 @@ page(
     scripts: ['/assets/swipe.js'],
     body: `<div class="po-app"><section class="po-hero swipe-hero"><div class="po-fond" aria-hidden="true"></div>
   <p class="po-eyebrow">Les Rencontres</p><h1>Swipe les profils vérifiés</h1>
-  <p class="po-lead">À droite 💚 s’il t’intéresse, à gauche ✕ sinon. Ton identité reste secrète : on ne voit que des numéros de profil. Si vous vous choisissez tous les deux, Lamia est prévenue et vous met en relation.</p>
+  <p class="po-lead">À droite 💚 s’il t’intéresse, à gauche ✕ sinon, sans limite. Ton identité reste secrète : on ne voit que des numéros de profil. Si vous vous choisissez tous les deux, Lamia est prévenue et vous met en relation.</p>
 </section>
 <div class="swipe-app">
   <div class="swipe-infos" data-swipe-infos></div>
   <div class="swipe-filtres-zone" data-swipe-filtres></div>
   <p class="swipe-compteur" data-swipe-compteur></p>
   <div class="swipe-pile" data-swipe><p class="annonce-vide">Les profils arrivent…</p></div>
-  <div class="swipe-boutons" data-swipe-boutons hidden><button type="button" data-swipe-non aria-label="Pas pour moi">✕</button><button type="button" data-swipe-oui aria-label="Ce profil m’intéresse">💚</button></div>
-  <p class="swipe-aide">Sur ordinateur : flèches ← et → du clavier. Ajoute le site à ton écran d’accueil pour l’avoir comme une application.</p>
+  <div class="swipe-boutons" data-swipe-boutons hidden><button type="button" data-swipe-non aria-label="Pas pour moi">✕</button><button type="button" class="swipe-annuler" data-swipe-annuler aria-label="Revenir au profil précédent" disabled>↩</button><button type="button" data-swipe-oui aria-label="Ce profil m’intéresse">💚</button></div>
+  <p class="swipe-aide">↩ pour revenir sur ton dernier choix. Sur ordinateur : flèches ← et → du clavier. Ajoute le site à ton écran d’accueil pour l’avoir comme une application.</p>
 </div></div>`,
   })
 );

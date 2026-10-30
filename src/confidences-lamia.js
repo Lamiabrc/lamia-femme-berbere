@@ -234,6 +234,7 @@ async function chargerAnnonces() {
       ${a.matching && Object.keys(a.matching).length ? `<p class="cl-coord">${[a.matching.situation, a.matching.enfants === 'Oui' ? `${a.matching.nbEnfants || ''} enfant(s)` : a.matching.enfants === 'Non' ? 'sans enfant' : '', a.matching.niveauEtudeDetail || a.matching.niveauEtudeCategorie, a.matching.profession, a.matching.religion, a.matching.pratique, ...(a.matching.origineTags || [])].filter(Boolean).map(lib).map(esc).join(' · ')}${a.matching.contactReseau ? `<br>Réseau : ${esc(a.matching.contactReseau)}` : ''}</p>` : ''}
       ${a.exportee_at ? `<p class="cl-aide">↪ Exportée vers l’outil de matching le ${quand(a.exportee_at)}</p>` : ''}
       ${(a.interets || []).length ? `<p class="cl-match-demande">💌 Match demandé : intéressé(e) par le profil n° ${a.interets.join(', ')}</p>` : ''}
+      ${a.status === 'publiee' ? `<p class="cl-bonus"><button class="cl-btn" type="button" data-decision="bonus_match">🎥 +1 match offert (vu en live)</button>${a.matchs_bonus ? ` <small>${a.matchs_bonus} match(s) offert(s) en plus</small>` : ''}</p>` : ''}
       <p class="cl-aide">${a.anonyme_ok ? (a.visible_anonyme ? '👁 Affiché anonymement dans les Rencontres' : 'Accepte d’être affiché(e) anonymement') : 'N’a pas accepté l’affichage anonyme'}</p>
       <p><b>Qui je suis</b><br>${esc(a.profil)}</p>
       <p><b>Qui je cherche</b>${a.age_min || a.age_max ? ` (${a.age_min || 18}-${a.age_max || 99} ans)` : ''}<br>${esc(a.recherche)}</p>
@@ -257,6 +258,7 @@ document.addEventListener('click', async (e) => {
   const d = b.dataset.decision;
   if (d === 'supprimer' && !confirm('Supprimer définitivement cette annonce et ses fichiers ?')) return;
   if (d === 'refuser' && !confirm('Refuser ce profil ? Les photos et la pièce d’identité seront supprimées et la personne prévenue par email.')) return;
+  if (d === 'bonus_match' && !confirm('Offrir un match de plus à ce profil ? Il pourra avoir un match en cours supplémentaire.')) return;
   if (d === 'resultat') { const nb = carte.querySelector('[data-nb]')?.value; if (nb === '' || nb == null) return say(st, 'Indique le nombre de profils compatibles.', true); if (!confirm(`Envoyer à cette personne : ${nb} profil(s) compatible(s) ?`)) return; }
   say(st, 'Un instant…');
   try { await api({ action: 'annonce_moderer', annonce_id: carte.dataset.id, decision: d, note: carte.querySelector('[data-note]').value, nb: carte.querySelector('[data-nb]')?.value }, await jetonFrais()); await chargerAnnonces(); }

@@ -41,6 +41,7 @@ const ERR = {
   tiktok_live: 'Indique le pseudo ou le lien TikTok que tu avais en live, pour que Lamia retrouve ta fiche.',
   enregistrement: 'Ton profil n’a pas pu être enregistré. Vérifie que tous les champs sont remplis, puis réessaie. Si ça recommence, écris à Lamia.',
   login_required: 'Ta connexion a expiré : reconnecte-toi dans « Mon espace », puis réessaie.',
+  limite_matchs: 'Tu as déjà ton nombre maximum de matchs en cours (1 avec la formule gratuite, 3 avec une formule). Viens voir Lamia en live, chaque soir à 21 h, pour matcher à nouveau, ou passe à une formule.',
   en_match: 'Tu as un match en cours : pour en découvrir d’autres, mets d’abord fin à ce match dans « Mon espace ».',
 };
 const opts = (list, vide = 'Choisis…') => `<option value="">${vide}</option>${list.map((v) => `<option value="${esc(v)}">${esc(lib(v))}</option>`).join('')}`;
@@ -408,6 +409,7 @@ async function interesse(ref) {
       return;
     } catch (err) {
       if (err.code === 'en_match') return montrerMessage(ERR.en_match, true);
+      if (err.code === 'limite_matchs') return montrerMessage(ERR.limite_matchs, true);
       if (err.code !== 'pas_de_profil') return montrerMessage('La demande n’a pas pu partir. Réessaie dans un instant.', true);
     }
   }
