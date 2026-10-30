@@ -733,26 +733,62 @@ renderSocials();
 })();
 
 // ---------------------------------------------------------------- application installable
+// Le bouton « Installer » marche partout : fenêtre d'installation quand le navigateur la propose,
+// sinon les étapes exactes pour CE téléphone (iPhone, Android, navigateur de TikTok / Instagram…).
 (() => {
-  if (!('serviceWorker' in navigator)) return;
-  addEventListener('load', () => { navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {}); });
+  if ('serviceWorker' in navigator) addEventListener('load', () => { navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {}); });
   const installee = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
-  if (installee) { document.querySelectorAll('[data-installee]').forEach((e) => { e.hidden = false; }); return; }
+  const boutons = () => document.querySelectorAll('[data-installer-bouton]');
+  if (installee) { document.querySelectorAll('[data-installee]').forEach((e) => { e.hidden = false; }); boutons().forEach((b) => { b.hidden = true; }); return; }
+  boutons().forEach((b) => { b.hidden = false; });
   let invite = null;
-  addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault(); invite = e;
-    document.querySelectorAll('[data-installer-bouton]').forEach((b) => { b.hidden = false; });
-  });
+  addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); invite = e; });
+  const ua = navigator.userAgent;
+  const dansAppli = /FBAN|FBAV|FB_IAB|Instagram|TikTok|musical_ly|Bytedance|Snapchat|Line\/|Pinterest/i.test(ua);
+  const ios = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const iosAutre = ios && /CriOS|FxiOS|EdgiOS|OPiOS/i.test(ua);
+  const samsung = /SamsungBrowser/i.test(ua);
+  const android = /Android/i.test(ua);
+  function etapes() {
+    if (dansAppli) return { titre: 'Ouvre d’abord le site dans ton vrai navigateur', liste: [
+      'Tu es dans le navigateur de TikTok, Instagram ou Facebook : il ne permet pas d’installer d’application.',
+      ios ? 'Touche les « … » (ou ⋯) en haut à droite, puis « Ouvrir dans Safari » (ou « Ouvrir dans le navigateur »).' : 'Touche les « ⋮ » en haut à droite, puis « Ouvrir dans Chrome » (ou « Ouvrir dans le navigateur »).',
+      'Une fois dans ' + (ios ? 'Safari' : 'Chrome') + ', reviens sur cette page et touche à nouveau « Installer l’application ».'], copier: true };
+    if (ios) return { titre: 'Sur iPhone, en quelques gestes', liste: [
+      iosAutre ? 'Le plus simple : ouvre ce site dans Safari (l’application Safari, la boussole bleue).' : 'Tu es bien dans Safari : parfait.',
+      'Touche le bouton Partager : le carré avec une flèche vers le haut (en bas de l’écran, ou en haut à droite sur iPad).',
+      'Fais défiler et choisis « Sur l’écran d’accueil », puis touche « Ajouter » en haut à droite.',
+      'L’icône « Maison Lamia » apparaît sur ton écran d’accueil : ouvre-la depuis là.'], copier: iosAutre };
+    if (samsung) return { titre: 'Sur Samsung Internet', liste: ['Touche le menu ≡ en bas à droite.', 'Choisis « Ajouter page à », puis « Écran d’accueil ».', 'Confirme : l’icône « Maison Lamia » apparaît sur ton écran d’accueil.'] };
+    if (android) return { titre: 'Sur Android (Chrome)', liste: ['Touche les « ⋮ » en haut à droite de Chrome.', 'Choisis « Installer l’application » (ou « Ajouter à l’écran d’accueil »).', 'Confirme : l’icône « Maison Lamia » apparaît avec tes autres applications.', 'Si rien de tout ça n’apparaît, mets Chrome à jour dans le Play Store, puis réessaie.'] };
+    return { titre: 'Sur ordinateur', liste: ['Dans Chrome ou Edge : clique sur l’icône d’installation (un écran avec une flèche) à droite de la barre d’adresse.', 'Ou ouvre le menu ⋮ puis « Installer La Maison Lamia Femme Berbère… ».', 'Sur téléphone, c’est encore mieux : ouvre lamia-femme-berbere.com/application/ depuis ton téléphone.'] };
+  }
+  function aide() {
+    document.querySelector('.install-aide')?.remove();
+    const { titre, liste, copier } = etapes();
+    const d = document.createElement('div');
+    d.className = 'install-aide'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-label', titre);
+    d.innerHTML = `<div class="install-boite"><button type="button" class="install-fermer" aria-label="Fermer">×</button><p class="install-icone"><img src="/images/marque/maison-icone-192.png" width="64" height="64" alt=""></p><h2>${titre}</h2><ol>${liste.map((x) => `<li>${x}</li>`).join('')}</ol>${copier ? '<button type="button" class="btn btn-ink" data-copier-lien>Copier le lien du site</button><p class="install-copie" data-copie hidden>Lien copié : colle-le dans ' + (ios ? 'Safari' : 'Chrome') + '.</p>' : ''}</div>`;
+    document.body.appendChild(d);
+    const fermer = () => d.remove();
+    d.addEventListener('click', (e) => { if (e.target === d || e.target.closest('.install-fermer')) fermer(); });
+    addEventListener('keydown', function esc(e) { if (e.key === 'Escape') { fermer(); removeEventListener('keydown', esc); } });
+    d.querySelector('[data-copier-lien]')?.addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(`${location.origin}/application/`); } catch { /* */ }
+      d.querySelector('[data-copie]').hidden = false;
+    });
+  }
   document.addEventListener('click', async (e) => {
     const b = e.target.closest('[data-installer-bouton], a[data-installer]');
-    if (!b || !invite) return;
+    if (!b) return;
     e.preventDefault();
+    if (!invite) return aide();
     invite.prompt();
     const { outcome } = await invite.userChoice.catch(() => ({}));
     invite = null;
-    if (outcome === 'accepted') document.querySelectorAll('[data-installer-bouton]').forEach((x) => { x.hidden = true; });
+    if (outcome === 'accepted') boutons().forEach((x) => { x.hidden = true; });
   });
-  addEventListener('appinstalled', () => { document.querySelectorAll('[data-installer-bouton]').forEach((x) => { x.hidden = true; }); document.querySelectorAll('[data-installee]').forEach((x) => { x.hidden = false; }); });
+  addEventListener('appinstalled', () => { boutons().forEach((x) => { x.hidden = true; }); document.querySelectorAll('[data-installee]').forEach((x) => { x.hidden = false; }); });
 })();
 
 // Lien FR / EN : garde la même pièce (utile pour les fiches produits servies par la page générique).

@@ -1,7 +1,7 @@
 // Service worker de la Maison : application installable (page hors ligne) et notifications.
 // Il ne met jamais en cache les données, les paiements ni les espaces privés : tout passe par le réseau.
 const HORS_LIGNE = '/hors-ligne/';
-const CACHE = 'maison-v2';
+const CACHE = 'maison-v3';
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll([HORS_LIGNE, '/images/marque/maison-icone-192.png'])).catch(() => {}));
   self.skipWaiting();

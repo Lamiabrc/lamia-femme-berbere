@@ -148,6 +148,9 @@ ${noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" hr
 <link rel="manifest" href="/maison.webmanifest">
 <link rel="apple-touch-icon" href="/images/marque/maison-icone-180.png">
 <meta name="apple-mobile-web-app-title" content="Maison Lamia">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="stylesheet" href="/fonts/polices.css">
 <link rel="stylesheet" href="/assets/maison.css?v=${VERSION}">
 </head>
@@ -801,6 +804,7 @@ page(
 
     <section>
       <h2>Mon profil âme sœur</h2>
+      <p><button type="button" class="btn btn-line btn-installer" data-installer-bouton>📲 Installer l’application sur mon téléphone</button></p>
       <div class="espace-profil" data-espace-profil><p class="loading">Un instant…</p></div>
     </section>
 
@@ -1681,11 +1685,11 @@ page(
   '/application/',
   layout({
     title: 'L’application de la Maison Lamia Femme Berbère',
-    description: 'Installe la Maison Lamia Femme Berbère sur ton téléphone : la boutique, le Grenier, la Bibliothèque et les soirées de rencontre à portée de doigt.',
+    description: 'Installe l’application de Lamia sur ton téléphone : les profils vérifiés, le swipe, ton espace, le live et le speed dating à portée de doigt.',
     path: '/application/',
     room: roomBySlug.boutique,
-    body: `<section class="room-head"><p class="room-name"><span class="pip" aria-hidden="true"></span>L’application</p><h1>La Maison dans ta poche</h1><p class="lead">Installe la Maison Lamia Femme Berbère sur ton téléphone : une icône sur ton écran d’accueil, la boutique, le Grenier et les soirées en plein écran, sans rien télécharger de lourd.</p>
-<p class="bal-actions"><button type="button" class="btn btn-ink" data-installer-bouton hidden>Installer l’application</button><span data-installee hidden>✓ L’application est déjà installée sur cet appareil.</span></p></section>
+    body: `<section class="room-head"><p class="room-name"><span class="pip" aria-hidden="true"></span>L’application</p><h1>La Maison dans ta poche</h1><p class="lead">Installe l’application de Lamia sur ton téléphone : une icône sur ton écran d’accueil, les profils vérifiés, le swipe, ton espace et le live en plein écran, sans passer par un magasin d’applications de lourd.</p>
+<p class="bal-actions"><button type="button" class="btn btn-ink btn-installer" data-installer-bouton>📲 Installer l’application</button><span data-installee hidden>✓ L’application est déjà installée sur cet appareil.</span></p></section>
 <section class="article"><h2>Sur Android</h2><ol><li>Ouvre lamia-femme-berbere.com dans Chrome.</li><li>Touche le bouton « Installer l’application » ci-dessus, ou le menu ⋮ puis « Installer l’application ».</li><li>Confirme : l’icône de la Maison apparaît sur ton écran d’accueil.</li></ol>
 <h2>Sur iPhone</h2><ol><li>Ouvre lamia-femme-berbere.com dans Safari.</li><li>Touche le bouton Partager (le carré avec une flèche vers le haut).</li><li>Choisis « Sur l’écran d’accueil », puis « Ajouter ».</li></ol>
 <p>L’application se met à jour toute seule, en même temps que le site. Tes paiements restent sécurisés de la même façon.</p></section>`,

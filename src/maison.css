@@ -3117,3 +3117,16 @@ label.is-manquant { outline: 2px solid #c0263f; outline-offset: 3px; border-radi
 .annonce-manques p strong, .annonce-manques strong { color: #8a1024 !important; font-size: 15px; }
 .annonce-manques button { display: inline; font: 600 14px/1.45 Inter, system-ui, sans-serif; text-align: left; }
 .annonce-manques li::marker { color: #8a1024; font-weight: 700; }
+
+/* Aide à l'installation de l'application */
+.install-aide { position: fixed; inset: 0; z-index: 2000; display: grid; place-items: end center; background: rgba(20,8,14,.55); padding: 16px; }
+@media (min-width: 700px) { .install-aide { place-items: center; } }
+.install-boite { position: relative; width: min(460px, 100%); max-height: 88vh; overflow-y: auto; background: #fffaf3; color: #2a2024; border-radius: 22px; border: 2px solid #d9b25f; padding: 22px 20px 20px; box-shadow: 0 30px 60px -20px rgba(0,0,0,.6); }
+.install-boite h2 { margin: 6px 0 10px; font-size: 1.35rem; color: #5c0f22; text-align: center; }
+.install-boite ol { padding-left: 1.3rem; margin: 0 0 14px; line-height: 1.55; }
+.install-boite li { margin: 6px 0; }
+.install-icone { text-align: center; margin: 0; }
+.install-icone img { border-radius: 16px; }
+.install-fermer { position: absolute; top: 8px; right: 10px; border: 0; background: none; font-size: 28px; line-height: 1; cursor: pointer; color: #5c0f22; }
+.install-copie { color: #1d7a46; font-weight: 600; margin: 8px 0 0; }
+.btn-installer { display: inline-flex; align-items: center; gap: 8px; }
