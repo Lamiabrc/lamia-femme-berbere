@@ -3105,3 +3105,15 @@ a.po-btn { display: inline-block; text-decoration: none; }
   body { padding-bottom: calc(68px + env(safe-area-inset-bottom)); }
 }
 @media (max-width: 420px) { .cta-profil { font-size: 0 !important; gap: 0; padding: 8px 11px !important; } .cta-profil::after { content: 'Confier'; font-size: 13px; margin-left: 5px; } .cta-profil::before { content: '💌'; font-size: 14px; } }
+
+/* Formulaire : ce qui manque pour l'envoi */
+.annonce-manques { margin: 14px 0; padding: 14px 16px; border-radius: 14px; background: #fff1f1; border: 2px solid #c0263f; color: #5a0f1c; }
+.annonce-manques p { margin: 0 0 6px; color: #5a0f1c !important; }
+.annonce-manques ol { margin: 0; padding-left: 1.3rem; }
+.annonce-manques li { margin: 4px 0; }
+.annonce-manques button { all: unset; cursor: pointer; text-decoration: underline; color: #8a1024; font-weight: 600; }
+.is-manquant input, .is-manquant select, .is-manquant textarea, input.is-manquant, select.is-manquant, textarea.is-manquant { border: 2px solid #c0263f !important; box-shadow: 0 0 0 3px rgba(192,38,63,.15) !important; }
+label.is-manquant { outline: 2px solid #c0263f; outline-offset: 3px; border-radius: 10px; }
+.annonce-manques p strong, .annonce-manques strong { color: #8a1024 !important; font-size: 15px; }
+.annonce-manques button { display: inline; font: 600 14px/1.45 Inter, system-ui, sans-serif; text-align: left; }
+.annonce-manques li::marker { color: #8a1024; font-weight: 700; }

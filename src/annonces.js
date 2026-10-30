@@ -39,6 +39,8 @@ const ERR = {
   deja_profil: 'Tu as déjà un profil chez Lamia : modifie-le dans « Mon espace ».',
   deja_profil_lien: 'Un profil existe déjà avec ce lien de réseau social. Connecte-toi avec le compte qui l’a créé (« Mon espace »), ou écris à Lamia si ce n’est pas toi.',
   tiktok_live: 'Indique le pseudo ou le lien TikTok que tu avais en live, pour que Lamia retrouve ta fiche.',
+  enregistrement: 'Ton profil n’a pas pu être enregistré. Vérifie que tous les champs sont remplis, puis réessaie. Si ça recommence, écris à Lamia.',
+  login_required: 'Ta connexion a expiré : reconnecte-toi dans « Mon espace », puis réessaie.',
   en_match: 'Tu as un match en cours : pour en découvrir d’autres, mets d’abord fin à ce match dans « Mon espace ».',
 };
 const opts = (list, vide = 'Choisis…') => `<option value="">${vide}</option>${list.map((v) => `<option value="${esc(v)}">${esc(lib(v))}</option>`).join('')}`;
@@ -281,29 +283,49 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
     if (['caracteristiques', 'caracteristiquesRecherche'].includes(e.target.name) && e.target.checked && $$(`[name=${e.target.name}]:checked`, form).length > 6) { e.target.checked = false; say(st, 'Six choix au maximum : garde ceux qui te ressemblent le plus.'); }
   });
 
+  const corrige = (e) => e.target.closest?.('.is-manquant, label')?.classList.remove('is-manquant');
+  form.addEventListener('input', corrige); form.addEventListener('change', corrige);
   if (existant) return monterEdition(form, st, existant, token);
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const f = form.elements;
-    const montre = (el) => { try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch { /* */ } el.focus?.(); };
-    const stop = (code, el) => { say(st, ERR[code] || code, true); if (el) montre(el); };
-    if (!f.prenom.value.trim()) return stop('missing_name', f.prenom);
-    if (!form.querySelector('[name=genre]:checked')) return stop('missing_genre', form.querySelector('[name=genre]'));
-    if (!f.birth_date.value) return stop('invalid_birth_date', f.birth_date);
-    if (f.birth_date.value > maxNaissance()) return stop('mineur', f.birth_date);
+    // Tout ce qui manque, d'un coup : la liste exacte, chaque champ entouré, et un clic emmène au champ.
+    const manques = [];
+    const manque = (texte, el) => manques.push({ texte, el });
     const live = estLive();
-    if (live && !f.tiktok_live.value.trim()) return stop('tiktok_live', f.tiktok_live);
+    if (!f.prenom.value.trim()) manque('Ton prénom (ou un petit nom)', f.prenom);
+    if (!form.querySelector('[name=genre]:checked')) manque('Femme ou homme', form.querySelector('[name=genre]')?.closest('label'));
+    if (!f.birth_date.value) manque('Ta date de naissance', f.birth_date);
+    else if (f.birth_date.value > maxNaissance()) manque('Ta date de naissance : il faut avoir 18 ans ou plus', f.birth_date);
+    if (live && !f.tiktok_live.value.trim()) manque('Ton pseudo ou lien TikTok du live', f.tiktok_live);
     if (!live) {
-      if (!f.ville.value.trim() || !f.pays.value) return stop('missing_lieu', f.ville.value.trim() ? f.pays : f.ville);
-      if (f.profil.value.trim().length < 20) return stop('textes_courts', f.profil);
-      if (f.recherche.value.trim().length < 20) return stop('textes_courts', f.recherche);
-      if (!medias.length) return stop('medias_requis', $('[data-medias]', form).closest('label'));
+      if (!f.ville.value.trim()) manque('Ta ville', f.ville);
+      if (!f.pays.value) manque('Ton pays', f.pays);
+      const n1 = f.profil.value.trim().length, n2 = f.recherche.value.trim().length;
+      if (n1 < 20) manque(`« Parle-nous de toi » : encore ${20 - n1} caractère${20 - n1 > 1 ? 's' : ''} au moins`, f.profil);
+      if (n2 < 20) manque(`« La personne que tu cherches » : encore ${20 - n2} caractère${20 - n2 > 1 ? 's' : ''} au moins`, f.recherche);
+      if (!medias.length) manque('Une ou deux photos de toi, ou une courte vidéo', $('[data-medias]', form).closest('label'));
+    }
+    if (sansReseau()) { if (!telephoneNormal(f.telephone.value)) manque(f.telephone.value.trim() ? 'Ton numéro de téléphone n’est pas valide (mets l’indicatif si tu n’es pas en France)' : 'Ton numéro de téléphone (puisque tu n’as pas de réseau social)', f.telephone); }
+    else if (!f.contactReseau.value.trim()) manque('Ton lien TikTok, Instagram ou Facebook (ou coche « Je n’ai aucun profil sur les réseaux »)', f.contactReseau);
+    if (!f.majeur.checked) manque('La case « J’ai 18 ans ou plus… »', f.majeur.closest('label'));
+    if (!f.publication.checked) manque('La case « Je confie mon profil à Lamia… »', f.publication.closest('label'));
+    if (identite.length && !f.identite_ok.checked) manque('La case d’accord pour ta pièce d’identité (ou retire la photo)', f.identite_ok.closest('label'));
+    $$('.is-manquant', form).forEach((x) => x.classList.remove('is-manquant'));
+    $('[data-manques]', form)?.remove();
+    if (manques.length) {
+      say(st, '');
+      const liste = document.createElement('div');
+      liste.className = 'annonce-manques'; liste.setAttribute('data-manques', ''); liste.setAttribute('role', 'alert');
+      liste.innerHTML = `<p><strong>Il manque ${manques.length > 1 ? `${manques.length} informations` : 'une information'} pour envoyer ton profil :</strong></p><ol>${manques.map((m, k) => `<li><button type="button" data-aller="${k}">${esc(m.texte)}</button></li>`).join('')}</ol>`;
+      st.before(liste);
+      manques.forEach((m) => (m.el?.closest('label') || m.el)?.classList.add('is-manquant'));
+      liste.querySelectorAll('[data-aller]').forEach((b) => b.addEventListener('click', () => { const el = manques[b.dataset.aller].el; try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch { /* */ } el.focus?.(); }));
+      try { liste.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch { /* */ }
+      return;
     }
     const session = await sessionActive();
     if (!session) { monterFormulaire(box); return; }
-    if (sansReseau()) { if (!telephoneNormal(f.telephone.value)) return stop('telephone_invalide', f.telephone); }
-    else if (!f.contactReseau.value.trim()) return stop('contact_requis', f.contactReseau);
-    if (!f.majeur.checked || !f.publication.checked || (identite.length && !f.identite_ok.checked)) return stop('consent_required', identite.length && !f.identite_ok.checked ? f.identite_ok.closest('label') : f.majeur.closest('label'));
     const btn = $('.annonce-envoyer', form); btn.disabled = true;
     const fichiers = [...medias.map((x) => ({ blob: x, role: 'media' })), ...identite.map((x) => ({ blob: x, role: 'identite' }))];
     try {
@@ -327,7 +349,7 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
       box.innerHTML = `<div class="annonce-merci"><p class="annonce-coeur" aria-hidden="true">💌</p><h3>Merci ${esc(f.prenom.value.trim())}, ton profil est bien arrivé chez Lamia${fin.ref ? ` (n° ${fin.ref})` : ''} !</h3><p>Il n’est publié nulle part. Lamia le vérifie, puis le passe dans son outil de matching. Tu recevras par email le nombre de personnes avec qui tu pourrais correspondre. ${live ? 'Tes 3 premières mises en relation sont offertes.' : 'Ta première mise en relation est offerte.'}</p><p>Ton profil est lié à ton compte : tu peux le modifier quand tu veux dans <a href="/mon-espace/">Mon espace</a>.</p><p>En attendant, tu peux <a href="/speed-dating/">t’inscrire à la prochaine soirée</a> ou <a href="/confidences/">écrire à Lamia</a>.</p></div>`;
     } catch (err) {
       btn.disabled = false;
-      say(st, ERR[err.code] || 'L’envoi n’a pas abouti. Vérifie ta connexion et réessaie dans un instant.', true);
+      say(st, ERR[err.code] || (err.code && !/^http_/.test(err.code) ? `L’envoi n’a pas abouti (${err.code}). Réessaie, ou écris à Lamia en lui donnant ce code.` : 'L’envoi n’a pas abouti : la connexion a coupé ou le serveur n’a pas répondu. Réessaie dans un instant ; si ça recommence, écris à Lamia.'), true);
     }
   });
 }
