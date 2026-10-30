@@ -184,7 +184,7 @@ function header(room) {
     <details class="maison-menu" data-maison-menu>
       <summary>Menu <span aria-hidden="true">▾</span></summary>
       <div class="maison-menu-panneau">
-        <div class="maison-menu-etage"><p>Rencontres</p><ul><li><a href="/rencontres/#profils-anonymes"><strong>Les profils</strong></a></li><li><a href="/rencontres/#confier"><strong>Confier mon profil</strong></a></li><li><a href="/speed-dating/"><strong>Speed dating</strong></a></li><li><a href="/abonnement/"><strong>Les formules</strong></a></li><li><a href="/salon/"><strong>Le live</strong></a></li><li><a href="/confidences/"><strong>Écrire à Lamia</strong></a></li></ul></div>
+        <div class="maison-menu-etage"><p>Rencontres</p><ul><li><a href="/rencontres/#profils-anonymes"><strong>Les profils</strong></a></li><li><a href="/rencontres/swipe/"><strong>Swiper les profils</strong></a></li><li><a href="/rencontres/#confier"><strong>Confier mon profil</strong></a></li><li><a href="/speed-dating/"><strong>Speed dating</strong></a></li><li><a href="/abonnement/"><strong>Les formules</strong></a></li><li><a href="/salon/"><strong>Le live</strong></a></li><li><a href="/confidences/"><strong>Écrire à Lamia</strong></a></li></ul></div>
         <div class="maison-menu-etage"><p>L’univers de Lamia</p><ul><li><a href="/lamia-brechet/"><strong>Qui est Lamia</strong></a></li><li><a href="/ecrin/"><strong>Bijoux kabyles</strong></a></li><li><a href="/werdi-ouvre-les-yeux/"><strong>Le livre Werdi</strong></a></li><li><a href="/boutique/"><strong>La boutique</strong></a></li><li><a href="/galerie/"><strong>La galerie</strong></a></li></ul></div>
         <div class="maison-menu-etage"><p>Mon compte</p><ul><li><a href="/mon-espace/"><strong>Mon espace</strong></a></li><li><a href="/application/"><strong>L’application</strong></a></li></ul></div>
       </div>
@@ -1233,7 +1233,7 @@ page(
     </div>
     <div class="cl-carte cl-export">
       <h3>💌 Matchs demandés <span data-n-demandes></span></h3>
-      <p class="cl-aide">Quand quelqu’un clique sur « Ce profil m’intéresse » dans les Rencontres puis crée son profil, la demande arrive ici (et tu reçois une alerte). Personne d’autre ne la voit. Elle est aussi notée dans la fiche exportée vers ton outil.</p>
+      <p class="cl-aide">Quand quelqu’un clique sur « Ce profil m’intéresse » ou swipe un profil à droite, la demande arrive ici. Quand deux personnes se choisissent l’une l’autre, la demande passe en tête avec « 💞 INTÉRÊT RÉCIPROQUE » et tu reçois une alerte (notification et email). Personne d’autre ne la voit. Elle est aussi notée dans la fiche exportée vers ton outil.</p>
       <div data-demandes></div>
     </div>
     <div class="cl-carte cl-export">
@@ -1325,6 +1325,7 @@ page(
   <div class="abo-grille">${FORMULES.map((f) => `<a class="abo-carte abo-mini${f.vedette ? ' is-vedette' : ''}" href="${f.mois ? `/abonnement/?formule=${f.id}` : '#confier'}">${f.vedette ? '<span class="abo-ruban">Le plus choisi</span>' : ''}<h3>${esc(f.nom)}</h3><p class="abo-prix">${f.mois ? `${eurosAbo(f.mois)}<small> / mois</small>` : 'Gratuit'}</p><ul>${f.avantages.slice(0, 2).map((x) => `<li>${esc(x)}</li>`).join('')}</ul><span class="po-btn">${f.mois ? `Choisir ${esc(f.nom)}` : 'Commencer'}</span></a>`).join('')}</div>
   <h2 class="annonces-titre" id="profils-anonymes">Les profils vérifiés</h2>
   <p class="annonces-sous">Ni prénom, ni photo, ni contact. Un profil te touche ? Clique sur « Ce profil m’intéresse » : Lamia regarde si vous pouvez correspondre. Personne ne sait qui s’intéresse à qui.</p>
+  <p class="po-actions btn-swipe"><a class="po-btn" href="/rencontres/swipe/">💘 Swiper les profils, un par un</a></p>
   <div class="annonces-liste" data-annonces-liste><p class="annonce-vide">Les profils arrivent…</p></div>
   <div class="accueil-duo">
     <a class="abo-carte accueil-carte" href="/speed-dating/"><h3>Speed dating en ligne</h3><p>Des soirées en visio par tranche d’âge, caméra allumée, avec Lamia qui veille.</p><span class="po-btn-verre">Voir les prochaines soirées</span></a>
@@ -1397,6 +1398,27 @@ page(
   </div>
 </section>
 </div>`,
+  })
+);
+// Swipe : découvrir les profils un par un et dire lesquels intéressent (application sur téléphone).
+page(
+  '/rencontres/swipe/',
+  layout({
+    title: 'Swipe · Les profils vérifiés',
+    description: 'Découvre les profils vérifiés un par un : à droite s’il t’intéresse, à gauche sinon. Si vous vous choisissez tous les deux, Lamia vous met en relation.',
+    path: '/rencontres/swipe/',
+    room: roomBySlug.patio,
+    scripts: ['/assets/swipe.js'],
+    body: `<div class="po-app"><section class="po-hero swipe-hero"><div class="po-fond" aria-hidden="true"></div>
+  <p class="po-eyebrow">Les Rencontres</p><h1>Swipe les profils vérifiés</h1>
+  <p class="po-lead">À droite 💚 s’il t’intéresse, à gauche ✕ sinon. Personne ne sait qui a choisi qui. Si vous vous choisissez tous les deux, Lamia est prévenue et vous met en relation.</p>
+</section>
+<div class="swipe-app">
+  <p class="swipe-compteur" data-swipe-compteur></p>
+  <div class="swipe-pile" data-swipe><p class="annonce-vide">Les profils arrivent…</p></div>
+  <div class="swipe-boutons" data-swipe-boutons hidden><button type="button" data-swipe-non aria-label="Pas pour moi">✕</button><button type="button" data-swipe-oui aria-label="Ce profil m’intéresse">💚</button></div>
+  <p class="swipe-aide">Sur ordinateur : flèches ← et → du clavier. Ajoute le site à ton écran d’accueil pour l’avoir comme une application.</p>
+</div></div>`,
   })
 );
 page(
@@ -1778,7 +1800,7 @@ await cp(join(ROOT, 'public'), DIST, { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await writeFile(join(DIST, 'assets', 'editable.json'), JSON.stringify({ fields: [...EDITABLE, ...REGISTRE], defaults: DEFAULTS }));
-for (const f of ['abonnement.js', 'abonnement-merci.js', 'maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'annonces.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
+for (const f of ['abonnement.js', 'abonnement-merci.js', 'swipe.js', 'maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'annonces.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
 await cp(join(ROOT, 'content', 'shipping.mjs'), join(DIST, 'assets', 'shipping.mjs'));
 await cp(join(ROOT, 'content', 'rubriques.mjs'), join(DIST, 'assets', 'rubriques.mjs'));
 await cp(join(ROOT, 'content', 'matching-options.mjs'), join(DIST, 'assets', 'matching-options.mjs'));
@@ -1788,7 +1810,7 @@ await cp(join(ROOT, 'content', 'en', 'products.json'), join(DIST, 'assets', 'i18
 const MOTIFS_EN = JSON.parse(await readFile(join(ROOT, 'content', 'en', 'patterns.json'), 'utf8'));
 await writeFile(join(DIST, 'assets', 'i18n', 'en.json'), JSON.stringify({ strings: STRINGS, pages: [...PAGES_EN], motifs: MOTIFS_EN.motifs, noms: MOTIFS_EN.noms }));
 
-const indexable = pages.filter((p) => !soonRooms.some((r) => p.path.replace(/^\/en\//, '/') === r.path) && !p.path.endsWith('.html') && !p.path.startsWith('/en/produit/') && !['/produit/', '/speed-dating/merci/', '/commande/merci/', '/abonnement/merci/', '/speed-dating/souhaits/', '/cgv/', '/mentions-legales/', '/confidentialite/', '/retours/', '/conditions-utilisation/', '/confidences-lamia/', '/hors-ligne/'].includes(p.path.replace(/^\/en\//, '/')));
+const indexable = pages.filter((p) => !soonRooms.some((r) => p.path.replace(/^\/en\//, '/') === r.path) && !p.path.endsWith('.html') && !p.path.startsWith('/en/produit/') && !['/produit/', '/speed-dating/merci/', '/commande/merci/', '/abonnement/merci/', '/rencontres/swipe/', '/speed-dating/souhaits/', '/cgv/', '/mentions-legales/', '/confidentialite/', '/retours/', '/conditions-utilisation/', '/confidences-lamia/', '/hors-ligne/'].includes(p.path.replace(/^\/en\//, '/')));
 await writeFile(
   join(DIST, 'sitemap.xml'),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${indexable.filter((p) => !p.path.startsWith('/produit/')).map((p) => `<url><loc>${SITE_URL}${p.path}</loc></url>`).join('')}${PRODUITS_INDEXES.map((p) => `<url><loc>${SITE_URL}${p.path}</loc>${p.lastmod ? `<lastmod>${p.lastmod}</lastmod>` : ''}</url><url><loc>${SITE_URL}/en${p.path}</loc>${p.lastmod ? `<lastmod>${p.lastmod}</lastmod>` : ''}</url>`).join('')}</urlset>\n`

@@ -3049,3 +3049,38 @@ a.po-btn { display: inline-block; text-decoration: none; }
 .espace-suivi li { margin: .25rem 0; }
 .espace-photo { margin: .6rem 0; }
 .espace-photo-match { display: block; max-width: 260px; width: 100%; border-radius: 14px; margin: .4rem 0; -webkit-user-drag: none; }
+
+/* Swipe des profils */
+.swipe-app { max-width: 460px; margin: 0 auto; padding: 0 16px 40px; }
+.swipe-compteur { text-align: center; opacity: .8; margin: .4rem 0 1rem; min-height: 1.2em; }
+.swipe-pile { position: relative; height: min(68vh, 600px); touch-action: pan-y; }
+.swipe-carte { position: absolute; inset: 0; display: grid; grid-template-rows: auto 1fr; border-radius: 22px; overflow: hidden; background: #fff; border: 2px solid #d9b25f; box-shadow: 0 24px 50px -28px rgba(0,0,0,.6); color: #2a2024; user-select: none; cursor: grab; touch-action: pan-y; }
+.swipe-carte:active { cursor: grabbing; }
+.swipe-carte:not(:last-child) { transform: scale(.95) translateY(12px); filter: brightness(.96); }
+.swipe-texte { padding: 1rem 1.2rem 1.4rem; overflow-y: auto; }
+.swipe-texte h2 { font-size: 1.5rem; margin: .2rem 0 .3rem; }
+.swipe-texte h3 { font-size: 1rem; margin: .9rem 0 .2rem; color: #7d1530; }
+.swipe-texte p { margin: .2rem 0; line-height: 1.5; }
+.swipe-tampon { position: absolute; top: 26px; z-index: 2; padding: .35rem .8rem; border: 3px solid; border-radius: 10px; font-weight: 800; font-size: 1.05rem; opacity: 0; transition: opacity .15s; background: rgba(255,255,255,.9); }
+.swipe-tampon.is-oui { left: 104px; color: #1d7a46; transform: rotate(-12deg); }
+.swipe-tampon.is-non { right: 18px; color: #a3122a; transform: rotate(12deg); }
+.swipe-carte.vers-oui .is-oui, .swipe-carte.vers-non .is-non { opacity: 1; }
+.swipe-boutons { display: flex; justify-content: center; gap: 28px; margin-top: 1.2rem; }
+.swipe-boutons button { width: 68px; height: 68px; border-radius: 50%; border: 2px solid #d9b25f; background: #fff; font-size: 1.8rem; cursor: pointer; box-shadow: 0 12px 26px -14px rgba(0,0,0,.6); }
+.swipe-boutons button:hover { transform: scale(1.06); }
+.swipe-boutons [data-swipe-non] { color: #a3122a; }
+.swipe-message { text-align: center; padding: 2rem 1rem; border-radius: 22px; background: rgba(255,255,255,.06); border: 1px solid rgba(217,178,95,.4); }
+.swipe-message .po-actions { justify-content: center; }
+.swipe-coeur { font-size: 3rem; margin: 0; }
+.swipe-aide { text-align: center; font-size: .9rem; opacity: .8; margin-top: 1rem; }
+.btn-swipe { margin: .4rem 0 1.2rem; }
+.swipe-carte .annonce-sceau { height: 84px; display: grid; place-items: center; }
+.swipe-carte .annonce-sceau img { width: 62px; height: 62px; border-radius: 50%; border: 2px solid #d9b25f; object-fit: cover; background: #fff6e6; }
+.po-app .swipe-carte, .po-app .swipe-carte p, .po-app .swipe-carte .annonce-lieu { color: #2a2024; opacity: 1; }
+.po-app .swipe-carte h2 { color: #5c0f22; }
+.po-app .swipe-carte h3 { color: #7d1530; }
+.po-app .swipe-carte .annonce-tags span { color: #5c0f22; background: #fbefdc; border-color: #e6cf9f; }
+.po-app .swipe-carte .annonce-ref { color: #6b4a1f; background: #fbefdc; }
+.swipe-carte .annonce-lieu, .swipe-carte .annonce-tags span, .swipe-carte .annonce-ref { color: #5a3a2a !important; opacity: 1 !important; }
+.swipe-carte .annonce-tags span { background: #fbefdc !important; border: 1px solid #e6cf9f !important; }
+.swipe-carte .annonce-sceau { display: flex !important; justify-content: center !important; align-items: center !important; }

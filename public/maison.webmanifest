@@ -2,7 +2,7 @@
   "id": "/",
   "name": "La Maison Lamia Femme Berbère",
   "short_name": "Maison Lamia",
-  "description": "Bijoux kabyles, livres, trouvailles du Grenier et soirées de rencontre de Lamia Femme Berbère.",
+  "description": "Rencontres kabyles sérieuses avec Lamia : profils vérifiés, swipe, speed dating, live. Et les bijoux, livres et trouvailles de la Maison.",
   "lang": "fr",
   "start_url": "/?source=app",
   "scope": "/",
@@ -10,16 +10,71 @@
   "orientation": "portrait",
   "background_color": "#fbf6f1",
   "theme_color": "#1B1A18",
-  "categories": ["shopping", "lifestyle", "social"],
+  "categories": [
+    "shopping",
+    "lifestyle",
+    "social"
+  ],
   "icons": [
-    { "src": "/images/marque/maison-icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/images/marque/maison-icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "/images/marque/maison-icone-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "/images/marque/maison-icone-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/marque/maison-icone-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/marque/maison-icone-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ],
   "shortcuts": [
-    { "name": "La Boutique", "url": "/boutique/?source=app", "icons": [{ "src": "/images/marque/maison-icone-192.png", "sizes": "192x192" }] },
-    { "name": "Le Grenier", "url": "/grenier/?source=app", "icons": [{ "src": "/images/marque/maison-icone-192.png", "sizes": "192x192" }] },
-    { "name": "Speed dating", "url": "/speed-dating/?source=app", "icons": [{ "src": "/images/marque/maison-icone-192.png", "sizes": "192x192" }] },
-    { "name": "Mon espace", "url": "/mon-espace/?source=app", "icons": [{ "src": "/images/marque/maison-icone-192.png", "sizes": "192x192" }] }
+    {
+      "name": "Swiper les profils",
+      "url": "/rencontres/swipe/?source=app",
+      "icons": [
+        {
+          "src": "/images/marque/maison-icone-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Mon espace",
+      "url": "/mon-espace/?source=app",
+      "icons": [
+        {
+          "src": "/images/marque/maison-icone-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Speed dating",
+      "url": "/speed-dating/?source=app",
+      "icons": [
+        {
+          "src": "/images/marque/maison-icone-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Le live",
+      "url": "/salon/?source=app",
+      "icons": [
+        {
+          "src": "/images/marque/maison-icone-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
   ]
 }

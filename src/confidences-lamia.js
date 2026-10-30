@@ -336,8 +336,9 @@ async function chargerDemandes() {
     $('[data-n-demandes]').textContent = n ? `(${n})` : '';
     if (!demandes.length) { box.innerHTML = '<p class="cl-vide">Aucune demande pour le moment.</p>'; return; }
     const qui = (p) => p?.prenom ? `n° ${p.ref} · ${esc(p.prenom)}, ${p.age} ans, ${esc(p.ville)} (${esc(lib(p.pays))})${p.contact ? `<br><small>${esc(p.contact)}</small>` : ''}` : `n° ${p?.ref} <small>(profil retiré ou inconnu)</small>`;
+    demandes.sort((x, y) => (y.reciproque && y.statut === 'a_traiter') - (x.reciproque && x.statut === 'a_traiter'));
     box.innerHTML = demandes.map((d) => `<article class="cl-carte cl-demande" data-demande="${d.id}">
-      <p class="cl-coord">${quand(d.created_at)} · <b>${STATUT_DEMANDE[d.statut]}</b>${d.demandeur?.status && d.demandeur.status !== 'publiee' ? ' · <b class="cl-a-verifier">⏳ profil pas encore vérifié : valide-le d’abord dans la liste ci-dessus</b>' : ''}</p>
+      <p class="cl-coord">${d.reciproque ? '<b class="cl-reciproque">💞 INTÉRÊT RÉCIPROQUE</b> · ' : ''}${d.via === 'swipe' ? '💘 swipe · ' : ''}${quand(d.created_at)} · <b>${STATUT_DEMANDE[d.statut]}</b>${d.demandeur?.status && d.demandeur.status !== 'publiee' ? ' · <b class="cl-a-verifier">⏳ profil pas encore vérifié : valide-le d’abord dans la liste ci-dessus</b>' : ''}</p>
       <div class="cl-demande-duo"><div><small>S’intéresse à</small><br>${qui(d.demandeur)}</div><div class="cl-demande-coeur">💌 →</div><div><small>Profil choisi</small><br>${qui(d.cible)}</div></div>
       <label>Statut<select data-demande-statut>${Object.entries(STATUT_DEMANDE).map(([k, v]) => `<option value="${k}"${k === d.statut ? ' selected' : ''}>${v}</option>`).join('')}</select></label>
     </article>`).join('');

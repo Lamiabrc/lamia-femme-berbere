@@ -118,6 +118,7 @@ async function suivi(el, p) {
     : pm.accepte === false ? '<h3>📷 La photo de ton match</h3><p>Ton match n’a pas (encore) accepté de transmettre sa photo.</p>'
     : '<h3>📷 La photo de ton match</h3><p>Lamia te la transmet dès que possible.</p>';
   el.innerHTML = `<h3>Mon suivi</h3><ul>${lignes}</ul>${blocPhoto}
+    <p><a class="po-btn" href="/rencontres/swipe/">💘 Swiper les profils</a></p>
     <h3>Mes demandes de match</h3>${demandes ? `<ul>${demandes}</ul>` : '<p>Aucune pour l’instant. <a class="text-link" href="/rencontres/#profils-anonymes">Voir les profils</a></p>'}`;
 }
 
