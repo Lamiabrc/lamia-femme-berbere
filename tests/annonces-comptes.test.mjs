@@ -133,3 +133,21 @@ test('swipe sans limite ; matchs : 1 à la fois en Découverte, 3 avec une formu
   r = await handleAnnonces('annonce_swipe', { ref: 33, choix: 'oui' }, c('decouverte', 1));
   assert.equal(r.status, 200);
 });
+test('la personne choisie est prévenue par email (sans savoir qui), au plus une fois toutes les 12 h ; les deux le sont quand c’est réciproque', async () => {
+  const { ctx, db } = monde();
+  const mails = [];
+  const c = (user) => ({ ...ctx(user), email: async (to, sujet) => { mails.push([to, sujet]); return true; } });
+  await handleAnnonces('annonce_deposer', { ...complet }, c(NINA));
+  const SAM = { id: 'u-sam', email: 'sam@example.com' };
+  await handleAnnonces('annonce_deposer', { ...complet, prenom: 'Sam', genre: 'homme', email: 'sam@example.com', matching: { contactReseau: 'https://www.tiktok.com/@sam.kab' } }, c(SAM));
+  const [nina, sam] = db.annonces; nina.status = 'publiee'; sam.status = 'publiee';
+  mails.length = 0;
+  await handleAnnonces('annonce_swipe', { ref: nina.ref, choix: 'oui' }, c(SAM));
+  assert.deepEqual(mails.map((m) => m[0]), ['nina@example.com']);
+  assert.match(mails[0][1], /quelqu’un s’intéresse à toi/);
+  assert.ok(!mails[0][1].includes('Sam'));
+  mails.length = 0;
+  await handleAnnonces('annonce_swipe', { ref: sam.ref, choix: 'oui' }, c(NINA));
+  assert.deepEqual(mails.map((m) => m[0]).sort(), ['nina@example.com', 'sam@example.com']);
+  assert.ok(mails.every((m) => /réciproque/.test(m[1])));
+});

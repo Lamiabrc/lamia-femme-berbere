@@ -4,3 +4,5 @@ alter table public.profils_outil
   add column if not exists confirme_at timestamptz,
   add column if not exists retire_at timestamptz;
 create index if not exists profils_outil_confirme_idx on public.profils_outil (confirme_at) where confirme_at is not null;
+-- Quand un profil du site reçoit un intérêt, la personne est prévenue par email (au plus une fois toutes les 12 h).
+alter table public.annonces add column if not exists interet_notifie_at timestamptz;
