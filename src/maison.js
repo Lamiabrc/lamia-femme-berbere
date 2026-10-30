@@ -553,8 +553,16 @@ renderSocials();
   if (!a) return;
   try {
     const raw = localStorage.getItem('sb-tybwvxinigahhntfeeur-auth-token');
-    if (raw && JSON.parse(raw)?.access_token) a.textContent = 'Mon espace';
+    if (raw && JSON.parse(raw)?.access_token) {
+      const t = a.querySelector('[data-account-texte]'); if (t) t.textContent = 'Mon espace'; else a.textContent = 'Mon espace';
+      const c = document.querySelector('[data-barre-compte] b'); if (c) c.textContent = 'Mon espace';
+    }
   } catch { /* stockage indisponible */ }
+  // Barre du bas (téléphone) : l'onglet de la page en cours.
+  const ici = location.pathname + location.hash;
+  const liens = [...document.querySelectorAll('.barre-app a')];
+  const actif = liens.find((l) => l.getAttribute('href') === ici) || liens.filter((l) => !l.getAttribute('href').includes('#')).sort((x, y) => y.getAttribute('href').length - x.getAttribute('href').length).find((l) => location.pathname.startsWith(l.getAttribute('href')));
+  if (actif) actif.setAttribute('aria-current', 'page');
 })();
 
 // ---------------------------------------------------------------- compteur de visites anonyme (sans cookie)

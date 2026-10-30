@@ -174,6 +174,7 @@ function header(room) {
   </a>
   <nav class="site-nav" aria-label="Navigation principale">
     ${link('/rencontres/', 'Rencontres', 'patio')}
+    <a href="/rencontres/swipe/">💘 Swipe</a>
     ${link('/speed-dating/', 'Speed dating', 'speed-dating')}
     ${link('/abonnement/', 'Formules', 'abonnement')}
     ${link('/salon/', 'Lives', 'salon')}
@@ -189,10 +190,17 @@ function header(room) {
         <div class="maison-menu-etage"><p>Mon compte</p><ul><li><a href="/mon-espace/"><strong>Mon espace</strong></a></li><li><a href="/application/"><strong>L’application</strong></a></li></ul></div>
       </div>
     </details>
-    <a class="account-link" href="/mon-espace/" data-account-link>Se connecter</a>
+    <a class="account-link" href="/mon-espace/" data-account-link aria-label="Se connecter ou ouvrir mon espace"><span class="account-icone" aria-hidden="true">👤</span><span data-account-texte>Se connecter</span></a>
     <a class="cta-profil" href="/rencontres/#confier">💌 Confier mon profil</a>
   </div>
-</header>`;
+</header>
+<nav class="barre-app" aria-label="Raccourcis">
+  <a href="/rencontres/"><span aria-hidden="true">💞</span>Profils</a>
+  <a href="/rencontres/swipe/"><span aria-hidden="true">💘</span>Swipe</a>
+  <a href="/rencontres/#confier"><span aria-hidden="true">💌</span>Mon profil</a>
+  <a href="/salon/"><span aria-hidden="true">🎥</span>Live</a>
+  <a href="/mon-espace/" data-barre-compte><span aria-hidden="true">👤</span><b>Connexion</b></a>
+</nav>`;
 }
 
 function footer() {

@@ -3000,8 +3000,8 @@ a.po-btn { display: inline-block; text-decoration: none; }
 /* ================= Refonte : un message, peu de clics ================= */
 .cta-profil { display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: 999px; background: linear-gradient(90deg, #92283f, #b23a52); color: #fff !important; font-weight: 700; font-size: 14px; text-decoration: none; white-space: nowrap; box-shadow: 0 6px 16px rgba(146,40,63,.28); }
 .cta-profil:hover { filter: brightness(1.08); }
-@media (max-width: 640px) { .header-actions .account-link { display: none; } .cta-profil { padding: 8px 12px; font-size: 13px; } }
-@media (max-width: 374px) { .cta-profil { font-size: 0; gap: 0; padding: 8px 12px; } .cta-profil::after { content: 'Mon profil'; font-size: 13px; margin-left: 4px; } }
+@media (max-width: 640px) { .cta-profil { padding: 8px 12px; font-size: 13px; } }
+
 /* Accueil */
 .accueil-hero { padding-top: 84px; }
 .accueil-hero h1 { font-size: clamp(36px, 5.4vw, 64px); }
@@ -3085,3 +3085,23 @@ a.po-btn { display: inline-block; text-decoration: none; }
 .swipe-carte .annonce-tags span { background: #fbefdc !important; border: 1px solid #e6cf9f !important; }
 .swipe-carte .annonce-sceau { display: flex !important; justify-content: center !important; align-items: center !important; }
 .annonce-large { grid-column: 1 / -1; }
+
+/* Compte dans l'en-tête : icône toujours visible, texte caché sur téléphone */
+.account-link { display: inline-flex; align-items: center; gap: 6px; }
+@media (max-width: 640px) {
+  .header-actions .account-link { display: inline-flex !important; width: 36px; height: 36px; padding: 0 !important; justify-content: center; border-radius: 50%; }
+  .account-link [data-account-texte] { display: none; }
+  .account-icone { font-size: 18px; }
+}
+@media (min-width: 641px) { .account-icone { display: none; } }
+/* Barre du bas, comme une application (téléphone) */
+.barre-app { display: none; }
+@media (max-width: 760px) {
+  .barre-app { display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; background: rgba(36,10,20,.96); backdrop-filter: blur(10px); border-top: 1px solid rgba(217,178,95,.45); padding: 6px 4px calc(6px + env(safe-area-inset-bottom)); }
+  .barre-app a { display: flex; flex-direction: column; align-items: center; gap: 2px; color: #f6e7d0; text-decoration: none; font-size: 11px; font-weight: 600; padding: 4px 0; border-radius: 12px; }
+  .barre-app a span { font-size: 21px; line-height: 1; }
+  .barre-app a b { font-weight: 600; }
+  .barre-app a[aria-current="page"] { color: #ffd27a; background: rgba(255,210,122,.12); }
+  body { padding-bottom: calc(68px + env(safe-area-inset-bottom)); }
+}
+@media (max-width: 420px) { .cta-profil { font-size: 0 !important; gap: 0; padding: 8px 11px !important; } .cta-profil::after { content: 'Confier'; font-size: 13px; margin-left: 5px; } .cta-profil::before { content: '💌'; font-size: 14px; } }
