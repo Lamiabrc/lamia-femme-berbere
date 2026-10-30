@@ -3200,3 +3200,8 @@ label.is-manquant { outline: 2px solid #c0263f; outline-offset: 3px; border-radi
 .confirmer-note { font-size: 14px; opacity: .85; }
 .confirmer-note a { color: #ffd27a; }
 .confirmer-erreur { padding: 18px; border-radius: 14px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,210,122,.45); }
+.confirmer-modif { display: grid; gap: 10px; margin-top: 14px; }
+.confirmer-modif label { display: grid; gap: 6px; }
+.confirmer-modif textarea { width: 100%; border-radius: 12px; border: 1px solid rgba(255,210,122,.45); background: rgba(255,255,255,.06); color: #fff4ec; padding: 10px 12px; font: inherit; }
+.confirmer-modif .po-btn { justify-self: start; }
+.confirmer-lien { background: none; border: 0; padding: 0; color: #ffd27a; text-decoration: underline; cursor: pointer; font: inherit; }

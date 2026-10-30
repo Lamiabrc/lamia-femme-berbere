@@ -50,3 +50,21 @@ test('« je ne veux plus apparaître » masque la fiche, même confirmée', asyn
   const r = await (await handleAnnonces('annonces_publiques', {}, ctx)).json();
   assert.equal(r.annonces.filter((a) => a.ref === 5020).length, 0);
 });
+test('« je veux la modifier avant » : la fiche reste cachée et Lamia reçoit la demande', async () => {
+  const { ctx, jeton, alertes, fiches } = monde();
+  let r = await handleAnnonces('annonce_modifier_outil', { n: '5020', t: jeton, texte: '' }, ctx);
+  assert.equal(r.status, 400);
+  const d = await (await handleAnnonces('annonce_modifier_outil', { n: '5020', t: jeton, texte: 'Je vis maintenant à Paris.' }, ctx)).json();
+  assert.equal(d.modif, true);
+  assert.equal(fiches[0].modif_demandee, 'Je vis maintenant à Paris.');
+  assert.equal(fiches[0].confirme_at, null);
+  assert.match(alertes[0], /modification demandée/);
+});
+test('« je ne veux plus être dans l’outil » : retirée du site et Lamia doit l’effacer', async () => {
+  const { ctx, jeton, alertes, fiches } = monde();
+  const d = await (await handleAnnonces('annonce_effacer_outil', { n: '5020', t: jeton }, ctx)).json();
+  assert.equal(d.efface, true);
+  assert.equal(fiches[0].visible, false);
+  assert.ok(fiches[0].retire_at);
+  assert.match(alertes[0], /effacement/);
+});
