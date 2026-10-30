@@ -3138,3 +3138,17 @@ label.is-manquant { outline: 2px solid #c0263f; outline-offset: 3px; border-radi
 .swipe-info.is-choisi { background: rgba(176,18,58,.25); border-color: #e0899c; }
 .swipe-flou { filter: blur(4px); user-select: none; margin-left: 6px; }
 .swipe-ta-choisi { position: absolute; top: 14px; right: 14px; z-index: 2; padding: .3rem .7rem; border-radius: 999px; background: #b0123a; color: #fff; font: 700 .85rem Inter, system-ui, sans-serif; box-shadow: 0 6px 14px rgba(0,0,0,.25); }
+
+/* Swipe : filtres */
+.swipe-filtres-zone { margin-bottom: .6rem; }
+.swipe-filtres-bouton { display: block; margin: 0 auto; padding: 9px 18px; border-radius: 999px; border: 1px solid rgba(217,178,95,.7); background: rgba(255,255,255,.08); color: #ffe7b0; font: 700 14px Inter, system-ui, sans-serif; cursor: pointer; }
+.swipe-filtres { margin-top: 10px; padding: 14px; border-radius: 18px; background: #fffaf3; color: #2a2024; border: 2px solid #d9b25f; }
+.swipe-filtres-grille { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.swipe-filtres label { display: grid; gap: 4px; font: 600 13px Inter, system-ui, sans-serif; color: #5c0f22; }
+.swipe-filtres input[type=number], .swipe-filtres select { width: 100%; padding: 8px 10px; border-radius: 10px; border: 1px solid #d8c4a0; background: #fff; color: #2a2024; font: 15px Inter, system-ui, sans-serif; }
+.swipe-filtres .swipe-case { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-weight: 500; color: #2a2024; }
+.swipe-filtres-bas { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; margin: 14px 0 0; }
+.swipe-filtres-bas span { flex: 1 1 100%; font-weight: 700; color: #1d7a46; }
+.po-app .swipe-filtres .po-btn-verre { color: #5c0f22; border-color: #d8c4a0; }
+.swipe-filtres label.swipe-case { display: flex !important; flex-direction: row !important; align-items: center; justify-content: flex-start !important; text-align: left !important; gap: 10px; grid-template-columns: none !important; }
+.swipe-filtres label.swipe-case input { flex: none; width: 20px; height: 20px; margin: 0; accent-color: #8a1024; }

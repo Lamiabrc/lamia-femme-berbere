@@ -1433,6 +1433,7 @@ page(
 </section>
 <div class="swipe-app">
   <div class="swipe-infos" data-swipe-infos></div>
+  <div class="swipe-filtres-zone" data-swipe-filtres></div>
   <p class="swipe-compteur" data-swipe-compteur></p>
   <div class="swipe-pile" data-swipe><p class="annonce-vide">Les profils arrivent…</p></div>
   <div class="swipe-boutons" data-swipe-boutons hidden><button type="button" data-swipe-non aria-label="Pas pour moi">✕</button><button type="button" data-swipe-oui aria-label="Ce profil m’intéresse">💚</button></div>
