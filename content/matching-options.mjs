@@ -51,6 +51,16 @@ export const LIBELLE = {
 export const lib = (v) => LIBELLE[v] || v;
 
 // Nettoie les choix envoyés par le formulaire : ne garde que des valeurs connues de l'outil.
+// Numéro de téléphone (pour qui n'a aucun réseau social) : renvoie un numéro propre au format international, ou '' s'il n'est pas valide.
+export function telephoneNormal(v) {
+  let t = String(v || '').replace(/[\s.\-()\/]/g, '');
+  if (t.startsWith('00')) t = `+${t.slice(2)}`;
+  if (/^0[1-9]\d{8}$/.test(t)) t = `+33${t.slice(1)}`;
+  if (/^\+33/.test(t)) return /^\+33[1-9]\d{8}$/.test(t) ? t : '';
+  if (/^\+213/.test(t)) return /^\+213[1-9]\d{8}$/.test(t) ? t : '';
+  return /^\+[1-9]\d{7,14}$/.test(t) ? t : '';
+}
+
 export function choixPropres(m = {}) {
   const un = (v, list) => (list.includes(v) ? v : '');
   const plusieurs = (v, list, max = 8) => (Array.isArray(v) ? [...new Set(v.filter((x) => list.includes(x)))].slice(0, max) : []);

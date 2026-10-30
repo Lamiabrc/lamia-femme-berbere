@@ -27,6 +27,8 @@ function monde({ compte = true, tiktok = {} } = {}) {
 const base = { action: 'annonce_deposer', majeur: true, publication: true, prenom: 'Nina', genre: 'femme', birth_date: '1995-03-02', email: 'nina@example.com', matching: { contactReseau: 'https://www.tiktok.com/@nina.kab' } };
 const complet = { ...base, ville: 'Lyon', pays: 'France', profil: 'Je suis souriante et sérieuse.', recherche: 'Un homme sérieux et doux.', medias: [{ role: 'media', type: 'image/jpeg', size: 1000 }] };
 
+const NINA = { id: 'u-nina', email: 'nina@example.com' };
+
 test('pseudo TikTok lu dans un lien ou un @pseudo', () => {
   assert.equal(pseudoTikTok('https://www.tiktok.com/@Nina.Kab?lang=fr'), 'nina.kab');
   assert.equal(pseudoTikTok('@nina_75'), 'nina_75');
@@ -35,21 +37,39 @@ test('pseudo TikTok lu dans un lien ou un @pseudo', () => {
   assert.equal(normLien('https://facebook.com/nina.kab'), 'facebook:nina.kab');
   assert.match(empreinteLien('tiktok:nina'), /^[0-9a-f]{64}$/);
 });
-test('sans compte, pas de profil', async () => {
-  const { ctx } = monde({ compte: false });
+test('sans être connecté(e), pas de profil (même si un compte existe avec cet email)', async () => {
+  const { ctx } = monde({ compte: true });
   const r = await handleAnnonces('annonce_deposer', complet, ctx());
+  assert.equal(r.status, 401);
   assert.equal((await r.json()).error, 'compte_requis');
+});
+test('pas de réseau social : un numéro de téléphone valide est obligatoire', async () => {
+  const { ctx, db } = monde();
+  const sans = { ...complet, matching: {}, sans_reseau: true };
+  let r = await handleAnnonces('annonce_deposer', { ...sans, telephone: '12' }, ctx(NINA));
+  assert.equal((await r.json()).error, 'telephone_invalide');
+  r = await handleAnnonces('annonce_deposer', { ...complet, matching: {} }, ctx(NINA));
+  assert.equal((await r.json()).error, 'contact_requis');
+  r = await handleAnnonces('annonce_deposer', { ...sans, telephone: '06 12 34 56 78' }, ctx(NINA));
+  assert.equal(r.status, 200);
+  assert.equal(db.annonces[0].phone, '+33612345678');
+  assert.equal(db.annonces[0].user_id, 'u-nina');
+});
+test('dire qu’un profil intéresse demande un compte', async () => {
+  const { ctx } = monde();
+  const r = await handleAnnonces('annonce_interet', { ref: 9 }, ctx());
+  assert.equal(r.status, 401);
 });
 test('profil créé en live : formulaire allégé, fiche retrouvée par empreinte TikTok', async () => {
   const { ctx, db } = monde({ tiktok: { [empreinteLien('tiktok:nina.kab')]: 'outil-42' } });
-  const r = await handleAnnonces('annonce_deposer', { ...base, live: true, tiktok_live: '@nina.kab' }, ctx());
+  const r = await handleAnnonces('annonce_deposer', { ...base, live: true, tiktok_live: '@nina.kab' }, ctx(NINA));
   assert.equal(r.status, 200);
   assert.equal(db.annonces[0].live_declare, true);
   assert.equal(db.annonces[0].outil_id, 'outil-42');
 });
 test('hors live, textes et photos restent obligatoires', async () => {
   const { ctx } = monde();
-  const r = await handleAnnonces('annonce_deposer', { ...base, ville: 'Lyon', pays: 'France' }, ctx());
+  const r = await handleAnnonces('annonce_deposer', { ...base, ville: 'Lyon', pays: 'France' }, ctx(NINA));
   assert.equal((await r.json()).error, 'textes_courts');
 });
 test('match actif : plus de nouvel intérêt jusqu’au dématch', async () => {
@@ -68,10 +88,10 @@ test('match actif : plus de nouvel intérêt jusqu’au dématch', async () => {
 test('lien déjà connu : relié à la fiche de l’outil, et pas de doublon sur le site', async () => {
   const { ctx, db } = monde({ tiktok: { [empreinteLien('instagram:nina.k')]: 'outil-7' } });
   const insta = { ...complet, matching: { contactReseau: 'https://instagram.com/nina.k' } };
-  let r = await handleAnnonces('annonce_deposer', insta, ctx());
+  let r = await handleAnnonces('annonce_deposer', insta, ctx(NINA));
   assert.equal(r.status, 200);
   assert.equal(db.annonces[0].outil_id, 'outil-7');
   db.annonces[0].status = 'a_verifier';
-  r = await handleAnnonces('annonce_deposer', { ...insta, email: 'autre@example.com' }, ctx());
+  r = await handleAnnonces('annonce_deposer', { ...insta, email: 'autre@example.com' }, ctx({ id: 'u2', email: 'autre@example.com' }));
   assert.equal((await r.json()).error, 'deja_profil_lien');
 });

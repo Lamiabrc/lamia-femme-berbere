@@ -1,6 +1,6 @@
 // Annonces de rencontre : dépôt (Patio et Confidences) et affichage des annonces vérifiées par Lamia.
 import { api, esc, PUBLIC_KEY } from './confidences-commun.js';
-import { O, lib } from './matching-options.mjs';
+import { O, lib, telephoneNormal } from './matching-options.mjs';
 import { createClient } from '/vendor/supabase.mjs';
 
 // Compte (le même que « Mon espace ») : chaque profil y est lié pour pouvoir être modifié.
@@ -28,7 +28,11 @@ const ERR = {
   rate_limited: 'Tu as déjà déposé plusieurs annonces aujourd’hui : réessaie demain.',
   upload_failed: 'Les photos ne sont pas toutes arrivées. Vérifie ta connexion et réessaie.',
   contact_requis: 'Indique le lien de ton TikTok, Instagram ou Facebook : Lamia en a besoin pour la mise en relation.',
-  compte_requis: 'Crée ton compte (email et mot de passe) pour pouvoir modifier ton profil plus tard.',
+  compte_requis: 'Crée d’abord ton compte (ou connecte-toi) : il faut un compte pour confier ton profil ou dire qu’un profil t’intéresse.',
+  connexion: 'Email ou mot de passe incorrect.',
+  trop_de_demandes: 'Trop de demandes en ce moment. Réessaie dans une heure.',
+  compte_impossible: 'La création du compte n’a pas fonctionné. Réessaie dans un instant.',
+  telephone_invalide: 'Ce numéro de téléphone n’est pas valide. Mets-le en entier, avec l’indicatif si tu n’es pas en France (par ex. +213 5 12 34 56 78).',
   compte_autre_email: 'Tu es connecté(e) avec une autre adresse email : utilise celle de ton compte.',
   mot_de_passe: 'Choisis un mot de passe d’au moins 8 caractères.',
   compte_existant: 'Un compte existe déjà avec cet email, mais le mot de passe ne correspond pas. Mets ton mot de passe, ou réinitialise-le dans « Mon espace ».',
@@ -129,14 +133,15 @@ export function formulaireHtml() {
     <ul class="annonce-apercu" data-identite-liste></ul>
   </div>
   <div class="annonce-etape">
-    <h3><span>6</span> Ton compte, pour modifier ton profil quand tu veux</h3>
+    <h3><span>6</span> Ton contact (jamais affiché)</h3>
     <p class="annonce-aide" data-connecte hidden></p>
     <div class="annonce-grille">
       <label data-compte-email>Ton email<input name="email" type="email" autocomplete="email" required></label>
-      <label data-mdp>Choisis un mot de passe <small>(8 caractères minimum ; déjà un compte ? mets ton mot de passe)</small><input name="motdepasse" type="password" minlength="8" autocomplete="new-password"></label>
-      <label>Ton lien TikTok, Instagram ou Facebook <small>(obligatoire)</small><input name="contactReseau" maxlength="200" placeholder="https://www.tiktok.com/@tonpseudo" required></label>
+      <label data-reseau>Ton lien TikTok, Instagram ou Facebook <small>(obligatoire)</small><input name="contactReseau" maxlength="200" placeholder="https://www.tiktok.com/@tonpseudo"></label>
     </div>
-    <p class="annonce-aide">Le lien vers ton réseau social est obligatoire : c’est par là que Lamia te contactera. Il n’est jamais affiché sur le site. Ton numéro de téléphone ne t’est demandé que plus tard, par Lamia elle-même, si un match te convient ; il reste chez elle.</p>
+    <label class="annonce-case"><input type="checkbox" name="sans_reseau"> <span>Je n’ai aucun profil sur les réseaux sociaux : je donne mon numéro de téléphone à la place.</span></label>
+    <label data-tel hidden>Ton numéro de téléphone <small>(obligatoire si tu n’as pas de réseau ; avec l’indicatif si tu n’es pas en France, par ex. +213…)</small><input name="telephone" type="tel" autocomplete="tel" maxlength="25" placeholder="06 12 34 56 78"></label>
+    <p class="annonce-aide">Ton lien de réseau social (ou, à défaut, ton numéro) est obligatoire : c’est par là que Lamia te contactera. Il n’est jamais affiché sur le site ni transmis à personne. Si tu as un réseau, ton numéro ne t’est demandé que plus tard, par Lamia elle-même, si un match te convient ; il reste chez elle.</p>
     <p class="annonce-aide">Tes coordonnées ne sont jamais affichées ni transmises : c’est Lamia qui te contacte pour une mise en relation.</p>
   </div>
   <label class="annonce-case" data-consent-depot><input type="checkbox" name="majeur"> <span>J’ai 18 ans ou plus et cette annonce est sincère : je cherche une vraie rencontre.</span></label>
@@ -157,11 +162,83 @@ function apercu(ul, fichiers, retirer) {
   $$('button', ul).forEach((b) => b.addEventListener('click', () => retirer(Number(b.dataset.i))));
 }
 
-export function monterFormulaire(box, { existant = null, token = null } = {}) {
+// Le compte d'abord : sans être connecté(e), on ne voit que la création de compte / connexion.
+export async function monterFormulaire(box, { existant = null, token = null } = {}) {
   if (!box) return;
+  if (!existant && !(await sessionActive())) { porteCompte(box); return; }
+  monterFormulaireConnecte(box, { existant, token });
+  appliquerInteret(box);
+}
+
+function porteCompte(box) {
+  const ref = box.dataset.interet;
+  box.innerHTML = `<div class="annonce-porte">
+    <h3>Étape 1 : ton compte</h3>
+    ${ref ? `<p class="annonce-interet">💌 Le profil n° ${esc(ref)} t’intéresse : crée d’abord ton compte, puis ton profil. Lamia regardera si vous pouvez correspondre.</p>` : ''}
+    <p class="annonce-aide">Il faut un compte pour confier ton profil à Lamia ou dire qu’un profil t’intéresse. C’est avec lui que tu modifies ton profil et suis tes mises en relation.</p>
+    <div class="annonce-onglets" role="tablist"><button type="button" role="tab" data-mode="creer" aria-selected="true">Créer mon compte</button><button type="button" role="tab" data-mode="connexion" aria-selected="false">J’ai déjà un compte</button></div>
+    <form class="annonce-grille" data-porte novalidate>
+      <label data-seulement-creer>Ton prénom<input name="prenom" maxlength="60" autocomplete="given-name"></label>
+      <label>Ton email<input name="email" type="email" autocomplete="email" required></label>
+      <label>Mot de passe <small>(8 caractères minimum)</small><input name="mdp" type="password" minlength="8" autocomplete="new-password" required></label>
+      <button class="btn btn-ink" type="submit">Créer mon compte</button>
+      <p class="form-status" role="status" data-porte-statut></p>
+      <p class="annonce-aide" data-seulement-connexion hidden><a class="text-link" href="/mon-espace/">Mot de passe oublié ?</a></p>
+    </form>
+  </div>`;
+  const f = $('[data-porte]', box), st = $('[data-porte-statut]', box);
+  let mode = 'creer';
+  $$('[data-mode]', box).forEach((b) => b.addEventListener('click', () => {
+    mode = b.dataset.mode;
+    $$('[data-mode]', box).forEach((x) => x.setAttribute('aria-selected', String(x === b)));
+    $('[data-seulement-creer]', f).hidden = mode !== 'creer'; $('[data-seulement-connexion]', f).hidden = mode === 'creer';
+    f.mdp.autocomplete = mode === 'creer' ? 'new-password' : 'current-password';
+    $('button[type=submit]', f).textContent = mode === 'creer' ? 'Créer mon compte' : 'Me connecter';
+    say(st, '');
+  }));
+  f.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = f.email.value.trim(), mdp = f.mdp.value;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return say(st, ERR.invalid_email, true);
+    if (mdp.length < 8) return say(st, ERR.mot_de_passe, true);
+    if (mode === 'creer' && !f.prenom.value.trim()) return say(st, ERR.missing_name, true);
+    const btn = $('button[type=submit]', f); btn.disabled = true; say(st, 'Un instant…');
+    try {
+      let session = null;
+      if (mode === 'creer') {
+        const cree = await supabase.auth.signUp({ email, password: mdp, options: { data: { first_name: f.prenom.value.trim() }, emailRedirectTo: `${location.origin}/mon-espace/` } });
+        if (cree.error && !/already|exists|registered/i.test(cree.error.message)) throw Object.assign(new Error(), { code: /password/i.test(cree.error.message) ? 'mot_de_passe' : /rate/i.test(cree.error.message) ? 'trop_de_demandes' : 'compte_impossible' });
+        session = cree.data?.session || null;
+      }
+      if (!session) {
+        const co = await supabase.auth.signInWithPassword({ email, password: mdp });
+        if (co.error) {
+          if (/not confirmed/i.test(co.error.message)) { say(st, 'Ton compte est créé. Clique sur le lien reçu par email pour confirmer ton adresse (regarde aussi les courriers indésirables), puis reviens ici et choisis « J’ai déjà un compte ».'); btn.disabled = false; return; }
+          throw Object.assign(new Error(), { code: mode === 'creer' ? 'compte_existant' : 'connexion' });
+        }
+        session = co.data.session;
+      }
+      monterFormulaire(box);
+    } catch (err) { say(st, ERR[err.code] || 'Ça n’a pas fonctionné. Réessaie dans un instant.', true); btn.disabled = false; }
+  });
+}
+
+function appliquerInteret(box) {
+  const ref = box.dataset.interet, form = box.querySelector('[data-annonce-form]');
+  if (!form || !ref) return;
+  form.elements.interet_ref.value = ref;
+  const info = form.querySelector('[data-interet-info]');
+  form.prepend(info);
+  info.hidden = false;
+  info.textContent = `💌 Le profil n° ${ref} t’intéresse : crée ton profil ci-dessous. Lamia est prévenue et regarde si vous pouvez correspondre. Personne d’autre ne le saura.`;
+}
+
+function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
   box.innerHTML = formulaireHtml();
   const form = $('[data-annonce-form]', box), st = $('[data-annonce-statut]', form);
   const estLive = () => form.querySelector('[name=live]:checked')?.value === 'oui';
+  const sansReseau = () => form.elements.sans_reseau.checked;
+  form.elements.sans_reseau.addEventListener('change', () => { $('[data-tel]', form).hidden = !sansReseau(); $('[data-reseau]', form).hidden = sansReseau(); });
   form.addEventListener('change', (e) => {
     if (e.target.name !== 'live') return;
     $('[data-si-live]', form).hidden = !estLive();
@@ -171,7 +248,7 @@ export function monterFormulaire(box, { existant = null, token = null } = {}) {
   sessionActive().then((s) => {
     if (!s || existant) return;
     form.elements.email.value = s.user.email; form.elements.email.readOnly = true;
-    $('[data-mdp]', form).hidden = true;
+    $('[data-mdp]', form)?.setAttribute('hidden', '');
     const c = $('[data-connecte]', form); c.hidden = false; c.textContent = `Tu es connecté(e) : ton profil sera lié à ton compte ${s.user.email}.`;
   });
   let medias = [], identite = [];
@@ -219,33 +296,21 @@ export function monterFormulaire(box, { existant = null, token = null } = {}) {
       if (f.recherche.value.trim().length < 20) return stop('textes_courts', f.recherche);
       if (!medias.length) return stop('medias_requis', $('[data-medias]', form).closest('label'));
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(f.email.value.trim())) return stop('invalid_email', f.email);
-    let session = await sessionActive();
-    if (!session && f.motdepasse.value.length < 8) return stop('mot_de_passe', f.motdepasse);
-    if (!f.contactReseau.value.trim()) return stop('contact_requis', f.contactReseau);
+    const session = await sessionActive();
+    if (!session) { monterFormulaire(box); return; }
+    if (sansReseau()) { if (!telephoneNormal(f.telephone.value)) return stop('telephone_invalide', f.telephone); }
+    else if (!f.contactReseau.value.trim()) return stop('contact_requis', f.contactReseau);
     if (!f.majeur.checked || !f.publication.checked || (identite.length && !f.identite_ok.checked)) return stop('consent_required', identite.length && !f.identite_ok.checked ? f.identite_ok.closest('label') : f.majeur.closest('label'));
     const btn = $('.annonce-envoyer', form); btn.disabled = true;
     const fichiers = [...medias.map((x) => ({ blob: x, role: 'media' })), ...identite.map((x) => ({ blob: x, role: 'identite' }))];
     try {
-      // Le compte d'abord : créé ici, ou retrouvé si la personne en a déjà un.
-      if (!session) {
-        say(st, 'Création de ton compte…');
-        const mail = f.email.value.trim(), mdp = f.motdepasse.value;
-        const cree = await supabase.auth.signUp({ email: mail, password: mdp, options: { data: { first_name: f.prenom.value.trim() }, emailRedirectTo: `${location.origin}/mon-espace/` } });
-        if (cree.error && /already|exists|registered/i.test(cree.error.message)) {
-          const co = await supabase.auth.signInWithPassword({ email: mail, password: mdp });
-          if (co.error) throw Object.assign(new Error('compte_existant'), { code: 'compte_existant' });
-          session = co.data.session;
-        } else if (cree.error) throw Object.assign(new Error('mot_de_passe'), { code: /password/i.test(cree.error.message) ? 'mot_de_passe' : 'compte_requis' });
-        else session = cree.data.session;
-      }
       say(st, 'Envoi de ton annonce…');
       const res = await api({
         live, tiktok_live: f.tiktok_live.value,
         action: 'annonce_deposer', prenom: f.prenom.value, genre: form.querySelector('[name=genre]:checked').value, birth_date: f.birth_date.value,
         ville: f.ville.value, pays: f.pays.value, profil: f.profil.value, recherche: f.recherche.value,
         matching: lireMatching(form),
-        age_min: f.age_min.value, age_max: f.age_max.value, email: f.email.value.trim(),
+        age_min: f.age_min.value, age_max: f.age_max.value, email: session.user.email, sans_reseau: sansReseau(), telephone: sansReseau() ? f.telephone.value : '',
         majeur: true, publication: true, identite_ok: Boolean(identite.length && f.identite_ok.checked), website: f.zz_site.value, anonyme_ok: f.anonyme_ok.checked, photo_partage: f.photo_partage.checked, interet_ref: f.interet_ref.value,
         medias: fichiers.map((x) => ({ role: x.role, type: typeDe(x.blob), size: x.blob.size })),
       }, session?.access_token);
@@ -256,7 +321,7 @@ export function monterFormulaire(box, { existant = null, token = null } = {}) {
       }
       const fin = res.annonce_id ? await api({ action: 'annonce_finaliser', annonce_id: res.annonce_id, token: res.token }) : {};
       window.lfbEvent?.('annonce_deposee');
-      box.innerHTML = `<div class="annonce-merci"><p class="annonce-coeur" aria-hidden="true">💌</p><h3>Merci ${esc(f.prenom.value.trim())}, ton profil est bien arrivé chez Lamia${fin.ref ? ` (n° ${fin.ref})` : ''} !</h3><p>Il n’est publié nulle part. Lamia le vérifie, puis le passe dans son outil de matching. Tu recevras par email le nombre de personnes avec qui tu pourrais correspondre. ${live ? 'Tes 3 premières mises en relation sont offertes.' : 'Ta première mise en relation est offerte.'}</p><p>Ton profil est lié à ton compte : tu peux le modifier quand tu veux dans <a href="/mon-espace/">Mon espace</a>${session ? '' : ' (confirme d’abord ton adresse grâce au lien reçu par email)'}.</p><p>En attendant, tu peux <a href="/speed-dating/">t’inscrire à la prochaine soirée</a> ou <a href="/confidences/">écrire à Lamia</a>.</p></div>`;
+      box.innerHTML = `<div class="annonce-merci"><p class="annonce-coeur" aria-hidden="true">💌</p><h3>Merci ${esc(f.prenom.value.trim())}, ton profil est bien arrivé chez Lamia${fin.ref ? ` (n° ${fin.ref})` : ''} !</h3><p>Il n’est publié nulle part. Lamia le vérifie, puis le passe dans son outil de matching. Tu recevras par email le nombre de personnes avec qui tu pourrais correspondre. ${live ? 'Tes 3 premières mises en relation sont offertes.' : 'Ta première mise en relation est offerte.'}</p><p>Ton profil est lié à ton compte : tu peux le modifier quand tu veux dans <a href="/mon-espace/">Mon espace</a>.</p><p>En attendant, tu peux <a href="/speed-dating/">t’inscrire à la prochaine soirée</a> ou <a href="/confidences/">écrire à Lamia</a>.</p></div>`;
     } catch (err) {
       btn.disabled = false;
       say(st, ERR[err.code] || 'L’envoi n’a pas abouti. Vérifie ta connexion et réessaie dans un instant.', true);
@@ -291,15 +356,16 @@ function monterEdition(form, st, p, token) {
   for (const n of LISTES) for (const v of m[n] || []) { const c = form.querySelector(`[name=${n}][value="${CSS.escape(v)}"]`); if (c) c.checked = true; }
   for (const n of CASES) F[n].checked = Boolean(m[n]);
   F.anonyme_ok.checked = Boolean(p.anonyme_ok);
+  if (p.sans_reseau) { F.sans_reseau.checked = true; F.telephone.value = p.telephone || ''; F.sans_reseau.dispatchEvent(new Event('change')); }
   F.photo_partage.checked = Boolean(p.photo_partage);
   const btn = $('.annonce-envoyer', form); btn.textContent = 'Enregistrer mes modifications';
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (F.profil.value.trim().length < 20 || F.recherche.value.trim().length < 20) return say(st, ERR.textes_courts, true);
-    if (!F.contactReseau.value.trim()) return say(st, ERR.contact_requis, true);
+    if (F.sans_reseau.checked ? !telephoneNormal(F.telephone.value) : !F.contactReseau.value.trim()) return say(st, F.sans_reseau.checked ? ERR.telephone_invalide : ERR.contact_requis, true);
     btn.disabled = true; say(st, 'Enregistrement…');
     try {
-      await api({ action: 'annonce_modifier', prenom: F.prenom.value, ville: F.ville.value, pays: F.pays.value, profil: F.profil.value, recherche: F.recherche.value, age_min: F.age_min.value, age_max: F.age_max.value, anonyme_ok: F.anonyme_ok.checked, photo_partage: F.photo_partage.checked, matching: lireMatching(form) }, token);
+      await api({ action: 'annonce_modifier', prenom: F.prenom.value, ville: F.ville.value, pays: F.pays.value, profil: F.profil.value, recherche: F.recherche.value, age_min: F.age_min.value, age_max: F.age_max.value, anonyme_ok: F.anonyme_ok.checked, photo_partage: F.photo_partage.checked, sans_reseau: F.sans_reseau.checked, telephone: F.sans_reseau.checked ? F.telephone.value : '', matching: lireMatching(form) }, token);
       say(st, '✓ Ton profil est à jour. Lamia est prévenue.');
     } catch (err) { say(st, ERR[err.code] || 'L’enregistrement n’a pas abouti. Réessaie dans un instant.', true); }
     btn.disabled = false;
@@ -406,18 +472,10 @@ retraitDepuisLien();
 function ouvrirFormulaire(ref) {
   const box = document.querySelector('[data-annonce-box]');
   if (!box) return;
-  if (!box.dataset.monte) { monterFormulaire(box); box.dataset.monte = '1'; }
+  if (ref) { box.dataset.interet = ref; window.lfbEvent?.('interet_profil'); }
+  if (!box.dataset.monte || ref) { monterFormulaire(box); box.dataset.monte = '1'; }
   box.hidden = false;
   document.querySelector('.patio-etapes')?.setAttribute('hidden', '');
-  const form = box.querySelector('[data-annonce-form]');
-  if (form && ref) {
-    form.elements.interet_ref.value = ref;
-    const info = form.querySelector('[data-interet-info]');
-    form.prepend(info);
-    info.hidden = false;
-    info.textContent = `💌 Le profil n° ${ref} t’intéresse : crée ton profil ci-dessous. Lamia est prévenue et regarde si vous pouvez correspondre. Personne d’autre ne le saura.`;
-    window.lfbEvent?.('interet_profil');
-  }
   document.querySelectorAll('[data-annonce-ouvrir]').forEach((b) => b.setAttribute('aria-expanded', 'true'));
   box.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
