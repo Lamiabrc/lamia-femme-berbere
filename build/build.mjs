@@ -1163,10 +1163,16 @@ page(
 <body class="cl">
 <header class="cl-haut">
   <button class="cl-retour" type="button" data-retour hidden aria-label="Retour à la liste">‹</button>
-  <img src="/images/marque/confidences-icone-192.png" width="36" height="36" alt="">
+  <a class="cl-logo" href="/" aria-label="Retour à l’accueil du site"><img src="/images/marque/lamia-logo-net-160.webp" width="36" height="36" alt=""></a>
   <h1>Confidences <span data-total></span></h1>
   <button class="cl-icone" type="button" data-ouvrir-reglages aria-label="Réglages des alertes">⚙︎</button>
 </header>
+<nav class="cl-nav" aria-label="Navigation">
+  <a href="/">🏠 Accueil du site</a>
+  <a href="/tableau-de-bord">📊 Tableau de bord</a>
+  <a href="/rencontres/">💞 Rencontres</a>
+  <a href="/mon-espace/">👤 Mon espace</a>
+</nav>
 
 <main class="cl-main">
   <form class="cl-login" data-login hidden>

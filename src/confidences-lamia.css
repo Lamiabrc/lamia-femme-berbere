@@ -97,3 +97,9 @@ legend { font-size: 14px; font-weight: 600; padding: 0 4px; }
 .cl-badges:empty { display: none; }
 
 .cl-reciproque { color: #fff; background: #b0123a; padding: .1rem .5rem; border-radius: 999px; }
+
+.cl-logo { display: inline-flex; flex: none; border-radius: 50%; background: #fff; box-shadow: 0 0 0 1px var(--poudre-fonce); }
+.cl-logo img { display: block; border-radius: 50%; }
+.cl-nav { position: sticky; top: calc(57px + env(safe-area-inset-top)); z-index: 4; display: flex; gap: 8px; overflow-x: auto; padding: 8px 14px; background: rgba(251,246,241,.94); backdrop-filter: blur(10px); border-bottom: 1px solid var(--poudre-fonce); scrollbar-width: none; }
+.cl-nav::-webkit-scrollbar { display: none; }
+.cl-nav a { flex: none; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--poudre-fonce); color: inherit; text-decoration: none; font: 600 13px var(--sans); background: #fff; white-space: nowrap; }
