@@ -1342,7 +1342,7 @@ page(
   <p class="annonces-sous">Sans engagement. La première mise en relation est toujours offerte.</p>
   <div class="abo-grille">${FORMULES.map((f) => `<a class="abo-carte abo-mini${f.vedette ? ' is-vedette' : ''}" href="${f.mois ? `/abonnement/?formule=${f.id}` : '#confier'}">${f.vedette ? '<span class="abo-ruban">Le plus choisi</span>' : ''}<h3>${esc(f.nom)}</h3><p class="abo-prix">${f.mois ? `${eurosAbo(f.mois)}<small> / mois</small>` : 'Gratuit'}</p><ul>${f.avantages.slice(0, 2).map((x) => `<li>${esc(x)}</li>`).join('')}</ul><span class="po-btn">${f.mois ? `Choisir ${esc(f.nom)}` : 'Commencer'}</span></a>`).join('')}</div>
   <h2 class="annonces-titre" id="profils-anonymes">Les profils vérifiés</h2>
-  <p class="annonces-sous">Ni prénom, ni photo, ni contact. Un profil te touche ? Clique sur « Ce profil m’intéresse » : Lamia regarde si vous pouvez correspondre. Personne ne sait qui s’intéresse à qui.</p>
+  <p class="annonces-sous">Ni prénom, ni photo, ni contact. Un profil te touche ? Clique sur « Ce profil m’intéresse » : Lamia regarde si vous pouvez correspondre. Ton identité reste secrète : on ne voit que des numéros de profil.</p>
   <p class="po-actions btn-swipe"><a class="po-btn" href="/rencontres/swipe/">💘 Swiper les profils, un par un</a></p>
   <div class="annonces-liste" data-annonces-liste><p class="annonce-vide">Les profils arrivent…</p></div>
   <div class="accueil-duo">
@@ -1429,9 +1429,10 @@ page(
     scripts: ['/assets/swipe.js'],
     body: `<div class="po-app"><section class="po-hero swipe-hero"><div class="po-fond" aria-hidden="true"></div>
   <p class="po-eyebrow">Les Rencontres</p><h1>Swipe les profils vérifiés</h1>
-  <p class="po-lead">À droite 💚 s’il t’intéresse, à gauche ✕ sinon. Personne ne sait qui a choisi qui. Si vous vous choisissez tous les deux, Lamia est prévenue et vous met en relation.</p>
+  <p class="po-lead">À droite 💚 s’il t’intéresse, à gauche ✕ sinon. Ton identité reste secrète : on ne voit que des numéros de profil. Si vous vous choisissez tous les deux, Lamia est prévenue et vous met en relation.</p>
 </section>
 <div class="swipe-app">
+  <div class="swipe-infos" data-swipe-infos></div>
   <p class="swipe-compteur" data-swipe-compteur></p>
   <div class="swipe-pile" data-swipe><p class="annonce-vide">Les profils arrivent…</p></div>
   <div class="swipe-boutons" data-swipe-boutons hidden><button type="button" data-swipe-non aria-label="Pas pour moi">✕</button><button type="button" data-swipe-oui aria-label="Ce profil m’intéresse">💚</button></div>

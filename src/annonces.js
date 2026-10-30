@@ -235,7 +235,7 @@ function appliquerInteret(box) {
   const info = form.querySelector('[data-interet-info]');
   form.prepend(info);
   info.hidden = false;
-  info.textContent = `💌 Le profil n° ${ref} t’intéresse : crée ton profil ci-dessous. Lamia est prévenue et regarde si vous pouvez correspondre. Personne d’autre ne le saura.`;
+  info.textContent = `💌 Le profil n° ${ref} t’intéresse : crée ton profil ci-dessous. Lamia est prévenue et regarde si vous pouvez correspondre. Ton identité reste secrète.`;
 }
 
 function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
@@ -403,7 +403,7 @@ async function interesse(ref) {
   if (s) {
     try {
       await api({ action: 'annonce_interet', ref }, s.access_token);
-      montrerMessage(`💌 C’est noté : Lamia sait que le profil n° ${ref} t’intéresse. Elle regarde si vous pouvez correspondre, et personne d’autre ne le saura.`);
+      montrerMessage(`💌 C’est noté : Lamia sait que le profil n° ${ref} t’intéresse. Elle regarde si vous pouvez correspondre. Ton identité reste secrète : seul ton numéro de profil peut apparaître.`);
       window.lfbEvent?.('interet_profil');
       return;
     } catch (err) {

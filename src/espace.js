@@ -117,7 +117,11 @@ async function suivi(el, p) {
     : !pm.inclus ? '<h3>📷 La photo de ton match</h3><p>Elle est incluse à partir de la formule <a class="text-link" href="/abonnement/?formule=passion">Passion</a>, si ton match accepte de la transmettre.</p>'
     : pm.accepte === false ? '<h3>📷 La photo de ton match</h3><p>Ton match n’a pas (encore) accepté de transmettre sa photo.</p>'
     : '<h3>📷 La photo de ton match</h3><p>Lamia te la transmet dès que possible.</p>';
-  el.innerHTML = `<h3>Mon suivi</h3><ul>${lignes}</ul>${blocPhoto}
+  const cp = p.choisi_par || { nombre: 0, refs: [] };
+  const blocChoisi = !cp.nombre ? '' : cp.inclus
+    ? `<h3>💞 Qui t’a choisi·e</h3><p>${cp.refs.map((r) => `<strong>n° ${esc(r)}</strong>`).join(', ')} : ${cp.nombre > 1 ? 'ces profils sont' : 'ce profil est'} en tête de ton <a class="text-link" href="/rencontres/swipe/">swipe</a>. Choisis-${cp.nombre > 1 ? 'les' : 'le'} à ton tour pour un intérêt réciproque.</p>`
+    : `<h3>💞 ${cp.nombre} personne${cp.nombre > 1 ? 's t’ont' : ' t’a'} choisi·e</h3><p>Découvre qui avec la formule <a class="text-link" href="/abonnement/?formule=passion">Passion</a>.</p>`;
+  el.innerHTML = `<h3>Mon suivi</h3><ul>${lignes}</ul>${blocChoisi}${blocPhoto}
     <p><a class="po-btn" href="/rencontres/swipe/">💘 Swiper les profils</a></p>
     <h3>Mes demandes de match</h3>${demandes ? `<ul>${demandes}</ul>` : '<p>Aucune pour l’instant. <a class="text-link" href="/rencontres/#profils-anonymes">Voir les profils</a></p>'}`;
 }

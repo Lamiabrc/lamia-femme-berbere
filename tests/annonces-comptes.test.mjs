@@ -23,7 +23,7 @@ function monde({ compte = true, tiktok = {} } = {}) {
   };
   const insert = async (t, row) => { const r = { id: `00000000-0000-0000-0000-00000000000${db[t].length + 1}`, ref: db[t].length + 1, status: 'brouillon', ...row }; db[t].push(r); return r; };
   const patch = async (t, filtre, v) => { const [k, val] = filtre.split('&')[0].split('=eq.'); for (const r of db[t]) if (String(r[k]) === decodeURIComponent(val)) Object.assign(r, v); return { ok: true }; };
-  const ctx = (user = null) => ({ env: { SUPABASE_SERVICE_ROLE_KEY: 'x' }, call, read, insert, patch, admin: false, user, ipHash: 'ip', now: () => new Date('2026-10-29T20:00:00Z'), email: async () => true, alerter: async (a) => alertes.push(a.titre) });
+  const ctx = (user = null, formule = 'decouverte') => ({ formuleDe: async () => formule, env: { SUPABASE_SERVICE_ROLE_KEY: 'x' }, call, read, insert, patch, admin: false, user, ipHash: 'ip', now: () => new Date('2026-10-29T20:00:00Z'), email: async () => true, alerter: async (a) => alertes.push(a.titre) });
   return { db, alertes, ctx };
 }
 const base = { action: 'annonce_deposer', majeur: true, publication: true, prenom: 'Nina', genre: 'femme', birth_date: '1995-03-02', email: 'nina@example.com', matching: { contactReseau: 'https://www.tiktok.com/@nina.kab' } };
@@ -112,4 +112,17 @@ test('swipe : deux personnes qui se choisissent → intérêt réciproque et ale
   assert.equal(db.annonce_interets.every((i) => i.reciproque), true);
   r = await handleAnnonces('annonce_swipe', { ref: 99, choix: 'non' }, ctx(karim));
   assert.equal(db.annonce_passes[0].cible_ref, 99);
+});
+
+test('swipe : 10 profils par jour en Découverte, sans limite en Passion', async () => {
+  const { ctx, db } = monde();
+  db.annonces.push({ id: 'a1', ref: 21, user_id: 'u1', email: 'nina@example.com', status: 'publiee', prenom: 'Nina', genre: 'femme', en_match: false });
+  const nina = { id: 'u1', email: 'nina@example.com' };
+  const oldRead = ctx().read;
+  const c = (formule, deja) => ({ ...ctx(nina, formule), read: async (u) => (u.includes('annonce_passes?demandeur_id=eq.a1&created_at=gte.') ? Array.from({ length: deja }, () => ({ id: 'x' })) : oldRead(u)) });
+  let r = await handleAnnonces('annonce_swipe', { ref: 30, choix: 'non' }, c('decouverte', 10));
+  assert.equal(r.status, 429);
+  assert.equal((await r.json()).error, 'quota_swipe');
+  r = await handleAnnonces('annonce_swipe', { ref: 30, choix: 'non' }, c('passion', 500));
+  assert.equal(r.status, 200);
 });

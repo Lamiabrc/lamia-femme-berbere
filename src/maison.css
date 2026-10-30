@@ -3130,3 +3130,11 @@ label.is-manquant { outline: 2px solid #c0263f; outline-offset: 3px; border-radi
 .install-fermer { position: absolute; top: 8px; right: 10px; border: 0; background: none; font-size: 28px; line-height: 1; cursor: pointer; color: #5c0f22; }
 .install-copie { color: #1d7a46; font-weight: 600; margin: 8px 0 0; }
 .btn-installer { display: inline-flex; align-items: center; gap: 8px; }
+
+/* Swipe : quotas et « qui m'a choisi·e » */
+.swipe-infos { display: grid; gap: 8px; margin-bottom: .6rem; }
+.swipe-info { margin: 0; padding: 10px 14px; border-radius: 14px; background: rgba(255,255,255,.08); border: 1px solid rgba(217,178,95,.45); font-size: .93rem; line-height: 1.45; text-align: center; }
+.swipe-info a { color: #ffd27a; font-weight: 700; }
+.swipe-info.is-choisi { background: rgba(176,18,58,.25); border-color: #e0899c; }
+.swipe-flou { filter: blur(4px); user-select: none; margin-left: 6px; }
+.swipe-ta-choisi { position: absolute; top: 14px; right: 14px; z-index: 2; padding: .3rem .7rem; border-radius: 999px; background: #b0123a; color: #fff; font: 700 .85rem Inter, system-ui, sans-serif; box-shadow: 0 6px 14px rgba(0,0,0,.25); }
