@@ -1,6 +1,6 @@
 // Annonces de rencontre : dépôt (Patio et Confidences) et affichage des annonces vérifiées par Lamia.
 import { api, esc, PUBLIC_KEY, creerCompte } from './confidences-commun.js';
-import { O, lib, telephoneNormal, foiEtVie } from './matching-options.mjs';
+import { O, lib, secteurLisible, telephoneNormal, foiEtVie } from './matching-options.mjs';
 import { createClient } from '/vendor/supabase.mjs';
 
 // Compte (le même que « Mon espace ») : chaque profil y est lié pour pouvoir être modifié.
@@ -445,11 +445,11 @@ function carte(a) {
       <h3>${esc(infos.slice(0, 2).join(', '))}</h3>
       <p class="annonce-lieu"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lieu"/></svg>${esc([a.ville, ...infos.slice(2)].filter(Boolean).join(' · '))}</p>
       ${a.village ? `<p class="annonce-lieu"><svg class="ico" aria-hidden="true"><use href="/icones.svg#maison"/></svg> Originaire de ${esc(a.village)}</p>` : ''}
+      ${secteurLisible(a.secteur) ? `<p class="annonce-lieu annonce-secteur"><svg class="ico" aria-hidden="true"><use href="/icones.svg#boussole"/></svg> Cherche en : <b>${esc(secteurLisible(a.secteur))}</b></p>` : ''}
       ${tags.length ? `<p class="annonce-tags">${tags.map((t) => `<span>${esc(lib(t))}</span>`).join('')}</p>` : ''}
       <h4>Qui je suis</h4><p>${esc(a.profil)}</p>
       <h4>Qui je cherche${ages}</h4><p>${esc(a.recherche)}</p>
       ${foiEtVie(a)}
-      ${a.secteur ? `<p class="annonce-lieu"><svg class="ico" aria-hidden="true"><use href="/icones.svg#boussole"/></svg> Secteur recherché : ${esc(a.secteur)}</p>` : ''}
       <button type="button" class="btn btn-ink" data-interet="${a.ref}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur"/></svg> Ce profil m’intéresse</button>
     </div>
   </article>`;

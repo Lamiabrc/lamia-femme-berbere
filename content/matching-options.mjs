@@ -50,6 +50,13 @@ export const LIBELLE = {
   'Fumeur: non': 'Non-fumeur', 'Fumeur: occasionnel': 'Fumeur occasionnel', 'Fumeur: oui': 'Fumeur', 'Sport: oui': 'Sport régulier', 'Sport: occasionnel': 'Sport de temps en temps', 'Sport: non': 'Pas de sport', 'Alcool: non': 'Pas d’alcool', 'Alcool: occasionnel': 'Alcool occasionnel', 'Alcool: oui': 'Alcool', 'Chemma: non': 'Sans chique (chemma)', 'Chemma: oui': 'Chique (chemma)',
 };
 export const lib = (v) => LIBELLE[v] || v;
+// Secteur recherché, lisible : « Algerie · Tizi ouzou » → « Algérie · Tizi Ouzou », doublons et valeurs vides retirés.
+const SECTEURS = { algerie: 'Algérie', 'autre que algerie': 'Hors Algérie', "n'importe ou": 'Partout', 'pas important': 'Partout', usa: 'États-Unis', amerique: 'Amérique', autre: 'Autre' };
+export function secteurLisible(v) {
+  const vus = new Set();
+  return String(v || '').split('·').map((x) => x.trim()).filter((x) => x && !/^[.…]+$/.test(x)).map((x) => SECTEURS[x.toLowerCase()] || x.charAt(0).toUpperCase() + x.slice(1))
+    .filter((x) => { const k = x.toLowerCase(); if (vus.has(k)) return false; vus.add(k); return true; }).join(' · ');
+}
 
 // Nettoie les choix envoyés par le formulaire : ne garde que des valeurs connues de l'outil.
 // Numéro de téléphone (pour qui n'a aucun réseau social) : renvoie un numéro propre au format international, ou '' s'il n'est pas valide.

@@ -1,6 +1,7 @@
 // Mon espace : connexion, mot de passe, soirées réservées, liens d'administration.
 import { createClient } from '/vendor/supabase.mjs';
 import { creerCompte } from './confidences-commun.js';
+import { secteurLisible } from './matching-options.mjs';
 
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc');
 const $ = (s) => document.querySelector(s);
@@ -23,6 +24,7 @@ async function render() {
   monProfil(session);
   mesFiches(session);
   interetsRecus(session);
+  avisLamia(session);
   propositions(session);
   discussions(session);
   const { data } = await supabase.from('event_registrations')
@@ -255,6 +257,7 @@ async function propositions(session) {
       ${x.message ? `<p class="proposition-mot">« ${esc(x.message)} » <small>Lamia</small></p>` : ''}
       ${f.profil ? `<p><strong>Qui je suis :</strong> ${esc(f.profil)}</p>` : ''}
       ${f.recherche ? `<p><strong>Qui je cherche${esc(ages)} :</strong> ${esc(f.recherche)}</p>` : ''}
+      ${secteurLisible(f.secteur) ? `<p><strong>Cherche en :</strong> ${esc(secteurLisible(f.secteur))}</p>` : ''}
       ${rep}</div></article>`;
   };
   const afficher = () => { box.innerHTML = liste.length ? liste.map(carte).join('') : '<p>Pas encore de proposition. Quand Lamia trouve un profil pour toi, il apparaît ici et tu es prévenu·e.</p>'; };
@@ -266,6 +269,42 @@ async function propositions(session) {
     b.parentElement.querySelectorAll('button').forEach((x) => { x.disabled = true; });
     try { await appelProfil({ action: 'annonce_proposition_rep', id: b.dataset.id, reponse: b.dataset.proposition }, session); liste = liste.map((x) => (x.id === b.dataset.id ? { ...x, reponse: b.dataset.proposition } : x)); afficher(); }
     catch { b.parentElement.querySelectorAll('button').forEach((x) => { x.disabled = false; }); }
+  });
+}
+
+// « Lamia te demande ton avis » : un de tes critères (secteur…) n'est pas respecté par un profil ; d'accord quand même ?
+async function avisLamia(session) {
+  const ancre = document.querySelector('[data-espace-interets]');
+  if (!ancre) return;
+  let liste = [];
+  try { ({ avis: liste = [] } = await appelProfil({ action: 'annonce_avis_lamia' }, session)); } catch { return; }
+  if (!liste.length) return;
+  const box = document.createElement('div');
+  box.className = 'espace-interets espace-avis'; box.id = 'avis';
+  ancre.before(box);
+  const carte = (x) => {
+    const f = x.fiche;
+    const infos = [f.genre === 'femme' ? 'Une femme' : 'Un homme', f.age && `${f.age} ans`, f.ville, f.pays, f.situation].filter(Boolean);
+    const ages = f.age_min || f.age_max ? ` · ${f.age_min || 18} à ${f.age_max || 99} ans` : '';
+    const rep = x.reponse === 'oui' ? '<p class="espace-match">👍 Tu es d’accord : Lamia s’occupe de la suite.</p>'
+      : x.reponse === 'non' ? '<p>Tu as répondu non : c’est noté, merci.</p>'
+      : `<p class="interet-boutons"><button type="button" class="btn btn-ink" data-avis="oui" data-id="${esc(x.id)}">Oui, je suis d’accord</button><button type="button" class="btn btn-line" data-avis="non" data-id="${esc(x.id)}">Non merci</button></p>`;
+    return `<article class="espace-achat interet-recu proposition"><div><p class="event-date">💬 Lamia te demande ton avis · profil n° ${esc(f.ref)}</p>
+      <p class="proposition-mot">« ${esc(x.question)} Lamia pense que vous pourriez quand même bien vous entendre. Es-tu d’accord ? » <small>Lamia</small></p>
+      <h3>${esc(infos.join(' · '))}</h3>
+      ${f.profil ? `<p><strong>Qui je suis :</strong> ${esc(f.profil)}</p>` : ''}
+      ${f.recherche ? `<p><strong>Qui je cherche${esc(ages)} :</strong> ${esc(f.recherche)}</p>` : ''}
+      ${secteurLisible(f.secteur) ? `<p><strong>Cherche en :</strong> ${esc(secteurLisible(f.secteur))}</p>` : ''}
+      ${rep}</div></article>`;
+  };
+  const afficher = () => { box.innerHTML = `<h3 class="espace-avis-titre">Lamia te demande ton avis</h3>${liste.map(carte).join('')}`; };
+  afficher();
+  box.addEventListener('click', async (e) => {
+    const b = e.target.closest('[data-avis]');
+    if (!b) return;
+    b.parentElement.querySelectorAll('button').forEach((y) => { y.disabled = true; });
+    try { await appelProfil({ action: 'annonce_repondre_avis', id: b.dataset.id, reponse: b.dataset.avis }, session); liste = liste.map((y) => (y.id === b.dataset.id ? { ...y, reponse: b.dataset.avis } : y)); afficher(); }
+    catch { b.parentElement.querySelectorAll('button').forEach((y) => { y.disabled = false; }); }
   });
 }
 
@@ -285,6 +324,7 @@ async function interetsRecus(session) {
       <h3>${esc(infos.join(' · '))}</h3>
       ${f.profil ? `<p><strong>Qui je suis :</strong> ${esc(f.profil)}</p>` : ''}
       ${f.recherche ? `<p><strong>Qui je cherche${esc(ages)} :</strong> ${esc(f.recherche)}</p>` : ''}
+      ${secteurLisible(f.secteur) ? `<p><strong>Cherche en :</strong> ${esc(secteurLisible(f.secteur))}</p>` : ''}
       ${rep}</div></article>`;
   };
   const afficher = () => { box.innerHTML = liste.length ? liste.map(carte).join('') : '<p>Personne pour le moment. Dès qu’une personne s’intéresse à ton profil, sa fiche apparaît ici et tu reçois un email.</p>'; };

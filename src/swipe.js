@@ -3,7 +3,7 @@
 // Swipe sans limite. Matchs en même temps : 1 en Découverte (Lamia en débloque d'autres en live), 3 avec une formule.
 // « Qui m'a choisi·e » (Passion, Prestige) : ces profils passent en tête.
 import { api, esc, PUBLIC_KEY } from './confidences-commun.js';
-import { O, lib, foiEtVie } from './matching-options.mjs';
+import { O, lib, secteurLisible, foiEtVie } from './matching-options.mjs';
 import { createClient } from '/vendor/supabase.mjs';
 
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', PUBLIC_KEY);
@@ -27,11 +27,11 @@ function carte(a) {
       <h2>${a.genre === 'femme' ? 'Une femme' : 'Un homme'}, ${esc(a.age)} ans</h2>
       <p class="annonce-lieu"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lieu"/></svg>${esc([a.ville, ...infos].filter(Boolean).join(' · '))}</p>
       ${a.village ? `<p class="annonce-lieu"><svg class="ico" aria-hidden="true"><use href="/icones.svg#maison"/></svg> Originaire de ${esc(a.village)}</p>` : ''}
+      ${secteurLisible(a.secteur) ? `<p class="annonce-lieu annonce-secteur"><svg class="ico" aria-hidden="true"><use href="/icones.svg#boussole"/></svg> Cherche en : <b>${esc(secteurLisible(a.secteur))}</b></p>` : ''}
       ${tags.length ? `<p class="annonce-tags">${tags.map((t) => `<span>${esc(lib(t))}</span>`).join('')}</p>` : ''}
       ${a.profil ? `<h3>Qui je suis</h3><p>${esc(a.profil)}</p>` : ''}
       ${a.recherche ? `<h3>Qui je cherche${ages}</h3><p>${esc(a.recherche)}</p>` : ''}
       ${foiEtVie(a).replace(/<h4>/g, '<h3>').replace(/<\/h4>/g, '</h3>')}
-      ${a.secteur ? `<p class="annonce-lieu"><svg class="ico" aria-hidden="true"><use href="/icones.svg#boussole"/></svg> Secteur recherché : ${esc(a.secteur)}</p>` : ''}
     </div>
   </article>`;
 }

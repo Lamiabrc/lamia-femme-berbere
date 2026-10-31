@@ -3345,3 +3345,8 @@ body[data-ambiance="espace"] .espace .room-name { color: #8a1024; }
 @media (max-width: 600px) {
   .annonce-nav { position: sticky; bottom: calc(66px + env(safe-area-inset-bottom)); z-index: 5; background: linear-gradient(180deg, rgba(42,9,19,0), rgba(42,9,19,.96) 40%); padding-top: 18px; margin: 0 -4px; }
 }
+
+/* Secteur recherché bien visible sur les annonces et le swipe ; avis demandé par Lamia dans Mon espace. */
+.annonce-secteur b { color: #7a1f2b; font-weight: 700; }
+.espace-avis { margin-bottom: 1.4rem; padding: 1rem; border: 2px solid #c9a24a; border-radius: 18px; background: #fff8ea; }
+.espace-avis-titre { margin: 0 0 .6rem; color: #7a1f2b; }
