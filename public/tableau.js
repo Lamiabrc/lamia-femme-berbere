@@ -12,6 +12,7 @@ const STATUTS = { pending: 'En attente de paiement', paid: 'Payée, à expédier
 const ALERTES = { new: 'Nouvelle', reviewing: 'En cours', needs_info: 'Besoin d’infos', watch: 'Sous surveillance', suspended: 'Suspendu', resolved: 'Résolue', dismissed: 'Classée' };
 const GRAVITE = { red: 'Danger', orange: 'Inquiétant', yellow: 'À surveiller' };
 
+let comptes = null;
 let token = null, data = null, produits = [], categories = [], edition = null, aller = '';
 
 function message(t, err = false) { const m = $('[data-message]'); m.textContent = t; m.classList.toggle('is-error', err); if (t && !err) setTimeout(() => { if (m.textContent === t) m.textContent = ''; }, 4000); }
@@ -37,6 +38,7 @@ function ouvrir(tab) {
   if (tab === 'textes') chargerTextes();
   if (tab === 'bilan') chargerBilan();
   if (tab === 'application') chargerJournal();
+  if (tab === 'comptes' && !comptes) chargerComptes();
   if (tab === 'rencontres') { const f = $('[data-rencontres]'); if (f && !f.src) f.src = `/confidences-lamia/?integre=1#${aller || 'annonces'}`; aller = ''; }
   scrollTo({ top: 0 });
 }
@@ -496,6 +498,142 @@ $('[data-textes-publier]').addEventListener('click', async () => {
   } catch (e) { message(e.message, true); }
 });
 
+// ---------------------------------------------------------------- comptes : toutes les personnes inscrites sur le site
+const GENRE = { femme: 'Femme', homme: 'Homme' };
+const PRESENCE = { registered: 'inscrit·e', checked_in: 'arrivé·e', attended: 'venu·e', no_show: 'absent·e', cancelled: 'annulée' };
+const ANNONCE = { brouillon: 'brouillon', a_verifier: 'à vérifier', publiee: 'publiée', retiree: 'retirée' };
+let filtreComptes = 'tous', compteOuvert = null;
+
+const ageDe = (birth) => {
+  if (!birth) return null;
+  const b = new Date(`${birth}T12:00:00Z`), d = new Date();
+  let a = d.getUTCFullYear() - b.getUTCFullYear();
+  if (d.getUTCMonth() < b.getUTCMonth() || (d.getUTCMonth() === b.getUTCMonth() && d.getUTCDate() < b.getUTCDate())) a--;
+  return a;
+};
+const nomDe = (c) => c.profil?.real_first_name || c.profil?.display_name || '(sans prénom)';
+const incomplet = (c) => !c.profil || !c.profil.gender || !c.profil.birth_date || !(c.profil.real_first_name || c.profil.display_name);
+const salonCourt = (s) => String(s || '').replace(/^Grand salon · /, '');
+
+async function chargerComptes() {
+  $('[data-comptes]').innerHTML = '<tr><td colspan="6">Chargement…</td></tr>';
+  try { comptes = await api({ action: 'comptes_liste' }); }
+  catch (e) { $('[data-comptes]').innerHTML = `<tr><td colspan="6">${esc(e.message)}</td></tr>`; return; }
+  const l = comptes.comptes;
+  const kpi = (t, n, s) => `<div class="kpi"><span>${t}</span><strong>${n}</strong>${s ? `<small>${s}</small>` : ''}</div>`;
+  $('[data-comptes-kpis]').innerHTML = [
+    kpi('Comptes', l.length, `${l.filter((c) => c.profil?.gender === 'femme').length} femmes · ${l.filter((c) => c.profil?.gender === 'homme').length} hommes`),
+    kpi('Inscrits à une soirée', l.filter((c) => c.inscriptions.some((i) => i.statut !== 'cancelled')).length),
+    kpi('Avec annonce', l.filter((c) => c.annonces.length).length),
+    kpi('Profil incomplet', l.filter(incomplet).length, 'genre, date de naissance ou prénom manquant'),
+  ].join('');
+  listeComptes();
+  if (compteOuvert) ouvrirCompte(compteOuvert);
+}
+
+function listeComptes() {
+  if (!comptes) return;
+  const q = $('[data-comptes-cherche]').value.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const garde = {
+    tous: () => true,
+    soiree: (c) => c.inscriptions.some((i) => i.statut !== 'cancelled'),
+    annonce: (c) => c.annonces.length,
+    fiche: (c) => c.fiches.length,
+    incomplet,
+  }[filtreComptes];
+  const l = comptes.comptes.filter(garde).filter((c) => !q || [nomDe(c), c.email, c.profil?.city, c.profil?.display_name].join(' ').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes(q));
+  $('[data-comptes]').innerHTML = l.length ? l.map((c) => {
+    const age = ageDe(c.profil?.birth_date);
+    const soirees = c.inscriptions.slice(0, 3).map((i) => `<span class="compte-badge ${i.statut === 'cancelled' ? 'is-annule' : 'is-bal'}">${esc(salonCourt(i.salon) || i.titre)}</span>`).join('');
+    const liens = [...c.annonces.map((a) => `<span class="compte-badge">Annonce n° ${esc(a.ref)}</span>`), ...c.fiches.map((f) => `<span class="compte-badge">Fiche n° ${esc(f.ref)}</span>`)].join('');
+    return `<tr class="compte-ligne" data-compte="${esc(c.id)}" tabindex="0">
+      <td><strong>${esc(nomDe(c))}${c.admin ? ' <span class="compte-badge">toi (admin)</span>' : ''}</strong><small>${esc(c.email || '')}</small></td>
+      <td>${c.profil?.gender ? esc(GENRE[c.profil.gender]) : '<span class="compte-badge is-alerte">genre ?</span>'} ${age != null ? `· ${age} ans` : '<span class="compte-badge is-alerte">âge ?</span>'}</td>
+      <td>${esc(c.profil?.city || '')}</td>
+      <td>${soirees || '—'}</td>
+      <td>${liens || '—'}</td>
+      <td>${esc(date(c.cree_le, { day: 'numeric', month: 'short', year: 'numeric' }))}</td></tr>`;
+  }).join('') : '<tr><td colspan="6">Aucun compte ne correspond.</td></tr>';
+}
+
+function ouvrirCompte(id) {
+  const c = comptes?.comptes.find((x) => x.id === id);
+  if (!c) return;
+  compteOuvert = id;
+  const p = c.profil || {};
+  $('[data-compte-email]').textContent = c.email || '';
+  $('[data-compte-nom]').textContent = nomDe(c);
+  $('[data-compte-infos]').textContent = [
+    `Compte créé le ${date(c.cree_le, { day: 'numeric', month: 'long', year: 'numeric' })}`,
+    c.vu_le ? `dernière connexion le ${date(c.vu_le, { day: 'numeric', month: 'long' })}` : 'jamais reconnecté·e',
+    c.email_confirme ? 'email confirmé' : 'email non confirmé',
+    c.source ? `venu·e de ${c.source}` : '',
+  ].filter(Boolean).join(' · ');
+  const f = $('[data-compte-form]');
+  for (const k of ['real_first_name', 'display_name', 'gender', 'birth_date', 'city', 'country']) f.elements[k].value = p[k] || '';
+  f.elements.profile_status.value = p.profile_status || 'active';
+  $('[data-compte-statut]').textContent = c.profil ? '' : 'Ce compte n’a pas encore de profil : il sera créé à l’enregistrement.';
+  $('[data-compte-soirees]').innerHTML = c.inscriptions.length ? c.inscriptions.map((i) => `<li><div><strong>${esc(i.titre)}</strong><small>${esc(i.salon || '')} · ${esc(date(i.date, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }))} · ${esc(PRESENCE[i.statut] || i.statut)}</small></div>
+    ${i.statut === 'cancelled'
+      ? `<button class="btn btn-line" type="button" data-compte-presence="registered" data-event="${esc(i.event_id)}">Réinscrire</button>`
+      : `<button class="btn btn-line" type="button" data-compte-presence="cancelled" data-event="${esc(i.event_id)}">Annuler l’inscription</button>`}</li>`).join('') : '<li>Aucune inscription.</li>';
+  const deja = new Set(c.inscriptions.map((i) => i.event_id));
+  const dispo = (comptes.soirees || []).filter((e) => !deja.has(e.id));
+  $('[data-compte-soiree]').innerHTML = dispo.length
+    ? dispo.map((e) => `<option value="${esc(e.id)}">${esc(e.salon || e.titre)} · ${esc(date(e.date, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }))}${e.statut === 'draft' ? ' (brouillon)' : ''}</option>`).join('')
+    : '<option value="">Aucune autre soirée à venir</option>';
+  $('[data-compte-inscrire]').disabled = !dispo.length;
+  $('[data-compte-liens]').innerHTML = [
+    ...c.annonces.map((a) => `<li><div><strong>Annonce n° ${esc(a.ref)}</strong><small>${esc(ANNONCE[a.status] || a.status)}${a.test ? ' · test' : ''}</small></div><button class="btn btn-line" type="button" data-rencontres-aller="annonces">Voir dans Rencontres</button></li>`),
+    ...c.fiches.map((x) => `<li><div><strong>Fiche de l’outil n° ${esc(x.ref)}</strong><small>${x.retiree ? 'retirée' : x.confirmee ? 'confirmée' : 'en attente de confirmation'}</small></div></li>`),
+  ].join('') || '<li>Ni annonce ni fiche de l’outil liée à ce compte.</li>';
+  $('[data-compte-fiche]').hidden = false;
+  $('[data-compte-fond]').hidden = false;
+}
+function fermerCompte() { compteOuvert = null; $('[data-compte-fiche]').hidden = true; $('[data-compte-fond]').hidden = true; }
+
+$('[data-comptes]').addEventListener('click', (e) => { const l = e.target.closest('[data-compte]'); if (l) ouvrirCompte(l.dataset.compte); });
+$('[data-comptes]').addEventListener('keydown', (e) => { const l = e.target.closest('[data-compte]'); if (l && e.key === 'Enter') ouvrirCompte(l.dataset.compte); });
+$('[data-comptes-cherche]').addEventListener('input', listeComptes);
+$('[data-comptes-filtres]').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-filtre]'); if (!b) return;
+  filtreComptes = b.dataset.filtre;
+  $$('[data-filtre]', $('[data-comptes-filtres]')).forEach((x) => x.classList.toggle('is-on', x === b));
+  listeComptes();
+});
+$('[data-comptes-maj]').addEventListener('click', chargerComptes);
+$('[data-compte-fermer]').addEventListener('click', fermerCompte);
+$('[data-compte-fond]').addEventListener('click', fermerCompte);
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && compteOuvert) fermerCompte(); });
+$('[data-compte-fiche]').addEventListener('click', (e) => { if (e.target.closest('[data-rencontres-aller]')) fermerCompte(); });
+
+$('[data-compte-form]').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = e.target, st = $('[data-compte-statut]');
+  const profil = Object.fromEntries(['real_first_name', 'display_name', 'gender', 'birth_date', 'city', 'country', 'profile_status'].map((k) => [k, f.elements[k].value]));
+  st.textContent = 'Enregistrement…';
+  try {
+    await api({ action: 'comptes_modifier', user_id: compteOuvert, profil });
+    message('Profil enregistré.');
+    await chargerComptes();
+    $('[data-compte-statut]').textContent = 'Enregistré ✓';
+  } catch (err) {
+    st.textContent = { 'Une erreur est survenue. Réessaie dans un instant.': 'Vérifie la date de naissance (18 ans minimum) et réessaie.' }[err.message] || err.message;
+  }
+});
+$('[data-compte-fiche]').addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-compte-presence]'); if (!b) return;
+  if (b.dataset.comptePresence === 'cancelled' && !confirm('Annuler cette inscription ? La personne ne pourra plus entrer à cette soirée (tu pourras la réinscrire).')) return;
+  b.disabled = true;
+  try { await api({ action: 'comptes_inscription', user_id: compteOuvert, event_id: b.dataset.event, statut: b.dataset.comptePresence }); message('Inscription mise à jour.'); await chargerComptes(); }
+  catch (err) { message(err.message, true); b.disabled = false; }
+});
+$('[data-compte-inscrire]').addEventListener('click', async () => {
+  const ev = $('[data-compte-soiree]').value; if (!ev) return;
+  try { await api({ action: 'comptes_inscription', user_id: compteOuvert, event_id: ev, statut: 'registered' }); message('Personne inscrite à la soirée.'); await chargerComptes(); }
+  catch (err) { message(err.message, true); }
+});
+
 // ---------------------------------------------------------------- connexion
 async function demarrer() {
   const { data: { session } } = await supabase.auth.getSession();
@@ -508,7 +646,7 @@ async function demarrer() {
   if (session && !admin) message('Ce compte n’a pas le rôle administratrice.', true);
   if (!admin) return;
   const tab = location.hash.slice(1);
-  ouvrir(['accueil', 'rencontres', 'application', 'ventes', 'produits', 'soirees', 'bilan', 'alertes', 'textes', 'visites'].includes(tab) ? tab : 'accueil');
+  ouvrir(['accueil', 'rencontres', 'comptes', 'application', 'ventes', 'produits', 'soirees', 'bilan', 'alertes', 'textes', 'visites'].includes(tab) ? tab : 'accueil');
   aFaire(); pastilleJournal();
   await charger();
 }
