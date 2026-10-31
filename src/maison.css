@@ -3296,3 +3296,37 @@ label.is-manquant { outline: 2px solid #c0263f; outline-offset: 3px; border-radi
 .disc-numeros.is-ok { background: #e6f2e4; }
 .disc-numeros input { width: 100%; min-height: 46px; border-radius: 12px; border: 1px solid #e0cdb5; padding: 8px 12px; font-size: 16px; margin-top: 4px; }
 .disc-numeros small { color: #6f6152; }
+
+/* Swipe : l'écran s'ouvre directement sur les cartes, comme une appli */
+.swipe-page { padding-top: 6px; }
+.swipe-tete { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; max-width: 560px; margin: 0 auto; padding: 8px 16px 0; }
+.swipe-tete h1 { margin: 0; font-size: clamp(1.5rem, 6vw, 2rem); line-height: 1.1; color: #fff4e6; }
+.swipe-explique { font-size: 14px; color: #f3dcc4; }
+.swipe-explique summary { cursor: pointer; padding: 8px 12px; border: 1px solid rgba(255, 236, 210, .35); border-radius: 999px; list-style: none; min-height: 40px; display: inline-flex; align-items: center; }
+.swipe-explique summary::-webkit-details-marker { display: none; }
+.swipe-explique[open] { flex-basis: 100%; }
+.swipe-explique p { margin: 10px 0 0; line-height: 1.5; color: #f6e7d6; }
+@media (max-width: 600px) {
+  .swipe-app { padding-top: 4px; }
+  .swipe-infos { gap: 6px; margin-bottom: .4rem; }
+  .swipe-infos .swipe-info { padding: 7px 12px; font-size: 14px; }
+  .swipe-filtres-zone { margin-bottom: .3rem; }
+  .swipe-compteur { margin: .2rem 0 .5rem; font-size: 14px; }
+  .swipe-pile { height: min(calc(100dvh - 450px), 560px); min-height: 300px; }
+  .swipe-boutons { margin-top: .7rem; }
+}
+/* Navigation d'appli : une seule porte vers le compte (onglet « Moi » en bas), cibles tactiles confortables */
+@media (max-width: 600px) {
+  .header-actions .account-link { display: none !important; }
+  .barre-app a { font-size: 12px; min-height: 52px; justify-content: center; }
+  .barre-app a { position: relative; }
+  .barre-app [data-barre-point] { position: absolute; top: 6px; right: calc(50% - 16px); width: 9px; height: 9px; border-radius: 50%; background: #ff7a62; box-shadow: 0 0 0 2px #2a0d16; }
+  .site-footer a, .maison-menu-panneau a { display: inline-block; padding: 9px 0; }
+}
+/* Mon espace aux couleurs de la marque (bordeaux et or), comme le reste de l'application */
+body[data-ambiance="espace"] main { --sauge: #c9a15f; --sauge-fonce: #8a1024; }
+body[data-ambiance="espace"] .espace h1 { color: #3d0c18; }
+body[data-ambiance="espace"] .espace h2 { color: #4a1220; }
+body[data-ambiance="espace"] .espace .btn-ink { background: linear-gradient(135deg, #8a1024, #b0263f); border-color: #8a1024; }
+body[data-ambiance="espace"] .espace-admin { background: linear-gradient(180deg, #4a1220, #2a0d16); }
+body[data-ambiance="espace"] .espace .room-name { color: #8a1024; }

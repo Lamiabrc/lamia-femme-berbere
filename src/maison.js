@@ -555,7 +555,6 @@ renderSocials();
     const raw = localStorage.getItem('sb-tybwvxinigahhntfeeur-auth-token');
     if (raw && JSON.parse(raw)?.access_token) {
       const t = a.querySelector('[data-account-texte]'); if (t) t.textContent = 'Mon espace'; else a.textContent = 'Mon espace';
-      const c = document.querySelector('[data-barre-compte] b'); if (c) c.textContent = 'Mon espace';
     }
   } catch { /* stockage indisponible */ }
   // Barre du bas (téléphone) : l'onglet de la page en cours.

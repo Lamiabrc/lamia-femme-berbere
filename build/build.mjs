@@ -201,9 +201,9 @@ function header(room) {
 <nav class="barre-app" aria-label="Raccourcis">
   <a href="/rencontres/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#profils"/></svg>Profils</a>
   <a href="/rencontres/swipe/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur"/></svg>Swipe</a>
-  <a href="/rencontres/#confier"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg>Mon profil</a>
+  <a href="/mon-espace/#discussion" data-barre-messages><svg class="ico" aria-hidden="true"><use href="/icones.svg#bulle"/></svg>Messages<i data-barre-point hidden></i></a>
   <a href="/salon/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#live"/></svg>Live</a>
-  <a href="/mon-espace/" data-barre-compte><svg class="ico" aria-hidden="true"><use href="/icones.svg#compte"/></svg><b>Connexion</b></a>
+  <a href="/mon-espace/" data-barre-compte><svg class="ico" aria-hidden="true"><use href="/icones.svg#compte"/></svg><b>Moi</b></a>
 </nav>`;
 }
 
@@ -743,19 +743,19 @@ page(
   <div data-espace-out hidden>
     <h1>Se connecter</h1>
     <div class="espace-grid">
+      <form class="espace-card espace-card-vedette" data-espace-reset>
+        <h2>Me connecter sans mot de passe</h2>
+        <p>Reçois un lien par email : un clic et tu es dans ton espace. Ça marche aussi si tu as oublié ton mot de passe.</p>
+        <label>Email<input name="email" type="email" autocomplete="email" required></label>
+        <button class="btn btn-ink" type="submit">Recevoir mon lien de connexion</button>
+        <p class="form-status" role="status" data-reset-status></p>
+      </form>
       <form class="espace-card" data-espace-login>
         <h2>J’ai un mot de passe</h2>
         <label>Email<input name="email" type="email" autocomplete="email" required></label>
         <label>Mot de passe<input name="password" type="password" autocomplete="current-password" required></label>
-        <button class="btn btn-ink" type="submit">Me connecter</button>
+        <button class="btn btn-line" type="submit">Me connecter</button>
         <p class="form-status" role="status" data-espace-status></p>
-      </form>
-      <form class="espace-card" data-espace-reset>
-        <h2>Pas encore de mot de passe ?</h2>
-        <p>Tu t’es inscrit·e à une soirée sans mot de passe, ou tu l’as oublié : reçois un lien par email pour en choisir un.</p>
-        <label>Email<input name="email" type="email" autocomplete="email" required></label>
-        <button class="btn btn-line" type="submit">Recevoir le lien</button>
-        <p class="form-status" role="status" data-reset-status></p>
       </form>
       <form class="espace-card" data-espace-signup>
         <h2>Créer mon espace</h2>
@@ -788,6 +788,15 @@ page(
         <label>Confirmer le nouveau mot de passe<input name="password2" type="password" autocomplete="new-password" minlength="8" required></label>
         <button class="btn btn-ink" type="submit">Enregistrer</button>
         <p class="form-status" role="status" data-mdp-status></p>
+      </form>
+    </details>
+    <details class="espace-mdp espace-supprimer">
+      <summary>Supprimer mon compte</summary>
+      <form data-espace-supprimer>
+        <p>Ton profil, tes photos, tes demandes, tes discussions et tes notifications sont effacés pour de bon, et Lamia est prévenue pour effacer ta fiche de son outil. Tes factures sont gardées, comme la loi l’exige. Si tu as un abonnement, résilie-le d’abord (bloc « Mon abonnement »).</p>
+        <label>Écris SUPPRIMER pour confirmer<input name="confirmation" autocomplete="off" required></label>
+        <button class="btn btn-line" type="submit">Supprimer définitivement mon compte</button>
+        <p class="form-status" role="status" data-supprimer-status></p>
       </form>
     </details>
 
@@ -1477,10 +1486,10 @@ page(
     path: '/rencontres/swipe/',
     room: roomBySlug.patio,
     scripts: ['/assets/swipe.js'],
-    body: `<div class="po-app"><section class="po-hero swipe-hero"><div class="po-fond" aria-hidden="true"></div>
-  <p class="po-eyebrow">Les Rencontres</p><h1>Swipe les profils vérifiés</h1>
-  <p class="po-lead">À droite (cœur) s’il t’intéresse, à gauche (croix) sinon, sans limite. Ton identité reste secrète : on ne voit que des numéros de profil. Si vous vous choisissez tous les deux, Lamia est prévenue et vous met en relation.</p>
-</section>
+    body: `<div class="po-app swipe-page"><header class="swipe-tete">
+  <h1>💘 Swipe</h1>
+  <details class="swipe-explique"><summary>Comment ça marche ?</summary><p>À droite (cœur) s’il t’intéresse, à gauche (croix) sinon, sans limite. Ton identité reste secrète : on ne voit que des numéros de profil. Si vous vous choisissez tous les deux, Lamia est prévenue et vous met en relation.</p></details>
+</header>
 <div class="swipe-app">
   <div class="swipe-infos" data-swipe-infos></div>
   <div class="swipe-filtres-zone" data-swipe-filtres></div>

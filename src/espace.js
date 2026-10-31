@@ -170,9 +170,11 @@ $('[data-espace-login]').addEventListener('submit', async (e) => {
 $('[data-espace-reset]').addEventListener('submit', async (e) => {
   e.preventDefault();
   const f = new FormData(e.target), st = $('[data-reset-status]');
-  const { error } = await supabase.auth.resetPasswordForEmail(f.get('email'), { redirectTo: `${location.origin}${document.documentElement.lang === 'en' ? '/en' : ''}/mon-espace/` });
-  if (error) return say(st, /rate limit/i.test(error.message) ? 'Trop de demandes en ce moment. Réessaie dans une heure.' : 'L’envoi n’a pas fonctionné. Réessaie plus tard.', true);
-  say(st, 'Si un espace existe avec cet email, un lien vient de partir. Pense à regarder tes courriers indésirables.');
+  // Connexion sans mot de passe : un lien par email (le lien connecte directement ; le mot de passe se change ensuite dans l'espace).
+  const { error } = await supabase.auth.signInWithOtp({ email: String(f.get('email')).trim(), options: { emailRedirectTo: `${location.origin}${document.documentElement.lang === 'en' ? '/en' : ''}/mon-espace/`, shouldCreateUser: false } });
+  if (error && /signups? not allowed|not found|user/i.test(error.message)) return say(st, 'Aucun espace n’existe avec cet email. Crée-le juste en dessous, c’est rapide.', true);
+  if (error) return say(st, /rate limit|seconds/i.test(error.message) ? 'Un lien vient déjà de partir. Attends une minute avant d’en redemander un.' : 'L’envoi n’a pas fonctionné. Réessaie plus tard.', true);
+  say(st, '📩 C’est parti ! Ouvre l’email que tu viens de recevoir et clique sur le lien (pense aux courriers indésirables).');
 });
 
 $('[data-espace-newpass]').addEventListener('submit', async (e) => {
@@ -415,3 +417,24 @@ async function discussions(session) {
   });
   box.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && e.target.matches('textarea')) { e.preventDefault(); e.target.form.requestSubmit(); } });
 }
+
+
+// ---------------------------------------------------------------- supprimer mon compte
+document.querySelector('[data-espace-supprimer]')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const st = document.querySelector('[data-supprimer-status]'), bouton = e.target.querySelector('button');
+  const confirmation = String(new FormData(e.target).get('confirmation') || '').trim();
+  if (confirmation.toUpperCase() !== 'SUPPRIMER') return say(st, 'Écris SUPPRIMER pour confirmer.', true);
+  if (!confirm('Supprimer définitivement ton compte ? Ce n’est pas réversible.')) return;
+  bouton.disabled = true;
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    await appelProfil({ action: 'annonce_supprimer_compte', confirmation }, session);
+    await supabase.auth.signOut().catch(() => {});
+    say(st, 'Ton compte est supprimé. Merci d’être passé·e chez Lamia, prends soin de toi.');
+    setTimeout(() => { location.href = '/'; }, 2500);
+  } catch (err) {
+    bouton.disabled = false;
+    say(st, err.code === 'abonnement_actif' ? 'Tu as un abonnement en cours : résilie-le d’abord dans « Mon abonnement », puis reviens ici.' : 'La suppression n’a pas fonctionné. Réessaie, ou écris à Lamia.', true);
+  }
+});
