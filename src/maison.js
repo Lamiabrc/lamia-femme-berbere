@@ -808,3 +808,23 @@ document.querySelectorAll('.lang-link').forEach((a) => {
   fetch('/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'annonce_nouveautes' }) })
     .then((r) => r.json()).then((r) => { const d = r.nouveautes?.[0]?.created_at || null; try { sessionStorage.setItem('lfb-nouveautes-der', JSON.stringify({ t: Date.now(), d })); } catch { /* */ } montrer(d); }).catch(() => {});
 })();
+
+// ---------------------------------------------------------------- bandeau d'alerte : soirée de speed dating imminente, places restantes par salon
+(function bandeauSoiree() {
+  if (/^\/(confidences-lamia|admin|tableau)/.test(location.pathname)) return;
+  try { if (sessionStorage.getItem('lfb-bandeau-ferme')) return; } catch { /* */ }
+  fetch('/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'annonce_places_bal' }) })
+    .then((r) => r.json()).then(({ soirees = [] }) => {
+      if (!soirees.length) return;
+      const s0 = soirees[0], d = new Date(s0.debut), maintenant = new Date();
+      const memeJour = d.toDateString() === maintenant.toDateString();
+      const heure = d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' }).replace(':00', ' h').replace(':', ' h ');
+      const quand = maintenant >= d ? 'En ce moment' : memeJour ? `Ce soir ${heure}` : `${d.toLocaleDateString('fr-FR', { weekday: 'long', timeZone: 'Europe/Paris' })} ${heure}`;
+      const salons = soirees.map((x) => `<span class="bandeau-salon">${(x.salon || '').replace(/^Grand salon · /, '')} : <b>${x.complet || !x.places ? 'complet' : `plus que ${x.places} place${x.places > 1 ? 's' : ''}`}</b></span>`).join('');
+      const b = document.createElement('div');
+      b.className = 'bandeau-soiree'; b.setAttribute('role', 'region'); b.setAttribute('aria-label', 'Soirée de speed dating');
+      b.innerHTML = `<p><span class="bandeau-masque" aria-hidden="true"></span><strong>${quand} · ${s0.titre}</strong><span class="bandeau-detail">Speed dating en visio${s0.gratuit ? ', gratuit' : ''}</span>${salons}</p><a class="bandeau-btn" href="/speed-dating/#events-title">Je m’inscris</a><button type="button" class="bandeau-fermer" aria-label="Fermer">×</button>`;
+      document.querySelector('.site-header')?.after(b);
+      b.querySelector('.bandeau-fermer').addEventListener('click', () => { b.remove(); try { sessionStorage.setItem('lfb-bandeau-ferme', '1'); } catch { /* */ } });
+    }).catch(() => {});
+})();

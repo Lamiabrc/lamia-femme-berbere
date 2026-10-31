@@ -3262,3 +3262,17 @@ label.is-manquant { outline: 2px solid #c0263f; outline-offset: 3px; border-radi
 .proposition { border-left: 4px solid #c8902e; }
 .proposition-mot { font-style: italic; color: #7a4b12; }
 .proposition-mot small { font-style: normal; font-weight: 700; margin-left: 4px; }
+
+/* Bandeau d'alerte : soirée imminente */
+.bandeau-soiree { position: sticky; top: 64px; z-index: 39; display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: linear-gradient(90deg, #3a0814, #6d1028 55%, #3a0814); color: #fbe9c8; border-bottom: 1px solid #c8902e; box-shadow: 0 8px 20px -12px rgba(0,0,0,.6); font: 500 14px/1.4 Inter, system-ui, sans-serif; }
+.bandeau-soiree p { flex: 1; margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; color: #fbe9c8 !important; }
+.bandeau-soiree strong { color: #ffd27a; }
+.bandeau-detail { opacity: .85; }
+.bandeau-salon { padding: 2px 10px; border-radius: 999px; background: rgba(255,210,122,.14); border: 1px solid rgba(255,210,122,.4); }
+.bandeau-salon b { color: #fff; }
+.bandeau-masque { width: 26px; height: 14px; flex: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 32'%3E%3Cpath d='M2 8c10-6 20-4 30 4C42 4 52 2 62 8c0 12-8 20-18 20-6 0-9-4-12-8-3 4-6 8-12 8C10 28 2 20 2 8Z' fill='%23e3bd6e'/%3E%3Cellipse cx='19' cy='15' rx='6' ry='4' fill='%233a0814'/%3E%3Cellipse cx='45' cy='15' rx='6' ry='4' fill='%233a0814'/%3E%3C/svg%3E") center / contain no-repeat; }
+.bandeau-btn { flex: none; padding: 8px 16px; border-radius: 999px; background: linear-gradient(90deg, #e3a33a, #ffd27a); color: #3a0814 !important; font-weight: 800; text-decoration: none; white-space: nowrap; animation: bandeau-pulse 2.4s ease-in-out infinite; }
+@keyframes bandeau-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(255,210,122,.5); } 50% { box-shadow: 0 0 0 7px rgba(255,210,122,0); } }
+.bandeau-fermer { flex: none; border: 0; background: none; color: #fbe9c8; font-size: 22px; line-height: 1; cursor: pointer; padding: 0 4px; }
+@media (max-width: 640px) { .bandeau-soiree { top: 56px; font-size: 13px; padding: 8px 12px; gap: 8px; } .bandeau-detail { display: none; } .bandeau-btn { padding: 7px 12px; } }
+@media (prefers-reduced-motion: reduce) { .bandeau-btn { animation: none; } }
