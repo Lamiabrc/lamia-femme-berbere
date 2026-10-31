@@ -131,6 +131,9 @@
         </div>
         <p id="wishes" style="margin-top:12px"></p>
         <table><thead><tr><th>Souhait réciproque</th><th>Emails</th></tr></thead><tbody id="mutual"></tbody></table>
+        <h2>Tous les souhaits</h2>
+        <p style="font-size:14px;color:#b8a98f">Ce que chaque participant a coché, même si ce n’est pas réciproque. 💞 = réciproque. Personne d’autre ne voit cette liste.</p>
+        <table><thead><tr><th>Participant</th><th>Aimerait revoir</th><th>Son mot</th><th>Avis sur le bal</th></tr></thead><tbody id="souhaits"></tbody></table>
       </div>
     </div>
   </section>
@@ -183,6 +186,8 @@ function paint(d) {
   // Fin du tour : si Lamia était en visite, elle revient au salon d'attente.
   if (salleActuelle && s.phase !== 'tour' && cadre) openRoom();
   $('#wishes').textContent = `${d.wishes_count} personne${d.wishes_count > 1 ? 's ont' : ' a'} envoyé ses souhaits.`;
+  const AV = { oui: 'oui', moyen: 'moyen', non: 'non', 'peut-etre': 'peut-être' };
+  $('#souhaits').innerHTML = (d.souhaits || []).map((w) => `<tr><td><b>${esc(w.nom)}</b><br><small style="color:#b8a98f">${esc(w.salon)} · ${w.rencontres} tête-à-tête</small></td><td>${w.choix.length ? w.choix.map((c) => `${esc(c.nom)}${c.reciproque ? ' 💞' : ''}`).join(', ') : '<span style="color:#b8a98f">personne</span>'}</td><td>${esc(w.message)}</td><td><small>${[w.avis.aime && `a aimé : ${AV[w.avis.aime]}`, w.avis.reviendrait && `reviendrait : ${AV[w.avis.reviendrait]}`, w.avis.paierait && `paierait : ${AV[w.avis.paierait]}`].filter(Boolean).join('<br>')}</small></td></tr>`).join('') || '<tr><td colspan="4">Personne n’a encore envoyé ses souhaits.</td></tr>';
   $('#mutual').innerHTML = d.mutual.map(([a, b]) => `<tr><td>${esc(a.name)} et ${esc(b.name)}</td><td>${esc(a.email || '')} · ${esc(b.email || '')}</td></tr>`).join('') || '<tr><td colspan="2">Pas encore de souhait réciproque.</td></tr>';
 }
 
