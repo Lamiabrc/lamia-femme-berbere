@@ -811,6 +811,12 @@ page(
       <div class="espace-profil" data-espace-fiches></div>
     </section>
 
+    <section id="discussion" data-espace-discussion-bloc hidden>
+      <h2>💬 Ma discussion</h2>
+      <p>Lamia vous a mis en relation : vous avez 7 jours pour faire connaissance ici, en privé. Quand vous êtes prêts, échangez vos numéros pour passer au téléphone. Lamia ne lit pas vos messages, sauf si l’un de vous la signale.</p>
+      <div data-espace-discussion></div>
+    </section>
+
     <section id="propositions">
       <h2>Profils proposés par Lamia</h2>
       <p>Lamia a choisi pour toi des profils qui pourraient te correspondre. Leur fiche est anonyme. Dis-lui s’ils t’intéressent : si l’autre personne dit oui aussi, Lamia vous met en relation.</p>
@@ -1395,7 +1401,7 @@ page(
   '/abonnement/',
   layout({
     title: 'Abonnement · Trouve ton âme sœur avec Lamia',
-    description: 'Les formules de Lamia pour trouver ton âme sœur : Découverte gratuite, Cœur, Passion et Prestige. Mises en relation, speed datings inclus, sans engagement.',
+    description: 'Les formules de Lamia pour trouver ton âme sœur : Découverte gratuite, Passion à 9 € et Prestige à 22 € par mois. Mises en relation, speed datings inclus, sans engagement.',
     path: '/abonnement/',
     room: roomBySlug.patio,
     scripts: ['/assets/abonnement.js'],

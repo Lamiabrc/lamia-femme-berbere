@@ -156,3 +156,5 @@
 .tdb-notifs { display: grid; gap: 8px; }
 .tdb-notifs label { display: flex; gap: 8px; align-items: flex-start; font-size: 15px; }
 .tdb-notifs input { width: 18px; height: 18px; margin-top: 2px; flex: none; }
+.tdb-disc-lue { margin-top: 12px; padding: 10px 12px; border-radius: 12px; background: #fff3e2; max-height: 50vh; overflow: auto; }
+.tdb-disc-lue p { margin: 6px 0; }

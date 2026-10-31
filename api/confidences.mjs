@@ -27,6 +27,11 @@ export async function GET(request) {
   const secret = process.env.CRON_SECRET;
   const ok = secret ? request.headers.get('authorization') === `Bearer ${secret}` : /vercel-cron/i.test(request.headers.get('user-agent') || '');
   if (!ok) return json({ error: 'forbidden' }, 403);
-  try { return json({ ok: true, ...(await envoyerNouveautes()) }); }
+  try {
+    const nouveautes = await envoyerNouveautes();
+    // Rappel aux discussions qui se terminent demain.
+    const r = await handleConfidences(new Request('https://lamia-femme-berbere.com/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'annonce_rappels_cron' }) }), { cron: true }).catch(() => null);
+    return json({ ok: true, ...nouveautes, rappels: r ? (await r.json().catch(() => ({}))).rappels ?? null : null });
+  }
   catch (e) { console.error('nouveautes failed', e?.message); return json({ error: 'temporary_failure' }, 502); }
 }

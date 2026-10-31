@@ -117,6 +117,7 @@ async function chargerJournal() {
     $('[data-retraits]').innerHTML = d.retraits.map((r) => `<li><span>${r.source === 'fiche' ? 'Fiche' : 'Profil'} n° ${r.ref} · ${r.genre === 'femme' ? 'femme' : 'homme'}${r.age ? `, ${r.age} ans` : ''}${r.lieu ? `, ${esc(r.lieu)}` : ''}<br><small>${esc(date(r.quand))} · ${r.effacement ? (r.fait ? 'effacée ✓' : '<b>veut être effacée de ton outil</b>') : 'ne veut plus apparaître sur le site (reste dans ton outil)'}</small></span>${r.effacement && !r.fait ? `<button type="button" class="btn btn-ink" data-effacement-fait="${r.ref}">C’est fait</button>` : ''}</li>`).join('') || '<li>Personne pour le moment.</li>';
     $('[data-appareils]').textContent = `Tes appareils qui reçoivent les alertes : ${d.appareils.lamia}. Membres abonnés aux notifications : ${d.appareils.membres}.`;
     $('[data-notifs-lamia]').innerHTML = Object.entries(cats).map(([k, c]) => `<label><input type="checkbox" name="${k}" ${d.notifs[k] ? 'checked' : ''}> <span>${c.emoji} ${esc(c.nom)}</span></label>`).join('') + '<p class="aide">Enregistré dès que tu coches. Les « matchs demandés » restent visibles ici et dans « Aujourd’hui ».</p>';
+    chargerDiscussions();
     if (d.non_lus) { await conf({ action: 'annonce_journal_lu' }).catch(() => {}); $('[data-journal-pastille]').hidden = true; }
   } catch { box.innerHTML = '<li>Le journal ne s’affiche pas pour le moment.</li>'; }
 }
@@ -131,6 +132,17 @@ document.addEventListener('click', async (e) => {
     try { await conf({ action: 'annonce_effacement_fait', ref: Number(ef.dataset.effacementFait) }); message('Effacement noté.'); chargerJournal(); } catch { message('L’effacement n’a pas pu être noté.', true); }
   }
 });
+const ETATS_DISC = { ouverte: '🟢 en cours', numeros: '📞 numéros échangés', terminee: 'terminée sans échange', dematch: 'dématché', signalee: '🚩 signalée' };
+async function chargerDiscussions(id = null) {
+  const box = $('[data-discussions]');
+  try {
+    const d = await conf({ action: 'annonce_discussions_admin', id });
+    box.innerHTML = d.discussions.map((x) => `<li><span>n° ${x.a_ref} ${esc(x.a_prenom || '')} ↔ n° ${x.b_ref} ${esc(x.b_prenom || '')}<br><small>${esc(ETATS_DISC[x.etat] || x.etat)} · ${x.messages} message(s) · depuis le ${esc(date(x.ouverte_at, { day: 'numeric', month: 'short' }))}</small></span>${x.etat === 'signalee' ? `<button type="button" class="btn btn-ink" data-lire-discussion="${esc(x.id)}">Lire</button>` : ''}</li>`).join('') || '<li>Aucune discussion pour le moment.</li>';
+    const lue = $('[data-discussion-lue]');
+    if (d.messages) { const x = d.discussions.find((y) => y.id === id); lue.hidden = false; lue.innerHTML = `<h3>Discussion signalée</h3>${d.messages.map((m) => `<p><small><b>${esc(m.qui)}</b> · ${esc(date(m.created_at))}</small><br>${esc(m.texte)}</p>`).join('') || '<p>Aucun message.</p>'}`; void x; }
+  } catch { box.innerHTML = '<li>Les discussions ne s’affichent pas pour le moment.</li>'; }
+}
+document.addEventListener('click', (e) => { const b = e.target.closest('[data-lire-discussion]'); if (b) chargerDiscussions(b.dataset.lireDiscussion); });
 document.addEventListener('change', async (e) => {
   const form = e.target.closest('[data-notifs-lamia]');
   if (!form) return;

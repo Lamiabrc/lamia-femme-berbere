@@ -127,7 +127,7 @@ test('swipe sans limite ; matchs : 1 à la fois en Découverte, 3 avec une formu
   assert.equal((await r.json()).error, 'limite_matchs');
   r = await handleAnnonces('annonce_swipe', { ref: 31, choix: 'oui' }, c('passion', 1));
   assert.equal(r.status, 200);
-  r = await handleAnnonces('annonce_swipe', { ref: 32, choix: 'oui' }, c('coeur', 3));
+  r = await handleAnnonces('annonce_swipe', { ref: 32, choix: 'oui' }, c('passion', 3));
   assert.equal(r.status, 409);
   db.annonces[0].matchs_bonus = 1;
   r = await handleAnnonces('annonce_swipe', { ref: 33, choix: 'oui' }, c('decouverte', 1));

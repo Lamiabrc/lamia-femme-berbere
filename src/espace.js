@@ -24,6 +24,7 @@ async function render() {
   mesFiches(session);
   interetsRecus(session);
   propositions(session);
+  discussions(session);
   const { data } = await supabase.from('event_registrations')
     .select('attendance_status, speed_dating_events(title, audience, starts_at)')
     .neq('attendance_status', 'cancelled');
@@ -101,7 +102,8 @@ async function monProfil(session) {
 }
 
 // Suivi : mises en relation offertes et du mois, speed datings inclus, demandes envoyées.
-const QUOTAS = { coeur: { nom: 'Cœur', mises: 3, sd: 1 }, passion: { nom: 'Passion', mises: null, sd: 2 }, prestige: { nom: 'Prestige', mises: null, sd: 2 } };
+// « coeur » : ancienne formule (supprimée le 31/10/2026), gardée pour un éventuel ancien abonnement.
+const QUOTAS = { coeur: { nom: 'Cœur', mises: 3, sd: 1 }, passion: { nom: 'Passion', mises: 3, sd: 1 }, prestige: { nom: 'Prestige', mises: null, sd: 2 } };
 const ETAT_DEMANDE = { a_traiter: '⏳ Lamia étudie la compatibilité', mis_en_relation: '💞 Mise en relation faite', en_reserve: '🗂 Gardé en réserve : Lamia te le reproposera si ton match se termine', pas_compatible: 'Pas compatible, désolée', dematche: 'Match terminé' };
 async function suivi(el, p) {
   const etat = await etatAbo;
@@ -348,3 +350,68 @@ async function interetsRecus(session) {
   });
   supabase.auth.getSession().then(({ data: { session } }) => { if (session) etat(); });
 })();
+
+
+// ---------------------------------------------------------------- discussion après une mise en relation (7 jours, puis échange des numéros)
+async function discussions(session) {
+  const bloc = document.querySelector('[data-espace-discussion-bloc]'), box = document.querySelector('[data-espace-discussion]');
+  if (!bloc || !box) return;
+  let liste = [], ouverte = null, minuterie = null;
+  const heure = (d) => new Date(d).toLocaleString('fr-FR', { weekday: 'short', hour: '2-digit', minute: '2-digit' });
+  const reste = (d) => { const ms = new Date(d.ferme_at) - Date.now(); if (ms <= 0) return 'terminée'; const j = Math.floor(ms / 86400e3), h = Math.floor((ms % 86400e3) / 3600e3); return j ? `encore ${j} jour${j > 1 ? 's' : ''}${h ? ` et ${h} h` : ''}` : `encore ${h} h`; };
+  const vue = (d) => {
+    const msgs = d.messages.map((m) => `<p class="disc-msg ${m.moi ? 'is-moi' : ''}"><span>${esc(m.texte)}</span><small>${esc(heure(m.le))}</small></p>`).join('') || `<p class="disc-vide">Dis bonjour à ${esc(d.avec)} 👋</p>`;
+    const numeros = d.echange
+      ? `<div class="disc-numeros is-ok">📞 Vous avez échangé vos numéros. Celui de ${esc(d.avec)} : <a href="tel:${esc(d.son_numero)}"><strong>${esc(d.son_numero)}</strong></a></div>`
+      : d.mon_numero
+        ? `<div class="disc-numeros">📞 Tu as donné ton numéro. ${esc(d.avec)} le verra dès qu’il ou elle aura donné le sien${d.il_a_partage ? '' : ' (on l’a prévenu·e)'}.</div>`
+        : d.ouverte ? `<form class="disc-numeros" data-disc-numero><label>📞 ${d.il_a_partage ? `<strong>${esc(d.avec)} a donné son numéro</strong> : donne le tien pour le voir` : 'Prêt·e à passer au téléphone ? Donne ton numéro'} <input name="telephone" type="tel" autocomplete="tel" placeholder="06 12 34 56 78" required></label><button class="btn btn-ink" type="submit">Échanger nos numéros</button><small>Ton numéro n’est montré que quand vous l’avez donné tous les deux.</small></form>` : '';
+    return `<article class="disc" data-disc="${esc(d.id)}">
+      <header class="disc-tete"><strong>Avec ${esc(d.avec)}</strong><span>${d.ouverte ? `⏳ ${esc(reste(d))}` : d.close_raison === 'signalee' ? 'fermée (signalée)' : d.close_raison ? 'fermée' : 'terminée'}</span></header>
+      <div class="disc-fil" data-disc-fil>${msgs}</div>
+      ${d.ouverte ? `<form class="disc-saisie" data-disc-envoi><textarea name="texte" rows="2" maxlength="1000" placeholder="Ton message…" required></textarea><button class="btn btn-ink" type="submit">Envoyer</button></form>
+      <p class="disc-aide">Pour ta sécurité, les numéros, liens et emails écrits dans les messages sont masqués : utilise le bouton ci-dessous pour échanger vos numéros.</p>` : ''}
+      ${numeros}
+      ${d.ouverte ? '<p><button type="button" class="link-button" data-disc-signaler>🚩 Signaler un problème à Lamia</button></p>' : ''}
+    </article>`;
+  };
+  const afficher = () => {
+    bloc.hidden = !liste.length;
+    if (!liste.length) return;
+    const brouillons = Object.fromEntries([...box.querySelectorAll('[data-disc]')].map((a) => [a.dataset.disc, a.querySelector('textarea')?.value || '']));
+    box.innerHTML = liste.map(vue).join('');
+    box.querySelectorAll('[data-disc]').forEach((a) => { const t = a.querySelector('textarea'); if (t && brouillons[a.dataset.disc]) t.value = brouillons[a.dataset.disc]; const f = a.querySelector('[data-disc-fil]'); f.scrollTop = f.scrollHeight; });
+  };
+  const charger = async () => { try { ({ discussions: liste = [] } = await appelProfil({ action: 'annonce_discussions' }, session)); afficher(); } catch { /* */ } };
+  await charger();
+  if (location.hash === '#discussion' && liste.length) bloc.scrollIntoView({ behavior: 'smooth' });
+  // Les nouveaux messages arrivent toutes les 10 secondes tant que la page est ouverte.
+  if (liste.some((d) => d.ouverte)) minuterie = setInterval(() => { if (!document.hidden && !box.contains(document.activeElement)) charger(); }, 10000);
+  box.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const a = e.target.closest('[data-disc]'), id = a?.dataset.disc;
+    const bouton = e.target.querySelector('button'); bouton.disabled = true;
+    try {
+      if (e.target.matches('[data-disc-envoi]')) {
+        const texte = e.target.texte.value.trim();
+        const r = await appelProfil({ action: 'annonce_discussion_envoyer', id, texte }, session);
+        e.target.texte.value = '';
+        if (r.masque) alert('Un numéro, un lien ou un email a été masqué dans ton message. Pour passer au téléphone, utilise « Échanger nos numéros ».');
+      } else if (e.target.matches('[data-disc-numero]')) {
+        await appelProfil({ action: 'annonce_discussion_numero', id, telephone: e.target.telephone.value }, session);
+      }
+      await charger();
+    } catch (err) {
+      alert(err.code === 'telephone_invalide' ? 'Ce numéro ne semble pas valide. Exemple : 06 12 34 56 78 ou +213 5 12 34 56 78.' : err.code === 'discussion_fermee' ? 'Cette discussion est terminée.' : err.code === 'rate_limited' ? 'Doucement 🙂 Réessaie dans quelques minutes.' : 'Le message n’est pas parti. Réessaie.');
+    }
+    bouton.disabled = false;
+  });
+  box.addEventListener('click', async (e) => {
+    if (!e.target.closest('[data-disc-signaler]')) return;
+    const id = e.target.closest('[data-disc]').dataset.disc;
+    const motif = prompt('Que s’est-il passé ? La discussion sera fermée et Lamia la lira.');
+    if (motif === null) return;
+    try { await appelProfil({ action: 'annonce_discussion_signaler', id, motif }, session); clearInterval(minuterie); await charger(); alert('Merci. Lamia est prévenue.'); } catch { alert('Le signalement n’est pas parti. Réessaie.'); }
+  });
+  box.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && e.target.matches('textarea')) { e.preventDefault(); e.target.form.requestSubmit(); } });
+}

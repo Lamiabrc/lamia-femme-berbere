@@ -10,11 +10,11 @@ const fauxStripe = () => { const appels = []; return { appels, checkout: { sessi
 const vide = async () => ({ ok: true, json: async () => [] });
 
 test('les prix suivent la formule choisie par Lamia', () => {
-  assert.deepEqual(FORMULES.map((f) => [f.id, f.mois]), [['decouverte', 0], ['coeur', 1490], ['passion', 2990], ['prestige', 5900]]);
-  assert.equal(prixAnnuel(FORMULES[2]), 29900);
+  assert.deepEqual(FORMULES.map((f) => [f.id, f.mois]), [['decouverte', 0], ['passion', 900], ['prestige', 2200]]);
+  assert.equal(prixAnnuel(FORMULES[2]), 22000);
 });
 test('abonnement mensuel et annuel : prix relus côté serveur', async () => {
-  for (const [periode, montant, intervalle] of [['mois', 2990, 'month'], ['an', 29900, 'year']]) {
+  for (const [periode, montant, intervalle] of [['mois', 900, 'month'], ['an', 9000, 'year']]) {
     const s = fauxStripe();
     const r = await actionAbonnement({ ...base, formule: 'passion', periode, prix: 1 }, req, { env, fetcher: vide, stripe: s });
     assert.equal(r.status, 200);
@@ -29,12 +29,12 @@ test('abonnement mensuel et annuel : prix relus côté serveur', async () => {
 test('formule gratuite, CGV absentes ou paiement fermé : aucun paiement', async () => {
   const s = fauxStripe();
   assert.equal((await actionAbonnement({ ...base, formule: 'decouverte' }, req, { env, fetcher: vide, stripe: s })).status, 400);
-  assert.equal((await actionAbonnement({ ...base, cgv_accepted: false, formule: 'coeur' }, req, { env, fetcher: vide, stripe: s })).status, 400);
-  assert.equal((await actionAbonnement({ ...base, formule: 'coeur' }, req, { env: { ...env, CHECKOUT_ENABLED: 'false' }, fetcher: vide, stripe: s })).status, 503);
+  assert.equal((await actionAbonnement({ ...base, cgv_accepted: false, formule: 'passion' }, req, { env, fetcher: vide, stripe: s })).status, 400);
+  assert.equal((await actionAbonnement({ ...base, formule: 'passion' }, req, { env: { ...env, CHECKOUT_ENABLED: 'false' }, fetcher: vide, stripe: s })).status, 503);
   assert.equal(s.appels.length, 0);
 });
 test('déjà abonné : pas de second abonnement', async () => {
-  const fetcher = async (u) => ({ ok: true, json: async () => (u.includes('abonnements?') ? [{ formule: 'coeur', statut: 'actif' }] : []) });
+  const fetcher = async (u) => ({ ok: true, json: async () => (u.includes('abonnements?') ? [{ formule: 'passion', statut: 'actif' }] : []) });
   const r = await actionAbonnement({ ...base, formule: 'passion' }, req, { env, fetcher, stripe: fauxStripe() });
   assert.equal(r.status, 409);
 });
@@ -67,10 +67,10 @@ test('état : crédits à l’unité restants', async () => {
 test('retour de paiement : la session est relue chez Stripe puis enregistrée', async () => {
   const ecrits = [];
   const fetcher = async (u, o = {}) => { ecrits.push([u, o.method]); return { ok: true, json: async () => (u.includes('on_conflict') ? [{}] : []) }; };
-  const stripe = { checkout: { sessions: { retrieve: async () => ({ id: 'cs_test_1', status: 'complete', payment_status: 'paid', livemode: false, subscription: 'sub_9', customer: 'cus_9', customer_email: 'a@b.fr', metadata: { kind: 'abonnement', formule: 'coeur', periode: 'mois' } }) } }, subscriptions: { retrieve: async () => ({ id: 'sub_9', status: 'active', items: { data: [{ current_period_end: 1800000000 }] }, metadata: { kind: 'abonnement' } }) } };
+  const stripe = { checkout: { sessions: { retrieve: async () => ({ id: 'cs_test_1', status: 'complete', payment_status: 'paid', livemode: false, subscription: 'sub_9', customer: 'cus_9', customer_email: 'a@b.fr', metadata: { kind: 'abonnement', formule: 'passion', periode: 'mois' } }) } }, subscriptions: { retrieve: async () => ({ id: 'sub_9', status: 'active', items: { data: [{ current_period_end: 1800000000 }] }, metadata: { kind: 'abonnement' } }) } };
   const r = await actionAbonnement({ action: 'abonnement_confirmer', session_id: 'cs_test_1' }, req, { env, fetcher, stripe });
   const d = await r.json();
-  assert.equal(d.statut, 'paye'); assert.equal(d.nom, 'Cœur');
+  assert.equal(d.statut, 'paye'); assert.equal(d.nom, 'Passion');
   assert(ecrits.some(([u]) => u.includes('abonnements?on_conflict')));
   assert(ecrits.some(([u, m]) => u.includes('stripe_subscription_id=eq.sub_9') && m === 'PATCH'));
   const faux = await actionAbonnement({ action: 'abonnement_confirmer', session_id: 'pas_une_session' }, req, { env, fetcher, stripe });
