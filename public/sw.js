@@ -1,7 +1,7 @@
 // Service worker de la Maison : application installable (page hors ligne) et notifications.
 // Il ne met jamais en cache les données, les paiements ni les espaces privés : tout passe par le réseau.
 const HORS_LIGNE = '/hors-ligne/';
-const CACHE = 'maison-v4';
+const CACHE = 'maison-v5';
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll([HORS_LIGNE, '/images/marque/maison-icone-192.png'])).catch(() => {}));
   self.skipWaiting();
@@ -25,8 +25,8 @@ self.addEventListener('push', (event) => {
       body: d.body || 'Ouvre ton espace pour la lire.',
       tag: d.tag || 'confidences',
       renotify: true,
-      icon: d.icon || '/images/marque/confidences-icone-192.png',
-      badge: d.icon || '/images/marque/confidences-icone-192.png',
+      icon: d.icon || '/images/marque/notif-lfb.png',
+      badge: '/images/marque/badge-lfb.png',
       data: { url: d.url || '/confidences-lamia/' },
     });
     if (self.navigator?.setAppBadge) self.navigator.setAppBadge().catch(() => {});
