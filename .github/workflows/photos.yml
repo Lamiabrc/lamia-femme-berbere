@@ -1,0 +1,25 @@
+name: photos
+on: push
+jobs:
+  dl:
+    if: contains(github.event.head_commit.message, '[photos]')
+    runs-on: ubuntu-latest
+    permissions: { contents: write }
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          mkdir -p tmp-photos
+          for id in B1Cxgp8muFo mCq14_JRNZM XRzUf1SGWEI UTRSA1oMREM t6GwIFrW70w zozHHQSlO5M JWviCf8pUNI b12aZke0oA8 syIiWozXZXA JspLp0iej_A K2u71wv2eI4 tcbaEUPu2AA wpOUt1_ig1g GbzBbDiUjf0 UCO_F89lL04 X1exjxxBho4 4iCKcpzGABc 0ICcSSgR3Fw pksGryThsgQ DS1so8zGgNM; do
+            curl -sSL -A "Mozilla/5.0" -o "tmp-photos/u-$id.jpg" "https://unsplash.com/photos/$id/download?force=true&w=1800" || true
+            file "tmp-photos/u-$id.jpg"
+          done
+          for id in 32657873 37955490 33757392 33757377 33757338 33757113 33757051 32658052 32657939 29862773; do
+            curl -sSL -A "Mozilla/5.0" -o "tmp-photos/p-$id.jpg" "https://images.pexels.com/photos/$id/pexels-photo-$id.jpeg?auto=compress&cs=tinysrgb&w=1800" || true
+            file "tmp-photos/p-$id.jpg"
+          done
+          find tmp-photos -type f ! -exec sh -c 'file -b "$1" | grep -q JPEG' _ {} \; -delete
+          ls -la tmp-photos
+      - run: |
+          git config user.name "github-actions"; git config user.email "actions@github.com"
+          git checkout -b photos-brutes
+          git add tmp-photos && git commit -m "photos brutes" && git push -f origin photos-brutes
