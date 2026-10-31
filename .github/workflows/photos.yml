@@ -9,11 +9,11 @@ jobs:
       - uses: actions/checkout@v4
       - run: |
           mkdir -p tmp-photos
-          for id in B1Cxgp8muFo mCq14_JRNZM XRzUf1SGWEI UTRSA1oMREM t6GwIFrW70w zozHHQSlO5M JWviCf8pUNI b12aZke0oA8 syIiWozXZXA JspLp0iej_A K2u71wv2eI4 tcbaEUPu2AA wpOUt1_ig1g GbzBbDiUjf0 UCO_F89lL04 X1exjxxBho4 4iCKcpzGABc 0ICcSSgR3Fw pksGryThsgQ DS1so8zGgNM; do
+          for id in B1Cxgp8muFo; do
             curl -sSL -A "Mozilla/5.0" -o "tmp-photos/u-$id.jpg" "https://unsplash.com/photos/$id/download?force=true&w=1800" || true
             file "tmp-photos/u-$id.jpg"
           done
-          for id in 32657873 37955490 33757392 33757377 33757338 33757113 33757051 32658052 32657939 29862773; do
+          for id in 1998441 11588968 3618162 1753922 22185 9884687 3923073 6184491 32657873 37955490; do
             curl -sSL -A "Mozilla/5.0" -o "tmp-photos/p-$id.jpg" "https://images.pexels.com/photos/$id/pexels-photo-$id.jpeg?auto=compress&cs=tinysrgb&w=1800" || true
             file "tmp-photos/p-$id.jpg"
           done
