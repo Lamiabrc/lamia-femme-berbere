@@ -3,6 +3,7 @@
 // et la protection serveur (RLS) déjà en place côté Supabase.
 
 import { createClient } from '/vendor/supabase.mjs';
+import { creerCompte } from './confidences-commun.js';
 
 const SUPABASE_URL = 'https://tybwvxinigahhntfeeur.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc';
@@ -63,10 +64,12 @@ supabase.auth.onAuthStateChange(() => refresh().then(renderWishes));
 $('[data-signup]')?.addEventListener('submit', async (e) => {
   e.preventDefault();
   const f = new FormData(e.target);
-  const { error } = await supabase.auth.signUp({ email: f.get('email'), password: f.get('password'), options: { emailRedirectTo: `${location.origin}/speed-dating/` } });
-  if (error) return status($('[data-member-status]'), explain(error), true);
+  const email = String(f.get('email')).trim(), password = String(f.get('password'));
+  try { await creerCompte({ email, password, source: 'speed-dating' }); }
+  catch (err) { return status($('[data-member-status]'), err.code === 'compte_existe' ? 'Un espace existe déjà avec cet email : connecte-toi.' : err.code === 'trop_de_demandes' ? 'Trop de tentatives. Réessaie dans une heure.' : err.code === 'mot_de_passe' ? 'Mot de passe trop court (8 caractères minimum).' : 'La création n’a pas fonctionné. Réessaie.', true); }
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
   e.target.reset();
-  status($('[data-member-status]'), 'Ton espace est créé. Ouvre l’email de confirmation, puis connecte-toi.');
+  status($('[data-member-status]'), error ? 'Ton espace est créé : connecte-toi avec ton email et ton mot de passe.' : 'Ton espace est créé, tu es connecté·e.');
 });
 
 $('[data-login]')?.addEventListener('submit', async (e) => {

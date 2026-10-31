@@ -151,3 +151,22 @@ test('la personne choisie est prévenue par email (sans savoir qui), au plus une
   assert.deepEqual(mails.map((m) => m[0]).sort(), ['nina@example.com', 'sam@example.com']);
   assert.ok(mails.every((m) => /réciproque/.test(m[1])));
 });
+test('création de compte par le site : compte déjà confirmé, 5 au plus par heure et par connexion', async () => {
+  const appels = [];
+  const ctx = { env: { SUPABASE_SERVICE_ROLE_KEY: 'x' }, admin: false, user: null, ipHash: 'ip', now: () => new Date('2026-10-31T00:00:00Z'), email: async () => true, alerter: async () => {},
+    call: async (u, o = {}) => { appels.push([u, o.body && JSON.parse(o.body)]); return { ok: true, status: 200, json: async () => ({ id: 'u' }) }; },
+    read: async () => [], insert: async () => ({}), patch: async () => ({}) };
+  let r = await handleAnnonces('annonce_creer_compte', { email: 'pas-un-email', password: '12345678' }, ctx);
+  assert.equal(r.status, 400);
+  r = await handleAnnonces('annonce_creer_compte', { email: 'Nina@Example.com', password: '12345678', prenom: 'Nina' }, ctx);
+  assert.equal(r.status, 200);
+  assert.equal(appels[0][0], '/auth/v1/admin/users');
+  assert.equal(appels[0][1].email_confirm, true);
+  assert.equal(appels[0][1].email, 'nina@example.com');
+  const plein = { ...ctx, read: async () => [1, 2, 3, 4, 5] };
+  r = await handleAnnonces('annonce_creer_compte', { email: 'x@example.com', password: '12345678' }, plein);
+  assert.equal(r.status, 429);
+  const existe = { ...ctx, call: async () => ({ ok: false, status: 422 }) };
+  r = await handleAnnonces('annonce_creer_compte', { email: 'x@example.com', password: '12345678' }, existe);
+  assert.equal((await r.json()).error, 'compte_existe');
+});

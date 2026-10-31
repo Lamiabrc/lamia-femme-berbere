@@ -20,6 +20,11 @@ export const ERREURS = {
 };
 export const erreur = (code) => ERREURS[code] || 'L’envoi n’a pas fonctionné. Réessaie dans un instant.';
 
+// Création de compte par le site (compte déjà confirmé, pas d'email à attendre). Erreurs : compte_existe, mot_de_passe, email_invalide, trop_de_demandes.
+export async function creerCompte({ email, password, prenom = '', source = 'site' }) {
+  return api({ action: 'annonce_creer_compte', email, password, prenom, source });
+}
+
 export async function api(body, token) {
   const r = await fetch('/api/confidences', { method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }, body: JSON.stringify(body) });
   let data = {};

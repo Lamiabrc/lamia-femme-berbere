@@ -1,6 +1,6 @@
 // Confirmation d'une fiche créée en live avec Lamia : la personne ouvre son lien personnel,
 // voit sa fiche anonyme et choisit : « je confirme » (elle apparaît dans les profils) ou « je ne veux plus apparaître ».
-import { api, esc, PUBLIC_KEY } from './confidences-commun.js';
+import { api, esc, PUBLIC_KEY, creerCompte } from './confidences-commun.js';
 import { createClient } from '/vendor/supabase.mjs';
 
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', PUBLIC_KEY);
@@ -91,8 +91,8 @@ async function monterAcces(d) {
     const msg = f.querySelector('[data-acces-msg]'); const email = f.email.value.trim(), mdp = f.mdp.value;
     msg.textContent = 'Un instant…';
     if (mode === 'creer') {
-      const cree = await supabase.auth.signUp({ email, password: mdp, options: { data: { first_name: f.prenom.value.trim() }, emailRedirectTo: `${location.origin}/mon-espace/` } });
-      if (cree.error && !/already/i.test(cree.error.message)) { msg.textContent = 'Le compte n’a pas pu être créé. Vérifie ton email, et un mot de passe d’au moins 8 caractères.'; return; }
+      try { await creerCompte({ email, password: mdp, prenom: f.prenom.value.trim(), source: 'fiche-live' }); }
+      catch (err) { if (err.code !== 'compte_existe') { msg.textContent = err.code === 'trop_de_demandes' ? 'Plusieurs comptes viennent d’être créés depuis cette connexion. Réessaie dans une heure.' : 'Le compte n’a pas pu être créé. Vérifie ton email, et un mot de passe d’au moins 8 caractères.'; return; } }
     }
     const co = await supabase.auth.signInWithPassword({ email, password: mdp });
     if (co.error) { msg.textContent = mode === 'creer' ? 'Un compte existe déjà avec cet email : choisis « J’ai déjà un compte ».' : 'Email ou mot de passe incorrect.'; return; }

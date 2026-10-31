@@ -1,5 +1,6 @@
 // Mon espace : connexion, mot de passe, soirées réservées, liens d'administration.
 import { createClient } from '/vendor/supabase.mjs';
+import { creerCompte } from './confidences-commun.js';
 
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc');
 const $ = (s) => document.querySelector(s);
@@ -204,11 +205,13 @@ $('[data-espace-signup]').addEventListener('submit', async (e) => {
   e.preventDefault();
   const f = new FormData(e.target), st = $('[data-signup-status]');
   say(st, 'Un instant…');
-  const { data, error } = await supabase.auth.signUp({ email: f.get('email'), password: f.get('password'), options: { data: { first_name: String(f.get('first_name')).trim() }, emailRedirectTo: `${location.origin}/mon-espace/` } });
-  if (error) return say(st, /already registered|already exists/i.test(error.message) ? 'Un espace existe déjà avec cet email : connecte-toi, ou reçois un lien pour choisir ton mot de passe.' : /rate limit/i.test(error.message) ? 'Trop de demandes en ce moment. Réessaie dans une heure.' : /password/i.test(error.message) ? 'Mot de passe trop court (8 caractères minimum).' : 'La création n’a pas fonctionné. Réessaie.', true);
-  if (data.session) { say(st, ''); return render(); }
-  say(st, 'Ton espace est créé. Clique sur le lien reçu par email pour le confirmer (regarde aussi les courriers indésirables).');
-  e.target.reset();
+  try { await creerCompte({ email: String(f.get('email')).trim(), password: String(f.get('password')), prenom: String(f.get('first_name')).trim(), source: 'mon-espace' }); }
+  catch (err) {
+    return say(st, err.code === 'compte_existe' ? 'Un espace existe déjà avec cet email : connecte-toi, ou reçois un lien pour choisir ton mot de passe.' : err.code === 'trop_de_demandes' ? 'Plusieurs espaces viennent d’être créés depuis cette connexion. Réessaie dans une heure.' : err.code === 'mot_de_passe' ? 'Mot de passe trop court (8 caractères minimum).' : err.code === 'email_invalide' ? 'Vérifie ton adresse email.' : 'La création n’a pas fonctionné. Réessaie.', true);
+  }
+  const { error } = await supabase.auth.signInWithPassword({ email: String(f.get('email')).trim(), password: String(f.get('password')) });
+  if (error) return say(st, 'Ton espace est créé : connecte-toi avec ton email et ton mot de passe.');
+  say(st, ''); e.target.reset(); render();
 });
 
 supabase.auth.onAuthStateChange((event) => { if (event === 'PASSWORD_RECOVERY') recovering = true; render(); });

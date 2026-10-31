@@ -1,5 +1,5 @@
 // Annonces de rencontre : dépôt (Patio et Confidences) et affichage des annonces vérifiées par Lamia.
-import { api, esc, PUBLIC_KEY } from './confidences-commun.js';
+import { api, esc, PUBLIC_KEY, creerCompte } from './confidences-commun.js';
 import { O, lib, telephoneNormal, foiEtVie } from './matching-options.mjs';
 import { createClient } from '/vendor/supabase.mjs';
 
@@ -212,9 +212,8 @@ function porteCompte(box) {
     try {
       let session = null;
       if (mode === 'creer') {
-        const cree = await supabase.auth.signUp({ email, password: mdp, options: { data: { first_name: f.prenom.value.trim() }, emailRedirectTo: `${location.origin}/mon-espace/` } });
-        if (cree.error && !/already|exists|registered/i.test(cree.error.message)) throw Object.assign(new Error(), { code: /password/i.test(cree.error.message) ? 'mot_de_passe' : /rate/i.test(cree.error.message) ? 'trop_de_demandes' : 'compte_impossible' });
-        session = cree.data?.session || null;
+        try { await creerCompte({ email, password: mdp, prenom: f.prenom.value.trim(), source: 'rencontres' }); }
+        catch (err) { if (err.code !== 'compte_existe') throw Object.assign(new Error(), { code: ['mot_de_passe', 'trop_de_demandes'].includes(err.code) ? err.code : err.code === 'email_invalide' ? 'invalid_email' : 'compte_impossible' }); }
       }
       if (!session) {
         const co = await supabase.auth.signInWithPassword({ email, password: mdp });
