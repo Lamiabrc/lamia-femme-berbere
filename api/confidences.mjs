@@ -1,5 +1,6 @@
 import { handleConfidences } from '../lib/confidences.mjs';
 import { json } from '../lib/event-tickets.mjs';
+import { envoyerNouveautes } from '../lib/nouveautes.mjs';
 
 // L'outil de matching de Lamia tourne sur son ordinateur (http://127.0.0.1:18080) : il a le droit d'appeler cette API.
 const OUTIL = /^http:\/\/(127\.0\.0\.1|localhost):18080$/;
@@ -19,4 +20,13 @@ export async function POST(request) {
 }
 export async function OPTIONS(request) {
   return cors(request, new Response(null, { status: 204 }));
+}
+
+// Chaque soir (tâche programmée de Vercel) : les nouveautés pas encore annoncées partent en notification, regroupées.
+export async function GET(request) {
+  const secret = process.env.CRON_SECRET;
+  const ok = secret ? request.headers.get('authorization') === `Bearer ${secret}` : /vercel-cron/i.test(request.headers.get('user-agent') || '');
+  if (!ok) return json({ error: 'forbidden' }, 403);
+  try { return json({ ok: true, ...(await envoyerNouveautes()) }); }
+  catch (e) { console.error('nouveautes failed', e?.message); return json({ error: 'temporary_failure' }, 502); }
 }

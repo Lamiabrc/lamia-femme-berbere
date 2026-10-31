@@ -193,6 +193,7 @@ function header(room) {
         <div class="maison-menu-etage"><p>Mon compte</p><ul><li><a href="/mon-espace/"><strong>Mon espace</strong></a></li><li><a href="/application/"><strong>L’application</strong></a></li></ul></div>
       </div>
     </details>
+    <a class="cloche" href="/nouveautes/" aria-label="Les nouveautés"><span aria-hidden="true">🔔</span><b data-cloche-point hidden></b></a>
     <a class="account-link" href="/mon-espace/" data-account-link aria-label="Se connecter ou ouvrir mon espace"><span class="account-icone" aria-hidden="true">👤</span><span data-account-texte>Se connecter</span></a>
     <a class="cta-profil" href="/rencontres/#confier">💌 Confier mon profil</a>
   </div>
@@ -1252,7 +1253,21 @@ page(
       <div data-outil-zone hidden><input data-outil-valeur readonly style="width:100%;font-family:monospace"> <button class="cl-btn" type="button" data-outil-copier>Copier</button></div>
       <p class="cl-statut" role="status" data-outil-statut></p>
     </div>
-    <div class="cl-carte cl-export">
+<div class="cl-carte cl-export cl-nouveautes">
+      <h3>📣 Nouveautés et notifications <span data-n-nouv></span></h3>
+      <p class="cl-aide">Les produits mis en vente s’ajoutent tout seuls et partent en notification chaque soir à 18 h (regroupés). Pour un article, une actu ou un live, écris-le ici : il part tout de suite, avec sa couleur, chez les membres qui ont activé les notifications.</p>
+      <form class="cl-nouv-form" data-nouv-form>
+        <label>Type<select name="type"><option value="actu">📣 Actu (vert)</option><option value="article">📰 Article (bleu)</option><option value="live">🎥 Live (rouge)</option><option value="boutique">🛍️ Boutique (doré)</option></select></label>
+        <label>Titre<input name="titre" maxlength="140" required placeholder="Ce soir à 21 h : live spécial mariage"></label>
+        <label>Texte <small>(facultatif)</small><textarea name="texte" maxlength="600" rows="2"></textarea></label>
+        <label>Lien <small>(facultatif, ex. /salon/ ou /produit/…)</small><input name="lien" maxlength="300" placeholder="/salon/"></label>
+        <label class="cl-case"><input type="checkbox" name="envoyer" checked> Envoyer la notification maintenant</label>
+        <button class="cl-btn cl-plein" type="submit">Publier</button>
+        <p class="cl-statut" data-nouv-statut></p>
+      </form>
+      <div data-nouv-liste></div>
+    </div>
+        <div class="cl-carte cl-export">
       <h3>💳 Abonnés et achats à l’unité <span data-n-abonnes></span></h3>
       <p class="cl-aide">Les formules payées sur la page Abonnement. Quand tu fais une mise en relation ou inscris quelqu’un à un speed dating payé à l’unité, clique « Utiliser 1 » pour le décompter. Les résiliations se font par la personne depuis son espace.</p>
       <div data-abonnes></div>
@@ -1424,6 +1439,22 @@ page(
   </div>
 </section>
 </div>`,
+  })
+);
+// Nouveautés de la Maison (produits, articles, actus, lives), chaque type de sa couleur.
+page(
+  '/nouveautes/',
+  layout({
+    title: 'Les nouveautés · Lamia Femme Berbère',
+    description: 'Les nouveautés de Lamia : trouvailles et bijoux de la boutique, articles, actus et lives.',
+    path: '/nouveautes/',
+    room: roomBySlug.patio,
+    scripts: ['/assets/nouveautes.js'],
+    body: `<div class="po-app"><section class="po-hero"><div class="po-fond" aria-hidden="true"></div>
+  <p class="po-eyebrow">🔔 Les nouveautés</p><h1>Quoi de neuf chez Lamia ?</h1>
+  <p class="po-lead">Les nouvelles trouvailles de la boutique, les articles, les actus et les lives. Active les notifications dans <a href="/mon-espace/">Mon espace</a> pour ne rien manquer.</p>
+</section>
+<div class="nouveautes-app"><div class="nouveautes-filtres" data-nouveautes-filtres></div><div class="nouveautes-liste" data-nouveautes><p class="annonce-vide">Un instant…</p></div></div></div>`,
   })
 );
 // Swipe : découvrir les profils un par un et dire lesquels intéressent (application sur téléphone).
@@ -1846,7 +1877,7 @@ await cp(join(ROOT, 'public'), DIST, { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await writeFile(join(DIST, 'assets', 'editable.json'), JSON.stringify({ fields: [...EDITABLE, ...REGISTRE], defaults: DEFAULTS }));
-for (const f of ['abonnement.js', 'abonnement-merci.js', 'swipe.js', 'confirmer.js', 'maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'annonces.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
+for (const f of ['abonnement.js', 'abonnement-merci.js', 'swipe.js', 'nouveautes.js', 'confirmer.js', 'maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'annonces.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
 await cp(join(ROOT, 'content', 'shipping.mjs'), join(DIST, 'assets', 'shipping.mjs'));
 await cp(join(ROOT, 'content', 'rubriques.mjs'), join(DIST, 'assets', 'rubriques.mjs'));
 await cp(join(ROOT, 'content', 'matching-options.mjs'), join(DIST, 'assets', 'matching-options.mjs'));

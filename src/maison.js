@@ -796,3 +796,15 @@ document.querySelectorAll('.lang-link').forEach((a) => {
   const ici = location.pathname.replace(/^\/en(?=\/)/, '');
   a.setAttribute('href', `${a.hreflang === 'en' ? '/en' : ''}${ici}${location.search}${location.hash}`);
 });
+
+// ---------------------------------------------------------------- cloche des nouveautés : un point rouge s'il y a du nouveau depuis la dernière visite
+(function cloche() {
+  const point = document.querySelector('[data-cloche-point]');
+  if (!point || location.pathname.startsWith('/nouveautes')) return;
+  let vu = 0, cache = null;
+  try { vu = Number(localStorage.getItem('lfb-nouveautes-vu') || 0); cache = JSON.parse(sessionStorage.getItem('lfb-nouveautes-der') || 'null'); } catch { /* */ }
+  const montrer = (der) => { if (der && new Date(der).getTime() > vu) point.hidden = false; };
+  if (cache && Date.now() - cache.t < 600000) return montrer(cache.d);
+  fetch('/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'annonce_nouveautes' }) })
+    .then((r) => r.json()).then((r) => { const d = r.nouveautes?.[0]?.created_at || null; try { sessionStorage.setItem('lfb-nouveautes-der', JSON.stringify({ t: Date.now(), d })); } catch { /* */ } montrer(d); }).catch(() => {});
+})();

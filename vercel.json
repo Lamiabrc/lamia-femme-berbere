@@ -190,5 +190,11 @@
       "source": "/en/produit/:slug/",
       "destination": "/en/produit/"
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/confidences/",
+      "schedule": "0 17 * * *"
+    }
   ]
 }

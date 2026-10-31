@@ -276,9 +276,20 @@ async function interetsRecus(session) {
     if (!possible) return dire(ios && !installee ? '<p>🔔 Sur iPhone, les notifications marchent avec l’application installée : <a class="text-link" href="/application/">installe-la</a>, puis reviens ici depuis l’icône.</p><p class="espace-aide">En attendant, tu es prévenu·e par email.</p>' : '<p>🔔 Ce navigateur ne permet pas les notifications. Tu es prévenu·e par email.</p>');
     const reg = await navigator.serviceWorker.getRegistration('/');
     const sub = reg ? await reg.pushManager.getSubscription() : null;
-    if (sub && Notification.permission === 'granted') return dire('<p>🔔 <strong>Notifications activées sur ce téléphone.</strong> Tu es prévenu·e dès qu’une personne s’intéresse à toi, quand c’est réciproque et quand Lamia te trouve un match.</p><p><button type="button" class="btn btn-line" data-notif-off>Désactiver sur ce téléphone</button></p>');
+    if (sub && Notification.permission === 'granted') {
+      let prefs = {}; try { prefs = JSON.parse(localStorage.getItem('lfb-notif-prefs') || '{}'); } catch { /* */ }
+      const T = [['boutique', '🛍️ Boutique', '#c8901a'], ['article', '📰 Articles', '#2f6fb5'], ['actu', '📣 Actus', '#2e9d5b'], ['live', '🎥 Lives', '#c8213f']];
+      dire(`<p>🔔 <strong>Notifications activées sur ce téléphone.</strong> Tu es toujours prévenu·e pour tes rencontres (intérêt, réciproque, match). En plus, je veux être prévenu·e des nouveautés :</p><div class="notif-prefs">${T.map(([k, n, c]) => `<label style="--c:${c}"><input type="checkbox" data-pref="${k}"${prefs[k] === false ? '' : ' checked'}> ${n}</label>`).join('')}</div><p><button type="button" class="btn btn-line" data-notif-off>Désactiver sur ce téléphone</button></p>`);
+      box.querySelectorAll('[data-pref]').forEach((c) => c.addEventListener('change', async () => {
+        const p = Object.fromEntries([...box.querySelectorAll('[data-pref]')].map((x) => [x.dataset.pref, x.checked]));
+        try { localStorage.setItem('lfb-notif-prefs', JSON.stringify(p)); } catch { /* */ }
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) fetch('/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` }, body: JSON.stringify({ action: 'annonce_notif_prefs', endpoint: sub.endpoint, prefs: p }) }).catch(() => {});
+      }));
+      return;
+    }
     if (Notification.permission === 'denied') return dire('<p>🔕 Les notifications sont bloquées pour ce site dans les réglages de ton téléphone. Autorise-les dans les réglages du navigateur, puis recharge la page.</p>');
-    dire('<p>🔔 Sois prévenu·e tout de suite quand quelqu’un s’intéresse à toi, quand c’est réciproque et quand Lamia te trouve un match.</p><p><button type="button" class="btn btn-ink" data-notif-on>Activer les notifications</button></p>');
+    dire('<p>🔔 Sois prévenu·e tout de suite quand quelqu’un s’intéresse à toi, quand c’est réciproque, quand Lamia te trouve un match… et des nouveautés de la boutique, des articles et des lives.</p><p><button type="button" class="btn btn-ink" data-notif-on>Activer les notifications</button></p>');
   }
   box.addEventListener('click', async (e) => {
     const { data: { session } } = await supabase.auth.getSession();

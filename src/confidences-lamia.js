@@ -122,7 +122,7 @@ function router() {
   if (!session) return;
   const h = location.hash.slice(1);
   if (h === 'reglages') { courant = null; vue('reglages'); chargerReglages(); return; }
-  if (h === 'annonces') { courant = null; vue('annonces'); chargerAnnonces(); chargerDemandes(); chargerAbonnes(); return; }
+  if (h === 'annonces') { courant = null; vue('annonces'); chargerAnnonces(); chargerDemandes(); chargerAbonnes(); chargerNouveautes(); return; }
   if (/^[0-9a-f-]{36}$/i.test(h)) return ouvrirFil(h);
   courant = null; vue('liste'); rendreListe();
 }
@@ -393,3 +393,32 @@ $('[data-outil-cle]')?.addEventListener('click', async () => {
   } catch (err) { say(st, erreur(err.code), true); }
 });
 $('[data-outil-copier]')?.addEventListener('click', async () => { try { await navigator.clipboard.writeText($('[data-outil-valeur]').value); say($('[data-outil-statut]'), 'Clé copiée.'); } catch { $('[data-outil-valeur]').select(); } });
+
+// ---------------------------------------------------------------- nouveautés : publier un article / une actu / un live, voir ce qui est parti
+async function chargerNouveautes() {
+  const box = $('[data-nouv-liste]');
+  if (!box) return;
+  try {
+    const { nouveautes = [], abonnes = 0, types = {} } = await api({ action: 'annonce_nouveautes_admin' }, await jetonFrais());
+    const attente = nouveautes.filter((n) => !n.envoyee_at).length;
+    $('[data-n-nouv]').textContent = attente ? `(${attente} en attente)` : '';
+    box.innerHTML = `<p class="cl-aide">🔔 ${abonnes} téléphone(s) de membres abonnés aux notifications.${attente ? ` <button class="cl-btn" type="button" data-nouv-envoyer>Envoyer les ${attente} en attente maintenant</button>` : ''}</p>`
+      + nouveautes.slice(0, 15).map((n) => { const t = types[n.type] || {}; return `<p class="cl-nouv" style="border-left:5px solid ${t.couleur || '#999'}">${t.emoji || ''} <b>${esc(n.titre)}</b> <small>· ${quand(n.created_at)} · ${n.envoyee_at ? `envoyée (${n.nb_envoyes})` : 'en attente'}</small> <button class="cl-btn" type="button" data-nouv-suppr="${n.id}" aria-label="Supprimer">✕</button></p>`; }).join('');
+  } catch (err) { box.innerHTML = `<p class="cl-vide">${esc(erreur(err.code))}</p>`; }
+}
+$('[data-nouv-form]')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = e.target, st = $('[data-nouv-statut]');
+  say(st, 'Un instant…');
+  try {
+    const r = await api({ action: 'annonce_nouveaute_publier', type: f.type.value, titre: f.titre.value, texte: f.texte.value, lien: f.lien.value, envoyer: f.envoyer.checked }, await jetonFrais());
+    say(st, f.envoyer.checked ? `Publiée et envoyée sur ${r.envoyes || 0} téléphone(s).` : 'Publiée (pas encore envoyée).');
+    f.titre.value = ''; f.texte.value = ''; f.lien.value = '';
+    chargerNouveautes();
+  } catch (err) { say(st, erreur(err.code), true); }
+});
+document.addEventListener('click', async (e) => {
+  const env = e.target.closest('[data-nouv-envoyer]'), sup = e.target.closest('[data-nouv-suppr]');
+  if (env) { env.disabled = true; try { await api({ action: 'annonce_nouveautes_envoyer' }, await jetonFrais()); } catch { /* */ } chargerNouveautes(); }
+  if (sup && confirm('Supprimer cette nouveauté du fil ?')) { try { await api({ action: 'annonce_nouveaute_suppr', id: sup.dataset.nouvSuppr }, await jetonFrais()); } catch { /* */ } chargerNouveautes(); }
+});

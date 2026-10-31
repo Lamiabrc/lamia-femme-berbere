@@ -116,3 +116,8 @@ legend { font-size: 14px; font-weight: 600; padding: 0 4px; }
 .cl-meilleur { color: #8a5a00; }
 .cl-forts { color: #1d6a3e; font-size: 13px; } .cl-vigilance { color: #9a1230; font-size: 13px; }
 .cl-demande-corps details summary { cursor: pointer; font-size: 13px; color: #6b4a3a; }
+
+.cl-nouv-form { display: grid; gap: 8px; margin: 8px 0 12px; }
+.cl-nouv-form label { display: grid; gap: 4px; font-weight: 600; font-size: 14px; }
+.cl-nouv-form .cl-case { display: flex; align-items: center; gap: 8px; }
+.cl-nouv { margin: 6px 0; padding: 6px 10px; background: #fff; border-radius: 10px; }
