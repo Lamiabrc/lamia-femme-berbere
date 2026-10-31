@@ -338,18 +338,47 @@ async function chargerDemandes() {
     $('[data-n-demandes]').textContent = n ? `(${n})` : '';
     if (!demandes.length) { box.innerHTML = '<p class="cl-vide">Aucune demande pour le moment.</p>'; return; }
     const qui = (p) => p?.prenom ? `n° ${p.ref} · ${esc(p.prenom)}, ${p.age} ans, ${esc(p.ville)} (${esc(lib(p.pays))})${p.contact ? `<br><small>${esc(p.contact)}</small>` : ''}` : `n° ${p?.ref} <small>(profil retiré ou inconnu)</small>`;
-    demandes.sort((x, y) => (y.reciproque && y.statut === 'a_traiter') - (x.reciproque && x.statut === 'a_traiter'));
-    box.innerHTML = demandes.map((d) => `<article class="cl-carte cl-demande" data-demande="${d.id}">
-      <p class="cl-coord">${d.reciproque ? '<b class="cl-reciproque">💞 INTÉRÊT RÉCIPROQUE</b> · ' : ''}${d.via === 'swipe' ? '💘 swipe · ' : ''}${quand(d.created_at)} · <b>${STATUT_DEMANDE[d.statut]}</b>${d.demandeur?.status && d.demandeur.status !== 'publiee' ? ' · <b class="cl-a-verifier">⏳ profil pas encore vérifié : valide-le d’abord dans la liste ci-dessus</b>' : ''}</p>
-      <div class="cl-demande-duo"><div><small>S’intéresse à</small><br>${qui(d.demandeur)}</div><div class="cl-demande-coeur">💌 →</div><div><small>Profil choisi</small><br>${qui(d.cible)}</div></div>
-      <label>Statut<select data-demande-statut>${Object.entries(STATUT_DEMANDE).map(([k, v]) => `<option value="${k}"${k === d.statut ? ' selected' : ''}>${v}</option>`).join('')}</select></label>
-    </article>`).join('');
+    // Regroupées par personne : ses matchs demandés du plus fort au plus faible potentiel, pour n'en choisir qu'un.
+    const niveau = (sc) => (sc == null ? ['?', 'is-inconnu', 'à vérifier dans ton outil'] : sc >= 75 ? [sc, 'is-fort', 'fort potentiel'] : sc >= 50 ? [sc, 'is-moyen', 'potentiel moyen'] : [sc, 'is-faible', 'faible potentiel']);
+    const groupes = new Map();
+    for (const d of demandes) { const k = d.demandeur?.ref ?? '?'; if (!groupes.has(k)) groupes.set(k, { qui: d.demandeur, liste: [] }); groupes.get(k).liste.push(d); }
+    const ordre = [...groupes.values()].map((g) => {
+      g.liste.sort((x, y) => (y.statut === 'a_traiter') - (x.statut === 'a_traiter') || (y.potentiel?.score ?? -1) - (x.potentiel?.score ?? -1));
+      g.aTraiter = g.liste.filter((d) => d.statut === 'a_traiter').length;
+      g.enRelation = g.liste.some((d) => d.statut === 'mis_en_relation');
+      g.meilleur = g.enRelation ? null : g.liste.find((d) => d.statut === 'a_traiter');
+      return g;
+    }).sort((x, y) => (y.aTraiter > 0) - (x.aTraiter > 0) || (y.meilleur?.potentiel?.score ?? -1) - (x.meilleur?.potentiel?.score ?? -1));
+    box.innerHTML = ordre.map((g) => `<section class="cl-carte cl-groupe">
+      <h4>${qui(g.qui)}</h4>
+      <p class="cl-coord">${g.liste.length} match(s) demandé(s)${g.aTraiter ? ` · <b>${g.aTraiter} à traiter</b>` : ''}${g.enRelation ? ' · <b>💞 déjà mis(e) en relation</b>' : g.meilleur ? ' · ⭐ fais la mise en relation avec le meilleur potentiel' : ''}${g.qui?.status && g.qui.status !== 'publiee' ? ' · <b class="cl-a-verifier">⏳ profil pas encore vérifié</b>' : ''}</p>
+      ${g.liste.map((d) => { const [sc, cl, txt] = niveau(d.potentiel?.score); return `<article class="cl-demande${d === g.meilleur ? ' is-meilleur' : ''}" data-demande="${d.id}">
+        <div class="cl-pot ${cl}" title="${txt}"><b>${sc}</b><small>/100</small></div>
+        <div class="cl-demande-corps">
+          <p class="cl-coord">${d === g.meilleur ? '<b class="cl-meilleur">⭐ Meilleur potentiel</b> · ' : ''}${d.reciproque ? '<b class="cl-reciproque">💞 RÉCIPROQUE</b> · ' : ''}${d.via === 'swipe' ? '💘 swipe · ' : ''}${quand(d.created_at)} · ${txt}</p>
+          <p>💌 → ${qui(d.cible)}</p>
+          ${d.potentiel && (d.potentiel.forts.length || d.potentiel.vigilance.length) ? `<details><summary>Pourquoi ce score</summary>${d.potentiel.forts.length ? `<p class="cl-forts">✓ ${d.potentiel.forts.map(esc).join('<br>✓ ')}</p>` : ''}${d.potentiel.vigilance.length ? `<p class="cl-vigilance">⚠ ${d.potentiel.vigilance.map(esc).join('<br>⚠ ')}</p>` : ''}</details>` : ''}
+          <label>Statut<select data-demande-statut>${Object.entries(STATUT_DEMANDE).map(([k, v]) => `<option value="${k}"${k === d.statut ? ' selected' : ''}>${v}</option>`).join('')}</select></label>
+        </div>
+      </article>`; }).join('')}
+    </section>`).join('');
   } catch (err) { box.innerHTML = `<p class="cl-vide">${esc(erreur(err.code))}</p>`; }
 }
 document.addEventListener('change', async (e) => {
   const sel = e.target.closest('[data-demande-statut]');
   if (!sel) return;
-  try { await api({ action: 'match_demande_statut', id: sel.closest('[data-demande]').dataset.demande, statut: sel.value }, await jetonFrais()); chargerDemandes(); } catch { /* */ }
+  try {
+    await api({ action: 'match_demande_statut', id: sel.closest('[data-demande]').dataset.demande, statut: sel.value }, await jetonFrais());
+    // Une seule mise en relation par personne : proposer de clore ses autres demandes en attente.
+    if (sel.value === 'mis_en_relation') {
+      const autres = [...sel.closest('.cl-groupe').querySelectorAll('[data-demande]')].filter((x) => x !== sel.closest('[data-demande]') && x.querySelector('[data-demande-statut]').value === 'a_traiter');
+      if (autres.length && confirm(`Passer les ${autres.length} autre(s) demande(s) de cette personne en « Pas compatible » ?`)) {
+        const jeton = await jetonFrais();
+        for (const x of autres) await api({ action: 'match_demande_statut', id: x.dataset.demande, statut: 'pas_compatible' }, jeton).catch(() => {});
+      }
+    }
+    chargerDemandes();
+  } catch { /* */ }
 });
 
 // ---------------------------------------------------------------- clé de liaison avec l'outil de matching

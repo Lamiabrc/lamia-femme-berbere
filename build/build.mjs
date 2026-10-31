@@ -1258,7 +1258,7 @@ page(
     </div>
     <div class="cl-carte cl-export">
       <h3>💌 Matchs demandés <span data-n-demandes></span></h3>
-      <p class="cl-aide">Quand quelqu’un clique sur « Ce profil m’intéresse » ou swipe un profil à droite, la demande arrive ici. Quand deux personnes se choisissent l’une l’autre, la demande passe en tête avec « 💞 INTÉRÊT RÉCIPROQUE » et tu reçois une alerte (notification et email). Personne d’autre ne la voit. Elle est aussi notée dans la fiche exportée vers ton outil.</p>
+      <p class="cl-aide">Quand quelqu’un clique sur « Ce profil m’intéresse » ou swipe un profil à droite, la demande arrive ici. Quand deux personnes se choisissent l’une l’autre, la demande passe en tête avec « 💞 INTÉRÊT RÉCIPROQUE » et tu reçois une alerte (notification et email). Les demandes sont regroupées par personne et notées sur 100 selon leur potentiel (âge, religion, pratique, origine, enfants, situation, tabac, pays, dans les deux sens) : fais la mise en relation avec le ⭐ meilleur potentiel, puis confirme dans ton outil. Personne d’autre ne la voit. Elle est aussi notée dans la fiche exportée vers ton outil.</p>
       <div data-demandes></div>
     </div>
     <div class="cl-carte cl-export">

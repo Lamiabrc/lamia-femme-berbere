@@ -186,3 +186,61 @@ export function foiEtVie(a) {
     ${foi ? `<p>🕊 ${esc(foi.charAt(0).toUpperCase() + foi.slice(1))}</p>` : ''}${a.religion_texte ? `<p>${esc(a.religion_texte)}</p>` : ''}
     ${vie.length ? `<p class="annonce-tags">${vie.map((t) => `<span>${esc(t)}</span>`).join('')}</p>` : ''}${a.autres ? `<p>${esc(a.autres)}</p>` : ''}`;
 }
+
+// ---------------------------------------------------------------- potentiel d'un match (0 à 100)
+// Pour aider Lamia à choisir LA mise en relation à faire parmi tous les matchs demandés par une personne.
+// Calculé dans les deux sens (ce que A cherche chez B, et ce que B cherche chez A), puis moyenné.
+// Ce n'est pas l'outil de matching complet de Lamia : un premier tri, à confirmer dans l'outil.
+export function fichePotentiel(src, { outil = false, age = null } = {}) {
+  if (outil) return { age: src.age ?? null, age_min: src.age_min, age_max: src.age_max, pays: src.pays || '', religion: src.religion || '', pratique: src.pratique || '', enfants: src.enfants || '', situation: src.situation || '', origine: src.origine || [], hygiene: src.mode_vie || [], etudes: src.etudes || '', prefs: {} };
+  const m = src.matching || {};
+  return { age, age_min: src.age_min, age_max: src.age_max, pays: src.pays || '', religion: m.religion || '', pratique: m.pratique || '', enfants: m.enfants || '', situation: m.situation || '', origine: m.origineTags || [], hygiene: m.hygieneVie || [], etudes: m.niveauEtudeCategorie || '',
+    prefs: { religion: m.religionRecherche || '', pratique: m.pratiqueRecherche || '', origines: m.origineRechercheTags || [], kabyleUniquement: Boolean(m.kabyleUniquement), accepteEnfants: m.accepteEnfants, accepteDivorce: m.accepteDivorce, accepteVeuf: m.accepteVeuf, zone: m.zoneGeo || '', mobilite: m.mobiliteGeographique || '', fumeur: (m.hygieneVie || []).find((x) => /^Fumeur/.test(x)) || '' } };
+}
+function sens(A, B, forts, vigilance, quiA, quiB) {
+  let pts = 0, max = 0;
+  const ajoute = (p, m) => { pts += p; max += m; };
+  // Âge (25)
+  if (B.age && (A.age_min || A.age_max)) {
+    const lo = A.age_min || 18, hi = A.age_max || 99, ecart = B.age < lo ? lo - B.age : B.age > hi ? B.age - hi : 0;
+    ajoute(Math.max(0, 25 - ecart * 6), 25);
+    if (!ecart) forts.push(`${quiB} a l’âge recherché par ${quiA}`); else vigilance.push(`${quiB} (${B.age} ans) hors de la tranche ${lo}-${hi} ans de ${quiA}`);
+  } else ajoute(15, 25);
+  // Religion (20) et pratique (15)
+  const crit = (pref, val, poids, nom) => {
+    if (!pref || pref === 'Pas important') return ajoute(poids * 0.7, poids);
+    if (!val) return ajoute(poids * 0.5, poids);
+    if (pref === val) { forts.push(`${nom} de ${quiB} : celle recherchée par ${quiA}`); return ajoute(poids, poids); }
+    vigilance.push(`${nom} de ${quiB} différente de celle recherchée par ${quiA}`); return ajoute(0, poids);
+  };
+  crit(A.prefs.religion, B.religion, 20, 'Religion'); crit(A.prefs.pratique, B.pratique, 15, 'Pratique');
+  // Enfants (10)
+  if (B.enfants === 'Oui' && A.prefs.accepteEnfants === false) { vigilance.push(`${quiB} a des enfants, ${quiA} ne l’a pas accepté`); ajoute(0, 10); } else ajoute(B.enfants ? 10 : 7, 10);
+  // Divorce / veuvage (10)
+  const div = /^Divorce|^Separe/.test(B.situation), veuf = /^Veuf/.test(B.situation);
+  if ((div && A.prefs.accepteDivorce === false) || (veuf && A.prefs.accepteVeuf === false)) { vigilance.push(`Situation de ${quiB} non acceptée par ${quiA}`); ajoute(0, 10); } else ajoute(10, 10);
+  // Origine (10)
+  const ori = A.prefs.origines || [];
+  if (A.prefs.kabyleUniquement && !B.origine.some((o) => /^Kabyle/.test(o))) { vigilance.push(`${quiA} cherche uniquement kabyle`); ajoute(0, 10); }
+  else if (ori.length && B.origine.length) { if (B.origine.some((o) => ori.includes(o))) { forts.push(`Origine de ${quiB} recherchée par ${quiA}`); ajoute(10, 10); } else { vigilance.push(`Origine de ${quiB} pas dans les souhaits de ${quiA}`); ajoute(2, 10); } }
+  else ajoute(7, 10);
+  // Tabac (5)
+  const fB = B.hygiene.find((x) => /^Fumeur/.test(x));
+  if (A.prefs.fumeur === 'Fumeur: non' && fB && fB !== 'Fumeur: non') { vigilance.push(`${quiB} fume, ${quiA} non`); ajoute(1, 5); } else ajoute(fB ? 5 : 4, 5);
+  // Géographie (5)
+  const zone = A.prefs.zone;
+  if (zone && zone !== "N'importe ou" && B.pays) { if (zone === B.pays || (zone === 'Europe' && ['France', 'Europe'].includes(B.pays))) ajoute(5, 5); else if (/^Oui/.test(A.prefs.mobilite || '')) ajoute(3, 5); else { vigilance.push(`${quiB} vit hors de la zone voulue par ${quiA}`); ajoute(1, 5); } }
+  else ajoute(B.pays && B.pays === A.pays ? 5 : 3.5, 5);
+  return pts / max;
+}
+export function potentiel(A, B, { a = 'A', b = 'B' } = {}) {
+  const forts = [], vigilance = [];
+  const ab = sens(A, B, forts, vigilance, a, b), ba = sens(B, A, forts, vigilance, b, a);
+  // Points rédhibitoires (enfants ou situation refusés, origine exclusive, religion différente) : ils pèsent plus lourd.
+  const redhibitoires = vigilance.filter((v) => /ne l’a pas accepté|non acceptée|uniquement kabyle|Religion de/.test(v)).length;
+  const score = Math.max(0, Math.round(((ab + ba) / 2) * 100) - redhibitoires * 8);
+  if (A.religion && B.religion && A.religion === B.religion) forts.push('Même religion');
+  if (A.origine.some((o) => B.origine.includes(o))) forts.push('Même origine');
+  if (A.pays && A.pays === B.pays) forts.push('Même pays');
+  return { score, forts: [...new Set(forts)].slice(0, 5), vigilance: [...new Set(vigilance)].slice(0, 5) };
+}
