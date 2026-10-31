@@ -934,6 +934,13 @@ page(
   <p class="salle-msg" role="status" data-salle-msg></p>
   <p class="salle-demasque" data-demasque hidden>Dernier tête-à-tête : le moment du démasquage. Retire ton masque si tu le souhaites.</p>
   <p class="salle-compte" data-salle-compte></p>
+  <div class="tchat" data-tchat hidden>
+    <button class="tchat-bulle" type="button" data-tchat-ouvrir aria-expanded="false">💬 Écrire à Lamia <b data-tchat-nouveau hidden>•</b></button>
+    <div class="tchat-panneau" data-tchat-panneau hidden>
+      <ol class="tchat-fil" data-tchat-fil aria-live="polite"><li class="tchat-vide">Lamia peut t’écrire ici. Ta réponse n’est lue que par elle.</li></ol>
+      <form class="tchat-form" data-tchat-form><input name="t" maxlength="300" autocomplete="off" placeholder="Ta réponse à Lamia…" aria-label="Message à Lamia"><button class="btn btn-gold" type="submit">Envoyer</button></form>
+    </div>
+  </div>
   <aside class="carnet" data-carnet aria-label="Mon carnet de bal"><h2>Mon carnet de bal</h2><ol data-carnet-liste><li class="carnet-vide">Tes cavaliers s’inscriront ici au fil des tours.</li></ol></aside>
   <div class="salle-boutons">
     <button class="btn bal-btn-line" type="button" data-micro aria-pressed="false">Micro</button>

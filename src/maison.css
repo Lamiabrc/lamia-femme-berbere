@@ -3356,3 +3356,16 @@ body[data-ambiance="espace"] .espace .room-name { color: #8a1024; }
 .is-cam-eteinte .salle-moi video { opacity: 0; }
 .is-cam-eteinte .salle-moi::after { content: 'Caméra éteinte ici · elle s’allume au tête-à-tête'; position: absolute; inset: 0; display: grid; place-items: center; padding: 8px; text-align: center; font-size: 12px; color: #f3e6c8; background: #2a1418; border-radius: inherit; }
 [data-micro]:disabled, [data-camera]:disabled { opacity: .45; cursor: not-allowed; }
+
+/* Bulle de chat avec Lamia, au salon d'attente du bal. */
+.tchat { position: fixed; right: 16px; bottom: 16px; z-index: 40; display: grid; justify-items: end; gap: 8px; max-width: min(360px, calc(100vw - 32px)); }
+.tchat-bulle { border: 0; border-radius: 999px; padding: 12px 18px; background: #f3e0b9; color: #2a1418; font-weight: 700; box-shadow: 0 8px 24px rgba(0,0,0,.35); cursor: pointer; }
+.tchat-bulle b { color: #8a1024; }
+.tchat-panneau { width: 100%; background: #1d1220; border: 1px solid rgba(227,189,110,.45); border-radius: 16px; padding: 10px; box-shadow: 0 10px 30px rgba(0,0,0,.4); }
+.tchat-fil { list-style: none; margin: 0 0 8px; padding: 0; max-height: 240px; overflow-y: auto; display: grid; gap: 6px; font-size: 15px; color: #f3e6c8; }
+.tchat-fil li { padding: 7px 10px; border-radius: 12px; background: rgba(255,255,255,.07); }
+.tchat-fil li.is-moi { background: rgba(243,224,185,.2); justify-self: end; }
+.tchat-fil li b { color: #e3bd6e; margin-right: 5px; }
+.tchat-vide { color: #b8a98f; background: none !important; }
+.tchat-form { display: flex; gap: 6px; }
+.tchat-form input { flex: 1; min-width: 0; min-height: 44px; padding: 8px 12px; border-radius: 10px; border: 1px solid rgba(227,189,110,.5); font-size: 16px; }

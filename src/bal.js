@@ -89,6 +89,7 @@ $('[data-entrer]')?.addEventListener('click', async () => {
   call = Daily.createCallObject({ subscribeToTracksAutomatically: false, dailyConfig: { useDevicePreferenceCookies: true } });
   for (const ev of ['participant-joined', 'participant-updated', 'participant-left', 'track-started', 'track-stopped', 'joined-meeting']) call.on(ev, render);
   call.on('left-meeting', () => { roomKey = null; });
+  tchatBrancher();
   let flouPret = false;
   call.on('joined-meeting', () => { if (!flouPret) { flouPret = true; preparerFlou(); } else if (prefs.flou) flou(true); });
   call.on('error', () => message('La connexion vidéo s’est interrompue. Nous te reconnectons…'));
@@ -157,6 +158,7 @@ function decor() {
   if (s.planb) pb.querySelector('[data-planb-lien]').href = s.planb;
   carnet(s.met || []);
   ambiance();
+  tchatVisible();
   const souhaits = $('[data-souhaits]');
   souhaits.hidden = s.phase !== 'fin';
   if (s.phase === 'fin' && !wishesSent) {
@@ -227,6 +229,45 @@ function render() {
   $('[data-micro]').setAttribute('aria-pressed', String(!call.localAudio()));
   $('[data-camera]').setAttribute('aria-pressed', String(!call.localVideo()));
 }
+
+// ---------------------------------------------------------------- bulle de chat avec Lamia (salon d'attente)
+// Lamia écrit à tout le salon ; la réponse d'un participant ne va qu'à Lamia. Rien n'est enregistré.
+const fil = [];
+function tchatAfficher() {
+  const ol = $('[data-tchat-fil]');
+  if (!ol) return;
+  ol.innerHTML = fil.length ? fil.map((m) => `<li class="${m.moi ? 'is-moi' : 'is-lamia'}"><b>${m.moi ? 'Toi' : 'Lamia'}</b> ${esc(m.t)}</li>`).join('') : '<li class="tchat-vide">Lamia peut t’écrire ici. Ta réponse n’est lue que par elle.</li>';
+  ol.scrollTop = ol.scrollHeight;
+}
+function tchatBrancher() {
+  call.on('app-message', (e) => {
+    const d = e?.data;
+    if (d?.type !== 'tchat-lamia' || !d.t) return;
+    const lamia = Object.values(call.participants()).find((p) => p.session_id === e.fromId);
+    if (lamia && !lamia.owner) return;
+    fil.push({ moi: false, t: String(d.t).slice(0, 300) }); tchatAfficher();
+    const panneau = $('[data-tchat-panneau]');
+    if (panneau?.hidden) { $('[data-tchat-nouveau]').hidden = false; panneau.hidden = false; $('[data-tchat-ouvrir]').setAttribute('aria-expanded', 'true'); }
+  });
+}
+function tchatVisible() {
+  const box = $('[data-tchat]');
+  if (box) box.hidden = !state || state.where === 'tat';
+}
+$('[data-tchat-ouvrir]')?.addEventListener('click', () => {
+  const p = $('[data-tchat-panneau]'); p.hidden = !p.hidden;
+  $('[data-tchat-ouvrir]').setAttribute('aria-expanded', String(!p.hidden)); $('[data-tchat-nouveau]').hidden = true;
+  if (!p.hidden) p.querySelector('input')?.focus();
+});
+$('[data-tchat-form]')?.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const input = e.target.t, t = input.value.trim().slice(0, 300);
+  if (!t || !call) return;
+  const lamia = Object.values(call.participants()).find((p) => !p.local && p.owner);
+  if (!lamia) { fil.push({ moi: false, t: 'Lamia n’est pas encore dans le salon : réessaie dans un instant.' }); tchatAfficher(); return; }
+  call.sendAppMessage({ type: 'tchat-membre', t, nom: me?.name || '' }, lamia.session_id);
+  fil.push({ moi: true, t }); input.value = ''; tchatAfficher();
+});
 
 $('[data-micro]')?.addEventListener('click', () => { call?.setLocalAudio(!call.localAudio()); render(); });
 $('[data-camera]')?.addEventListener('click', () => { call?.setLocalVideo(!call.localVideo()); render(); });

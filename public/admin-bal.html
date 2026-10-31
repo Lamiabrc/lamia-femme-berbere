@@ -34,6 +34,11 @@
   .regie-cmd .btn { width: 100%; justify-content: center; }
   .regie-chrono { font-family: var(--serif); font-size: 44px; color: #fff1c9; margin: 0; text-align: center; }
   .regie-cmd .tat { flex-direction: column; }
+  .tchat-admin { border: 1px solid rgba(227,189,110,.35); border-radius: 12px; padding: 10px; background: rgba(0,0,0,.25); }
+  .tchat-fil { list-style: none; margin: 0; padding: 0; max-height: 220px; overflow-y: auto; display: grid; gap: 6px; font-size: 14px; }
+  .tchat-fil li { padding: 6px 9px; border-radius: 10px; background: rgba(255,255,255,.06); }
+  .tchat-fil li.is-moi { background: rgba(243,224,185,.18); }
+  .tchat-fil b { color: #e3bd6e; margin-right: 4px; }
   @media (max-width: 860px) { .regie { grid-template-columns: 1fr; } .regie-video { height: 55vh; } }
 </style>
 </head>
@@ -80,6 +85,11 @@
             <div class="tat" id="r-tat"></div>
             <button class="btn btn-out" id="r-salon" type="button" hidden>Revenir au salon d’attente</button>
             <button class="btn btn-out" id="r-fin" type="button">Fin du bal (souhaits)</button>
+            <div class="tchat-admin">
+              <p class="kicker" style="margin:0 0 6px">💬 Chat du salon</p>
+              <ol id="tchat-fil" class="tchat-fil"><li style="color:#b8a98f">Écris à tout le salon d’attente. Leurs réponses n’arrivent qu’à toi.</li></ol>
+              <form id="tchat-form" class="row" style="gap:6px;margin-top:6px"><input name="t" maxlength="300" autocomplete="off" placeholder="Vous m’entendez ?" style="flex:1;min-width:0"><button class="btn btn-gold" type="submit">Envoyer</button></form>
+            </div>
             <button class="btn btn-out" id="r-quitter" type="button">Fermer la caméra</button>
             <p style="font-size:13px;color:#b8a98f;margin:0">Ta caméra et ton micro sont coupés en arrivant : allume-les en bas de la vidéo pour faire une annonce. Les boutons ici commandent tout le bal.</p>
           </div>
@@ -209,6 +219,12 @@ async function openRoom(room) {
     if (!cadre) {
       const { default: Daily } = await import('/vendor/daily.mjs');
       cadre = Daily.createFrame($('#cadre'), { showLeaveButton: false, iframeStyle: { width: '100%', height: '100%', border: '0' } });
+      cadre.on('app-message', (e) => {
+        const d = e?.data;
+        if (d?.type !== 'tchat-membre' || !d.t) return;
+        const nom = cadre.participants()?.[e.fromId]?.user_name || d.nom || 'Masque';
+        tchatAjout(nom, String(d.t).slice(0, 300), false);
+      });
     } else if (cadre.meetingState() === 'joined-meeting') await cadre.leave();
     const u = new URL(url), token = u.searchParams.get('t') || undefined; u.search = '';
     await cadre.join({ url: u.toString(), token });
@@ -218,6 +234,21 @@ async function openRoom(room) {
     $('#regie').scrollIntoView({ behavior: 'smooth', block: 'start' });
   } catch { $('#status').textContent = 'La caméra ne s’ouvre pas. Réessaie dans un instant.'; $('#status').className = 'status err'; }
 }
+const tchat = [];
+function tchatAjout(qui, t, moi) {
+  tchat.push({ qui, t, moi });
+  $('#tchat-fil').innerHTML = tchat.map((m) => `<li class="${m.moi ? 'is-moi' : ''}"><b>${esc(m.qui)}</b>${esc(m.t)}</li>`).join('');
+  $('#tchat-fil').scrollTop = $('#tchat-fil').scrollHeight;
+}
+$('#tchat-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const t = e.target.t.value.trim().slice(0, 300);
+  if (!t) return;
+  if (!cadre || cadre.meetingState() !== 'joined-meeting') { tchatAjout('Info', 'Ouvre d’abord la caméra (salon d’attente) pour écrire au salon.', false); return; }
+  if (salleActuelle) { tchatAjout('Info', 'Tu es en visite dans un tête-à-tête : reviens au salon d’attente pour écrire à tout le monde.', false); return; }
+  cadre.sendAppMessage({ type: 'tchat-lamia', t }, '*');
+  tchatAjout('Toi', t, true); e.target.t.value = '';
+});
 async function fermerCamera() { try { await cadre?.leave(); cadre?.destroy(); } catch { /* */ } cadre = null; salleActuelle = null; $('#regie').hidden = true; }
 $('#r-quitter').addEventListener('click', fermerCamera);
 $('#r-salon').addEventListener('click', () => openRoom());
