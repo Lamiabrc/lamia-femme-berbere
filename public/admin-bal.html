@@ -73,7 +73,9 @@
           <div class="regie-cmd">
             <p class="regie-chrono" id="chrono"></p>
             <label>Durée d’un tour (minutes)<input id="minutes2" type="number" min="2" max="15" value="6"></label>
+            <label style="display:flex;gap:8px;align-items:center;font-weight:600"><input id="melanger" type="checkbox" checked style="width:20px;min-height:0;height:20px"> Mélanger les salons s’il manque quelqu’un en face</label>
             <button class="btn btn-gold" id="r-round" type="button">▶ Lancer un tour</button>
+            <p id="r-last" style="margin:0;font-size:14px;color:#fff1c9"></p>
             <button class="btn btn-out" id="r-grand" type="button">↩ Rappeler tout le monde</button>
             <div class="tat" id="r-tat"></div>
             <button class="btn btn-out" id="r-salon" type="button" hidden>Revenir au salon d’attente</button>
@@ -160,7 +162,10 @@ function paint(d) {
   $('#phase').textContent = `${PHASES[s.phase] || ''}${s.round ? ` · tour ${s.round}` : ''}${s.ends_at && s.phase === 'tour' ? ` · fin à ${new Date(s.ends_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}` : ''}`;
   $('#presents').textContent = `${d.present} masque${d.present > 1 ? 's' : ''} au bal`;
   $('#salons').innerHTML = d.salons.map((x) => `<tr><td>${esc(x.label)}</td><td>${x.inscrits}</td><td>${x.presents}</td><td>${x.femmes}</td><td>${x.hommes}</td></tr>`).join('');
-  $('#last').textContent = s.last_round ? `Dernier tour : ${s.last_round.pairs} tête-à-tête${s.last_round.waiting.length ? ` · en attente : ${s.last_round.waiting.join(', ')}` : ''}` : '';
+  const lr = s.last_round;
+  const texteTour = lr ? (lr.pairs ? `Tour ${s.round} : ${lr.pairs} tête-à-tête lancé${lr.pairs > 1 ? 's' : ''}${lr.waiting.length ? ` · en attente : ${lr.waiting.join(', ')}` : ''}` : `⚠️ Tour ${s.round} : aucun tête-à-tête. ${lr.raison || ''}${lr.waiting.length ? ` En attente : ${lr.waiting.join(', ')}.` : ''}`) : '';
+  $('#last').textContent = texteTour;
+  $('#r-last').textContent = texteTour;
   const boutonsTat = s.phase === 'tour' ? d.tat.map((t, i) => { const n = t.noms?.length ? t.noms.join(' et ') : `tête-à-tête ${i + 1}`; return `<button class="btn btn-out" type="button" data-room="${esc(t.room)}" data-noms="${esc(n)}">Rendre visite : ${esc(n)}</button>`; }).join('') : '';
   $('#tat').innerHTML = boutonsTat;
   $('#r-tat').innerHTML = boutonsTat;
@@ -189,7 +194,7 @@ $('#login').addEventListener('submit', async (e) => {
 });
 const act = (body, confirmText) => async () => { if (confirmText && !confirm(confirmText)) return; try { paint(await bal(body())); } catch { /* */ } };
 $('#btn-open').addEventListener('click', act(() => ({ action: 'open', event_id: $('#soiree').value })));
-$('#btn-round').addEventListener('click', act(() => ({ action: 'round', minutes: Number($('#minutes').value), demasque: $('#demasque').checked })));
+$('#btn-round').addEventListener('click', act(() => ({ action: 'round', minutes: Number($('#minutes').value), demasque: $('#demasque').checked, melanger: $('#melanger').checked })));
 $('#btn-planb').addEventListener('click', act(() => ({ action: 'planb', url: $('#planb').value.trim() })));
 $('#btn-planb-off').addEventListener('click', act(() => ({ action: 'planb', url: '' })));
 $('#btn-grand').addEventListener('click', act(() => ({ action: 'grand' })));
@@ -216,7 +221,7 @@ async function openRoom(room) {
 async function fermerCamera() { try { await cadre?.leave(); cadre?.destroy(); } catch { /* */ } cadre = null; salleActuelle = null; $('#regie').hidden = true; }
 $('#r-quitter').addEventListener('click', fermerCamera);
 $('#r-salon').addEventListener('click', () => openRoom());
-$('#r-round').addEventListener('click', act(() => ({ action: 'round', minutes: Number($('#minutes2').value), demasque: $('#demasque').checked })));
+$('#r-round').addEventListener('click', act(() => ({ action: 'round', minutes: Number($('#minutes2').value), demasque: $('#demasque').checked, melanger: $('#melanger').checked })));
 $('#r-grand').addEventListener('click', act(() => ({ action: 'grand' })));
 $('#r-fin').addEventListener('click', act(() => ({ action: 'fin' })));
 $('#r-tat').addEventListener('click', (e) => { const b = e.target.closest('[data-room]'); if (b) openRoom(b.dataset.room); });
