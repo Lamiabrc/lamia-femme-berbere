@@ -142,7 +142,7 @@ const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
 const when = (iso) => new Date(iso).toLocaleString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
 const PHASES = { accueil: 'Grand salon ouvert', tour: 'Tête-à-tête en cours', fin: 'Fin du bal : souhaits', ferme: 'Portes fermées' };
-const ERRORS = { forbidden: 'Ce compte n’a pas le rôle administratrice.', video_not_configured: 'La clé Daily manque dans Vercel.', bal_closed: 'Le bal est fermé.', bad_planb: 'Le lien de secours doit être un lien Google Meet, Zoom ou Jitsi.', temporary_failure: 'Erreur temporaire, réessaie.' };
+const ERRORS = { forbidden: 'Ce compte n’a pas le rôle administratrice.', video_not_configured: 'La clé Daily manque dans Vercel.', bal_closed: 'Le bal est fermé.', tour_en_cours: 'Un tour est déjà en cours.', bad_planb: 'Le lien de secours doit être un lien Google Meet, Zoom ou Jitsi.', temporary_failure: 'Erreur temporaire, réessaie.' };
 
 async function bal(body) {
   const { data: { session } } = await supabase.auth.getSession();
@@ -202,7 +202,22 @@ $('#login').addEventListener('submit', async (e) => {
   if (error) { alert('Connexion impossible : vérifie ton email et ton mot de passe.'); return; }
   start();
 });
-const act = (body, confirmText) => async () => { if (confirmText && !confirm(confirmText)) return; try { paint(await bal(body())); } catch { /* */ } };
+const act = (body, confirmText) => async () => {
+  if (confirmText && !confirm(confirmText)) return;
+  const corps = body();
+  // Un seul clic compte : pas de tours lancés en double.
+  if (act.enCours) return;
+  act.enCours = true;
+  document.querySelectorAll('#bal button').forEach((x) => { x.dataset.avant = x.disabled ? '1' : ''; x.disabled = true; });
+  setTimeout(() => { act.enCours = false; document.querySelectorAll('#bal button').forEach((x) => { x.disabled = x.dataset.avant === '1'; }); }, 2500);
+  try { paint(await bal(corps)); }
+  catch (e) {
+    // Un tour est déjà en cours : on ne le remplace qu'après confirmation.
+    if (e.message === 'tour_en_cours' && confirm('Un tour est déjà en cours.\n\nLe remplacer par un nouveau tour ? (S’il a commencé il y a moins d’une minute, il ne compte pas : ces personnes pourront encore se rencontrer.)')) {
+      try { paint(await bal({ ...corps, forcer: true })); } catch { /* */ }
+    }
+  }
+};
 $('#btn-open').addEventListener('click', act(() => ({ action: 'open', event_id: $('#soiree').value })));
 $('#btn-round').addEventListener('click', act(() => ({ action: 'round', minutes: Number($('#minutes').value), demasque: $('#demasque').checked, melanger: $('#melanger').checked })));
 $('#btn-planb').addEventListener('click', act(() => ({ action: 'planb', url: $('#planb').value.trim() })));
