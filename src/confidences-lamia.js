@@ -333,7 +333,7 @@ async function chargerDemandes() {
   const box = $('[data-demandes]');
   if (!box) return;
   try {
-    const { demandes } = await api({ action: 'matchs_demandes' }, await jetonFrais());
+    const { demandes, personnes = {} } = await api({ action: 'matchs_demandes' }, await jetonFrais());
     const n = demandes.filter((d) => d.statut === 'a_traiter').length;
     $('[data-n-demandes]').textContent = n ? `(${n})` : '';
     if (!demandes.length) { box.innerHTML = '<p class="cl-vide">Aucune demande pour le moment.</p>'; return; }
@@ -356,12 +356,15 @@ async function chargerDemandes() {
       ${g.liste.map((d) => { const [sc, cl, txt] = niveau(d.potentiel?.score); return `<article class="cl-demande${d === g.meilleur ? ' is-meilleur' : ''}" data-demande="${d.id}">
         <div class="cl-pot ${cl}" title="${txt}"><b>${sc}</b><small>/100</small></div>
         <div class="cl-demande-corps">
-          <p class="cl-coord">${d === g.meilleur ? '<b class="cl-meilleur">⭐ Meilleur potentiel</b> · ' : ''}${d.reciproque ? '<b class="cl-reciproque">💞 RÉCIPROQUE</b> · ' : ''}${d.via === 'swipe' ? '💘 swipe · ' : ''}${quand(d.created_at)} · ${txt}</p>
+          <p class="cl-coord">${d.potentiel?.outil ? '<b class="cl-source">algorithme de ton outil</b> · ' : d.potentiel?.provisoire ? '<b class="cl-provisoire">note provisoire : synchronise ton outil</b> · ' : ''}${d === g.meilleur ? '<b class="cl-meilleur">⭐ Meilleur potentiel</b> · ' : ''}${d.reciproque ? '<b class="cl-reciproque">💞 RÉCIPROQUE</b> · ' : ''}${d.via === 'swipe' ? '💘 swipe · ' : ''}${quand(d.created_at)} · ${txt}</p>
           <p>💌 → ${qui(d.cible)}</p>
           ${d.potentiel && (d.potentiel.forts.length || d.potentiel.vigilance.length) ? `<details><summary>Pourquoi ce score</summary>${d.potentiel.forts.length ? `<p class="cl-forts">✓ ${d.potentiel.forts.map(esc).join('<br>✓ ')}</p>` : ''}${d.potentiel.vigilance.length ? `<p class="cl-vigilance">⚠ ${d.potentiel.vigilance.map(esc).join('<br>⚠ ')}</p>` : ''}</details>` : ''}
           <label>Statut<select data-demande-statut>${Object.entries(STATUT_DEMANDE).map(([k, v]) => `<option value="${k}"${k === d.statut ? ' selected' : ''}>${v}</option>`).join('')}</select></label>
         </div>
       </article>`; }).join('')}
+      ${(() => { const pp = personnes[g.qui?.ref] || {}; const prop = pp.proposes || [], sug = pp.suggestions || [];
+        return `${prop.length ? `<div class="cl-jauge"><h5>💌 Proposés par toi</h5>${prop.map((x) => { const [sc, cl] = niveau(x.score); return `<p><span class="cl-pot ${cl} is-petit"><b>${sc}</b></span> n° ${x.cible_ref} · ${x.reponse === 'oui' ? '✅ ça l’intéresse' : x.reponse === 'non' ? '✖ pas pour elle / lui' : '⏳ en attente de réponse'}</p>`; }).join('')}</div>` : ''}
+        ${sug.length ? `<div class="cl-jauge"><h5>🧭 Meilleurs scores de ton outil, pas encore demandés ni proposés</h5>${sug.map((x) => { const [sc, cl] = niveau(x.score); return `<p><span class="cl-pot ${cl} is-petit"><b>${sc}</b></span> n° ${x.ref}${x.niveau ? ` · ${esc(x.niveau)}` : ''} <button class="cl-btn" type="button" data-proposer="${g.qui.ref}" data-cible="${x.ref}" data-score="${x.score}">💌 Lui proposer</button></p>`; }).join('')}</div>` : ''}`; })()}
     </section>`).join('');
   } catch (err) { box.innerHTML = `<p class="cl-vide">${esc(erreur(err.code))}</p>`; }
 }
@@ -421,4 +424,13 @@ document.addEventListener('click', async (e) => {
   const env = e.target.closest('[data-nouv-envoyer]'), sup = e.target.closest('[data-nouv-suppr]');
   if (env) { env.disabled = true; try { await api({ action: 'annonce_nouveautes_envoyer' }, await jetonFrais()); } catch { /* */ } chargerNouveautes(); }
   if (sup && confirm('Supprimer cette nouveauté du fil ?')) { try { await api({ action: 'annonce_nouveaute_suppr', id: sup.dataset.nouvSuppr }, await jetonFrais()); } catch { /* */ } chargerNouveautes(); }
+});
+
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-proposer]');
+  if (!b) return;
+  if (!confirm(`Proposer le profil n° ${b.dataset.cible} à la personne n° ${b.dataset.proposer} ? Elle le verra dans son espace LFB (fiche anonyme) et recevra une notification.`)) return;
+  b.disabled = true;
+  try { await api({ action: 'annonce_proposer', pour: b.dataset.proposer, cible: b.dataset.cible, score: b.dataset.score }, await jetonFrais()); b.textContent = '✅ Proposé'; }
+  catch (err) { b.disabled = false; alert(err.code === 'pas_de_compte' ? 'Cette personne n’a pas encore de compte LFB.' : 'La proposition n’est pas partie. Réessaie.'); }
 });
