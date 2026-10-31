@@ -17,7 +17,8 @@ Email : <a href="mailto:lamia.brechet@outlook.fr">lamia.brechet@outlook.fr</a></
 <p>Site hébergé par Vercel Inc., 440 N Barranca Avenue #4133, Covina, CA 91723, États-Unis.<br>
 Données stockées par Supabase, centre de données de Paris (Union européenne).</p>
 <h2>Propriété intellectuelle</h2>
-<p>Les textes, illustrations, photographies, logos et la marque Lamia Femme Berbère sont la propriété de leur autrice. Toute reproduction sans autorisation écrite est interdite.</p>`,
+<p>Les textes, illustrations, photographies, logos et la marque Lamia Femme Berbère sont la propriété de leur autrice. Toute reproduction sans autorisation écrite est interdite.</p>
+<p>Crédits : photographies de paysages de Kabylie et de silhouettes issues de Pexels (licence Pexels, usage libre) ; icônes inspirées de Lucide (licence ISC).</p>`,
   },
   {
     path: '/cgv/',

@@ -193,17 +193,17 @@ function header(room) {
         <div class="maison-menu-etage"><p>Mon compte</p><ul><li><a href="/mon-espace/"><strong>Mon espace</strong></a></li><li><a href="/application/"><strong>L’application</strong></a></li></ul></div>
       </div>
     </details>
-    <a class="cloche" href="/nouveautes/" aria-label="Les nouveautés"><span aria-hidden="true">🔔</span><b data-cloche-point hidden></b></a>
-    <a class="account-link" href="/mon-espace/" data-account-link aria-label="Se connecter ou ouvrir mon espace"><span class="account-icone" aria-hidden="true">👤</span><span data-account-texte>Se connecter</span></a>
-    <a class="cta-profil" href="/rencontres/#confier">💌 Confier mon profil</a>
+    <a class="cloche" href="/nouveautes/" aria-label="Les nouveautés"><svg class="ico" aria-hidden="true"><use href="/icones.svg#cloche"/></svg><b data-cloche-point hidden></b></a>
+    <a class="account-link" href="/mon-espace/" data-account-link aria-label="Se connecter ou ouvrir mon espace"><span class="account-icone" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#compte"/></svg></span><span data-account-texte>Se connecter</span></a>
+    <a class="cta-profil" href="/rencontres/#confier"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg><span>Confier mon profil</span></a>
   </div>
 </header>
 <nav class="barre-app" aria-label="Raccourcis">
-  <a href="/rencontres/"><span aria-hidden="true">💞</span>Profils</a>
-  <a href="/rencontres/swipe/"><span aria-hidden="true">💘</span>Swipe</a>
-  <a href="/rencontres/#confier"><span aria-hidden="true">💌</span>Mon profil</a>
-  <a href="/salon/"><span aria-hidden="true">🎥</span>Live</a>
-  <a href="/mon-espace/" data-barre-compte><span aria-hidden="true">👤</span><b>Connexion</b></a>
+  <a href="/rencontres/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#profils"/></svg>Profils</a>
+  <a href="/rencontres/swipe/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur"/></svg>Swipe</a>
+  <a href="/rencontres/#confier"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg>Mon profil</a>
+  <a href="/salon/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#live"/></svg>Live</a>
+  <a href="/mon-espace/" data-barre-compte><svg class="ico" aria-hidden="true"><use href="/icones.svg#compte"/></svg><b>Connexion</b></a>
 </nav>`;
 }
 
@@ -319,7 +319,7 @@ page(
       <p class="po-eyebrow">${esc(T('accueil.surtitre', 'Accueil', 'Petite ligne au-dessus du titre', 'La marieuse kabyle · rencontres sérieuses'))}</p>
       <h1 id="accueil-titre">${esc(T('accueil.titre', 'Accueil', 'Grand titre', 'Trouve ton âme sœur kabyle, avec Lamia'))}</h1>
       <p class="po-sub">${esc(T('accueil.sous-titre', 'Accueil', 'Phrase sous le titre', 'Profils vérifiés. Mises en relation faites par Lamia. En vue du mariage.'))}</p>
-      <p class="po-actions"><a class="po-btn" href="/rencontres/#confier">💌 Je confie mon profil</a><a class="po-btn-verre" href="/rencontres/#profils-anonymes">Voir les profils</a></p>
+      <p class="po-actions"><a class="po-btn" href="/rencontres/#confier"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> Je confie mon profil</a><a class="po-btn-verre" href="/rencontres/#profils-anonymes">Voir les profils</a></p>
       <ul class="accueil-preuves">
         <li>✓ Chaque profil vérifié par Lamia</li>
         <li>✓ 1re mise en relation offerte</li>
@@ -343,7 +343,7 @@ page(
       <li><strong>Elle cherche pour toi</strong><span>Son outil de matching compare les profils, et Lamia choisit avec son regard.</span></li>
       <li><strong>Elle vous présente</strong><span>Si vous êtes d’accord tous les deux, elle vous met en contact. La première fois, c’est offert.</span></li>
     </ol>
-    <p class="po-actions"><a class="po-btn" href="/rencontres/#confier">💌 Je confie mon profil</a></p>
+    <p class="po-actions"><a class="po-btn" href="/rencontres/#confier"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> Je confie mon profil</a></p>
   </div>
 
   <div class="accueil-bloc">
@@ -478,7 +478,7 @@ page(
       <li><strong>La mise en relation</strong><span>Si vous êtes d’accord tous les deux, je vous mets en contact. Ton numéro reste chez moi jusque-là. La première mise en relation est offerte, les suivantes avec une <a href="/abonnement/">formule</a>.</span></li>
       <li><strong>Je vous suis</strong><span>Je prends des nouvelles après la rencontre. Si ça ne colle pas, on clôt le match avec respect et ton profil revient en attente pour une nouvelle chance.</span></li>
     </ol>
-    <p class="po-actions"><a class="po-btn" href="/rencontres/">💌 Je confie mon profil à Lamia</a><a class="po-btn-verre" href="/rencontres/#profils-anonymes">Voir les profils anonymes</a></p>
+    <p class="po-actions"><a class="po-btn" href="/rencontres/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> Je confie mon profil à Lamia</a><a class="po-btn-verre" href="/rencontres/#profils-anonymes">Voir les profils anonymes</a></p>
   </div>
 </section>
 <section class="salon-replays" id="replays" aria-labelledby="replays-titre">
@@ -1340,7 +1340,7 @@ page(
       <p class="po-eyebrow">Les Rencontres de Lamia</p>
       <h1 id="po-titre">Rencontres kabyles sérieuses, profils vérifiés</h1>
       <p class="po-sub">Tu confies ton profil, Lamia vérifie, cherche et vous présente.</p>
-      <p class="po-actions"><button type="button" class="po-btn" data-annonce-ouvrir aria-expanded="false">💌 Je confie mon profil</button><a class="po-btn-verre" href="#profils-anonymes">Voir les profils</a></p>
+      <p class="po-actions"><button type="button" class="po-btn" data-annonce-ouvrir aria-expanded="false"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> Je confie mon profil</button><a class="po-btn-verre" href="#profils-anonymes">Voir les profils</a></p>
     </div>
     <figure class="po-lamia">
       <img src="/images/lamia/lamia-portrait-tatouages-rond-480.webp" alt="Lamia Femme Berbère, marieuse kabyle" width="240" height="240">
@@ -1359,7 +1359,7 @@ page(
       <li><strong>Tu sais combien te correspondent</strong><span>Lamia te dit avec combien de personnes tu pourrais correspondre. Personne ne sait qui matche avec qui.</span></li>
       <li><strong>Lamia vous présente</strong><span>Si vous êtes d’accord tous les deux, elle vous met en contact. Ton numéro reste chez elle jusque-là. La première fois, c’est offert.</span></li>
     </ol>
-    <p class="po-actions"><button type="button" class="po-btn" data-annonce-ouvrir aria-expanded="false">💌 Je confie mon profil</button></p>
+    <p class="po-actions"><button type="button" class="po-btn" data-annonce-ouvrir aria-expanded="false"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> Je confie mon profil</button></p>
   </div>
   <h2 class="annonces-titre">Les formules</h2>
   <p class="annonces-sous">Sans engagement. La première mise en relation est toujours offerte.</p>
@@ -1468,15 +1468,15 @@ page(
     scripts: ['/assets/swipe.js'],
     body: `<div class="po-app"><section class="po-hero swipe-hero"><div class="po-fond" aria-hidden="true"></div>
   <p class="po-eyebrow">Les Rencontres</p><h1>Swipe les profils vérifiés</h1>
-  <p class="po-lead">À droite 💚 s’il t’intéresse, à gauche ✕ sinon, sans limite. Ton identité reste secrète : on ne voit que des numéros de profil. Si vous vous choisissez tous les deux, Lamia est prévenue et vous met en relation.</p>
+  <p class="po-lead">À droite (cœur) s’il t’intéresse, à gauche (croix) sinon, sans limite. Ton identité reste secrète : on ne voit que des numéros de profil. Si vous vous choisissez tous les deux, Lamia est prévenue et vous met en relation.</p>
 </section>
 <div class="swipe-app">
   <div class="swipe-infos" data-swipe-infos></div>
   <div class="swipe-filtres-zone" data-swipe-filtres></div>
   <p class="swipe-compteur" data-swipe-compteur></p>
   <div class="swipe-pile" data-swipe><p class="annonce-vide">Les profils arrivent…</p></div>
-  <div class="swipe-boutons" data-swipe-boutons hidden><button type="button" data-swipe-non aria-label="Pas pour moi">✕</button><button type="button" class="swipe-annuler" data-swipe-annuler aria-label="Revenir au profil précédent" disabled>↩</button><button type="button" data-swipe-oui aria-label="Ce profil m’intéresse">💚</button></div>
-  <p class="swipe-aide">↩ pour revenir sur ton dernier choix. Sur ordinateur : flèches ← et → du clavier. Ajoute le site à ton écran d’accueil pour l’avoir comme une application.</p>
+  <div class="swipe-boutons" data-swipe-boutons hidden><button type="button" data-swipe-non aria-label="Pas pour moi"><svg class="ico" aria-hidden="true"><use href="/icones.svg#croix"/></svg></button><button type="button" class="swipe-annuler" data-swipe-annuler aria-label="Revenir au profil précédent" disabled><svg class="ico" aria-hidden="true"><use href="/icones.svg#retour"/></svg></button><button type="button" data-swipe-oui aria-label="Ce profil m’intéresse"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur-plein"/></svg></button></div>
+  <p class="swipe-aide">La flèche ronde te fait revenir sur ton dernier choix. Sur ordinateur : flèches ← et → du clavier. Ajoute le site à ton écran d’accueil pour l’avoir comme une application.</p>
 </div></div>`,
   })
 );
