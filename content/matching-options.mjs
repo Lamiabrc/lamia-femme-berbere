@@ -183,7 +183,7 @@ export function foiEtVie(a) {
   const vie = (a.mode_vie || []).map((x) => lib(x));
   if (!foi && !a.religion_texte && !vie.length && !a.autres) return '';
   return `<h4>Religion et mode de vie</h4>
-    ${foi ? `<p>🕊 ${esc(foi.charAt(0).toUpperCase() + foi.slice(1))}</p>` : ''}${a.religion_texte ? `<p>${esc(a.religion_texte)}</p>` : ''}
+    ${foi ? `<p>${esc(foi.charAt(0).toUpperCase() + foi.slice(1))}</p>` : ''}${a.religion_texte ? `<p>${esc(a.religion_texte)}</p>` : ''}
     ${vie.length ? `<p class="annonce-tags">${vie.map((t) => `<span>${esc(t)}</span>`).join('')}</p>` : ''}${a.autres ? `<p>${esc(a.autres)}</p>` : ''}`;
 }
 

@@ -426,18 +426,18 @@ function carte(a) {
   const tags = [...(a.origine || []), ...(a.caracteristiques || [])];
   const infos = [a.genre === 'femme' ? 'Une femme' : 'Un homme', `${a.age} ans`, lib(a.pays), a.situation && lib(a.situation), a.enfants === 'Oui' ? 'avec enfant(s)' : a.enfants === 'Non' ? 'sans enfant' : '', a.etudes && `études : ${lib(a.etudes).toLowerCase()}`].filter(Boolean);
   return `<article class="annonce-carte annonce-anonyme">
-    <div class="annonce-sceau" aria-hidden="true"><img src="/images/outil/${a.genre === 'femme' ? 'h_femme' : 'h_man'}.webp" alt="" width="80" height="80"></div>
+    <div class="annonce-sceau" aria-hidden="true"><img src="/images/outil/${a.genre === 'femme' ? 'avatar-femme' : 'avatar-homme'}.webp" alt="" width="80" height="80"></div>
     <div class="annonce-texte">
-      <p class="annonce-ref${a.piece_identite ? ' is-piece' : ''}">Profil n° ${a.ref} · ${a.piece_identite ? '🛡 vérifié avec pièce d’identité' : a.outil ? (a.confirme ? '✓ vérifié par Lamia · ✅ confirmé' : '✓ vérifié par Lamia · ⏳ en attente de confirmation') : '✓ profil vérifié'}</p>
+      <p class="annonce-ref${a.piece_identite ? ' is-piece' : ''}">Profil n° ${a.ref} · ${a.piece_identite ? 'vérifié avec pièce d’identité' : a.outil ? (a.confirme ? '✓ vérifié par Lamia · ✅ confirmé' : '✓ vérifié par Lamia · ⏳ en attente de confirmation') : '✓ profil vérifié'}</p>
       <h3>${esc(infos.slice(0, 2).join(', '))}</h3>
-      <p class="annonce-lieu">${esc([a.ville && `📍 ${a.ville}`, ...infos.slice(2)].filter(Boolean).join(' · '))}</p>
-      ${a.village ? `<p class="annonce-lieu">🏡 Originaire de ${esc(a.village)}</p>` : ''}
+      <p class="annonce-lieu"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lieu"/></svg>${esc([a.ville, ...infos.slice(2)].filter(Boolean).join(' · '))}</p>
+      ${a.village ? `<p class="annonce-lieu"><svg class="ico" aria-hidden="true"><use href="/icones.svg#maison"/></svg> Originaire de ${esc(a.village)}</p>` : ''}
       ${tags.length ? `<p class="annonce-tags">${tags.map((t) => `<span>${esc(lib(t))}</span>`).join('')}</p>` : ''}
       <h4>Qui je suis</h4><p>${esc(a.profil)}</p>
       <h4>Qui je cherche${ages}</h4><p>${esc(a.recherche)}</p>
       ${foiEtVie(a)}
-      ${a.secteur ? `<p class="annonce-lieu">🧭 Secteur recherché : ${esc(a.secteur)}</p>` : ''}
-      <button type="button" class="btn btn-ink" data-interet="${a.ref}">💌 Ce profil m’intéresse</button>
+      ${a.secteur ? `<p class="annonce-lieu"><svg class="ico" aria-hidden="true"><use href="/icones.svg#boussole"/></svg> Secteur recherché : ${esc(a.secteur)}</p>` : ''}
+      <button type="button" class="btn btn-ink" data-interet="${a.ref}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur"/></svg> Ce profil m’intéresse</button>
     </div>
   </article>`;
 }

@@ -3256,3 +3256,6 @@ label.is-manquant { outline: 2px solid #c0263f; outline-offset: 3px; border-radi
 /* Photo de Kabylie plus présente, toujours feutrée */
 .po-hero::before { background: linear-gradient(180deg, rgba(35,4,12,.7) 0%, rgba(35,4,12,.35) 30%, rgba(35,4,12,.12) 55%), linear-gradient(0deg, rgba(25,3,8,.8) 0%, rgba(25,3,8,0) 42%), linear-gradient(90deg, rgba(25,3,8,.6), rgba(25,3,8,0) 70%) !important; }
 .swipe-info .ico { color: #ff8fa8; width: 1.1em; height: 1.1em; }
+.annonce-lieu .ico { color: #e3b45c; margin-right: 4px; width: 1.05em; height: 1.05em; }
+.annonce-ref.is-piece::before { content: ''; }
+[data-interet] .ico { width: 1.1em; height: 1.1em; margin-right: 4px; }
