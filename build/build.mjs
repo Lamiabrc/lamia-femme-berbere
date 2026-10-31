@@ -961,6 +961,9 @@ page(
 <section class="bal-step" data-step="ferme" hidden>
   <div class="bal-hero is-short"><h1>Le bal est fermé</h1><p class="bal-lead">Les portes ne sont pas encore ouvertes, ou le bal est terminé. Merci, et à très vite à la Maison.</p><p class="bal-actions"><a class="btn btn-gold" href="/speed-dating/">Retour au Boudoir</a></p></div>
 </section>
+<section class="bal-step" data-step="autre" hidden>
+  <div class="bal-hero is-short"><h1>Tu es entré·e ailleurs</h1><p class="bal-lead">Ton compte vient d’entrer au bal sur un autre appareil ou un autre onglet. Une seule connexion par personne : celle-ci est fermée.</p><p class="bal-actions"><button class="btn btn-gold" type="button" onclick="location.reload()">Revenir ici à la place</button></p></div>
+</section>
 <section class="bal-step" data-step="quitte" hidden>
   <div class="bal-hero is-short"><h1>Tu as quitté le bal</h1><p class="bal-lead">Tu peux revenir à tout moment tant que le bal est ouvert.</p><p class="bal-actions"><button class="btn btn-gold" type="button" onclick="location.reload()">Revenir au bal</button></p></div>
 </section>

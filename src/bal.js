@@ -104,6 +104,7 @@ async function tick() {
   if (!ok) {
     if (status === 401) { store.clear(); location.reload(); return; }
     if (data?.error === 'bal_closed') { await call?.leave().catch(() => {}); clearInterval(poll); show('ferme'); return; }
+    if (data?.error === 'autre_connexion') { await call?.leave().catch(() => {}); clearInterval(poll); store.clear(); show('autre'); return; }
     return;
   }
   state = data;
