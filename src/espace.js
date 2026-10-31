@@ -304,7 +304,6 @@ async function interetsRecus(session) {
         const { publicKey } = await appel({ action: 'annonce_push_cle' });
         const sub = (await reg.pushManager.getSubscription()) || (await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: octets(publicKey) }));
         const r = await appel({ action: 'annonce_push_abonner', subscription: sub.toJSON(), tester: true });
-        if (r.lamia) return dire('<p>🔔 Ce téléphone reçoit déjà tes alertes de Lamia (espace Confidences) : rien à changer.</p>');
       } catch { /* */ }
       etat();
     }
