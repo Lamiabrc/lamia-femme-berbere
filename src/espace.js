@@ -23,6 +23,7 @@ async function render() {
   monProfil(session);
   mesFiches(session);
   interetsRecus(session);
+  propositions(session);
   const { data } = await supabase.from('event_registrations')
     .select('attendance_status, speed_dating_events(title, audience, starts_at)')
     .neq('attendance_status', 'cancelled');
@@ -231,6 +232,37 @@ async function mesFiches(session) {
       <p>💌 <strong>${esc(f.interets.total)}</strong> personne(s) intéressée(s)${f.interets.mis_en_relation ? ` · 💞 ${esc(f.interets.mis_en_relation)} mise(s) en relation` : ''}${f.interets.dernier ? ` · dernier intérêt le ${esc(new Date(f.interets.dernier).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' }))}` : ''}</p></div>
       <div class="espace-achat-droite"><a class="btn btn-ink" href="${esc(f.lien)}">Voir ma fiche</a></div></article>`).join('');
   } catch { box.innerHTML = ''; }
+}
+
+// Profils proposés par Lamia (depuis son outil) : fiche anonyme et réponse oui / non.
+async function propositions(session) {
+  const box = document.querySelector('[data-espace-propositions]');
+  if (!box) return;
+  let liste = [];
+  const carte = (x) => {
+    const f = x.fiche;
+    const infos = [f.genre === 'femme' ? 'Une femme' : 'Un homme', f.age && `${f.age} ans`, f.ville, f.village && `originaire de ${f.village}`, f.pays, f.situation].filter(Boolean);
+    const ages = f.age_min || f.age_max ? ` · ${f.age_min || 18} à ${f.age_max || 99} ans` : '';
+    const rep = x.reponse === 'oui' ? '<p class="espace-match">Tu as dit oui : Lamia est prévenue et s’occupe de la suite.</p>'
+      : x.reponse === 'non' ? '<p>Tu as répondu : pas pour moi.</p>'
+      : `<p class="interet-boutons"><button type="button" class="btn btn-ink" data-proposition="oui" data-id="${esc(x.id)}">Ce profil m’intéresse</button><button type="button" class="btn btn-line" data-proposition="non" data-id="${esc(x.id)}">Pas pour moi</button></p>`;
+    return `<article class="espace-achat interet-recu proposition"><div><p class="event-date">Proposé par Lamia · profil n° ${esc(f.ref)} · le ${esc(new Date(x.le).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' }))}</p>
+      <h3>${esc(infos.join(' · '))}</h3>
+      ${x.message ? `<p class="proposition-mot">« ${esc(x.message)} » <small>Lamia</small></p>` : ''}
+      ${f.profil ? `<p><strong>Qui je suis :</strong> ${esc(f.profil)}</p>` : ''}
+      ${f.recherche ? `<p><strong>Qui je cherche${esc(ages)} :</strong> ${esc(f.recherche)}</p>` : ''}
+      ${rep}</div></article>`;
+  };
+  const afficher = () => { box.innerHTML = liste.length ? liste.map(carte).join('') : '<p>Pas encore de proposition. Quand Lamia trouve un profil pour toi, il apparaît ici et tu es prévenu·e.</p>'; };
+  try { ({ propositions: liste = [] } = await appelProfil({ action: 'annonce_propositions' }, session)); afficher(); }
+  catch { box.innerHTML = '<p>Les propositions ne s’affichent pas pour le moment.</p>'; return; }
+  box.addEventListener('click', async (e) => {
+    const b = e.target.closest('[data-proposition]');
+    if (!b) return;
+    b.parentElement.querySelectorAll('button').forEach((x) => { x.disabled = true; });
+    try { await appelProfil({ action: 'annonce_proposition_rep', id: b.dataset.id, reponse: b.dataset.proposition }, session); liste = liste.map((x) => (x.id === b.dataset.id ? { ...x, reponse: b.dataset.proposition } : x)); afficher(); }
+    catch { b.parentElement.querySelectorAll('button').forEach((x) => { x.disabled = false; }); }
+  });
 }
 
 // Intérêts reçus : fiche anonyme de la personne intéressée, et réponse oui / non.

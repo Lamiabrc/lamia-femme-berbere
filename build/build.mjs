@@ -811,6 +811,11 @@ page(
       <div class="espace-profil" data-espace-fiches></div>
     </section>
 
+    <section id="propositions">
+      <h2>Profils proposés par Lamia</h2>
+      <p>Lamia a choisi pour toi des profils qui pourraient te correspondre. Leur fiche est anonyme. Dis-lui s’ils t’intéressent : si l’autre personne dit oui aussi, Lamia vous met en relation.</p>
+      <div class="espace-interets" data-espace-propositions><p class="loading">Un instant…</p></div>
+    </section>
     <section id="interets">
       <h2>Intérêts reçus</h2>
       <p>Les personnes qui ont dit que ton profil les intéresse. Leur fiche est anonyme, comme sur le site. Si l’une t’intéresse aussi, c’est réciproque : Lamia vous met en relation.</p>

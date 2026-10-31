@@ -3259,3 +3259,6 @@ label.is-manquant { outline: 2px solid #c0263f; outline-offset: 3px; border-radi
 .annonce-lieu .ico { color: #e3b45c; margin-right: 4px; width: 1.05em; height: 1.05em; }
 .annonce-ref.is-piece::before { content: ''; }
 [data-interet] .ico { width: 1.1em; height: 1.1em; margin-right: 4px; }
+.proposition { border-left: 4px solid #c8902e; }
+.proposition-mot { font-style: italic; color: #7a4b12; }
+.proposition-mot small { font-style: normal; font-weight: 700; margin-left: 4px; }
