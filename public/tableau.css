@@ -131,3 +131,28 @@
 .tdb-afaire .btn { padding: 6px 14px; font-size: 14px; }
 /* Rencontres : l'espace de gestion des profils, intégré au tableau de bord */
 .tdb-rencontres { width: 100%; height: calc(100vh - 190px); min-height: 640px; border: 1px solid #e6d6c0; border-radius: 16px; background: #fbf6f1; }
+
+/* Application : journal, retraits, notifications */
+.tdb-pastille { display: inline-block; min-width: 18px; padding: 0 5px; border-radius: 999px; background: #8a1024; color: #fff; font-size: 11px; line-height: 18px; text-align: center; }
+.tdb-grille-app { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.tdb-grille-app > div > .tdb-carte + .tdb-carte { margin-top: 18px; }
+@media (max-width: 900px) { .tdb-grille-app { grid-template-columns: 1fr; } }
+.tdb-filtres-journal { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 12px; }
+.tdb-filtres-journal button { border: 1px solid #e6d6c0; background: #fff; border-radius: 999px; padding: 5px 11px; font: inherit; font-size: 13px; cursor: pointer; color: #2b2118; }
+.tdb-filtres-journal button.is-on { background: #2b2118; color: #fff; border-color: #2b2118; }
+.tdb-filtres-journal b { color: #8a1024; }
+.tdb-filtres-journal button.is-on b { color: #ffd6a0; }
+.tdb-journal, .tdb-retraits { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; max-height: 70vh; overflow: auto; }
+.tdb-jour { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: #8a7a6a; margin-top: 8px; }
+.tdb-evt { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 9px 11px; border-radius: 12px; background: #fbf6f1; border-left: 4px solid #d8c7b0; }
+.tdb-evt.is-nouveau { background: #fff3e2; }
+.tdb-evt p { margin: 0; line-height: 1.4; }
+.tdb-evt small { color: #8a7a6a; }
+.tdb-evt .btn { padding: 4px 12px; font-size: 13px; }
+.tdb-evt-ico { font-size: 20px; }
+.cat-reciproque { border-left-color: #c2185b; } .cat-retrait { border-left-color: #6d4c41; } .cat-proposition { border-left-color: #2e7d32; }
+.cat-boutique { border-left-color: #b8860b; } .cat-confidence { border-left-color: #5e35b1; } .cat-demande { border-left-color: #e57373; } .cat-profil { border-left-color: #1e88e5; }
+.tdb-retraits li { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 9px 11px; border-radius: 12px; background: #fbf6f1; }
+.tdb-notifs { display: grid; gap: 8px; }
+.tdb-notifs label { display: flex; gap: 8px; align-items: flex-start; font-size: 15px; }
+.tdb-notifs input { width: 18px; height: 18px; margin-top: 2px; flex: none; }

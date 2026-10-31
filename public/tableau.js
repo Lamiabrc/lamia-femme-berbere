@@ -36,6 +36,7 @@ function ouvrir(tab) {
   if (tab === 'produits' && !produits.length) { chargerProduits(); chargerReglages(); }
   if (tab === 'textes') chargerTextes();
   if (tab === 'bilan') chargerBilan();
+  if (tab === 'application') chargerJournal();
   if (tab === 'rencontres') { const f = $('[data-rencontres]'); if (f && !f.src) f.src = `/confidences-lamia/?integre=1#${aller || 'annonces'}`; aller = ''; }
   scrollTo({ top: 0 });
 }
@@ -91,6 +92,50 @@ document.addEventListener('click', (e) => {
   ouvrir('rencontres');
   const cible = b.dataset.rencontresAller;
   if (cible !== 'annonces') setTimeout(() => { try { f.contentWindow.document.querySelector(cible === 'demandes' ? '[data-demandes]' : '[data-nouv-form]')?.scrollIntoView({ behavior: 'smooth' }); } catch { /* */ } }, 2500);
+});
+
+// ---------------------------------------------------------------- Application : journal « qui fait quoi », retraits, notifications
+let filtreJournal = '';
+const conf = async (body) => { const r = await fetch('/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(body) }); const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'erreur'); return d; };
+async function pastilleJournal() {
+  try { const d = await conf({ action: 'annonce_journal', categorie: 'aucune' }); const p = $('[data-journal-pastille]'); p.textContent = d.non_lus; p.hidden = !d.non_lus; } catch { /* */ }
+}
+async function chargerJournal() {
+  const box = $('[data-journal]');
+  try {
+    const d = await conf({ action: 'annonce_journal', categorie: filtreJournal });
+    const cats = d.categories;
+    $('[data-journal-filtres]').innerHTML = [['', 'Tout', d.non_lus], ...Object.entries(cats).map(([k, c]) => [k, `${c.emoji} ${c.nom.split(' (')[0]}`, d.non_lus_par[k] || 0])]
+      .map(([k, n, nb]) => `<button type="button" class="${k === filtreJournal ? 'is-on' : ''}" data-filtre-journal="${k}">${esc(n)}${nb ? ` <b>${nb}</b>` : ''}</button>`).join('');
+    const jour = (iso) => new Date(iso).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'Europe/Paris' });
+    let dernier = '';
+    box.innerHTML = d.journal.map((x) => {
+      const j = jour(x.created_at), sep = j !== dernier ? `<li class="tdb-jour">${esc(j)}</li>` : ''; dernier = j;
+      const c = cats[x.categorie] || { emoji: '•' };
+      return `${sep}<li class="tdb-evt cat-${esc(x.categorie)}${x.lu ? '' : ' is-nouveau'}"><span class="tdb-evt-ico">${c.emoji}</span><div><p><b>${esc(x.titre)}</b> <small>${esc(date(x.created_at, { hour: '2-digit', minute: '2-digit' }))}${x.notifie ? '' : ' · sans notification'}</small></p>${(x.lignes || []).map((l) => `<p>${esc(l)}</p>`).join('')}</div>${x.lien ? `<button type="button" class="btn btn-line" data-journal-ouvrir="${esc(x.lien)}">Ouvrir</button>` : ''}</li>`;
+    }).join('') || '<li>Rien pour le moment.</li>';
+    $('[data-retraits]').innerHTML = d.retraits.map((r) => `<li><span>${r.source === 'fiche' ? 'Fiche' : 'Profil'} n° ${r.ref} · ${r.genre === 'femme' ? 'femme' : 'homme'}${r.age ? `, ${r.age} ans` : ''}${r.lieu ? `, ${esc(r.lieu)}` : ''}<br><small>${esc(date(r.quand))} · ${r.effacement ? (r.fait ? 'effacée ✓' : '<b>veut être effacée de ton outil</b>') : 'ne veut plus apparaître sur le site (reste dans ton outil)'}</small></span>${r.effacement && !r.fait ? `<button type="button" class="btn btn-ink" data-effacement-fait="${r.ref}">C’est fait</button>` : ''}</li>`).join('') || '<li>Personne pour le moment.</li>';
+    $('[data-appareils]').textContent = `Tes appareils qui reçoivent les alertes : ${d.appareils.lamia}. Membres abonnés aux notifications : ${d.appareils.membres}.`;
+    $('[data-notifs-lamia]').innerHTML = Object.entries(cats).map(([k, c]) => `<label><input type="checkbox" name="${k}" ${d.notifs[k] ? 'checked' : ''}> <span>${c.emoji} ${esc(c.nom)}</span></label>`).join('') + '<p class="aide">Enregistré dès que tu coches. Les « matchs demandés » restent visibles ici et dans « Aujourd’hui ».</p>';
+    if (d.non_lus) { await conf({ action: 'annonce_journal_lu' }).catch(() => {}); $('[data-journal-pastille]').hidden = true; }
+  } catch { box.innerHTML = '<li>Le journal ne s’affiche pas pour le moment.</li>'; }
+}
+document.addEventListener('click', async (e) => {
+  const f = e.target.closest('[data-filtre-journal]');
+  if (f) { filtreJournal = f.dataset.filtreJournal; chargerJournal(); return; }
+  const o = e.target.closest('[data-journal-ouvrir]');
+  if (o) { const l = o.dataset.journalOuvrir; if (l.startsWith('/confidences-lamia/#annonces')) { aller = 'annonces'; const fr = $('[data-rencontres]'); if (fr) fr.removeAttribute('src'); ouvrir('rencontres'); } else window.open(l, '_blank', 'noopener'); return; }
+  const ef = e.target.closest('[data-effacement-fait]');
+  if (ef) {
+    if (!confirm(`Tu as bien supprimé la fiche n° ${ef.dataset.effacementFait} de ton outil ? Son contenu sera aussi effacé du site.`)) return;
+    try { await conf({ action: 'annonce_effacement_fait', ref: Number(ef.dataset.effacementFait) }); message('Effacement noté.'); chargerJournal(); } catch { message('L’effacement n’a pas pu être noté.', true); }
+  }
+});
+document.addEventListener('change', async (e) => {
+  const form = e.target.closest('[data-notifs-lamia]');
+  if (!form) return;
+  const notifs = Object.fromEntries($$('input', form).map((i) => [i.name, i.checked]));
+  try { await conf({ action: 'annonce_notifs_lamia', notifs }); message('Notifications enregistrées.'); } catch { message('Pas enregistré, réessaie.', true); }
 });
 
 function barres(box, jours) {
@@ -451,8 +496,8 @@ async function demarrer() {
   if (session && !admin) message('Ce compte n’a pas le rôle administratrice.', true);
   if (!admin) return;
   const tab = location.hash.slice(1);
-  ouvrir(['accueil', 'rencontres', 'ventes', 'produits', 'soirees', 'bilan', 'alertes', 'textes', 'visites'].includes(tab) ? tab : 'accueil');
-  aFaire();
+  ouvrir(['accueil', 'rencontres', 'application', 'ventes', 'produits', 'soirees', 'bilan', 'alertes', 'textes', 'visites'].includes(tab) ? tab : 'accueil');
+  aFaire(); pastilleJournal();
   await charger();
 }
 $('[data-login]').addEventListener('submit', async (e) => {

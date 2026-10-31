@@ -14,6 +14,7 @@
   <nav class="tdb-onglets" aria-label="Rubriques" data-onglets hidden>
     <button type="button" data-tab="accueil" aria-current="true">Aujourd’hui</button>
     <button type="button" data-tab="rencontres">💞 Rencontres</button>
+    <button type="button" data-tab="application">📱 Application <span class="tdb-pastille" data-journal-pastille hidden></span></button>
     <button type="button" data-tab="ventes">Ventes</button>
     <button type="button" data-tab="produits">Produits</button>
     <button type="button" data-tab="soirees">Soirées</button>
@@ -72,6 +73,30 @@
     <div class="tdb-entete"><h1 class="tdb-titre">Rencontres</h1><div class="tdb-raccourcis"><a class="btn btn-line" href="/confidences-lamia/" target="_blank" rel="noopener">Les messages des Confidences</a></div></div>
     <p class="aide">Ici : valider les profils, traiter les matchs demandés (notés par ton outil), proposer, publier une nouveauté, les abonnés. Ton outil de matching garde ses rôles : publier les fiches, envoyer les liens de confirmation (publipostage), tester les matchs.</p>
     <iframe class="tdb-rencontres" data-rencontres title="Gestion des rencontres" loading="lazy"></iframe>
+  </section>
+
+  <section data-panel="application" hidden>
+    <div class="tdb-entete"><h1 class="tdb-titre">L’application LFB</h1></div>
+    <p class="aide">Tout ce qui se passe dans l’application, avec qui l’a fait. Les notifications de ton téléphone viennent d’ici : tu choisis en bas celles qui sonnent. Les autres restent dans ce journal.</p>
+    <div class="tdb-grille-app">
+      <div class="tdb-carte">
+        <h2>Qui fait quoi</h2>
+        <div class="tdb-filtres-journal" data-journal-filtres></div>
+        <ul class="tdb-journal" data-journal><li>Chargement…</li></ul>
+      </div>
+      <div>
+        <div class="tdb-carte">
+          <h2>Ne veulent plus apparaître</h2>
+          <p class="aide">Les personnes qui ont retiré leur fiche ou demandé l’effacement. Elles ne sont plus visibles sur le site. Pour un effacement : supprime la fiche de ton outil, puis clique « C’est fait ».</p>
+          <ul class="tdb-retraits" data-retraits><li>Chargement…</li></ul>
+        </div>
+        <div class="tdb-carte">
+          <h2>Ce qui sonne sur mon téléphone</h2>
+          <p class="aide" data-appareils></p>
+          <form class="tdb-notifs" data-notifs-lamia></form>
+        </div>
+      </div>
+    </div>
   </section>
 
   <section data-panel="ventes" hidden>
