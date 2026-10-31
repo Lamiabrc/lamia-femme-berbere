@@ -3330,3 +3330,18 @@ body[data-ambiance="espace"] .espace h2 { color: #4a1220; }
 body[data-ambiance="espace"] .espace .btn-ink { background: linear-gradient(135deg, #8a1024, #b0263f); border-color: #8a1024; }
 body[data-ambiance="espace"] .espace-admin { background: linear-gradient(180deg, #4a1220, #2a0d16); }
 body[data-ambiance="espace"] .espace .room-name { color: #8a1024; }
+/* Formulaire de profil en étapes */
+.annonce-form .etape-off { display: none !important; }
+.annonce-progres { display: grid; gap: 6px; margin-bottom: 4px; scroll-margin-top: 90px; }
+.annonce-progres-barre { height: 8px; border-radius: 999px; background: rgba(138, 16, 36, .14); overflow: hidden; }
+.annonce-progres-barre span { display: block; height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg, #d9b25f, #8a1024); transition: width .35s ease; }
+.annonce-progres p { margin: 0; font-size: 14px; font-weight: 600; color: #8a1024; }
+.annonce-nav { display: flex; gap: 10px; justify-content: space-between; padding: 10px 0 4px; }
+.annonce-nav .btn { min-height: 48px; flex: 1; }
+.annonce-nav [data-etape-prec] { flex: 0 0 auto; }
+.annonce-nav [hidden] { display: none; }
+.annonce-reprise { margin: 0; }
+.annonce-etape-fin .annonce-envoyer { width: 100%; min-height: 52px; }
+@media (max-width: 600px) {
+  .annonce-nav { position: sticky; bottom: calc(66px + env(safe-area-inset-bottom)); z-index: 5; background: linear-gradient(180deg, rgba(42,9,19,0), rgba(42,9,19,.96) 40%); padding-top: 18px; margin: 0 -4px; }
+}

@@ -286,10 +286,9 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
   const corrige = (e) => e.target.closest?.('.is-manquant, label')?.classList.remove('is-manquant');
   form.addEventListener('input', corrige); form.addEventListener('change', corrige);
   if (existant) return monterEdition(form, st, existant, token);
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+  // Tout ce qui manque, d'un coup : la liste exacte, chaque champ entouré, et un clic emmène au champ.
+  const calculerManques = () => {
     const f = form.elements;
-    // Tout ce qui manque, d'un coup : la liste exacte, chaque champ entouré, et un clic emmène au champ.
     const manques = [];
     const manque = (texte, el) => manques.push({ texte, el });
     const live = estLive();
@@ -311,19 +310,32 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
     if (!f.majeur.checked) manque('La case « J’ai 18 ans ou plus… »', f.majeur.closest('label'));
     if (!f.publication.checked) manque('La case « Je confie mon profil à Lamia… »', f.publication.closest('label'));
     if (identite.length && !f.identite_ok.checked) manque('La case d’accord pour ta pièce d’identité (ou retire la photo)', f.identite_ok.closest('label'));
+    return manques;
+  };
+  const afficherManques = (manques, ou = st) => {
     $$('.is-manquant', form).forEach((x) => x.classList.remove('is-manquant'));
-    $('[data-manques]', form)?.remove();
+    $$('[data-manques]', form).forEach((x) => x.remove());
     if (manques.length) {
       say(st, '');
       const liste = document.createElement('div');
       liste.className = 'annonce-manques'; liste.setAttribute('data-manques', ''); liste.setAttribute('role', 'alert');
       liste.innerHTML = `<p><strong>Il manque ${manques.length > 1 ? `${manques.length} informations` : 'une information'} pour envoyer ton profil :</strong></p><ol>${manques.map((m, k) => `<li><button type="button" data-aller="${k}">${esc(m.texte)}</button></li>`).join('')}</ol>`;
-      st.before(liste);
+      if (ou === st) st.before(liste); else ou.append(liste);
       manques.forEach((m) => (m.el?.closest('label') || m.el)?.classList.add('is-manquant'));
-      liste.querySelectorAll('[data-aller]').forEach((b) => b.addEventListener('click', () => { const el = manques[b.dataset.aller].el; try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch { /* */ } el.focus?.(); }));
+      liste.querySelectorAll('[data-aller]').forEach((b) => b.addEventListener('click', () => { const el = manques[b.dataset.aller].el; etapes?.allerA(el); try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch { /* */ } el.focus?.(); }));
       try { liste.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch { /* */ }
-      return;
+      return true;
     }
+    return false;
+  };
+  // Formulaire en étapes, comme une appli : une étape à la fois, barre de progression, brouillon gardé.
+  const etapes = monterEtapes(form, { calculerManques, afficherManques });
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = form.elements;
+    const live = estLive();
+    const manques = calculerManques();
+    if (manques.length) { etapes?.allerA(manques[0].el); afficherManques(manques, etapes ? etapes.courante() : st); return; }
     const session = await sessionActive();
     if (!session) { monterFormulaire(box); return; }
     const btn = $('.annonce-envoyer', form); btn.disabled = true;
@@ -346,6 +358,7 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
       }
       const fin = res.annonce_id ? await api({ action: 'annonce_finaliser', annonce_id: res.annonce_id, token: res.token }) : {};
       window.lfbEvent?.('annonce_deposee');
+      try { localStorage.removeItem(BROUILLON); } catch { /* */ }
       box.innerHTML = `<div class="annonce-merci"><p class="annonce-coeur" aria-hidden="true">💌</p><h3>Merci ${esc(f.prenom.value.trim())}, ton profil est bien arrivé chez Lamia${fin.ref ? ` (n° ${fin.ref})` : ''} !</h3><p>Il n’est publié nulle part. Lamia le vérifie, puis le passe dans son outil de matching. Tu recevras par email le nombre de personnes avec qui tu pourrais correspondre. ${live ? 'Tes 3 premières mises en relation sont offertes.' : 'Ta première mise en relation est offerte.'}</p><p>Ton profil est lié à ton compte : tu peux le modifier quand tu veux dans <a href="/mon-espace/">Mon espace</a>.</p><p>En attendant, tu peux <a href="/speed-dating/">t’inscrire à la prochaine soirée</a> ou <a href="/confidences/">écrire à Lamia</a>.</p></div>`;
     } catch (err) {
       btn.disabled = false;
@@ -514,3 +527,86 @@ if (liste) monterListe(liste);
 const viaAncre = () => { if (location.hash === '#confier' && document.querySelector('[data-annonce-box]')) ouvrirFormulaire(); };
 viaAncre();
 addEventListener('hashchange', viaAncre);
+
+
+// ---------------------------------------------------------------- formulaire en étapes (création de profil)
+const BROUILLON = 'lfb-brouillon-profil';
+function monterEtapes(form, { calculerManques, afficherManques }) {
+  // La fin du formulaire (accords + bouton d'envoi) devient la dernière étape.
+  const enfants = [...form.children];
+  const derniere = enfants.filter((x) => x.classList.contains('annonce-etape')).pop();
+  if (!derniere) return null;
+  const fin = document.createElement('div');
+  fin.className = 'annonce-etape annonce-etape-fin';
+  fin.innerHTML = '<h3><span>✓</span> Tes accords, et c’est parti</h3>';
+  enfants.slice(enfants.indexOf(derniere) + 1).forEach((x) => { if (!x.matches('[data-interet-info]')) fin.append(x); });
+  form.append(fin);
+  const toutes = () => $$(':scope > .annonce-etape', form).filter((x) => !x.hidden);
+  const progres = document.createElement('div');
+  progres.className = 'annonce-progres';
+  progres.innerHTML = '<div class="annonce-progres-barre"><span></span></div><p></p>';
+  form.prepend(progres);
+  const nav = document.createElement('div');
+  nav.className = 'annonce-nav';
+  nav.innerHTML = '<button type="button" class="btn btn-line" data-etape-prec>← Retour</button><button type="button" class="btn btn-ink" data-etape-suiv>Continuer →</button>';
+  form.append(nav);
+  let i = 0;
+  const montrer = (n, defiler = true) => {
+    const l = toutes(); i = Math.max(0, Math.min(n, l.length - 1));
+    l.forEach((x, k) => x.classList.toggle('etape-off', k !== i));
+    l.forEach((x, k) => { const n = x.querySelector(':scope > h3 > span'); if (n && !x.classList.contains('annonce-etape-fin')) n.textContent = String(k + 1); });
+    $('span', progres).style.width = `${Math.round(((i + 1) / l.length) * 100)}%`;
+    $('p', progres).textContent = `Étape ${i + 1} sur ${l.length}`;
+    $('[data-etape-prec]', nav).hidden = i === 0;
+    $('[data-etape-suiv]', nav).hidden = i === l.length - 1;
+    sauver();
+    if (defiler) try { progres.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch { /* */ }
+  };
+  $('[data-etape-prec]', nav).addEventListener('click', () => montrer(i - 1));
+  $('[data-etape-suiv]', nav).addEventListener('click', () => {
+    const cur = toutes()[i];
+    const m = calculerManques().filter((x) => x.el && cur.contains(x.el));
+    if (afficherManques(m, cur)) return;
+    montrer(i + 1);
+  });
+  // Brouillon : tout ce qui est écrit est gardé sur ce téléphone (sauf les fichiers), pour reprendre plus tard.
+  const sauver = () => {
+    try {
+      const v = { _etape: i };
+      for (const el of form.elements) {
+        if (!el.name || ['file', 'hidden', 'password'].includes(el.type) || el.name === 'email' || el.name === 'zz_site') continue;
+        if (el.type === 'checkbox') { if (el.checked) (v[el.name] ||= []).push(el.value); }
+        else if (el.type === 'radio') { if (el.checked) v[el.name] = el.value; }
+        else if (el.value) v[el.name] = el.value;
+      }
+      localStorage.setItem(BROUILLON, JSON.stringify(v));
+    } catch { /* stockage indisponible */ }
+  };
+  let brouillon = null;
+  try { brouillon = JSON.parse(localStorage.getItem(BROUILLON) || 'null'); } catch { /* */ }
+  if (brouillon) {
+    const remplir = () => {
+      for (const el of form.elements) {
+        if (!el.name || !(el.name in brouillon) || ['file', 'hidden', 'password'].includes(el.type) || el.name === 'email') continue;
+        const val = brouillon[el.name];
+        if (el.type === 'checkbox') el.checked = Array.isArray(val) && val.includes(el.value);
+        else if (el.type === 'radio') el.checked = el.value === val;
+        else el.value = val;
+      }
+    };
+    remplir();
+    for (const n of ['live', 'genre', 'enfants', 'niveauEtudeCategorie', 'sans_reseau']) form.querySelector(`[name=${n}]:checked, select[name=${n}], [name=${n}][type=checkbox]`)?.dispatchEvent(new Event('change', { bubbles: true }));
+    remplir(); // les listes qui dépendent d'une autre réponse (diplôme, vision du couple) sont remplies maintenant
+    const note = document.createElement('p');
+    note.className = 'annonce-aide annonce-reprise';
+    note.innerHTML = '📝 On a gardé ce que tu avais commencé. <button type="button" class="link-button">Tout effacer</button>';
+    $('button', note).addEventListener('click', () => { try { localStorage.removeItem(BROUILLON); } catch { /* */ } location.reload(); });
+    progres.after(note);
+  }
+  form.addEventListener('input', sauver); form.addEventListener('change', sauver);
+  montrer(brouillon?._etape || 0, false);
+  return {
+    courante: () => toutes()[i],
+    allerA: (el) => { const k = toutes().findIndex((x) => x.contains(el)); if (k >= 0 && k !== i) montrer(k, false); },
+  };
+}
