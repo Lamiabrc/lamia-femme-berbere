@@ -3232,3 +3232,5 @@ label.is-manquant { outline: 2px solid #c0263f; outline-offset: 3px; border-radi
 @media (max-width: 480px) { .nouveaute { grid-template-columns: 64px 1fr; } .nouveaute img, .nouveaute-emoji { width: 64px; height: 64px; font-size: 30px; } }
 .notif-prefs { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
 .notif-prefs label { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; border: 2px solid var(--c); color: var(--c); font: 700 13px Inter, system-ui, sans-serif; background: #fff; }
+.notif-prefs label { width: auto !important; flex-direction: row !important; }
+.notif-prefs input[type=checkbox] { width: 18px !important; height: 18px !important; min-width: 0 !important; padding: 0 !important; margin: 0 !important; flex: none; accent-color: var(--c); }
