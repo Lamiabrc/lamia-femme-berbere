@@ -328,7 +328,7 @@ async function chargerAbonnes() {
 }
 
 // ---------------------------------------------------------------- matchs demandés (« ce profil m'intéresse »)
-const STATUT_DEMANDE = { a_traiter: 'À traiter', mis_en_relation: 'Mis en relation (match actif)', pas_compatible: 'Pas compatible', dematche: 'Dématché' };
+const STATUT_DEMANDE = { a_traiter: 'À traiter', mis_en_relation: 'Mis en relation (match actif)', en_reserve: '🗂 Gardé en réserve', pas_compatible: 'Pas compatible', dematche: 'Dématché' };
 async function chargerDemandes() {
   const box = $('[data-demandes]');
   if (!box) return;
@@ -345,13 +345,14 @@ async function chargerDemandes() {
     const ordre = [...groupes.values()].map((g) => {
       g.liste.sort((x, y) => (y.statut === 'a_traiter') - (x.statut === 'a_traiter') || (y.potentiel?.score ?? -1) - (x.potentiel?.score ?? -1));
       g.aTraiter = g.liste.filter((d) => d.statut === 'a_traiter').length;
+      g.reserve = g.liste.filter((d) => d.statut === 'en_reserve').length;
       g.enRelation = g.liste.some((d) => d.statut === 'mis_en_relation');
       g.meilleur = g.enRelation ? null : g.liste.find((d) => d.statut === 'a_traiter');
       return g;
     }).sort((x, y) => (y.aTraiter > 0) - (x.aTraiter > 0) || (y.meilleur?.potentiel?.score ?? -1) - (x.meilleur?.potentiel?.score ?? -1));
     box.innerHTML = ordre.map((g) => `<section class="cl-carte cl-groupe">
       <h4>${qui(g.qui)}</h4>
-      <p class="cl-coord">${g.liste.length} match(s) demandé(s)${g.aTraiter ? ` · <b>${g.aTraiter} à traiter</b>` : ''}${g.enRelation ? ' · <b>💞 déjà mis(e) en relation</b>' : g.meilleur ? ' · ⭐ fais la mise en relation avec le meilleur potentiel' : ''}${g.qui?.status && g.qui.status !== 'publiee' ? ' · <b class="cl-a-verifier">⏳ profil pas encore vérifié</b>' : ''}</p>
+      <p class="cl-coord">${g.liste.length} match(s) demandé(s)${g.aTraiter ? ` · <b>${g.aTraiter} à traiter</b>` : ''}${g.reserve ? ` · 🗂 ${g.reserve} en réserve` : ''}${g.enRelation ? ' · <b>💞 déjà mis(e) en relation</b>' : g.meilleur ? ' · ⭐ fais la mise en relation avec le meilleur potentiel' : ''}${g.qui?.status && g.qui.status !== 'publiee' ? ' · <b class="cl-a-verifier">⏳ profil pas encore vérifié</b>' : ''}</p>
       ${g.liste.map((d) => { const [sc, cl, txt] = niveau(d.potentiel?.score); return `<article class="cl-demande${d === g.meilleur ? ' is-meilleur' : ''}" data-demande="${d.id}">
         <div class="cl-pot ${cl}" title="${txt}"><b>${sc}</b><small>/100</small></div>
         <div class="cl-demande-corps">
@@ -372,9 +373,9 @@ document.addEventListener('change', async (e) => {
     // Une seule mise en relation par personne : proposer de clore ses autres demandes en attente.
     if (sel.value === 'mis_en_relation') {
       const autres = [...sel.closest('.cl-groupe').querySelectorAll('[data-demande]')].filter((x) => x !== sel.closest('[data-demande]') && x.querySelector('[data-demande-statut]').value === 'a_traiter');
-      if (autres.length && confirm(`Passer les ${autres.length} autre(s) demande(s) de cette personne en « Pas compatible » ?`)) {
+      if (autres.length && confirm(`Garder les ${autres.length} autre(s) demande(s) de cette personne en réserve ?\n\nSi ce match se termine, celles qui sont toujours disponibles repasseront « à traiter » et tu recevras une alerte avec le meilleur potentiel.`)) {
         const jeton = await jetonFrais();
-        for (const x of autres) await api({ action: 'match_demande_statut', id: x.dataset.demande, statut: 'pas_compatible' }, jeton).catch(() => {});
+        for (const x of autres) await api({ action: 'match_demande_statut', id: x.dataset.demande, statut: 'en_reserve' }, jeton).catch(() => {});
       }
     }
     chargerDemandes();

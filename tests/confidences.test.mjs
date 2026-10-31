@@ -38,7 +38,7 @@ test('heures de silence (heure de Paris) et réglages nettoyés', () => {
 test('confidence vocale sans compte : envoi signé, alerte push sans contenu et email avec lien', async () => {
   const be = backend({ users: { L: lamia } });
   const ua = createECDH('prime256v1'); ua.generateKeys();
-  be.db.push_subscriptions.push({ id: 'p1', user_id: 'lamia', endpoint: 'https://push.example/abc', p256dh: b64u(ua.getPublicKey()), auth: b64u(randomBytes(16)) });
+  be.db.push_subscriptions.push({ id: 'p1', user_id: 'lamia', pour: 'lamia', endpoint: 'https://push.example/abc', p256dh: b64u(ua.getPublicKey()), auth: b64u(randomBytes(16)) });
   be.db.platform_settings.push({ key: 'confidences_reglages', value: { email_alerte: 'alerte@exemple.fr' } });
 
   assert.equal((await call(be, { action: 'envoyer', name: 'Nadia', email: 'nadia@exemple.fr', body: 'Bonjour' })).body.error, 'consent_required');

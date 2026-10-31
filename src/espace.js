@@ -101,7 +101,7 @@ async function monProfil(session) {
 
 // Suivi : mises en relation offertes et du mois, speed datings inclus, demandes envoyées.
 const QUOTAS = { coeur: { nom: 'Cœur', mises: 3, sd: 1 }, passion: { nom: 'Passion', mises: null, sd: 2 }, prestige: { nom: 'Prestige', mises: null, sd: 2 } };
-const ETAT_DEMANDE = { a_traiter: '⏳ Lamia étudie la compatibilité', mis_en_relation: '💞 Mise en relation faite', pas_compatible: 'Pas compatible, désolée', dematche: 'Match terminé' };
+const ETAT_DEMANDE = { a_traiter: '⏳ Lamia étudie la compatibilité', mis_en_relation: '💞 Mise en relation faite', en_reserve: '🗂 Gardé en réserve : Lamia te le reproposera si ton match se termine', pas_compatible: 'Pas compatible, désolée', dematche: 'Match terminé' };
 async function suivi(el, p) {
   const etat = await etatAbo;
   const a = etat?.abonnement, q = a ? QUOTAS[a.formule] : null, u = etat?.unites || {};
@@ -262,3 +262,47 @@ async function interetsRecus(session) {
     catch { b.parentElement.querySelectorAll('button').forEach((x) => { x.disabled = false; }); }
   });
 }
+
+
+// ---------------------------------------------------------------- notifications sur ce téléphone (intérêts, matchs, mises en relation)
+(function notifications() {
+  const box = document.querySelector('[data-espace-notifs]');
+  if (!box) return;
+  const possible = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+  const ios = /iPhone|iPad|iPod/i.test(navigator.userAgent), installee = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  const octets = (b64) => { const s = atob(b64.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - (b64.length % 4)) % 4)); return Uint8Array.from(s, (c) => c.charCodeAt(0)); };
+  const dire = (html) => { box.innerHTML = html; };
+  async function etat() {
+    if (!possible) return dire(ios && !installee ? '<p>🔔 Sur iPhone, les notifications marchent avec l’application installée : <a class="text-link" href="/application/">installe-la</a>, puis reviens ici depuis l’icône.</p><p class="espace-aide">En attendant, tu es prévenu·e par email.</p>' : '<p>🔔 Ce navigateur ne permet pas les notifications. Tu es prévenu·e par email.</p>');
+    const reg = await navigator.serviceWorker.getRegistration('/');
+    const sub = reg ? await reg.pushManager.getSubscription() : null;
+    if (sub && Notification.permission === 'granted') return dire('<p>🔔 <strong>Notifications activées sur ce téléphone.</strong> Tu es prévenu·e dès qu’une personne s’intéresse à toi, quand c’est réciproque et quand Lamia te trouve un match.</p><p><button type="button" class="btn btn-line" data-notif-off>Désactiver sur ce téléphone</button></p>');
+    if (Notification.permission === 'denied') return dire('<p>🔕 Les notifications sont bloquées pour ce site dans les réglages de ton téléphone. Autorise-les dans les réglages du navigateur, puis recharge la page.</p>');
+    dire('<p>🔔 Sois prévenu·e tout de suite quand quelqu’un s’intéresse à toi, quand c’est réciproque et quand Lamia te trouve un match.</p><p><button type="button" class="btn btn-ink" data-notif-on>Activer les notifications</button></p>');
+  }
+  box.addEventListener('click', async (e) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    const appel = (body) => fetch('/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` }, body: JSON.stringify(body) }).then((r) => r.json());
+    if (e.target.closest('[data-notif-on]')) {
+      e.target.disabled = true;
+      try {
+        if ((await Notification.requestPermission()) !== 'granted') return etat();
+        const reg = (await navigator.serviceWorker.getRegistration('/')) || (await navigator.serviceWorker.register('/sw.js', { scope: '/' }));
+        await navigator.serviceWorker.ready;
+        const { publicKey } = await appel({ action: 'annonce_push_cle' });
+        const sub = (await reg.pushManager.getSubscription()) || (await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: octets(publicKey) }));
+        const r = await appel({ action: 'annonce_push_abonner', subscription: sub.toJSON(), tester: true });
+        if (r.lamia) return dire('<p>🔔 Ce téléphone reçoit déjà tes alertes de Lamia (espace Confidences) : rien à changer.</p>');
+      } catch { /* */ }
+      etat();
+    }
+    if (e.target.closest('[data-notif-off]')) {
+      const reg = await navigator.serviceWorker.getRegistration('/');
+      const sub = reg ? await reg.pushManager.getSubscription() : null;
+      if (sub) { await appel({ action: 'annonce_push_desabonner', endpoint: sub.endpoint }).catch(() => {}); await sub.unsubscribe().catch(() => {}); }
+      etat();
+    }
+  });
+  supabase.auth.getSession().then(({ data: { session } }) => { if (session) etat(); });
+})();
