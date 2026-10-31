@@ -101,6 +101,10 @@
         {
           "key": "X-Robots-Tag",
           "value": "noindex, nofollow"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(self \"https://lamiafemmeberbere.daily.co\"), microphone=(self \"https://lamiafemmeberbere.daily.co\"), display-capture=(self \"https://lamiafemmeberbere.daily.co\"), autoplay=(self \"https://lamiafemmeberbere.daily.co\"), fullscreen=(self \"https://lamiafemmeberbere.daily.co\"), geolocation=()"
         }
       ]
     },
@@ -110,6 +114,10 @@
         {
           "key": "X-Robots-Tag",
           "value": "noindex, nofollow"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(self \"https://lamiafemmeberbere.daily.co\"), microphone=(self \"https://lamiafemmeberbere.daily.co\"), display-capture=(self \"https://lamiafemmeberbere.daily.co\"), autoplay=(self \"https://lamiafemmeberbere.daily.co\"), fullscreen=(self \"https://lamiafemmeberbere.daily.co\"), geolocation=()"
         }
       ]
     },
@@ -119,6 +127,10 @@
         {
           "key": "X-Robots-Tag",
           "value": "noindex, nofollow"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(self \"https://lamiafemmeberbere.daily.co\"), microphone=(self \"https://lamiafemmeberbere.daily.co\"), display-capture=(self \"https://lamiafemmeberbere.daily.co\"), autoplay=(self \"https://lamiafemmeberbere.daily.co\"), fullscreen=(self \"https://lamiafemmeberbere.daily.co\"), geolocation=()"
         }
       ]
     },
