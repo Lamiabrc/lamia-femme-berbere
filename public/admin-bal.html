@@ -25,6 +25,16 @@
   .status.err { color: #ff9aa8; }
   [hidden] { display: none !important; }
   .tat { display: flex; flex-wrap: wrap; gap: 8px; }
+  /* Régie : la caméra et les commandes du bal sur le même écran. */
+  .regie { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 14px; margin-top: 14px; }
+  .regie-video { position: relative; min-height: 420px; height: 62vh; border-radius: 16px; overflow: hidden; background: #000; border: 1px solid rgba(227,189,110,.4); }
+  .regie-video iframe { width: 100%; height: 100%; border: 0; }
+  .regie-ou { position: absolute; top: 10px; left: 10px; z-index: 2; padding: 4px 12px; border-radius: 999px; background: rgba(18,13,26,.85); color: #f3e0b9; font-size: 13px; font-weight: 700; }
+  .regie-cmd { display: grid; gap: 10px; align-content: start; }
+  .regie-cmd .btn { width: 100%; justify-content: center; }
+  .regie-chrono { font-family: var(--serif); font-size: 44px; color: #fff1c9; margin: 0; text-align: center; }
+  .regie-cmd .tat { flex-direction: column; }
+  @media (max-width: 860px) { .regie { grid-template-columns: 1fr; } .regie-video { height: 55vh; } }
 </style>
 </head>
 <body>
@@ -56,7 +66,21 @@
         <p class="kicker" id="phase"></p>
         <p class="big" id="presents"></p>
         <div class="row" style="margin-top:12px">
-          <button class="btn btn-gold" id="btn-salon" type="button">Entrer dans le salon d’attente (nouvel onglet, caméra éteinte)</button>
+          <button class="btn btn-gold" id="btn-salon" type="button">📹 Ouvrir la caméra ici (salon d’attente)</button>
+        </div>
+        <div class="regie" id="regie" hidden>
+          <div class="regie-video"><span class="regie-ou" id="regie-ou">Salon d’attente</span><div id="cadre" style="height:100%"></div></div>
+          <div class="regie-cmd">
+            <p class="regie-chrono" id="chrono"></p>
+            <label>Durée d’un tour (minutes)<input id="minutes2" type="number" min="2" max="15" value="6"></label>
+            <button class="btn btn-gold" id="r-round" type="button">▶ Lancer un tour</button>
+            <button class="btn btn-out" id="r-grand" type="button">↩ Rappeler tout le monde</button>
+            <div class="tat" id="r-tat"></div>
+            <button class="btn btn-out" id="r-salon" type="button" hidden>Revenir au salon d’attente</button>
+            <button class="btn btn-out" id="r-fin" type="button">Fin du bal (souhaits)</button>
+            <button class="btn btn-out" id="r-quitter" type="button">Fermer la caméra</button>
+            <p style="font-size:13px;color:#b8a98f;margin:0">Ta caméra et ton micro sont coupés en arrivant : allume-les en bas de la vidéo pour faire une annonce. Les boutons ici commandent tout le bal.</p>
+          </div>
         </div>
       </div>
 
@@ -70,7 +94,7 @@
         </div>
         <p id="last" style="color:#b8a98f;font-size:14px"></p>
         <div class="tat" id="tat"></div>
-        <p style="font-size:14px;color:#b8a98f">Pendant un tour, clique sur un couple pour lui rendre visite (nouvel onglet). Tu entres caméra et micro coupés : ils voient « Lamia » arriver dans la salle. Allume ta caméra ou ton micro si tu veux leur parler, puis ferme l’onglet pour repartir.</p>
+        <p style="font-size:14px;color:#b8a98f">Pendant un tour, clique sur un couple pour lui rendre visite : la vidéo s’ouvre dans la régie, en haut. Tu entres caméra et micro coupés : ils voient « Lamia » arriver. Allume ta caméra ou ton micro si tu veux leur parler, puis clique « Revenir au salon d’attente ».</p>
       </div>
 
       <div class="box">
@@ -125,6 +149,7 @@ async function soirees() {
 }
 
 function paint(d) {
+  if (d.state && !d.state.open && cadre) fermerCamera();
   $('#no-video').hidden = d.video;
   const open = d.state?.open;
   $('#ouvrir').hidden = !!open;
@@ -136,7 +161,12 @@ function paint(d) {
   $('#presents').textContent = `${d.present} masque${d.present > 1 ? 's' : ''} au bal`;
   $('#salons').innerHTML = d.salons.map((x) => `<tr><td>${esc(x.label)}</td><td>${x.inscrits}</td><td>${x.presents}</td><td>${x.femmes}</td><td>${x.hommes}</td></tr>`).join('');
   $('#last').textContent = s.last_round ? `Dernier tour : ${s.last_round.pairs} tête-à-tête${s.last_round.waiting.length ? ` · en attente : ${s.last_round.waiting.join(', ')}` : ''}` : '';
-  $('#tat').innerHTML = s.phase === 'tour' ? d.tat.map((t, i) => `<button class="btn btn-out" type="button" data-room="${esc(t.room)}">Rendre visite : ${t.noms?.length ? esc(t.noms.join(' et ')) : `tête-à-tête ${i + 1}`}</button>`).join('') : '';
+  const boutonsTat = s.phase === 'tour' ? d.tat.map((t, i) => { const n = t.noms?.length ? t.noms.join(' et ') : `tête-à-tête ${i + 1}`; return `<button class="btn btn-out" type="button" data-room="${esc(t.room)}" data-noms="${esc(n)}">Rendre visite : ${esc(n)}</button>`; }).join('') : '';
+  $('#tat').innerHTML = boutonsTat;
+  $('#r-tat').innerHTML = boutonsTat;
+  dernier = d;
+  // Fin du tour : si Lamia était en visite, elle revient au salon d'attente.
+  if (salleActuelle && s.phase !== 'tour' && cadre) openRoom();
   $('#wishes').textContent = `${d.wishes_count} personne${d.wishes_count > 1 ? 's ont' : ' a'} envoyé ses souhaits.`;
   $('#mutual').innerHTML = d.mutual.map(([a, b]) => `<tr><td>${esc(a.name)} et ${esc(b.name)}</td><td>${esc(a.email || '')} · ${esc(b.email || '')}</td></tr>`).join('') || '<tr><td colspan="2">Pas encore de souhait réciproque.</td></tr>';
 }
@@ -165,7 +195,38 @@ $('#btn-planb-off').addEventListener('click', act(() => ({ action: 'planb', url:
 $('#btn-grand').addEventListener('click', act(() => ({ action: 'grand' })));
 $('#btn-fin').addEventListener('click', act(() => ({ action: 'fin' })));
 $('#btn-close').addEventListener('click', act(() => ({ action: 'close' }), 'Fermer les portes du bal ? Tout le monde sera déconnecté.'));
-const openRoom = async (room) => { const w = window.open('', '_blank'); try { const { url } = await bal({ action: 'admin_join', room }); w.location = url; } catch { w.close(); } };
+// La caméra s'ouvre dans la page, à côté des commandes (plus de nouvel onglet).
+let cadre = null, salleActuelle = null, dernier = null;
+async function openRoom(room) {
+  try {
+    const { url } = await bal({ action: 'admin_join', room });
+    $('#regie').hidden = false;
+    if (!cadre) {
+      const { default: Daily } = await import('/vendor/daily.mjs');
+      cadre = Daily.createFrame($('#cadre'), { showLeaveButton: false, iframeStyle: { width: '100%', height: '100%', border: '0' } });
+    } else if (cadre.meetingState() === 'joined-meeting') await cadre.leave();
+    const u = new URL(url), token = u.searchParams.get('t') || undefined; u.search = '';
+    await cadre.join({ url: u.toString(), token });
+    salleActuelle = room || null;
+    $('#regie-ou').textContent = room ? `En visite : ${$(`[data-room="${CSS.escape(room)}"]`)?.dataset.noms || 'tête-à-tête'}` : 'Salon d’attente';
+    $('#r-salon').hidden = !room;
+    $('#regie').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch { $('#status').textContent = 'La caméra ne s’ouvre pas. Réessaie dans un instant.'; $('#status').className = 'status err'; }
+}
+async function fermerCamera() { try { await cadre?.leave(); cadre?.destroy(); } catch { /* */ } cadre = null; salleActuelle = null; $('#regie').hidden = true; }
+$('#r-quitter').addEventListener('click', fermerCamera);
+$('#r-salon').addEventListener('click', () => openRoom());
+$('#r-round').addEventListener('click', act(() => ({ action: 'round', minutes: Number($('#minutes2').value), demasque: $('#demasque').checked })));
+$('#r-grand').addEventListener('click', act(() => ({ action: 'grand' })));
+$('#r-fin').addEventListener('click', act(() => ({ action: 'fin' })));
+$('#r-tat').addEventListener('click', (e) => { const b = e.target.closest('[data-room]'); if (b) openRoom(b.dataset.room); });
+// Chrono du tour en cours.
+setInterval(() => {
+  const s = dernier?.state;
+  if (!s || s.phase !== 'tour' || !s.ends_at) { $('#chrono').textContent = s?.phase === 'fin' ? 'Fin du bal' : ''; return; }
+  const left = Math.max(0, Date.parse(s.ends_at) - Date.now());
+  $('#chrono').textContent = `${Math.floor(left / 60000)}:${String(Math.floor((left % 60000) / 1000)).padStart(2, '0')}`;
+}, 500);
 $('#btn-salon').addEventListener('click', () => openRoom());
 $('#tat').addEventListener('click', (e) => { const b = e.target.closest('[data-room]'); if (b) openRoom(b.dataset.room); });
 start();
