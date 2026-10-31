@@ -911,8 +911,9 @@ page(
   <div class="ante">
     <div class="ante-miroir"><video data-pret-video playsinline muted autoplay></video><span class="ante-cadre" aria-hidden="true"></span></div>
     <div class="ante-panneau">
-      <p class="ante-msg" data-pret-msg>Activation de ta caméra…</p>
-      <button class="btn btn-gold" type="button" data-entrer>Entrer au bal</button>
+      <p class="ante-msg" data-pret-msg>Tu entres d’abord au salon d’attente, caméra et micro éteints.</p>
+      <button class="btn btn-gold" type="button" data-entrer>Entrer au salon d’attente</button>
+      <button class="btn bal-btn-line" type="button" data-tester aria-pressed="false">Tester ma caméra</button>
       <button class="btn bal-btn-line" type="button" data-sortir>Ce n’est pas moi</button>
     </div>
   </div>

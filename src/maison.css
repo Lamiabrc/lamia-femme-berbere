@@ -3350,3 +3350,9 @@ body[data-ambiance="espace"] .espace .room-name { color: #8a1024; }
 .annonce-secteur b { color: #7a1f2b; font-weight: 700; }
 .espace-avis { margin-bottom: 1.4rem; padding: 1rem; border: 2px solid #c9a24a; border-radius: 18px; background: #fff8ea; }
 .espace-avis-titre { margin: 0 0 .6rem; color: #7a1f2b; }
+
+/* Salon d'attente du bal : caméras éteintes hors tête-à-tête. */
+.is-cam-eteinte .salle-moi { position: relative; }
+.is-cam-eteinte .salle-moi video { opacity: 0; }
+.is-cam-eteinte .salle-moi::after { content: 'Caméra éteinte ici · elle s’allume au tête-à-tête'; position: absolute; inset: 0; display: grid; place-items: center; padding: 8px; text-align: center; font-size: 12px; color: #f3e6c8; background: #2a1418; border-radius: inherit; }
+[data-micro]:disabled, [data-camera]:disabled { opacity: .45; cursor: not-allowed; }

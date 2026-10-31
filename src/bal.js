@@ -68,16 +68,23 @@ async function pret() {
   $('[data-pret-nom]').textContent = me.name;
   const th = themeSalon(me.salon);
   $('[data-pret-salon]').textContent = th ? th.nom : me.salon ? `Salon ${me.salon}` : '';
+  // Plus d'aperçu automatique : on entre au salon d'attente caméra éteinte. Tester sa caméra est facultatif.
+  $('[data-pret-msg]').textContent = 'Tu entres d’abord au salon d’attente, caméra et micro éteints. Ils s’allument seulement pendant tes tête-à-têtes.';
+}
+function arreterApercu() { preview?.getTracks().forEach((t) => t.stop()); preview = null; const v = $('[data-pret-video]'); if (v) v.srcObject = null; $('[data-tester]')?.setAttribute('aria-pressed', 'false'); }
+$('[data-tester]')?.addEventListener('click', async () => {
+  if (preview) { arreterApercu(); $('[data-tester]').textContent = 'Tester ma caméra'; return; }
   try {
     preview = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
     $('[data-pret-video]').srcObject = preview;
-    $('[data-pret-msg]').textContent = 'On te voit. Ajuste ton masque, puis entre au bal.';
+    $('[data-tester]').textContent = 'Éteindre l’essai';
+    $('[data-pret-msg]').textContent = 'On te voit. Ajuste ton masque. Au salon d’attente, ta caméra sera éteinte.';
   } catch {
-    $('[data-pret-msg]').textContent = 'Ta caméra ou ton micro est bloqué. Autorise-les (cadenas à côté de l’adresse du site), puis recharge la page.';
+    $('[data-pret-msg]').textContent = 'Ta caméra ou ton micro est bloqué. Autorise-les (cadenas à côté de l’adresse du site), puis recharge la page. Ils serviront pour les tête-à-têtes.';
   }
-}
+});
 $('[data-entrer]')?.addEventListener('click', async () => {
-  preview?.getTracks().forEach((t) => t.stop());
+  arreterApercu();
   show('salle');
   call = Daily.createCallObject({ subscribeToTracksAutomatically: false, dailyConfig: { useDevicePreferenceCookies: true } });
   for (const ev of ['participant-joined', 'participant-updated', 'participant-left', 'track-started', 'track-stopped', 'joined-meeting']) call.on(ev, render);
@@ -113,7 +120,9 @@ async function rejoindre(key) {
     const { ok, data } = await api({ action: 'join', pass: me.pass });
     if (!ok) { message('La salle ne s’ouvre pas encore. Nouvel essai dans quelques secondes…'); return; }
     if (call.meetingState() === 'joined-meeting') await call.leave();
-    await call.join({ url: data.url, token: data.token, startVideoOff: false, startAudioOff: false });
+    // Caméra et micro allumés seulement en tête-à-tête ; au salon d'attente, éteints.
+    const enTat = state?.where === 'tat';
+    await call.join({ url: data.url, token: data.token, startVideoOff: !enTat, startAudioOff: !enTat });
     roomKey = key;
     if (state?.where === 'tat') transition('Le prochain masque vous invite…', state.partner);
     else if (avant?.startsWith('tat:')) transition('Merci pour cette danse', 'Retour au grand salon');
@@ -128,9 +137,9 @@ function decor() {
   salle.dataset.where = s.where;
   salle.dataset.phase = s.phase;
   const titres = {
-    accueil: ['Le grand salon', 'Lamia ouvre le bal. Garde ton masque, les tête-à-tête commencent bientôt.'],
+    accueil: ['Le salon d’attente', 'Bienvenue ! Ta caméra et ton micro sont éteints ici. Ils s’allumeront tout seuls quand ton tête-à-tête commencera.'],
     tat: [`Tête-à-tête avec ${s.partner || 'ton cavalier'}`, 'Présente-toi, souris, pose une vraie question. La cloche sonnera à la fin.'],
-    attente: ['Le grand salon', 'Pas de tête-à-tête pour toi à ce tour : reste au salon, ton tour arrive.'],
+    attente: ['Le salon d’attente', 'Pas de tête-à-tête pour toi à ce tour : reste ici, caméra éteinte, ton tour arrive.'],
     fin: ['La fin du bal', 'Merci pour cette soirée. Indique en privé qui tu aimerais revoir.'],
   };
   const [titre, texte] = s.phase === 'fin' ? titres.fin : titres[s.where] || titres.accueil;
@@ -209,6 +218,11 @@ function render() {
   if (accueil) accueil.hidden = Boolean(target?.tracks?.video?.state === 'playable');
   $('[data-autre-nom]').textContent = target ? (target.owner ? 'Lamia' : target.user_name || '') : (state?.where === 'tat' ? 'En attente de ton cavalier…' : 'Lamia arrive…');
   $('[data-salle-compte]').textContent = state?.where === 'tat' ? '' : `${others.length + 1} masque${others.length ? 's' : ''} au bal`;
+  // Hors tête-à-tête : caméra et micro forcés à éteint, boutons désactivés.
+  const enTat = state?.where === 'tat';
+  if (!enTat && state) { if (call.localVideo()) call.setLocalVideo(false); if (call.localAudio()) call.setLocalAudio(false); }
+  for (const b of [$('[data-micro]'), $('[data-camera]')]) { b.disabled = !enTat; b.title = enTat ? '' : 'S’allume pendant ton tête-à-tête'; }
+  $('[data-salle]')?.classList.toggle('is-cam-eteinte', !enTat);
   $('[data-micro]').setAttribute('aria-pressed', String(!call.localAudio()));
   $('[data-camera]').setAttribute('aria-pressed', String(!call.localVideo()));
 }
