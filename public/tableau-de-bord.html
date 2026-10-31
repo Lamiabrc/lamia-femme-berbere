@@ -12,7 +12,8 @@
 <header class="tdb-top">
   <a class="tdb-marque" href="/"><img src="/images/marque/lamia-logo-net-160.webp" width="40" height="40" alt=""><span>La Maison <em>· tableau de bord</em></span></a>
   <nav class="tdb-onglets" aria-label="Rubriques" data-onglets hidden>
-    <button type="button" data-tab="accueil" aria-current="true">Accueil</button>
+    <button type="button" data-tab="accueil" aria-current="true">Aujourd’hui</button>
+    <button type="button" data-tab="rencontres">💞 Rencontres</button>
     <button type="button" data-tab="ventes">Ventes</button>
     <button type="button" data-tab="produits">Produits</button>
     <button type="button" data-tab="soirees">Soirées</button>
@@ -20,7 +21,6 @@
     <button type="button" data-tab="alertes">Alertes</button>
     <button type="button" data-tab="textes">Textes &amp; images</button>
     <button type="button" data-tab="visites">Visites</button>
-    <a class="tdb-onglet-lien" href="/confidences-lamia/#annonces">💌 Profils &amp; matching</a>
   </nav>
   <div class="tdb-moi" data-moi hidden><span data-moi-email></span> <button type="button" class="link-button" data-deconnexion>Se déconnecter</button></div>
 </header>
@@ -40,6 +40,11 @@
   <!-- ===================================================== Accueil -->
   <section data-panel="accueil" hidden>
     <h1 class="tdb-titre">Bonjour Lamia</h1>
+    <div class="tdb-carte tdb-afaire">
+      <h2>À faire aujourd’hui</h2>
+      <p class="aide">Dans l’ordre. Chaque bouton t’emmène au bon endroit. Le reste se fait dans ton outil de matching (onglet Site).</p>
+      <ol data-afaire><li>Un instant…</li></ol>
+    </div>
     <div class="tdb-kpis">
       <a class="kpi" data-go="ventes"><span>Ventes et commandes</span><strong data-k="ventes-total">—</strong><small data-k="ventes-detail"></small></a>
       <a class="kpi" data-go="soirees"><span>Inscrits aux soirées</span><strong data-k="inscrits">—</strong><small data-k="inscrits-detail"></small></a>
@@ -63,6 +68,12 @@
   </section>
 
   <!-- ===================================================== Ventes -->
+  <section data-panel="rencontres" hidden>
+    <div class="tdb-entete"><h1 class="tdb-titre">Rencontres</h1><div class="tdb-raccourcis"><a class="btn btn-line" href="/confidences-lamia/" target="_blank" rel="noopener">Les messages des Confidences</a></div></div>
+    <p class="aide">Ici : valider les profils, traiter les matchs demandés (notés par ton outil), proposer, publier une nouveauté, les abonnés. Ton outil de matching garde ses rôles : publier les fiches, envoyer les liens de confirmation (publipostage), tester les matchs.</p>
+    <iframe class="tdb-rencontres" data-rencontres title="Gestion des rencontres" loading="lazy"></iframe>
+  </section>
+
   <section data-panel="ventes" hidden>
     <h1 class="tdb-titre">Ventes et commandes</h1>
     <div class="tdb-filtres">

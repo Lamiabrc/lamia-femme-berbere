@@ -123,3 +123,11 @@
 .classement small { font-weight: 400; color: var(--qvt-taupe); }
 .tdb-onglet-lien { margin-left: auto; padding: 8px 14px; border-radius: 999px; background: #7d1530; border: 1px solid #e3bd6e; color: #fff6e6; font: 700 14px var(--sans); text-decoration: none; }
 .tdb-onglet-lien:hover { background: #5c0f22; }
+
+/* Aujourd'hui : la liste des choses à faire */
+.tdb-afaire ol { margin: 8px 0 0; padding-left: 1.4rem; display: grid; gap: 10px; }
+.tdb-afaire li { padding: 10px 12px; border-radius: 12px; background: #fbf4ea; }
+.tdb-afaire li > span { display: block; margin-bottom: 6px; line-height: 1.45; }
+.tdb-afaire .btn { padding: 6px 14px; font-size: 14px; }
+/* Rencontres : l'espace de gestion des profils, intégré au tableau de bord */
+.tdb-rencontres { width: 100%; height: calc(100vh - 190px); min-height: 640px; border: 1px solid #e6d6c0; border-radius: 16px; background: #fbf6f1; }

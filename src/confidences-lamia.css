@@ -127,3 +127,5 @@ legend { font-size: 14px; font-weight: 600; padding: 0 4px; }
 .cl-jauge h5 { margin: 0 0 6px; font-size: 14px; }
 .cl-jauge p { display: flex; align-items: center; gap: 8px; margin: 4px 0; flex-wrap: wrap; }
 .cl-pot.is-petit { width: 34px; height: 34px; } .cl-pot.is-petit b { font-size: 13px; }
+
+.cl-integre .cl-haut, .cl-integre .cl-nav, .cl-integre [data-retour] { display: none !important; }

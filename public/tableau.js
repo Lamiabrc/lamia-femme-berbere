@@ -12,7 +12,7 @@ const STATUTS = { pending: 'En attente de paiement', paid: 'Payée, à expédier
 const ALERTES = { new: 'Nouvelle', reviewing: 'En cours', needs_info: 'Besoin d’infos', watch: 'Sous surveillance', suspended: 'Suspendu', resolved: 'Résolue', dismissed: 'Classée' };
 const GRAVITE = { red: 'Danger', orange: 'Inquiétant', yellow: 'À surveiller' };
 
-let token = null, data = null, produits = [], categories = [], edition = null;
+let token = null, data = null, produits = [], categories = [], edition = null, aller = '';
 
 function message(t, err = false) { const m = $('[data-message]'); m.textContent = t; m.classList.toggle('is-error', err); if (t && !err) setTimeout(() => { if (m.textContent === t) m.textContent = ''; }, 4000); }
 
@@ -36,6 +36,7 @@ function ouvrir(tab) {
   if (tab === 'produits' && !produits.length) { chargerProduits(); chargerReglages(); }
   if (tab === 'textes') chargerTextes();
   if (tab === 'bilan') chargerBilan();
+  if (tab === 'rencontres') { const f = $('[data-rencontres]'); if (f && !f.src) f.src = `/confidences-lamia/?integre=1#${aller || 'annonces'}`; aller = ''; }
   scrollTo({ top: 0 });
 }
 document.addEventListener('click', (e) => {
@@ -61,6 +62,36 @@ async function charger() {
   $('[data-dernieres]').innerHTML = v.orders.slice(0, 5).map((o) => `<p class="ligne"><span>n° ${esc(o.order_number)} · ${esc(o.customer_name || o.customer_email || '')}<br><small>${esc((o.order_items || []).map((x) => x.product_name).join(', '))}</small></span><strong>${money(o.amount_total_cents, o.currency)}</strong></p>`).join('') || '<p>Pas encore de commande.</p>';
   ventes(); soirees(); alertes(); visites();
 }
+
+// ---------------------------------------------------------------- « À faire aujourd'hui » : tout ce qui attend Lamia, dans l'ordre
+async function aFaire() {
+  const box = $('[data-afaire]');
+  if (!box) return;
+  try {
+    const r = await fetch('/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ action: 'annonce_a_faire' }) });
+    const { a_faire: f } = await r.json();
+    const heure = (d) => new Date(d).toLocaleString('fr-FR', { weekday: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
+    const lignes = [
+      ...f.soirees.map((s) => [`🎭 <b>${esc(s.titre)}</b>, ${esc(heure(s.debut))} · ${esc(s.salon)} : <b>${s.inscrits} inscrit(s)</b>, ${Math.max(0, s.places - s.inscrits)} place(s) libre(s). À 20 h 45, ouvre le bal.`, '<a class="btn btn-ink" href="/admin-bal.html">Poste du bal</a>']),
+      f.a_verifier.length && [`⏳ <b>${f.a_verifier.length} profil(s) à vérifier</b> (n° ${f.a_verifier.join(', ')}) : valide-les pour qu’ils puissent matcher.`, '<button class="btn btn-ink" type="button" data-rencontres-aller="annonces">Vérifier</button>'],
+      f.reciproques && [`💞 <b>${f.reciproques} intérêt(s) réciproque(s)</b> : les deux se sont choisis, fais la mise en relation.`, '<button class="btn btn-ink" type="button" data-rencontres-aller="demandes">Voir</button>'],
+      f.demandes && [`💌 <b>${f.demandes} match(s) demandé(s)</b> par ${f.personnes} personne(s) : une mise en relation par personne, avec la ⭐ meilleure note.`, '<button class="btn btn-ink" type="button" data-rencontres-aller="demandes">Traiter</button>'],
+      f.propositions_oui && [`✅ <b>${f.propositions_oui} proposition(s) acceptée(s)</b> : la personne est intéressée par le profil que tu lui as proposé.`, '<button class="btn btn-line" type="button" data-rencontres-aller="demandes">Voir</button>'],
+      (f.fiches_a_modifier || f.fiches_a_effacer) && [`✏️ <b>${f.fiches_a_modifier} fiche(s) à corriger</b>${f.fiches_a_effacer ? ` et <b>${f.fiches_a_effacer} à effacer</b>` : ''} dans ton outil (demandes des personnes).`, '<span class="aide">Outil › Site › Publipostage</span>'],
+      f.fiches_en_attente && [`📮 <b>${f.fiches_en_attente} fiche(s) pas encore confirmée(s)</b> (${f.fiches_confirmees} confirmée(s)) : envoie les liens de confirmation.`, '<span class="aide">Outil › Site › Publipostage › « À prévenir »</span>'],
+      f.nouveautes_en_attente && [`📣 <b>${f.nouveautes_en_attente} nouveauté(s)</b> partiront au prochain envoi de 18 h en notification.`, '<button class="btn btn-line" type="button" data-rencontres-aller="nouveautes">Voir</button>'],
+    ].filter(Boolean);
+    box.innerHTML = lignes.length ? lignes.map(([t, b]) => `<li><span>${t}</span>${b}</li>`).join('') : '<li>Rien en attente. 🌿</li>';
+  } catch { box.innerHTML = '<li>La liste ne s’affiche pas pour le moment.</li>'; }
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-rencontres-aller]');
+  if (!b) return;
+  aller = 'annonces'; const f = $('[data-rencontres]'); if (f) f.removeAttribute('src');
+  ouvrir('rencontres');
+  const cible = b.dataset.rencontresAller;
+  if (cible !== 'annonces') setTimeout(() => { try { f.contentWindow.document.querySelector(cible === 'demandes' ? '[data-demandes]' : '[data-nouv-form]')?.scrollIntoView({ behavior: 'smooth' }); } catch { /* */ } }, 2500);
+});
 
 function barres(box, jours) {
   const max = Math.max(1, ...jours.map((j) => j.visiteurs));
@@ -420,7 +451,8 @@ async function demarrer() {
   if (session && !admin) message('Ce compte n’a pas le rôle administratrice.', true);
   if (!admin) return;
   const tab = location.hash.slice(1);
-  ouvrir(['accueil', 'ventes', 'produits', 'soirees', 'bilan', 'alertes', 'textes', 'visites'].includes(tab) ? tab : 'accueil');
+  ouvrir(['accueil', 'rencontres', 'ventes', 'produits', 'soirees', 'bilan', 'alertes', 'textes', 'visites'].includes(tab) ? tab : 'accueil');
+  aFaire();
   await charger();
 }
 $('[data-login]').addEventListener('submit', async (e) => {

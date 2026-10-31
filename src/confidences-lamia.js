@@ -1,3 +1,5 @@
+// Intégré au tableau de bord (onglet Rencontres) : sans en-tête ni menu, directement sur la gestion des profils.
+if (new URLSearchParams(location.search).has('integre')) document.documentElement.classList.add('cl-integre');
 // Espace de Lamia : conversations, lecture des confidences, réponses (texte, vocal, images), alertes.
 import { createClient } from '/vendor/supabase.mjs';
 import { api, envoyer, erreur, esc, taille, quand, piecesHtml, PUBLIC_KEY } from './confidences-commun.js';
