@@ -198,7 +198,7 @@ async function monProfil(session) {
       ${p.live ? `<p>🎥 Profil créé en live avec Lamia${p.live_retrouve ? '' : ' (Lamia vérifie ta fiche)'} : <strong>tes 3 premières mises en relation sont offertes</strong>.</p>` : '<p>Ta première mise en relation est offerte.</p>'}
       ${p.nb_compatibles !== null && p.nb_compatibles !== undefined ? `<p>D’après l’outil de Lamia, tu pourrais correspondre à ${esc(p.nb_compatibles)} personne(s).</p>` : ''}
       ${p.matchs ? `<p class="espace-match">💞 Matchs en cours : <strong>${esc(p.matchs.actifs)} / ${esc(p.matchs.limite)}</strong>${p.matchs.actifs >= p.matchs.limite ? (p.matchs.formule === 'decouverte' ? ' · pour matcher à nouveau, viens voir Lamia en live (chaque soir à 21 h) ou passe à une formule.' : ' · dès que Lamia a traité un match, tu peux en choisir d’autres.') : ''}</p>` : ''}</div>
-      <div class="espace-achat-droite"><button class="btn btn-ink" type="button" data-profil-modifier>Modifier mon profil</button>${p.en_match ? '<button class="btn btn-line" type="button" data-profil-dematcher>Mettre fin à mon match</button>' : ''}</div></article>
+      <div class="espace-achat-droite">${p.fiche_live ? '' : '<button class="btn btn-ink" type="button" data-profil-modifier>Modifier mon profil</button>'}${p.en_match ? '<button class="btn btn-line" type="button" data-profil-dematcher>Mettre fin à mon match</button>' : ''}</div></article>
       <div class="espace-suivi" data-profil-suivi></div>
       <label class="annonce-case espace-photo"><input type="checkbox" data-profil-photo${p.photo_partage ? ' checked' : ''}> <span>Si un match me convient, Lamia peut transmettre <strong>ma photo</strong> à la personne avec qui elle me met en relation (et à elle seule).</span></label>
       <p class="form-status" data-profil-statut></p><div data-profil-edition hidden></div>`;
@@ -209,7 +209,7 @@ async function monProfil(session) {
       catch { e.target.checked = !e.target.checked; st.textContent = 'Ça n’a pas été enregistré. Réessaie.'; }
       e.target.disabled = false;
     });
-    box.querySelector('[data-profil-modifier]').addEventListener('click', async () => {
+    box.querySelector('[data-profil-modifier]')?.addEventListener('click', async () => {
       const zone = box.querySelector('[data-profil-edition]');
       zone.hidden = false;
       const { monterFormulaire } = await import('/assets/annonces.js');

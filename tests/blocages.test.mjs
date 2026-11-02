@@ -29,12 +29,12 @@ test('il faut être connecté, et on ne se bloque pas soi-même', async () => {
 });
 
 test('bloquer : discussion fermée, demandes retirées, match terminé, Lamia alertée', async () => {
-  const h = harnais({ 'annonce_interets?demandeur_id=eq.a1': [{ id: 'i1', statut: 'mis_en_relation' }], 'annonces?ref=eq.9': [{ id: 'c1' }], 'annonce_interets?demandeur_id=eq.c1': [{ id: 'i2', statut: 'a_traiter' }] });
+  const h = harnais({ 'annonce_interets?demandeur_id=eq.a1': [{ id: 'i1', statut: 'mis_en_relation' }], 'annonces?ref=in.(9)': [{ id: 'c1' }], 'annonce_interets?demandeur_id=eq.c1': [{ id: 'i2', statut: 'a_traiter' }] });
   const r = await lire(await actionBlocage('annonce_bloquer', { ref: 9, motif: 'insultes' }, h.deps));
   assert.equal(r.ok, true);
   const corps = JSON.parse(h.appels[0].o.body);
   assert.deepEqual([corps.auteur_user, corps.auteur_ref, corps.cible_ref, corps.cible_user], ['moi', 5, 9, 'lui']);
-  assert.ok(h.patches.some((p) => p.t === 'discussions' && p.v.close_raison === 'bloque' && p.f.includes('b_ref.eq.9')));
+  assert.ok(h.patches.some((p) => p.t === 'discussions' && p.v.close_raison === 'bloque' && p.f.includes('b_ref.in.(9)')));
   assert.ok(h.patches.some((p) => p.t === 'annonce_interets' && p.f === 'id=eq.i2' && p.v.statut === 'pas_compatible'));
   assert.deepEqual(h.fini, { id: 'a1', ref: 5 });
   assert.match(h.alertes[0].titre, /bloqué n° 9/);
@@ -58,7 +58,7 @@ test('le blocage cache dans les deux sens', async () => {
   const read = async () => [{ auteur_ref: 5, cible_ref: 9 }, { auteur_ref: 7, cible_ref: 5 }];
   assert.deepEqual([...await refsCachees({ read }, [5])].sort(), [7, 9]);
   assert.equal((await refsCachees({ read }, [])).size, 0);
-  assert.equal(await blocageEntre({ read: async () => [{ id: 1 }] }, 5, 9), true);
+  assert.equal(await blocageEntre({ read }, 5, 9), true);
   assert.equal(await blocageEntre({ read: async () => [] }, 5, 9), false);
 });
 
