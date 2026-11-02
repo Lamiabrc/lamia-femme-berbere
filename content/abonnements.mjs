@@ -3,14 +3,14 @@
 // le prix payé est toujours relu ici côté serveur, jamais repris du navigateur.
 export const FORMULES = [
   { id: 'decouverte', nom: 'Découverte', mois: 0, accroche: 'Pour commencer, sans rien payer',
-    avantages: ['Ton profil confié à Lamia, vérifié et affiché anonymement', 'La première mise en relation offerte', 'Swipe sans limite, 1 match à la fois', '💬 7 jours de discussion avec ton match, puis vous échangez vos numéros', 'Le nombre de personnes qui t’ont choisi·e'],
+    avantages: ['Ton profil confié à Lamia, vérifié et affiché anonymement', 'Swipe sans limite', '1 match offert', 'D’autres matchs en venant soutenir le live de Lamia', '💬 7 jours de discussion avec ton match, puis vous échangez vos numéros', 'Le nombre de personnes qui t’ont choisi·e'],
     mises: 1, speedDatings: 0, swipesJour: null, matchs: 1 },
   { id: 'passion', nom: 'Passion', mois: 900, accroche: 'Le choix des cœurs sérieux', vedette: true,
-    avantages: ['Jusqu’à 3 mises en relation par mois', '1 match à la fois, pour avancer sérieusement', '💞 Qui t’a choisi·e : les profils qui t’ont swipé·e, en tête de ta pile', '📷 La photo de ton match, s’il ou elle l’accepte', '1 speed dating par mois inclus', 'Tout ce que contient Découverte'],
-    mises: 3, speedDatings: 1, photoMatch: true, swipesJour: null, quiMaChoisi: true, matchs: 1 },
-  { id: 'prestige', nom: 'Prestige', mois: 2200, accroche: 'L’accompagnement personnel de Lamia',
-    avantages: ['Mises en relation sans limite, dès qu’il y a une vraie compatibilité', 'Ton profil passe en priorité dans le matching', '2 speed datings par mois inclus', '1 échange en visio par mois avec Lamia : conseils et travail de ton profil', 'Ton annonce présentée en priorité en live', 'Tout ce que contient Passion'],
-    mises: null, speedDatings: 2, prioritaire: true, visio: 1, live: true, photoMatch: true, swipesJour: null, quiMaChoisi: true, matchs: 1 },
+    avantages: ['10 matchs par mois, un à la fois pour avancer sérieusement', '💞 Qui t’a choisi·e : les profils qui t’ont swipé·e, en tête de ta pile', '📷 La photo de ton match, s’il ou elle l’accepte', '1 speed dating par mois inclus', 'Tes questions à Lamia pour améliorer ton profil', 'Tout ce que contient Découverte'],
+    mises: 10, speedDatings: 1, photoMatch: true, swipesJour: null, quiMaChoisi: true, matchs: 1 },
+  { id: 'prestige', nom: 'Prestige', mois: 2200, accroche: 'L’accompagnement personnel de Lamia, jusqu’au mariage',
+    avantages: ['Matchs illimités, un à la fois', 'Ton profil passe en priorité dans le matching', '2 speed datings par mois inclus', 'Coaching : 1 visio par mois avec Lamia, pour ton profil et tes rencontres', 'Option mariage : Lamia t’accompagne dans ton projet, de la rencontre aux familles', 'Ton annonce présentée en priorité en live', 'Tout ce que contient Passion'],
+    mises: null, speedDatings: 2, prioritaire: true, visio: 1, live: true, coaching: true, mariage: true, photoMatch: true, swipesJour: null, quiMaChoisi: true, matchs: 1 },
 ];
 // À l'année : 2 mois offerts (on paie 10 mois).
 export const prixAnnuel = (f) => f.mois * 10;

@@ -144,7 +144,7 @@ async function monProfil(session) {
 
 // Suivi : mises en relation offertes et du mois, speed datings inclus, demandes envoyées.
 // « coeur » : ancienne formule (supprimée le 31/10/2026), gardée pour un éventuel ancien abonnement.
-const QUOTAS = { coeur: { nom: 'Cœur', mises: 3, sd: 1 }, passion: { nom: 'Passion', mises: 3, sd: 1 }, prestige: { nom: 'Prestige', mises: null, sd: 2 } };
+const QUOTAS = { coeur: { nom: 'Cœur', mises: 3, sd: 1 }, passion: { nom: 'Passion', mises: 10, sd: 1 }, prestige: { nom: 'Prestige', mises: null, sd: 2 } };
 const ETAT_DEMANDE = { a_traiter: '⏳ Lamia étudie la compatibilité', mis_en_relation: '💞 Mise en relation faite', en_reserve: '🗂 Gardé en réserve : Lamia te le reproposera si ton match se termine', pas_compatible: 'Pas compatible, désolée', dematche: 'Match terminé' };
 async function suivi(el, p) {
   const etat = await etatAbo;
@@ -154,7 +154,7 @@ async function suivi(el, p) {
   const lignes = [
     `<li><strong>Mises en relation offertes</strong> : ${offertesRestantes} sur ${p.offertes || 1} restante(s)</li>`,
     q ? `<li><strong>Formule ${esc(q.nom)}</strong> : ${s.mises_mois} mise(s) en relation ce mois-ci${q.mises ? ` sur ${q.mises}` : ' (sans limite)'} · ${q.sd} speed dating inclus par mois</li>`
-      : `<li><strong>Formule Découverte</strong> (gratuite) · <a class="text-link" href="/abonnement/">voir les formules</a></li>`,
+      : (p.algerie ? '<li><strong>Formule Découverte</strong> (gratuite) · pour d’autres matchs, <a class="text-link" href="/salon/">viens soutenir le live de Lamia</a></li>' : '<li><strong>Formule Découverte</strong> (gratuite) · d’autres matchs en <a class="text-link" href="/salon/">venant au live</a> ou avec <a class="text-link" href="/abonnement/">une formule</a></li>'),
     q && q.nom !== 'Cœur' ? '<li><strong>📷 Photo de ton match</strong> : incluse dans ta formule, si ton match l’accepte</li>' : '<li><strong>📷 Photo de ton match</strong> : incluse à partir de la formule Passion · <a class="text-link" href="/abonnement/?formule=passion">en savoir plus</a></li>',
     u.mise_en_relation || u.speed_dating ? `<li><strong>Achetés à l’unité</strong> : ${u.mise_en_relation || 0} mise(s) en relation · ${u.speed_dating || 0} place(s) de speed dating</li>` : '',
   ].filter(Boolean).join('');

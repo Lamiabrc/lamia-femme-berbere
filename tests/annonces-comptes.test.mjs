@@ -135,6 +135,30 @@ test('swipe sans limite ; un seul match à la fois pour tout le monde, jusqu’a
   r = await handleAnnonces('annonce_swipe', { ref: 34, choix: 'oui' }, c('decouverte', 0));
   assert.equal(r.status, 200);
 });
+test('quotas : 1 match offert, puis le live ; Passion 10 par mois, Prestige illimité ; l’Algérie renvoie au live', async () => {
+  const { ctx, db } = monde();
+  db.annonces.push({ id: 'a1', ref: 21, user_id: 'u1', email: 'nina@example.com', status: 'publiee', prenom: 'Nina', genre: 'femme', en_match: false, matchs_bonus: 0, pays: 'France' });
+  const nina = { id: 'u1', email: 'nina@example.com' };
+  const c = (formule, nb) => { const x = ctx(nina, formule), base = x.read; return { ...x, read: async (u) => (u.includes('statut=in.(mis_en_relation,dematche)') ? Array.from({ length: nb }, () => ({ cible_ref: 900, updated_at: new Date().toISOString(), annonces: { ref: 21 } })) : base(u)) }; };
+  const oui = async (formule, nb) => { const r = await handleAnnonces('annonce_swipe', { ref: 31, choix: 'oui' }, c(formule, nb)); return [r.status, await r.json()]; };
+  assert.equal((await oui('decouverte', 0))[0], 200);
+  let [s, r] = await oui('decouverte', 1);
+  assert.equal(s, 409); assert.equal(r.error, 'quota_matchs'); assert.equal(r.algerie, false);
+  db.annonces[0].pays = 'Algerie';
+  [, r] = await oui('decouverte', 1);
+  assert.equal(r.algerie, true);
+  // Un match offert en live redonne une chance.
+  db.annonces[0].matchs_bonus = 1;
+  assert.equal((await oui('decouverte', 1))[0], 200);
+  db.annonces[0].matchs_bonus = 0;
+  assert.equal((await oui('passion', 9))[0], 200);
+  assert.equal((await oui('passion', 10))[0], 409);
+  assert.equal((await oui('prestige', 50))[0], 200);
+  // Un profil créé en live garde ses 3 offertes.
+  db.annonces[0].live_declare = true;
+  assert.equal((await oui('decouverte', 2))[0], 200);
+  assert.equal((await oui('decouverte', 3))[0], 409);
+});
 test('la personne choisie est prévenue par email (sans savoir qui), au plus une fois toutes les 12 h ; les deux le sont quand c’est réciproque', async () => {
   const { ctx, db } = monde();
   const mails = [];

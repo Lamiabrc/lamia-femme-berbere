@@ -143,6 +143,13 @@ function limiteAtteinte() {
   vibrer(80);
   return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true">💞</p><h2>Tu as déjà ton match</h2><p>Chez Lamia, c’est <strong>un match à la fois</strong>, pour avancer sérieusement. Tu peux continuer à découvrir les profils. Pour choisir quelqu’un d’autre, mets d’abord fin à ton match en cours depuis ton espace.</p><p class="po-actions"><a class="po-btn-verre" href="/mon-espace/">Mon espace</a></p>`);
 }
+// Plus de match disponible : le live, et les formules pour celles et ceux qui peuvent payer en ligne.
+function quotaAtteint({ algerie, formule } = {}) {
+  vibrer(80);
+  if (algerie) return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true">🎥</p><h2>Viens me voir en live</h2><p>Tu as utilisé ton match. Pour en avoir d’autres, <strong>viens soutenir le live de Lamia</strong>, chaque soir à 21 h : elle peut t’offrir un nouveau match.</p><p class="po-actions"><a class="po-btn-verre" href="/salon/">Voir le live</a></p>`);
+  if (formule === 'passion') return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true">💞</p><h2>Tes 10 matchs du mois sont utilisés</h2><p>Ils reviennent le mois prochain. Avec <strong>Prestige</strong>, les matchs sont illimités. Tu peux aussi venir soutenir le live de Lamia.</p><p class="po-actions"><a class="po-btn-verre" href="/abonnement/">Voir les formules</a><a class="po-btn-verre" href="/salon/">Voir le live</a></p>`);
+  return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true">🎥</p><h2>Tu as utilisé ton match offert</h2><p>Pour en avoir d’autres, <strong>viens soutenir le live de Lamia</strong>, chaque soir à 21 h, ou choisis une formule : 10 matchs par mois avec Passion, illimités avec Prestige.</p><p class="po-actions"><a class="po-btn-verre" href="/salon/">Voir le live</a><a class="po-btn-verre" href="/abonnement/">Voir les formules</a></p>`);
+}
 function annulerDernier() {
   if (!dernier || occupe) return;
   const d = dernier; dernier = null;
@@ -171,7 +178,7 @@ async function choisir(choix) {
   api({ action: 'annonce_swipe', ref, choix }, token).then((r) => {
     if (r?.matchs) { matchs = { ...matchs, ...r.matchs }; infos(); }
     if (r?.match) { dernier = null; majAnnuler(); celebrerMatch(r.ref); }
-  }).catch((err) => { if (err.code === 'limite_matchs') { matchs = { ...matchs, actifs: err.actifs ?? matchs.limite }; infos(); limiteAtteinte(); } });
+  }).catch((err) => { if (err.code === 'quota_matchs') return quotaAtteint(err); if (err.code === 'limite_matchs') { matchs = { ...matchs, actifs: err.actifs ?? matchs.limite }; infos(); limiteAtteinte(); } });
   await new Promise((r) => setTimeout(r, 300));
   profils.shift();
   tous = tous.filter((p) => p.ref !== ref);
