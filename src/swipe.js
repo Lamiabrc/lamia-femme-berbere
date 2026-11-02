@@ -141,8 +141,7 @@ function celebrerMatch(ref) {
 }
 function limiteAtteinte() {
   vibrer(80);
-  if (matchs.formule === 'decouverte') return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true">🎥</p><h2>Tu as déjà ton match</h2><p>Avec la formule gratuite, c’est <strong>un match à la fois</strong>. Pour matcher à nouveau, <strong>viens voir Lamia en live</strong>, chaque soir à 21 h : elle peut débloquer un nouveau match pour toi.</p><p>Ou passe à une formule : jusqu’à <strong>3 matchs à la fois</strong>.</p><p class="po-actions"><a class="po-btn-verre" href="/salon/">Voir le live</a><a class="po-btn-verre" href="/abonnement/">Les formules</a></p>`);
-  return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true">💞</p><h2>${matchs.actifs} matchs en cours</h2><p>C’est le maximum en même temps. Lamia s’occupe de tes matchs : dès que l’un d’eux est traité ou terminé, tu peux de nouveau choisir des profils. Tu peux continuer à les découvrir en attendant.</p><p class="po-actions"><a class="po-btn-verre" href="/mon-espace/">Mon espace</a></p>`);
+  return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true">💞</p><h2>Tu as déjà ton match</h2><p>Chez Lamia, c’est <strong>un match à la fois</strong>, pour avancer sérieusement. Tu peux continuer à découvrir les profils. Pour choisir quelqu’un d’autre, mets d’abord fin à ton match en cours depuis ton espace.</p><p class="po-actions"><a class="po-btn-verre" href="/mon-espace/">Mon espace</a></p>`);
 }
 function annulerDernier() {
   if (!dernier || occupe) return;
