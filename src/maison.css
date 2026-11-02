@@ -3403,3 +3403,5 @@ body[data-ambiance="espace"] .espace .room-name { color: #8a1024; }
 .espace-salon-prix { font-size: 1.25rem; font-weight: 700; margin: 10px 0; }
 .espace-salon label { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 10px; }
 .espace-salon .form-status.is-error { color: #a3122a; }
+
+.disc-honnete { margin: 8px 0; padding: 8px 12px; border-radius: 10px; background: #fbf1e3; color: #5c3d1e; font-size: 14px; }

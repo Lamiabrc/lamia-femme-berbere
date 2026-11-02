@@ -798,8 +798,8 @@ page(
     </section>
 
     <section id="discussion" data-espace-discussion-bloc hidden>
-      <h2>💬 Ma discussion</h2>
-      <p>Lamia vous a mis en relation : vous avez 7 jours pour faire connaissance ici, en privé. Quand vous êtes prêts, échangez vos numéros pour passer au téléphone. Lamia ne lit pas vos messages, sauf si l’un de vous la signale.</p>
+      <h2>Mes matchs en cours</h2>
+      <p>Vos matchs réciproques : vous avez 7 jours pour faire connaissance ici, en privé. Quand vous êtes prêts, échangez vos numéros pour passer au téléphone. Lamia ne lit pas vos messages, sauf si l’un de vous la signale.</p>
       <div data-espace-discussion></div>
     </section>
 

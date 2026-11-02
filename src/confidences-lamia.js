@@ -354,7 +354,7 @@ async function chargerDemandes() {
     }).sort((x, y) => (y.aTraiter > 0) - (x.aTraiter > 0) || (y.meilleur?.potentiel?.score ?? -1) - (x.meilleur?.potentiel?.score ?? -1));
     box.innerHTML = ordre.map((g) => `<section class="cl-carte cl-groupe">
       <h4>${qui(g.qui)}</h4>
-      <p class="cl-coord">${g.liste.length} match(s) demandé(s)${g.aTraiter ? ` · <b>${g.aTraiter} à traiter</b>` : ''}${g.reserve ? ` · 🗂 ${g.reserve} en réserve` : ''}${g.enRelation ? ' · <b>💞 déjà mis(e) en relation</b>' : g.meilleur ? ' · ⭐ fais la mise en relation avec le meilleur potentiel' : ''}${g.qui?.status && g.qui.status !== 'publiee' ? ' · <b class="cl-a-verifier">⏳ profil pas encore vérifié</b>' : ''}</p>
+      <p class="cl-coord">${g.liste.length} match(s) demandé(s)${g.aTraiter ? ` · <b>${g.aTraiter} à traiter</b>` : ''}${g.reserve ? ` · 🗂 ${g.reserve} en réserve` : ''}${(personnes[g.qui?.ref]?.matchs_en_cours || 0) > 1 ? ` · <b>💞 ${personnes[g.qui.ref].matchs_en_cours} matchs en cours</b>` : g.enRelation ? ' · <b>💞 déjà mis(e) en relation</b>' : g.meilleur ? ' · ⭐ fais la mise en relation avec le meilleur potentiel' : ''}${g.qui?.status && g.qui.status !== 'publiee' ? ' · <b class="cl-a-verifier">⏳ profil pas encore vérifié</b>' : ''}</p>
       ${g.liste.map((d) => { const [sc, cl, txt] = niveau(d.potentiel?.score); return `<article class="cl-demande${d === g.meilleur ? ' is-meilleur' : ''}" data-demande="${d.id}">
         <div class="cl-pot ${cl}" title="${txt}"><b>${sc}</b><small>/100</small></div>
         <div class="cl-demande-corps">
