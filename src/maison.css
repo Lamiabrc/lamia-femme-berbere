@@ -3457,3 +3457,4 @@ body[data-ambiance="espace"] .espace .room-name { color: #8a1024; }
 /* Version Google Play : rien ne se vend dans l'appli */
 .version-play [data-gerer-abo], .version-play [data-salon-payer] { display: none !important; }
 .version-play .accueil-bloc:has(.abo-grille) { display: none !important; }
+.confirmer-modif[hidden] { display: none; }

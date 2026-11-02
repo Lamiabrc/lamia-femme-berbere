@@ -53,12 +53,50 @@ function afficher(d) {
     monterAcces(d);
     return;
   }
-  zone.innerHTML = `<p class="confirmer-intro">Voici ta fiche, telle qu’elle apparaît sur le site avec la mention « en attente de confirmation ». Elle est <strong>anonyme</strong> : ni prénom, ni TikTok, ni numéro, ni photo. Seule Lamia sait qui tu es.</p>
+  // Une seule étape : la fiche, puis un seul bouton qui confirme et crée l'accès.
+  zone.innerHTML = `<p class="confirmer-intro">Voici ta fiche. Elle est <strong>anonyme</strong> : ni prénom, ni TikTok, ni numéro, ni photo.</p>
     ${fiche(f)}
-    <div class="confirmer-etat"><p>Tu es d’accord pour qu’elle reste dans les profils, pour que d’autres célibataires sérieux puissent la découvrir ?</p>
-    <p class="confirmer-actions"><button type="button" class="po-btn" data-confirmer-oui>✅ Oui, je confirme ma fiche</button><button type="button" class="po-btn-verre" data-modifier>✏️ Je veux la modifier avant</button><button type="button" class="po-btn-verre" data-retirer>Non, je ne veux pas apparaître</button></p>
-    ${formulaire}${effacer}</div>${acces(d)}`;
-  monterAcces(d);
+    <div class="confirmer-etat" data-simple><p class="annonce-vide">Un instant…</p></div>
+    <p class="confirmer-note">Pas tout à fait ça ? <button type="button" class="confirmer-lien" data-modifier>Modifier ma fiche</button> · <button type="button" class="confirmer-lien" data-retirer>Ne pas apparaître</button> · <button type="button" class="confirmer-lien" data-confirmer-oui>Confirmer sans créer d’accès</button></p>
+    ${formulaire}${effacer}`;
+  monterSimple();
+}
+
+// Confirme la fiche et la relie au compte, en un seul geste. L'accord de la personne reste explicite : c'est le bouton « Je confirme ».
+async function monterSimple() {
+  const z = zone.querySelector('[data-simple]');
+  if (!z) return;
+  const { data: { session } } = await supabase.auth.getSession();
+  const finir = async (s, dire) => {
+    try { await api({ action: 'annonce_lier_fiche_outil', n, t }, s.access_token); }
+    catch (e) { dire(e.code === 'deja_liee' ? 'Cette fiche est déjà reliée à un autre compte. Écris à Lamia pour qu’elle t’aide.' : 'Ça n’a pas fonctionné. Réessaie dans un instant.'); return; }
+    await agir('annonce_confirmer_outil');
+  };
+  if (session) {
+    z.innerHTML = `<p>Tu es connecté·e avec <strong>${esc(session.user.email)}</strong>.</p><p class="confirmer-actions"><button type="button" class="po-btn" data-tout>✅ Je confirme ma fiche</button></p><p class="confirmer-note" data-simple-msg></p>`;
+    z.querySelector('[data-tout]').addEventListener('click', (e) => { e.target.disabled = true; const msg = z.querySelector('[data-simple-msg]'); finir(session, (x) => { msg.textContent = x; e.target.disabled = false; }); });
+    return;
+  }
+  z.innerHTML = `<form class="confirmer-modif" data-simple-form>
+    <p><strong>Tu es d’accord pour apparaître dans les profils ?</strong> Choisis ton accès pour suivre ta fiche :</p>
+    <label>Ton prénom<input name="prenom" autocomplete="given-name" required></label>
+    <label>Ton email<input name="email" type="email" autocomplete="email" required></label>
+    <label>Un mot de passe (8 caractères minimum)<input name="mdp" type="password" minlength="8" autocomplete="new-password" required></label>
+    <button type="submit" class="po-btn" data-tout>✅ Je confirme ma fiche</button>
+    <p class="confirmer-note" data-simple-msg role="status"></p></form>`;
+  const f = z.querySelector('form'), msg = f.querySelector('[data-simple-msg]'), bouton = f.querySelector('[data-tout]');
+  f.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const dire = (x) => { msg.innerHTML = x; bouton.disabled = false; };
+    bouton.disabled = true; msg.textContent = 'Un instant…';
+    const email = f.email.value.trim(), mdp = f.mdp.value;
+    try { await creerCompte({ email, password: mdp, prenom: f.prenom.value.trim(), source: 'fiche-live' }); }
+    catch (err) { if (err.code !== 'compte_existe') return dire(err.code === 'trop_de_demandes' ? 'Plusieurs comptes viennent d’être créés depuis cette connexion. Réessaie dans une heure.' : 'Le compte n’a pas pu être créé. Réessaie dans un instant.'); }
+    // Si l'email a déjà un compte, le mot de passe saisi suffit à s'y connecter.
+    const co = await supabase.auth.signInWithPassword({ email, password: mdp });
+    if (co.error) return dire('Cet email a déjà un compte, avec un autre mot de passe. Saisis le bon, ou <a href="/mon-espace/">choisis-en un nouveau</a>, puis reviens sur ce lien.');
+    await finir(co.data.session, dire);
+  });
 }
 
 // Accès direct : la personne crée son compte (ou se connecte) et sa fiche y est reliée.
@@ -75,6 +113,7 @@ async function monterAcces(d) {
     try { await api({ action: 'annonce_lier_fiche_outil', n, t }, s.access_token); z.innerHTML = `<p><strong>✓ Ta fiche est reliée à ton compte (${esc(s.user.email)}).</strong></p><p><a class="po-btn" href="/mon-espace/#interets">Voir mon espace</a></p>`; }
     catch (e) { z.innerHTML = `<p class="confirmer-erreur">${e.code === 'deja_liee' ? 'Cette fiche est déjà reliée à un autre compte. Si c’est une erreur, écris à Lamia.' : 'La liaison n’a pas fonctionné. Réessaie dans un instant.'}</p>`; }
   };
+  if (session && d.compte) { z.innerHTML = `<p><strong>✓ Ta fiche est reliée à ton compte (${esc(session.user.email)}).</strong></p><p><a class="po-btn" href="/mon-espace/">Aller dans mon espace</a></p>`; return; }
   if (session) { z.innerHTML = `<p>Tu es connecté·e avec <strong>${esc(session.user.email)}</strong>.</p><p><button type="button" class="po-btn" data-lier>Relier ma fiche à ce compte</button></p>`; z.querySelector('[data-lier]').onclick = () => lier(session); return; }
   z.innerHTML = `<form class="confirmer-modif" data-acces-form>
     <p class="confirmer-actions"><button type="button" class="po-btn-verre is-on" data-mode="creer">Je crée mon accès</button><button type="button" class="po-btn-verre" data-mode="connexion">J’ai déjà un compte</button></p>
