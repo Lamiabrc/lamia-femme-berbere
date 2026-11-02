@@ -66,3 +66,14 @@ test('annuler la fusion : la fiche redevient visible', async () => {
   await handleAnnonces('outil_fusion_annuler', { cle, retire: 'vieux' }, deps);
   assert.equal(patches[0].valeur.visible, true);
 });
+
+test('empreintes : deux fiches avec le même lien ne font plus échouer tout le lot', async () => {
+  const { deps } = harnais({});
+  const envois = [];
+  deps.call = async (u, o) => { if (o?.method === 'POST') envois.push(...JSON.parse(o.body)); return new Response('[]', { status: 200 }); };
+  const h = (c) => c.repeat(64);
+  const r = await handleAnnonces('outil_tiktok', { cle, empreintes: [{ h: h('a'), outil_id: 'fiche-1' }, { h: h('b'), outil_id: 'fiche-2' }, { h: h('a'), outil_id: 'fiche-3' }] }, deps);
+  assert.equal(r.status, 200);
+  assert.equal(envois.length, 2);
+  assert.equal(envois.find((x) => x.h === h('a')).outil_id, 'fiche-1');
+});
