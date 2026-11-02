@@ -503,7 +503,7 @@ async function discussions(session) {
         : `<p class="parcours-valider">${x.lui ? `<span>${esc(d.avec)} a déjà validé.</span> ` : ''}<button type="button" class="btn btn-ink" data-parcours-valider="${esc(x.id)}">Nous avons vécu cette étape</button></p>`;
       return `<li class="parcours-etape is-${esc(x.etat)}"><span class="parcours-num">${x.etat === 'faite' ? '✓' : esc(x.numero)}</span><div><strong>${esc(x.titre)}</strong>${x.etat === 'en_cours' ? `<p>${esc(x.texte)}</p>${questions}${etat}` : ''}</div></li>`;
     }).join('');
-    return `<details class="parcours" ${p.fini ? '' : 'open'}><summary>💍 Votre parcours vers le mariage <span>${p.fini ? 'Terminé, félicitations !' : `Étape ${esc(p.courante + 1)} sur ${esc(p.total)}`}</span></summary><ol>${etapes}</ol></details>`;
+    return `<details class="parcours" ${p.fini ? '' : 'open'}><summary>💍 Votre parcours vers le mariage <span>${p.fini ? 'Terminé, félicitations !' : `Étape ${esc(p.courante + 1)} sur ${esc(p.total)}`}</span></summary><p class="parcours-livre">Le parcours de mariage de Lamia, détaillé dans l’ebook <a class="text-link" href="/werdi-ouvre-les-yeux/"><em>Werdi, ouvre les yeux !</em></a></p><ol>${etapes}</ol></details>`;
   };
   const vue = (d) => {
     const msgs = d.messages.map((m) => `<p class="disc-msg ${m.moi ? 'is-moi' : ''}"><span>${esc(m.texte)}</span><small>${esc(heure(m.le))}</small></p>`).join('') || `<p class="disc-vide">${salut ? `${esc(salut)}, dis` : 'Dis'} bonjour à ${esc(d.avec)} 👋</p>`;

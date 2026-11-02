@@ -3298,6 +3298,7 @@ label.is-manquant { outline: 2px solid #c0263f; outline-offset: 3px; border-radi
 .disc-numeros small { color: #6f6152; }
 .parcours { border: 1px solid #e0cdb5; border-radius: 14px; padding: 10px 12px; background: #fffaf2; color: #2b2118; }
 .parcours summary { cursor: pointer; font-weight: 600; }
+.parcours-livre { margin: 8px 0; color: #6f6152; font-size: 15px; }
 .parcours summary span { font-weight: 400; color: #6f6152; font-size: 14px; margin-left: 6px; }
 .parcours ol { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 8px; }
 .parcours-etape { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; align-items: start; }
