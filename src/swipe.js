@@ -32,6 +32,7 @@ function carte(a) {
       ${a.profil ? `<h3>Qui je suis</h3><p>${esc(a.profil)}</p>` : ''}
       ${a.recherche ? `<h3>Qui je cherche${ages}</h3><p>${esc(a.recherche)}</p>` : ''}
       ${foiEtVie(a).replace(/<h4>/g, '<h3>').replace(/<\/h4>/g, '</h3>')}
+      <p class="profil-moderer"><button type="button" class="link-button" data-moderer="${a.ref}">🚩 Bloquer ou signaler</button></p>
     </div>
   </article>`;
 }
@@ -146,10 +147,23 @@ function limiteAtteinte() {
 // Plus de match disponible : le live, et les formules pour celles et ceux qui peuvent payer en ligne.
 function quotaAtteint({ algerie, formule } = {}) {
   vibrer(80);
-  if (algerie) return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true">🎥</p><h2>Viens me voir en live</h2><p>Tu as utilisé ton match. Pour en avoir d’autres, <strong>viens soutenir le live de Lamia</strong>, chaque soir à 21 h : elle peut t’offrir un nouveau match.</p><p class="po-actions"><a class="po-btn-verre" href="/salon/">Voir le live</a></p>`);
+  if (algerie || window.LFB_PLAY) return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true">🎥</p><h2>Viens me voir en live</h2><p>Tu as utilisé ton match. Pour en avoir d’autres, <strong>viens soutenir le live de Lamia</strong>, chaque soir à 21 h : elle peut t’offrir un nouveau match.</p><p class="po-actions"><a class="po-btn-verre" href="/salon/">Voir le live</a></p>`);
   if (formule === 'passion') return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true">💞</p><h2>Tes 10 matchs du mois sont utilisés</h2><p>Ils reviennent le mois prochain. Avec <strong>Prestige</strong>, les matchs sont illimités. Tu peux aussi venir soutenir le live de Lamia.</p><p class="po-actions"><a class="po-btn-verre" href="/abonnement/">Voir les formules</a><a class="po-btn-verre" href="/salon/">Voir le live</a></p>`);
   return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true">🎥</p><h2>Tu as utilisé ton match offert</h2><p>Pour en avoir d’autres, <strong>viens soutenir le live de Lamia</strong>, chaque soir à 21 h, ou choisis une formule : 10 matchs par mois avec Passion, illimités avec Prestige.</p><p class="po-actions"><a class="po-btn-verre" href="/salon/">Voir le live</a><a class="po-btn-verre" href="/abonnement/">Voir les formules</a></p>`);
 }
+// Bloquer ou signaler le profil affiché. Bloquer le retire tout de suite, et la personne n'en sait rien.
+function moderer(ref) {
+  const d = fenetre(`<h2>Profil n° ${esc(ref)}</h2><p>Bloquer : vous ne vous verrez plus et vous ne pourrez plus vous écrire. La personne n’est pas prévenue.</p><p>Signaler : Lamia reçoit une alerte et regarde ce profil.</p><label class="profil-motif">Que s’est-il passé ? (facultatif)<textarea rows="3" maxlength="500" data-motif></textarea></label><p class="po-actions"><button type="button" class="po-btn" data-bloquer>🚫 Bloquer</button><button type="button" class="po-btn" data-signaler>🚩 Signaler</button></p><p class="form-status" role="status" data-moderer-statut></p>`);
+  const envoyer = async (action, fin) => {
+    d.querySelectorAll('button').forEach((x) => { x.disabled = true; });
+    try { await api({ action, ref, motif: d.querySelector('[data-motif]').value }, token); fin(); }
+    catch { d.querySelectorAll('button').forEach((x) => { x.disabled = false; }); d.querySelector('[data-moderer-statut]').textContent = 'Ça n’a pas abouti. Réessaie dans un instant.'; }
+  };
+  d.querySelector('[data-bloquer]').addEventListener('click', () => envoyer('annonce_bloquer', () => { d.remove(); tous = tous.filter((p) => p.ref !== ref); profils = profils.filter((p) => p.ref !== ref); if (dernier?.profil.ref === ref) { dernier = null; majAnnuler(); } afficher(); toast('Profil bloqué. Vous ne vous verrez plus.'); }));
+  d.querySelector('[data-signaler]').addEventListener('click', () => envoyer('annonce_signaler_profil', () => { d.remove(); toast('Merci. Lamia est prévenue.'); }));
+}
+zone.addEventListener('click', (e) => { const b = e.target.closest('[data-moderer]'); if (b) moderer(Number(b.dataset.moderer)); });
+
 function annulerDernier() {
   if (!dernier || occupe) return;
   const d = dernier; dernier = null;

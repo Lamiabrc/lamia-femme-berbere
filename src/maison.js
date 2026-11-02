@@ -204,7 +204,7 @@ async function renderProductPage() {
       ${Array.isArray(m.extrait) && m.extrait.length ? `<details class="extrait-livre" data-extrait><summary>📖 Lire gratuitement les premières pages <small>(${m.extrait.length} pages)</small></summary>
         <div class="extrait-pages">${m.extrait.filter((u) => /^\/images\//.test(u)).map((u, i) => `<img src="${esc(u)}" alt="Extrait, page ${i + 1}" loading="lazy">`).join('')}</div>
         <p class="fine">La suite t’attend dans le livre complet.</p></details>` : ''}
-      ${sold ? '<button class="btn btn-ink" type="button" disabled>Déjà partie</button>' : preorderForm(p)}
+      ${sold ? '<button class="btn btn-ink" type="button" disabled>Déjà partie</button>' : window.LFB_PLAY && p.product_type === 'digital' ? '<p>Ce livre numérique ne s’achète pas dans cette version de l’appli.</p>' : preorderForm(p)}
       ${p.product_type === 'digital' ? renvoiForm() : ''}
     </div>`;
   $$('[data-thumb]', box).forEach((b) =>

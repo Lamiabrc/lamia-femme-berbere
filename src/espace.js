@@ -41,6 +41,7 @@ async function render() {
   discussions(session);
   monSpeedDating(session);
   demasquages(session);
+  mesBlocages(session);
 }
 
 // Démasquages : souhaits réciproques du bal, à confirmer.
@@ -50,6 +51,39 @@ const ETAT_DEMASQUE = {
   confirme: '💞 Confirmé des deux côtés : Lamia va vous mettre en relation.',
   pas_cette_fois: 'Pas de démasquage cette fois.',
 };
+// Bloquer ou signaler un profil depuis Mon espace (demandes reçues, propositions, discussions).
+const moderation = (ref) => (ref ? `<p class="profil-moderer"><button type="button" class="link-button" data-moderer-bloquer="${esc(ref)}">🚫 Bloquer</button> · <button type="button" class="link-button" data-moderer-signaler="${esc(ref)}">🚩 Signaler</button></p>` : '');
+document.addEventListener('click', async (e) => {
+  const bloquer = e.target.closest('[data-moderer-bloquer]'), signaler = e.target.closest('[data-moderer-signaler]');
+  if (!bloquer && !signaler) return;
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return;
+  const ref = (bloquer || signaler).dataset[bloquer ? 'modererBloquer' : 'modererSignaler'];
+  if (bloquer && !confirm(`Bloquer le profil n° ${ref} ? Vous ne vous verrez plus et vous ne pourrez plus vous écrire. La personne n’est pas prévenue.`)) return;
+  const motif = signaler ? prompt('Que s’est-il passé ? Lamia reçoit une alerte et regarde ce profil.') : '';
+  if (motif === null) return;
+  try {
+    await appelProfil({ action: bloquer ? 'annonce_bloquer' : 'annonce_signaler_profil', ref, motif }, session);
+    alert(bloquer ? 'Profil bloqué.' : 'Merci. Lamia est prévenue.');
+    if (bloquer) render();
+  } catch { alert('Ça n’a pas abouti. Réessaie dans un instant.'); }
+});
+// Les profils que j'ai bloqués, avec la possibilité de revenir en arrière.
+async function mesBlocages(session) {
+  const box = document.querySelector('[data-espace-blocages]');
+  if (!box) return;
+  let liste = [];
+  try { ({ blocages: liste = [] } = await appelProfil({ action: 'annonce_mes_blocages' }, session)); } catch { return; }
+  box.hidden = !liste.length;
+  box.querySelector('[data-blocages-liste]').innerHTML = liste.map((x) => `<li>Profil n° ${esc(x.ref)} <button type="button" class="link-button" data-debloquer="${esc(x.ref)}">Débloquer</button></li>`).join('');
+  ecouter(box, 'click', async (e) => {
+    const b = e.target.closest('[data-debloquer]');
+    if (!b) return;
+    b.disabled = true;
+    try { await appelProfil({ action: 'annonce_debloquer', ref: b.dataset.debloquer }, session); mesBlocages(session); } catch { b.disabled = false; }
+  });
+}
+
 async function demasquages(session) {
   const box = document.querySelector('[data-espace-demasquage]');
   if (!box) return;
@@ -123,6 +157,7 @@ async function monSpeedDating(session) {
   else if (ins.statut === 'place') contenu = `<h3>Ta place est confirmée</h3><p><strong>${esc(ins.quand)}</strong><br>${esc(ins.salon)} · ${esc(ins.secteur)}</p><p>Tu recevras un rappel le jour même, une heure avant, puis au démarrage.</p><p><a class="text-link" href="/speed-dating/salle/">Tester ma caméra</a></p>${ins.gratuit || ins.inclus ? quitter : ''}`;
   else if (ins.gratuit) contenu = `<h3>Ton salon est confirmé</h3><p><strong>${esc(ins.quand)}</strong><br>${esc(ins.salon)} · ${esc(ins.secteur)}</p><p class="espace-salon-prix">Gratuit</p><p>Valide ta place avant le ${esc(ins.payer_avant)}.</p><button class="btn btn-ink" type="button" data-salon-valider>Valider ma place</button>${statut}${quitter}`;
   else if (ins.algerie) contenu = `<h3>Ton salon est confirmé</h3><p><strong>${esc(ins.quand)}</strong><br>${esc(ins.salon)} · ${esc(ins.secteur)}</p><p>Le paiement en ligne n’est pas possible en Algérie. <a class="text-link" href="/salon/">Viens au live de Lamia</a>, chaque soir à 21 h : elle peut t’offrir ta place. Sans validation avant le ${esc(ins.payer_avant)}, ta place passera à la personne suivante.</p>${quitter}`;
+  else if (window.LFB_PLAY) contenu = `<h3>Ton salon est confirmé</h3><p><strong>${esc(ins.quand)}</strong><br>${esc(ins.salon)} · ${esc(ins.secteur)}</p><p>Le règlement de cette place ne se fait pas dans cette version de l’appli.</p>${statut}`;
   else contenu = `<h3>Ton salon est confirmé</h3><p><strong>${esc(ins.quand)}</strong><br>${esc(ins.salon)} · ${esc(ins.secteur)}</p><p class="espace-salon-prix">${esc(money(ins.prix))}</p><p>Règle ta place avant le ${esc(ins.payer_avant)}, sinon elle passera à la personne suivante.</p><label><input type="checkbox" data-salon-cgv> <span>J’accepte les <a class="text-link" href="/cgv/">conditions de vente</a>. Place non remboursable.</span></label><button class="btn btn-ink" type="button" data-salon-payer>Régler ma place</button>${statut}${quitter}`;
   box.innerHTML = `<article class="espace-salon">${contenu}</article>`;
   const dire = (t) => { const s = $('[data-salon-statut]'); if (s) { s.textContent = t; s.classList.add('is-error'); } };
@@ -348,7 +383,7 @@ async function propositions(session) {
       ${f.profil ? `<p><strong>Qui je suis :</strong> ${esc(f.profil)}</p>` : ''}
       ${f.recherche ? `<p><strong>Qui je cherche${esc(ages)} :</strong> ${esc(f.recherche)}</p>` : ''}
       ${secteurLisible(f.secteur) ? `<p><strong>Cherche en :</strong> ${esc(secteurLisible(f.secteur))}</p>` : ''}
-      ${rep}</div></article>`;
+      ${rep}${moderation(f.ref)}</div></article>`;
   };
   const afficher = () => { box.innerHTML = liste.length ? liste.map(carte).join('') : '<p>Pas encore de proposition. Quand Lamia trouve un profil pour toi, il apparaît ici et tu es prévenu·e.</p>'; };
   try { ({ propositions: liste = [] } = await appelProfil({ action: 'annonce_propositions' }, session)); afficher(); }
@@ -385,7 +420,7 @@ async function avisLamia(session) {
       ${f.profil ? `<p><strong>Qui je suis :</strong> ${esc(f.profil)}</p>` : ''}
       ${f.recherche ? `<p><strong>Qui je cherche${esc(ages)} :</strong> ${esc(f.recherche)}</p>` : ''}
       ${secteurLisible(f.secteur) ? `<p><strong>Cherche en :</strong> ${esc(secteurLisible(f.secteur))}</p>` : ''}
-      ${rep}</div></article>`;
+      ${rep}${moderation(f.ref)}</div></article>`;
   };
   const afficher = () => { box.innerHTML = `<h3 class="espace-avis-titre">Un profil avec une différence</h3>${liste.map(carte).join('')}`; };
   afficher();
@@ -415,7 +450,7 @@ async function interetsRecus(session) {
       ${f.profil ? `<p><strong>Qui je suis :</strong> ${esc(f.profil)}</p>` : ''}
       ${f.recherche ? `<p><strong>Qui je cherche${esc(ages)} :</strong> ${esc(f.recherche)}</p>` : ''}
       ${secteurLisible(f.secteur) ? `<p><strong>Cherche en :</strong> ${esc(secteurLisible(f.secteur))}</p>` : ''}
-      ${rep}</div></article>`;
+      ${rep}${moderation(f.ref)}</div></article>`;
   };
   const afficher = () => { box.innerHTML = liste.length ? liste.map(carte).join('') : '<p>Personne pour le moment. Dès qu’une personne s’intéresse à ton profil, sa fiche apparaît ici et tu reçois un email.</p>'; };
   try { ({ interets: liste = [] } = await appelProfil({ action: 'annonce_interets_recus' }, session)); afficher(); }
@@ -522,7 +557,7 @@ async function discussions(session) {
       ${d.ouverte ? `<form class="disc-saisie" data-disc-envoi><textarea name="texte" rows="2" maxlength="1000" placeholder="Ton message…" required></textarea><button class="btn btn-ink" type="submit">Envoyer</button></form>
       <p class="disc-aide">Pour ta sécurité, les numéros, liens et emails écrits dans les messages sont masqués : utilise le bouton ci-dessous pour échanger vos numéros.</p>` : ''}
       ${numeros}
-      ${d.ouverte ? '<p><button type="button" class="link-button" data-disc-signaler>🚩 Signaler un problème à Lamia</button></p>' : ''}
+      ${d.ouverte ? `<p><button type="button" class="link-button" data-disc-signaler>🚩 Signaler un problème à Lamia</button>${d.avec_ref ? ` · <button type="button" class="link-button" data-moderer-bloquer="${esc(d.avec_ref)}">🚫 Bloquer</button>` : ''}</p>` : ''}
     </article>`;
   };
   const afficher = () => {

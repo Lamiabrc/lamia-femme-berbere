@@ -148,6 +148,7 @@ ${noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" hr
 <meta name="theme-color" content="#1B1A18">
 <link rel="icon" href="/images/marque/lamia-logo-net-160.webp" type="image/webp">
 <link rel="manifest" href="/maison.webmanifest">
+<script src="/assets/version-play.js"></script>
 <link rel="apple-touch-icon" href="/images/marque/maison-icone-180.png">
 <meta name="apple-mobile-web-app-title" content="LFB">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -815,6 +816,7 @@ page(
     <section id="discussion" data-espace-discussion-bloc hidden>
       <h2>Mes matchs en cours</h2>
       <p>Vos matchs réciproques : vous avez 7 jours pour faire connaissance ici, en privé. Quand vous êtes prêts, échangez vos numéros pour passer au téléphone. Lamia ne lit pas vos messages, sauf si l’un de vous la signale.</p>
+      <div class="espace-profil" data-espace-blocages hidden><h3>Profils bloqués</h3><ul data-blocages-liste></ul></div>
       <p class="parcours-livre">💍 Vous suivez le parcours de mariage de Lamia, détaillé dans l’ebook <a class="text-link" href="/werdi-ouvre-les-yeux/"><em>Werdi, ouvre les yeux !</em></a></p>
       <div data-espace-discussion></div>
     </section>
@@ -1986,7 +1988,7 @@ await cp(join(ROOT, 'public'), DIST, { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await writeFile(join(DIST, 'assets', 'editable.json'), JSON.stringify({ fields: [...EDITABLE, ...REGISTRE], defaults: DEFAULTS }));
-for (const f of ['abonnement.js', 'abonnement-merci.js', 'swipe.js', 'nouveautes.js', 'confirmer.js', 'maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'soirees.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'annonces.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
+for (const f of ['version-play.js', 'abonnement.js', 'abonnement-merci.js', 'swipe.js', 'nouveautes.js', 'confirmer.js', 'maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'soirees.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'annonces.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
 await cp(join(ROOT, 'content', 'shipping.mjs'), join(DIST, 'assets', 'shipping.mjs'));
 await cp(join(ROOT, 'content', 'rubriques.mjs'), join(DIST, 'assets', 'rubriques.mjs'));
 await cp(join(ROOT, 'content', 'matching-options.mjs'), join(DIST, 'assets', 'matching-options.mjs'));

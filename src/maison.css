@@ -3448,3 +3448,12 @@ body[data-ambiance="espace"] .espace .room-name { color: #8a1024; }
 .salle-reciproque-ok { font-style: italic; }
 .salle-reciproque [hidden], .espace-demasque [hidden] { display: none !important; }
 .salons-beta { margin: 0 0 12px; font-size: 15px; font-style: italic; opacity: .9; }
+
+/* Bloquer et signaler */
+.profil-moderer { margin: 12px 0 0; font-size: 15px; }
+.profil-motif { display: grid; gap: 4px; margin: 8px 0; text-align: left; }
+.profil-motif textarea { width: 100%; border-radius: 10px; border: 1px solid #e0cdb5; padding: 8px; font: inherit; }
+
+/* Version Google Play : rien ne se vend dans l'appli */
+.version-play [data-gerer-abo], .version-play [data-salon-payer] { display: none !important; }
+.version-play .accueil-bloc:has(.abo-grille) { display: none !important; }
