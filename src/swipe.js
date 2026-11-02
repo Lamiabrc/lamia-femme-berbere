@@ -93,12 +93,12 @@ function infos() {
   if (quota.limite) lignes.push(`<p class="swipe-info">Il te reste <strong>${quota.restants}</strong> profil${quota.restants > 1 ? 's' : ''} à swiper aujourd’hui (${quota.limite} par jour avec ta formule). <a href="/abonnement/">Plus de profils</a></p>`);
   bandeau.innerHTML = lignes.join('');
 }
-function quotaAtteint() {
+function plusDeProfilsAujourdhui() {
   message(`<p class="swipe-coeur">⏳</p><h2>C’est tout pour aujourd’hui</h2><p>Tu as swipé tes ${quota.limite} profils du jour. Reviens demain : ton compteur repart à zéro à minuit.</p><p>Envie d’en voir plus ? Avec <strong>Cœur</strong>, 30 profils par jour ; avec <strong>Passion</strong>, sans limite, et tu découvres qui t’a choisi·e.</p><p class="po-actions"><a class="po-btn" href="/abonnement/">Voir les formules</a><a class="po-btn-verre" href="/mon-espace/">Mon espace</a></p>`);
 }
 function afficher() {
   infos();
-  if (quota.limite && quota.restants <= 0 && profils.length) return quotaAtteint();
+  if (quota.limite && quota.restants <= 0 && profils.length) return plusDeProfilsAujourdhui();
   compteur.textContent = profils.length ? `${profils.length} profil${profils.length > 1 ? 's' : ''} à découvrir` : '';
   if (!profils.length && tous.length) return message(`<p class="swipe-coeur">🎚</p><h2>Aucun profil avec ces filtres</h2><p>${tous.length} profil${tous.length > 1 ? 's restent' : ' reste'} à découvrir si tu élargis ta recherche : ouvre les filtres et enlève un critère.</p>`);
   if (!profils.length) return message(`<p class="swipe-coeur">💌</p><h2>Tu as vu tous les profils pour le moment</h2>${coeurs ? `<p><strong>${coeurs} coup${coeurs > 1 ? 's' : ''} de cœur</strong> envoyé${coeurs > 1 ? 's' : ''} aujourd’hui 💘</p>` : ''}<p>Lamia a noté tes choix. Si une personne que tu as choisie te choisit aussi, Lamia est prévenue tout de suite et revient vers toi pour la mise en relation. Ton identité n’est jamais révélée : les autres ne voient qu’un numéro de profil.</p><p>De nouveaux profils arrivent chaque semaine : reviens bientôt.</p><p><a class="po-btn" href="/mon-espace/">Suivre mes demandes</a></p>`);
