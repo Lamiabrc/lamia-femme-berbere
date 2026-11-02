@@ -615,16 +615,16 @@ page(
   '/speed-dating/',
   layout({
     title: 'Speed dating en ligne sérieux — Le Boudoir des Rencontres | Lamia Femme Berbère',
-    description: 'Des soirées de speed dating en visio pour des rencontres sérieuses, en deux salons par âge, de l’Algérie à la France et au Canada, animées par Lamia. Inscription toujours ouverte.',
+    description: 'Des soirées de speed dating en visio pour des rencontres sérieuses, en deux salons par âge, de l’Algérie à la France et au Canada, animées par Lamia. Inscription toujours ouverte. Chaque soirée est un Bal masqué Virtuel Kabyle.',
     path: '/speed-dating/',
     room: roomBySlug['speed-dating'],
     scripts: ['/assets/membre.js', '/assets/soirees.js'],
     ogTitle: 'Le speed dating de Lamia Femme Berbère',
     ogDescription: 'Rencontres sérieuses en visio, en deux salons par âge, animées par Lamia. Inscription toujours ouverte, deux salons par âge.',
-    ogImage: '/images/lamia/lamia-venise-1672.webp',
-    ogImageAlt: 'Lamia Femme Berbère, masque vénitien à la main, sur le Grand Canal de Venise',
-    ogImageWidth: 1672,
-    ogImageHeight: 941,
+    ogImage: '/images/lamia/lamia-salon-1122.webp',
+    ogImageAlt: 'Lamia Femme Berbère en robe kabyle, dans son salon',
+    ogImageWidth: 1122,
+    ogImageHeight: 1402,
     body: `<div class="bal boudoir-immersif">
 <span class="boudoir-scene" aria-hidden="true"></span>
 <span class="boudoir-rideau-fixe boudoir-rideau-gauche" aria-hidden="true"></span>
@@ -649,11 +649,24 @@ page(
 </section>
 
 <div class="boudoir-plateau">
+<section class="lancement" aria-labelledby="lancement-title">
+  <figure class="lancement-image">
+    ${IMGT('image.speed.lancement', 'Le Boudoir des Rencontres', 'Image du thème des soirées', `<img src="/images/lamia/lamia-salon-1122.webp" srcset="/images/lamia/lamia-salon-560.webp 560w, /images/lamia/lamia-salon-900.webp 900w, /images/lamia/lamia-salon-1122.webp 1122w" sizes="(max-width: 860px) 100vw, 560px" width="1122" height="1402" alt="Lamia en robe kabyle, dans son salon" loading="lazy">`)}
+  </figure>
+  <div class="lancement-texte">
+    <p class="bal-kicker">Le thème de toutes nos soirées</p>
+    <h2 id="lancement-title">${esc(T('speed.lancement-titre', 'Le Boudoir des Rencontres', 'Thème des soirées : titre', 'Le Bal masqué Virtuel Kabyle'))}</h2>
+    <p>Chaque soirée du Boudoir est un <strong>bal masqué virtuel kabyle</strong>, en visio, depuis chez vous. Venez masqué·e, en robe kabyle, avec vos bijoux ou dans votre plus belle tenue : le mystère fait partie du jeu, et le démasquage vient à la fin.</p>
+    <p><a class="btn btn-gold" href="#events-title">Réserver ma place</a></p>
+  </div>
+</section>
+
 <section class="salons-accueil" aria-labelledby="events-title">
   <p class="bal-kicker">L’inscription est toujours ouverte</p>
   <h2 id="events-title">Choisis ton salon</h2>
   <p class="salons-gratuit" data-salons-gratuit hidden>La prochaine soirée est gratuite</p>
   <p>Deux salons, plusieurs secteurs de recherche. Quand assez de femmes et d’hommes sont inscrits dans un même secteur, le salon est confirmé et tu es prévenu·e.</p>
+  <p class="salons-beta">Nous sommes en période de bêta-test : merci pour votre participation active ! N’hésitez pas à nous signaler le moindre problème, et soyez indulgents avec nos petits réglages techniques.</p>
   <div class="salons-deux">
     <a class="salons-carte" href="/speed-dating/inscription/?salon=20-39"><span><strong>Salon 20-39 ans</strong><small>Je m’inscris</small></span></a>
     <a class="salons-carte" href="/speed-dating/inscription/?salon=40%2B"><span><strong>Salon 40 ans et plus</strong><small>Je m’inscris</small></span></a>
@@ -687,7 +700,7 @@ page(
     <li><strong>Des rencontres sérieuses</strong> : on vient pour rencontrer quelqu’un, pas pour faire défiler des profils.</li>
     <li><strong>Caméra allumée</strong>, dans un endroit calme, et aucun propos déplacé.</li>
     <li><strong>Lamia veille</strong> : l’accueil, l’animation et le suivi de chaque soirée. Elle peut passer saluer un tête-à-tête pendant le bal : son nom s’affiche quand elle entre.</li>
-    <li><strong>Une ambiance</strong> : chaque soirée a son thème. Pour la première, masque vénitien, loup ou tenue élégante.</li>
+    <li><strong>Une ambiance</strong> : chaque soirée est un bal masqué virtuel kabyle : masque, robe kabyle ou tenue élégante.</li>
     <li><strong>Un souci ?</strong> <a href="/confidences/">Les Confidences avec Lamia</a> permettent de lui écrire ou de lui signaler un souci en toute discrétion.</li>
   </ul>
 </section>
@@ -855,6 +868,12 @@ page(
       </div>
     </section>
 
+    <section id="demasquage" data-espace-demasquage-section hidden>
+      <h2>💞 Mes démasquages</h2>
+      <p class="espace-note">Tu as choisi quelqu’un au bal, et cette personne t’a choisi·e aussi. Veux-tu te démasquer ? Ta réponse reste privée : si vous dites oui tous les deux, Lamia vous met en relation.</p>
+      <div class="espace-soirees" data-espace-demasquage></div>
+    </section>
+
     <div class="espace-liens is-light">
       <a href="/confidences/"><strong>Me confier à Lamia</strong><span>Écrire, laisser un vocal, échanger</span></a>
     </div>
@@ -867,8 +886,8 @@ page(
 page(
   '/speed-dating/bal/',
   layout({
-    title: 'La salle du Bal masqué de Venise',
-    description: 'Entre dans la salle du Bal masqué de Venise : grand salon, tête-à-tête masqués et souhaits de fin de bal.',
+    title: 'La salle du Bal masqué Virtuel Kabyle',
+    description: 'Entre dans la salle du Bal masqué Virtuel Kabyle : grand salon, tête-à-tête masqués et souhaits de fin de bal.',
     path: '/speed-dating/bal/',
     room: roomBySlug['speed-dating'],
     noindex: true,
@@ -882,7 +901,7 @@ page(
 </div>
 <section class="bal-step" data-step="entree">
   <div class="bal-hero is-short">
-    <p class="bal-kicker">Le Bal masqué de Venise</p>
+    <p class="bal-kicker">Le Bal masqué Virtuel Kabyle</p>
     <h1>La porte du bal</h1>
     <p class="bal-lead">Entre avec l’email et la date de naissance donnés à ton inscription.</p>
   </div>
@@ -919,12 +938,18 @@ page(
     <p class="salle-temps" data-salle-temps aria-live="off"></p>
   </header>
   <div class="salle-scene">
-    <figure class="salle-autre"><div class="salle-accueil" data-salle-accueil style="--accueil:url('${esc(imgOr('salle-accueil', '/images/lamia/lamia-venise-1672.webp'))}')" role="img" aria-label="Lamia vous accueille au Bal masqué de Venise"><p>« ${esc(P.speedDating.salleAccueil)} »<span>Lamia</span></p></div><video data-video-autre playsinline autoplay></video><img class="salle-logo" src="/images/marque/lamia-logo-net-160.webp" alt="" width="64" height="64"><figcaption data-autre-nom>Lamia arrive…</figcaption><span class="salle-cadre" aria-hidden="true"></span></figure>
+    <figure class="salle-autre"><div class="salle-accueil" data-salle-accueil style="--accueil:url('${esc(imgOr('salle-accueil', '/images/lamia/lamia-salon-1122.webp'))}')" role="img" aria-label="Lamia vous accueille au Bal masqué Virtuel Kabyle"><p>« ${esc(P.speedDating.salleAccueil)} »<span>Lamia</span></p></div><video data-video-autre playsinline autoplay></video><img class="salle-logo" src="/images/marque/lamia-logo-net-160.webp" alt="" width="64" height="64"><figcaption data-autre-nom>Lamia arrive…</figcaption><span class="salle-cadre" aria-hidden="true"></span></figure>
     <figure class="salle-moi"><video data-video-moi playsinline autoplay muted></video><figcaption>Toi</figcaption></figure>
     <audio data-audio-autre autoplay></audio>
   </div>
   <p class="salle-msg" role="status" data-salle-msg></p>
   <p class="salle-demasque" data-demasque hidden>Dernier tête-à-tête : le moment du démasquage. Retire ton masque si tu le souhaites.</p>
+  <div class="salle-reciproque" data-reciproque hidden>
+    <p class="salle-reciproque-titre">💞 Vous vous êtes choisis tous les deux</p>
+    <p>Après ce tête-à-tête sans masque, veux-tu te démasquer pour de bon, et que Lamia vous mette en relation ? Ta réponse reste privée.</p>
+    <p class="bal-actions" data-reciproque-boutons><button class="btn btn-gold" type="button" data-reciproque-rep="oui">Oui, je me démasque</button><button class="btn bal-btn-line" type="button" data-reciproque-rep="non">Pas cette fois</button></p>
+    <p class="salle-reciproque-ok" data-reciproque-ok hidden></p>
+  </div>
   <p class="salle-compte" data-salle-compte></p>
   <div class="tchat" data-tchat hidden>
     <button class="tchat-bulle" type="button" data-tchat-ouvrir aria-expanded="false">💬 Écrire à Lamia <b data-tchat-nouveau hidden>•</b></button>
@@ -937,11 +962,17 @@ page(
   <div class="salle-boutons">
     <button class="btn bal-btn-line" type="button" data-micro aria-pressed="false">Micro</button>
     <button class="btn bal-btn-line" type="button" data-camera aria-pressed="false">Caméra</button>
-    <button class="btn bal-btn-line" type="button" data-flou aria-pressed="false" hidden>Flouter mon décor</button>
+    <label class="btn bal-btn-line decor-choix" data-decor-choix hidden>Mon décor<select data-decor aria-label="Choisir mon décor">
+      <option value="aucun">Ma pièce</option>
+      <option value="flou">Pièce floutée</option>
+      <option value="petillant">Salon Pétillant</option>
+      <option value="ambre">Salon de l’Ambre</option>
+    </select></label>
     <button class="btn bal-btn-line" type="button" data-musique aria-pressed="true">Musique douce</button>
     <a class="btn bal-btn-line" href="/confidences/#signaler" target="_blank" rel="noopener">Signaler à Lamia</a>
     <button class="btn bal-btn-line" type="button" data-quitter>Quitter le bal</button>
   </div>
+  <p class="decor-conseil" data-decor-conseil hidden>Astuce : installe-toi devant un mur uni, avec une lumière face à toi. Ton masque fera le reste.</p>
   <form class="souhaits" data-souhaits hidden>
     <h2>Ton carnet de bal</h2>
     <p>Coche les personnes que tu aimerais revoir. Ton choix reste privé : si c’est réciproque, Lamia vous met en relation.</p>
@@ -976,7 +1007,7 @@ page(
   '/speed-dating/salle/',
   layout({
     title: 'L’antichambre du bal · tester ma caméra',
-    description: 'Avant le Bal masqué de Venise, vérifie ta caméra et ton micro. Ta vidéo reste sur ton appareil.',
+    description: 'Avant le Bal masqué Virtuel Kabyle, vérifie ta caméra et ton micro. Ta vidéo reste sur ton appareil.',
     path: '/speed-dating/salle/',
     room: roomBySlug['speed-dating'],
     noindex: true,
@@ -989,7 +1020,7 @@ page(
   <p class="bal-actions"><button class="btn btn-gold" type="button" data-appli-copier>Copier le lien</button><a class="btn bal-btn-line" data-appli-chrome hidden>Ouvrir dans Chrome</a></p>
 </div>
 <section class="bal-hero is-short">
-  <p class="bal-kicker">Le Bal masqué de Venise</p>
+  <p class="bal-kicker">Le Bal masqué Virtuel Kabyle</p>
   <h1>L’antichambre</h1>
   <p class="bal-lead">Avant d’entrer au bal, ajuste ton masque et vérifie ta caméra et ton micro. Ta vidéo reste sur ton appareil : rien n’est enregistré ni envoyé.</p>
 </section>

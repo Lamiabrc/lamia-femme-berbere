@@ -231,7 +231,12 @@ $('[data-ventes]').addEventListener('change', async (e) => {
 function soirees() {
   const s = data.inscrits.salons;
   $('[data-soirees-resume]').textContent = `${data.inscrits.total} inscription${data.inscrits.total > 1 ? 's' : ''} au total, dont ${data.inscrits.nouveaux_7j} cette semaine.`;
-  $('[data-soirees]').innerHTML = s.map((e) => `<tr><td>${esc(e.title)}</td><td>${esc(e.audience || '')}</td><td>${esc(date(e.starts_at, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }))}</td><td><strong>${e.inscrits}</strong></td><td>${e.capacity}</td></tr>`).join('') || '<tr><td colspan="5">Aucune soirée à venir.</td></tr>';
+  // Une soirée est « précédente » trois heures après son début.
+  const limite = new Date(Date.now() - 3 * 3600e3).toISOString();
+  const ligne = (e) => `<tr><td>${esc(e.title)}</td><td>${esc(e.audience || '')}</td><td>${esc(date(e.starts_at, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }))}</td><td><strong>${e.inscrits}</strong></td><td>${e.capacity}</td></tr>`;
+  const avenir = s.filter((e) => e.starts_at >= limite), passees = s.filter((e) => e.starts_at < limite).reverse();
+  $('[data-soirees]').innerHTML = avenir.map(ligne).join('') || '<tr><td colspan="5">Aucune soirée à venir.</td></tr>';
+  $('[data-soirees-passees]').innerHTML = passees.map(ligne).join('') || '<tr><td colspan="5">Aucune soirée passée ces trois derniers mois.</td></tr>';
 }
 function alertes() {
   const list = data.alertes.recentes;

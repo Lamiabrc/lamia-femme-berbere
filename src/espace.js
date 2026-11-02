@@ -28,6 +28,41 @@ async function render() {
   propositions(session);
   discussions(session);
   monSpeedDating(session);
+  demasquages(session);
+}
+
+// Démasquages : souhaits réciproques du bal, à confirmer.
+const ETAT_DEMASQUE = {
+  a_repondre: null,
+  attente: 'Tu as dit oui. On attend la réponse de l’autre personne.',
+  confirme: '💞 Confirmé des deux côtés : Lamia va vous mettre en relation.',
+  pas_cette_fois: 'Pas de démasquage cette fois.',
+};
+async function demasquages(session) {
+  const box = document.querySelector('[data-espace-demasquage]');
+  if (!box) return;
+  const appel = async (body) => {
+    const r = await fetch('/api/bal', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` }, body: JSON.stringify(body) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || 'erreur');
+    return d;
+  };
+  let couples = [];
+  try { ({ couples = [] } = await appel({ action: 'mes_demasquages' })); } catch { return; }
+  document.querySelector('[data-espace-demasquage-section]').hidden = !couples.length;
+  box.innerHTML = couples.map((c) => `<article class="espace-soiree espace-demasque"><h3>${esc(c.autre.name)} souhaite aussi te revoir</h3>
+    ${c.etat === 'a_repondre'
+      ? `<p class="bal-actions"><button class="btn btn-ink" type="button" data-demasque-oui="${esc(c.session)}|${esc(c.autre.uid)}">Oui, je me démasque</button><button class="btn btn-line" type="button" data-demasque-non="${esc(c.session)}|${esc(c.autre.uid)}">Pas cette fois</button></p>`
+      : `<p>${esc(ETAT_DEMASQUE[c.etat] || '')}</p>`}</article>`).join('');
+  box.onclick = async (e) => {
+    const b = e.target.closest('[data-demasque-oui],[data-demasque-non]'); if (!b) return;
+    const [s, autre] = (b.dataset.demasqueOui || b.dataset.demasqueNon).split('|');
+    b.disabled = true;
+    try { await appel({ action: 'demasque_repondre', session: s, autre, oui: Boolean(b.dataset.demasqueOui) }); }
+    catch { b.disabled = false; return; }
+    demasquages(session);
+  };
+  if (location.hash === '#demasquage' && couples.length) document.getElementById('demasquage')?.scrollIntoView({ behavior: 'smooth' });
 }
 
 const money = (c, cur = 'EUR') => new Intl.NumberFormat((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { style: 'currency', currency: cur || 'EUR' }).format((c || 0) / 100);

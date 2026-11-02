@@ -62,6 +62,7 @@
       <div class="row">
         <label style="flex:1;min-width:260px">Soirée<select id="soiree"></select></label>
         <button class="btn btn-gold" id="btn-open" type="button">Ouvrir les portes</button>
+        <a class="btn btn-out" href="/speed-dating/bal/?apercu=1" target="_blank" rel="noopener">Voir la salle en aperçu</a>
       </div>
       <p style="font-size:14px;color:#b8a98f">Ouvrir les portes crée le salon d’attente : tout le monde y arrive caméra et micro éteints, toi aussi (allume-les seulement pour une annonce). Les caméras s’allument toutes seules au début de chaque tête-à-tête. Les inscrits entrent sur lamia-femme-berbere.com/speed-dating/bal/ avec leur email et leur date de naissance.</p>
     </div>
@@ -130,7 +131,9 @@
           <button class="btn btn-stop" id="btn-close" type="button">Fermer les portes</button>
         </div>
         <p id="wishes" style="margin-top:12px"></p>
-        <table><thead><tr><th>Souhait réciproque</th><th>Emails</th></tr></thead><tbody id="mutual"></tbody></table>
+        <div class="row" style="margin:10px 0"><button class="btn btn-gold" id="btn-demasque" type="button">Lancer le tour du démasquage (souhaits réciproques)</button></div>
+        <p style="font-size:14px;color:#b8a98f">Réunit seulement les couples qui se sont choisis et sont encore connectés, pour un dernier tête-à-tête sans masque. Chacun confirme à l’écran s’il veut être mis en relation. Ceux déjà partis reçoivent la question dans « Mon espace ».</p>
+        <table><thead><tr><th>Souhait réciproque</th><th>Démasquage</th><th>Emails</th></tr></thead><tbody id="mutual"></tbody></table>
         <h2>Tous les souhaits</h2>
         <p style="font-size:14px;color:#b8a98f">Ce que chaque participant a coché, même si ce n’est pas réciproque. 💞 = réciproque. Personne d’autre ne voit cette liste.</p>
         <table><thead><tr><th>Participant</th><th>Aimerait revoir</th><th>Son mot</th><th>Avis sur le bal</th></tr></thead><tbody id="souhaits"></tbody></table>
@@ -188,7 +191,9 @@ function paint(d) {
   $('#wishes').textContent = `${d.wishes_count} personne${d.wishes_count > 1 ? 's ont' : ' a'} envoyé ses souhaits.`;
   const AV = { oui: 'oui', moyen: 'moyen', non: 'non', 'peut-etre': 'peut-être' };
   $('#souhaits').innerHTML = (d.souhaits || []).map((w) => `<tr><td><b>${esc(w.nom)}</b><br><small style="color:#b8a98f">${esc(w.salon)} · ${w.rencontres} tête-à-tête</small></td><td>${w.choix.length ? w.choix.map((c) => `${esc(c.nom)}${c.reciproque ? ' 💞' : ''}`).join(', ') : '<span style="color:#b8a98f">personne</span>'}</td><td>${esc(w.message)}</td><td><small>${[w.avis.aime && `a aimé : ${AV[w.avis.aime]}`, w.avis.reviendrait && `reviendrait : ${AV[w.avis.reviendrait]}`, w.avis.paierait && `paierait : ${AV[w.avis.paierait]}`].filter(Boolean).join('<br>')}</small></td></tr>`).join('') || '<tr><td colspan="4">Personne n’a encore envoyé ses souhaits.</td></tr>';
-  $('#mutual').innerHTML = d.mutual.map(([a, b]) => `<tr><td>${esc(a.name)} et ${esc(b.name)}</td><td>${esc(a.email || '')} · ${esc(b.email || '')}</td></tr>`).join('') || '<tr><td colspan="2">Pas encore de souhait réciproque.</td></tr>';
+  const REP = (x) => (x === true ? 'oui' : x === false ? 'non' : 'pas encore répondu');
+  const ETAT = { confirme: '💞 Confirmé : mets-les en relation', pas_cette_fois: 'Pas cette fois', en_cours: 'En attente' };
+  $('#mutual').innerHTML = d.mutual.map(([a, b]) => `<tr><td>${esc(a.name)} et ${esc(b.name)}</td><td><strong>${esc(ETAT[a.demasque?.etat] || 'En attente')}</strong><br><small>${esc(a.name)} : ${REP(a.demasque?.reponse)} · ${esc(b.name)} : ${REP(b.demasque?.reponse)}</small></td><td>${esc(a.email || '')} · ${esc(b.email || '')}</td></tr>`).join('') || '<tr><td colspan="3">Pas encore de souhait réciproque.</td></tr>';
 }
 
 async function refresh() { try { paint(await bal({ action: 'admin_state' })); } catch { /* message affiché */ } }
@@ -225,6 +230,7 @@ const act = (body, confirmText) => async () => {
 };
 $('#btn-open').addEventListener('click', act(() => ({ action: 'open', event_id: $('#soiree').value })));
 $('#btn-round').addEventListener('click', act(() => ({ action: 'round', minutes: Number($('#minutes').value), demasque: $('#demasque').checked, melanger: $('#melanger').checked })));
+$('#btn-demasque').addEventListener('click', act(() => ({ action: 'round', reciproques: true, forcer: true, minutes: Number($('#minutes').value) }), 'Lancer le tour du démasquage ? Seuls les couples réciproques encore connectés seront réunis, sans masque.'));
 $('#btn-planb').addEventListener('click', act(() => ({ action: 'planb', url: $('#planb').value.trim() })));
 $('#btn-planb-off').addEventListener('click', act(() => ({ action: 'planb', url: '' })));
 $('#btn-grand').addEventListener('click', act(() => ({ action: 'grand' })));
