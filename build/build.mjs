@@ -14,7 +14,9 @@ import { reglagesPropres } from '../content/shipping.mjs';
 import { facade } from './facade.mjs';
 import { pageAnglaise, pageFrancaise, produitAnglais, enPath, FR_ONLY, STRINGS, MANQUANTS } from './english.mjs';
 import { EDITABLE, defaults, applyOverrides } from '../content/editable.mjs';
-import { FORMULES, UNITES, prixAnnuel, euros as eurosAbo } from '../content/abonnements.mjs';
+import { FORMULES, UNITES, prixAnnuel, prixMensuel, euros as eurosAbo } from '../content/abonnements.mjs';
+
+const placesLancement = (f) => (f.lancement ? `<p class="abo-places" data-prestige-places>Prix de lancement pour les ${f.lancement.places} premiers abonnés, puis ${eurosAbo(f.mois)} par mois</p>` : '');
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = join(ROOT, 'dist');
@@ -349,7 +351,7 @@ page(
   <div class="accueil-bloc">
     <h2 class="annonces-titre">Les formules</h2>
     <p class="annonces-sous">Sans engagement. La première mise en relation est toujours offerte.</p>
-    <div class="abo-grille">${FORMULES.map((f) => `<a class="abo-carte abo-mini${f.vedette ? ' is-vedette' : ''}" href="${f.mois ? `/abonnement/?formule=${f.id}` : '/rencontres/#confier'}">${f.vedette ? '<span class="abo-ruban">Le plus choisi</span>' : ''}<h3>${esc(f.nom)}</h3><p class="abo-prix">${f.mois ? `${eurosAbo(f.mois)}<small> / mois</small>` : 'Gratuit'}</p><ul>${f.avantages.slice(0, 2).map((a) => `<li>${esc(a)}</li>`).join('')}</ul><span class="po-btn">${f.mois ? `Choisir ${esc(f.nom)}` : 'Commencer'}</span></a>`).join('')}</div>
+    <div class="abo-grille">${FORMULES.map((f) => `<a class="abo-carte abo-mini${f.vedette ? ' is-vedette' : ''}" href="${f.mois ? `/abonnement/?formule=${f.id}` : '/rencontres/#confier'}">${f.vedette ? '<span class="abo-ruban">Le plus choisi</span>' : ''}<h3>${esc(f.nom)}</h3><p class="abo-prix">${f.mois ? `<span${f.lancement ? ' data-prestige-prix="mois"' : ''}>${eurosAbo(prixMensuel(f, 0))}<small> / mois</small></span>` : 'Gratuit'}</p>${placesLancement(f)}<ul>${f.avantages.slice(0, 2).map((a) => `<li>${esc(a)}</li>`).join('')}</ul><span class="po-btn">${f.mois ? `Choisir ${esc(f.nom)}` : 'Commencer'}</span></a>`).join('')}</div>
   </div>
 
   <div class="accueil-bloc">
@@ -1436,7 +1438,7 @@ page(
   </div>
   <h2 class="annonces-titre">Les formules</h2>
   <p class="annonces-sous">Sans engagement. La première mise en relation est toujours offerte.</p>
-  <div class="abo-grille">${FORMULES.map((f) => `<a class="abo-carte abo-mini${f.vedette ? ' is-vedette' : ''}" href="${f.mois ? `/abonnement/?formule=${f.id}` : '#confier'}">${f.vedette ? '<span class="abo-ruban">Le plus choisi</span>' : ''}<h3>${esc(f.nom)}</h3><p class="abo-prix">${f.mois ? `${eurosAbo(f.mois)}<small> / mois</small>` : 'Gratuit'}</p><ul>${f.avantages.slice(0, 2).map((x) => `<li>${esc(x)}</li>`).join('')}</ul><span class="po-btn">${f.mois ? `Choisir ${esc(f.nom)}` : 'Commencer'}</span></a>`).join('')}</div>
+  <div class="abo-grille">${FORMULES.map((f) => `<a class="abo-carte abo-mini${f.vedette ? ' is-vedette' : ''}" href="${f.mois ? `/abonnement/?formule=${f.id}` : '#confier'}">${f.vedette ? '<span class="abo-ruban">Le plus choisi</span>' : ''}<h3>${esc(f.nom)}</h3><p class="abo-prix">${f.mois ? `<span${f.lancement ? ' data-prestige-prix="mois"' : ''}>${eurosAbo(prixMensuel(f, 0))}<small> / mois</small></span>` : 'Gratuit'}</p>${placesLancement(f)}<ul>${f.avantages.slice(0, 2).map((x) => `<li>${esc(x)}</li>`).join('')}</ul><span class="po-btn">${f.mois ? `Choisir ${esc(f.nom)}` : 'Commencer'}</span></a>`).join('')}</div>
   <h2 class="annonces-titre" id="profils-anonymes">Les profils vérifiés</h2>
   <p class="annonces-sous">Ni prénom, ni photo, ni contact. Un profil te touche ? Clique sur « Ce profil m’intéresse » : Lamia regarde si vous pouvez correspondre. Ton identité reste secrète : on ne voit que des numéros de profil.</p>
   <p class="po-actions btn-swipe"><a class="po-btn" href="/rencontres/swipe/">💘 Swiper les profils, un par un</a></p>
@@ -1455,7 +1457,8 @@ const carteFormule = (f) => `<article class="abo-carte${f.vedette ? ' is-vedette
   ${f.vedette ? '<p class="abo-ruban">Le plus choisi</p>' : ''}
   <h3>${esc(f.nom)}</h3>
   <p class="abo-accroche">${esc(f.accroche)}</p>
-  <p class="abo-prix">${f.mois ? `<span data-prix-mois>${eurosAbo(f.mois)}<small> / mois</small></span><span data-prix-an hidden>${eurosAbo(prixAnnuel(f))}<small> / an</small><em>soit 2 mois offerts</em></span>` : 'Gratuit'}</p>
+  <p class="abo-prix">${f.mois ? `<span data-prix-mois${f.lancement ? ' data-prestige-prix="mois"' : ''}>${eurosAbo(prixMensuel(f, 0))}<small> / mois</small></span><span data-prix-an hidden${f.lancement ? ' data-prestige-prix="an"' : ''}>${eurosAbo(prixAnnuel(f, 0))}<small> / an</small><em>soit 2 mois offerts</em></span>` : 'Gratuit'}</p>
+  ${placesLancement(f)}
   <ul>${f.avantages.map((a) => `<li>${esc(a)}</li>`).join('')}</ul>
   ${f.mois ? `<button type="button" class="po-btn" data-choisir="${f.id}">Choisir ${esc(f.nom)}</button>` : '<a class="po-btn-verre" href="/rencontres/#confier">Confier mon profil</a>'}
 </article>`;
@@ -1463,7 +1466,7 @@ page(
   '/abonnement/',
   layout({
     title: 'Abonnement · Trouve ton âme sœur avec Lamia',
-    description: 'Les formules de Lamia pour trouver ton âme sœur : Découverte gratuite, Passion à 9 € et Prestige à 22 € par mois. Mises en relation, speed datings inclus, sans engagement.',
+    description: 'Les formules de Lamia pour trouver ton âme sœur : Découverte gratuite, Passion à 9 € et Prestige à 22 € pour les 20 premiers abonnés, puis 49 € par mois. Mises en relation, speed datings inclus, sans engagement.',
     path: '/abonnement/',
     room: roomBySlug.patio,
     scripts: ['/assets/abonnement.js'],

@@ -310,7 +310,7 @@ document.addEventListener('click', (e) => {
 });
 
 // ---------------------------------------------------------------- abonnés et achats à l'unité
-const FORMULES_NOMS = { coeur: 'Cœur (ancienne formule)', passion: 'Passion · 9 €', prestige: 'Prestige · 22 €' };
+const FORMULES_NOMS = { coeur: 'Cœur (ancienne formule)', passion: 'Passion · 9 €', prestige: 'Prestige' };
 const ETATS = { actif: 'actif', impaye: 'paiement en retard', resilie: 'résilié', en_attente: 'en attente', suspendu: 'suspendu' };
 async function chargerAbonnes() {
   const box = $('[data-abonnes]');

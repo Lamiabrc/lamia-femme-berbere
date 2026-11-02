@@ -3405,3 +3405,6 @@ body[data-ambiance="espace"] .espace .room-name { color: #8a1024; }
 .espace-salon .form-status.is-error { color: #a3122a; }
 
 .disc-honnete { margin: 8px 0; padding: 8px 12px; border-radius: 10px; background: #fbf1e3; color: #5c3d1e; font-size: 14px; }
+
+.abo-places { margin: 4px 0 10px; font-size: 13px; font-weight: 700; }
+.abo-places[hidden] { display: none; }
