@@ -26,7 +26,7 @@ const ERR = {
   file_type: 'Ce type de fichier n’est pas accepté : photos (JPG, PNG, HEIC), vidéo (MP4, MOV) ou PDF pour la pièce d’identité.',
   file_size: 'Un fichier est trop lourd : 12 Mo par photo, 50 Mo pour la vidéo.',
   rate_limited: 'Tu as déjà déposé plusieurs annonces aujourd’hui : réessaie demain.',
-  upload_failed: 'Les photos ne sont pas toutes arrivées. Vérifie ta connexion et réessaie.',
+  upload_failed: 'Tes photos ne sont pas arrivées. Vérifie ta connexion, puis appuie à nouveau sur « Envoyer » : ton profil reprend là où il s’est arrêté.',
   contact_requis: 'Indique le lien de ton TikTok, Instagram ou Facebook : Lamia en a besoin pour la mise en relation.',
   compte_requis: 'Crée d’abord ton compte (ou connecte-toi) : il faut un compte pour confier ton profil ou dire qu’un profil t’intéresse.',
   connexion: 'Email ou mot de passe incorrect.',
@@ -163,6 +163,32 @@ export function formulaireHtml() {
 </form>`;
 }
 
+// Copie en mémoire dès le choix : sur Android, la photo prise dans la galerie ou Google Photos est une copie temporaire
+// qui peut disparaître pendant qu'on remplit le formulaire (l'envoi échouait alors sans bruit). Les photos sont aussi réduites.
+async function enMemoire(f, max = 1600) {
+  const type = typeDe(f), nom = f.name || 'fichier';
+  if (type.startsWith('image/') && !/heic|heif|gif/.test(type)) {
+    try {
+      const img = await createImageBitmap(f);
+      const k = Math.min(1, max / Math.max(img.width, img.height));
+      const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); img.close?.();
+      const blob = await new Promise((ok) => c.toBlob(ok, 'image/jpeg', 0.85));
+      if (blob && blob.size) return new File([blob], nom.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' });
+    } catch { /* on garde l'original, copié ci-dessous */ }
+  }
+  const buf = await f.arrayBuffer();
+  return new File([buf], nom, { type });
+}
+async function copier(liste, max) {
+  const out = [];
+  for (const f of liste) {
+    try { out.push(await enMemoire(f, max)); }
+    catch { throw Object.assign(new Error('illisible'), { code: 'fichier_illisible' }); }
+  }
+  return out;
+}
+
 function apercu(ul, fichiers, retirer) {
   ul.innerHTML = fichiers.map((f, i) => `<li>${f.type.startsWith('image/') && !/heic|heif/.test(f.type) ? `<img src="${URL.createObjectURL(f)}" alt="">` : f.type.startsWith('video/') ? '<span class="annonce-ico">🎬</span>' : '<span class="annonce-ico">📄</span>'}<small>${esc(f.name || 'fichier')}</small><button type="button" data-i="${i}" aria-label="Retirer ce fichier">✕</button></li>`).join('');
   $$('button', ul).forEach((b) => b.addEventListener('click', () => retirer(Number(b.dataset.i))));
@@ -271,11 +297,15 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
     $('[data-mdp]', form)?.setAttribute('hidden', '');
     const c = $('[data-connecte]', form); c.hidden = false; c.textContent = `Tu es connecté(e) : ton profil sera lié à ton compte ${s.user.email}.`;
   });
-  let medias = [], identite = [];
+  let medias = [], identite = [], envoi = null;
   const majMedias = () => apercu($('[data-medias-liste]', form), medias, (i) => { medias.splice(i, 1); majMedias(); });
   const majId = () => { apercu($('[data-identite-liste]', form), identite, (i) => { identite.splice(i, 1); majId(); }); const acc = $('[data-identite-accord]', form); if (acc) acc.hidden = !identite.length; };
-  $('[data-medias]', form).addEventListener('change', (e) => {
-    const nouveaux = [...e.target.files]; e.target.value = '';
+  $('[data-medias]', form).addEventListener('change', async (e) => {
+    const choisis = [...e.target.files]; e.target.value = '';
+    if (!choisis.length) return;
+    say(st, 'Préparation de tes photos…');
+    let nouveaux;
+    try { nouveaux = await copier(choisis, 1600); } catch { return say(st, 'Cette photo ne peut pas être lue par ton téléphone. Choisis-la à nouveau, ou prends une autre photo.', true); }
     const tous = [...medias, ...nouveaux];
     const videos = tous.filter((f) => typeDe(f).startsWith('video/'));
     medias = videos.length ? [videos[videos.length - 1]] : tous.slice(-2);
@@ -284,7 +314,12 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
     else say(st, '');
     majMedias();
   });
-  $('[data-identite]', form).addEventListener('change', (e) => { identite = [...e.target.files].slice(0, 1); e.target.value = ''; majId(); });
+  $('[data-identite]', form).addEventListener('change', async (e) => {
+    const choisis = [...e.target.files].slice(0, 1); e.target.value = '';
+    if (!choisis.length) return;
+    try { identite = await copier(choisis, 2000); } catch { return say(st, 'Ce document ne peut pas être lu par ton téléphone. Choisis-le à nouveau.', true); }
+    majId();
+  });
   // Champs qui dépendent d'autres réponses (comme dans l'outil de matching).
   const F = form.elements;
   F.enfants.addEventListener('change', () => $$('[data-si-enfants]', form).forEach((l) => { l.hidden = F.enfants.value !== 'Oui'; }));
@@ -355,9 +390,12 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
     if (!session) { monterFormulaire(box); return; }
     const btn = $('.annonce-envoyer', form); btn.disabled = true;
     const fichiers = [...medias.map((x) => ({ blob: x, role: 'media' })), ...identite.map((x) => ({ blob: x, role: 'identite' }))];
+    // Si un premier essai a échoué pendant l'envoi des photos, on reprend le même profil (pas de doublon).
+    const cle = fichiers.map((x) => `${x.role}:${x.blob.size}`).join('|');
+    if (envoi && envoi.cle !== cle) envoi = null;
     try {
       say(st, 'Envoi de ton annonce…');
-      const res = await api({
+      const res = envoi?.res || await api({
         live, tiktok_live: f.tiktok_live.value,
         action: 'annonce_deposer', prenom: f.prenom.value, genre: form.querySelector('[name=genre]:checked').value, birth_date: f.birth_date.value,
         ville: f.ville.value, pays: f.pays.value, profil: f.profil.value, recherche: f.recherche.value,
@@ -366,12 +404,24 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
         majeur: true, publication: true, identite_ok: Boolean(identite.length && f.identite_ok.checked), website: f.zz_site.value, anonyme_ok: f.anonyme_ok.checked, photo_partage: f.photo_partage.checked, interet_ref: f.interet_ref.value,
         medias: fichiers.map((x) => ({ role: x.role, type: typeDe(x.blob), size: x.blob.size })),
       }, session?.access_token);
+      if (!envoi) envoi = { cle, res, faits: new Set() };
       for (const [i, up] of (res.uploads || []).entries()) {
+        if (envoi.faits.has(i)) continue;
         say(st, `Envoi de tes fichiers (${i + 1}/${res.uploads.length})…`);
-        const r = await fetch(up.url, { method: 'PUT', headers: { apikey: PUBLIC_KEY, 'Content-Type': up.type, 'x-upsert': 'false' }, body: fichiers[i].blob });
-        if (!r.ok) throw Object.assign(new Error('upload_failed'), { code: 'upload_failed' });
+        let ok = false;
+        for (let essai = 0; essai < 3 && !ok; essai++) {
+          if (essai) { say(st, `Envoi de tes fichiers (${i + 1}/${res.uploads.length}), nouvel essai…`); await new Promise((r) => setTimeout(r, 1500 * essai)); }
+          try {
+            const r = await fetch(up.url, { method: 'PUT', headers: { apikey: PUBLIC_KEY, 'Content-Type': up.type, 'x-upsert': 'false' }, body: fichiers[i].blob });
+            // 400/409 « existe déjà » : le fichier était arrivé lors d'un essai précédent.
+            ok = r.ok || r.status === 409 || (r.status === 400 && /exist|duplicate/i.test(await r.text().catch(() => '')));
+          } catch { ok = false; }
+        }
+        if (!ok) throw Object.assign(new Error('upload_failed'), { code: 'upload_failed' });
+        envoi.faits.add(i);
       }
       const fin = res.annonce_id ? await api({ action: 'annonce_finaliser', annonce_id: res.annonce_id, token: res.token }) : {};
+      envoi = null;
       window.lfbEvent?.('annonce_deposee');
       try { localStorage.removeItem(BROUILLON); } catch { /* */ }
       box.innerHTML = `<div class="annonce-merci"><p class="annonce-coeur" aria-hidden="true">💌</p><h3>Merci ${esc(f.prenom.value.trim())}, ton profil est bien arrivé chez Lamia${fin.ref ? ` (n° ${fin.ref})` : ''} !</h3><p>Il n’est publié nulle part. Lamia le vérifie, puis le passe dans son outil de matching. Tu recevras par email le nombre de personnes avec qui tu pourrais correspondre. ${live ? 'Tes 3 premières mises en relation sont offertes.' : 'Ta première mise en relation est offerte.'}</p><p>Ton profil est lié à ton compte : tu peux le modifier quand tu veux dans <a href="/mon-espace/">Mon espace</a>.</p><p>En attendant, tu peux <a href="/speed-dating/">t’inscrire à la prochaine soirée</a> ou <a href="/confidences/">écrire à Lamia</a>.</p></div>`;
