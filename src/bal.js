@@ -1,4 +1,4 @@
-// La salle du Bal masqué de Venise, côté participant.
+// La salle du Bal masqué Virtuel Kabyle, côté participant.
 // Vidéo : Daily (mode « call object ») ; l'interface est celle de la Maison.
 // Le serveur décide où chacun doit être (grand salon, tête-à-tête, attente, fin du bal).
 

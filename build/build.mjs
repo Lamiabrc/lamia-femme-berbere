@@ -613,14 +613,14 @@ page(
   '/speed-dating/',
   layout({
     title: 'Speed dating en ligne sérieux — Le Boudoir des Rencontres | Lamia Femme Berbère',
-    description: 'Des soirées de speed dating en visio pour des rencontres sérieuses, en deux salons par âge, de l’Algérie à la France et au Canada, animées par Lamia. Pour le lancement, la première soirée est offerte : le Bal masqué de Venise, le 31 octobre à 21 h.',
+    description: 'Des soirées de speed dating en visio pour des rencontres sérieuses, en deux salons par âge, de l’Algérie à la France et au Canada, animées par Lamia. Chaque soirée est un Bal masqué Virtuel Kabyle : masque, robe kabyle ou tenue élégante, le mystère fait partie du jeu.',
     path: '/speed-dating/',
     room: roomBySlug['speed-dating'],
     scripts: ['/assets/membre.js'],
     ogTitle: 'Le speed dating de Lamia Femme Berbère — première soirée offerte',
-    ogDescription: 'Rencontres sérieuses en visio, en deux salons par âge, animées par Lamia. Pour le lancement, le Bal masqué de Venise du 31 octobre est gratuit.',
-    ogImage: '/images/lamia/lamia-venise-1672.webp',
-    ogImageAlt: 'Lamia Femme Berbère, masque vénitien à la main, sur le Grand Canal de Venise',
+    ogDescription: 'Rencontres sérieuses en visio, en deux salons par âge, animées par Lamia. Chaque soirée est un Bal masqué Virtuel Kabyle.',
+    ogImage: '/images/lamia/lamia-salon-1122.webp',
+    ogImageAlt: 'Lamia Femme Berbère en robe kabyle, dans son salon',
     ogImageWidth: 1672,
     ogImageHeight: 941,
     body: `<div class="bal boudoir-immersif">
@@ -649,13 +649,13 @@ page(
 <div class="boudoir-plateau">
 <section class="lancement" aria-labelledby="lancement-title">
   <figure class="lancement-image">
-    ${IMGT('image.speed.lancement', 'Le Boudoir des Rencontres', 'Image de la soirée de lancement', `<img src="/images/lamia/lamia-venise-1672.webp" srcset="/images/lamia/lamia-venise-900.webp 900w, /images/lamia/lamia-venise-1672.webp 1672w" sizes="(max-width: 860px) 100vw, 560px" width="1672" height="941" alt="Lamia, masque vénitien à la main, sur le Grand Canal de Venise à la tombée de la nuit" loading="lazy">`)}
+    ${IMGT('image.speed.lancement', 'Le Boudoir des Rencontres', 'Image du thème des soirées', `<img src="/images/lamia/lamia-salon-1122.webp" srcset="/images/lamia/lamia-salon-560.webp 560w, /images/lamia/lamia-salon-900.webp 900w, /images/lamia/lamia-salon-1122.webp 1122w" sizes="(max-width: 860px) 100vw, 560px" width="1122" height="1402" alt="Lamia en robe kabyle, dans son salon" loading="lazy">`)}
   </figure>
   <div class="lancement-texte">
-    <p class="bal-kicker">Soirée de lancement · offerte</p>
-    <h2 id="lancement-title">${esc(T('speed.lancement-titre', 'Le Boudoir des Rencontres', 'Soirée de lancement : titre', 'La première soirée est gratuite : le Bal masqué de Venise'))}</h2>
-    <p>Pour lancer le Boudoir, Lamia vous offre la première soirée, le <strong>samedi 31 octobre à 21 h</strong>, en visio, sur le thème du Carnaval de Venise. Venez masqué·e, le mystère fait partie du jeu. Les soirées suivantes seront payantes.</p>
-    <p><a class="btn btn-gold" href="#events-title">Réserver ma place offerte</a></p>
+    <p class="bal-kicker">Le thème de toutes nos soirées</p>
+    <h2 id="lancement-title">${esc(T('speed.lancement-titre', 'Le Boudoir des Rencontres', 'Thème des soirées : titre', 'Le Bal masqué Virtuel Kabyle'))}</h2>
+    <p>Chaque soirée du Boudoir est un <strong>bal masqué virtuel kabyle</strong>, en visio, depuis chez vous. Venez masqué·e, en robe kabyle, avec vos bijoux ou dans votre plus belle tenue : le mystère fait partie du jeu, et le démasquage vient à la fin.</p>
+    <p><a class="btn btn-gold" href="#events-title">Réserver ma place</a></p>
   </div>
 </section>
 
@@ -707,7 +707,7 @@ page(
     <li><strong>Des rencontres sérieuses</strong> : on vient pour rencontrer quelqu’un, pas pour faire défiler des profils.</li>
     <li><strong>Caméra allumée</strong>, dans un endroit calme, et aucun propos déplacé.</li>
     <li><strong>Lamia veille</strong> : l’accueil, l’animation et le suivi de chaque soirée. Elle peut passer saluer un tête-à-tête pendant le bal : son nom s’affiche quand elle entre.</li>
-    <li><strong>Une ambiance</strong> : chaque soirée a son thème. Pour la première, masque vénitien, loup ou tenue élégante.</li>
+    <li><strong>Une ambiance</strong> : chaque soirée est un bal masqué virtuel kabyle : masque, robe kabyle ou tenue élégante.</li>
     <li><strong>Un souci ?</strong> <a href="/confidences/">Les Confidences avec Lamia</a> permettent de lui écrire ou de lui signaler un souci en toute discrétion.</li>
   </ul>
 </section>
@@ -722,7 +722,7 @@ page(
   <p>${esc(P.speedDating.origin)}</p>
 </section>
 </div>
-<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@type': 'Event', name: 'Bal masqué de Venise — soirée de lancement du speed dating de Lamia Femme Berbère', startDate: '2026-10-31T21:00:00+01:00', endDate: '2026-10-31T23:00:00+01:00', eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode', eventStatus: 'https://schema.org/EventScheduled', location: { '@type': 'VirtualLocation', url: SITE_URL + '/speed-dating/' }, image: SITE_URL + '/images/lamia/lamia-venise-1672.webp', description: 'Soirée de speed dating en visio, en deux salons par âge, sur le thème du Carnaval de Venise. Offerte pour le lancement.', offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR', availability: 'https://schema.org/InStock', url: SITE_URL + '/speed-dating/' }, organizer: { '@type': 'Person', name: 'Lamia Bréchet Ighil', url: SITE_URL + '/lamia-brechet/' } })}</script>`,
+`,
   })
 );
 
@@ -875,8 +875,8 @@ page(
 page(
   '/speed-dating/bal/',
   layout({
-    title: 'La salle du Bal masqué de Venise',
-    description: 'Entre dans la salle du Bal masqué de Venise : grand salon, tête-à-tête masqués et souhaits de fin de bal.',
+    title: 'La salle du Bal masqué Virtuel Kabyle',
+    description: 'Entre dans la salle du Bal masqué Virtuel Kabyle : grand salon, tête-à-tête masqués et souhaits de fin de bal.',
     path: '/speed-dating/bal/',
     room: roomBySlug['speed-dating'],
     noindex: true,
@@ -890,7 +890,7 @@ page(
 </div>
 <section class="bal-step" data-step="entree">
   <div class="bal-hero is-short">
-    <p class="bal-kicker">Le Bal masqué de Venise</p>
+    <p class="bal-kicker">Le Bal masqué Virtuel Kabyle</p>
     <h1>La porte du bal</h1>
     <p class="bal-lead">Entre avec l’email et la date de naissance donnés à ton inscription.</p>
   </div>
@@ -927,7 +927,7 @@ page(
     <p class="salle-temps" data-salle-temps aria-live="off"></p>
   </header>
   <div class="salle-scene">
-    <figure class="salle-autre"><div class="salle-accueil" data-salle-accueil style="--accueil:url('${esc(imgOr('salle-accueil', '/images/lamia/lamia-venise-1672.webp'))}')" role="img" aria-label="Lamia vous accueille au Bal masqué de Venise"><p>« ${esc(P.speedDating.salleAccueil)} »<span>Lamia</span></p></div><video data-video-autre playsinline autoplay></video><img class="salle-logo" src="/images/marque/lamia-logo-net-160.webp" alt="" width="64" height="64"><figcaption data-autre-nom>Lamia arrive…</figcaption><span class="salle-cadre" aria-hidden="true"></span></figure>
+    <figure class="salle-autre"><div class="salle-accueil" data-salle-accueil style="--accueil:url('${esc(imgOr('salle-accueil', '/images/lamia/lamia-salon-1122.webp'))}')" role="img" aria-label="Lamia vous accueille au Bal masqué Virtuel Kabyle"><p>« ${esc(P.speedDating.salleAccueil)} »<span>Lamia</span></p></div><video data-video-autre playsinline autoplay></video><img class="salle-logo" src="/images/marque/lamia-logo-net-160.webp" alt="" width="64" height="64"><figcaption data-autre-nom>Lamia arrive…</figcaption><span class="salle-cadre" aria-hidden="true"></span></figure>
     <figure class="salle-moi"><video data-video-moi playsinline autoplay muted></video><figcaption>Toi</figcaption></figure>
     <audio data-audio-autre autoplay></audio>
   </div>
@@ -990,7 +990,7 @@ page(
   '/speed-dating/salle/',
   layout({
     title: 'L’antichambre du bal · tester ma caméra',
-    description: 'Avant le Bal masqué de Venise, vérifie ta caméra et ton micro. Ta vidéo reste sur ton appareil.',
+    description: 'Avant le Bal masqué Virtuel Kabyle, vérifie ta caméra et ton micro. Ta vidéo reste sur ton appareil.',
     path: '/speed-dating/salle/',
     room: roomBySlug['speed-dating'],
     noindex: true,
@@ -1003,7 +1003,7 @@ page(
   <p class="bal-actions"><button class="btn btn-gold" type="button" data-appli-copier>Copier le lien</button><a class="btn bal-btn-line" data-appli-chrome hidden>Ouvrir dans Chrome</a></p>
 </div>
 <section class="bal-hero is-short">
-  <p class="bal-kicker">Le Bal masqué de Venise</p>
+  <p class="bal-kicker">Le Bal masqué Virtuel Kabyle</p>
   <h1>L’antichambre</h1>
   <p class="bal-lead">Avant d’entrer au bal, ajuste ton masque et vérifie ta caméra et ton micro. Ta vidéo reste sur ton appareil : rien n’est enregistré ni envoyé.</p>
 </section>
