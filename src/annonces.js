@@ -224,7 +224,22 @@ function porteCompte(box) {
         session = co.data.session;
       }
       monterFormulaire(box);
-    } catch (err) { say(st, ERR[err.code] || 'Ça n’a pas fonctionné. Réessaie dans un instant.', true); btn.disabled = false; }
+    } catch (err) {
+      say(st, ERR[err.code] || 'Ça n’a pas fonctionné. Réessaie dans un instant.', true); btn.disabled = false;
+      // Compte existant ou mot de passe oublié : un lien de connexion par email, en un clic.
+      if (['compte_existant', 'connexion'].includes(err.code)) {
+        const lien = document.createElement('button');
+        lien.type = 'button'; lien.className = 'btn btn-line'; lien.textContent = '📩 Recevoir un lien de connexion par email';
+        st.append(document.createElement('br'), lien);
+        lien.addEventListener('click', async () => {
+          lien.disabled = true;
+          try {
+            const r = await api({ action: 'annonce_lien_connexion', email, retour: 'rencontres' });
+            say(st, r.existe === false ? 'Aucun compte n’existe avec cet email : choisis « Créer mon compte ».' : '📩 C’est parti ! Ouvre l’email que tu viens de recevoir et clique sur « Me connecter » (regarde aussi les courriers indésirables).', r.existe === false);
+          } catch (e2) { say(st, e2.code === 'trop_de_demandes' ? 'Plusieurs liens sont déjà partis : regarde dans tes emails, ou réessaie dans une heure.' : 'L’envoi n’a pas fonctionné. Réessaie dans un instant.', true); lien.disabled = false; }
+        });
+      }
+    }
   });
 }
 

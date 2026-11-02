@@ -1,6 +1,6 @@
 // Mon espace : connexion, mot de passe, soirées réservées, liens d'administration.
 import { createClient } from '/vendor/supabase.mjs';
-import { creerCompte } from './confidences-commun.js';
+import { creerCompte, api } from './confidences-commun.js';
 import { secteurLisible } from './matching-options.mjs';
 
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc');
@@ -173,9 +173,12 @@ $('[data-espace-reset]').addEventListener('submit', async (e) => {
   e.preventDefault();
   const f = new FormData(e.target), st = $('[data-reset-status]');
   // Connexion sans mot de passe : un lien par email (le lien connecte directement ; le mot de passe se change ensuite dans l'espace).
-  const { error } = await supabase.auth.signInWithOtp({ email: String(f.get('email')).trim(), options: { emailRedirectTo: `${location.origin}${document.documentElement.lang === 'en' ? '/en' : ''}/mon-espace/`, shouldCreateUser: false } });
-  if (error && /signups? not allowed|not found|user/i.test(error.message)) return say(st, 'Aucun espace n’existe avec cet email. Crée-le juste en dessous, c’est rapide.', true);
-  if (error) return say(st, /rate limit|seconds/i.test(error.message) ? 'Un lien vient déjà de partir. Attends une minute avant d’en redemander un.' : 'L’envoi n’a pas fonctionné. Réessaie plus tard.', true);
+  // Le lien part par l'email du site (pas de limite « trop de demandes » partagée par tout le site).
+  say(st, 'Un instant…');
+  let rep;
+  try { rep = await api({ action: 'annonce_lien_connexion', email: String(f.get('email')).trim(), retour: 'espace', en: document.documentElement.lang === 'en' }); }
+  catch (err) { return say(st, err.code === 'trop_de_demandes' ? 'Plusieurs liens sont déjà partis pour cette adresse. Regarde dans tes emails (et les courriers indésirables), ou réessaie dans une heure.' : err.code === 'email_invalide' ? 'Vérifie ton adresse email.' : 'L’envoi n’a pas fonctionné. Réessaie dans un instant.', true); }
+  if (rep && rep.existe === false) return say(st, 'Aucun espace n’existe avec cet email. Crée-le juste en dessous, c’est rapide.', true);
   say(st, '📩 C’est parti ! Ouvre l’email que tu viens de recevoir et clique sur le lien (pense aux courriers indésirables).');
 });
 
@@ -183,7 +186,7 @@ $('[data-espace-newpass]').addEventListener('submit', async (e) => {
   e.preventDefault();
   const f = new FormData(e.target), st = $('[data-newpass-status]');
   const { error } = await supabase.auth.updateUser({ password: f.get('password') });
-  if (error) return say(st, 'Le mot de passe n’a pas été enregistré (8 caractères minimum).', true);
+  if (error) return say(st, /different|same/i.test(error.message) ? 'C’est déjà ton mot de passe actuel : tu es connecté·e, tu peux continuer.' : /weak|least|characters/i.test(error.message) ? 'Mot de passe trop simple : 8 caractères minimum, avec des lettres et des chiffres.' : /session|expired|jwt/i.test(error.message) ? 'Le lien a expiré. Redemande un lien de connexion.' : 'Le mot de passe n’a pas été enregistré. Réessaie.', true);
   recovering = false;
   render();
 });
