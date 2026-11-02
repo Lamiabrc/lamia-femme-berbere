@@ -496,14 +496,15 @@ async function discussions(session) {
   const vueParcours = (d) => {
     const p = d.parcours;
     if (!p) return '';
-    const etapes = p.etapes.map((x) => {
-      const questions = x.etat === 'en_cours' && p.actif && d.ouverte && x.questions.length ? `<div class="parcours-questions"><small>Une question pour commencer :</small>${x.questions.map((q) => `<button type="button" class="parcours-question" data-parcours-question="${esc(q)}">${esc(q)}</button>`).join('')}</div>` : '';
-      const etat = x.etat !== 'en_cours' || !p.actif ? '' : x.moi
-        ? `<p class="parcours-attente">✓ Tu as validé. On attend ${esc(d.avec)}.</p>`
-        : `<p class="parcours-valider">${x.lui ? `<span>${esc(d.avec)} a déjà validé.</span> ` : ''}<button type="button" class="btn btn-ink" data-parcours-valider="${esc(x.id)}">Nous avons vécu cette étape</button></p>`;
-      return `<li class="parcours-etape is-${esc(x.etat)}"><span class="parcours-num">${x.etat === 'faite' ? '✓' : esc(x.numero)}</span><div><strong>${esc(x.titre)}</strong>${x.etat === 'en_cours' ? `<p>${esc(x.texte)}</p>${questions}${etat}` : ''}</div></li>`;
-    }).join('');
-    return `<details class="parcours" ${p.fini ? '' : 'open'}><summary>💍 Votre parcours vers le mariage <span>${p.fini ? 'Terminé, félicitations !' : `Étape ${esc(p.courante + 1)} sur ${esc(p.total)}`}</span></summary><p class="parcours-livre">Le parcours de mariage de Lamia, détaillé dans l’ebook <a class="text-link" href="/werdi-ouvre-les-yeux/"><em>Werdi, ouvre les yeux !</em></a></p><ol>${etapes}</ol></details>`;
+    // La frise : chaque étape en un mot, celle en cours bien visible. Le détail n'est donné que pour l'étape en cours.
+    const frise = p.etapes.map((x) => `<li class="parcours-mot is-${esc(x.etat)}"${x.etat === 'en_cours' ? ' aria-current="step"' : ''}><span>${x.etat === 'faite' ? '✓' : esc(x.numero)}</span>${esc(x.mot)}</li>`).join('');
+    const x = p.etapes.find((y) => y.etat === 'en_cours');
+    const questions = x && p.actif && d.ouverte && x.questions.length ? `<div class="parcours-questions"><small>Une question pour commencer :</small>${x.questions.map((q) => `<button type="button" class="parcours-question" data-parcours-question="${esc(q)}">${esc(q)}</button>`).join('')}</div>` : '';
+    const etat = !x || !p.actif ? '' : x.moi
+      ? `<p class="parcours-attente">✓ Tu as validé. On attend ${esc(d.avec)}.</p>`
+      : `<p class="parcours-valider">${x.lui ? `<span>${esc(d.avec)} a déjà validé.</span> ` : ''}<button type="button" class="btn btn-ink" data-parcours-valider="${esc(x.id)}">Nous avons vécu cette étape</button></p>`;
+    const detail = x ? `<div class="parcours-detail"><strong>${esc(x.titre)}</strong><p>${esc(x.texte)}</p>${questions}${etat}</div>` : '';
+    return `<details class="parcours" ${p.fini ? '' : 'open'}><summary>💍 Votre parcours vers le mariage <span>${p.fini ? 'Terminé, félicitations !' : `Étape ${esc(p.courante + 1)} sur ${esc(p.total)} : ${esc(x.mot)}`}</span></summary><p class="parcours-livre">Le parcours de mariage de Lamia, détaillé dans l’ebook <a class="text-link" href="/werdi-ouvre-les-yeux/"><em>Werdi, ouvre les yeux !</em></a></p><ol class="parcours-frise">${frise}</ol>${detail}</details>`;
   };
   const vue = (d) => {
     const msgs = d.messages.map((m) => `<p class="disc-msg ${m.moi ? 'is-moi' : ''}"><span>${esc(m.texte)}</span><small>${esc(heure(m.le))}</small></p>`).join('') || `<p class="disc-vide">${salut ? `${esc(salut)}, dis` : 'Dis'} bonjour à ${esc(d.avec)} 👋</p>`;
