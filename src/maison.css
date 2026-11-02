@@ -3300,13 +3300,13 @@ label.is-manquant { outline: 2px solid #c0263f; outline-offset: 3px; border-radi
 .parcours summary { cursor: pointer; font-weight: 600; }
 .parcours-livre { margin: 8px 0; color: #6f6152; font-size: 15px; }
 .parcours summary span { font-weight: 400; color: #6f6152; font-size: 14px; margin-left: 6px; }
-.parcours ol { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 8px; }
-.parcours-etape { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; align-items: start; }
-.parcours-etape p { margin: 4px 0 8px; }
-.parcours-num { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 14px; background: #f3ead9; }
-.parcours-etape.is-faite .parcours-num { background: #e6f2e4; }
-.parcours-etape.is-en_cours .parcours-num { background: #2b2118; color: #fff; }
-.parcours-etape.is-a_venir { color: #6f6152; }
+.parcours-frise { list-style: none; margin: 10px 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.parcours-mot { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px 4px 4px; border-radius: 999px; font-size: 14px; color: #6f6152; background: #f3ead9; }
+.parcours-mot span { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; background: #fff; }
+.parcours-mot.is-faite { color: #1d6a3e; background: #e6f2e4; }
+.parcours-mot.is-en_cours { color: #fff; background: #2b2118; font-weight: 700; }
+.parcours-mot.is-en_cours span { color: #2b2118; }
+.parcours-detail p { margin: 4px 0 8px; }
 .parcours-questions { display: grid; gap: 6px; margin-bottom: 8px; }
 .parcours-questions small { color: #6f6152; }
 .parcours-question { text-align: left; min-height: 44px; padding: 8px 12px; border-radius: 12px; border: 1px solid #e0cdb5; background: #fff; color: inherit; font: inherit; cursor: pointer; }
