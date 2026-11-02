@@ -613,12 +613,12 @@ page(
   '/speed-dating/',
   layout({
     title: 'Speed dating en ligne sérieux — Le Boudoir des Rencontres | Lamia Femme Berbère',
-    description: 'Des soirées de speed dating en visio pour des rencontres sérieuses, en deux salons par âge, de l’Algérie à la France et au Canada, animées par Lamia. Pour le lancement, la première soirée est offerte : le Bal masqué de Venise, le 31 octobre à 21 h.',
+    description: 'Des soirées de speed dating en visio pour des rencontres sérieuses, en deux salons par âge, de l’Algérie à la France et au Canada, animées par Lamia. Inscription toujours ouverte.',
     path: '/speed-dating/',
     room: roomBySlug['speed-dating'],
-    scripts: ['/assets/membre.js'],
-    ogTitle: 'Le speed dating de Lamia Femme Berbère — première soirée offerte',
-    ogDescription: 'Rencontres sérieuses en visio, en deux salons par âge, animées par Lamia. Pour le lancement, le Bal masqué de Venise du 31 octobre est gratuit.',
+    scripts: ['/assets/membre.js', '/assets/soirees.js'],
+    ogTitle: 'Le speed dating de Lamia Femme Berbère',
+    ogDescription: 'Rencontres sérieuses en visio, en deux salons par âge, animées par Lamia. Inscription toujours ouverte, deux salons par âge.',
     ogImage: '/images/lamia/lamia-venise-1672.webp',
     ogImageAlt: 'Lamia Femme Berbère, masque vénitien à la main, sur le Grand Canal de Venise',
     ogImageWidth: 1672,
@@ -642,50 +642,28 @@ page(
     <div class="bal-facts" aria-label="En bref">
       <span>En visio, depuis chez vous</span><span>Deux salons par âge</span><span>20 personnes max par salon</span><span>Lamia veille</span>
     </div>
-    <p class="bal-actions"><a class="btn btn-gold" href="#events-title">Voir les prochaines soirées</a><a class="btn bal-btn-line" href="/speed-dating/salle/">Tester ma caméra</a></p>
+    <p class="bal-actions"><a class="btn btn-gold" href="/speed-dating/inscription/">M’inscrire à un salon</a><a class="btn bal-btn-line" href="/speed-dating/salle/">Tester ma caméra</a></p>
   </div>
 </section>
 
 <div class="boudoir-plateau">
-<section class="lancement" aria-labelledby="lancement-title">
-  <figure class="lancement-image">
-    ${IMGT('image.speed.lancement', 'Le Boudoir des Rencontres', 'Image de la soirée de lancement', `<img src="/images/lamia/lamia-venise-1672.webp" srcset="/images/lamia/lamia-venise-900.webp 900w, /images/lamia/lamia-venise-1672.webp 1672w" sizes="(max-width: 860px) 100vw, 560px" width="1672" height="941" alt="Lamia, masque vénitien à la main, sur le Grand Canal de Venise à la tombée de la nuit" loading="lazy">`)}
-  </figure>
-  <div class="lancement-texte">
-    <p class="bal-kicker">Soirée de lancement · offerte</p>
-    <h2 id="lancement-title">${esc(T('speed.lancement-titre', 'Le Boudoir des Rencontres', 'Soirée de lancement : titre', 'La première soirée est gratuite : le Bal masqué de Venise'))}</h2>
-    <p>Pour lancer le Boudoir, Lamia vous offre la première soirée, le <strong>samedi 31 octobre à 21 h</strong>, en visio, sur le thème du Carnaval de Venise. Venez masqué·e, le mystère fait partie du jeu. Les soirées suivantes seront payantes.</p>
-    <p><a class="btn btn-gold" href="#events-title">Réserver ma place offerte</a></p>
+<section class="salons-accueil" aria-labelledby="events-title">
+  <p class="bal-kicker">L’inscription est toujours ouverte</p>
+  <h2 id="events-title">Choisis ton salon</h2>
+  <p class="salons-gratuit" data-salons-gratuit hidden>La prochaine soirée est gratuite</p>
+  <p>Deux salons, plusieurs secteurs de recherche. Quand assez de femmes et d’hommes sont inscrits dans un même secteur, le salon est confirmé et tu es prévenu·e.</p>
+  <div class="salons-deux">
+    <a class="salons-carte" href="/speed-dating/inscription/?salon=20-39"><span><strong>Salon 20-39 ans</strong><small>Je m’inscris</small></span></a>
+    <a class="salons-carte" href="/speed-dating/inscription/?salon=40%2B"><span><strong>Salon 40 ans et plus</strong><small>Je m’inscris</small></span></a>
   </div>
-</section>
-
-<section class="boudoir-reservation" aria-labelledby="events-title">
-  <span class="boudoir-curtain boudoir-curtain-left" aria-hidden="true"></span>
-  <span class="boudoir-curtain boudoir-curtain-right" aria-hidden="true"></span>
-  <div class="boudoir-reservation-head">
-    <p class="bal-kicker">Prenez place dans le salon</p>
-    <h2 id="events-title">Les prochaines soirées</h2>
-    <p>Pour le lancement, la première soirée est offerte, sur inscription. Les places sont limitées afin de préserver la qualité des échanges.</p>
-  </div>
-  <div class="boudoir-reservation-stage">
-    <aside class="boudoir-side-note">
-      <span class="boudoir-side-icon" aria-hidden="true">✦</span>
-      <strong>Soirée de lancement</strong>
-      <span>Samedi 31 octobre · 21 h</span>
-      <span>En visio · offerte</span>
-      <span>20 personnes maximum par salon</span>
-    </aside>
-    <div class="events">
-      <div class="event-grid" data-events><p class="loading">Les soirées arrivent…</p></div>
-    </div>
-  </div>
+  <div class="salons-confirmes" data-salons-confirmes hidden></div>
 </section>
 </div>
 <section class="bal-deroule" aria-labelledby="deroule-title">
   <h2 id="deroule-title">Comment se passe une soirée</h2>
   <ol>
-    <li><strong>Vous choisissez</strong><span>Une soirée, puis votre salon. Votre tranche d’âge est choisie automatiquement. L’inscription prend une minute, sans mot de passe.</span></li>
-    <li><strong>Vous vous préparez</strong><span>Vous testez votre caméra et votre micro dans l’antichambre. Les informations pratiques vous sont envoyées avant la soirée.</span></li>
+    <li><strong>Vous choisissez</strong><span>Votre salon, puis les secteurs où vous cherchez. L’inscription prend une minute, sans mot de passe.</span></li>
+    <li><strong>Votre salon est confirmé</strong><span>Dès qu’il y a assez de femmes et d’hommes dans un secteur, Lamia fixe la date et vous êtes prévenu·e. Vous recevez aussi un rappel le jour même, une heure avant, puis au démarrage.</span></li>
     <li><strong>Vous entrez dans le grand salon</strong><span>À l’heure dite, Lamia accueille tout le monde et ouvre la soirée.</span></li>
     <li><strong>Vous faites connaissance</strong><span>Des tête-à-tête de quelques minutes, au son d’une cloche. Les cavaliers rencontrés s’inscrivent dans votre carnet de bal.</span></li>
     <li><strong>Vous choisissez qui revoir</strong><span>En privé, dans votre carnet. Si le souhait est réciproque, Lamia vous met en relation.</span></li>
@@ -693,10 +671,10 @@ page(
 </section>
 
 <section class="bal-code" aria-labelledby="salons-title">
-  <h2 id="salons-title">Le Grand Salon, en deux tranches d’âge</h2>
+  <h2 id="salons-title">Deux salons, en deux tranches d’âge</h2>
   <ul>
-    <li><strong>Grand Salon 25-39 ans</strong></li>
-    <li><strong>Grand Salon 40 ans et plus</strong></li>
+    <li><strong>Salon 20-39 ans</strong></li>
+    <li><strong>Salon 40 ans et plus</strong></li>
   </ul>
   <p class="bal-note">Toutes les zones sont réunies : Algérie, France, Europe, Canada et ailleurs. Votre salon est choisi automatiquement d’après votre date de naissance, avec 20 personnes au maximum par salon, pour garder des échanges de qualité.</p>
 </section>
@@ -714,15 +692,14 @@ page(
 
 <section class="member-panel bal-espace" aria-labelledby="member-title">
   <h2 id="member-title">Le soir de la soirée</h2>
-  <p>Pas besoin de compte : inscrivez-vous juste au-dessus, puis le soir venu, entrez par la porte de la salle avec votre email et votre date de naissance. À la fin, votre <strong>carnet de bal</strong> vous permet d’indiquer, en privé, qui vous aimeriez revoir.</p>
+  <p>Pas besoin de compte : <a class="text-link" href="/speed-dating/inscription/">inscrivez-vous à un salon</a>, puis le soir venu, entrez par la porte de la salle avec votre email et votre date de naissance. À la fin, votre <strong>carnet de bal</strong> vous permet d’indiquer, en privé, qui vous aimeriez revoir.</p>
   <p class="bal-actions"><a class="btn btn-gold" href="/speed-dating/bal/">Entrer dans la salle</a><a class="btn bal-btn-line" href="/speed-dating/salle/">Tester ma caméra</a><a class="btn bal-btn-line" href="/mon-espace/">Mon espace</a></p>
 </section>
 <section class="origin">
   <blockquote>« ${esc(P.speedDating.promise)} »<cite>Lamia</cite></blockquote>
   <p>${esc(P.speedDating.origin)}</p>
 </section>
-</div>
-<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@type': 'Event', name: 'Bal masqué de Venise — soirée de lancement du speed dating de Lamia Femme Berbère', startDate: '2026-10-31T21:00:00+01:00', endDate: '2026-10-31T23:00:00+01:00', eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode', eventStatus: 'https://schema.org/EventScheduled', location: { '@type': 'VirtualLocation', url: SITE_URL + '/speed-dating/' }, image: SITE_URL + '/images/lamia/lamia-venise-1672.webp', description: 'Soirée de speed dating en visio, en deux salons par âge, sur le thème du Carnaval de Venise. Offerte pour le lancement.', offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR', availability: 'https://schema.org/InStock', url: SITE_URL + '/speed-dating/' }, organizer: { '@type': 'Person', name: 'Lamia Bréchet Ighil', url: SITE_URL + '/lamia-brechet/' } })}</script>`,
+</div>`,
   })
 );
 
@@ -858,6 +835,10 @@ page(
       </div>
     </section>
 
+    <section id="salons" data-espace-salon-bloc hidden>
+      <h2>Mon salon</h2>
+      <div data-espace-salon></div>
+    </section>
     <section>
       <h2>Mes soirées</h2>
       <div class="espace-soirees" data-espace-soirees><p class="loading">Un instant…</p></div>
@@ -900,7 +881,7 @@ page(
     <label>Date de naissance<input name="birth_date" type="date" required></label>
     <button class="btn btn-gold" type="submit">Pousser la porte</button>
     <p class="form-status" role="status" data-entree-status></p>
-    <p class="bal-petit">Pas encore inscrit·e ? <a class="text-link" href="/speed-dating/#events-title">Réserve ta place</a>. Un souci de caméra ? <a class="text-link" href="/speed-dating/salle/">Passe par l’antichambre</a>.</p>
+    <p class="bal-petit">Pas encore inscrit·e ? <a class="text-link" href="/speed-dating/inscription/">Inscris-toi à un salon</a>. Un souci de caméra ? <a class="text-link" href="/speed-dating/salle/">Passe par l’antichambre</a>.</p>
   </form>
 </section>
 
@@ -1023,6 +1004,54 @@ page(
 </section>
 </div>
 <script type="module" src="/assets/antichambre.js?v=${VERSION}"></script>`,
+  })
+);
+
+// Le lien d'inscription aux soirées : toujours actif.
+page(
+  '/speed-dating/inscription/',
+  layout({
+    title: 'S’inscrire à un salon · Le Boudoir des Rencontres',
+    description: 'Inscris-toi aux soirées de speed dating de Lamia : deux salons par âge, plusieurs secteurs de recherche, autant de femmes que d’hommes.',
+    path: '/speed-dating/inscription/',
+    room: roomBySlug['speed-dating'],
+    scripts: ['/assets/soirees.js'],
+    body: `<div class="bal"><section class="salons">
+  <p class="bal-kicker">Le Boudoir des Rencontres</p>
+  <h1>Choisis ton salon</h1>
+  <p class="salons-gratuit" data-salons-gratuit hidden>La prochaine soirée est gratuite</p>
+  <p>L’inscription est ouverte en permanence. Dès que ${'6'} femmes et ${'6'} hommes attendent dans un même secteur, Lamia confirme le salon et fixe la date.</p>
+  <form data-salon-form novalidate>
+    <fieldset class="salons-etape"><legend>1. Ton salon</legend>
+      <div class="salons-deux">
+        <label class="salons-carte"><input type="radio" name="salon" value="20-39"><span><strong>Salon 20-39 ans</strong><small>De 20 ans à 39 ans</small></span></label>
+        <label class="salons-carte"><input type="radio" name="salon" value="40+"><span><strong>Salon 40 ans et plus</strong><small>À partir de 40 ans</small></span></label>
+      </div>
+    </fieldset>
+    <fieldset class="salons-etape"><legend>2. Les secteurs où tu cherches</legend>
+      <p class="salons-aide">Plusieurs choix possibles : plus tu en coches, plus vite tu trouves un salon.</p>
+      <div class="salons-options" data-salon-options><p class="salons-aide">Choisis d’abord ton salon.</p></div>
+    </fieldset>
+    <fieldset class="salons-etape"><legend>3. Toi</legend>
+      <div class="salons-champs">
+        <label>Prénom<input name="first_name" autocomplete="given-name" maxlength="60" required></label>
+        <label>Email<input name="email" type="email" autocomplete="email" required></label>
+        <label>Je suis<select name="gender" required><option value="">Choisir</option><option value="femme">Une femme</option><option value="homme">Un homme</option></select></label>
+        <label>Date de naissance<input name="birth_date" type="date" autocomplete="bday" required></label>
+        <label>Ville<input name="city" autocomplete="address-level2" maxlength="80" required></label>
+        <label class="salons-piege" aria-hidden="true">Site web<input name="website" tabindex="-1" autocomplete="off"></label>
+        <label class="salons-accord"><input name="rules" type="checkbox" required><span>Je viens pour une rencontre sérieuse, caméra allumée, et j’accepte le cadre de la soirée et les <a class="text-link" href="/conditions-utilisation/">conditions d’utilisation</a>.</span></label>
+      </div>
+    </fieldset>
+    <button class="btn btn-gold" type="submit">M’inscrire au salon</button>
+    <p class="salons-statut" role="status" data-salon-status></p>
+  </form>
+  <div class="salons-merci" data-salon-merci hidden>
+    <h2>Tu es inscrit·e</h2>
+    <p>Tu n’as rien à payer pour l’instant. Tu recevras un message quand ton salon sera confirmé, puis un rappel le jour de la soirée, une heure avant et au démarrage.</p>
+    <p>Pour recevoir aussi ces messages sur ton téléphone, connecte-toi à <a class="text-link" href="/mon-espace/">Mon espace</a> avec cet email et active les notifications.</p>
+  </div>
+</section></div>`,
   })
 );
 
@@ -1909,7 +1938,7 @@ await cp(join(ROOT, 'public'), DIST, { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await writeFile(join(DIST, 'assets', 'editable.json'), JSON.stringify({ fields: [...EDITABLE, ...REGISTRE], defaults: DEFAULTS }));
-for (const f of ['abonnement.js', 'abonnement-merci.js', 'swipe.js', 'nouveautes.js', 'confirmer.js', 'maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'annonces.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
+for (const f of ['abonnement.js', 'abonnement-merci.js', 'swipe.js', 'nouveautes.js', 'confirmer.js', 'maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'soirees.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'annonces.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
 await cp(join(ROOT, 'content', 'shipping.mjs'), join(DIST, 'assets', 'shipping.mjs'));
 await cp(join(ROOT, 'content', 'rubriques.mjs'), join(DIST, 'assets', 'rubriques.mjs'));
 await cp(join(ROOT, 'content', 'matching-options.mjs'), join(DIST, 'assets', 'matching-options.mjs'));

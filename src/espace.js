@@ -4,7 +4,7 @@ import { creerCompte, api } from './confidences-commun.js';
 import { secteurLisible } from './matching-options.mjs';
 
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc');
-const $ = (s) => document.querySelector(s);
+const $ = (s, r = document) => r.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
 const when = (iso) => new Date(iso).toLocaleString((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
 const say = (el, msg, err = false) => { el.textContent = msg; el.classList.toggle('is-error', err); };
@@ -27,13 +27,14 @@ async function render() {
   avisLamia(session);
   propositions(session);
   discussions(session);
+  monSalon(session);
   const { data } = await supabase.from('event_registrations')
     .select('attendance_status, speed_dating_events(title, audience, starts_at)')
     .neq('attendance_status', 'cancelled');
   const rows = (data || []).filter((r) => r.speed_dating_events).sort((a, b) => a.speed_dating_events.starts_at.localeCompare(b.speed_dating_events.starts_at));
   $('[data-espace-soirees]').innerHTML = rows.length
     ? rows.map((r) => `<article class="espace-soiree"><p class="event-date">${esc(when(r.speed_dating_events.starts_at))}</p><h3>${esc(r.speed_dating_events.title)}</h3>${r.speed_dating_events.audience ? `<p>${/^grand salon/i.test(r.speed_dating_events.audience) ? '' : 'Salon '}${esc(r.speed_dating_events.audience)}</p>` : ''}</article>`).join('')
-    : '<p>Tu n’as pas encore réservé de soirée. <a class="text-link" href="/speed-dating/#events-title">Voir le Bal masqué</a></p>';
+    : '<p>Tu n’as pas encore réservé de soirée. <a class="text-link" href="/speed-dating/inscription/">M’inscrire à un salon</a></p>';
 }
 
 const money = (c, cur = 'EUR') => new Intl.NumberFormat((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { style: 'currency', currency: cur || 'EUR' }).format((c || 0) / 100);
@@ -65,6 +66,34 @@ async function appelProfil(body, session) {
   const d = await r.json().catch(() => ({}));
   if (!r.ok || d.error) throw Object.assign(new Error(d.error || 'erreur'), { code: d.error });
   return d;
+}
+// Mon salon de soirée : attente, place gratuite à valider, place à régler, place confirmée.
+async function monSalon(session) {
+  const bloc = $('[data-espace-salon-bloc]'), box = $('[data-espace-salon]');
+  if (!bloc || !box) return;
+  let ins;
+  try { ({ inscription: ins } = await appelProfil({ action: 'salon_mes' }, session)); } catch { return; }
+  bloc.hidden = !ins;
+  if (!ins) return;
+  const quitter = '<p><button type="button" class="link-button" data-salon-quitter>Me désinscrire</button></p>';
+  const statut = '<p class="form-status" role="status" data-salon-statut></p>';
+  let contenu;
+  if (ins.statut === 'attente') contenu = `<h3>${esc(ins.salon)}</h3><p>Secteurs : ${esc(ins.secteurs.join(', '))}.</p><p>Tu seras prévenu·e dès que ton salon sera confirmé.</p>${quitter}`;
+  else if (ins.statut === 'place') contenu = `<h3>Ta place est confirmée</h3><p><strong>${esc(ins.quand)}</strong><br>${esc(ins.salon)} · ${esc(ins.secteur)}</p><p>Tu recevras un rappel le jour même, une heure avant, puis au démarrage.</p><p><a class="text-link" href="/speed-dating/salle/">Tester ma caméra</a></p>${ins.gratuit || ins.inclus ? quitter : ''}`;
+  else if (ins.gratuit) contenu = `<h3>Ton salon est confirmé</h3><p><strong>${esc(ins.quand)}</strong><br>${esc(ins.salon)} · ${esc(ins.secteur)}</p><p class="espace-salon-prix">Gratuit</p><p>Valide ta place avant le ${esc(ins.payer_avant)}.</p><button class="btn btn-ink" type="button" data-salon-valider>Valider ma place</button>${statut}${quitter}`;
+  else contenu = `<h3>Ton salon est confirmé</h3><p><strong>${esc(ins.quand)}</strong><br>${esc(ins.salon)} · ${esc(ins.secteur)}</p><p class="espace-salon-prix">${esc(money(ins.prix))}</p><p>Règle ta place avant le ${esc(ins.payer_avant)}, sinon elle passera à la personne suivante.</p><label><input type="checkbox" data-salon-cgv> <span>J’accepte les <a class="text-link" href="/cgv/">conditions de vente</a>. Place non remboursable.</span></label><button class="btn btn-ink" type="button" data-salon-payer>Régler ma place</button>${statut}${quitter}`;
+  box.innerHTML = `<article class="espace-salon">${contenu}</article>`;
+  const dire = (t) => { const s = $('[data-salon-statut]'); if (s) { s.textContent = t; s.classList.add('is-error'); } };
+  $('[data-salon-valider]', box)?.addEventListener('click', async () => { try { await appelProfil({ action: 'salon_valider' }, session); monSalon(session); } catch { dire('La validation n’a pas abouti. Réessaie dans un instant.'); } });
+  $('[data-salon-quitter]', box)?.addEventListener('click', async () => { if (!confirm('Te désinscrire de ce salon ?')) return; try { await appelProfil({ action: 'salon_quitter' }, session); monSalon(session); } catch { dire('La désinscription n’a pas abouti. Réessaie dans un instant.'); } });
+  $('[data-salon-payer]', box)?.addEventListener('click', async () => {
+    if (!$('[data-salon-cgv]', box).checked) return dire('Merci d’accepter les conditions de vente.');
+    try {
+      const r = await fetch('/api/event-checkout', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` }, body: JSON.stringify({ event_id: ins.event_id, cgv_accepted: true }) });
+      const d = await r.json().catch(() => ({}));
+      if (d.url) location.assign(d.url); else dire('Le paiement n’est pas disponible pour le moment. Écris à Lamia.');
+    } catch { dire('Le paiement n’est pas disponible pour le moment. Écris à Lamia.'); }
+  });
 }
 async function monProfil(session) {
   const box = document.querySelector('[data-espace-profil]');

@@ -440,7 +440,7 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeCart(
 // ---------------------------------------------------------------- soirées et réseaux
 
 export async function loadEvents() {
-  return rest('speed_dating_events?select=id,title,description,starts_at,min_age,max_age,capacity,ticket_price_cents,currency,status&status=in.(published,sold_out)&order=starts_at');
+  return rest('speed_dating_events?select=id,title,description,starts_at,min_age,max_age,capacity,ticket_price_cents,currency,status&status=in.(published,sold_out)&sur_invitation=eq.false&order=starts_at');
 }
 export const eventDate = (iso) => new Date(iso).toLocaleString((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
 
