@@ -244,6 +244,7 @@ addEventListener('keydown', (e) => { if (document.querySelector('.swipe-fenetre'
     monterFiltres();
     appliquer();
   } catch (err) {
+    if (err.code === 'fiche_live') return message('<h2>Ta fiche du live est bien là ✅</h2><p>Inutile de refaire un profil. Les personnes intéressées peuvent te choisir, et tu réponds depuis ton espace. Le swipe n’est pas encore ouvert aux fiches créées en live.</p><p><a class="po-btn" href="/mon-espace/">Aller dans mon espace</a></p>');
     if (err.code === 'pas_de_profil') return message('<h2>Confie d’abord ton profil</h2><p>Pour swiper, Lamia a besoin de connaître ton profil : c’est lui qui sera proposé aux personnes qui te correspondent.</p><p><a class="po-btn" href="/rencontres/#confier">💌 Confier mon profil</a></p>');
     if (err.code === 'en_match') return message('<h2>💞 Tu as un match en cours</h2><p>Tant qu’il dure, tu ne peux pas choisir d’autres profils. Tu peux y mettre fin depuis ton espace.</p><p><a class="po-btn" href="/mon-espace/">Mon espace</a></p>');
     message('<h2>Les profils ne s’affichent pas pour le moment</h2><p>Réessaie dans un instant.</p>');
