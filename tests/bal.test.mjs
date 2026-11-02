@@ -106,3 +106,13 @@ test('questionnaire : seules les réponses prévues sont gardées', async () => 
   await handleBal(req({ action: 'wish', pass, wished: [], avis: { aime: 'oui', reviendrait: 'peut-etre', paierait: '<script>' } }), { env, fetcher });
   assert.deepEqual(calls.find((c) => c.url.includes('on_conflict')).body.value.avis, { aime: 'oui', reviendrait: 'peut-etre', paierait: null });
 });
+
+test('tours : deux tranches d’âge ne se rencontrent que si les deux acceptent, même en mélangeant les salons', () => {
+  const p = (uid, gender, ev, tranche, accepte_autre) => ({ uid, name: uid, gender, ev, tranche, accepte_autre });
+  const r1 = pairRound([p('f', 'femme', 'a', '40+', false), p('h', 'homme', 'a', '20-39', true)], [], () => 0, { melanger: true });
+  assert.equal(r1.pairs.length, 0); assert.equal(r1.waiting.length, 2);
+  const r2 = pairRound([p('f', 'femme', 'a', '40+', true), p('h', 'homme', 'b', '20-39', true)], [], () => 0, { melanger: true });
+  assert.equal(r2.pairs.length, 1);
+  const r3 = pairRound([p('f', 'femme', 'a', '40+', false), p('h', 'homme', 'a', '40+', false)], [], () => 0);
+  assert.equal(r3.pairs.length, 1);
+});

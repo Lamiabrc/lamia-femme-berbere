@@ -14,7 +14,7 @@ const api = async (body) => {
 };
 const ERREURS = {
   missing_salon: 'Choisis un salon.', missing_secteur: 'Choisis au moins un secteur.', rules_required: 'Merci d’accepter le cadre de la soirée.',
-  age_invalide: 'Ces soirées sont réservées aux personnes de 20 ans et plus.', profil_requis: 'Il te faut d’abord un profil pour t’inscrire.', login_required: 'Connecte-toi pour t’inscrire.',
+  age_invalide: 'Ces soirées sont réservées aux personnes de 20 ans et plus.', profil_requis: 'Il te faut d’abord un profil validé pour t’inscrire.', login_required: 'Connecte-toi pour t’inscrire.',
 };
 
 let etat = null;
@@ -38,6 +38,20 @@ async function charger() {
   }
 }
 
+// L'option « autre tranche d'âge » : un choix dans son salon, automatique si on choisit l'autre salon.
+let ma_tranche = null;
+function afficherAutre() {
+  const salon = form.elements.salon.value, bloc = $('[data-salon-autre]'), c = form.elements.accepte_autre;
+  bloc.hidden = !salon || !ma_tranche;
+  if (bloc.hidden) return;
+  const autre = ma_tranche === '40+' ? 'moins de 40 ans' : '40 ans et plus';
+  const croise = salon !== ma_tranche;
+  $('[data-salon-autre-titre]').textContent = `J’accepte de rencontrer des personnes de ${autre}`;
+  $('[data-salon-autre-aide]').textContent = croise ? 'Tu choisis ce salon : cette option est automatiquement activée.' : `Sans cette option, tes tête-à-tête restent avec des personnes de ${ma_tranche === '40+' ? '40 ans et plus' : 'moins de 40 ans'}.`;
+  if (croise) c.checked = true;
+  c.disabled = croise;
+}
+
 // L'inscription passe par le compte et le profil de la personne.
 async function preparer() {
   try { const { data: { session } } = await supabase.auth.getSession(); jeton = session?.access_token || null; } catch { jeton = null; }
@@ -47,39 +61,37 @@ async function preparer() {
   if (c) c.hidden = true;
   if (!moi.connecte) { $('[data-salon-sans-compte]').hidden = false; return; }
   if (!moi.profil) {
+    if (moi.a_verifier) { $('[data-salon-sans-profil] h2').textContent = 'Ton profil est en cours de validation'; $('[data-salon-sans-profil-texte]').textContent = 'Dès qu’il est validé, tu pourras revenir ici choisir ton salon.'; $('[data-salon-sans-profil] .btn-gold').hidden = true; }
     if (moi.brouillon) $('[data-salon-sans-profil-texte]').textContent = 'Ton profil n’est pas terminé. Termine-le, puis reviens ici choisir ton salon.';
     $('[data-salon-sans-profil]').hidden = false;
     return;
   }
   form.hidden = false;
-  // Le salon de son âge est présélectionné ; les moins de 40 ans peuvent choisir le salon 40 ans et plus, pas l'inverse.
+  // Le salon de son âge est présélectionné ; chacun peut choisir l'autre.
+  ma_tranche = moi.salon;
+  form.elements.accepte_autre.checked = Boolean(moi.inscription?.accepte_autre);
   const depart = moi.inscription?.salon || new URLSearchParams(location.search).get('salon') || moi.salon;
-  const moins = form.querySelector('[name=salon][value="20-39"]');
-  if (moi.salon === '40+') { moins.disabled = true; moins.closest('label').hidden = true; }
-  const choix = form.querySelector(`[name=salon][value="${CSS.escape(depart || '')}"]:not([disabled])`) || form.querySelector(`[name=salon][value="${CSS.escape(moi.salon || '')}"]`);
+  const choix = form.querySelector(`[name=salon][value="${CSS.escape(depart || '')}"]`) || form.querySelector(`[name=salon][value="${CSS.escape(moi.salon || '')}"]`);
   if (choix) choix.checked = true;
   afficherOptions();
+  afficherAutre();
   for (const v of moi.inscription?.secteurs || []) { const x = form.querySelector(`[name=secteurs][value="${CSS.escape(v)}"]`); if (x) x.checked = true; }
 }
 
 if (form) {
-  form.addEventListener('change', (e) => { if (e.target.name === 'salon') afficherOptions(); });
+  form.addEventListener('change', (e) => { if (e.target.name === 'salon') { afficherOptions(); afficherAutre(); } });
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const st = $('[data-salon-status]'), btn = form.querySelector('button[type=submit]'), f = form.elements;
     st.classList.remove('is-error'); st.textContent = ''; btn.disabled = true;
     try {
-      await api({ action: 'salon_inscrire', salon: f.salon.value, secteurs: $$('[name=secteurs]:checked', form).map((x) => x.value), rules_accepted: f.rules.checked });
+      await api({ action: 'salon_inscrire', salon: f.salon.value, secteurs: $$('[name=secteurs]:checked', form).map((x) => x.value), accepte_autre: f.accepte_autre.checked, rules_accepted: f.rules.checked });
       form.hidden = true;
       $('[data-salon-merci]').hidden = false;
       $('[data-salon-merci]').scrollIntoView({ behavior: 'smooth', block: 'center' });
     } catch (err) {
       st.classList.add('is-error');
-      if (err.code === 'salon_age') {
-        const bon = form.querySelector(`[name=salon][value="${CSS.escape(err.bon || '')}"]`);
-        if (bon) { bon.checked = true; afficherOptions(); st.textContent = 'À partir de 40 ans, ta place est dans le salon 40 ans et plus : on l’a sélectionné, choisis tes secteurs.'; }
-        else st.textContent = ERREURS.age_invalide;
-      } else st.textContent = ERREURS[err.code] || 'L’inscription n’a pas abouti. Réessaie dans un instant.';
+      st.textContent = ERREURS[err.code] || 'L’inscription n’a pas abouti. Réessaie dans un instant.';
     } finally { btn.disabled = false; }
   });
 }

@@ -662,7 +662,7 @@ page(
 <section class="bal-deroule" aria-labelledby="deroule-title">
   <h2 id="deroule-title">Comment se passe une soirée</h2>
   <ol>
-    <li><strong>Vous choisissez</strong><span>Avec votre profil, vous choisissez votre salon, puis les secteurs où vous cherchez. Cela prend une minute.</span></li>
+    <li><strong>Vous choisissez</strong><span>Avec votre profil validé, vous choisissez votre salon, puis les secteurs où vous cherchez. Cela prend une minute.</span></li>
     <li><strong>Votre salon est confirmé</strong><span>Dès qu’il y a assez de femmes et d’hommes dans un secteur, Lamia fixe la date et vous êtes prévenu·e. Vous recevez aussi un rappel le jour même, une heure avant, puis au démarrage.</span></li>
     <li><strong>Vous entrez dans le grand salon</strong><span>À l’heure dite, Lamia accueille tout le monde et ouvre la soirée.</span></li>
     <li><strong>Vous faites connaissance</strong><span>Des tête-à-tête de quelques minutes, au son d’une cloche. Les cavaliers rencontrés s’inscrivent dans votre carnet de bal.</span></li>
@@ -692,7 +692,7 @@ page(
 
 <section class="member-panel bal-espace" aria-labelledby="member-title">
   <h2 id="member-title">Le soir de la soirée</h2>
-  <p><a class="text-link" href="/speed-dating/inscription/">Inscrivez-vous à un salon</a> avec votre profil, puis le soir venu, entrez par la porte de la salle avec votre email et votre date de naissance. À la fin, votre <strong>carnet de bal</strong> vous permet d’indiquer, en privé, qui vous aimeriez revoir.</p>
+  <p><a class="text-link" href="/speed-dating/inscription/">Inscrivez-vous à un salon</a> avec votre profil validé, puis le soir venu, entrez par la porte de la salle avec votre email et votre date de naissance. À la fin, votre <strong>carnet de bal</strong> vous permet d’indiquer, en privé, qui vous aimeriez revoir.</p>
   <p class="bal-actions"><a class="btn btn-gold" href="/speed-dating/bal/">Entrer dans la salle</a><a class="btn bal-btn-line" href="/speed-dating/salle/">Tester ma caméra</a><a class="btn bal-btn-line" href="/mon-espace/">Mon espace</a></p>
 </section>
 <section class="origin">
@@ -1031,7 +1031,7 @@ page(
   <p>L’inscription est ouverte en permanence. Dès que ${'6'} femmes et ${'6'} hommes attendent dans un même secteur, Lamia confirme le salon et fixe la date.</p>
   <p class="salons-aide" data-salon-chargement>Un instant…</p>
   <div class="salons-merci" data-salon-sans-compte hidden>
-    <h2>Il te faut un profil</h2>
+    <h2>Il te faut un profil validé</h2>
     <p>Pour t’inscrire à une soirée, crée ton profil, ou connecte-toi si tu en as déjà un. Cela garantit que chacun sait à qui il parle.</p>
     <p class="bal-actions"><a class="btn btn-gold" href="/rencontres/#confier">Créer mon profil</a><a class="btn bal-btn-line" href="/mon-espace/">Me connecter</a></p>
   </div>
@@ -1043,13 +1043,16 @@ page(
   <form data-salon-form novalidate hidden>
     <fieldset class="salons-etape"><legend>1. Ton salon</legend>
       <div class="salons-deux">
-        <label class="salons-carte"><input type="radio" name="salon" value="20-39"><span><strong>Salon 20-39 ans</strong><small>De 20 ans à 39 ans</small></span></label>
-        <label class="salons-carte"><input type="radio" name="salon" value="40+"><span><strong>Salon 40 ans et plus</strong><small>À partir de 40 ans, et ouvert aux plus jeunes qui préfèrent ce salon</small></span></label>
+        <label class="salons-carte"><input type="radio" name="salon" value="20-39"><span><strong>Salon 20-39 ans</strong><small>Pour celles et ceux qui préfèrent ce salon</small></span></label>
+        <label class="salons-carte"><input type="radio" name="salon" value="40+"><span><strong>Salon 40 ans et plus</strong><small>Pour celles et ceux qui préfèrent ce salon</small></span></label>
       </div>
     </fieldset>
     <fieldset class="salons-etape"><legend>2. Les secteurs où tu cherches</legend>
       <p class="salons-aide">Plusieurs choix possibles : plus tu en coches, plus vite tu trouves un salon.</p>
       <div class="salons-options" data-salon-options><p class="salons-aide">Choisis d’abord ton salon.</p></div>
+    </fieldset>
+    <fieldset class="salons-etape" data-salon-autre hidden><legend>3. L’autre tranche d’âge</legend>
+      <label class="salons-option"><input type="checkbox" name="accepte_autre"><span><strong data-salon-autre-titre></strong><small data-salon-autre-aide></small></span></label>
     </fieldset>
     <label class="salons-accord"><input name="rules" type="checkbox" required><span>Je viens pour une rencontre sérieuse, caméra allumée, et j’accepte le cadre de la soirée et les <a class="text-link" href="/conditions-utilisation/">conditions d’utilisation</a>.</span></label>
     <button class="btn btn-gold" type="submit">M’inscrire au salon</button>
