@@ -27,14 +27,7 @@ async function render() {
   avisLamia(session);
   propositions(session);
   discussions(session);
-  monSalon(session);
-  const { data } = await supabase.from('event_registrations')
-    .select('attendance_status, speed_dating_events(title, audience, starts_at)')
-    .neq('attendance_status', 'cancelled');
-  const rows = (data || []).filter((r) => r.speed_dating_events).sort((a, b) => a.speed_dating_events.starts_at.localeCompare(b.speed_dating_events.starts_at));
-  $('[data-espace-soirees]').innerHTML = rows.length
-    ? rows.map((r) => `<article class="espace-soiree"><p class="event-date">${esc(when(r.speed_dating_events.starts_at))}</p><h3>${esc(r.speed_dating_events.title)}</h3>${r.speed_dating_events.audience ? `<p>${/^grand salon/i.test(r.speed_dating_events.audience) ? '' : 'Salon '}${esc(r.speed_dating_events.audience)}</p>` : ''}</article>`).join('')
-    : '<p>Tu n’as pas encore réservé de soirée. <a class="text-link" href="/speed-dating/inscription/">M’inscrire à un salon</a></p>';
+  monSpeedDating(session);
 }
 
 const money = (c, cur = 'EUR') => new Intl.NumberFormat((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { style: 'currency', currency: cur || 'EUR' }).format((c || 0) / 100);
@@ -68,13 +61,14 @@ async function appelProfil(body, session) {
   return d;
 }
 // Mon salon de soirée : attente, place gratuite à valider, place à régler, place confirmée.
-async function monSalon(session) {
-  const bloc = $('[data-espace-salon-bloc]'), box = $('[data-espace-salon]');
-  if (!bloc || !box) return;
-  let ins;
-  try { ({ inscription: ins } = await appelProfil({ action: 'salon_mes' }, session)); } catch { return; }
-  bloc.hidden = !ins;
-  if (!ins) return;
+async function monSpeedDating(session) {
+  const box = $('[data-espace-salon]');
+  if (!box) return;
+  let ins = null;
+  try { ({ inscription: ins } = await appelProfil({ action: 'salon_mes' }, session)); } catch { /* la liste des soirées reste affichée */ }
+  await mesSoirees(ins);
+  if (location.hash === '#salons' || location.hash === '#speed-dating') $('#speed-dating')?.scrollIntoView({ behavior: 'smooth' });
+  if (!ins) { box.innerHTML = '<article class="espace-salon"><p>Tu n’es inscrit·e à aucun salon pour le moment.</p><p><a class="btn btn-ink" href="/speed-dating/inscription/">M’inscrire à un salon</a></p></article>'; return; }
   const quitter = '<p><button type="button" class="link-button" data-salon-quitter>Me désinscrire</button></p>';
   const statut = '<p class="form-status" role="status" data-salon-statut></p>';
   let contenu;
@@ -84,8 +78,8 @@ async function monSalon(session) {
   else contenu = `<h3>Ton salon est confirmé</h3><p><strong>${esc(ins.quand)}</strong><br>${esc(ins.salon)} · ${esc(ins.secteur)}</p><p class="espace-salon-prix">${esc(money(ins.prix))}</p><p>Règle ta place avant le ${esc(ins.payer_avant)}, sinon elle passera à la personne suivante.</p><label><input type="checkbox" data-salon-cgv> <span>J’accepte les <a class="text-link" href="/cgv/">conditions de vente</a>. Place non remboursable.</span></label><button class="btn btn-ink" type="button" data-salon-payer>Régler ma place</button>${statut}${quitter}`;
   box.innerHTML = `<article class="espace-salon">${contenu}</article>`;
   const dire = (t) => { const s = $('[data-salon-statut]'); if (s) { s.textContent = t; s.classList.add('is-error'); } };
-  $('[data-salon-valider]', box)?.addEventListener('click', async () => { try { await appelProfil({ action: 'salon_valider' }, session); monSalon(session); } catch { dire('La validation n’a pas abouti. Réessaie dans un instant.'); } });
-  $('[data-salon-quitter]', box)?.addEventListener('click', async () => { if (!confirm('Te désinscrire de ce salon ?')) return; try { await appelProfil({ action: 'salon_quitter' }, session); monSalon(session); } catch { dire('La désinscription n’a pas abouti. Réessaie dans un instant.'); } });
+  $('[data-salon-valider]', box)?.addEventListener('click', async () => { try { await appelProfil({ action: 'salon_valider' }, session); monSpeedDating(session); } catch { dire('La validation n’a pas abouti. Réessaie dans un instant.'); } });
+  $('[data-salon-quitter]', box)?.addEventListener('click', async () => { if (!confirm('Te désinscrire de ce salon ?')) return; try { await appelProfil({ action: 'salon_quitter' }, session); monSpeedDating(session); } catch { dire('La désinscription n’a pas abouti. Réessaie dans un instant.'); } });
   $('[data-salon-payer]', box)?.addEventListener('click', async () => {
     if (!$('[data-salon-cgv]', box).checked) return dire('Merci d’accepter les conditions de vente.');
     try {
@@ -94,6 +88,22 @@ async function monSalon(session) {
       if (d.url) location.assign(d.url); else dire('Le paiement n’est pas disponible pour le moment. Écris à Lamia.');
     } catch { dire('Le paiement n’est pas disponible pour le moment. Écris à Lamia.'); }
   });
+}
+// Les soirées réservées et passées. Une place encore à valider ou à régler est dans le bloc du salon, pas ici.
+async function mesSoirees(ins) {
+  const { data } = await supabase.from('event_registrations')
+    .select('attendance_status, payment_status, event_id, speed_dating_events(title, audience, starts_at)')
+    .neq('attendance_status', 'cancelled');
+  const rows = (data || []).filter((r) => r.speed_dating_events && r.payment_status !== 'pending' && r.event_id !== ins?.event_id);
+  const limite = Date.now() - 6 * 3600e3;
+  const date = (r) => new Date(r.speed_dating_events.starts_at).getTime();
+  const carte = (r, plus = '') => `<article class="espace-soiree"><p class="event-date">${esc(when(r.speed_dating_events.starts_at))}</p><h3>${esc(r.speed_dating_events.title)}</h3>${r.speed_dating_events.audience ? `<p>${esc(r.speed_dating_events.audience)}</p>` : ''}${plus}</article>`;
+  const avenir = rows.filter((r) => date(r) >= limite).sort((a, b) => date(a) - date(b));
+  const passees = rows.filter((r) => date(r) < limite).sort((a, b) => date(b) - date(a));
+  $('[data-espace-soirees-bloc]').hidden = !avenir.length;
+  $('[data-espace-soirees]').innerHTML = avenir.map((r) => carte(r)).join('');
+  $('[data-espace-passees-bloc]').hidden = !passees.length;
+  $('[data-espace-passees]').innerHTML = passees.map((r) => carte(r, '<p><a class="text-link" href="/speed-dating/souhaits/">Mon carnet de bal</a></p>')).join('');
 }
 async function monProfil(session) {
   const box = document.querySelector('[data-espace-profil]');

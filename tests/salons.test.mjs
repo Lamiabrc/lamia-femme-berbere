@@ -1,9 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { actionSalons, selection, salonPourAge, samediPropose, parisVersUTC, gratuitParDefaut, dateLimite, SEUIL } from '../lib/salons.mjs';
+import { actionSalons, selection, salonPourAge, salonAutorise, samediPropose, parisVersUTC, gratuitParDefaut, dateLimite, SEUIL } from '../lib/salons.mjs';
 
 test('âge → salon : 20-39, puis 40 et plus', () => {
   assert.equal(salonPourAge(19), null); assert.equal(salonPourAge(20), '20-39'); assert.equal(salonPourAge(39), '20-39'); assert.equal(salonPourAge(40), '40+');
+});
+test('un moins de 40 ans peut choisir le salon 40 et plus, pas l’inverse', () => {
+  assert.equal(salonAutorise(30, '40+'), true); assert.equal(salonAutorise(30, '20-39'), true);
+  assert.equal(salonAutorise(45, '40+'), true); assert.equal(salonAutorise(45, '20-39'), false);
+  assert.equal(salonAutorise(19, '40+'), false);
 });
 test('heure de Paris et samedi proposé à 21 h', () => {
   assert.equal(parisVersUTC('2026-11-14T21:00').toISOString(), '2026-11-14T20:00:00.000Z');
@@ -34,7 +39,7 @@ test('date limite : 48 h, et jamais moins de 24 h avant la soirée', () => {
 
 // Une petite base en mémoire qui comprend les filtres utilisés par les salons.
 function base(inscrits, t0) {
-  const db = { salon_inscriptions: inscrits.map((x) => ({ inclus: false, ...x })), salon_editions: [], speed_dating_events: [], event_registrations: [], platform_settings: [{ key: 'salons_cron', value: { jeton: 'x'.repeat(40) } }] };
+  const db = { annonces: [], profils_outil: [], member_profiles: [], salon_inscriptions: inscrits.map((x) => ({ inclus: false, ...x })), salon_editions: [], speed_dating_events: [], event_registrations: [], platform_settings: [{ key: 'salons_cron', value: { jeton: 'x'.repeat(40) } }] };
   let n = 0;
   const filtre = (rows, q) => rows.filter((r) => [...q.entries()].every(([k, v]) => {
     if (['select', 'order', 'limit', 'on_conflict'].includes(k)) return true;
@@ -129,4 +134,33 @@ test('soirée suivante : payante, et place incluse pour une formule qui la compr
   assert.equal(b.db.event_registrations.find((x) => x.user_id === 'f0').payment_status, 'waived');
   assert.equal(b.db.salon_inscriptions.find((x) => x.id === 'f1').statut, 'convoque');
   assert.equal((await actionSalons('salon_valider', {}, b.ctx({ user: { id: 'f1' } }))).status, 409);
+});
+
+test('s’inscrire à une soirée exige un compte et un profil', async () => {
+  const b = base([], new Date('2026-11-02T12:00:00Z'));
+  const ok = { salon: '40+', secteurs: ['europe'], rules_accepted: true };
+  assert.equal((await actionSalons('salon_inscrire', ok, b.ctx())).status, 401);
+  const u = { id: 'u1', email: 'R@x.fr', user_metadata: { first_name: 'Rachid' } };
+  // Sans profil, ou profil pas terminé : refusé.
+  let [s, r] = await rep(await actionSalons('salon_inscrire', ok, b.ctx({ user: u })));
+  assert.equal(s, 409); assert.equal(r.error, 'profil_requis');
+  b.db.annonces.push({ user_id: 'u1', ref: 1, status: 'brouillon', prenom: 'Rachid', genre: 'homme', birth_date: '1995-01-01' });
+  [s] = await rep(await actionSalons('salon_inscrire', ok, b.ctx({ user: u })));
+  assert.equal(s, 409);
+  const [, m0] = await rep(await actionSalons('salon_mon_profil', {}, b.ctx({ user: u })));
+  assert.equal(m0.profil, false); assert.equal(m0.brouillon, true);
+  // Un moins de 40 ans peut choisir le salon 40 ans et plus ; l'âge et le genre viennent du profil.
+  b.db.annonces[0].status = 'publiee';
+  [s] = await rep(await actionSalons('salon_inscrire', { ...ok, genre: 'femme', birth_date: '1960-01-01' }, b.ctx({ user: u })));
+  assert.equal(s, 200);
+  const i = b.db.salon_inscriptions[0];
+  assert.equal(i.salon, '40+'); assert.equal(i.genre, 'homme'); assert.equal(i.email, 'r@x.fr');
+  // Un plus de 40 ans ne peut pas aller dans le salon 20-39.
+  b.db.annonces.push({ user_id: 'u2', ref: 2, status: 'publiee', prenom: 'Werda', genre: 'femme', birth_date: '1980-01-01' });
+  const [s2, r2] = await rep(await actionSalons('salon_inscrire', { ...ok, salon: '20-39' }, b.ctx({ user: { id: 'u2', email: 'w@x.fr' } })));
+  assert.equal(s2, 409); assert.equal(r2.bon, '40+');
+  // Une fiche de l'outil reliée au compte compte comme un profil.
+  b.db.profils_outil.push({ user_id: 'u3', ref: 5001, genre: 'femme', age: 31, ville: 'Rennes' });
+  const [s3] = await rep(await actionSalons('salon_inscrire', { ...ok, salon: '20-39' }, b.ctx({ user: { id: 'u3', email: 'f@x.fr', user_metadata: { first_name: 'Sara' } } })));
+  assert.equal(s3, 200);
 });

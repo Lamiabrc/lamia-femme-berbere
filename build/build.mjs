@@ -662,7 +662,7 @@ page(
 <section class="bal-deroule" aria-labelledby="deroule-title">
   <h2 id="deroule-title">Comment se passe une soirée</h2>
   <ol>
-    <li><strong>Vous choisissez</strong><span>Votre salon, puis les secteurs où vous cherchez. L’inscription prend une minute, sans mot de passe.</span></li>
+    <li><strong>Vous choisissez</strong><span>Avec votre profil, vous choisissez votre salon, puis les secteurs où vous cherchez. Cela prend une minute.</span></li>
     <li><strong>Votre salon est confirmé</strong><span>Dès qu’il y a assez de femmes et d’hommes dans un secteur, Lamia fixe la date et vous êtes prévenu·e. Vous recevez aussi un rappel le jour même, une heure avant, puis au démarrage.</span></li>
     <li><strong>Vous entrez dans le grand salon</strong><span>À l’heure dite, Lamia accueille tout le monde et ouvre la soirée.</span></li>
     <li><strong>Vous faites connaissance</strong><span>Des tête-à-tête de quelques minutes, au son d’une cloche. Les cavaliers rencontrés s’inscrivent dans votre carnet de bal.</span></li>
@@ -692,7 +692,7 @@ page(
 
 <section class="member-panel bal-espace" aria-labelledby="member-title">
   <h2 id="member-title">Le soir de la soirée</h2>
-  <p>Pas besoin de compte : <a class="text-link" href="/speed-dating/inscription/">inscrivez-vous à un salon</a>, puis le soir venu, entrez par la porte de la salle avec votre email et votre date de naissance. À la fin, votre <strong>carnet de bal</strong> vous permet d’indiquer, en privé, qui vous aimeriez revoir.</p>
+  <p><a class="text-link" href="/speed-dating/inscription/">Inscrivez-vous à un salon</a> avec votre profil, puis le soir venu, entrez par la porte de la salle avec votre email et votre date de naissance. À la fin, votre <strong>carnet de bal</strong> vous permet d’indiquer, en privé, qui vous aimeriez revoir.</p>
   <p class="bal-actions"><a class="btn btn-gold" href="/speed-dating/bal/">Entrer dans la salle</a><a class="btn bal-btn-line" href="/speed-dating/salle/">Tester ma caméra</a><a class="btn bal-btn-line" href="/mon-espace/">Mon espace</a></p>
 </section>
 <section class="origin">
@@ -803,6 +803,24 @@ page(
       <div data-espace-discussion></div>
     </section>
 
+    <section id="speed-dating">
+      <h2>Mon speed dating</h2>
+      <div id="salons" data-espace-salon><p class="loading">Un instant…</p></div>
+      <div data-espace-soirees-bloc hidden>
+        <h3>Mes soirées réservées</h3>
+        <div class="espace-soirees" data-espace-soirees></div>
+      </div>
+      <div data-espace-passees-bloc hidden>
+        <h3>Mes soirées passées</h3>
+        <div class="espace-soirees" data-espace-passees></div>
+      </div>
+      <div class="espace-liens is-light">
+        <a href="/speed-dating/salle/"><strong>Tester ma caméra</strong><span>Avant la soirée</span></a>
+        <a href="/speed-dating/bal/"><strong>Entrer dans la salle</strong><span>Le soir de la soirée</span></a>
+        <a href="/speed-dating/souhaits/"><strong>Mon carnet de bal</strong><span>Qui aimerais-tu revoir ?</span></a>
+      </div>
+    </section>
+
     <section id="propositions">
       <h2>Profils proposés par Lamia</h2>
       <p>Lamia a choisi pour toi des profils qui te correspondent, selon son algorithme. Leur fiche est anonyme. Dis oui ou non : <strong>si l’autre personne dit oui aussi, vous êtes mis en relation tout de suite</strong>, avec une discussion privée de 7 jours.</p>
@@ -835,17 +853,7 @@ page(
       </div>
     </section>
 
-    <section id="salons" data-espace-salon-bloc hidden>
-      <h2>Mon salon</h2>
-      <div data-espace-salon></div>
-    </section>
-    <section>
-      <h2>Mes soirées</h2>
-      <div class="espace-soirees" data-espace-soirees><p class="loading">Un instant…</p></div>
-    </section>
     <div class="espace-liens is-light">
-      <a href="/speed-dating/bal/"><strong>Entrer au bal</strong><span>Le soir de la soirée</span></a>
-      <a href="/speed-dating/souhaits/"><strong>Mon carnet de bal</strong><span>Qui aimerais-tu revoir ?</span></a>
       <a href="/confidences/"><strong>Me confier à Lamia</strong><span>Écrire, laisser un vocal, échanger</span></a>
     </div>
   </div>
@@ -1021,35 +1029,36 @@ page(
   <h1>Choisis ton salon</h1>
   <p class="salons-gratuit" data-salons-gratuit hidden>La prochaine soirée est gratuite</p>
   <p>L’inscription est ouverte en permanence. Dès que ${'6'} femmes et ${'6'} hommes attendent dans un même secteur, Lamia confirme le salon et fixe la date.</p>
-  <form data-salon-form novalidate>
+  <p class="salons-aide" data-salon-chargement>Un instant…</p>
+  <div class="salons-merci" data-salon-sans-compte hidden>
+    <h2>Il te faut un profil</h2>
+    <p>Pour t’inscrire à une soirée, crée ton profil, ou connecte-toi si tu en as déjà un. Cela garantit que chacun sait à qui il parle.</p>
+    <p class="bal-actions"><a class="btn btn-gold" href="/rencontres/#confier">Créer mon profil</a><a class="btn bal-btn-line" href="/mon-espace/">Me connecter</a></p>
+  </div>
+  <div class="salons-merci" data-salon-sans-profil hidden>
+    <h2>Il te manque ton profil</h2>
+    <p data-salon-sans-profil-texte>Pour t’inscrire à une soirée, crée d’abord ton profil. Tu reviendras ensuite ici choisir ton salon.</p>
+    <p class="bal-actions"><a class="btn btn-gold" href="/rencontres/#confier">Créer mon profil</a><a class="btn bal-btn-line" href="/mon-espace/">Mon espace</a></p>
+  </div>
+  <form data-salon-form novalidate hidden>
     <fieldset class="salons-etape"><legend>1. Ton salon</legend>
       <div class="salons-deux">
         <label class="salons-carte"><input type="radio" name="salon" value="20-39"><span><strong>Salon 20-39 ans</strong><small>De 20 ans à 39 ans</small></span></label>
-        <label class="salons-carte"><input type="radio" name="salon" value="40+"><span><strong>Salon 40 ans et plus</strong><small>À partir de 40 ans</small></span></label>
+        <label class="salons-carte"><input type="radio" name="salon" value="40+"><span><strong>Salon 40 ans et plus</strong><small>À partir de 40 ans, et ouvert aux plus jeunes qui préfèrent ce salon</small></span></label>
       </div>
     </fieldset>
     <fieldset class="salons-etape"><legend>2. Les secteurs où tu cherches</legend>
       <p class="salons-aide">Plusieurs choix possibles : plus tu en coches, plus vite tu trouves un salon.</p>
       <div class="salons-options" data-salon-options><p class="salons-aide">Choisis d’abord ton salon.</p></div>
     </fieldset>
-    <fieldset class="salons-etape"><legend>3. Toi</legend>
-      <div class="salons-champs">
-        <label>Prénom<input name="first_name" autocomplete="given-name" maxlength="60" required></label>
-        <label>Email<input name="email" type="email" autocomplete="email" required></label>
-        <label>Je suis<select name="gender" required><option value="">Choisir</option><option value="femme">Une femme</option><option value="homme">Un homme</option></select></label>
-        <label>Date de naissance<input name="birth_date" type="date" autocomplete="bday" required></label>
-        <label>Ville<input name="city" autocomplete="address-level2" maxlength="80" required></label>
-        <label class="salons-piege" aria-hidden="true">Site web<input name="website" tabindex="-1" autocomplete="off"></label>
-        <label class="salons-accord"><input name="rules" type="checkbox" required><span>Je viens pour une rencontre sérieuse, caméra allumée, et j’accepte le cadre de la soirée et les <a class="text-link" href="/conditions-utilisation/">conditions d’utilisation</a>.</span></label>
-      </div>
-    </fieldset>
+    <label class="salons-accord"><input name="rules" type="checkbox" required><span>Je viens pour une rencontre sérieuse, caméra allumée, et j’accepte le cadre de la soirée et les <a class="text-link" href="/conditions-utilisation/">conditions d’utilisation</a>.</span></label>
     <button class="btn btn-gold" type="submit">M’inscrire au salon</button>
     <p class="salons-statut" role="status" data-salon-status></p>
   </form>
   <div class="salons-merci" data-salon-merci hidden>
     <h2>Tu es inscrit·e</h2>
-    <p>Tu n’as rien à payer pour l’instant. Tu recevras un message quand ton salon sera confirmé, puis un rappel le jour de la soirée, une heure avant et au démarrage.</p>
-    <p>Pour recevoir aussi ces messages sur ton téléphone, connecte-toi à <a class="text-link" href="/mon-espace/">Mon espace</a> avec cet email et active les notifications.</p>
+    <p>Tu n’as rien à payer pour l’instant. Tu recevras un message quand ton salon sera confirmé, puis un rappel le jour de la soirée, une heure avant et au démarrage. Tout se retrouve dans <a class="text-link" href="/mon-espace/#speed-dating">Mon speed dating</a>.</p>
+    <p>Pour recevoir aussi ces messages sur ton téléphone, active les notifications dans <a class="text-link" href="/mon-espace/">Mon espace</a>.</p>
   </div>
 </section></div>`,
   })
