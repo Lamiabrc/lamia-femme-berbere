@@ -183,3 +183,20 @@ test('s’inscrire à une soirée exige un compte et un profil', async () => {
   const [s3] = await rep(await actionSalons('salon_inscrire', { ...ok, salon: '20-39' }, b.ctx({ user: { id: 'u3', email: 'f@x.fr', user_metadata: { first_name: 'Sara' } } })));
   assert.equal(s3, 200);
 });
+
+test('Algérie : Lamia offre la place, et elle seule', async () => {
+  const b = base(gens(1, 0), new Date('2026-11-16T12:00:00Z'));
+  const id = '33333333-3333-4333-8333-333333333333';
+  b.db.salon_editions.push({ id: 'ed', salon: '20-39', secteur: 'europe', statut: 'confirme', gratuit: false, event_id: 'ev', starts_at: '2026-11-28T20:00:00Z' });
+  Object.assign(b.db.salon_inscriptions[0], { id, statut: 'convoque', edition_id: 'ed', pays: 'Algerie', payer_avant: '2026-11-18T12:00:00Z' });
+  b.db.event_registrations.push({ event_id: 'ev', user_id: 'f0', payment_status: 'pending', attendance_status: 'registered' });
+  const [, mes] = await rep(await actionSalons('salon_mes', {}, b.ctx({ user: { id: 'f0' } })));
+  assert.equal(mes.inscription.algerie, true);
+  const [, adm] = await rep(await actionSalons('salon_admin', {}, b.ctx({ admin: true })));
+  assert.deepEqual(adm.confirmes[0].a_offrir, [{ id, prenom: 'F0' }]);
+  assert.equal((await actionSalons('salon_offrir', { id }, b.ctx({ user: { id: 'f0' } }))).status, 403);
+  assert.equal((await actionSalons('salon_offrir', { id }, b.ctx({ admin: true }))).status, 200);
+  assert.equal(b.db.salon_inscriptions[0].statut, 'place');
+  assert.equal(b.db.event_registrations[0].payment_status, 'waived');
+  assert.equal(b.notifs[0][1], '{A}, Lamia t’offre ta place !');
+});
