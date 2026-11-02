@@ -572,6 +572,9 @@ function peindreActivite(d) {
   $('[data-pilote-statut]').textContent = `${r.actif === false ? '⏸️ Pilote en pause.' : '✅ Pilote actif.'}${r.dernier ? ` Dernier passage le ${new Date(r.dernier.le).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} : ${r.dernier.propositions} proposition(s) envoyée(s) à ${r.dernier.personnes} personne(s), ${r.dernier.relations} mise(s) en relation.` : ''}`;
   $('[data-pilote-relations]').innerHTML = (d.relations || []).map((x) => `<li><span><b>${escA(x.a)}</b>${x.actif && x.a_matchs > 1 ? ` <em class="tdb-plusieurs">${x.a_matchs} matchs en cours</em>` : ''} ↔ <b>${escA(x.b)}</b>${x.actif && x.b_matchs > 1 ? ` <em class="tdb-plusieurs">${x.b_matchs} matchs en cours</em>` : ''}<small>${escA(jourA(x.le))}${x.reciproque ? ' · réciproque' : ''}${x.discussion ? ' · discussion ouverte' : ''} · ${escA(x.etat)}</small></span>${x.actif ? `<button type="button" class="link-button" data-dematcher="${escA(x.id)}">Annuler ce match</button>` : ''}</li>`).join('') || '<li>Pas encore de mise en relation.</li>';
   $('[data-pilote-propositions]').innerHTML = (d.propositions || []).map((x) => `<li><span><b>${escA(x.a)}</b> ↔ <b>${escA(x.b)}</b><small>${x.score != null ? `${x.score}/100 · ` : ''}${escA(jourA(x.le))} · ${escA(x.etat)}${x.auto ? ' · auto' : ''}</small></span>${/attente/.test(x.etat) ? `<button type="button" class="link-button" data-retirer-prop="${escA(x.id)}">Retirer</button>` : ''}</li>`).join('') || '<li>Pas encore de proposition. Clique « Envoyer les matchs maintenant ».</li>';
+  const att = d.en_attente || [], bv = $('[data-valider-tout]');
+  bv.hidden = !att.length; bv.textContent = `✅ Valider les ${att.length} profil${att.length > 1 ? 's' : ''} en attente`;
+  bv.title = att.map((a) => `${a.prenom || ''} n° ${a.ref}`).join(', ');
   $('[data-pilote-bloques]').innerHTML = (d.bloques || []).map((x) => `<li><span><b>${escA(x.a)}</b> ↔ <b>${escA(x.b)}</b><small>${escA(x.raison)}</small></span></li>`).join('') || '<li>Rien de bloqué.</li>';
 }
 async function chargerActivite(corps = { op: 'etat' }) {
@@ -580,6 +583,14 @@ async function chargerActivite(corps = { op: 'etat' }) {
   catch { $('[data-pilote-statut]').textContent = 'L’activité ne se charge pas. Réessaie dans un instant.'; }
 }
 $('[data-pilote-reglages]')?.addEventListener('submit', (e) => { e.preventDefault(); const f = e.target; chargerActivite({ op: 'reglages', actif: f.actif.checked, parPersonne: Number(f.parPersonne.value), scoreMin: Number(f.scoreMin.value) }); });
+$('[data-valider-tout]')?.addEventListener('click', async (e) => {
+  const n = e.target.textContent.match(/\d+/)?.[0] || '';
+  if (!confirm(`Valider d’un coup les ${n} profils en attente (${e.target.title}) ?\n\nIls sont validés même s’il leur manque une photo ou un contact. Chacun reçoit l’email « profil validé », et ils entrent dans les matchs automatiques.`)) return;
+  e.target.disabled = true;
+  try { const d = await conf({ action: 'annonce_pilote', op: 'valider_tout' }); peindreActivite(d); $('[data-pilote-statut]').textContent = `✅ ${d.valides} profil(s) validé(s)${d.relations ? ` · ${d.relations} mise(s) en relation faite(s) dans la foulée` : ''}.`; }
+  catch { $('[data-pilote-statut]').textContent = 'La validation n’a pas fonctionné. Réessaie.'; }
+  e.target.disabled = false;
+});
 $('[data-pilote-lancer]')?.addEventListener('click', (e) => { e.target.disabled = true; chargerActivite({ op: 'lancer' }).finally(() => { e.target.disabled = false; }); });
 document.addEventListener('click', (e) => {
   const d = e.target.closest('[data-dematcher]'), p = e.target.closest('[data-retirer-prop]');
