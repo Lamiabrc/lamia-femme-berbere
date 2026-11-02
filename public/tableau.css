@@ -174,3 +174,25 @@
 
 .tdb-plusieurs { font-style: normal; font-size: 12px; font-weight: 700; color: #8a1024; background: #fbecee; border-radius: 999px; padding: 1px 8px; white-space: nowrap; }
 .tdb-actions-activite { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* ---------------------------------------------------------------- Comptes */
+.compte-ligne { cursor: pointer; }
+.compte-ligne:hover td { background: var(--qvt-creme); }
+.compte-ligne strong { display: block; }
+.compte-ligne small { color: var(--qvt-taupe); word-break: break-all; }
+.compte-badge { display: inline-block; margin: 2px 4px 2px 0; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #f3ead9; color: #2b2118; white-space: nowrap; }
+.compte-badge.is-bal { background: #2b2118; color: #ffe4b0; }
+.compte-badge.is-annule { background: #f6e3e5; color: #6b1d2a; text-decoration: line-through; }
+.compte-badge.is-alerte { background: #fff3c4; }
+.compte-fond { position: fixed; inset: 0; background: rgba(18, 13, 26, .45); z-index: 40; }
+.compte-fiche { position: fixed; top: 0; right: 0; bottom: 0; width: min(560px, 100%); overflow-y: auto; background: var(--qvt-creme, #fbf6ee); z-index: 41; padding: 20px 16px 40px; box-shadow: -12px 0 40px rgba(0, 0, 0, .25); }
+.compte-fiche .tdb-carte { margin-top: 14px; }
+.compte-tete { display: flex; gap: 12px; justify-content: space-between; align-items: start; }
+.compte-tete h2 { margin: 0; font-family: var(--serif); font-size: 30px; }
+.compte-kicker { margin: 0; font-size: 13px; color: var(--qvt-taupe); word-break: break-all; }
+.compte-liste { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.compte-liste li { display: flex; gap: 10px; align-items: center; justify-content: space-between; padding: 10px 12px; border: 1px solid var(--qvt-sable); border-radius: 12px; background: #fff; }
+.compte-liste li > div { display: grid; gap: 2px; }
+.compte-liste small { color: var(--qvt-taupe); }
+.compte-ajout { display: flex; gap: 10px; align-items: end; flex-wrap: wrap; margin-top: 12px; }
+.compte-ajout label { display: grid; gap: 6px; font-weight: 600; font-size: 14px; flex: 1; min-width: 220px; }

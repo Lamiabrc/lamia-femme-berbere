@@ -15,6 +15,7 @@
     <button type="button" data-tab="accueil" aria-current="true">Aujourd’hui</button>
     <button type="button" data-tab="activite">🗺️ Activité</button>
     <button type="button" data-tab="rencontres">💞 Rencontres</button>
+    <button type="button" data-tab="comptes">👥 Comptes</button>
     <button type="button" data-tab="application">📱 Application <span class="tdb-pastille" data-journal-pastille hidden></span></button>
     <button type="button" data-tab="ventes">Ventes</button>
     <button type="button" data-tab="produits">Produits</button>
@@ -105,6 +106,51 @@
         <ul class="tdb-liste-activite" data-pilote-bloques></ul>
       </div>
     </div>
+  </section>
+
+  <!-- ===================================================== Comptes -->
+  <section data-panel="comptes" hidden>
+    <div class="tdb-entete"><h1 class="tdb-titre">Les comptes</h1><button class="btn btn-line" type="button" data-comptes-maj>Actualiser</button></div>
+    <p class="aide">Toutes les personnes qui ont créé un compte sur le site, avec ou sans annonce. Clique sur une personne pour corriger son profil (prénom, genre, date de naissance, ville) et gérer ses inscriptions aux soirées.</p>
+    <div class="tdb-kpis" data-comptes-kpis></div>
+    <div class="tdb-filtres">
+      <label>Chercher<input type="search" data-comptes-cherche placeholder="Prénom, email, ville…" autocomplete="off"></label>
+      <div class="tdb-filtres-journal" data-comptes-filtres>
+        <button type="button" class="is-on" data-filtre="tous">Tous</button>
+        <button type="button" data-filtre="soiree">Inscrits à une soirée</button>
+        <button type="button" data-filtre="annonce">Avec annonce</button>
+        <button type="button" data-filtre="fiche">Avec fiche outil</button>
+        <button type="button" data-filtre="incomplet">Profil incomplet</button>
+      </div>
+    </div>
+    <div class="tdb-table"><table><thead><tr><th>Personne</th><th>Genre · âge</th><th>Ville</th><th>Soirées</th><th>Annonce · fiche</th><th>Compte créé</th></tr></thead><tbody data-comptes><tr><td colspan="6">Chargement…</td></tr></tbody></table></div>
+
+    <div class="compte-fond" data-compte-fond hidden></div>
+    <aside class="compte-fiche" data-compte-fiche hidden aria-label="Fiche du compte">
+      <div class="compte-tete"><div><p class="compte-kicker" data-compte-email></p><h2 data-compte-nom></h2><p class="aide" data-compte-infos></p></div><button type="button" class="btn btn-line" data-compte-fermer>Fermer</button></div>
+      <form class="tdb-carte reglages" data-compte-form>
+        <h3 style="margin-top:0">Profil</h3>
+        <div class="champs">
+          <label>Prénom<input name="real_first_name" maxlength="60"></label>
+          <label>Nom affiché<input name="display_name" maxlength="60"></label>
+          <label>Genre<select name="gender"><option value="">Non renseigné</option><option value="femme">Femme</option><option value="homme">Homme</option></select></label>
+          <label>Date de naissance<input name="birth_date" type="date"></label>
+          <label>Ville<input name="city" maxlength="80"></label>
+          <label>Pays<input name="country" maxlength="80"></label>
+          <label>Statut du profil<select name="profile_status"><option value="active">Actif</option><option value="draft">Brouillon</option><option value="paused">En pause</option><option value="suspended">Suspendu</option></select></label>
+        </div>
+        <p class="actions"><button class="btn btn-ink" type="submit">Enregistrer le profil</button> <span class="aide" data-compte-statut></span></p>
+      </form>
+      <div class="tdb-carte">
+        <h3 style="margin-top:0">Soirées</h3>
+        <ul class="compte-liste" data-compte-soirees></ul>
+        <div class="compte-ajout"><label>Inscrire à une soirée<select data-compte-soiree></select></label><button class="btn btn-line" type="button" data-compte-inscrire>Inscrire</button></div>
+      </div>
+      <div class="tdb-carte">
+        <h3 style="margin-top:0">Annonces et fiches de l’outil</h3>
+        <ul class="compte-liste" data-compte-liens></ul>
+      </div>
+    </aside>
   </section>
 
   <section data-panel="application" hidden>
