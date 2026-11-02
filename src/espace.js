@@ -10,6 +10,18 @@ const when = (iso) => new Date(iso).toLocaleString((document.documentElement.lan
 const say = (el, msg, err = false) => { el.textContent = msg; el.classList.toggle('is-error', err); };
 let recovering = false;
 
+// render() repasse à chaque événement de connexion (ouverture, retour sur l'onglet, jeton renouvelé) :
+// un écouteur ajouté à chaque passage enverrait tout en double ou en triple. Ici, le nouveau remplace l'ancien.
+const ecouteurs = new WeakMap();
+function ecouter(box, type, fn) {
+  const m = ecouteurs.get(box) || {};
+  if (m[type]) box.removeEventListener(type, m[type]);
+  m[type] = fn;
+  ecouteurs.set(box, m);
+  box.addEventListener(type, fn);
+}
+let minuterieDiscussions = null;
+
 async function render() {
   const { data: { session } } = await supabase.auth.getSession();
   $('[data-espace-newpass]').hidden = !recovering;
@@ -341,7 +353,7 @@ async function propositions(session) {
   const afficher = () => { box.innerHTML = liste.length ? liste.map(carte).join('') : '<p>Pas encore de proposition. Quand Lamia trouve un profil pour toi, il apparaît ici et tu es prévenu·e.</p>'; };
   try { ({ propositions: liste = [] } = await appelProfil({ action: 'annonce_propositions' }, session)); afficher(); }
   catch { box.innerHTML = '<p>Les propositions ne s’affichent pas pour le moment.</p>'; return; }
-  box.addEventListener('click', async (e) => {
+  ecouter(box, 'click', async (e) => {
     const b = e.target.closest('[data-proposition]');
     if (!b) return;
     b.parentElement.querySelectorAll('button').forEach((x) => { x.disabled = true; });
@@ -377,7 +389,7 @@ async function avisLamia(session) {
   };
   const afficher = () => { box.innerHTML = `<h3 class="espace-avis-titre">Un profil avec une différence</h3>${liste.map(carte).join('')}`; };
   afficher();
-  box.addEventListener('click', async (e) => {
+  ecouter(box, 'click', async (e) => {
     const b = e.target.closest('[data-avis]');
     if (!b) return;
     b.parentElement.querySelectorAll('button').forEach((y) => { y.disabled = true; });
@@ -408,7 +420,7 @@ async function interetsRecus(session) {
   const afficher = () => { box.innerHTML = liste.length ? liste.map(carte).join('') : '<p>Personne pour le moment. Dès qu’une personne s’intéresse à ton profil, sa fiche apparaît ici et tu reçois un email.</p>'; };
   try { ({ interets: liste = [] } = await appelProfil({ action: 'annonce_interets_recus' }, session)); afficher(); }
   catch { box.innerHTML = '<p>Les intérêts reçus ne s’affichent pas pour le moment. Réessaie dans un instant.</p>'; return; }
-  box.addEventListener('click', async (e) => {
+  ecouter(box, 'click', async (e) => {
     const b = e.target.closest('[data-repondre]');
     if (!b) return;
     b.parentElement.querySelectorAll('button').forEach((x) => { x.disabled = true; });
@@ -445,7 +457,7 @@ async function interetsRecus(session) {
     if (Notification.permission === 'denied') return dire('<p>🔕 Les notifications sont bloquées pour ce site dans les réglages de ton téléphone. Autorise-les dans les réglages du navigateur, puis recharge la page.</p>');
     dire('<p>🔔 Sois prévenu·e tout de suite quand quelqu’un s’intéresse à toi, quand c’est réciproque, quand Lamia te trouve un match… et des nouveautés de la boutique, des articles et des lives.</p><p><button type="button" class="btn btn-ink" data-notif-on>Activer les notifications</button></p>');
   }
-  box.addEventListener('click', async (e) => {
+  ecouter(box, 'click', async (e) => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
     const appel = (body) => fetch('/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` }, body: JSON.stringify(body) }).then((r) => r.json());
@@ -476,7 +488,8 @@ async function interetsRecus(session) {
 async function discussions(session) {
   const bloc = document.querySelector('[data-espace-discussion-bloc]'), box = document.querySelector('[data-espace-discussion]');
   if (!bloc || !box) return;
-  let liste = [], ouverte = null, minuterie = null, salut = '', e = '·e';
+  let liste = [], ouverte = null, salut = '', e = '·e';
+  clearInterval(minuterieDiscussions);
   const heure = (d) => new Date(d).toLocaleString('fr-FR', { weekday: 'short', hour: '2-digit', minute: '2-digit' });
   const reste = (d) => { const ms = new Date(d.ferme_at) - Date.now(); if (ms <= 0) return 'terminée'; const j = Math.floor(ms / 86400e3), h = Math.floor((ms % 86400e3) / 3600e3); return j ? `encore ${j} jour${j > 1 ? 's' : ''}${h ? ` et ${h} h` : ''}` : `encore ${h} h`; };
   // Parcours vers le mariage : ouvert avec la discussion, les deux valident chaque étape.
@@ -522,8 +535,8 @@ async function discussions(session) {
   await charger();
   if (location.hash === '#discussion' && liste.length) bloc.scrollIntoView({ behavior: 'smooth' });
   // Les nouveaux messages arrivent toutes les 10 secondes tant que la page est ouverte.
-  if (liste.some((d) => d.ouverte)) minuterie = setInterval(() => { if (!document.hidden && !box.contains(document.activeElement)) charger(); }, 10000);
-  box.addEventListener('submit', async (e) => {
+  if (liste.some((d) => d.ouverte)) minuterieDiscussions = setInterval(() => { if (!document.hidden && !box.contains(document.activeElement)) charger(); }, 10000);
+  ecouter(box, 'submit', async (e) => {
     e.preventDefault();
     const a = e.target.closest('[data-disc]'), id = a?.dataset.disc;
     const bouton = e.target.querySelector('button'); bouton.disabled = true;
@@ -542,7 +555,7 @@ async function discussions(session) {
     }
     bouton.disabled = false;
   });
-  box.addEventListener('click', async (e) => {
+  ecouter(box, 'click', async (e) => {
     const question = e.target.closest('[data-parcours-question]');
     if (question) { const t = question.closest('[data-disc]').querySelector('textarea'); if (t) { t.value = question.dataset.parcoursQuestion; t.focus(); } return; }
     const valider = e.target.closest('[data-parcours-valider]');
@@ -555,9 +568,9 @@ async function discussions(session) {
     const id = e.target.closest('[data-disc]').dataset.disc;
     const motif = prompt('Que s’est-il passé ? La discussion sera fermée et Lamia la lira.');
     if (motif === null) return;
-    try { await appelProfil({ action: 'annonce_discussion_signaler', id, motif }, session); clearInterval(minuterie); await charger(); alert('Merci. Lamia est prévenue.'); } catch { alert('Le signalement n’est pas parti. Réessaie.'); }
+    try { await appelProfil({ action: 'annonce_discussion_signaler', id, motif }, session); clearInterval(minuterieDiscussions); await charger(); alert('Merci. Lamia est prévenue.'); } catch { alert('Le signalement n’est pas parti. Réessaie.'); }
   });
-  box.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && e.target.matches('textarea')) { e.preventDefault(); e.target.form.requestSubmit(); } });
+  ecouter(box, 'keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && e.target.matches('textarea')) { e.preventDefault(); e.target.form.requestSubmit(); } });
 }
 
 
