@@ -607,6 +607,21 @@ renderSocials();
 })();
 
 // ---------------------------------------------------------------- prix du Hall lus dans la boutique (modifiables depuis le tableau de bord)
+// Prestige : le prix de lancement et les places restantes, relus côté serveur.
+(async function placesPrestige() {
+  const prix = $$('[data-prestige-prix]'), lignes = $$('[data-prestige-places]');
+  if (!prix.length && !lignes.length) return;
+  try {
+    const r = await fetch('/api/preorder', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'abonnement_places' }) });
+    const d = await r.json();
+    if (!d.ok) return;
+    const eur = (c) => `${(c / 100).toLocaleString('fr-FR')} €`;
+    if (d.restantes > 0) { lignes.forEach((l) => { l.textContent = `Plus que ${d.restantes} place${d.restantes > 1 ? 's' : ''} à ${eur(d.prix)}, puis ${eur(d.prix_normal)} par mois`; }); return; }
+    lignes.forEach((l) => { l.hidden = true; });
+    prix.forEach((p) => { const an = p.dataset.prestigePrix === 'an'; const em = p.querySelector('em'); p.innerHTML = `${eur(an ? d.prix_an : d.prix)}<small> / ${an ? 'an' : 'mois'}</small>${em ? em.outerHTML : ''}`; });
+  } catch { /* le prix réel reste décidé par le serveur au moment du paiement */ }
+})();
+
 (async function prixDuHall() {
   const one = document.querySelectorAll('[data-prix]'), werdi = document.querySelector('[data-prix-werdi]');
   if (!one.length && !werdi) return;

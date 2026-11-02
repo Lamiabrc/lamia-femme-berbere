@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { actionAbonnement, traiterEvenementAbonnement, etatAbonnement } from '../lib/abonnements.mjs';
-import { FORMULES, prixAnnuel } from '../content/abonnements.mjs';
+import { FORMULES, prixAnnuel, prixMensuel } from '../content/abonnements.mjs';
 
 const env = { CHECKOUT_ENABLED: 'true', STRIPE_SECRET_KEY: 'sk_test_x', SUPABASE_SERVICE_ROLE_KEY: 'srv' };
 const req = new Request('https://lamia-femme-berbere.com/api/preorder', { method: 'POST' });
@@ -10,8 +10,9 @@ const fauxStripe = () => { const appels = []; return { appels, checkout: { sessi
 const vide = async () => ({ ok: true, json: async () => [] });
 
 test('les prix suivent la formule choisie par Lamia', () => {
-  assert.deepEqual(FORMULES.map((f) => [f.id, f.mois]), [['decouverte', 0], ['passion', 900], ['prestige', 2200]]);
-  assert.equal(prixAnnuel(FORMULES[2]), 22000);
+  assert.deepEqual(FORMULES.map((f) => [f.id, f.mois]), [['decouverte', 0], ['passion', 900], ['prestige', 4900]]);
+  assert.equal(prixMensuel(FORMULES[2], 0), 2200); assert.equal(prixMensuel(FORMULES[2], 19), 2200); assert.equal(prixMensuel(FORMULES[2], 20), 4900);
+  assert.equal(prixAnnuel(FORMULES[2], 0), 22000); assert.equal(prixAnnuel(FORMULES[2]), 49000); assert.equal(prixMensuel(FORMULES[1], 0), 900);
 });
 test('abonnement mensuel et annuel : prix relus côté serveur', async () => {
   for (const [periode, montant, intervalle] of [['mois', 900, 'month'], ['an', 9000, 'year']]) {
@@ -25,6 +26,24 @@ test('abonnement mensuel et annuel : prix relus côté serveur', async () => {
     assert.equal(p.metadata.kind, 'abonnement');
     assert.equal(p.subscription_data.metadata.formule, 'passion');
   }
+});
+test('Prestige : 22 € pour les 20 premiers, puis 49 €, et le prix vient toujours du serveur', async () => {
+  const avec = (nb) => async (u) => ({ ok: true, json: async () => (String(u).includes('formule=eq.prestige') ? Array.from({ length: nb }, (_, i) => ({ id: i })) : []) });
+  for (const [nb, periode, montant] of [[0, 'mois', 2200], [19, 'mois', 2200], [20, 'mois', 4900], [21, 'mois', 4900], [19, 'an', 22000], [20, 'an', 49000]]) {
+    const s = fauxStripe();
+    const r = await actionAbonnement({ ...base, formule: 'prestige', periode, prix: 1 }, req, { env, fetcher: avec(nb), stripe: s });
+    assert.equal(r.status, 200);
+    assert.equal(s.appels[0].line_items[0].price_data.unit_amount, montant);
+    assert.equal(s.appels[0].metadata.prix_centimes, String(montant));
+  }
+  let d = await (await actionAbonnement({ action: 'abonnement_places' }, req, { env, fetcher: avec(17) })).json();
+  assert.equal(d.restantes, 3); assert.equal(d.prix, 2200);
+  d = await (await actionAbonnement({ action: 'abonnement_places' }, req, { env, fetcher: avec(21) })).json();
+  assert.equal(d.restantes, 0); assert.equal(d.prix, 4900); assert.equal(d.prix_an, 49000);
+  // Nombre de places illisible : pas de paiement, pour ne pas se tromper de prix.
+  const s = fauxStripe();
+  const r = await actionAbonnement({ ...base, formule: 'prestige' }, req, { env, fetcher: async (u) => (String(u).includes('formule=eq.prestige') ? { ok: false } : { ok: true, json: async () => [] }), stripe: s });
+  assert.equal(r.status, 503); assert.equal(s.appels.length, 0);
 });
 test('formule gratuite, CGV absentes ou paiement fermé : aucun paiement', async () => {
   const s = fauxStripe();
