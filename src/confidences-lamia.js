@@ -124,7 +124,7 @@ function router() {
   if (!session) return;
   const h = location.hash.slice(1);
   if (h === 'reglages') { courant = null; vue('reglages'); chargerReglages(); return; }
-  if (h === 'annonces') { courant = null; vue('annonces'); chargerAnnonces(); chargerDemandes(); chargerAbonnes(); chargerNouveautes(); return; }
+  if (h === 'annonces' || /^annonce-\d+$/.test(h)) { courant = null; vue('annonces'); chargerAnnonces(); chargerDemandes(); chargerAbonnes(); chargerNouveautes(); return; }
   if (/^[0-9a-f-]{36}$/i.test(h)) return ouvrirFil(h);
   courant = null; vue('liste'); rendreListe();
 }
@@ -226,7 +226,7 @@ async function chargerAnnonces() {
     dernieresAnnonces = annonces;
     const aExporter = annonces.filter((a) => a.status === 'publiee' && !a.exportee_at).length;
     $('[data-export-info]').textContent = aExporter ? `${aExporter} annonce(s) publiée(s) pas encore dans l’outil.` : 'Toutes les annonces publiées sont déjà dans l’outil.';
-    box.innerHTML = annonces.map((a) => `<article class="cl-carte cl-annonce" data-id="${a.id}">
+    box.innerHTML = annonces.map((a) => `<article class="cl-carte cl-annonce" data-id="${a.id}" id="annonce-${a.ref}">
       <p class="cl-coord"><b>N° ${a.ref}</b> · ${STATUT_ANNONCE[a.status] || a.status}${a.submitted_at ? ` · reçue le ${quand(a.submitted_at)}` : ''}</p>
       <h3>${esc(a.prenom)}, ${a.age} ans · ${a.genre === 'femme' ? 'femme' : 'homme'}</h3>
       <p class="cl-badges">${[a.test ? '🧪 PROFIL DE TEST (invisible du public)' : '',a.live_declare ? (a.outil_lie ? '🎥 Créé en live · fiche retrouvée dans l’outil · 3 offertes' : '🎥 Dit avoir été en live · fiche à retrouver · 3 offertes') : a.outil_lie ? '🔗 Déjà dans ton outil (même lien)' : '', a.compte ? '👤 Compte lié' : '', a.photo_partage ? '📷 Photo transmissible au match' : '🚫📷 Photo à ne pas transmettre', a.en_match ? '💞 Match en cours' : '', a.modifiee_at ? `✏️ Modifié le ${quand(a.modifiee_at)}` : ''].filter(Boolean).map((t) => `<span>${esc(t)}</span>`).join('')}</p>
@@ -236,7 +236,6 @@ async function chargerAnnonces() {
       ${a.matching && Object.keys(a.matching).length ? `<p class="cl-coord">${[a.matching.situation, a.matching.enfants === 'Oui' ? `${a.matching.nbEnfants || ''} enfant(s)` : a.matching.enfants === 'Non' ? 'sans enfant' : '', a.matching.niveauEtudeDetail || a.matching.niveauEtudeCategorie, a.matching.profession, a.matching.religion, a.matching.pratique, ...(a.matching.origineTags || [])].filter(Boolean).map(lib).map(esc).join(' · ')}${a.matching.contactReseau ? `<br>Réseau : ${esc(a.matching.contactReseau)}` : ''}</p>` : ''}
       ${a.exportee_at ? `<p class="cl-aide">↪ Exportée vers l’outil de matching le ${quand(a.exportee_at)}</p>` : ''}
       ${(a.interets || []).length ? `<p class="cl-match-demande">💌 Match demandé : intéressé(e) par le profil n° ${a.interets.join(', ')}</p>` : ''}
-      ${a.status === 'publiee' ? `<p class="cl-bonus"><button class="cl-btn" type="button" data-decision="bonus_match">🎥 +1 match offert (vu en live)</button>${a.matchs_bonus ? ` <small>${a.matchs_bonus} match(s) offert(s) en plus</small>` : ''}</p>` : ''}
       <p class="cl-aide">${a.anonyme_ok ? (a.visible_anonyme ? '👁 Affiché anonymement dans les Rencontres' : 'Accepte d’être affiché(e) anonymement') : 'N’a pas accepté l’affichage anonyme'}</p>
       <p><b>Qui je suis</b><br>${esc(a.profil)}</p>
       <p><b>Qui je cherche</b>${a.age_min || a.age_max ? ` (${a.age_min || 18}-${a.age_max || 99} ans)` : ''}<br>${esc(a.recherche)}</p>
@@ -251,6 +250,9 @@ async function chargerAnnonces() {
       </div>
       <p class="cl-statut" role="status" data-annonce-statut></p>
     </article>`).join('');
+    // Lien direct vers une annonce (depuis la fiche de l'outil).
+    const h = location.hash.slice(1);
+    if (/^annonce-\d+$/.test(h)) document.getElementById(h)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   } catch (err) { box.innerHTML = `<p class="cl-vide">${esc(erreur(err.code))}</p>`; }
 }
 document.addEventListener('click', async (e) => {
@@ -354,7 +356,7 @@ async function chargerDemandes() {
     }).sort((x, y) => (y.aTraiter > 0) - (x.aTraiter > 0) || (y.meilleur?.potentiel?.score ?? -1) - (x.meilleur?.potentiel?.score ?? -1));
     box.innerHTML = ordre.map((g) => `<section class="cl-carte cl-groupe">
       <h4>${qui(g.qui)}</h4>
-      <p class="cl-coord">${g.liste.length} match(s) demandé(s)${g.aTraiter ? ` · <b>${g.aTraiter} à traiter</b>` : ''}${g.reserve ? ` · 🗂 ${g.reserve} en réserve` : ''}${g.enRelation ? ' · <b>💞 déjà mis(e) en relation</b>' : g.meilleur ? ' · ⭐ fais la mise en relation avec le meilleur potentiel' : ''}${g.qui?.status && g.qui.status !== 'publiee' ? ' · <b class="cl-a-verifier">⏳ profil pas encore vérifié</b>' : ''}</p>
+      <p class="cl-coord">${g.liste.length} match(s) demandé(s)${g.aTraiter ? ` · <b>${g.aTraiter} à traiter</b>` : ''}${g.reserve ? ` · 🗂 ${g.reserve} en réserve` : ''}${(personnes[g.qui?.ref]?.matchs_en_cours || 0) > 1 ? ` · <b>💞 ${personnes[g.qui.ref].matchs_en_cours} matchs en cours</b>` : g.enRelation ? ' · <b>💞 déjà mis(e) en relation</b>' : g.meilleur ? ' · ⭐ fais la mise en relation avec le meilleur potentiel' : ''}${g.qui?.status && g.qui.status !== 'publiee' ? ' · <b class="cl-a-verifier">⏳ profil pas encore vérifié</b>' : ''}</p>
       ${g.liste.map((d) => { const [sc, cl, txt] = niveau(d.potentiel?.score); return `<article class="cl-demande${d === g.meilleur ? ' is-meilleur' : ''}" data-demande="${d.id}">
         <div class="cl-pot ${cl}" title="${txt}"><b>${sc}</b><small>/100</small></div>
         <div class="cl-demande-corps">

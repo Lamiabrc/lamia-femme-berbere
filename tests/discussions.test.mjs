@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { ouvrirDiscussion, actionDiscussion } from '../lib/discussions.mjs';
+import { compterMatchs, ouvrirDiscussion, actionDiscussion } from '../lib/discussions.mjs';
 
 const A = '11111111-1111-4111-8111-111111111111', B = '22222222-2222-4222-8222-222222222222', D = '33333333-3333-4333-8333-333333333333';
 function base() {
@@ -42,4 +42,22 @@ test('discussion : ouverte 7 jours, contacts masqués, numéros montrés quand l
   // Un inconnu ne voit rien.
   const [s3] = await json(await actionDiscussion('annonce_discussion_envoyer', { id: D, texte: 'x' }, { ...ctx, user: null }));
   assert.equal(s3, 401);
+});
+
+test('matchs en cours : compté par personne, même avec un profil et une fiche', () => {
+  const compteDe = new Map([[3, 'u1'], [5001, 'u1'], [27, 'u2'], [28, 'u3']]);
+  const m = compterMatchs([{ id: 'i1', a: 3, b: 27 }, { id: 'i2', a: 28, b: 5001 }, { id: 'i3', a: 40, b: 28 }], compteDe);
+  assert.equal(m.deCompte('u1'), 2); assert.equal(m.deRef(5001), 2); assert.equal(m.deCompte('u2'), 1);
+  assert.equal(m.deCompte('u3'), 2); assert.equal(m.deRef(40), 1); assert.equal(m.deCompte('inconnu'), 0);
+});
+
+test('discussion : les autres matchs en cours sont affichés en nombre, sans dire qui', async () => {
+  const { ctx } = base();
+  await ouvrirDiscussion(ctx, { interetId: 'i1', a: { user_id: A, ref: 3, prenom: 'Melina' }, b: { user_id: B, ref: 27, prenom: 'Rachid' } });
+  const matchs = compterMatchs([{ id: 'i1', a: 3, b: 27 }, { id: 'i2', a: 27, b: 40 }, { id: 'i3', a: 27, b: 41 }], new Map([[3, A], [27, B]]));
+  const [, l] = await json(await actionDiscussion('annonce_discussions', {}, { ...ctx, user: { id: A }, matchsEnCoursParPersonne: async () => matchs }));
+  assert.equal(l.discussions[0].ses_autres_matchs, 2); assert.equal(l.discussions[0].mes_autres_matchs, 0);
+  const [, l2] = await json(await actionDiscussion('annonce_discussions', {}, { ...ctx, user: { id: B }, matchsEnCoursParPersonne: async () => matchs }));
+  assert.equal(l2.discussions[0].ses_autres_matchs, 0); assert.equal(l2.discussions[0].mes_autres_matchs, 2);
+  assert.ok(!JSON.stringify(l.discussions[0]).includes('"40"'));
 });
