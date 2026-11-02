@@ -252,7 +252,7 @@ async function propositions(session) {
     const f = x.fiche;
     const infos = [f.genre === 'femme' ? 'Une femme' : 'Un homme', f.age && `${f.age} ans`, f.ville, f.village && `originaire de ${f.village}`, f.pays, f.situation].filter(Boolean);
     const ages = f.age_min || f.age_max ? ` · ${f.age_min || 18} à ${f.age_max || 99} ans` : '';
-    const rep = x.reponse === 'oui' ? '<p class="espace-match">Tu as dit oui : Lamia est prévenue et s’occupe de la suite.</p>'
+    const rep = x.reponse === 'oui' ? '<p class="espace-match">Tu as dit oui ! Si l’autre personne dit oui aussi, vous êtes mis en relation tout de suite et une discussion s’ouvre ici.</p>'
       : x.reponse === 'non' ? '<p>Tu as répondu : pas pour moi.</p>'
       : `<p class="interet-boutons"><button type="button" class="btn btn-ink" data-proposition="oui" data-id="${esc(x.id)}">Ce profil m’intéresse</button><button type="button" class="btn btn-line" data-proposition="non" data-id="${esc(x.id)}">Pas pour moi</button></p>`;
     return `<article class="espace-achat interet-recu proposition"><div><p class="event-date">Proposé par Lamia · profil n° ${esc(f.ref)} · le ${esc(new Date(x.le).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' }))}</p>
@@ -270,7 +270,7 @@ async function propositions(session) {
     const b = e.target.closest('[data-proposition]');
     if (!b) return;
     b.parentElement.querySelectorAll('button').forEach((x) => { x.disabled = true; });
-    try { await appelProfil({ action: 'annonce_proposition_rep', id: b.dataset.id, reponse: b.dataset.proposition }, session); liste = liste.map((x) => (x.id === b.dataset.id ? { ...x, reponse: b.dataset.proposition } : x)); afficher(); }
+    try { const r = await appelProfil({ action: 'annonce_proposition_rep', id: b.dataset.id, reponse: b.dataset.proposition }, session); liste = liste.map((x) => (x.id === b.dataset.id ? { ...x, reponse: b.dataset.proposition } : x)); afficher(); if (r?.mis_en_relation) location.hash = '#discussion', location.reload(); }
     catch { b.parentElement.querySelectorAll('button').forEach((x) => { x.disabled = false; }); }
   });
 }

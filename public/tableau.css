@@ -158,3 +158,16 @@
 .tdb-notifs input { width: 18px; height: 18px; margin-top: 2px; flex: none; }
 .tdb-disc-lue { margin-top: 12px; padding: 10px 12px; border-radius: 12px; background: #fff3e2; max-height: 50vh; overflow: auto; }
 .tdb-disc-lue p { margin: 6px 0; }
+
+/* Activité des matchs (pilote automatique) */
+.tdb-chiffres { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin: 12px 0 18px; }
+.tdb-chiffre { background: #fff; border: 1px solid #ead9c4; border-radius: 14px; padding: 12px; display: grid; gap: 2px; }
+.tdb-chiffre b { font-size: 26px; color: #8a1024; }
+.tdb-chiffre span { font-size: 13px; color: #5e4b50; }
+.tdb-liste-activite { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; max-height: 420px; overflow-y: auto; }
+.tdb-liste-activite li { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 10px; background: #faf5ee; font-size: 14px; }
+.tdb-liste-activite small { display: block; color: #6b585d; }
+.tdb-form-pilote { display: grid; gap: 10px; }
+.tdb-form-pilote label { display: grid; gap: 4px; font-weight: 600; font-size: 14px; }
+.tdb-form-pilote input[type=number] { min-height: 40px; padding: 6px 10px; border-radius: 10px; border: 1px solid #d9c7b0; width: 120px; }
+.tdb-coche { display: flex !important; align-items: center; gap: 8px; }

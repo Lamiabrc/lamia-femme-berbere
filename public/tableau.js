@@ -37,6 +37,7 @@ function ouvrir(tab) {
   if (tab === 'textes') chargerTextes();
   if (tab === 'bilan') chargerBilan();
   if (tab === 'application') chargerJournal();
+  if (tab === 'activite') chargerActivite();
   if (tab === 'rencontres') { const f = $('[data-rencontres]'); if (f && !f.src) f.src = `/confidences-lamia/?integre=1#${aller || 'annonces'}`; aller = ''; }
   scrollTo({ top: 0 });
 }
@@ -508,7 +509,7 @@ async function demarrer() {
   if (session && !admin) message('Ce compte n’a pas le rôle administratrice.', true);
   if (!admin) return;
   const tab = location.hash.slice(1);
-  ouvrir(['accueil', 'rencontres', 'application', 'ventes', 'produits', 'soirees', 'bilan', 'alertes', 'textes', 'visites'].includes(tab) ? tab : 'accueil');
+  ouvrir(['accueil', 'activite', 'rencontres', 'application', 'ventes', 'produits', 'soirees', 'bilan', 'alertes', 'textes', 'visites'].includes(tab) ? tab : 'accueil');
   aFaire(); pastilleJournal();
   await charger();
 }
@@ -525,3 +526,35 @@ demarrer();
 
 // Liste des rubriques du Grenier dans la fiche produit.
 { const sel = $('[data-familles]'); if (sel) sel.insertAdjacentHTML('beforeend', FAMILLES.map(([v, l]) => `<option value="${v}">${l}</option>`).join('')); }
+
+// ---------------------------------------------------------------- activité des matchs (pilote automatique)
+const escA = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
+const jourA = (iso) => (iso ? new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : '');
+function peindreActivite(d) {
+  const c = d.chiffres || {};
+  const tuiles = [
+    ['Mises en relation en cours', c.en_relation], ['Numéros échangés', c.numeros], ['Propositions envoyées', c.propositions], ['…en attente de réponse', c.propositions_attente],
+    ['Les deux ont dit oui', c.propositions_oui], ['Refusées', c.propositions_non], ['Demandes (swipe) en attente', c.demandes_attente], ['Personnes joignables', c.comptes_joignables],
+    ['Profils validés', c.profils_valides], ['À vérifier', c.profils_a_verifier], ['Profils pas finis', c.profils_inacheves],
+  ];
+  $('[data-pilote-chiffres]').innerHTML = tuiles.map(([t, v]) => `<div class="tdb-chiffre"><b>${v ?? 0}</b><span>${escA(t)}</span></div>`).join('');
+  const r = d.reglages || {};
+  const f = $('[data-pilote-reglages]');
+  f.actif.checked = r.actif !== false; f.parPersonne.value = r.parPersonne ?? 3; f.scoreMin.value = r.scoreMin ?? 55;
+  $('[data-pilote-statut]').textContent = `${r.actif === false ? '⏸️ Pilote en pause.' : '✅ Pilote actif.'}${r.dernier ? ` Dernier passage le ${new Date(r.dernier.le).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} : ${r.dernier.propositions} proposition(s) envoyée(s) à ${r.dernier.personnes} personne(s), ${r.dernier.relations} mise(s) en relation.` : ''}`;
+  $('[data-pilote-relations]').innerHTML = (d.relations || []).map((x) => `<li><span><b>${escA(x.a)}</b> ↔ <b>${escA(x.b)}</b><small>${escA(jourA(x.le))} · ${escA(x.etat)}</small></span>${x.actif ? `<button type="button" class="link-button" data-dematcher="${escA(x.id)}">Annuler ce match</button>` : ''}</li>`).join('') || '<li>Pas encore de mise en relation.</li>';
+  $('[data-pilote-propositions]').innerHTML = (d.propositions || []).map((x) => `<li><span><b>${escA(x.a)}</b> ↔ <b>${escA(x.b)}</b><small>${x.score != null ? `${x.score}/100 · ` : ''}${escA(jourA(x.le))} · ${escA(x.etat)}${x.auto ? ' · auto' : ''}</small></span>${/attente/.test(x.etat) ? `<button type="button" class="link-button" data-retirer-prop="${escA(x.id)}">Retirer</button>` : ''}</li>`).join('') || '<li>Pas encore de proposition. Clique « Envoyer les matchs maintenant ».</li>';
+  $('[data-pilote-bloques]').innerHTML = (d.bloques || []).map((x) => `<li><span><b>${escA(x.a)}</b> ↔ <b>${escA(x.b)}</b><small>${escA(x.raison)}</small></span></li>`).join('') || '<li>Rien de bloqué.</li>';
+}
+async function chargerActivite(corps = { op: 'etat' }) {
+  $('[data-pilote-statut]').textContent = 'Chargement…';
+  try { const d = await conf({ action: 'annonce_pilote', ...corps }); peindreActivite(d); if (d.lance) $('[data-pilote-statut]').textContent += ` ➜ Envoi fait : ${d.lance.propositions || 0} proposition(s), ${d.lance.relations?.length || 0} mise(s) en relation.`; }
+  catch { $('[data-pilote-statut]').textContent = 'L’activité ne se charge pas. Réessaie dans un instant.'; }
+}
+$('[data-pilote-reglages]')?.addEventListener('submit', (e) => { e.preventDefault(); const f = e.target; chargerActivite({ op: 'reglages', actif: f.actif.checked, parPersonne: Number(f.parPersonne.value), scoreMin: Number(f.scoreMin.value) }); });
+$('[data-pilote-lancer]')?.addEventListener('click', (e) => { e.target.disabled = true; chargerActivite({ op: 'lancer' }).finally(() => { e.target.disabled = false; }); });
+document.addEventListener('click', (e) => {
+  const d = e.target.closest('[data-dematcher]'), p = e.target.closest('[data-retirer-prop]');
+  if (d && confirm('Annuler ce match ? La discussion se ferme et leurs autres choix reviennent.')) chargerActivite({ op: 'dematcher', id: d.dataset.dematcher });
+  if (p) chargerActivite({ op: 'retirer_proposition', id: p.dataset.retirerProp });
+});

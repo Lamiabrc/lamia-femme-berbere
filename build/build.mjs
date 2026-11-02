@@ -828,7 +828,8 @@ page(
 
     <section id="propositions">
       <h2>Profils proposés par Lamia</h2>
-      <p>Lamia a choisi pour toi des profils qui pourraient te correspondre. Leur fiche est anonyme. Dis-lui s’ils t’intéressent : si l’autre personne dit oui aussi, Lamia vous met en relation.</p>
+      <p>Lamia a choisi pour toi des profils qui te correspondent, selon son algorithme. Leur fiche est anonyme. Dis oui ou non : <strong>si l’autre personne dit oui aussi, vous êtes mis en relation tout de suite</strong>, avec une discussion privée de 7 jours.</p>
+      <p><a class="btn btn-line" href="/confidences/">✉️ Contacter Lamia</a></p>
       <div class="espace-interets" data-espace-propositions><p class="loading">Un instant…</p></div>
     </section>
     <section id="interets">

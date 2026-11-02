@@ -13,6 +13,7 @@
   <a class="tdb-marque" href="/"><img src="/images/marque/lamia-logo-net-160.webp" width="40" height="40" alt=""><span>La Maison <em>· tableau de bord</em></span></a>
   <nav class="tdb-onglets" aria-label="Rubriques" data-onglets hidden>
     <button type="button" data-tab="accueil" aria-current="true">Aujourd’hui</button>
+    <button type="button" data-tab="activite">🗺️ Activité</button>
     <button type="button" data-tab="rencontres">💞 Rencontres</button>
     <button type="button" data-tab="application">📱 Application <span class="tdb-pastille" data-journal-pastille hidden></span></button>
     <button type="button" data-tab="ventes">Ventes</button>
@@ -73,6 +74,37 @@
     <div class="tdb-entete"><h1 class="tdb-titre">Rencontres</h1><div class="tdb-raccourcis"><a class="btn btn-line" href="/confidences-lamia/" target="_blank" rel="noopener">Les messages des Confidences</a></div></div>
     <p class="aide">Ici : valider les profils, traiter les matchs demandés (notés par ton outil), proposer, publier une nouveauté, les abonnés. Ton outil de matching garde ses rôles : publier les fiches, envoyer les liens de confirmation (publipostage), tester les matchs.</p>
     <iframe class="tdb-rencontres" data-rencontres title="Gestion des rencontres" loading="lazy"></iframe>
+  </section>
+
+  <section data-panel="activite" hidden>
+    <div class="tdb-entete"><h1 class="tdb-titre">Activité des matchs</h1><button type="button" class="btn btn-ink" data-pilote-lancer>🚀 Envoyer les matchs maintenant</button></div>
+    <p class="aide">Le site travaille sans toi. Chaque jour (et à chaque récupération de ton outil), il envoie à chaque personne les meilleurs profils selon <strong>ton algorithme</strong>, dans les deux sens. Dès que les deux disent oui, il les met en relation tout seul : discussion de 7 jours, puis échange des numéros. Tu regardes ici, tu règles, et tu annules un match si besoin. Pour changer l’algorithme, change tes poids dans l’outil : les nouveaux scores arrivent à la récupération suivante.</p>
+    <p class="aide" data-pilote-statut></p>
+    <div class="tdb-chiffres" data-pilote-chiffres></div>
+    <div class="tdb-grille-app">
+      <div class="tdb-carte">
+        <h2>Réglages du pilote</h2>
+        <form data-pilote-reglages class="tdb-form-pilote">
+          <label class="tdb-coche"><input type="checkbox" name="actif"> Pilote automatique activé</label>
+          <label>Profils proposés à chaque personne (en attente de réponse)<input type="number" name="parPersonne" min="1" max="10"></label>
+          <label>Note minimum de ton algorithme (sur 100)<input type="number" name="scoreMin" min="0" max="100"></label>
+          <button type="submit" class="btn btn-ink">Enregistrer</button>
+        </form>
+        <p class="aide">Les paires avec un blocage de ton algorithme (secteur, âge, religion…) ne sont jamais proposées automatiquement. Une personne qui dit non ne reçoit plus ce profil.</p>
+      </div>
+      <div class="tdb-carte">
+        <h2>Mises en relation</h2>
+        <ul class="tdb-liste-activite" data-pilote-relations></ul>
+      </div>
+      <div class="tdb-carte">
+        <h2>Propositions envoyées</h2>
+        <ul class="tdb-liste-activite" data-pilote-propositions></ul>
+      </div>
+      <div class="tdb-carte">
+        <h2>Bloqué (les deux ont dit oui)</h2>
+        <ul class="tdb-liste-activite" data-pilote-bloques></ul>
+      </div>
+    </div>
   </section>
 
   <section data-panel="application" hidden>
