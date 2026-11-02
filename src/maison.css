@@ -3369,3 +3369,37 @@ body[data-ambiance="espace"] .espace .room-name { color: #8a1024; }
 .tchat-vide { color: #b8a98f; background: none !important; }
 .tchat-form { display: flex; gap: 6px; }
 .tchat-form input { flex: 1; min-width: 0; min-height: 44px; padding: 8px 12px; border-radius: 10px; border: 1px solid rgba(227,189,110,.5); font-size: 16px; }
+
+/* Inscription permanente aux salons des soirées */
+.salons { max-width: 760px; margin: 0 auto; padding: clamp(28px, 5vw, 56px) var(--gouttiere); }
+.salons h1 { color: var(--or-clair); margin: 6px 0 10px; }
+.salons h2 { color: var(--or-clair); font-size: 1.25rem; margin: 0 0 12px; }
+.salons-etape { margin: 0 0 28px; padding: 0; border: 0; }
+.salons-etape legend { color: var(--or-clair); font-size: 1.15rem; font-weight: 600; margin-bottom: 12px; padding: 0; }
+.salons-deux { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.salons-carte, .salons-option { display: flex; gap: 12px; align-items: flex-start; padding: 16px; border: 1px solid rgba(227,189,110,.4); border-radius: 12px; background: rgba(255,255,255,.04); cursor: pointer; color: inherit; text-decoration: none; }
+.salons-carte:has(input:checked), .salons-option:has(input:checked) { border-color: var(--or); background: rgba(227,189,110,.14); }
+.salons-carte strong, .salons-option strong { display: block; color: var(--or-clair); }
+.salons-carte small, .salons-option small { display: block; margin-top: 4px; opacity: .85; }
+.salons-carte input, .salons-option input { margin-top: 4px; flex: none; width: 18px; height: 18px; accent-color: var(--or); }
+.salons-options { display: grid; gap: 10px; }
+.salons-aide { margin: 0; opacity: .85; }
+.salons-accord { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 18px; }
+.salons-carte[hidden] { display: none; }
+.salons-accord input { width: 18px; height: 18px; margin-top: 3px; flex: none; accent-color: var(--or); }
+.salons-gratuit { display: inline-block; margin: 0 0 12px; padding: 6px 14px; border-radius: 999px; background: var(--or); color: #1c1020; font-weight: 700; }
+.salons-statut { min-height: 1.4em; margin: 12px 0 0; }
+.salons-statut.is-error { color: #ffb3b3; }
+.salons-merci { padding: 20px; border: 1px solid var(--or); border-radius: 12px; background: rgba(227,189,110,.12); }
+.salons-merci h2 { margin-bottom: 8px; }
+.salons-confirmes { margin-top: 18px; padding: 16px; border-radius: 12px; border: 1px solid rgba(227,189,110,.4); }
+.salons-confirmes h3 { margin: 0 0 8px; color: var(--or-clair); }
+.salons-etapes { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.salons-accueil { max-width: 860px; margin: 0 auto; padding: clamp(28px, 5vw, 56px) var(--gouttiere); }
+.salons-accueil h2 { color: var(--or-clair); margin: 4px 0 10px; }
+.salons-accueil .salons-deux { margin: 18px 0; }
+.espace-salon { padding: 16px; border: 1px solid var(--ligne, #e6d8c8); border-radius: 12px; margin-bottom: 14px; }
+.espace-salon h3 { margin: 0 0 6px; }
+.espace-salon-prix { font-size: 1.25rem; font-weight: 700; margin: 10px 0; }
+.espace-salon label { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 10px; }
+.espace-salon .form-status.is-error { color: #a3122a; }

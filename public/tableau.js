@@ -37,6 +37,7 @@ function ouvrir(tab) {
   if (tab === 'textes') chargerTextes();
   if (tab === 'bilan') chargerBilan();
   if (tab === 'application') chargerJournal();
+  if (tab === 'soirees') chargerSalons();
   if (tab === 'activite') chargerActivite();
   if (tab === 'rencontres') { const f = $('[data-rencontres]'); if (f && !f.src) f.src = `/confidences-lamia/?integre=1#${aller || 'annonces'}`; aller = ''; }
   scrollTo({ top: 0 });
@@ -93,6 +94,33 @@ document.addEventListener('click', (e) => {
   ouvrir('rencontres');
   const cible = b.dataset.rencontresAller;
   if (cible !== 'annonces') setTimeout(() => { try { f.contentWindow.document.querySelector(cible === 'demandes' ? '[data-demandes]' : '[data-nouv-form]')?.scrollIntoView({ behavior: 'smooth' }); } catch { /* */ } }, 2500);
+});
+
+// ---------------------------------------------------------------- Salons des soirées : confirmer une date, suivre les inscrits
+async function chargerSalons() {
+  const box = $('[data-salons-admin]');
+  if (!box) return;
+  let d;
+  try { d = await conf({ action: 'salon_admin' }); } catch { box.innerHTML = '<p>Les salons ne s’affichent pas pour le moment.</p>'; return; }
+  const aValider = d.a_valider.length ? d.a_valider.map((e) => `<form class="salon-valider" data-salon-confirmer="${esc(e.id)}"><h3>${esc(e.nom)}</h3><p>${e.femmes} femmes et ${e.hommes} hommes attendent : <b>${e.retenus} + ${e.retenus}</b> seront invités.</p><label>Date et heure (heure de Paris)<input type="datetime-local" name="date" value="${esc(e.date)}" required></label><label class="salon-gratuit-case"><input type="checkbox" name="gratuit"${e.gratuit ? ' checked' : ''}> Soirée gratuite</label><button class="btn btn-ink" type="submit">Confirmer le salon</button><p class="aide" data-salon-msg></p></form>`).join('') : `<p>Aucun salon à confirmer. Une proposition arrive dès ${d.seuil} femmes et ${d.seuil} hommes dans un même secteur.</p>`;
+  const conf2 = d.confirmes.map((e) => `<p class="ligne"><span><b>${esc(e.nom)}</b><br><small>${esc(e.quand)}${e.gratuit ? ' · gratuite' : ''}</small></span><span>${e.femmes} F + ${e.hommes} H<br><small>en attente de validation : ${e.attente_f} F, ${e.attente_h} H</small></span></p>`).join('');
+  const lignes = d.options.filter((o) => o.femmes || o.hommes).map((o) => `<tr><td>${esc(o.salon)}</td><td>${esc(o.secteur)}</td><td>${o.femmes}</td><td>${o.hommes}</td></tr>`).join('');
+  box.innerHTML = `<h2>Salons à confirmer</h2>${aValider}${conf2 ? `<h2>Salons confirmés</h2>${conf2}` : ''}<h2>Inscrits en attente</h2>${lignes ? `<div class="tdb-table"><table><thead><tr><th>Salon</th><th>Secteur</th><th>Femmes</th><th>Hommes</th></tr></thead><tbody>${lignes}</tbody></table></div>` : '<p>Personne pour le moment.</p>'}<p class="aide">Lien à partager, toujours actif : <b>lamia-femme-berbere.com/speed-dating/inscription/</b></p><h2>Toutes les soirées</h2>`;
+}
+document.addEventListener('submit', async (e) => {
+  const f = e.target.closest('[data-salon-confirmer]');
+  if (!f) return;
+  e.preventDefault();
+  const msg = f.querySelector('[data-salon-msg]'), b = f.querySelector('button');
+  b.disabled = true; msg.textContent = 'Envoi des invitations…';
+  try {
+    const r = await conf({ action: 'salon_confirmer', id: f.dataset.salonConfirmer, date: f.elements.date.value, gratuit: f.elements.gratuit.checked });
+    msg.textContent = `Salon confirmé : ${r.convoques} personnes prévenues.`;
+    chargerSalons();
+  } catch (err) {
+    b.disabled = false;
+    msg.textContent = err.message === 'date_trop_proche' ? 'Choisis une date à au moins 3 jours : chacun a besoin de temps pour valider sa place.' : err.message === 'plus_assez' ? 'Il n’y a plus assez d’inscrits dans ce secteur.' : 'La confirmation n’a pas abouti. Réessaie.';
+  }
 });
 
 // ---------------------------------------------------------------- Application : journal « qui fait quoi », retraits, notifications

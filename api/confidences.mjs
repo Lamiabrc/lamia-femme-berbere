@@ -31,6 +31,8 @@ export async function GET(request) {
     const nouveautes = await envoyerNouveautes();
     // Rappel aux discussions qui se terminent demain.
     const r = await handleConfidences(new Request('https://lamia-femme-berbere.com/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'annonce_rappels_cron' }) }), { cron: true }).catch(() => null);
+    // Filet de sécurité : les rappels des salons tournent aussi une fois par jour d'ici.
+    await handleConfidences(new Request('https://lamia-femme-berbere.com/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'salon_cron' }) }), { cron: true }).catch(() => null);
     return json({ ok: true, ...nouveautes, rappels: r ? (await r.json().catch(() => ({}))).rappels ?? null : null });
   }
   catch (e) { console.error('nouveautes failed', e?.message); return json({ error: 'temporary_failure' }, 502); }

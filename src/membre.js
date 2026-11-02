@@ -96,6 +96,7 @@ async function renderEvents() {
     .from('speed_dating_events')
     .select('id,title,description,audience,starts_at,min_age,max_age,capacity,ticket_price_cents,currency,status')
     .in('status', ['published', 'sold_out'])
+    .eq('sur_invitation', false)
     .gte('starts_at', new Date().toISOString())
     .order('starts_at');
   if (error) {
