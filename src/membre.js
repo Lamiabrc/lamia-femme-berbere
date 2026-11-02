@@ -304,6 +304,7 @@ async function reserve(eventId, button, paying = true) {
     button.textContent = error ? 'Réserver ma place' : 'Place réservée';
     return status(st, error ? 'La réservation n’a pas abouti. Réessaie dans un instant.' : 'Ta place est réservée. Tu recevras le lien de la salle par email avant la soirée.', !!error);
   }
+  if (window.LFB_PLAY) { button.disabled = false; button.textContent = 'Réserver ma place'; return status(st, 'Le règlement de cette place ne se fait pas dans cette version de l’appli.', true); }
   let res, data = {};
   try {
     res = await fetch('/api/event-checkout', {

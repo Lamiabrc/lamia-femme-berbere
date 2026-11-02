@@ -195,6 +195,7 @@ Signature (si envoi papier) : …</p>
 <li>envoyer de fausses alertes aux Confidences avec Lamia ;</li>
 <li>tenter de perturber le fonctionnement du site ou d’accéder aux données d’autres personnes.</li>
 </ul>
+<p><strong>Bloquer et signaler.</strong> Tu peux bloquer ou signaler un profil depuis sa fiche, le swipe, ta discussion ou Mon espace. Un blocage vaut dans les deux sens : vous ne vous voyez plus et vous ne pouvez plus vous écrire, et la personne n’en est pas prévenue. Lamia reçoit une alerte à chaque blocage et chaque signalement, et peut retirer un profil qui ne respecte pas ces règles.</p>
 
 <h2>5. Les Confidences avec Lamia</h2>
 <p>Les alertes sont lues par Lamia seule. L’identité de la personne qui alerte n’est jamais communiquée à la personne signalée. Le Cabinet n’est pas un service d’urgence : <strong>en cas de danger immédiat, appelle le 17 (police) ou le 112</strong>.</p>
