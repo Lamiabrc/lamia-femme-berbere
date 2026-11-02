@@ -1474,8 +1474,9 @@ page(
     <div class="po-hero-texte">
       <p class="po-eyebrow">Matching kabyle IA · par Lamia</p>
       <h1 id="abo-titre">Choisis ta formule</h1>
-      <p class="po-sub">La première mise en relation est toujours offerte.</p>
-      <p class="po-lead">Ensuite, choisis le rythme qui te ressemble : plus de mises en relation, des speed datings inclus, et l’accompagnement de Lamia. Sans engagement, résiliable en un clic depuis ton espace.</p>
+      <p class="po-sub">Un match est toujours offert. D’autres en venant soutenir le live de Lamia.</p>
+      <p class="po-lead">Ou choisis le rythme qui te ressemble : 10 matchs par mois, ou illimités avec le coaching et l’option mariage de Lamia. Sans engagement, résiliable en un clic depuis ton espace.</p>
+      <p class="po-lead">Tu vis en Algérie ? Le paiement en ligne n’y est pas possible : <a class="text-link" href="/salon/">viens au live</a>, chaque soir à 21 h, pour d’autres matchs.</p>
     </div>
     <figure class="po-lamia"><img src="/images/lamia/lamia-portrait-tatouages-rond-480.webp" alt="Lamia Femme Berbère" width="200" height="200"><figcaption>Lamia · ton entremetteuse</figcaption></figure>
   </div>
