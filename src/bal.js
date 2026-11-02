@@ -91,7 +91,7 @@ $('[data-entrer]')?.addEventListener('click', async () => {
   call.on('left-meeting', () => { roomKey = null; });
   tchatBrancher();
   let flouPret = false;
-  call.on('joined-meeting', () => { if (!flouPret) { flouPret = true; preparerFlou(); } else if (prefs.flou) flou(true); });
+  call.on('joined-meeting', () => { if (!flouPret) { flouPret = true; preparerDecor(); } else if (prefs.decor && prefs.decor !== 'aucun') appliquerDecor(prefs.decor); });
   call.on('error', () => message('La connexion vidéo s’est interrompue. Nous te reconnectons…'));
   await tick();
   poll = setInterval(tick, 4000);
@@ -333,20 +333,34 @@ function ambiance() {
 }
 $('[data-musique]')?.addEventListener('click', () => { prefs.musique = prefs.musique === false; savePrefs(); ambiance(); });
 
-let flouDispo = false;
-async function flou(actif) {
-  if (!call || !flouDispo) return;
+// Décor : garder sa pièce, la flouter, ou la remplacer par un salon du bal (sans écran vert).
+// Possible seulement là où le navigateur traite la vidéo (surtout sur ordinateur) ; ailleurs, un conseil.
+const DECORS = {
+  aucun: { type: 'none' },
+  flou: { type: 'background-blur', config: { strength: 1 } },
+  petillant: { type: 'background-image', config: { source: `${location.origin}/images/lamia/salon-25-39-ans-800.webp` } },
+  ambre: { type: 'background-image', config: { source: `${location.origin}/images/lamia/salon-40-ans-et-plus-800.webp` } },
+};
+let decorDispo = false;
+async function appliquerDecor(nom) {
+  if (!call || !decorDispo) return;
+  const choix = DECORS[nom] ? nom : 'aucun';
   try {
-    await call.updateInputSettings({ video: { processor: actif ? { type: 'background-blur', config: { strength: 1 } } : { type: 'none' } } });
-    $('[data-flou]').setAttribute('aria-pressed', String(actif));
-    $('[data-flou]').textContent = actif ? 'Décor net' : 'Flouter mon décor';
-  } catch { $('[data-flou]').hidden = true; }
+    await call.updateInputSettings({ video: { processor: DECORS[choix] } });
+    $('[data-decor]').value = choix;
+  } catch {
+    if (choix !== 'flou' && choix !== 'aucun') { message('Ce décor ne se charge pas sur ton appareil : essaie le flou.'); $('[data-decor]').value = 'aucun'; }
+    else { $('[data-decor-choix]').hidden = true; $('[data-decor-conseil]').hidden = false; }
+  }
 }
-$('[data-flou]')?.addEventListener('click', () => { prefs.flou = !(prefs.flou === true); savePrefs(); flou(prefs.flou); });
-function preparerFlou() {
-  try { flouDispo = Boolean(Daily.supportedBrowser?.().supportsVideoProcessing); } catch { flouDispo = false; }
-  $('[data-flou]').hidden = !flouDispo;
-  if (flouDispo && prefs.flou) flou(true);
+$('[data-decor]')?.addEventListener('change', (e) => { prefs.decor = e.target.value; savePrefs(); appliquerDecor(prefs.decor); });
+function preparerDecor() {
+  try { decorDispo = Boolean(Daily.supportedBrowser?.().supportsVideoProcessing); } catch { decorDispo = false; }
+  $('[data-decor-choix]').hidden = !decorDispo;
+  $('[data-decor-conseil]').hidden = decorDispo;
+  // Ancien réglage « flou » gardé d'un bal précédent.
+  if (!prefs.decor && prefs.flou) prefs.decor = 'flou';
+  if (decorDispo && prefs.decor && prefs.decor !== 'aucun') appliquerDecor(prefs.decor);
 }
 
 // Au chargement : si la personne est déjà entrée ce soir, on reprend.

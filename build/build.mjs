@@ -945,11 +945,17 @@ page(
   <div class="salle-boutons">
     <button class="btn bal-btn-line" type="button" data-micro aria-pressed="false">Micro</button>
     <button class="btn bal-btn-line" type="button" data-camera aria-pressed="false">Caméra</button>
-    <button class="btn bal-btn-line" type="button" data-flou aria-pressed="false" hidden>Flouter mon décor</button>
+    <label class="btn bal-btn-line decor-choix" data-decor-choix hidden>Mon décor<select data-decor aria-label="Choisir mon décor">
+      <option value="aucun">Ma pièce</option>
+      <option value="flou">Pièce floutée</option>
+      <option value="petillant">Salon Pétillant</option>
+      <option value="ambre">Salon de l’Ambre</option>
+    </select></label>
     <button class="btn bal-btn-line" type="button" data-musique aria-pressed="true">Musique douce</button>
     <a class="btn bal-btn-line" href="/confidences/#signaler" target="_blank" rel="noopener">Signaler à Lamia</a>
     <button class="btn bal-btn-line" type="button" data-quitter>Quitter le bal</button>
   </div>
+  <p class="decor-conseil" data-decor-conseil hidden>Astuce : installe-toi devant un mur uni, avec une lumière face à toi. Ton masque fera le reste.</p>
   <form class="souhaits" data-souhaits hidden>
     <h2>Ton carnet de bal</h2>
     <p>Coche les personnes que tu aimerais revoir. Ton choix reste privé : si c’est réciproque, Lamia vous met en relation.</p>

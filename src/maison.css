@@ -1857,7 +1857,7 @@ body { background: var(--qvt-ivoire); }
 .avis-q label { display: inline-flex !important; gap: 6px; align-items: center; font-weight: 400 !important; }
 .avis-q input { width: 18px; height: 18px; accent-color: #5c1424; }
 @media (prefers-reduced-motion: reduce) { .transition, .transition svg { transition: none; animation: none; } }
-.salle-boutons [data-musique][aria-pressed="true"], .salle-boutons [data-flou][aria-pressed="true"] { background: rgba(227,189,110,.15); border-color: var(--or, #e3bd6e); color: #fff1c9; }
+.salle-boutons [data-musique][aria-pressed="true"] { background: rgba(227,189,110,.15); border-color: var(--or, #e3bd6e); color: #fff1c9; }
 .appli-alerte [hidden] { display: none !important; }
 .salon-choice .salon-pour { color: var(--qvt-encre); font-weight: 500; }
 .salon-choice.is-vedette { grid-column: 1 / -1; border-color: #b08a4e; background: linear-gradient(135deg, #fffaf0, var(--qvt-champagne-clair)); }
@@ -3369,3 +3369,8 @@ body[data-ambiance="espace"] .espace .room-name { color: #8a1024; }
 .tchat-vide { color: #b8a98f; background: none !important; }
 .tchat-form { display: flex; gap: 6px; }
 .tchat-form input { flex: 1; min-width: 0; min-height: 44px; padding: 8px 12px; border-radius: 10px; border: 1px solid rgba(227,189,110,.5); font-size: 16px; }
+
+/* Bal : choix du décor */
+.decor-choix { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; white-space: nowrap; }
+.decor-choix select { min-height: 0; padding: 4px 8px; border-radius: 999px; border: 1px solid rgba(227,189,110,.6); background: rgba(18,13,26,.6); color: #fff1c9; font: inherit; font-size: 14px; }
+.decor-conseil { margin: 8px auto 0; max-width: 520px; text-align: center; font-size: 14px; color: #e9dcc4; }
