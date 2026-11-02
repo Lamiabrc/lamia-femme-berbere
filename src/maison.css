@@ -3296,6 +3296,21 @@ label.is-manquant { outline: 2px solid #c0263f; outline-offset: 3px; border-radi
 .disc-numeros.is-ok { background: #e6f2e4; }
 .disc-numeros input { width: 100%; min-height: 46px; border-radius: 12px; border: 1px solid #e0cdb5; padding: 8px 12px; font-size: 16px; margin-top: 4px; }
 .disc-numeros small { color: #6f6152; }
+.parcours { border: 1px solid #e0cdb5; border-radius: 14px; padding: 10px 12px; background: #fffaf2; color: #2b2118; }
+.parcours summary { cursor: pointer; font-weight: 600; }
+.parcours summary span { font-weight: 400; color: #6f6152; font-size: 14px; margin-left: 6px; }
+.parcours ol { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 8px; }
+.parcours-etape { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; align-items: start; }
+.parcours-etape p { margin: 4px 0 8px; }
+.parcours-num { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 14px; background: #f3ead9; }
+.parcours-etape.is-faite .parcours-num { background: #e6f2e4; }
+.parcours-etape.is-en_cours .parcours-num { background: #2b2118; color: #fff; }
+.parcours-etape.is-a_venir { color: #6f6152; }
+.parcours-questions { display: grid; gap: 6px; margin-bottom: 8px; }
+.parcours-questions small { color: #6f6152; }
+.parcours-question { text-align: left; min-height: 44px; padding: 8px 12px; border-radius: 12px; border: 1px solid #e0cdb5; background: #fff; color: inherit; font: inherit; cursor: pointer; }
+.parcours-valider .btn { min-height: 46px; }
+.parcours-attente { color: #1d6a3e; }
 
 /* Swipe : l'écran s'ouvre directement sur les cartes, comme une appli */
 .swipe-page { padding-top: 6px; }

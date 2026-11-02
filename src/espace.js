@@ -479,6 +479,19 @@ async function discussions(session) {
   let liste = [], ouverte = null, minuterie = null, salut = '', e = '·e';
   const heure = (d) => new Date(d).toLocaleString('fr-FR', { weekday: 'short', hour: '2-digit', minute: '2-digit' });
   const reste = (d) => { const ms = new Date(d.ferme_at) - Date.now(); if (ms <= 0) return 'terminée'; const j = Math.floor(ms / 86400e3), h = Math.floor((ms % 86400e3) / 3600e3); return j ? `encore ${j} jour${j > 1 ? 's' : ''}${h ? ` et ${h} h` : ''}` : `encore ${h} h`; };
+  // Parcours vers le mariage : ouvert avec la discussion, les deux valident chaque étape.
+  const vueParcours = (d) => {
+    const p = d.parcours;
+    if (!p) return '';
+    const etapes = p.etapes.map((x) => {
+      const questions = x.etat === 'en_cours' && p.actif && d.ouverte && x.questions.length ? `<div class="parcours-questions"><small>Une question pour commencer :</small>${x.questions.map((q) => `<button type="button" class="parcours-question" data-parcours-question="${esc(q)}">${esc(q)}</button>`).join('')}</div>` : '';
+      const etat = x.etat !== 'en_cours' || !p.actif ? '' : x.moi
+        ? `<p class="parcours-attente">✓ Tu as validé. On attend ${esc(d.avec)}.</p>`
+        : `<p class="parcours-valider">${x.lui ? `<span>${esc(d.avec)} a déjà validé.</span> ` : ''}<button type="button" class="btn btn-ink" data-parcours-valider="${esc(x.id)}">Nous avons vécu cette étape</button></p>`;
+      return `<li class="parcours-etape is-${esc(x.etat)}"><span class="parcours-num">${x.etat === 'faite' ? '✓' : esc(x.numero)}</span><div><strong>${esc(x.titre)}</strong>${x.etat === 'en_cours' ? `<p>${esc(x.texte)}</p>${questions}${etat}` : ''}</div></li>`;
+    }).join('');
+    return `<details class="parcours" ${p.fini ? '' : 'open'}><summary>💍 Votre parcours vers le mariage <span>${p.fini ? 'Terminé, félicitations !' : `Étape ${esc(p.courante + 1)} sur ${esc(p.total)}`}</span></summary><ol>${etapes}</ol></details>`;
+  };
   const vue = (d) => {
     const msgs = d.messages.map((m) => `<p class="disc-msg ${m.moi ? 'is-moi' : ''}"><span>${esc(m.texte)}</span><small>${esc(heure(m.le))}</small></p>`).join('') || `<p class="disc-vide">${salut ? `${esc(salut)}, dis` : 'Dis'} bonjour à ${esc(d.avec)} 👋</p>`;
     const numeros = d.echange
@@ -490,6 +503,7 @@ async function discussions(session) {
       <header class="disc-tete"><strong>Avec ${esc(d.avec)}</strong><span>${d.ouverte ? `⏳ ${esc(reste(d))}` : d.close_raison === 'signalee' ? 'fermée (signalée)' : d.close_raison ? 'fermée' : 'terminée'}</span></header>
       ${d.ses_autres_matchs > 0 ? `<p class="disc-honnete">Par honnêteté : ${esc(d.avec)} a aussi ${d.ses_autres_matchs} autre${d.ses_autres_matchs > 1 ? 's' : ''} match${d.ses_autres_matchs > 1 ? 's' : ''} en cours.</p>` : ''}
       ${d.mes_autres_matchs > 0 ? `<p class="disc-honnete">De ton côté, tu as ${d.mes_autres_matchs} autre${d.mes_autres_matchs > 1 ? 's' : ''} match${d.mes_autres_matchs > 1 ? 's' : ''} en cours : ${esc(d.avec)} le voit aussi.</p>` : ''}
+      ${vueParcours(d)}
       <div class="disc-fil" data-disc-fil>${msgs}</div>
       ${d.ouverte ? `<form class="disc-saisie" data-disc-envoi><textarea name="texte" rows="2" maxlength="1000" placeholder="Ton message…" required></textarea><button class="btn btn-ink" type="submit">Envoyer</button></form>
       <p class="disc-aide">Pour ta sécurité, les numéros, liens et emails écrits dans les messages sont masqués : utilise le bouton ci-dessous pour échanger vos numéros.</p>` : ''}
@@ -529,6 +543,14 @@ async function discussions(session) {
     bouton.disabled = false;
   });
   box.addEventListener('click', async (e) => {
+    const question = e.target.closest('[data-parcours-question]');
+    if (question) { const t = question.closest('[data-disc]').querySelector('textarea'); if (t) { t.value = question.dataset.parcoursQuestion; t.focus(); } return; }
+    const valider = e.target.closest('[data-parcours-valider]');
+    if (valider) {
+      valider.disabled = true;
+      try { await appelProfil({ action: 'annonce_parcours_valider', id: valider.closest('[data-disc]').dataset.disc, etape: valider.dataset.parcoursValider }, session); await charger(); } catch { valider.disabled = false; alert('La validation n’est pas passée. Réessaie.'); }
+      return;
+    }
     if (!e.target.closest('[data-disc-signaler]')) return;
     const id = e.target.closest('[data-disc]').dataset.disc;
     const motif = prompt('Que s’est-il passé ? La discussion sera fermée et Lamia la lira.');
