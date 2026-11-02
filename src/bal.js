@@ -14,9 +14,31 @@ const store = {
 };
 
 let me = store.get();           // { pass, name, salon }
+let apercuCamera = false;
 let call = null, roomKey = null, state = null, offset = 0, poll = 0, joining = false, wishesSent = false;
 
+// ---------------------------------------------------------------- mode aperçu (?apercu)
+// Pour voir et régler la salle sans soirée ouverte : rien n'est envoyé, personne ne te voit,
+// ta caméra reste sur ton appareil. Un panneau permet de passer d'un écran à l'autre.
+const APERCU = new URLSearchParams(location.search).has('apercu');
+const sim = { phase: 'accueil', where: 'grand', round: 0, partner: null, demasque: false, salon: 'Grand salon · 25-39 ans', met: [], ends_at: null, planb: null };
+const SIM_MET = [{ uid: 'k', name: 'Karim', round: 1 }, { uid: 'm', name: 'Massinissa', round: 2 }, { uid: 'y', name: 'Yanis', round: 3 }];
+function simuler(body) {
+  const now = new Date();
+  if (body.action === 'enter') return { ok: true, status: 200, data: { pass: 'apercu', name: 'Lamia', salon: sim.salon } };
+  if (body.action === 'state') {
+    return { ok: true, status: 200, data: {
+      phase: sim.phase, round: sim.round, where: sim.where, key: sim.where === 'tat' ? `tat:${sim.round}` : 'grand:apercu',
+      ends_at: sim.ends_at, partner: sim.where === 'tat' ? sim.partner : null, demasque: sim.demasque, salon: sim.salon,
+      planb: sim.planb, met: sim.met, server_time: now.toISOString(),
+    } };
+  }
+  if (body.action === 'join') return { ok: true, status: 200, data: { url: '', token: '', key: '' } };
+  return { ok: true, status: 200, data: { ok: true, count: (body.wished || []).length } };
+}
+
 async function api(body) {
+  if (APERCU) return simuler(body);
   const r = await fetch('/api/bal', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   const data = await r.json().catch(() => ({}));
   return { ok: r.ok, status: r.status, data };
@@ -121,6 +143,17 @@ async function rejoindre(key) {
   try {
     const { ok, data } = await api({ action: 'join', pass: me.pass });
     if (!ok) { message('La salle ne s’ouvre pas encore. Nouvel essai dans quelques secondes…'); return; }
+    if (APERCU) {
+      if (!apercuCamera) {
+        apercuCamera = true;
+        await call.startCamera({ startVideoOff: false, startAudioOff: true }).catch(() => message('Autorise ta caméra pour voir ton image et tester les décors.'));
+        preparerDecor();
+      }
+      roomKey = key;
+      if (state?.where === 'tat') transition('Le prochain masque vous invite…', state.partner);
+      else if (avant?.startsWith('tat:')) transition('Merci pour cette danse', 'Retour au grand salon');
+      return;
+    }
     if (call.meetingState() === 'joined-meeting') await call.leave();
     // Caméra et micro allumés seulement en tête-à-tête ; au salon d'attente, éteints.
     const enTat = state?.where === 'tat';
@@ -202,7 +235,7 @@ function attach(el, track) {
 }
 
 function render() {
-  if (!call || call.meetingState() !== 'joined-meeting') return;
+  if (!call || (!APERCU && call.meetingState() !== 'joined-meeting')) return;
   const ps = call.participants();
   const local = ps.local;
   const others = Object.values(ps).filter((p) => !p.local);
@@ -363,5 +396,57 @@ function preparerDecor() {
   if (decorDispo && prefs.decor && prefs.decor !== 'aucun') appliquerDecor(prefs.decor);
 }
 
+// ---------------------------------------------------------------- panneau de l'aperçu
+function panneauApercu() {
+  const box = document.createElement('aside');
+  box.className = 'apercu-panneau';
+  box.setAttribute('aria-label', 'Aperçu de la salle');
+  box.innerHTML = `<p class="apercu-titre"><strong>Aperçu de la salle</strong> · rien n'est en ligne, personne ne te voit</p>
+    <div class="apercu-boutons">
+      <button type="button" data-ap="entree">Porte</button>
+      <button type="button" data-ap="pret">Antichambre</button>
+      <button type="button" data-ap="accueil">Grand salon</button>
+      <button type="button" data-ap="tat">Tête-à-tête</button>
+      <button type="button" data-ap="attente">En attente</button>
+      <button type="button" data-ap="demasque">Démasquage</button>
+      <button type="button" data-ap="planb">Plan B</button>
+      <button type="button" data-ap="fin">Fin du bal</button>
+      <button type="button" data-ap="ferme">Bal fermé</button>
+      <select data-ap-salon aria-label="Salon"><option value="Grand salon · 25-39 ans">Salon 25-39 ans</option><option value="Grand salon · 40 ans et plus">Salon 40 ans et plus</option></select>
+      <button type="button" data-ap-replier aria-expanded="true">Replier</button>
+    </div>`;
+  document.body.append(box);
+  const allerSalle = async () => {
+    me = { pass: 'apercu', name: 'Lamia', salon: sim.salon };
+    if (!call) { $('[data-entrer]').click(); return; }
+    show('salle'); await tick();
+  };
+  box.addEventListener('click', async (e) => {
+    const b = e.target.closest('[data-ap],[data-ap-replier]');
+    if (!b) return;
+    if (b.hasAttribute('data-ap-replier')) { const r = box.classList.toggle('is-replie'); b.textContent = r ? 'Aperçu' : 'Replier'; b.setAttribute('aria-expanded', String(!r)); return; }
+    const v = b.dataset.ap;
+    $$('[data-ap]', box).forEach((x) => x.classList.toggle('is-on', x === b));
+    if (v === 'entree') { show('entree'); return; }
+    if (v === 'pret') { me = { pass: 'apercu', name: 'Lamia', salon: sim.salon }; pret(); return; }
+    if (v === 'ferme') { show('ferme'); return; }
+    sim.planb = v === 'planb' ? 'https://meet.google.com/apercu' : null;
+    sim.demasque = v === 'demasque';
+    if (v === 'accueil' || v === 'planb') Object.assign(sim, { phase: 'accueil', where: 'grand', round: sim.round, ends_at: null });
+    if (v === 'tat' || v === 'demasque') {
+      sim.round = v === 'demasque' ? 3 : Math.min(3, sim.round + 1) || 1;
+      Object.assign(sim, { phase: 'tour', where: 'tat', partner: SIM_MET[sim.round - 1].name, ends_at: new Date(Date.now() + (v === 'demasque' ? 45e3 : 6 * 60e3)).toISOString(), met: SIM_MET.slice(0, sim.round) });
+    }
+    if (v === 'attente') Object.assign(sim, { phase: 'tour', where: 'attente', round: Math.max(1, sim.round), ends_at: new Date(Date.now() + 4 * 60e3).toISOString() });
+    if (v === 'fin') Object.assign(sim, { phase: 'fin', where: 'grand', ends_at: null, met: SIM_MET });
+    await allerSalle();
+  });
+  $('[data-ap-salon]', box).addEventListener('change', async (e) => {
+    sim.salon = e.target.value; me = { ...(me || {}), pass: 'apercu', name: 'Lamia', salon: sim.salon };
+    if (!$('[data-step="pret"]').hidden) pret(); else if (call) await tick();
+  });
+}
+
 // Au chargement : si la personne est déjà entrée ce soir, on reprend.
-if (me?.pass) pret(); else show('entree');
+if (APERCU) { store.clear(); me = null; panneauApercu(); show('entree'); }
+else if (me?.pass) pret(); else show('entree');

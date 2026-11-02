@@ -3374,3 +3374,13 @@ body[data-ambiance="espace"] .espace .room-name { color: #8a1024; }
 .decor-choix { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; white-space: nowrap; }
 .decor-choix select { min-height: 0; padding: 4px 8px; border-radius: 999px; border: 1px solid rgba(227,189,110,.6); background: rgba(18,13,26,.6); color: #fff1c9; font: inherit; font-size: 14px; }
 .decor-conseil { margin: 8px auto 0; max-width: 520px; text-align: center; font-size: 14px; color: #e9dcc4; }
+
+/* Bal : panneau de l'aperçu (?apercu) */
+.apercu-panneau { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 60; max-width: 980px; margin: 0 auto; padding: 10px 12px; border-radius: 16px; background: rgba(18,13,26,.94); border: 1px solid #e3bd6e; color: #fff1c9; box-shadow: 0 10px 30px rgba(0,0,0,.4); }
+.apercu-titre { margin: 0 0 8px; font-size: 13px; }
+.apercu-boutons { display: flex; flex-wrap: wrap; gap: 6px; }
+.apercu-boutons button, .apercu-boutons select { min-height: 34px; padding: 4px 11px; border-radius: 999px; border: 1px solid rgba(227,189,110,.6); background: transparent; color: #fff1c9; font: inherit; font-size: 13px; cursor: pointer; }
+.apercu-boutons select { background: #1d1526; }
+.apercu-boutons button.is-on { background: #e3bd6e; color: #120d1a; }
+.apercu-panneau.is-replie { left: auto; width: auto; }
+.apercu-panneau.is-replie .apercu-titre, .apercu-panneau.is-replie [data-ap], .apercu-panneau.is-replie select { display: none; }
