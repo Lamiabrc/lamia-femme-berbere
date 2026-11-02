@@ -579,7 +579,7 @@ function peindreActivite(d) {
   $('[data-pilote-relations]').innerHTML = (d.relations || []).map((x) => `<li><span><b>${escA(x.a)}</b>${x.actif && x.a_matchs > 1 ? ` <em class="tdb-plusieurs">${x.a_matchs} matchs en cours</em>` : ''} ↔ <b>${escA(x.b)}</b>${x.actif && x.b_matchs > 1 ? ` <em class="tdb-plusieurs">${x.b_matchs} matchs en cours</em>` : ''}<small>${escA(jourA(x.le))}${x.reciproque ? ' · réciproque' : ''}${x.discussion ? ' · discussion ouverte' : ''} · ${escA(x.etat)}</small></span>${x.actif ? `<button type="button" class="link-button" data-dematcher="${escA(x.id)}">Annuler ce match</button>` : ''}</li>`).join('') || '<li>Pas encore de mise en relation.</li>';
   $('[data-pilote-propositions]').innerHTML = (d.propositions || []).map((x) => `<li><span><b>${escA(x.a)}</b> ↔ <b>${escA(x.b)}</b><small>${x.score != null ? `${x.score}/100 · ` : ''}${escA(jourA(x.le))} · ${escA(x.etat)}${x.auto ? ' · auto' : ''}</small></span>${/attente/.test(x.etat) ? `<button type="button" class="link-button" data-retirer-prop="${escA(x.id)}">Retirer</button>` : ''}</li>`).join('') || '<li>Pas encore de proposition. Clique « Envoyer les matchs maintenant ».</li>';
   const att = d.en_attente || [], bv = $('[data-valider-tout]');
-  bv.hidden = !att.length; bv.textContent = `✅ Valider les ${att.length} profil${att.length > 1 ? 's' : ''} en attente`;
+  bv.hidden = !att.length; bv.textContent = `✅ Profils en attente (${att.length}) : valider les complets, relancer les autres`;
   bv.title = att.map((a) => `${a.prenom || ''} n° ${a.ref}`).join(', ');
   $('[data-pilote-bloques]').innerHTML = (d.bloques || []).map((x) => `<li><span><b>${escA(x.a)}</b> ↔ <b>${escA(x.b)}</b><small>${escA(x.raison)}</small></span></li>`).join('') || '<li>Rien de bloqué.</li>';
 }
@@ -590,11 +590,10 @@ async function chargerActivite(corps = { op: 'etat' }) {
 }
 $('[data-pilote-reglages]')?.addEventListener('submit', (e) => { e.preventDefault(); const f = e.target; chargerActivite({ op: 'reglages', actif: f.actif.checked, parPersonne: Number(f.parPersonne.value), scoreMin: Number(f.scoreMin.value) }); });
 $('[data-valider-tout]')?.addEventListener('click', async (e) => {
-  const n = e.target.textContent.match(/\d+/)?.[0] || '';
-  if (!confirm(`Valider d’un coup les ${n} profils en attente (${e.target.title}) ?\n\nIls sont validés même s’il leur manque une photo ou un contact. Chacun reçoit l’email « profil validé », et ils entrent dans les matchs automatiques.`)) return;
+  if (!confirm(`Profils en attente : ${e.target.title}\n\nLes profils complets (photo, email, contact) sont validés. Aucun profil incomplet n’est validé : chacun reçoit un message avec ce qui lui manque, et il sera validé tout seul dès qu’il l’ajoute.`)) return;
   e.target.disabled = true;
-  try { const d = await conf({ action: 'annonce_pilote', op: 'valider_tout' }); peindreActivite(d); $('[data-pilote-statut]').textContent = `✅ ${d.valides} profil(s) validé(s)${d.relations ? ` · ${d.relations} mise(s) en relation faite(s) dans la foulée` : ''}.`; }
-  catch { $('[data-pilote-statut]').textContent = 'La validation n’a pas fonctionné. Réessaie.'; }
+  try { const d = await conf({ action: 'annonce_pilote', op: 'valider_tout' }); peindreActivite(d); $('[data-pilote-statut]').textContent = `✅ ${d.valides} profil(s) complet(s) validé(s) · 📝 ${d.relances} profil(s) incomplet(s) prévenu(s) de ce qui manque${d.relations ? ` · ${d.relations} mise(s) en relation faite(s)` : ''}.`; }
+  catch { $('[data-pilote-statut]').textContent = 'Ça n’a pas fonctionné. Réessaie.'; }
   e.target.disabled = false;
 });
 $('[data-pilote-lancer]')?.addEventListener('click', (e) => { e.target.disabled = true; chargerActivite({ op: 'lancer' }).finally(() => { e.target.disabled = false; }); });

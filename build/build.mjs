@@ -791,7 +791,7 @@ page(
       </div>
     </section>
 
-    <section>
+    <section id="mon-profil">
       <h2>Mon profil âme sœur</h2>
       <p><button type="button" class="btn btn-line btn-installer" data-installer-bouton>📲 Installer l’application sur mon téléphone</button></p>
       <div class="espace-notifs" data-espace-notifs></div>

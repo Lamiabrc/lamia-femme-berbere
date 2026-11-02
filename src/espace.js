@@ -329,18 +329,18 @@ async function avisLamia(session) {
     const f = x.fiche;
     const infos = [f.genre === 'femme' ? 'Une femme' : 'Un homme', f.age && `${f.age} ans`, f.ville, f.pays, f.situation].filter(Boolean);
     const ages = f.age_min || f.age_max ? ` · ${f.age_min || 18} à ${f.age_max || 99} ans` : '';
-    const rep = x.reponse === 'oui' ? '<p class="espace-match">👍 Tu es d’accord : Lamia s’occupe de la suite.</p>'
+    const rep = x.reponse === 'oui' ? '<p class="espace-match">👍 Tu acceptes la différence : c’est noté, la suite se fait toute seule.</p><p>Pense à mettre à jour ce que tu recherches pour recevoir aussi ce genre de profils : <a class="text-link" href="#mon-profil">Modifier mon profil</a>.</p>'
       : x.reponse === 'non' ? '<p>Tu as répondu non : c’est noté, merci.</p>'
-      : `<p class="interet-boutons"><button type="button" class="btn btn-ink" data-avis="oui" data-id="${esc(x.id)}">Oui, je suis d’accord</button><button type="button" class="btn btn-line" data-avis="non" data-id="${esc(x.id)}">Non merci</button></p>`;
+      : `<p class="interet-boutons"><button type="button" class="btn btn-ink" data-avis="oui" data-id="${esc(x.id)}">Oui, j’accepte la différence</button><button type="button" class="btn btn-line" data-avis="non" data-id="${esc(x.id)}">Non merci</button></p>`;
     return `<article class="espace-achat interet-recu proposition"><div><p class="event-date">💬 Lamia te demande ton avis · profil n° ${esc(f.ref)}</p>
-      <p class="proposition-mot">« ${esc(x.question)} Lamia pense que vous pourriez quand même bien vous entendre. Es-tu d’accord ? » <small>Lamia</small></p>
+      <p class="proposition-mot">« ${esc(x.question)} Est-ce que tu acceptes cette différence ? » <small>Lamia</small></p>
       <h3>${esc(infos.join(' · '))}</h3>
       ${f.profil ? `<p><strong>Qui je suis :</strong> ${esc(f.profil)}</p>` : ''}
       ${f.recherche ? `<p><strong>Qui je cherche${esc(ages)} :</strong> ${esc(f.recherche)}</p>` : ''}
       ${secteurLisible(f.secteur) ? `<p><strong>Cherche en :</strong> ${esc(secteurLisible(f.secteur))}</p>` : ''}
       ${rep}</div></article>`;
   };
-  const afficher = () => { box.innerHTML = `<h3 class="espace-avis-titre">Lamia te demande ton avis</h3>${liste.map(carte).join('')}`; };
+  const afficher = () => { box.innerHTML = `<h3 class="espace-avis-titre">Un profil avec une différence</h3>${liste.map(carte).join('')}`; };
   afficher();
   box.addEventListener('click', async (e) => {
     const b = e.target.closest('[data-avis]');
