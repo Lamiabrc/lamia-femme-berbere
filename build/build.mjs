@@ -665,7 +665,7 @@ page(
   <div class="boudoir-reservation-head">
     <p class="bal-kicker">Prenez place dans le salon</p>
     <h2 id="events-title">Les prochaines soirées</h2>
-    <p>Pour le lancement, la première soirée est offerte, sur inscription. Les places sont limitées afin de préserver la qualité des échanges.</p>
+    <p>Nous sommes en période de bêta-test : merci pour votre participation active ! N’hésitez pas à nous signaler le moindre problème, et soyez indulgents avec nos petits réglages techniques. Les places sont limitées afin de préserver la qualité des échanges.</p>
   </div>
   <div class="boudoir-reservation-stage">
     <aside class="boudoir-side-note">
