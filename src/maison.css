@@ -3384,3 +3384,15 @@ body[data-ambiance="espace"] .espace .room-name { color: #8a1024; }
 .apercu-boutons button.is-on { background: #e3bd6e; color: #120d1a; }
 .apercu-panneau.is-replie { left: auto; width: auto; }
 .apercu-panneau.is-replie .apercu-titre, .apercu-panneau.is-replie [data-ap], .apercu-panneau.is-replie select { display: none; }
+
+/* Mon espace : soirées précédentes */
+.espace-soirees-titre { margin: 14px 0 0; font-size: 16px; letter-spacing: .04em; text-transform: uppercase; color: var(--qvt-taupe, #7a6a58); }
+.espace-soiree.is-passee { opacity: .78; border-left-color: #c9b9a2; }
+
+/* Bal : tour du démasquage (souhaits réciproques) */
+.salle-reciproque { max-width: 620px; margin: 12px auto 0; padding: 14px 18px; border-radius: 16px; border: 1px solid #e3bd6e; background: rgba(92,20,36,.55); color: #fff6dc; text-align: center; }
+.salle-reciproque p { margin: 6px 0; }
+.salle-reciproque-titre { font-family: var(--serif); font-size: 24px; color: #fff1c9; }
+.salle-reciproque .bal-actions { justify-content: center; }
+.salle-reciproque-ok { font-style: italic; }
+.salle-reciproque [hidden], .espace-demasque [hidden] { display: none !important; }

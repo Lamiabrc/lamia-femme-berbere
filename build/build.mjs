@@ -857,6 +857,12 @@ page(
       </div>
     </section>
 
+    <section id="demasquage" data-espace-demasquage-section hidden>
+      <h2>💞 Mes démasquages</h2>
+      <p class="espace-note">Tu as choisi quelqu’un au bal, et cette personne t’a choisi·e aussi. Veux-tu te démasquer ? Ta réponse reste privée : si vous dites oui tous les deux, Lamia vous met en relation.</p>
+      <div class="espace-soirees" data-espace-demasquage></div>
+    </section>
+
     <section>
       <h2>Mes soirées</h2>
       <div class="espace-soirees" data-espace-soirees><p class="loading">Un instant…</p></div>
@@ -933,6 +939,12 @@ page(
   </div>
   <p class="salle-msg" role="status" data-salle-msg></p>
   <p class="salle-demasque" data-demasque hidden>Dernier tête-à-tête : le moment du démasquage. Retire ton masque si tu le souhaites.</p>
+  <div class="salle-reciproque" data-reciproque hidden>
+    <p class="salle-reciproque-titre">💞 Vous vous êtes choisis tous les deux</p>
+    <p>Après ce tête-à-tête sans masque, veux-tu te démasquer pour de bon, et que Lamia vous mette en relation ? Ta réponse reste privée.</p>
+    <p class="bal-actions" data-reciproque-boutons><button class="btn btn-gold" type="button" data-reciproque-rep="oui">Oui, je me démasque</button><button class="btn bal-btn-line" type="button" data-reciproque-rep="non">Pas cette fois</button></p>
+    <p class="salle-reciproque-ok" data-reciproque-ok hidden></p>
+  </div>
   <p class="salle-compte" data-salle-compte></p>
   <div class="tchat" data-tchat hidden>
     <button class="tchat-bulle" type="button" data-tchat-ouvrir aria-expanded="false">💬 Écrire à Lamia <b data-tchat-nouveau hidden>•</b></button>

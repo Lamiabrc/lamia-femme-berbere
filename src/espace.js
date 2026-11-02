@@ -27,13 +27,54 @@ async function render() {
   avisLamia(session);
   propositions(session);
   discussions(session);
+  demasquages(session);
   const { data } = await supabase.from('event_registrations')
     .select('attendance_status, speed_dating_events(title, audience, starts_at)')
     .neq('attendance_status', 'cancelled');
   const rows = (data || []).filter((r) => r.speed_dating_events).sort((a, b) => a.speed_dating_events.starts_at.localeCompare(b.speed_dating_events.starts_at));
-  $('[data-espace-soirees]').innerHTML = rows.length
-    ? rows.map((r) => `<article class="espace-soiree"><p class="event-date">${esc(when(r.speed_dating_events.starts_at))}</p><h3>${esc(r.speed_dating_events.title)}</h3>${r.speed_dating_events.audience ? `<p>${/^grand salon/i.test(r.speed_dating_events.audience) ? '' : 'Salon '}${esc(r.speed_dating_events.audience)}</p>` : ''}</article>`).join('')
-    : '<p>Tu n’as pas encore réservé de soirée. <a class="text-link" href="/speed-dating/#events-title">Voir le Bal masqué</a></p>';
+  // Une soirée devient « précédente » trois heures après son début.
+  const limite = new Date(Date.now() - 3 * 3600e3).toISOString();
+  const carte = (r, passee) => `<article class="espace-soiree${passee ? ' is-passee' : ''}"><p class="event-date">${esc(when(r.speed_dating_events.starts_at))}${passee ? ' · soirée passée' : ''}</p><h3>${esc(r.speed_dating_events.title)}</h3>${r.speed_dating_events.audience ? `<p>${/^grand salon/i.test(r.speed_dating_events.audience) ? '' : 'Salon '}${esc(r.speed_dating_events.audience)}</p>` : ''}</article>`;
+  const avenir = rows.filter((r) => r.speed_dating_events.starts_at >= limite);
+  const passees = rows.filter((r) => r.speed_dating_events.starts_at < limite).reverse();
+  $('[data-espace-soirees]').innerHTML = (avenir.length
+    ? avenir.map((r) => carte(r, false)).join('')
+    : '<p>Aucune soirée à venir. <a class="text-link" href="/speed-dating/#events-title">Voir les prochains bals masqués</a></p>')
+    + (passees.length ? `<h3 class="espace-soirees-titre">Soirées précédentes</h3>${passees.map((r) => carte(r, true)).join('')}` : '');
+}
+
+// Démasquages : souhaits réciproques du bal, à confirmer.
+const ETAT_DEMASQUE = {
+  a_repondre: null,
+  attente: 'Tu as dit oui. On attend la réponse de l’autre personne.',
+  confirme: '💞 Confirmé des deux côtés : Lamia va vous mettre en relation.',
+  pas_cette_fois: 'Pas de démasquage cette fois.',
+};
+async function demasquages(session) {
+  const box = document.querySelector('[data-espace-demasquage]');
+  if (!box) return;
+  const appel = async (body) => {
+    const r = await fetch('/api/bal', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` }, body: JSON.stringify(body) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || 'erreur');
+    return d;
+  };
+  let couples = [];
+  try { ({ couples = [] } = await appel({ action: 'mes_demasquages' })); } catch { return; }
+  document.querySelector('[data-espace-demasquage-section]').hidden = !couples.length;
+  box.innerHTML = couples.map((c) => `<article class="espace-soiree espace-demasque"><h3>${esc(c.autre.name)} souhaite aussi te revoir</h3>
+    ${c.etat === 'a_repondre'
+      ? `<p class="bal-actions"><button class="btn btn-ink" type="button" data-demasque-oui="${esc(c.session)}|${esc(c.autre.uid)}">Oui, je me démasque</button><button class="btn btn-line" type="button" data-demasque-non="${esc(c.session)}|${esc(c.autre.uid)}">Pas cette fois</button></p>`
+      : `<p>${esc(ETAT_DEMASQUE[c.etat] || '')}</p>`}</article>`).join('');
+  box.onclick = async (e) => {
+    const b = e.target.closest('[data-demasque-oui],[data-demasque-non]'); if (!b) return;
+    const [s, autre] = (b.dataset.demasqueOui || b.dataset.demasqueNon).split('|');
+    b.disabled = true;
+    try { await appel({ action: 'demasque_repondre', session: s, autre, oui: Boolean(b.dataset.demasqueOui) }); }
+    catch { b.disabled = false; return; }
+    demasquages(session);
+  };
+  if (location.hash === '#demasquage' && couples.length) document.getElementById('demasquage')?.scrollIntoView({ behavior: 'smooth' });
 }
 
 const money = (c, cur = 'EUR') => new Intl.NumberFormat((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { style: 'currency', currency: cur || 'EUR' }).format((c || 0) / 100);

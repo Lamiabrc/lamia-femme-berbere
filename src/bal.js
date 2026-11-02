@@ -30,7 +30,7 @@ function simuler(body) {
     return { ok: true, status: 200, data: {
       phase: sim.phase, round: sim.round, where: sim.where, key: sim.where === 'tat' ? `tat:${sim.round}` : 'grand:apercu',
       ends_at: sim.ends_at, partner: sim.where === 'tat' ? sim.partner : null, demasque: sim.demasque, salon: sim.salon,
-      planb: sim.planb, met: sim.met, server_time: now.toISOString(),
+      planb: sim.planb, met: sim.met, reciproque: sim.where === 'tat' && Boolean(sim.reciproque), ma_reponse: sim.ma_reponse ?? null, server_time: now.toISOString(),
     } };
   }
   if (body.action === 'join') return { ok: true, status: 200, data: { url: '', token: '', key: '' } };
@@ -185,7 +185,16 @@ function decor() {
   const [zone, tranche] = String(s.salon || '').split(' · ');
   const th = themeSalon(s.salon);
   $('[data-salle-salon]').textContent = th ? `${th.nom} · ${tranche}` : s.salon ? (/tous/i.test(zone) ? 'Salon Tous âges' : `${NOMS[zone] || `Salon ${zone}`}${tranche ? ` · ${tranche}` : ''}`) : 'Le Bal masqué';
-  $('[data-demasque]').hidden = !(s.where === 'tat' && s.demasque);
+  $('[data-demasque]').hidden = !(s.where === 'tat' && s.demasque) || Boolean(s.reciproque);
+  // Tour du démasquage (souhaits réciproques) : chacun confirme s'il veut être mis en relation.
+  const rc = $('[data-reciproque]');
+  rc.hidden = !(s.where === 'tat' && s.reciproque);
+  if (!rc.hidden) {
+    const repondu = s.ma_reponse === true || s.ma_reponse === false;
+    $('[data-reciproque-boutons]').hidden = repondu;
+    $('[data-reciproque-ok]').hidden = !repondu;
+    if (repondu) $('[data-reciproque-ok]').textContent = s.ma_reponse ? 'C’est noté : tu veux te démasquer. Si l’autre personne dit oui aussi, Lamia vous met en relation.' : 'C’est noté. Ta réponse reste privée.';
+  }
   const pb = $('[data-planb]');
   pb.hidden = !s.planb;
   if (s.planb) pb.querySelector('[data-planb-lien]').href = s.planb;
@@ -306,6 +315,17 @@ $('[data-micro]')?.addEventListener('click', () => { call?.setLocalAudio(!call.l
 $('[data-camera]')?.addEventListener('click', () => { call?.setLocalVideo(!call.localVideo()); render(); });
 $('[data-quitter]')?.addEventListener('click', async () => { clearInterval(poll); await call?.leave(); show('quitte'); });
 
+$('[data-reciproque]')?.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-reciproque-rep]'); if (!b) return;
+  const oui = b.dataset.reciproqueRep === 'oui';
+  $$('[data-reciproque-rep]').forEach((x) => { x.disabled = true; });
+  const { ok } = await api({ action: 'demasque', pass: me.pass, oui });
+  $$('[data-reciproque-rep]').forEach((x) => { x.disabled = false; });
+  if (!ok) { message('Ta réponse n’est pas partie : réessaie.'); return; }
+  if (APERCU) sim.ma_reponse = oui;
+  state.ma_reponse = oui; decor();
+});
+
 $('[data-souhaits]')?.addEventListener('submit', async (e) => {
   e.preventDefault();
   const wished = [...e.target.querySelectorAll('input[type=checkbox]:checked')].map((x) => x.value);
@@ -409,6 +429,7 @@ function panneauApercu() {
       <button type="button" data-ap="tat">Tête-à-tête</button>
       <button type="button" data-ap="attente">En attente</button>
       <button type="button" data-ap="demasque">Démasquage</button>
+      <button type="button" data-ap="reciproque">Tour réciproque</button>
       <button type="button" data-ap="planb">Plan B</button>
       <button type="button" data-ap="fin">Fin du bal</button>
       <button type="button" data-ap="ferme">Bal fermé</button>
@@ -431,7 +452,9 @@ function panneauApercu() {
     if (v === 'pret') { me = { pass: 'apercu', name: 'Lamia', salon: sim.salon }; pret(); return; }
     if (v === 'ferme') { show('ferme'); return; }
     sim.planb = v === 'planb' ? 'https://meet.google.com/apercu' : null;
-    sim.demasque = v === 'demasque';
+    sim.demasque = v === 'demasque' || v === 'reciproque';
+    sim.reciproque = v === 'reciproque';
+    if (v === 'reciproque') { sim.ma_reponse = null; Object.assign(sim, { phase: 'tour', where: 'tat', round: 4, partner: 'Karim', ends_at: new Date(Date.now() + 5 * 60e3).toISOString(), met: SIM_MET }); }
     if (v === 'accueil' || v === 'planb') Object.assign(sim, { phase: 'accueil', where: 'grand', round: sim.round, ends_at: null });
     if (v === 'tat' || v === 'demasque') {
       sim.round = v === 'demasque' ? 3 : Math.min(3, sim.round + 1) || 1;
