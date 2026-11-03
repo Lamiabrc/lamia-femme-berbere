@@ -821,6 +821,12 @@ page(
       <div data-espace-discussion></div>
     </section>
 
+    <section id="coaching" data-espace-coaching-bloc hidden>
+      <h2>Mon coaching avec Lamia</h2>
+      <p>Ta formule Prestige comprend une visio de 15 minutes par mois avec Lamia, pour ton profil et tes rencontres. Elle n’est jamais enregistrée.</p>
+      <div class="espace-profil" data-espace-coaching></div>
+    </section>
+
     <section id="speed-dating">
       <h2>Mon speed dating</h2>
       <div id="salons" data-espace-salon><p class="loading">Un instant…</p></div>
@@ -1573,6 +1579,7 @@ page(
     <ol>
       <li><strong>C’est quoi, une mise en relation ?</strong><span>Lamia te propose une personne qui te correspond vraiment. Si vous êtes d’accord tous les deux, elle vous met en contact. Ton numéro reste chez elle jusque-là.</span></li>
       <li><strong>Plusieurs matchs en même temps, ça veut dire quoi ?</strong><span>Tu peux avoir 1 match en cours avec Découverte, 2 avec Passion et 5 avec Prestige. Quand tu mets fin à un match, une place se libère.</span></li>
+      <li><strong>Comment se passe le coaching Prestige ?</strong><span>Dans ton espace, tu choisis un créneau parmi ceux ouverts par Lamia : une visio de 15 minutes par mois, non enregistrée. Tu peux annuler jusqu’à 24 heures avant et choisir un autre créneau.</span></li>
       <li><strong>Et les speed datings inclus ?</strong><span>Ta place aux soirées de speed dating en ligne de ton salon, dans la limite indiquée chaque mois. Lamia la note quand tu t’inscris.</span></li>
       <li><strong>Je peux arrêter quand je veux ?</strong><span>Oui. Dans ton espace, « Gérer mon abonnement » : tu résilies en un clic. Ton abonnement reste actif jusqu’à la fin de la période payée.</span></li>
       <li><strong>Lamia garantit-elle un mariage ?</strong><span>Personne ne peut le promettre. Lamia s’engage sur le sérieux : profils vérifiés, matching soigné, et un vrai suivi.</span></li>

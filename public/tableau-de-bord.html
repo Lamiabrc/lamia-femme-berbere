@@ -17,6 +17,7 @@
     <button type="button" data-tab="rencontres">💞 Rencontres</button>
     <button type="button" data-tab="comptes">👥 Comptes</button>
     <button type="button" data-tab="application">📱 Application <span class="tdb-pastille" data-journal-pastille hidden></span></button>
+    <button type="button" data-tab="coaching">🎥 Coaching</button>
     <button type="button" data-tab="ventes">Ventes</button>
     <button type="button" data-tab="produits">Produits</button>
     <button type="button" data-tab="soirees">Soirées</button>
@@ -185,6 +186,37 @@
           <h2>Ce qui sonne sur mon téléphone</h2>
           <p class="aide" data-appareils></p>
           <form class="tdb-notifs" data-notifs-lamia></form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section data-panel="coaching" hidden>
+    <div class="tdb-entete"><h1 class="tdb-titre">Coaching Prestige</h1></div>
+    <p class="aide">Tes abonnés Prestige ont droit à une visio de 15 minutes par mois. Ouvre tes créneaux ici : ils réservent depuis leur espace. Horaires à l’heure de Paris.</p>
+    <div class="tdb-grille-app">
+      <div>
+        <div class="tdb-carte">
+          <h2>Mon planning</h2>
+          <div data-coaching-planning><p>Chargement…</p></div>
+        </div>
+      </div>
+      <div>
+        <div class="tdb-carte">
+          <h2>Ouvrir des créneaux</h2>
+          <form data-coaching-form class="tdb-coaching-form">
+            <label>Jour<input type="date" name="date" required></label>
+            <label>De<input type="time" name="de" value="18:00" required></label>
+            <label>À<input type="time" name="a" value="19:00" required></label>
+            <button class="btn btn-ink" type="submit">Ouvrir</button>
+          </form>
+          <p class="aide">Un créneau toutes les 20 minutes : 15 minutes de visio et 5 minutes entre deux personnes.</p>
+          <p class="aide" role="status" data-coaching-statut></p>
+        </div>
+        <div class="tdb-carte">
+          <h2>Mes abonnés Prestige</h2>
+          <ul class="tdb-retraits" data-coaching-abonnes><li>Chargement…</li></ul>
+          <p><button class="btn btn-line" type="button" data-coaching-prevenir>Prévenir ceux qui n’ont pas réservé ce mois-ci</button></p>
         </div>
       </div>
     </div>

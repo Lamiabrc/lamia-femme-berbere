@@ -40,8 +40,47 @@ async function render() {
   propositions(session);
   discussions(session);
   monSpeedDating(session);
+  monCoaching(session);
   demasquages(session);
   mesBlocages(session);
+}
+
+// Coaching Prestige : réserver sa visio du mois, l'annuler, y entrer.
+const ERR_COACHING = { deja_ce_mois: 'Tu as déjà ta visio pour ce mois-là.', creneau_pris: 'Ce créneau vient d’être pris. Choisis-en un autre.', creneau_passe: 'Ce créneau est trop proche. Choisis-en un autre.', trop_tard: 'Moins de 24 heures avant la visio, elle ne peut plus être annulée. Écris à Lamia si besoin.', trop_tot: 'La visio s’ouvre 10 minutes avant l’heure. Reviens un peu plus tard.', terminee: 'Cette visio est terminée.', paiement_a_regulariser: 'Ton paiement est à régulariser avant de réserver.', video_indisponible: 'La visio ne s’ouvre pas pour le moment. Réessaie dans un instant.', video_not_configured: 'La visio ne s’ouvre pas pour le moment. Écris à Lamia.' };
+async function monCoaching(session) {
+  const bloc = $('[data-espace-coaching-bloc]'), box = $('[data-espace-coaching]');
+  if (!bloc || !box) return;
+  const jour = (d) => new Date(d).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+  const heure = (d) => new Date(d).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  const peindre = (d, note = '') => {
+    bloc.hidden = !d.inclus;
+    if (!d.inclus) { box.innerHTML = ''; return; }
+    const parJour = new Map();
+    for (const c of d.creneaux || []) { const k = jour(c.debut); if (!parJour.has(k)) parJour.set(k, []); parJour.get(k).push(c); }
+    box.innerHTML = `${d.prochaine ? `<h3>🎥 Ta prochaine visio</h3><p><strong>${esc(jour(d.prochaine.debut))} à ${esc(heure(d.prochaine.debut))}</strong>, pour 15 minutes.</p><p class="po-actions"><button class="btn btn-ink" type="button" data-coaching-entrer="${esc(d.prochaine.id)}">Entrer dans la visio</button>${d.prochaine.annulable ? `<button class="btn btn-line" type="button" data-coaching-annuler="${esc(d.prochaine.id)}">Annuler</button>` : ''}</p><p><small>La visio s’ouvre 10 minutes avant l’heure.${d.prochaine.annulable ? ' Tu peux annuler jusqu’à 24 heures avant.' : ''}</small></p>` : ''}
+      ${d.impaye ? '<p>Ton paiement est à régulariser pour réserver une visio : va dans « Gérer mon abonnement ».</p>' : ''}
+      ${parJour.size ? `<h3>${d.prochaine ? 'Réserver ma visio d’un autre mois' : 'Choisir mon créneau'}</h3><p><small>Horaires à l’heure de ton téléphone.</small></p>${[...parJour].map(([k, l]) => `<p class="espace-coaching-jour"><strong>${esc(k)}</strong></p><p class="espace-coaching-heures">${l.map((c) => `<button class="btn btn-line" type="button" data-coaching-reserver="${esc(c.id)}" data-quand="${esc(`${k} à ${heure(c.debut)}`)}">${esc(heure(c.debut))}</button>`).join('')}</p>`).join('')}` : (!d.prochaine && !d.impaye ? '<p>Lamia n’a pas encore ouvert de créneaux. Tu seras prévenu·e dès que c’est le cas.</p>' : '')}
+      <p class="form-status" role="status" data-coaching-statut>${esc(note)}</p>`;
+  };
+  const faire = async (corps, ok = '') => {
+    const st = box.querySelector('[data-coaching-statut]');
+    try { peindre(await appelProfil(corps, session), ok); }
+    catch (e) { if (st) st.textContent = ERR_COACHING[e.code] || 'Ça n’a pas fonctionné. Réessaie dans un instant.'; box.querySelectorAll('button').forEach((x) => { x.disabled = false; }); }
+  };
+  // Une seule fois, même après une reconnexion : le gestionnaire est remplacé, avec la session du moment.
+  box.onclick = async (e) => {
+      const r = e.target.closest('[data-coaching-reserver]'), a = e.target.closest('[data-coaching-annuler]'), v = e.target.closest('[data-coaching-entrer]');
+      if (r) { if (!confirm(`Réserver ta visio du ${r.dataset.quand} ?`)) return; r.disabled = true; await faire({ action: 'annonce_coaching_reserver', id: r.dataset.coachingReserver }, 'C’est réservé. Tu reçois une confirmation par email.'); }
+      if (a) { if (!confirm('Annuler ta visio ? Tu pourras choisir un autre créneau.')) return; a.disabled = true; await faire({ action: 'annonce_coaching_annuler', id: a.dataset.coachingAnnuler }, 'Ta visio est annulée.'); }
+      if (v) {
+        const st = box.querySelector('[data-coaching-statut]'), fen = window.open('', '_blank');
+        v.disabled = true; st.textContent = 'Ouverture de la visio…';
+        try { const d = await appelProfil({ action: 'annonce_coaching_rejoindre', id: v.dataset.coachingEntrer }, session); if (fen) fen.location.href = d.url; else location.href = d.url; st.textContent = ''; }
+        catch (err) { fen?.close(); st.textContent = ERR_COACHING[err.code] || 'La visio ne s’ouvre pas pour le moment. Réessaie dans un instant.'; }
+        v.disabled = false;
+      }
+  };
+  try { peindre(await appelProfil({ action: 'annonce_coaching' }, session)); } catch { bloc.hidden = true; }
 }
 
 // Démasquages : souhaits réciproques du bal, à confirmer.

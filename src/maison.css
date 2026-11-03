@@ -3533,3 +3533,7 @@ body:has(.swipe-page) .barre-app a[aria-current="page"] { background: rgba(244,2
 body:has(.swipe-page) .barre-app [data-barre-point] { box-shadow: 0 0 0 2px #1C2059; }
 body:has(.swipe-page) .cta-profil { background-color: #252B78; background-image: none; box-shadow: none; }
 .swipe-page .swipe-carte .swipe-texte h2, .swipe-page .swipe-carte .swipe-texte h3, .swipe-page .swipe-carte .annonce-secteur b { color: #1C2059 !important; }
+
+/* Espace coaching Prestige dans Mon espace */
+.espace-coaching-jour { margin: 14px 0 6px; text-transform: capitalize; }
+.espace-coaching-heures { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }

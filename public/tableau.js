@@ -40,6 +40,7 @@ function ouvrir(tab) {
   if (tab === 'application') { chargerJournal(); chargerRecommandes(); }
   if (tab === 'soirees') chargerSalons();
   if (tab === 'activite') chargerActivite();
+  if (tab === 'coaching') chargerCoaching();
   if (tab === 'comptes' && !comptes) chargerComptes();
   if (tab === 'rencontres') { const f = $('[data-rencontres]'); if (f && !f.src) f.src = `/confidences-lamia/?integre=1#${aller || 'annonces'}`; aller = ''; }
   scrollTo({ top: 0 });
@@ -709,7 +710,7 @@ async function demarrer() {
   if (session && !admin) message('Ce compte n’a pas le rôle administratrice.', true);
   if (!admin) return;
   const tab = location.hash.slice(1);
-  ouvrir(['accueil', 'activite', 'rencontres', 'comptes', 'application', 'ventes', 'produits', 'soirees', 'bilan', 'alertes', 'textes', 'visites'].includes(tab) ? tab : 'accueil');
+  ouvrir(['accueil', 'activite', 'rencontres', 'comptes', 'application', 'coaching', 'ventes', 'produits', 'soirees', 'bilan', 'alertes', 'textes', 'visites'].includes(tab) ? tab : 'accueil');
   aFaire(); pastilleJournal();
   await charger();
 }
@@ -767,4 +768,36 @@ document.addEventListener('click', (e) => {
   const d = e.target.closest('[data-dematcher]'), p = e.target.closest('[data-retirer-prop]');
   if (d && confirm('Annuler ce match ? La discussion se ferme et leurs autres choix reviennent.')) chargerActivite({ op: 'dematcher', id: d.dataset.dematcher });
   if (p) chargerActivite({ op: 'retirer_proposition', id: p.dataset.retirerProp });
+});
+
+// ---------------------------------------------------------------- coaching Prestige : créneaux et réservations
+const ERR_COACHING = { plage_invalide: 'Vérifie le jour et les heures : il faut au moins 15 minutes.', plage_passee: 'Cette plage horaire est déjà passée.', trop_tot: 'La visio s’ouvre 10 minutes avant l’heure.', terminee: 'Cette visio est terminée.', video_indisponible: 'La visio ne s’ouvre pas pour le moment. Réessaie dans un instant.', video_not_configured: 'La clé vidéo Daily manque sur le site.' };
+function peindreCoaching(d) {
+  const parJour = new Map();
+  for (const c of d.creneaux || []) { const k = date(c.debut, { weekday: 'long', day: 'numeric', month: 'long' }); if (!parJour.has(k)) parJour.set(k, []); parJour.get(k).push(c); }
+  const passe = (c) => new Date(c.debut).getTime() + 30 * 60e3 < Date.now();
+  $('[data-coaching-planning]').innerHTML = [...parJour].map(([k, l]) => `<h3>${esc(k)}</h3><ul class="tdb-retraits">${l.map((c) => `<li><span><b>${esc(date(c.debut, { hour: '2-digit', minute: '2-digit' }))}</b> · ${c.user_id ? `${esc(c.prenom || '')} <small>${esc(c.email || '')}</small>` : '<small>Libre</small>'}</span>${passe(c) ? '' : `<span>${c.user_id ? `<button class="btn btn-ink" type="button" data-coaching-entrer="${esc(c.id)}">Entrer</button> ` : ''}<button class="link-button" type="button" data-coaching-fermer="${esc(c.id)}" data-reserve="${c.user_id ? '1' : ''}">${c.user_id ? 'Annuler' : 'Retirer'}</button></span>`}</li>`).join('')}</ul>`).join('') || '<p>Aucun créneau ouvert pour l’instant.</p>';
+  $('[data-coaching-abonnes]').innerHTML = (d.abonnes || []).map((a) => `<li><span><b>${esc(a.nom || a.email)}</b> <small>${a.reserve ? `Visio du mois : ${esc(date(a.reserve))}` : 'Pas encore de visio ce mois-ci'}</small></span></li>`).join('') || '<li>Pas encore d’abonné Prestige actif.</li>';
+}
+async function chargerCoaching(corps = { action: 'annonce_coaching_planning' }) {
+  const st = $('[data-coaching-statut]');
+  try { peindreCoaching(await conf(corps)); st.textContent = ''; }
+  catch (e) { st.textContent = ERR_COACHING[e.message] || 'Ça n’a pas fonctionné. Réessaie dans un instant.'; }
+}
+$('[data-coaching-form]')?.addEventListener('submit', (e) => { e.preventDefault(); const f = e.target; chargerCoaching({ action: 'annonce_coaching_ouvrir', date: f.date.value, de: f.de.value, a: f.a.value }); });
+$('[data-coaching-prevenir]')?.addEventListener('click', async (e) => {
+  if (!confirm('Envoyer une notification et un email aux abonnés Prestige qui n’ont pas encore réservé ce mois-ci ?')) return;
+  e.target.disabled = true;
+  try { const d = await conf({ action: 'annonce_coaching_prevenir' }); $('[data-coaching-statut]').textContent = `${d.prevenus} abonné(s) prévenu(s).`; }
+  catch { $('[data-coaching-statut]').textContent = 'L’envoi n’a pas fonctionné. Réessaie.'; }
+  e.target.disabled = false;
+});
+document.addEventListener('click', async (e) => {
+  const x = e.target.closest('[data-coaching-fermer]'), v = e.target.closest('[data-coaching-entrer]');
+  if (x) { if (x.dataset.reserve && !confirm('Annuler cette visio ? La personne est prévenue et pourra choisir un autre créneau.')) return; chargerCoaching({ action: 'annonce_coaching_fermer', id: x.dataset.coachingFermer }); }
+  if (v) {
+    const fen = window.open('', '_blank');
+    try { const d = await conf({ action: 'annonce_coaching_rejoindre', id: v.dataset.coachingEntrer }); if (fen) fen.location.href = d.url; else location.href = d.url; }
+    catch (err) { fen?.close(); $('[data-coaching-statut]').textContent = ERR_COACHING[err.message] || 'La visio ne s’ouvre pas pour le moment.'; }
+  }
 });
