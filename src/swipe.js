@@ -24,7 +24,7 @@ function carte(a) {
     ${a.revu ? '<span class="swipe-ta-choisi">👀 Tu l’as déjà passé : une seconde chance ?</span>' : a.hors_criteres ? '<span class="swipe-ta-choisi">🌍 Un peu hors de tes critères</span>' : ''}
     <div class="annonce-sceau" aria-hidden="true"><img src="/images/outil/${a.genre === 'femme' ? 'avatar-femme' : 'avatar-homme'}.webp" alt="" width="80" height="80" draggable="false"></div>
     <div class="swipe-texte">
-      <p class="annonce-ref${a.piece_identite ? ' is-piece' : ''}">Profil n° ${a.ref} · ${a.piece_identite ? 'vérifié avec pièce d’identité' : a.outil ? (a.confirme ? '✓ vérifié par Lamia · ✅ confirmé' : '✓ vérifié par Lamia · ⏳ en attente de confirmation') : '✓ profil vérifié'}</p>
+      <p class="annonce-ref${a.piece_identite ? ' is-piece' : ''}">Profil n° ${a.ref} · ${a.piece_identite ? '✓ vérifié par Lamia' : a.outil ? (a.confirme ? '✓ vérifié par Lamia · ✅ confirmé' : '✓ vérifié par Lamia · ⏳ en attente de confirmation') : '✓ profil vérifié'}</p>
       ${badgesProfil(a)}
       <h2>${a.genre === 'femme' ? 'Une femme' : 'Un homme'}, ${esc(a.age)} ans</h2>
       <p class="annonce-lieu"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lieu"/></svg>${esc([a.ville, ...infos].filter(Boolean).join(' · '))}</p>
