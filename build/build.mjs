@@ -1384,7 +1384,7 @@ page(
     </div>
         <div class="cl-carte cl-export">
       <h3>📷 Profils sans leurs photos <span data-n-sans-photos></span></h3>
-      <p class="cl-aide">Tant qu’il manque 2 photos ou une vidéo, la personne voit une demande dans l’application et ne peut ni swiper ni répondre. Le bouton lui envoie aussi une notification sur son téléphone, une seule fois, si elle les a activées.</p>
+      <p class="cl-aide">Tant qu’il manque 2 photos, la personne voit une demande dans l’application et ne peut ni swiper ni répondre. Le bouton lui envoie aussi une notification sur son téléphone, une seule fois, si elle les a activées.</p>
       <button class="cl-btn cl-plein" type="button" data-relance-medias>Envoyer la notification</button>
       <p class="cl-statut" data-relance-statut></p>
     </div>

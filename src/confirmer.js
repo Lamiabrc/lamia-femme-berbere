@@ -101,7 +101,7 @@ async function monterSimple() {
     return;
   }
   z.innerHTML = `<form class="confirmer-modif" data-simple-form>
-    <p><strong>Tu es d’accord pour apparaître dans les profils ?</strong> Choisis ton accès, puis ajoute 2 photos ou une courte vidéo (elles restent privées) :</p>
+    <p><strong>Tu es d’accord pour apparaître dans les profils ?</strong> Choisis ton accès, puis ajoute 2 photos de toi (elles restent privées) :</p>
     <label>Ton prénom<input name="prenom" autocomplete="given-name" required></label>
     <label>Ton email<input name="email" type="email" autocomplete="email" required></label>
     <label>Un mot de passe (8 caractères minimum)<input name="mdp" type="password" minlength="8" autocomplete="new-password" required></label>
