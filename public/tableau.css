@@ -196,3 +196,6 @@
 .compte-liste small { color: var(--qvt-taupe); }
 .compte-ajout { display: flex; gap: 10px; align-items: end; flex-wrap: wrap; margin-top: 12px; }
 .compte-ajout label { display: grid; gap: 6px; font-weight: 600; font-size: 14px; flex: 1; min-width: 220px; }
+
+.tdb-coaching-form { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
+.tdb-coaching-form label { display: grid; gap: 4px; font-size: 14px; }
