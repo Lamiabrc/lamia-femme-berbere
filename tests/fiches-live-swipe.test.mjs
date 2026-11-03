@@ -35,6 +35,7 @@ function base(initial = {}) {
   };
   const coupe = (u) => { const m = u.match(/^\/rest\/v1\/([a-z_]+)\??(.*)$/); return m ? [m[1], m[2]] : [null, '']; };
   const read = async (u) => {
+    if (u.includes('annonce_files?annonce_id=eq.') && u.includes('kind=in.')) return [{ kind: 'photo' }, { kind: 'photo' }];
     const [t, qs] = coupe(u); if (!t) return [];
     let l = filtrer(t, qs);
     if (t === 'annonce_interets') l = l.map((i) => ({ ...i, annonces: db.annonces.find((a) => a.id === i.demandeur_id) }));

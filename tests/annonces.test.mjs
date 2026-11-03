@@ -7,13 +7,14 @@ const video = { role: 'media', type: 'video/mp4', size: 1000 };
 const id = { role: 'identite', type: 'image/jpeg', size: 1000 };
 
 test('médias : photos ou vidéo ; pièce d’identité facultative (une seule)', () => {
-  assert.deepEqual(verifierMedias([photo]).files.map((f) => f.kind), ['photo']);
-  assert.equal(verifierMedias([photo, id, id]).error, 'identite_trop');
+  assert.equal(verifierMedias([photo]).error, 'medias_requis'); // 2 photos ou une vidéo
+  assert.deepEqual(verifierMedias([photo, photo]).files.map((f) => f.kind), ['photo', 'photo']);
+  assert.equal(verifierMedias([photo, photo, id, id]).error, 'identite_trop');
   assert.equal(verifierMedias([id]).error, 'medias_requis');
   assert.equal(verifierMedias([photo, photo, photo, id]).error, 'medias_trop');
   assert.equal(verifierMedias([photo, video, id]).error, 'medias_trop');
   assert.equal(verifierMedias([{ ...video, size: 60 * 1024 * 1024 }, id]).error, 'file_size');
-  assert.equal(verifierMedias([photo, { role: 'identite', type: 'video/mp4', size: 10 }]).error, 'file_type');
+  assert.equal(verifierMedias([photo, photo, { role: 'identite', type: 'video/mp4', size: 10 }]).error, 'file_type');
   assert.deepEqual(verifierMedias([photo, photo, id]).files.map((f) => f.kind), ['photo', 'photo', 'identite']);
   assert.deepEqual(verifierMedias([video, { ...id, type: 'application/pdf' }]).files.map((f) => f.kind), ['video', 'identite']);
 });

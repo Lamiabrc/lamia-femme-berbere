@@ -39,7 +39,7 @@ function choisie(d) {
     ? '<p class="confirmer-actions"><a class="po-btn" href="/mon-espace/#interets">Répondre dans mon espace</a></p>'
     : d.confirme
       ? '<p><strong>Dernière étape :</strong> crée ton accès ci-dessous pour répondre.</p>'
-      : '<p><strong>Pour répondre, il te reste à confirmer ta fiche et à créer ton compte.</strong> C’est gratuit et ça prend une minute. Personne ne verra ton prénom ni tes contacts.</p><p class="confirmer-actions"><button type="button" class="po-btn" data-aller-confirmer>Confirmer ma fiche et créer mon compte</button></p>';
+      : '<p><strong>Pour répondre, il te reste à confirmer ta fiche, créer ton compte et ajouter 2 photos.</strong> C’est gratuit et ça prend une minute. Personne ne verra ton prénom, tes contacts ni tes photos dans les profils.</p><p class="confirmer-actions"><button type="button" class="po-btn" data-aller-confirmer>Confirmer ma fiche et créer mon compte</button></p>';
   return `<section class="confirmer-choisie">
     <h2>💌 ${n > 1 ? `${n} personnes s’intéressent` : 'Quelqu’un s’intéresse'} à toi</h2>
     <p>${n > 1 ? 'Voici leurs annonces, anonymes comme la tienne.' : 'Voici son annonce, anonyme comme la tienne.'}</p>
@@ -78,7 +78,7 @@ function afficherFiche(d) {
   zone.innerHTML = `<p class="confirmer-intro">Voici ta fiche. Elle est <strong>anonyme</strong> : ni prénom, ni TikTok, ni numéro, ni photo.</p>
     ${fiche(f)}
     <div class="confirmer-etat" data-simple><p class="annonce-vide">Un instant…</p></div>
-    <p class="confirmer-note">Pas tout à fait ça ? <button type="button" class="confirmer-lien" data-modifier>Modifier ma fiche</button> · <button type="button" class="confirmer-lien" data-retirer>Ne pas apparaître</button> · <button type="button" class="confirmer-lien" data-confirmer-oui>Confirmer sans créer d’accès</button></p>
+    <p class="confirmer-note">Pas tout à fait ça ? <button type="button" class="confirmer-lien" data-modifier>Modifier ma fiche</button> · <button type="button" class="confirmer-lien" data-retirer>Ne pas apparaître</button></p>
     ${formulaire}${effacer}`;
   monterSimple();
 }
@@ -92,6 +92,8 @@ async function monterSimple() {
     try { await api({ action: 'annonce_lier_fiche_outil', n, t }, s.access_token); }
     catch (e) { dire(e.code === 'deja_liee' ? 'Cette fiche est déjà reliée à un autre compte. Écris à Lamia pour qu’elle t’aide.' : 'Ça n’a pas fonctionné. Réessaie dans un instant.'); return; }
     await agir('annonce_confirmer_outil');
+    // La fiche est confirmée : direction l'espace pour ajouter les photos, obligatoires pour swiper et répondre.
+    location.assign('/mon-espace/#photos');
   };
   if (session) {
     z.innerHTML = `<p>Tu es connecté·e avec <strong>${esc(session.user.email)}</strong>.</p><p class="confirmer-actions"><button type="button" class="po-btn" data-tout>✅ Je confirme ma fiche</button></p><p class="confirmer-note" data-simple-msg></p>`;
@@ -99,7 +101,7 @@ async function monterSimple() {
     return;
   }
   z.innerHTML = `<form class="confirmer-modif" data-simple-form>
-    <p><strong>Tu es d’accord pour apparaître dans les profils ?</strong> Choisis ton accès pour suivre ta fiche :</p>
+    <p><strong>Tu es d’accord pour apparaître dans les profils ?</strong> Choisis ton accès, puis ajoute 2 photos ou une courte vidéo (elles restent privées) :</p>
     <label>Ton prénom<input name="prenom" autocomplete="given-name" required></label>
     <label>Ton email<input name="email" type="email" autocomplete="email" required></label>
     <label>Un mot de passe (8 caractères minimum)<input name="mdp" type="password" minlength="8" autocomplete="new-password" required></label>

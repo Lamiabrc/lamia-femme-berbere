@@ -4,6 +4,7 @@ import { handleAnnonces, pseudoTikTok, normLien, empreinteLien } from '../lib/an
 
 // Petite base en mémoire, juste assez pour les actions testées.
 function monde({ compte = true, tiktok = {} } = {}) {
+  let medias = true;
   const db = { annonces: [], annonce_interets: [], annonce_files: [], annonce_passes: [] }, alertes = [];
   const json = async (x) => ({ ok: true, json: async () => x });
   const call = async (u, o = {}) => {
@@ -12,6 +13,7 @@ function monde({ compte = true, tiktok = {} } = {}) {
     return json([]);
   };
   const read = async (u) => {
+    if (u.includes('annonce_files?annonce_id=eq.') && u.includes('kind=in.')) return medias ? [{ kind: 'photo' }, { kind: 'photo' }] : [];
     const h = u.match(/outil_tiktok\?h=in\.\(([0-9a-f,]+)\)/); if (h) { const f = h[1].split(',').find((x) => tiktok[x]); return f ? [{ outil_id: tiktok[f] }] : []; }
     if (u.includes('lien_h=eq.')) { const x = u.match(/lien_h=eq\.([0-9a-f]+)/)[1]; return db.annonces.filter((a) => a.lien_h === x && ['a_verifier', 'publiee'].includes(a.status)); }
     if (u.includes('/annonce_interets?id=eq.')) { const id = u.match(/id=eq\.([^&]+)/)[1]; const i = db.annonce_interets.find((x) => x.id === id); return i ? [{ cible_ref: i.cible_ref, annonces: db.annonces.find((a) => a.id === i.demandeur_id) }] : []; }
@@ -25,10 +27,10 @@ function monde({ compte = true, tiktok = {} } = {}) {
   const insert = async (t, row) => { const r = { id: `00000000-0000-0000-0000-00000000000${db[t].length + 1}`, ref: db[t].length + 1, status: 'brouillon', ...row }; db[t].push(r); return r; };
   const patch = async (t, filtre, v) => { const [k, val] = filtre.split('&')[0].split('=eq.'); for (const r of db[t]) if (String(r[k]) === decodeURIComponent(val)) Object.assign(r, v); return { ok: true }; };
   const ctx = (user = null, formule = 'decouverte') => ({ formuleDe: async () => formule, env: { SUPABASE_SERVICE_ROLE_KEY: 'x' }, call, read, insert, patch, admin: false, user, ipHash: 'ip', now: () => new Date('2026-10-29T20:00:00Z'), email: async () => true, alerter: async (a) => alertes.push(a.titre) });
-  return { db, alertes, ctx };
+  return { db, alertes, ctx, sansMedias: () => { medias = false; } };
 }
 const base = { action: 'annonce_deposer', majeur: true, publication: true, prenom: 'Nina', genre: 'femme', birth_date: '1995-03-02', email: 'nina@example.com', matching: { contactReseau: 'https://www.tiktok.com/@nina.kab' } };
-const complet = { ...base, ville: 'Lyon', pays: 'France', profil: 'Je suis souriante et sérieuse.', recherche: 'Un homme sérieux et doux.', medias: [{ role: 'media', type: 'image/jpeg', size: 1000 }] };
+const complet = { ...base, ville: 'Lyon', pays: 'France', profil: 'Je suis souriante et sérieuse.', recherche: 'Un homme sérieux et doux.', medias: [{ role: 'media', type: 'image/jpeg', size: 1000 }, { role: 'media', type: 'image/jpeg', size: 1000 }] };
 
 const NINA = { id: 'u-nina', email: 'nina@example.com' };
 
@@ -65,7 +67,7 @@ test('dire qu’un profil intéresse demande un compte', async () => {
 });
 test('profil créé en live : formulaire allégé, fiche retrouvée par empreinte TikTok', async () => {
   const { ctx, db } = monde({ tiktok: { [empreinteLien('tiktok:nina.kab')]: 'outil-42' } });
-  const r = await handleAnnonces('annonce_deposer', { ...base, live: true, tiktok_live: '@nina.kab' }, ctx(NINA));
+  const r = await handleAnnonces('annonce_deposer', { ...complet, live: true, tiktok_live: '@nina.kab' }, ctx(NINA));
   assert.equal(r.status, 200);
   assert.equal(db.annonces[0].live_declare, true);
   assert.equal(db.annonces[0].outil_id, 'outil-42');
@@ -208,4 +210,16 @@ test('création de compte par le site : compte déjà confirmé, 5 au plus par h
   const existe = { ...ctx, call: async () => ({ ok: false, status: 422 }) };
   r = await handleAnnonces('annonce_creer_compte', { email: 'x@example.com', password: '12345678' }, existe);
   assert.equal((await r.json()).error, 'compte_existe');
+});
+
+test('photos obligatoires : sans 2 photos ni vidéo, ni swipe ni choix', async () => {
+  const { ctx, db, sansMedias } = monde();
+  db.annonces.push({ id: 'a1', ref: 11, user_id: 'u1', email: 'nina@example.com', status: 'publiee', prenom: 'Nina', genre: 'femme', en_match: false });
+  sansMedias();
+  const u = { id: 'u1', email: 'nina@example.com' };
+  const l = await handleAnnonces('annonce_swipe_liste', {}, ctx(u));
+  assert.equal(l.status, 403);
+  assert.equal((await l.json()).error, 'photos_requises');
+  assert.equal((await handleAnnonces('annonce_swipe', { ref: 12, choix: 'oui' }, ctx(u))).status, 403);
+  assert.equal((await handleAnnonces('annonce_swipe', { ref: 12, choix: 'non' }, ctx(u))).status, 200);
 });
