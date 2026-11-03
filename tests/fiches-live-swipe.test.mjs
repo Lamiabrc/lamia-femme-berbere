@@ -184,18 +184,25 @@ test('liste : mes critères d’âge et de lieu, ceux qui me cherchent aussi d�
     scores_outil: [{ a_ref: 100001, b_ref: 100002, score: 40 }, { a_ref: 100003, b_ref: 100001, score: 90 }],
   });
   const r = await lire(await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID)));
-  assert.deepEqual(r.profils.map((p) => p.ref), [100003, 100002, 100006]); // 100006 cherche au Canada : gardée, mais après
+  // 100006 cherche au Canada : gardée, mais après. Hors de mes critères (pays, âge) : à la fin, marquées.
+  assert.deepEqual(r.profils.map((p) => p.ref).slice(0, 3), [100003, 100002, 100006]);
+  assert.deepEqual(r.profils.slice(3).map((p) => [p.ref, p.hors_criteres]).sort(), [[100004, true], [100005, true]]);
   assert.equal(db.annonces[0].matching.zoneGeo, 'France');
 });
 
-test('revoir les profils passés : ils reviennent', async () => {
-  const { ctx } = base({ profils_outil: [FICHE(100001, 'u-rachid', 'homme'), FICHE(100002, null, 'femme')] });
+test('le swipe ne s’arrête jamais : les profils passés reviennent, jamais ceux déjà choisis ni bloqués', async () => {
+  const { db, ctx } = base({ profils_outil: [FICHE(100001, 'u-rachid', 'homme'), FICHE(100002, null, 'femme'), FICHE(100003, null, 'femme'), FICHE(100004, null, 'femme')] });
   await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID));
   await handleAnnonces('annonce_swipe', { ref: 100002, choix: 'non' }, ctx(RACHID));
+  await handleAnnonces('annonce_swipe', { ref: 100003, choix: 'oui' }, ctx(RACHID));
+  db.blocages.push({ auteur_user: 'u-rachid', auteur_ref: db.annonces[0].ref, cible_ref: 100004 });
   let r = await lire(await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID)));
-  assert.deepEqual([r.profils.length, r.passes], [0, 1]);
-  await handleAnnonces('annonce_swipe_revoir', {}, ctx(RACHID));
+  assert.deepEqual(r.profils.map((p) => [p.ref, p.revu]), [[100002, true]]);
+  await handleAnnonces('annonce_swipe', { ref: 100002, choix: 'non' }, ctx(RACHID)); // repasser une seconde fois ne casse rien
   r = await lire(await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID)));
-  assert.deepEqual([r.profils.length, r.passes], [1, 0]);
+  assert.equal(r.profils.length, 1);
+  const oui = await lire(await handleAnnonces('annonce_swipe', { ref: 100002, choix: 'oui' }, ctx(RACHID))); // seconde chance
+  assert.equal(oui.ok, true);
+  r = await lire(await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID)));
+  assert.equal(r.profils.length, 0);
 });
-
