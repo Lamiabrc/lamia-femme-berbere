@@ -246,6 +246,7 @@ async function chargerAnnonces() {
         ${a.status !== 'refusee' ? `<button class="cl-btn" type="button" data-decision="refuser">${a.status === 'publiee' ? 'Retirer le profil' : 'Refuser'}</button>` : ''}
         ${a.status === 'publiee' ? '<button class="cl-btn" type="button" data-exporter-une>↪ Fiche pour l’outil de matching</button>' : ''}
         ${a.status === 'publiee' ? `<span class="cl-aide">${a.visible_anonyme ? '👁 Affiché anonymement dans les Rencontres' : a.anonyme_ok ? 'Pour l’afficher dans les Rencontres : ton outil, écran « Le site » → Publier' : 'La personne n’a pas accepté l’affichage anonyme'}</span>${a.visible_anonyme ? ' <button class="cl-btn" type="button" data-decision="masquer">Retirer du Patio</button>' : ''}` : ''}
+        ${a.medias.length ? '<button class="cl-btn" type="button" data-decision="photos_refuser">📷 Photos non conformes : en redemander</button>' : ''}
         <button class="cl-btn" type="button" data-decision="supprimer">Supprimer définitivement</button>
       </div>
       <p class="cl-statut" role="status" data-annonce-statut></p>
@@ -262,6 +263,7 @@ document.addEventListener('click', async (e) => {
   const d = b.dataset.decision;
   if (d === 'supprimer' && !confirm('Supprimer définitivement cette annonce et ses fichiers ?')) return;
   if (d === 'refuser' && !confirm('Refuser ce profil ? Les photos et la pièce d’identité seront supprimées et la personne prévenue par email.')) return;
+  if (d === 'photos_refuser' && !confirm('Supprimer ses photos et lui en redemander ? Son swipe est bloqué jusqu’aux nouvelles photos, et elle est prévenue.')) return;
   if (d === 'bonus_match' && !confirm('Offrir un match de plus à ce profil ? C’est 1 match toutes les 2 semaines au maximum.')) return;
   if (d === 'resultat') { const nb = carte.querySelector('[data-nb]')?.value; if (nb === '' || nb == null) return say(st, 'Indique le nombre de profils compatibles.', true); if (!confirm(`Envoyer à cette personne : ${nb} profil(s) compatible(s) ?`)) return; }
   say(st, 'Un instant…');

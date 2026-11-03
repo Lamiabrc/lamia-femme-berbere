@@ -282,7 +282,7 @@ addEventListener('keydown', (e) => { if (document.querySelector('.swipe-fenetre'
     monterFiltres();
     appliquer();
   } catch (err) {
-    if (err.code === 'photos_requises') return message('<h2>Il manque tes photos</h2><p>Pour découvrir les profils, ajoute <strong>2 photos ou une courte vidéo</strong> dans ton espace. Elles restent privées.</p><p><a class="po-btn" href="/mon-espace/#photos">Ajouter mes photos</a></p>');
+    if (err.code === 'photos_requises') return message('<h2>Il manque tes photos</h2><p>Pour découvrir les profils, ajoute <strong>2 photos de toi</strong> dans ton espace. Elles restent privées.</p><p><a class="po-btn" href="/mon-espace/#photos">Ajouter mes photos</a></p>');
     if (err.code === 'fiche_a_confirmer') return message('<h2>Plus qu’une étape</h2><p>Ta fiche du live n’est pas encore confirmée. Confirme-la depuis ton espace, puis reviens swiper. Inutile de refaire un profil.</p><p><a class="po-btn" href="/mon-espace/">Confirmer ma fiche</a></p>');
     if (err.code === 'fiche_live') return message('<h2>Ta fiche du live est bien là ✅</h2><p>Il lui manque ton âge ou ton genre pour que tu puisses swiper. Écris à Lamia pour qu’elle la complète : inutile de refaire un profil.</p><p><a class="po-btn" href="/mon-espace/">Aller dans mon espace</a></p>');
     if (err.code === 'pas_de_profil') return message('<h2>Confie d’abord ton profil</h2><p>Pour swiper, Lamia a besoin de connaître ton profil : c’est lui qui sera proposé aux personnes qui te correspondent.</p><p><a class="po-btn" href="/rencontres/#confier">💌 Confier mon profil</a></p>');
