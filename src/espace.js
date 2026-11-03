@@ -197,8 +197,9 @@ async function monProfil(session) {
     box.innerHTML = `<article class="espace-achat"><div><p class="event-date">Profil n° ${esc(p.ref)}</p><h3>${esc(ETAT_PROFIL[p.status] || p.status)}${p.status === 'publiee' && p.piece_identite ? ' · 🛡 avec pièce d’identité' : ''}</h3>
       ${p.live ? `<p>🎥 Profil créé en live avec Lamia${p.live_retrouve ? '' : ' (Lamia vérifie ta fiche)'} : <strong>tes 3 premières mises en relation sont offertes</strong>.</p>` : '<p>Ta première mise en relation est offerte.</p>'}
       ${p.nb_compatibles !== null && p.nb_compatibles !== undefined ? `<p>D’après l’outil de Lamia, tu pourrais correspondre à ${esc(p.nb_compatibles)} personne(s).</p>` : ''}
-      ${p.matchs ? `<p class="espace-match">💞 Matchs en cours : <strong>${esc(p.matchs.actifs)} / ${esc(p.matchs.limite)}</strong>${p.matchs.actifs >= p.matchs.limite ? (p.matchs.formule === 'decouverte' ? ' · pour matcher à nouveau, viens voir Lamia en live (chaque soir à 21 h) ou passe à une formule.' : ' · dès que Lamia a traité un match, tu peux en choisir d’autres.') : ''}</p>` : ''}</div>
-      <div class="espace-achat-droite">${p.fiche_live ? '' : '<button class="btn btn-ink" type="button" data-profil-modifier>Modifier mon profil</button>'}${p.en_match ? '<button class="btn btn-line" type="button" data-profil-dematcher>Mettre fin à mon match</button>' : ''}</div></article>
+      ${p.matchs ? `<p class="espace-match">💞 Matchs en cours : <strong>${esc(p.matchs.actifs)} / ${esc(p.matchs.limite)}</strong>${p.matchs.actifs >= p.matchs.limite ? (p.matchs.formule === 'prestige' ? ' · mets fin à un match pour en choisir un autre.' : ' · mets fin à un match pour en choisir un autre, ou <a class="text-link" href="/abonnement/">passe à une formule supérieure</a>.') : ''}</p>` : ''}</div>
+      <div class="espace-achat-droite">${p.fiche_live ? '' : '<button class="btn btn-ink" type="button" data-profil-modifier>Modifier mon profil</button>'}</div></article>
+      ${(p.matchs_lies || []).length ? `<ul class="espace-matchs-liste">${p.matchs_lies.map((m) => `<li><span>💞 Match avec le profil n° ${esc(m.ref)}</span><button class="btn btn-line" type="button" data-profil-dematcher="${esc(m.ref)}">Mettre fin à ce match</button></li>`).join('')}</ul>` : ''}
       <div class="espace-suivi" data-profil-suivi></div>
       <label class="annonce-case espace-photo"><input type="checkbox" data-profil-photo${p.photo_partage ? ' checked' : ''}> <span>Si un match me convient, Lamia peut transmettre <strong>ma photo</strong> à la personne avec qui elle me met en relation (et à elle seule).</span></label>
       <p class="form-status" data-profil-statut></p><div data-profil-edition hidden></div>`;
@@ -216,12 +217,12 @@ async function monProfil(session) {
       monterFormulaire(zone, { existant: p, token: session.access_token });
       zone.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
-    box.querySelector('[data-profil-dematcher]')?.addEventListener('click', async (e) => {
-      if (!confirm('Mettre fin à ton match en cours ? Lamia sera prévenue, et ton profil pourra de nouveau matcher.')) return;
+    box.querySelectorAll('[data-profil-dematcher]').forEach((bouton) => bouton.addEventListener('click', async (e) => {
+      if (!confirm(`Mettre fin à ton match avec le profil n° ${bouton.dataset.profilDematcher} ? Lamia sera prévenue, et une place se libère.`)) return;
       e.target.disabled = true;
-      try { await appelProfil({ action: 'annonce_dematcher' }, session); monProfil(session); }
+      try { await appelProfil({ action: 'annonce_dematcher', ref: Number(bouton.dataset.profilDematcher) }, session); monProfil(session); }
       catch { box.querySelector('[data-profil-statut]').textContent = 'Ça n’a pas fonctionné. Réessaie, ou écris à Lamia.'; e.target.disabled = false; }
-    });
+    }));
   } catch { box.innerHTML = '<p>Ton profil ne s’affiche pas pour le moment. Réessaie dans un instant.</p>'; }
 }
 
@@ -237,16 +238,23 @@ async function suivi(el, p) {
   const lignes = [
     `<li><strong>Mises en relation offertes</strong> : ${offertesRestantes} sur ${p.offertes || 1} restante(s)</li>`,
     q ? `<li><strong>Formule ${esc(q.nom)}</strong> : ${s.mises_mois} mise(s) en relation ce mois-ci${q.mises ? ` sur ${q.mises}` : ' (sans limite)'} · ${q.sd} speed dating inclus par mois</li>`
-      : (p.algerie ? '<li><strong>Formule Découverte</strong> (gratuite) · pour d’autres matchs, <a class="text-link" href="/salon/">viens soutenir le live de Lamia</a></li>' : '<li><strong>Formule Découverte</strong> (gratuite) · d’autres matchs en <a class="text-link" href="/salon/">venant au live</a> ou avec <a class="text-link" href="/abonnement/">une formule</a></li>'),
-    q && q.nom !== 'Cœur' ? '<li><strong>📷 Photo de ton match</strong> : incluse dans ta formule, si ton match l’accepte</li>' : '<li><strong>📷 Photo de ton match</strong> : incluse à partir de la formule Passion · <a class="text-link" href="/abonnement/?formule=passion">en savoir plus</a></li>',
-    u.mise_en_relation || u.speed_dating ? `<li><strong>Achetés à l’unité</strong> : ${u.mise_en_relation || 0} mise(s) en relation · ${u.speed_dating || 0} place(s) de speed dating</li>` : '',
+      : (p.algerie ? '<li><strong>Formule Découverte</strong> (gratuite) · pour d’autres matchs, <a class="text-link" href="/salon/">viens au live de Lamia</a> (1 match offert toutes les 2 semaines)</li>' : '<li><strong>Formule Découverte</strong> (gratuite) · d’autres matchs en <a class="text-link" href="/salon/">venant au live</a> (1 toutes les 2 semaines), à l’unité ou avec <a class="text-link" href="/abonnement/">une formule</a></li>'),
+    q && q.nom !== 'Cœur' ? '<li><strong>📷 Photo de ton match</strong> : incluse dans ta formule, si ton match l’accepte</li>' : '<li><strong>📷 Photo de ton match</strong> : incluse à partir de la formule Passion, ou 3 € pour la voir 1 heure · <a class="text-link" href="/abonnement/?formule=passion">en savoir plus</a></li>',
+    u.mise_en_relation || u.speed_dating ? `<li><strong>Achetés à l’unité</strong> : ${u.mise_en_relation || 0} match(s) supplémentaire(s) · ${u.speed_dating || 0} place(s) de speed dating</li>` : '',
   ].filter(Boolean).join('');
   const demandes = (p.interets || []).map((i) => `<li>Profil n° ${esc(i.cible_ref)} · ${esc(ETAT_DEMANDE[i.statut] || i.statut)}${i.date ? ` <small>(${esc(new Date(i.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' }))})</small>` : ''}</li>`).join('');
-  const pm = p.photo_match;
-  const blocPhoto = !pm ? '' : pm.url ? `<h3>📷 La photo de ton match (profil n° ${esc(pm.ref)})</h3><img class="espace-photo-match" src="${esc(pm.url)}" alt="Photo de ton match" loading="lazy"><p><small>Pour toi seule : merci de ne pas la partager.</small></p>`
-    : !pm.inclus ? '<h3>📷 La photo de ton match</h3><p>Elle est incluse à partir de la formule <a class="text-link" href="/abonnement/?formule=passion">Passion</a>, si ton match accepte de la transmettre.</p>'
-    : pm.accepte === false ? '<h3>📷 La photo de ton match</h3><p>Ton match n’a pas (encore) accepté de transmettre sa photo.</p>'
-    : '<h3>📷 La photo de ton match</h3><p>Lamia te la transmet dès que possible.</p>';
+  const heure = (d) => new Date(d).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  // Une photo par match en cours. Pas d'achat dans l'appli Play, ni depuis l'Algérie (paiement en ligne impossible).
+  const peutPayer = !window.LFB_PLAY && !p.algerie;
+  const unePhoto = (pm) => {
+    const titre = `<h3>📷 La photo de ton match (profil n° ${esc(pm.ref)})</h3>`;
+    if (pm.url) return `${titre}<img class="espace-photo-match" src="${esc(pm.url)}" alt="Photo de ton match" loading="lazy"><p><small>${pm.jusqu_a ? `Visible jusqu’à ${esc(heure(pm.jusqu_a))}. ` : ''}Rien que pour toi : merci de ne pas la partager.</small></p>`;
+    if (pm.accepte === false) return `${titre}<p>Ton match n’a pas (encore) accepté de transmettre sa photo.</p>`;
+    if (pm.achetable && peutPayer) return `${titre}<p>Vois sa photo pendant 1 heure pour 3 €, ou tant que dure le match avec la formule <a class="text-link" href="/abonnement/?formule=passion">Passion</a>.</p><label class="annonce-case"><input type="checkbox" data-photo-cgv="${esc(pm.ref)}"> <span>J’accepte les <a href="/cgv/#abonnement" target="_blank">conditions de vente</a> et je demande que l’heure commence dès le paiement.</span></label><p><button class="btn btn-ink" type="button" data-photo-acheter="${esc(pm.ref)}">Voir la photo · 3 €</button></p><p class="form-status" data-photo-statut="${esc(pm.ref)}"></p>`;
+    if (!pm.inclus) return `${titre}<p>Elle est incluse à partir de la formule <a class="text-link" href="/abonnement/?formule=passion">Passion</a>, si ton match accepte de la transmettre.</p>`;
+    return `${titre}<p>Lamia te la transmet dès que possible.</p>`;
+  };
+  const blocPhoto = (p.matchs_lies || []).map(unePhoto).join('');
   const cp = p.choisi_par || { nombre: 0, refs: [] };
   const blocChoisi = !cp.nombre ? '' : cp.inclus
     ? `<h3>💞 Qui t’a choisi·e</h3><p>${cp.refs.map((r) => `<strong>n° ${esc(r)}</strong>`).join(', ')} : ${cp.nombre > 1 ? 'ces profils sont' : 'ce profil est'} en tête de ton <a class="text-link" href="/rencontres/swipe/">swipe</a>. Choisis-${cp.nombre > 1 ? 'les' : 'le'} à ton tour pour un intérêt réciproque.</p>`
@@ -254,6 +262,19 @@ async function suivi(el, p) {
   el.innerHTML = `<h3>Mon suivi</h3><ul>${lignes}</ul>${blocChoisi}${blocPhoto}
     <p><a class="po-btn" href="/rencontres/swipe/">💘 Swiper les profils</a></p>
     <h3>Mes demandes de match</h3>${demandes ? `<ul>${demandes}</ul>` : '<p>Aucune pour l’instant. <a class="text-link" href="/rencontres/#profils-anonymes">Voir les profils</a></p>'}`;
+  el.querySelectorAll('[data-photo-acheter]').forEach((b) => b.addEventListener('click', async () => {
+    const ref = b.dataset.photoAcheter, st = el.querySelector(`[data-photo-statut="${ref}"]`);
+    if (!el.querySelector(`[data-photo-cgv="${ref}"]`)?.checked) { st.textContent = 'Coche la case des conditions de vente pour continuer.'; return; }
+    b.disabled = true; st.textContent = 'Ouverture du paiement…';
+    try {
+      const { data } = await supabase.auth.getSession();
+      const r = await fetch('/api/preorder', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${data.session?.access_token}` }, body: JSON.stringify({ action: 'abonnement_payer', unite: 'photo_match', ref: Number(ref), cgv_accepted: true }) });
+      const d = await r.json().catch(() => ({}));
+      if (r.ok && d.url) { location.href = d.url; return; }
+      st.textContent = d.error === 'photo_indisponible' ? 'Cette photo n’est pas disponible : ton match l’a peut-être retirée.' : 'Le paiement n’a pas pu s’ouvrir. Réessaie dans un instant.';
+    } catch { st.textContent = 'Le paiement n’a pas pu s’ouvrir. Réessaie dans un instant.'; }
+    b.disabled = false;
+  }));
 }
 
 // Abonnement « Trouve ton âme sœur » : formule en cours, achats à l'unité, gestion (résiliation) chez Stripe.

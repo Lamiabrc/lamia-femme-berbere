@@ -3478,3 +3478,26 @@ body[data-ambiance="espace"] .espace .room-name { color: #8a1024; }
 /* Les liens dans le texte restent lisibles sur le velours */
 .po-app p a:not(.po-btn):not(.po-btn-verre):not(.btn), .po-app li a:not(.po-btn):not(.po-btn-verre):not(.btn) { color: #f6dc98; text-decoration: underline; }
 .po-app .swipe-carte p a:not(.po-btn):not(.btn), .po-app .annonce-carte p a:not(.po-btn):not(.btn) { color: #7d1530; }
+
+/* Tableau récapitulatif des formules : il défile dans son cadre sur téléphone, jamais la page. */
+.abo-tableau-cadre { overflow-x: auto; border-radius: 18px; border: 1px solid rgba(255,235,210,.22); background: rgba(52,9,22,.72); }
+.abo-tableau { width: 100%; min-width: 560px; border-collapse: collapse; color: #f3ddd4; font-size: 15px; line-height: 1.4; }
+.abo-tableau th, .abo-tableau td { padding: 12px 14px; text-align: center; border-bottom: 1px solid rgba(255,235,210,.14); vertical-align: middle; }
+.abo-tableau tbody tr:last-child th, .abo-tableau tbody tr:last-child td { border-bottom: 0; }
+.abo-tableau thead th { color: #ffd27a; font-size: 18px; }
+.abo-tableau thead th.is-vedette { background: rgba(255,210,122,.14); }
+.abo-tableau tbody th { position: sticky; left: 0; width: 38%; text-align: left; font-weight: 500; color: #fff3e6; background: #3a0c1b; }
+.abo-tableau thead th:first-child { position: sticky; left: 0; background: #3a0c1b; }
+.abo-oui { color: #ffd27a; font-weight: 700; }
+.abo-non { color: rgba(243,221,212,.5); }
+.abo-cache { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.abo-tableau-note { margin: 0; text-align: center; color: #f3ddd4; font-size: 15px; }
+.espace-matchs-liste { display: grid; gap: 10px; margin: 12px 0; padding: 0; list-style: none; }
+.espace-matchs-liste li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+@media (max-width: 640px) {
+  .abo-tableau { min-width: 0; table-layout: fixed; font-size: 13px; }
+  .abo-tableau th, .abo-tableau td { padding: 9px 4px; overflow-wrap: anywhere; }
+  .abo-tableau thead th { font-size: 12px; padding: 9px 1px; overflow-wrap: normal; }
+  .abo-tableau tbody th { position: static; width: 34%; padding-left: 10px; }
+  .abo-tableau thead th:first-child { position: static; width: 34%; }
+}

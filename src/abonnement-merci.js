@@ -9,7 +9,7 @@ const id = new URLSearchParams(location.search).get('session_id');
       const r = await fetch('/api/preorder/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'abonnement_confirmer', session_id: id }) });
       const d = await r.json().catch(() => ({}));
       if (r.ok && d.statut === 'paye') {
-        box.textContent = d.kind === 'abonnement' ? `✓ Ta formule ${d.nom} est active${d.periode === 'an' ? ' pour un an' : ''}. Tu la retrouves dans ton espace.` : `✓ Achat confirmé : ${d.quantite || 1} × ${d.nom.toLowerCase()}.`;
+        box.textContent = d.type === 'photo_match' ? '✓ La photo de ton match est visible pendant 1 heure dans ton espace.' : d.kind === 'abonnement' ? `✓ Ta formule ${d.nom} est active${d.periode === 'an' ? ' pour un an' : ''}. Tu la retrouves dans ton espace.` : `✓ Achat confirmé : ${d.quantite || 1} × ${d.nom.toLowerCase()}.`;
         return;
       }
     } catch { /* nouvel essai */ }
