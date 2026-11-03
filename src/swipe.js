@@ -9,7 +9,7 @@ import { createClient } from '/vendor/supabase.mjs';
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', PUBLIC_KEY);
 const zone = document.querySelector('[data-swipe]');
 const compteur = document.querySelector('[data-swipe-compteur]');
-let tous = [], profils = [], token = null, occupe = false, quota = { limite: null, restants: null }, choisi = { nombre: 0, refs: [] }, matchs = { actifs: 0, limite: 1, formule: 'decouverte' }, dernier = null, coeurs = 0;
+let nbPasses = 0, tous = [], profils = [], token = null, occupe = false, quota = { limite: null, restants: null }, choisi = { nombre: 0, refs: [] }, matchs = { actifs: 0, limite: 1, formule: 'decouverte' }, dernier = null, coeurs = 0;
 const bandeau = document.querySelector('[data-swipe-infos]');
 
 const message = (html) => { zone.innerHTML = `<div class="swipe-message">${html}</div>`; document.querySelector('[data-swipe-boutons]').hidden = true; };
@@ -102,7 +102,7 @@ function afficher() {
   if (quota.limite && quota.restants <= 0 && profils.length) return plusDeProfilsAujourdhui();
   compteur.textContent = profils.length ? `${profils.length} profil${profils.length > 1 ? 's' : ''} à découvrir` : '';
   if (!profils.length && tous.length) return message(`<p class="swipe-coeur">🎚</p><h2>Aucun profil avec ces filtres</h2><p>${tous.length} profil${tous.length > 1 ? 's restent' : ' reste'} à découvrir si tu élargis ta recherche : ouvre les filtres et enlève un critère.</p>`);
-  if (!profils.length) return message(`<p class="swipe-coeur">💌</p><h2>Tu as vu tous les profils pour le moment</h2>${coeurs ? `<p><strong>${coeurs} coup${coeurs > 1 ? 's' : ''} de cœur</strong> envoyé${coeurs > 1 ? 's' : ''} aujourd’hui 💘</p>` : ''}<p>Lamia a noté tes choix. Si une personne que tu as choisie te choisit aussi, Lamia est prévenue tout de suite et revient vers toi pour la mise en relation. Ton identité n’est jamais révélée : les autres ne voient qu’un numéro de profil.</p><p>De nouveaux profils arrivent chaque semaine : reviens bientôt.</p><p><a class="po-btn" href="/mon-espace/">Suivre mes demandes</a></p>`);
+  if (!profils.length) return message(`<p class="swipe-coeur">💌</p><h2>Tu as vu tous les profils pour le moment</h2>${coeurs ? `<p><strong>${coeurs} coup${coeurs > 1 ? 's' : ''} de cœur</strong> envoyé${coeurs > 1 ? 's' : ''} aujourd’hui 💘</p>` : ''}<p>Lamia a noté tes choix. Si une personne que tu as choisie te choisit aussi, Lamia est prévenue tout de suite et revient vers toi pour la mise en relation. Ton identité n’est jamais révélée : les autres ne voient qu’un numéro de profil.</p><p>De nouveaux profils arrivent chaque semaine : reviens bientôt.</p><p><a class="po-btn" href="/mon-espace/">Suivre mes demandes</a></p>${nbPasses ? `<p class="po-actions"><button type="button" class="po-btn-verre" data-swipe-revoir>Revoir les ${nbPasses} profil${nbPasses > 1 ? 's' : ''} que j’ai passé${nbPasses > 1 ? 's' : ''}</button></p>` : ''}`);
   zone.innerHTML = profils.slice(0, 2).reverse().map(carte).join('');
   document.querySelector('[data-swipe-boutons]').hidden = false;
   glisser(zone.lastElementChild);
@@ -166,12 +166,18 @@ zone.addEventListener('click', (e) => { const b = e.target.closest('[data-modere
 
 function annulerDernier() {
   if (!dernier || occupe) return;
-  const d = dernier; dernier = null;
+  const d = dernier; dernier = null; garderDernier(); if (d.choix === 'non') nbPasses = Math.max(0, nbPasses - 1);
   api({ action: 'annonce_swipe_annuler', ref: d.profil.ref }, token).catch(() => {});
   if (d.choix === 'oui') coeurs = Math.max(0, coeurs - 1);
   tous = [d.profil, ...tous]; profils = [d.profil, ...profils];
   majAnnuler(); afficher(); vibrer(10);
   zone.lastElementChild?.classList.add('is-retour');
+}
+// Le dernier swipe reste annulable même après avoir fermé l'appli (fiche anonyme gardée sur ce téléphone).
+const CLE_DERNIER = 'lfb-swipe-dernier';
+function garderDernier() { try { if (dernier) localStorage.setItem(CLE_DERNIER, JSON.stringify(dernier)); else localStorage.removeItem(CLE_DERNIER); } catch { /* */ } }
+function restaurerDernier() {
+  try { const d = JSON.parse(localStorage.getItem(CLE_DERNIER) || 'null'); if (d?.profil?.ref && !tous.some((p) => p.ref === d.profil.ref)) { dernier = d; majAnnuler(); } } catch { /* */ }
 }
 const majAnnuler = () => { const b = document.querySelector('[data-swipe-annuler]'); if (b) b.disabled = !dernier; };
 
@@ -188,7 +194,7 @@ async function choisir(choix) {
     coeurs += 1; if (PALIERS[coeurs]) setTimeout(() => toast(PALIERS[coeurs]), 350);
     window.lfbEvent?.('swipe_interesse');
   } else vibrer(8);
-  dernier = { profil, choix }; majAnnuler();
+  dernier = { profil, choix }; garderDernier(); majAnnuler(); if (choix === 'non') nbPasses += 1;
   api({ action: 'annonce_swipe', ref, choix }, token).then((r) => {
     if (r?.matchs) { matchs = { ...matchs, ...r.matchs }; infos(); }
     if (r?.match) { dernier = null; majAnnuler(); celebrerMatch(r.ref); }
@@ -235,12 +241,11 @@ addEventListener('keydown', (e) => { if (document.querySelector('.swipe-fenetre'
   if (!session) return message('<h2>Connecte-toi pour swiper</h2><p>Il faut un compte et un profil confié à Lamia pour découvrir les profils et dire lesquels t’intéressent.</p><p class="po-actions"><a class="po-btn" href="/rencontres/#confier">Créer mon compte et mon profil</a><a class="po-btn-verre" href="/mon-espace/">Me connecter</a></p>');
   token = session.access_token;
   try {
-    let criteres;
-    ({ profils: tous, quota, choisi, criteres, matchs = matchs } = await api({ action: 'annonce_swipe_liste' }, token));
-    // Filtres gardés sur ce téléphone ; la première fois, ceux de ton profil (âge, religion, pratique recherchés).
+    ({ profils: tous, quota, choisi, passes: nbPasses = 0, matchs = matchs } = await api({ action: 'annonce_swipe_liste' }, token));
+    restaurerDernier();
+    // Âge et localisation sont déjà appliqués par le serveur, dans les deux sens. Ici : les filtres choisis, gardés sur ce téléphone.
     const gardes = lireFiltres();
     if (gardes) filtres = { ...filtres, ...gardes };
-    else if (criteres) { filtres = { ...filtres, age_min: criteres.age_min || '', age_max: criteres.age_max || '', religion: criteres.religion || '', pratique: criteres.pratique || '' }; }
     monterFiltres();
     appliquer();
   } catch (err) {
@@ -251,3 +256,12 @@ addEventListener('keydown', (e) => { if (document.querySelector('.swipe-fenetre'
     message('<h2>Les profils ne s’affichent pas pour le moment</h2><p>Réessaie dans un instant.</p>');
   }
 })();
+
+// Revoir les profils passés, à la demande.
+zone.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-swipe-revoir]');
+  if (!b) return;
+  b.disabled = true;
+  try { await api({ action: 'annonce_swipe_revoir' }, token); try { localStorage.removeItem(CLE_DERNIER); } catch { /* */ } location.reload(); }
+  catch { b.disabled = false; toast('Ça n’a pas abouti. Réessaie dans un instant.'); }
+});

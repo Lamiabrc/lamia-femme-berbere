@@ -150,3 +150,52 @@ test('retirer sa fiche retire aussi son profil interne', async () => {
   await handleAnnonces('annonce_retirer_outil', { n: 100001, t }, ctx(RACHID));
   assert.equal(db.annonces[0].status, 'retiree');
 });
+
+test('zone et âge : dans les deux sens, en cas de doute on garde', async () => {
+  const { zoneAccepte, ageEtLieuOk } = await import('../content/matching-options.mjs');
+  assert.equal(zoneAccepte('France · Marseille', 'France'), true);
+  assert.equal(zoneAccepte('France', 'Algérie'), false);
+  assert.equal(zoneAccepte('Algerie', 'Algérie'), true);
+  assert.equal(zoneAccepte('Autre que Algerie', 'Algerie'), false);
+  assert.equal(zoneAccepte('Autre que Algerie', 'Canada'), true);
+  assert.equal(zoneAccepte('Europe', 'France'), true);
+  assert.equal(zoneAccepte('Amerique', 'USA'), true);
+  assert.equal(zoneAccepte("N'importe ou", 'Algerie'), true);
+  assert.equal(zoneAccepte('Pas important · Tizi Ouzou', 'Canada'), true);
+  assert.equal(zoneAccepte('', 'France'), true);
+  assert.equal(zoneAccepte('France', ''), true);
+  const moi = { age: 45, age_min: 30, age_max: 50, pays: 'France', secteur: 'France' };
+  assert.equal(ageEtLieuOk(moi, { age: 35, age_min: 30, age_max: 50, pays: 'France', secteur: 'France' }), true);
+  assert.equal(ageEtLieuOk(moi, { age: 35, age_min: 25, age_max: 35, pays: 'France', secteur: 'France' }), false, 'elle ne cherche pas mon âge');
+  assert.equal(ageEtLieuOk(moi, { age: 25, pays: 'France', secteur: 'France' }), false, 'hors de ma tranche');
+  assert.equal(ageEtLieuOk(moi, { age: 35, pays: 'Algerie', secteur: 'France' }), false, 'pas dans ma zone');
+  assert.equal(ageEtLieuOk(moi, { age: 35, pays: 'France', secteur: 'Algerie' }), false, 'je ne suis pas dans sa zone');
+  assert.equal(ageEtLieuOk(moi, { age: null, pays: '', secteur: '' }), true);
+});
+
+test('liste : mes critères d’âge et de lieu, ceux qui me cherchent aussi d’abord, puis les mieux notés, score de la fiche repris', async () => {
+  const { db, ctx } = base({
+    profils_outil: [FICHE(100001, 'u-rachid', 'homme', { secteur: 'France', age_min: 25, age_max: 40 }),
+      FICHE(100002, null, 'femme', { age: 30, secteur: 'France · Lyon', pays: 'France' }),
+      FICHE(100003, null, 'femme', { age: 31, secteur: 'France', pays: 'France' }),
+      FICHE(100004, null, 'femme', { age: 30, secteur: 'France', pays: 'Algerie' }),
+      FICHE(100005, null, 'femme', { age: 55, secteur: 'France', pays: 'France' }),
+      FICHE(100006, null, 'femme', { age: 30, secteur: 'Canada', pays: 'France' })],
+    scores_outil: [{ a_ref: 100001, b_ref: 100002, score: 40 }, { a_ref: 100003, b_ref: 100001, score: 90 }],
+  });
+  const r = await lire(await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID)));
+  assert.deepEqual(r.profils.map((p) => p.ref), [100003, 100002, 100006]); // 100006 cherche au Canada : gardée, mais après
+  assert.equal(db.annonces[0].matching.zoneGeo, 'France');
+});
+
+test('revoir les profils passés : ils reviennent', async () => {
+  const { ctx } = base({ profils_outil: [FICHE(100001, 'u-rachid', 'homme'), FICHE(100002, null, 'femme')] });
+  await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID));
+  await handleAnnonces('annonce_swipe', { ref: 100002, choix: 'non' }, ctx(RACHID));
+  let r = await lire(await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID)));
+  assert.deepEqual([r.profils.length, r.passes], [0, 1]);
+  await handleAnnonces('annonce_swipe_revoir', {}, ctx(RACHID));
+  r = await lire(await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID)));
+  assert.deepEqual([r.profils.length, r.passes], [1, 0]);
+});
+

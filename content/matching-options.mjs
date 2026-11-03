@@ -251,3 +251,27 @@ export function potentiel(A, B, { a = 'A', b = 'B' } = {}) {
   if (A.pays && A.pays === B.pays) forts.push('Même pays');
   return { score, forts: [...new Set(forts)].slice(0, 5), vigilance: [...new Set(vigilance)].slice(0, 5) };
 }
+
+// ---------------------------------------------------------------- swipe : âge et localisation, dans les deux sens
+const plat = (v) => String(v ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+// « France · Marseille » → « france » : seule la grande zone sert au filtre, la précision reste à lire sur la fiche.
+const zoneDe = (secteur) => plat(String(secteur ?? '').split('·')[0]);
+// La personne qui cherche dans cette zone accepte-t-elle quelqu'un qui vit dans ce pays ? En cas de doute : oui.
+export function zoneAccepte(secteur, pays) {
+  const z = zoneDe(secteur), p = plat(pays);
+  if (!z || !p || ['pas important', "n'importe ou", '…'].includes(z) || p === 'pas important') return true;
+  if (p === 'autre que algerie') return z !== 'algerie';
+  if (z === 'autre que algerie') return p !== 'algerie';
+  if (z === 'europe') return p === 'europe' || p === 'france';
+  if (z === 'amerique') return ['amerique', 'canada', 'usa'].includes(p);
+  if (z === 'autre') return !['france', 'algerie'].includes(p);
+  return z === p;
+}
+const ageAccepte = (qui, age) => !age || ((!qui.age_min || age >= qui.age_min) && (!qui.age_max || age <= qui.age_max));
+// moi et lui : { age, age_min, age_max, pays, secteur }.
+// Le profil entre dans ce que je cherche (filtre du swipe).
+export const dansMesCriteres = (moi, lui) => ageAccepte(moi, lui.age) && zoneAccepte(moi.secteur, lui.pays);
+// Chacun correspond à ce que l'autre cherche (ces profils passent en premier). Filtrer là-dessus viderait les piles :
+// médiane de 3 profils pour les hommes en novembre 2026, contre 29 avec les seuls critères de la personne.
+export const ageEtLieuOk = (moi, lui) => dansMesCriteres(moi, lui) && dansMesCriteres(lui, moi);
+
