@@ -1918,7 +1918,7 @@ for (const lp of legalPages) {
       description: lp.title,
       path: lp.path,
       noindex: true,
-      body: `<article class="article legal"><p class="draft-banner">Brouillon : ce texte sera complété et relu avant l’ouverture des ventes.</p><h1>${esc(lp.title)}</h1>${lp.body.replaceAll('{{LIVRAISON}}', livraisonTexte(BOUTIQUE.tarifs)).replace('{{TVA}}', tvaTexte(BOUTIQUE.tva))}</article>`,
+      body: `<article class="article legal">${lp.finale ? '' : '<p class="draft-banner">Brouillon : ce texte sera complété et relu avant l’ouverture des ventes.</p>'}<h1>${esc(lp.title)}</h1>${lp.body.replaceAll('{{LIVRAISON}}', livraisonTexte(BOUTIQUE.tarifs)).replace('{{TVA}}', tvaTexte(BOUTIQUE.tva))}</article>`,
     })
   );
 }
