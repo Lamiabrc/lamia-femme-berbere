@@ -3501,3 +3501,29 @@ body[data-ambiance="espace"] .espace .room-name { color: #8a1024; }
   .abo-tableau tbody th { position: static; width: 34%; padding-left: 10px; }
   .abo-tableau thead th:first-child { position: static; width: 34%; }
 }
+
+/* Swipe : fiche en sable sur bleu indigo, bijou doré, corail et pampilles */
+.swipe-page { background-color: #252B78; background-image: radial-gradient(120% 70% at 12% 0%, rgba(158,168,245,.2), transparent 60%), radial-gradient(90% 60% at 95% 55%, rgba(158,168,245,.13), transparent 65%), radial-gradient(110% 60% at 40% 105%, rgba(158,168,245,.17), transparent 60%); background-size: auto; background-blend-mode: normal; }
+.swipe-page .swipe-info { background: rgba(255,255,255,.1); }
+.swipe-defs { position: absolute; }
+.swipe-adresse { margin: 0 0 .7rem; text-align: center; font: italic 500 1.45rem "Playfair Display", Georgia, serif; color: #F4DC92 !important; }
+.swipe-page .swipe-pile { height: clamp(420px, calc(100svh - 300px), 560px); }
+.swipe-page .swipe-carte { display: block; background: #E8D6B5; border: 1.5px solid #C9992B; border-radius: 18px; }
+.swipe-resume { height: 100%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 12px 12px; text-align: center; }
+.swipe-bijou { flex: 1 1 auto; min-height: 0; width: 100%; max-height: 300px; margin-bottom: 6px; }
+.po-app .swipe-resume h2 { margin: 0; font: 600 clamp(1.7rem, 7.6vw, 1.95rem)/1.1 "Cormorant Garamond", Georgia, serif; color: #1C2059; }
+.po-app .swipe-carte .swipe-lieu, .po-app .swipe-carte .swipe-village { margin: 0; font: 500 1.2rem/1.3 "Cormorant Garamond", Georgia, serif; color: #4F3D22; }
+.po-app .swipe-carte .swipe-lieu { margin-top: 5px; }
+.po-app .swipe-carte .swipe-village { font-style: italic; }
+.po-app .swipe-carte .swipe-statut { margin: 7px 0 0; font-size: .78rem; line-height: 1.3; color: #0B5E45; }
+.swipe-voir { margin-top: 6px; padding: 6px 12px; border: 0; background: none; color: #1C2059; font: 500 .85rem var(--po-body, system-ui); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.swipe-page .swipe-carte .swipe-texte { position: absolute; inset: 0; z-index: 3; box-sizing: border-box; background: #F3E8D2; padding: .6rem 1.2rem 1.4rem; overflow-y: auto; }
+.swipe-texte[hidden] { display: none; }
+.swipe-texte .swipe-voir { display: block; margin: 0 0 .3rem auto; }
+.swipe-page .swipe-boutons [data-swipe-non], .swipe-page .swipe-boutons .swipe-annuler { background: #E8D6B5; border: 0; box-shadow: none; }
+.swipe-page .swipe-boutons [data-swipe-non] .ico { color: #1C2059; }
+.swipe-page .swipe-boutons .swipe-annuler { color: #1C2059; }
+.swipe-page .swipe-boutons [data-swipe-oui] { border: 3px solid #D9B04A; color: #FFF1DC; box-shadow: none; background: radial-gradient(circle at 36% 28%, rgba(240,106,142,.5), transparent 42%), radial-gradient(circle, #5A0A20 0, #7C102E 62%, #A81C42 90%, #C8355C 100%); }
+.swipe-page .swipe-boutons [data-swipe-oui] .ico { color: #FFF1DC; }
+.swipe-page .swipe-boutons [data-swipe-oui].is-actif { background: radial-gradient(circle at 36% 28%, rgba(240,106,142,.5), transparent 42%), radial-gradient(circle, #5A0A20 0, #7C102E 62%, #A81C42 90%, #C8355C 100%); box-shadow: 0 0 0 6px rgba(217,176,74,.3); }
+.swipe-page .swipe-boutons [data-swipe-non].is-actif { background: #E8D6B5; box-shadow: 0 0 0 6px rgba(232,214,181,.25); }

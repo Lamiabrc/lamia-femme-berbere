@@ -104,7 +104,9 @@ test('swipe : la liste des profils s’affiche', async () => {
   db.annonces.push({ id: 'a1', ref: 11, user_id: 'u1', email: 'nina@example.com', status: 'publiee', prenom: 'Nina', genre: 'femme', en_match: false });
   const r = await handleAnnonces('annonce_swipe_liste', {}, ctx({ id: 'u1', email: 'nina@example.com' }));
   assert.equal(r.status, 200);
-  assert.ok(Array.isArray((await r.json()).profils));
+  const d = await r.json();
+  assert.ok(Array.isArray(d.profils));
+  assert.equal(d.adresse, 'A weltma Nina');
 });
 
 test('swipe : deux personnes qui se choisissent → intérêt réciproque et alerte à Lamia', async () => {
