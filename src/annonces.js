@@ -20,7 +20,8 @@ const ERR = {
   missing_lieu: 'Indique ta ville et ton pays.',
   invalid_email: 'Vérifie ton adresse email : Lamia en a besoin pour te répondre.',
   textes_courts: 'Raconte-toi un peu plus : au moins quelques phrases pour ton profil et pour la personne que tu cherches.',
-  medias_requis: 'Ajoute une ou deux photos de toi, ou une courte vidéo.',
+  medias_requis: 'Ajoute 2 photos de toi, ou une courte vidéo.',
+  photos_requises: 'Ajoute d’abord 2 photos de toi ou une courte vidéo, dans « Mon espace ».',
   medias_trop: 'Deux photos au maximum, ou une seule vidéo (pas les deux).',
   identite_requise: 'Ajoute la photo de ta pièce d’identité, le numéro caché par ta main.',
   file_type: 'Ce type de fichier n’est pas accepté : photos (JPG, PNG, HEIC), vidéo (MP4, MOV) ou PDF pour la pièce d’identité.',
@@ -126,9 +127,9 @@ export function formulaireHtml() {
     <p class="annonce-sous">Son caractère <small>(jusqu’à 6)</small></p>${puces('caracteristiquesRecherche', O.caracteristiques)}
     <label>Dis-nous qui tu aimerais rencontrer <small>(vos projets, ce qui compte pour toi)</small><textarea name="recherche" rows="4" maxlength="1500" placeholder="Mariage, valeurs, région… dis ce qui est important pour toi."></textarea></label>
   </div>
-  <div class="annonce-etape" data-optionnel-live data-etape-medias>
+  <div class="annonce-etape" data-etape-medias>
     <h3><span>4</span> Tes photos ou ta vidéo</h3>
-    <p class="annonce-aide">Une ou deux photos récentes de toi, ou une courte vidéo de présentation (une minute suffit). Souris, sois toi-même : c’est ce qui touche le plus.</p>
+    <p class="annonce-aide">Deux photos récentes de toi, ou une courte vidéo de présentation (une minute suffit). Souris, sois toi-même : c’est ce qui touche le plus.</p>
     <label class="annonce-depot">＋ Ajouter mes photos ou ma vidéo<input type="file" accept="image/*,video/*" multiple data-medias></label>
     <ul class="annonce-apercu" data-medias-liste></ul>
   </div>
@@ -354,7 +355,7 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
       const n1 = f.profil.value.trim().length, n2 = f.recherche.value.trim().length;
       if (n1 < 20) manque(`« Parle-nous de toi » : encore ${20 - n1} caractère${20 - n1 > 1 ? 's' : ''} au moins`, f.profil);
       if (n2 < 20) manque(`« La personne que tu cherches » : encore ${20 - n2} caractère${20 - n2 > 1 ? 's' : ''} au moins`, f.recherche);
-      if (!medias.length) manque('Une ou deux photos de toi, ou une courte vidéo', $('[data-medias]', form).closest('label'));
+      if (medias.length < 2 && !medias.some((m) => typeDe(m).startsWith('video/'))) manque('2 photos de toi, ou une courte vidéo', $('[data-medias]', form).closest('label'));
     }
     if (sansReseau()) { if (!telephoneNormal(f.telephone.value)) manque(f.telephone.value.trim() ? 'Ton numéro de téléphone n’est pas valide (mets l’indicatif si tu n’es pas en France)' : 'Ton numéro de téléphone (puisque tu n’as pas de réseau social)', f.telephone); }
     else if (!f.contactReseau.value.trim()) manque('Ton lien TikTok, Instagram ou Facebook (ou coche « Je n’ai aucun profil sur les réseaux »)', f.contactReseau);
@@ -693,4 +694,40 @@ function monterEtapes(form, { calculerManques, afficherManques }) {
     courante: () => toutes()[i],
     allerA: (el) => { const k = toutes().findIndex((x) => x.contains(el)); if (k >= 0 && k !== i) montrer(k, false); },
   };
+}
+
+// Ajouter ses photos (espace membre, fiche du live) : 2 photos ou une courte vidéo. Elles restent privées.
+export async function monterAjoutMedias(box, { token, deja = 0, apres = () => {} }) {
+  const manque = Math.max(1, 2 - deja);
+  box.innerHTML = `<label class="annonce-depot">＋ ${deja ? 'Ajouter ma 2e photo' : 'Choisir 2 photos ou une courte vidéo'}<input type="file" accept="image/*,video/*" multiple data-ajout-medias></label>
+    <ul class="annonce-apercu" data-ajout-liste></ul>
+    <button type="button" class="po-btn" data-ajout-envoyer disabled>Envoyer</button>
+    <p class="form-status" role="status" data-ajout-statut></p>`;
+  const st = $('[data-ajout-statut]', box), bouton = $('[data-ajout-envoyer]', box);
+  let choix = [];
+  const pret = () => choix.some((f) => typeDe(f).startsWith('video/')) ? !deja : choix.length >= manque;
+  const maj = () => { apercu($('[data-ajout-liste]', box), choix, (i) => { choix.splice(i, 1); maj(); }); bouton.disabled = !pret(); };
+  $('[data-ajout-medias]', box).addEventListener('change', async (e) => {
+    const l = [...e.target.files]; e.target.value = '';
+    if (!l.length) return;
+    say(st, 'Préparation…');
+    let nouveaux;
+    try { nouveaux = await copier(l, 1600); } catch { return say(st, 'Ce fichier ne peut pas être lu par ton téléphone. Choisis-en un autre.', true); }
+    const tous = [...choix, ...nouveaux], videos = tous.filter((f) => typeDe(f).startsWith('video/'));
+    choix = videos.length && !deja ? [videos[videos.length - 1]] : tous.filter((f) => !typeDe(f).startsWith('video/')).slice(-manque);
+    say(st, ''); maj();
+  });
+  bouton.addEventListener('click', async () => {
+    bouton.disabled = true; say(st, 'Envoi en cours…');
+    try {
+      const r = await api({ action: 'annonce_ajouter_medias', medias: choix.map((f) => ({ role: 'media', type: typeDe(f), size: f.size })) }, token);
+      for (const [i, up] of (r.uploads || []).entries()) {
+        const u = await fetch(up.url, { method: 'PUT', headers: { apikey: PUBLIC_KEY, 'Content-Type': up.type, 'x-upsert': 'false' }, body: choix[i] });
+        if (!u.ok) throw Object.assign(new Error('upload_failed'), { code: 'upload_failed' });
+      }
+      const v = await api({ action: 'annonce_medias_verifier' }, token);
+      if (!v.medias_ok) throw Object.assign(new Error('upload_failed'), { code: 'upload_failed' });
+      say(st, '✓ Merci, c’est bon !'); apres();
+    } catch (e) { say(st, ERR[e.code] || 'L’envoi n’a pas abouti. Vérifie ta connexion et réessaie.', true); bouton.disabled = !pret(); }
+  });
 }

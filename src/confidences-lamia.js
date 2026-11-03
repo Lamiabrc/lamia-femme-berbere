@@ -124,7 +124,7 @@ function router() {
   if (!session) return;
   const h = location.hash.slice(1);
   if (h === 'reglages') { courant = null; vue('reglages'); chargerReglages(); return; }
-  if (h === 'annonces' || /^annonce-\d+$/.test(h)) { courant = null; vue('annonces'); chargerAnnonces(); chargerDemandes(); chargerAbonnes(); chargerNouveautes(); return; }
+  if (h === 'annonces' || /^annonce-\d+$/.test(h)) { courant = null; vue('annonces'); chargerAnnonces(); chargerSansPhotos(); chargerDemandes(); chargerAbonnes(); chargerNouveautes(); return; }
   if (/^[0-9a-f-]{36}$/i.test(h)) return ouvrirFil(h);
   courant = null; vue('liste'); rendreListe();
 }
@@ -312,6 +312,18 @@ document.addEventListener('click', (e) => {
 // ---------------------------------------------------------------- abonnés et achats à l'unité
 const FORMULES_NOMS = { coeur: 'Cœur (ancienne formule)', passion: 'Passion · 9 €', prestige: 'Prestige' };
 const ETATS = { actif: 'actif', impaye: 'paiement en retard', resilie: 'résilié', en_attente: 'en attente', suspendu: 'suspendu' };
+// Profils sans photos : le compte, et la notification envoyée à la demande de Lamia, par lots.
+async function chargerSansPhotos() {
+  try { const r = await api({ action: 'annonce_relance_medias' }, await jetonFrais()); $('[data-n-sans-photos]').textContent = `(${r.manquent})`; const b = $('[data-relance-medias]'); b.disabled = !r.a_prevenir; b.textContent = r.a_prevenir ? `Envoyer la notification à ${r.a_prevenir} profil${r.a_prevenir > 1 ? 's' : ''}` : 'Tous ont été notifiés'; } catch { /* */ }
+}
+$('[data-relance-medias]')?.addEventListener('click', async (e) => {
+  if (!confirm('Envoyer la notification « il manque tes photos » à ces profils ? Elle ne part qu’une fois par personne.')) return;
+  const st = $('[data-relance-statut]'); e.target.disabled = true; let total = 0, recus = 0;
+  try { for (let i = 0; i < 100; i += 1) { const r = await api({ action: 'annonce_relance_medias', envoyer: true }, await jetonFrais()); total += r.traites; recus += r.notifies; st.textContent = `${total} traité(s)…`; if (!r.a_prevenir) break; }
+    st.textContent = `C’est fait : ${total} profil(s) traité(s), ${recus} notification(s) reçue(s) sur un téléphone. Les autres verront la demande en ouvrant l’application.`; }
+  catch { st.textContent = 'L’envoi s’est arrêté. Clique à nouveau : ceux déjà faits ne recevront rien de plus.'; }
+  chargerSansPhotos();
+});
 async function chargerAbonnes() {
   const box = $('[data-abonnes]');
   if (!box) return;
