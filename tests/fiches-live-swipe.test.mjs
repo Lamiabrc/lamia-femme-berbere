@@ -267,3 +267,18 @@ test('swipe : les personnes qui ont un compte passent d’abord, même moins bie
   assert.deepEqual(r.profils.map((p) => p.ref), [100003, 100002]);
 });
 
+
+test('pendant le live : le lien d’une seule fiche, sans toucher aux autres', async () => {
+  const { createHash } = await import('node:crypto');
+  const cle = 'c'.repeat(40);
+  const { db, ctx } = base({ profils_outil: [FICHE(100001, null, 'homme'), FICHE(100002, null, 'femme')], platform_settings: [{ key: 'outil_liaison', value: { hash: createHash('sha256').update(cle).digest('hex') } }] });
+  const appel = (corps) => handleAnnonces('outil_fiche_live', { cle, ...corps }, ctx(null));
+  assert.equal((await appel({ cle: 'mauvaise-cle', profil: { outil_id: 'o-100001', genre: 'homme' } })).status, 403);
+  assert.equal((await appel({ profil: { outil_id: 'site-annonce-4', genre: 'homme' } })).status, 400);
+  assert.equal((await appel({ profil: { outil_id: 'o-100001' } })).status, 400);
+  const r = await lire(await appel({ profil: { outil_id: 'o-100001', genre: 'homme', age: 35, profil: 'Sérieux' } }));
+  assert.equal(r.ref, 100001);
+  assert.match(r.lien, /\/rencontres\/confirmer\/\?n=100001&t=/);
+  assert.equal(r.confirmation, 'confirmee'); // la fiche de test est déjà confirmée
+  assert.equal(db.profils_outil.find((f) => f.ref === 100002).visible, true); // l'autre fiche reste en ligne
+});
