@@ -30,7 +30,28 @@ function fiche(f) {
 const formulaire = `<form class="confirmer-modif" data-form-modif hidden><label>Qu’est-ce que tu veux changer dans ta fiche ?<textarea name="texte" rows="4" maxlength="1000" placeholder="Ex. : je n’habite plus à Lyon mais à Paris ; je cherche plutôt un homme de 35 à 42 ans…" required></textarea></label><button type="submit" class="po-btn">Envoyer ma demande à Lamia</button></form>`;
 const effacer = `<p class="confirmer-note"><button type="button" class="confirmer-lien" data-effacer>Je ne veux plus du tout être dans l’outil de Lamia</button></p>`;
 
+// Quelqu'un a choisi cette fiche : son annonce anonyme, et ce qu'il reste à faire pour répondre.
+function choisie(d) {
+  const l = d.interets || [];
+  if (!l.length) return '';
+  const n = l.length, plus = n > 3 ? `<p class="confirmer-note">Et ${n - 3} autre${n - 3 > 1 ? 's' : ''} : tu les verras dans ton espace.</p>` : '';
+  const suite = d.confirme && d.compte
+    ? '<p class="confirmer-actions"><a class="po-btn" href="/mon-espace/#interets">Répondre dans mon espace</a></p>'
+    : d.confirme
+      ? '<p><strong>Dernière étape :</strong> crée ton accès ci-dessous pour répondre.</p>'
+      : '<p><strong>Pour répondre, il te reste à confirmer ta fiche et à créer ton compte.</strong> C’est gratuit et ça prend une minute. Personne ne verra ton prénom ni tes contacts.</p><p class="confirmer-actions"><button type="button" class="po-btn" data-aller-confirmer>Confirmer ma fiche et créer mon compte</button></p>';
+  return `<section class="confirmer-choisie">
+    <h2>💌 ${n > 1 ? `${n} personnes s’intéressent` : 'Quelqu’un s’intéresse'} à toi</h2>
+    <p>${n > 1 ? 'Voici leurs annonces, anonymes comme la tienne.' : 'Voici son annonce, anonyme comme la tienne.'}</p>
+    ${l.slice(0, 3).map(fiche).join('')}${plus}${suite}
+  </section>`;
+}
+
 function afficher(d) {
+  afficherFiche(d);
+  if (!d.retire && !d.efface) zone.insertAdjacentHTML('afterbegin', choisie(d));
+}
+function afficherFiche(d) {
   const f = d.fiche;
   if (d.efface) {
     zone.innerHTML = `<div class="confirmer-etat"><p><strong>C’est noté.</strong> Ta fiche est retirée du site et Lamia est prévenue : elle va l’effacer de son outil de matching.</p><p>Merci d’être passé·e en live, et belle route à toi.</p></div>`;
@@ -146,7 +167,8 @@ async function agir(action, extra = {}) {
 }
 
 zone.addEventListener('click', (e) => {
-  if (e.target.closest('[data-confirmer-oui]')) agir('annonce_confirmer_outil');
+  if (e.target.closest('[data-aller-confirmer]')) { const c = zone.querySelector('[data-simple]'); c?.scrollIntoView({ behavior: 'smooth', block: 'center' }); c?.querySelector('input, [data-tout]')?.focus({ preventScroll: true }); }
+  else if (e.target.closest('[data-confirmer-oui]')) agir('annonce_confirmer_outil');
   else if (e.target.closest('[data-retirer]') && confirm('Ta fiche ne sera plus visible sur le site. Tu confirmes ?')) agir('annonce_retirer_outil');
   else if (e.target.closest('[data-modifier]')) { const fm = zone.querySelector('[data-form-modif]'); fm.hidden = false; fm.querySelector('textarea').focus(); }
   else if (e.target.closest('[data-effacer]') && confirm('Ta fiche sera retirée du site et Lamia l’effacera de son outil de matching. Tu confirmes ?')) agir('annonce_effacer_outil');
