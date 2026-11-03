@@ -14,19 +14,31 @@ const bandeau = document.querySelector('[data-swipe-infos]');
 
 const message = (html) => { zone.innerHTML = `<div class="swipe-message">${html}</div>`; document.querySelector('[data-swipe-boutons]').hidden = true; };
 
+// La fiche : l'essentiel en grand, dans un bijou rond (femme) ou triangulaire (homme). Le reste s'ouvre avec « Voir le profil ».
+const statut = (a) => (a.piece_identite ? 'Vérifié avec pièce d’identité' : a.outil && !a.confirme ? 'En attente de confirmation' : 'Profil vérifié');
 function carte(a) {
+  const femme = a.genre === 'femme';
   const tags = [...(a.origine || []), ...(a.caracteristiques || [])].slice(0, 8);
   const infos = [a.pays && lib(a.pays), a.situation && lib(a.situation), a.enfants === 'Oui' ? 'avec enfant(s)' : a.enfants === 'Non' ? 'sans enfant' : '', a.etudes && `études : ${lib(a.etudes).toLowerCase()}`].filter(Boolean);
   const ages = a.age_min || a.age_max ? ` (${a.age_min || 18} à ${a.age_max || 99} ans)` : '';
+  const lieu = a.ville || (a.pays && lib(a.pays)) || '';
   return `<article class="swipe-carte" data-ref="${a.ref}">
     <span class="swipe-tampon is-oui" aria-hidden="true">Intéressé·e</span><span class="swipe-tampon is-non" aria-hidden="true">Pas pour moi</span>
     ${a.ta_choisi ? '<span class="swipe-ta-choisi">💞 Ce profil t’a choisi·e</span>' : ''}
     ${a.revu ? '<span class="swipe-ta-choisi">👀 Tu l’as déjà passé : une seconde chance ?</span>' : a.hors_criteres ? '<span class="swipe-ta-choisi">🌍 Un peu hors de tes critères</span>' : ''}
-    <div class="annonce-sceau" aria-hidden="true"><img src="/images/outil/${a.genre === 'femme' ? 'avatar-femme' : 'avatar-homme'}.webp" alt="" width="80" height="80" draggable="false"></div>
-    <div class="swipe-texte">
-      <p class="annonce-ref${a.piece_identite ? ' is-piece' : ''}">Profil n° ${a.ref} · ${a.piece_identite ? '✓ vérifié par Lamia' : a.outil ? (a.confirme ? '✓ vérifié par Lamia · ✅ confirmé' : '✓ vérifié par Lamia · ⏳ en attente de confirmation') : '✓ profil vérifié'}</p>
+    <div class="swipe-resume">
+      <svg class="swipe-bijou" viewBox="0 -22 180 276" aria-hidden="true" focusable="false"><use href="#bijou-${femme ? 'femme' : 'homme'}"/></svg>
+      <h2>${femme ? 'Une femme' : 'Un homme'}, ${esc(a.age)} ans</h2>
+      ${lieu ? `<p class="swipe-lieu">${esc(lieu)}</p>` : ''}
+      ${a.village ? `<p class="swipe-village">Originaire de ${esc(a.village)}</p>` : ''}
+      <p class="swipe-statut"><span aria-hidden="true">✓</span> ${statut(a)}</p>
+      <button type="button" class="swipe-voir" data-voir aria-expanded="false">Voir le profil</button>
+    </div>
+    <div class="swipe-texte" data-details hidden>
+      <button type="button" class="swipe-voir" data-voir aria-expanded="true">Fermer</button>
+      <p class="annonce-ref${a.piece_identite ? ' is-piece' : ''}">Profil n° ${a.ref} · ${statut(a)}</p>
       ${badgesProfil(a)}
-      <h2>${a.genre === 'femme' ? 'Une femme' : 'Un homme'}, ${esc(a.age)} ans</h2>
+      <h2>${femme ? 'Une femme' : 'Un homme'}, ${esc(a.age)} ans</h2>
       <p class="annonce-lieu"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lieu"/></svg>${esc([a.ville, ...infos].filter(Boolean).join(' · '))}</p>
       ${a.village ? `<p class="annonce-lieu"><svg class="ico" aria-hidden="true"><use href="/icones.svg#maison"/></svg> Originaire de ${esc(a.village)}</p>` : ''}
       ${secteurLisible(a.secteur) ? `<p class="annonce-lieu annonce-secteur"><svg class="ico" aria-hidden="true"><use href="/icones.svg#boussole"/></svg> Cherche en : <b>${esc(secteurLisible(a.secteur))}</b></p>` : ''}
@@ -174,6 +186,12 @@ function moderer(ref) {
   d.querySelector('[data-signaler]').addEventListener('click', () => envoyer('annonce_signaler_profil', () => { d.remove(); toast('Merci. Lamia est prévenue.'); }));
 }
 zone.addEventListener('click', (e) => { const b = e.target.closest('[data-moderer]'); if (b) moderer(Number(b.dataset.moderer)); });
+zone.addEventListener('click', (e) => {
+  if (!e.target.closest('[data-voir]')) return;
+  const c = e.target.closest('.swipe-carte'), d = c.querySelector('[data-details]');
+  d.hidden = !d.hidden; c.classList.toggle('is-details', !d.hidden);
+  if (!d.hidden) d.scrollTop = 0;
+});
 
 function annulerDernier() {
   if (!dernier || occupe) return;
@@ -252,8 +270,11 @@ addEventListener('keydown', (e) => { if (document.querySelector('.swipe-fenetre'
   if (!session) return message('<h2>Connecte-toi pour swiper</h2><p>Il faut un compte et un profil confié à Lamia pour découvrir les profils et dire lesquels t’intéressent.</p><p class="po-actions"><a class="po-btn" href="/rencontres/#confier">Créer mon compte et mon profil</a><a class="po-btn-verre" href="/mon-espace/">Me connecter</a></p>');
   token = session.access_token;
   try {
-    ({ profils: tous, quota, choisi, matchs = matchs } = await api({ action: 'annonce_swipe_liste' }, token));
+    let adresse;
+    ({ profils: tous, quota, choisi, matchs = matchs, adresse } = await api({ action: 'annonce_swipe_liste' }, token));
     dejaCharge = true;
+    const salut = document.querySelector('[data-swipe-adresse]');
+    if (salut && adresse) { salut.textContent = adresse; salut.hidden = false; }
     restaurerDernier();
     // Âge et localisation sont déjà appliqués par le serveur, dans les deux sens. Ici : les filtres choisis, gardés sur ce téléphone.
     const gardes = lireFiltres();
