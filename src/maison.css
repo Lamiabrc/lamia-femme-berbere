@@ -3523,7 +3523,13 @@ body[data-ambiance="espace"] .espace .room-name { color: #8a1024; }
 .swipe-page .swipe-boutons [data-swipe-non], .swipe-page .swipe-boutons .swipe-annuler { background: #E8D6B5; border: 0; box-shadow: none; }
 .swipe-page .swipe-boutons [data-swipe-non] .ico { color: #1C2059; }
 .swipe-page .swipe-boutons .swipe-annuler { color: #1C2059; }
-.swipe-page .swipe-boutons [data-swipe-oui] { border: 3px solid #D9B04A; color: #FFF1DC; box-shadow: none; background: radial-gradient(circle at 36% 28%, rgba(240,106,142,.5), transparent 42%), radial-gradient(circle, #5A0A20 0, #7C102E 62%, #A81C42 90%, #C8355C 100%); }
+.swipe-page .swipe-boutons [data-swipe-oui] { border: 3px solid #D9B04A; color: #FFF1DC; box-shadow: none; background: radial-gradient(circle at 36% 28%, rgba(226,92,92,.32), transparent 42%), radial-gradient(circle, #4E0816 0, #720E24 62%, #8E1730 90%, #A32238 100%); }
 .swipe-page .swipe-boutons [data-swipe-oui] .ico { color: #FFF1DC; }
-.swipe-page .swipe-boutons [data-swipe-oui].is-actif { background: radial-gradient(circle at 36% 28%, rgba(240,106,142,.5), transparent 42%), radial-gradient(circle, #5A0A20 0, #7C102E 62%, #A81C42 90%, #C8355C 100%); box-shadow: 0 0 0 6px rgba(217,176,74,.3); }
+.swipe-page .swipe-boutons [data-swipe-oui].is-actif { background: radial-gradient(circle at 36% 28%, rgba(226,92,92,.32), transparent 42%), radial-gradient(circle, #4E0816 0, #720E24 62%, #8E1730 90%, #A32238 100%); box-shadow: 0 0 0 6px rgba(217,176,74,.3); }
 .swipe-page .swipe-boutons [data-swipe-non].is-actif { background: #E8D6B5; box-shadow: 0 0 0 6px rgba(232,214,181,.25); }
+/* Page du swipe : plus de rose autour de la fiche */
+body:has(.swipe-page) .barre-app { background-color: #1C2059; background-image: none; border-top-color: rgba(217,176,74,.55); }
+body:has(.swipe-page) .barre-app a[aria-current="page"] { background: rgba(244,220,146,.14); }
+body:has(.swipe-page) .barre-app [data-barre-point] { box-shadow: 0 0 0 2px #1C2059; }
+body:has(.swipe-page) .cta-profil { background-color: #252B78; background-image: none; box-shadow: none; }
+.swipe-page .swipe-carte .swipe-texte h2, .swipe-page .swipe-carte .swipe-texte h3, .swipe-page .swipe-carte .annonce-secteur b { color: #1C2059 !important; }
