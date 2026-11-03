@@ -108,7 +108,7 @@ function afficher() {
     toast(`🔄 Tour ${tour} ! Tu as tout vu : voici une seconde chance`);
     vibrer(30);
   }
-  compteur.textContent = nouveaux ? `${nouveaux} profil${nouveaux > 1 ? 's' : ''} à découvrir` : profils.length ? `🔄 Tour ${tour} · ${profils.length} seconde${profils.length > 1 ? 's' : ''} chance${profils.length > 1 ? 's' : ''}` : '';
+  compteur.textContent = nouveaux ? `${nouveaux} profil${nouveaux > 1 ? 's' : ''} à découvrir` : profils.length ? `🔄 Tour ${tour} · encore ${profils.length} profil${profils.length > 1 ? 's' : ''}` : '';
   // Fin de la pile : on repart pour un tour, le swipe ne s'arrête jamais.
   if (!profils.length && !tous.length && dejaCharge && !enRecharge) { recharger(); return; }
   if (!profils.length && tous.length) return message(`<p class="swipe-coeur">🎚</p><h2>Aucun profil avec ces filtres</h2><p>${tous.length} profil${tous.length > 1 ? 's restent' : ' reste'} à découvrir si tu élargis ta recherche : ouvre les filtres et enlève un critère.</p>`);
