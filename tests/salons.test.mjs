@@ -141,7 +141,7 @@ test('soirée suivante : payante, et place incluse pour une formule qui la compr
   const ctx = b.ctx({ admin: true, etat: async (mail) => (mail === 'f0@x.fr' ? { abonnement: { formule: 'passion' } } : {}) });
   const [, r] = await rep(await actionSalons('salon_confirmer', { id: ed.id, date: '2026-11-28T21:00' }, ctx));
   assert.equal(r.gratuit, false);
-  assert.equal(b.db.speed_dating_events[0].ticket_price_cents, 900);
+  assert.equal(b.db.speed_dating_events[0].ticket_price_cents, 1200);
   assert.equal(b.db.salon_inscriptions.find((x) => x.id === 'f0').statut, 'place');
   assert.equal(b.db.event_registrations.find((x) => x.user_id === 'f0').payment_status, 'waived');
   assert.equal(b.db.salon_inscriptions.find((x) => x.id === 'f1').statut, 'convoque');

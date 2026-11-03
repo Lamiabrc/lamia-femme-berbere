@@ -1487,6 +1487,34 @@ page(
 );
 
 // Abonnement « Trouve ton âme sœur »
+// Tableau récapitulatif : tout vient de content/abonnements.mjs, pour rester juste quand un prix ou un nombre change.
+const tableauFormules = () => {
+  const [d, pa, pr] = ['decouverte', 'passion', 'prestige'].map((id) => FORMULES.find((f) => f.id === id));
+  const oui = '<span class="abo-oui" aria-label="Oui">✓</span>', non = '<span class="abo-non" aria-label="Non">–</span>';
+  const v = (x) => (x ? oui : non);
+  const lignes = [
+    ['Prix par mois', 'Gratuit', eurosAbo(pa.mois), `${eurosAbo(pr.lancement.prix)} pour les ${pr.lancement.places} premiers abonnés, puis ${eurosAbo(pr.mois)}`],
+    ['Prix à l’année', '–', eurosAbo(prixAnnuel(pa)), `${eurosAbo(prixAnnuel(pr, 0))}, puis ${eurosAbo(prixAnnuel(pr))}`],
+    ['Matchs', `${d.mises} offert`, `${pa.mises} par mois`, 'Illimités'],
+    ['Matchs en cours en même temps', d.matchs, pa.matchs, pr.matchs],
+    ['Speed datings inclus par mois', '–', pa.speedDatings, pr.speedDatings],
+    ['Swipe sans limite', oui, oui, oui],
+    ['7 jours de discussion avec ton match', oui, oui, oui],
+    ['Le profil de qui t’a choisi·e', 'Le nombre seulement', v(pa.quiMaChoisi), v(pr.quiMaChoisi)],
+    ['La photo de ton match, s’il ou elle l’accepte', `${eurosAbo(UNITES.find((u) => u.id === 'photo_match').prix)} pour 1 heure`, 'Incluse', 'Incluse'],
+    ['Tes questions à Lamia sur ton profil', non, oui, oui],
+    ['Profil prioritaire dans le matching', non, non, oui],
+    ['Annonce présentée en priorité en live', non, non, oui],
+    ['Coaching avec Lamia', non, non, '1 visio de 15 minutes par mois'],
+    ['Option mariage, de la rencontre aux familles', non, non, oui],
+  ];
+  return `<h2 class="annonces-titre">Les formules en un coup d’œil</h2>
+  <div class="abo-tableau-cadre" tabindex="0" role="region" aria-label="Tableau récapitulatif des formules"><table class="abo-tableau">
+    <thead><tr><th scope="col"><span class="abo-cache">Ce qui est inclus</span></th>${[d, pa, pr].map((f) => `<th scope="col"${f.vedette ? ' class="is-vedette"' : ''}>${esc(f.nom)}</th>`).join('')}</tr></thead>
+    <tbody>${lignes.map(([titre, ...cases]) => `<tr><th scope="row">${esc(titre)}</th>${cases.map((c) => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>
+  </table></div>
+  <p class="abo-tableau-note">En live : 1 match supplémentaire offert toutes les 2 semaines, quelle que soit ta formule.</p>`;
+};
 const carteFormule = (f) => `<article class="abo-carte${f.vedette ? ' is-vedette' : ''}" data-formule="${f.id}">
   ${f.vedette ? '<p class="abo-ruban">Le plus choisi</p>' : ''}
   <h3>${esc(f.nom)}</h3>
@@ -1511,8 +1539,8 @@ page(
     <div class="po-hero-texte">
       <p class="po-eyebrow">Matching kabyle IA · par Lamia</p>
       <h1 id="abo-titre">Choisis ta formule</h1>
-      <p class="po-sub">Un match est toujours offert. D’autres en venant soutenir le live de Lamia.</p>
-      <p class="po-lead">Ou choisis le rythme qui te ressemble : 10 matchs par mois, ou illimités avec le coaching et l’option mariage de Lamia. Sans engagement, résiliable en un clic depuis ton espace.</p>
+      <p class="po-sub">Un match est toujours offert. En live, 1 match supplémentaire toutes les 2 semaines.</p>
+      <p class="po-lead">Ou choisis le rythme qui te ressemble : 10 matchs par mois et 2 en cours, ou illimités et 5 en cours, avec le coaching et l’option mariage de Lamia. Sans engagement, résiliable en un clic depuis ton espace.</p>
       <p class="po-lead">Tu vis en Algérie ? Le paiement en ligne n’y est pas possible : <a class="text-link" href="/salon/">viens au live</a>, chaque soir à 21 h, pour d’autres matchs.</p>
     </div>
     <figure class="po-lamia"><img src="/images/lamia/lamia-portrait-tatouages-rond-480.webp" alt="Lamia Femme Berbère" width="200" height="200"><figcaption>Lamia · ton entremetteuse</figcaption></figure>
@@ -1525,8 +1553,9 @@ page(
     <button type="button" role="radio" aria-checked="false" data-periode="an">À l’année <b>2 mois offerts</b></button>
   </div>
   <div class="abo-grille">${FORMULES.map(carteFormule).join('')}</div>
+  ${tableauFormules()}
   <h2 class="annonces-titre">Sans abonnement, à l’unité</h2>
-  <div class="abo-unites">${UNITES.map((u) => `<article class="abo-carte abo-unite"><h3>${esc(u.nom)}</h3><p class="abo-prix">${eurosAbo(u.prix)}</p><p>${esc(u.texte)}</p><button type="button" class="po-btn-verre" data-unite="${u.id}">Acheter</button></article>`).join('')}</div>
+  <div class="abo-unites">${UNITES.map((u) => `<article class="abo-carte abo-unite"><h3>${esc(u.nom)}</h3><p class="abo-prix">${eurosAbo(u.prix)}</p><p>${esc(u.texte)}</p>${u.depuisEspace ? '<a class="po-btn-verre" href="/mon-espace/">Mon espace</a>' : `<button type="button" class="po-btn-verre" data-unite="${u.id}">Acheter</button>`}</article>`).join('')}</div>
   <form class="abo-form annonce-form" data-abo-form hidden>
     <h2 data-abo-titre>Ta formule</h2>
     <p class="annonce-aide" data-abo-resume></p>
@@ -1543,6 +1572,7 @@ page(
     <h2>Questions fréquentes</h2>
     <ol>
       <li><strong>C’est quoi, une mise en relation ?</strong><span>Lamia te propose une personne qui te correspond vraiment. Si vous êtes d’accord tous les deux, elle vous met en contact. Ton numéro reste chez elle jusque-là.</span></li>
+      <li><strong>Plusieurs matchs en même temps, ça veut dire quoi ?</strong><span>Tu peux avoir 1 match en cours avec Découverte, 2 avec Passion et 5 avec Prestige. Quand tu mets fin à un match, une place se libère.</span></li>
       <li><strong>Et les speed datings inclus ?</strong><span>Ta place aux soirées de speed dating en ligne de ton salon, dans la limite indiquée chaque mois. Lamia la note quand tu t’inscris.</span></li>
       <li><strong>Je peux arrêter quand je veux ?</strong><span>Oui. Dans ton espace, « Gérer mon abonnement » : tu résilies en un clic. Ton abonnement reste actif jusqu’à la fin de la période payée.</span></li>
       <li><strong>Lamia garantit-elle un mariage ?</strong><span>Personne ne peut le promettre. Lamia s’engage sur le sérieux : profils vérifiés, matching soigné, et un vrai suivi.</span></li>

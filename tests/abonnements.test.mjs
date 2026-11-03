@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { actionAbonnement, traiterEvenementAbonnement, etatAbonnement } from '../lib/abonnements.mjs';
-import { FORMULES, prixAnnuel, prixMensuel } from '../content/abonnements.mjs';
+import { FORMULES, prixAnnuel, prixMensuel, unite } from '../content/abonnements.mjs';
 
 const env = { CHECKOUT_ENABLED: 'true', STRIPE_SECRET_KEY: 'sk_test_x', SUPABASE_SERVICE_ROLE_KEY: 'srv' };
 const req = new Request('https://lamia-femme-berbere.com/api/preorder', { method: 'POST' });
@@ -62,7 +62,7 @@ test('achat à l’unité limité à 5', async () => {
   await actionAbonnement({ ...base, unite: 'speed_dating', quantite: 40 }, req, { env, fetcher: vide, stripe: s });
   assert.equal(s.appels[0].mode, 'payment');
   assert.equal(s.appels[0].line_items[0].quantity, 5);
-  assert.equal(s.appels[0].line_items[0].price_data.unit_amount, 900);
+  assert.equal(s.appels[0].line_items[0].price_data.unit_amount, 1200);
 });
 test('notification Stripe : abonnement enregistré une seule fois, puis mis à jour', async () => {
   const ecrits = [];
@@ -94,4 +94,45 @@ test('retour de paiement : la session est relue chez Stripe puis enregistrée', 
   assert(ecrits.some(([u, m]) => u.includes('stripe_subscription_id=eq.sub_9') && m === 'PATCH'));
   const faux = await actionAbonnement({ action: 'abonnement_confirmer', session_id: 'pas_une_session' }, req, { env, fetcher, stripe });
   assert.equal(faux.status, 400);
+});
+
+test('prix à l’unité et matchs en cours choisis par Lamia', () => {
+  assert.deepEqual(FORMULES.map((f) => f.matchs), [1, 2, 5]);
+  assert.equal(unite('mise_en_relation').prix, 500);
+  assert.equal(unite('speed_dating').prix, 1200);
+  assert.equal(unite('photo_match').prix, 300);
+});
+test('la photo du match : jamais sans compte, ni sans accord du match', async () => {
+  const s = fauxStripe();
+  const r1 = await actionAbonnement({ action: 'abonnement_payer', cgv_accepted: true, unite: 'photo_match', ref: 12 }, req, { env, fetcher: vide, stripe: s });
+  assert.equal(r1.status, 401);
+  const auth = new Request('https://lamia-femme-berbere.com/api/preorder', { method: 'POST', headers: { Authorization: 'Bearer t' } });
+  const monde = (cible, interet = [{ id: 'i' }]) => async (u) => {
+    const url = String(u);
+    if (url.includes('/auth/v1/user')) return { ok: true, status: 200, json: async () => ({ id: '00000000-0000-0000-0000-000000000001', email: 'nina@example.com' }) };
+    if (url.includes('annonces?ref=eq.12')) return { ok: true, json: async () => cible };
+    if (url.includes('annonces?user_id')) return { ok: true, json: async () => [{ id: 'a1', ref: 5 }] };
+    if (url.includes('profils_outil')) return { ok: true, json: async () => [] };
+    if (url.includes('annonce_interets')) return { ok: true, json: async () => interet };
+    if (url.includes('annonce_files')) return { ok: true, json: async () => [{ id: 'f' }] };
+    return { ok: true, json: async () => [] };
+  };
+  const payer = (fetcher) => actionAbonnement({ action: 'abonnement_payer', cgv_accepted: true, unite: 'photo_match', ref: 12 }, auth, { env, fetcher, stripe: s });
+  assert.equal((await payer(monde([{ id: 'c', ref: 12, photo_partage: false }]))).status, 409);
+  assert.equal((await payer(monde([{ id: 'c', ref: 12, photo_partage: true }], []))).status, 409);
+  assert.equal(s.appels.length, 0);
+  assert.equal((await payer(monde([{ id: 'c', ref: 12, photo_partage: true }]))).status, 200);
+  assert.equal(s.appels[0].line_items[0].price_data.unit_amount, 300);
+  assert.equal(s.appels[0].metadata.photo_ref, '12');
+  // Sans passer par Mon espace, le bouton public ne peut pas vendre la photo.
+  assert.equal((await actionAbonnement({ ...base, unite: 'photo_match' }, req, { env, fetcher: vide, stripe: s })).status, 401);
+});
+test('l’heure de photo commence au paiement', async () => {
+  const lignes = [];
+  const fetcher = async (u, init) => { if (init?.method === 'POST') lignes.push(JSON.parse(init.body)); return { ok: true, json: async () => [{}] }; };
+  const t = new Date('2026-11-03T10:00:00Z');
+  await traiterEvenementAbonnement({ type: 'checkout.session.completed', data: { object: { id: 'cs_1', payment_status: 'paid', customer_email: 'x@y.fr', metadata: { kind: 'achat_unite', type: 'photo_match', quantite: '1', photo_ref: '12', email: 'nina@example.com' } } } }, { env, fetcher, now: () => t });
+  assert.equal(lignes[0].photo_ref, 12);
+  assert.equal(lignes[0].email, 'nina@example.com');
+  assert.equal(lignes[0].photo_jusqu_a, '2026-11-03T11:00:00.000Z');
 });

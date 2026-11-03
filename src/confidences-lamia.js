@@ -262,7 +262,7 @@ document.addEventListener('click', async (e) => {
   const d = b.dataset.decision;
   if (d === 'supprimer' && !confirm('Supprimer définitivement cette annonce et ses fichiers ?')) return;
   if (d === 'refuser' && !confirm('Refuser ce profil ? Les photos et la pièce d’identité seront supprimées et la personne prévenue par email.')) return;
-  if (d === 'bonus_match' && !confirm('Offrir un match de plus à ce profil ? Il pourra avoir un match en cours supplémentaire.')) return;
+  if (d === 'bonus_match' && !confirm('Offrir un match de plus à ce profil ? C’est 1 match toutes les 2 semaines au maximum.')) return;
   if (d === 'resultat') { const nb = carte.querySelector('[data-nb]')?.value; if (nb === '' || nb == null) return say(st, 'Indique le nombre de profils compatibles.', true); if (!confirm(`Envoyer à cette personne : ${nb} profil(s) compatible(s) ?`)) return; }
   say(st, 'Un instant…');
   try { await api({ action: 'annonce_moderer', annonce_id: carte.dataset.id, decision: d, note: carte.querySelector('[data-note]').value, nb: carte.querySelector('[data-nb]')?.value }, await jetonFrais()); await chargerAnnonces(); }
@@ -322,7 +322,7 @@ async function chargerAbonnes() {
     const d = (x) => x ? new Date(x).toLocaleDateString('fr-FR') : '';
     box.innerHTML = (abonnes.length || unites.length ? '' : '<p class="cl-vide">Pas encore d’abonné.</p>')
       + abonnes.map((a) => `<p class="cl-coord"><b>${esc(FORMULES_NOMS[a.formule] || a.formule)}</b>${a.periode === 'an' ? ' (annuel)' : ''} · ${esc(a.nom || '')} · ${esc(a.email)} · ${esc(ETATS[a.statut] || a.statut)}${a.resiliation_prevue ? ' · se termine' : ''}${a.fin_periode ? ` le ${d(a.fin_periode)}` : ''}</p>`).join('')
-      + unites.map((u) => `<p class="cl-coord">${u.type === 'speed_dating' ? '🎟 Speed dating' : '🤝 Mise en relation'} · ${esc(u.nom || '')} · ${esc(u.email)} · ${u.quantite - u.utilisees}/${u.quantite} restant(es) · ${d(u.created_at)} ${u.utilisees < u.quantite ? `<button type="button" class="cl-btn cl-petit" data-unite-utiliser="${u.id}">Utiliser 1</button>` : ''}</p>`).join('');
+      + unites.map((u) => `<p class="cl-coord">${u.type === 'speed_dating' ? '🎟 Speed dating' : u.type === 'photo_match' ? '📷 Photo du match (1 h)' : '🤝 Match supplémentaire'} · ${esc(u.nom || '')} · ${esc(u.email)} · ${u.quantite - u.utilisees}/${u.quantite} restant(es) · ${d(u.created_at)} ${u.utilisees < u.quantite ? `<button type="button" class="cl-btn cl-petit" data-unite-utiliser="${u.id}">Utiliser 1</button>` : ''}</p>`).join('');
     box.querySelectorAll('[data-unite-utiliser]').forEach((b) => b.addEventListener('click', async () => {
       b.disabled = true;
       try { await api({ action: 'annonce_unite_utiliser', id: b.dataset.uniteUtiliser }, await jetonFrais()); } catch { /* */ }

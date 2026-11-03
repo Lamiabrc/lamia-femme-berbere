@@ -123,7 +123,7 @@ test('swipe : deux personnes qui se choisissent → intérêt réciproque et ale
   assert.equal(db.annonce_passes[0].cible_ref, 99);
 });
 
-test('swipe sans limite ; un seul match à la fois pour tout le monde, jusqu’au dématch', async () => {
+test('swipe sans limite ; matchs en cours selon la formule : Découverte 1, Passion 2, Prestige 5', async () => {
   const { ctx, db } = monde();
   db.annonces.push({ id: 'a1', ref: 21, user_id: 'u1', email: 'nina@example.com', status: 'publiee', prenom: 'Nina', genre: 'femme', en_match: false, matchs_bonus: 0 });
   const nina = { id: 'u1', email: 'nina@example.com' };
@@ -134,10 +134,12 @@ test('swipe sans limite ; un seul match à la fois pour tout le monde, jusqu’a
   r = await handleAnnonces('annonce_swipe', { ref: 31, choix: 'oui' }, c('decouverte', 1));
   assert.equal(r.status, 409);
   assert.equal((await r.json()).error, 'limite_matchs');
-  r = await handleAnnonces('annonce_swipe', { ref: 31, choix: 'oui' }, c('passion', 1));
+  r = await handleAnnonces('annonce_swipe', { ref: 31, choix: 'oui' }, c('passion', 2));
   assert.equal(r.status, 409);
-  r = await handleAnnonces('annonce_swipe', { ref: 32, choix: 'oui' }, c('prestige', 1));
+  assert.equal((await handleAnnonces('annonce_swipe', { ref: 35, choix: 'oui' }, c('passion', 1))).status, 200);
+  r = await handleAnnonces('annonce_swipe', { ref: 32, choix: 'oui' }, c('prestige', 5));
   assert.equal(r.status, 409);
+  assert.equal((await handleAnnonces('annonce_swipe', { ref: 36, choix: 'oui' }, c('prestige', 4))).status, 200);
   db.annonces[0].matchs_bonus = 1;
   r = await handleAnnonces('annonce_swipe', { ref: 33, choix: 'oui' }, c('decouverte', 1));
   assert.equal(r.status, 409);

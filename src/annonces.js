@@ -41,9 +41,9 @@ const ERR = {
   tiktok_live: 'Indique le pseudo ou le lien TikTok que tu avais en live, pour que Lamia retrouve ta fiche.',
   enregistrement: 'Ton profil n’a pas pu être enregistré. Vérifie que tous les champs sont remplis, puis réessaie. Si ça recommence, écris à Lamia.',
   login_required: 'Ta connexion a expiré : reconnecte-toi dans « Mon espace », puis réessaie.',
-  limite_matchs: 'Tu as déjà un match en cours : chez Lamia, c’est un match à la fois. Termine-le depuis ton espace pour en choisir un autre.',
-  quota_matchs: 'Tu as utilisé tes matchs disponibles. Viens soutenir le live de Lamia, chaque soir à 21 h, pour en avoir d’autres.',
-  en_match: 'Tu as un match en cours : pour en découvrir d’autres, mets d’abord fin à ce match dans « Mon espace ».',
+  limite_matchs: 'Tu as atteint le nombre de matchs en cours de ta formule. Termines-en un depuis ton espace, ou passe à une formule supérieure.',
+  quota_matchs: 'Tu as utilisé tes matchs disponibles. Prends un match supplémentaire à 5 €, ou viens au live de Lamia, chaque soir à 21 h : 1 match offert toutes les 2 semaines.',
+  en_match: 'Tu as atteint le nombre de matchs en cours de ta formule : mets fin à l’un d’eux dans « Mon espace » pour en découvrir d’autres.',
 };
 const opts = (list, vide = 'Choisis…') => `<option value="">${vide}</option>${list.map((v) => `<option value="${esc(v)}">${esc(lib(v))}</option>`).join('')}`;
 const puces = (name, list) => `<div class="annonce-puces">${list.map((v) => `<label><input type="checkbox" name="${name}" value="${esc(v)}"><span>${esc(lib(v))}</span></label>`).join('')}</div>`;
