@@ -257,3 +257,13 @@ test('match offert en live : un seul toutes les 2 semaines', async () => {
   assert.equal((await offrir()).status, 200);
   assert.equal(a.matchs_bonus, 2);
 });
+
+test('swipe : les personnes qui ont un compte passent d’abord, même moins bien notées', async () => {
+  const { ctx } = base({
+    profils_outil: [FICHE(100001, 'u-rachid', 'homme'), FICHE(100002, null, 'femme'), FICHE(100003, 'u-sans', 'femme')],
+    scores_outil: [{ a_ref: 100001, b_ref: 100002, score: 95 }, { a_ref: 100001, b_ref: 100003, score: 40 }],
+  });
+  const r = await lire(await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID)));
+  assert.deepEqual(r.profils.map((p) => p.ref), [100003, 100002]);
+});
+
