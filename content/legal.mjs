@@ -62,6 +62,7 @@ Données stockées par Supabase, centre de données de Paris (Union européenne)
   },
   {
     path: '/confidentialite/',
+    finale: true,
     title: 'Politique de confidentialité',
     body: `
 <p>Responsable du traitement : Lamia Bréchet Ighil, Rennes, France, <a href="mailto:lamia.brechet@outlook.fr">lamia.brechet@outlook.fr</a>.</p>
@@ -158,6 +159,40 @@ Adresse : …<br>
 Date : …<br>
 Signature (si envoi papier) : …</p>
 </div>`,
+  },
+  {
+    path: '/suppression-compte/',
+    finale: true,
+    title: 'Supprimer ton compte LFB',
+    body: `
+<p>Cette page concerne l’appli <strong>LFB · Lamia Femme Berbère</strong> et le site lamia-femme-berbere.com. Le compte est le même dans les deux. La développeuse est Lamia Bréchet Ighil.</p>
+
+<h2>Comment supprimer ton compte</h2>
+<ol>
+<li>Ouvre l’appli ou le site, puis connecte-toi à <a href="/mon-espace/">Mon espace</a>.</li>
+<li>Ouvre la rubrique « Supprimer mon compte ».</li>
+<li>Confirme : la suppression est immédiate et définitive.</li>
+</ol>
+<p>Si tu as un abonnement en cours, résilie-le d’abord dans « Mon abonnement », puis reviens supprimer ton compte.</p>
+<p>Tu ne peux plus te connecter ? Écris depuis l’adresse de ton compte à <a href="mailto:lamia.brechet@outlook.fr">lamia.brechet@outlook.fr</a> en demandant la suppression de ton compte LFB.</p>
+
+<h2>Ce qui est supprimé</h2>
+<ul>
+<li>ton compte et tes identifiants de connexion ;</li>
+<li>ton profil, tes photos et ta vidéo ;</li>
+<li>tes demandes et tes choix de swipe ;</li>
+<li>les messages que tu as écrits dans tes discussions, et tes notifications ;</li>
+<li>ta fiche dans l’outil de Lamia.</li>
+</ul>
+
+<h2>Ce qui est conservé</h2>
+<ul>
+<li>les commandes et les factures : 10 ans (obligation comptable) ;</li>
+<li>les données d’abonnement : 3 ans après sa fin ;</li>
+<li>les alertes de sécurité : 3 ans ;</li>
+<li>les inscriptions et souhaits des soirées : 1 an après la soirée.</li>
+</ul>
+<p>Le détail se trouve dans la <a href="/confidentialite/">politique de confidentialité</a>.</p>`,
   },
   {
     path: '/conditions-utilisation/',
