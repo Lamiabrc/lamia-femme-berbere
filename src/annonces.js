@@ -1,6 +1,6 @@
 // Annonces de rencontre : dépôt (Patio et Confidences) et affichage des annonces vérifiées par Lamia.
 import { api, esc, PUBLIC_KEY, creerCompte } from './confidences-commun.js';
-import { O, lib, secteurLisible, telephoneNormal, foiEtVie } from './matching-options.mjs';
+import { O, lib, secteurLisible, telephoneNormal, foiEtVie, badgesProfil } from './matching-options.mjs';
 import { createClient } from '/vendor/supabase.mjs';
 
 // Compte (le même que « Mon espace ») : chaque profil y est lié pour pouvoir être modifié.
@@ -509,6 +509,7 @@ function carte(a) {
     <div class="annonce-sceau" aria-hidden="true"><img src="/images/outil/${a.genre === 'femme' ? 'avatar-femme' : 'avatar-homme'}.webp" alt="" width="80" height="80"></div>
     <div class="annonce-texte">
       <p class="annonce-ref${a.piece_identite ? ' is-piece' : ''}">Profil n° ${a.ref} · ${a.piece_identite ? 'vérifié avec pièce d’identité' : a.outil ? (a.confirme ? '✓ vérifié par Lamia · ✅ confirmé' : '✓ vérifié par Lamia · ⏳ en attente de confirmation') : '✓ profil vérifié'}</p>
+      ${badgesProfil(a)}
       <h3>${esc(infos.slice(0, 2).join(', '))}</h3>
       <p class="annonce-lieu"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lieu"/></svg>${esc([a.ville, ...infos.slice(2)].filter(Boolean).join(' · '))}</p>
       ${a.village ? `<p class="annonce-lieu"><svg class="ico" aria-hidden="true"><use href="/icones.svg#maison"/></svg> Originaire de ${esc(a.village)}</p>` : ''}

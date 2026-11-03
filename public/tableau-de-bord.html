@@ -164,6 +164,13 @@
       </div>
       <div>
         <div class="tdb-carte">
+          <h2>⭐ Mes profils recommandés</h2>
+          <p class="aide">Ils portent le badge « Recommandé par Lamia » sur leur carte. Saisis le numéro affiché sur le profil.</p>
+          <form data-reco-form class="tdb-filtres-journal"><input name="ref" inputmode="numeric" pattern="[0-9]+" placeholder="N° du profil" required aria-label="Numéro du profil"> <button type="submit">Recommander</button></form>
+          <p class="aide" data-reco-statut role="status"></p>
+          <ul class="tdb-journal" data-reco-liste><li>Chargement…</li></ul>
+        </div>
+        <div class="tdb-carte">
           <h2>Ne veulent plus apparaître</h2>
           <p class="aide">Les personnes qui ont retiré leur fiche ou demandé l’effacement. Elles ne sont plus visibles sur le site. Pour un effacement : supprime la fiche de ton outil, puis clique « C’est fait ».</p>
           <ul class="tdb-retraits" data-retraits><li>Chargement…</li></ul>

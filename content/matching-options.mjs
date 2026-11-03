@@ -275,3 +275,11 @@ export const dansMesCriteres = (moi, lui) => ageAccepte(moi, lui.age) && zoneAcc
 // médiane de 3 profils pour les hommes en novembre 2026, contre 29 avec les seuls critères de la personne.
 export const ageEtLieuOk = (moi, lui) => dansMesCriteres(moi, lui) && dansMesCriteres(lui, moi);
 
+// Les badges d'un profil, sur les cartes du swipe et de la liste.
+export function badgesProfil(a) {
+  const b = [];
+  if (a.recommande) b.push('<span class="profil-badge is-lamia">⭐ Recommandé par Lamia</span>');
+  if (a.piece_identite) b.push('<span class="profil-badge is-identite">🪪 Validé avec pièce d’identité</span>');
+  return b.length ? `<p class="profil-badges">${b.join('')}</p>` : '';
+}
+

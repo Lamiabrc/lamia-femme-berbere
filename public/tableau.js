@@ -37,7 +37,7 @@ function ouvrir(tab) {
   if (tab === 'produits' && !produits.length) { chargerProduits(); chargerReglages(); }
   if (tab === 'textes') chargerTextes();
   if (tab === 'bilan') chargerBilan();
-  if (tab === 'application') chargerJournal();
+  if (tab === 'application') { chargerJournal(); chargerRecommandes(); }
   if (tab === 'soirees') chargerSalons();
   if (tab === 'activite') chargerActivite();
   if (tab === 'comptes' && !comptes) chargerComptes();
@@ -137,6 +137,29 @@ const conf = async (body) => { const r = await fetch('/api/confidences/', { meth
 async function pastilleJournal() {
   try { const d = await conf({ action: 'annonce_journal', categorie: 'aucune' }); const p = $('[data-journal-pastille]'); p.textContent = d.non_lus; p.hidden = !d.non_lus; } catch { /* */ }
 }
+// ---------------------------------------------------------------- Profils recommandés par Lamia
+async function chargerRecommandes() {
+  const box = $('[data-reco-liste]');
+  if (!box) return;
+  try {
+    const { profils = [] } = await conf({ action: 'annonce_recommandes' });
+    box.innerHTML = profils.length ? profils.map((p) => `<li>Profil n° ${esc(p.ref)} · ${p.genre === 'femme' ? 'une femme' : 'un homme'}${p.age ? `, ${esc(p.age)} ans` : ''}${p.ville ? ` · ${esc(p.ville)}` : ''} <button type="button" data-reco-retirer="${esc(p.ref)}">Retirer</button></li>`).join('') : '<li>Aucun profil recommandé pour l’instant.</li>';
+  } catch { box.innerHTML = '<li>La liste ne s’affiche pas pour le moment.</li>'; }
+}
+document.addEventListener('submit', async (e) => {
+  if (!e.target.matches('[data-reco-form]')) return;
+  e.preventDefault();
+  const st = $('[data-reco-statut]');
+  try { await conf({ action: 'annonce_recommander', ref: e.target.ref.value, oui: true }); st.textContent = `⭐ Profil n° ${e.target.ref.value} recommandé.`; e.target.reset(); chargerRecommandes(); }
+  catch { st.textContent = 'Ce numéro de profil est introuvable.'; }
+});
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-reco-retirer]');
+  if (!b) return;
+  b.disabled = true;
+  try { await conf({ action: 'annonce_recommander', ref: b.dataset.recoRetirer, oui: false }); chargerRecommandes(); } catch { b.disabled = false; }
+});
+
 async function chargerJournal() {
   const box = $('[data-journal]');
   try {
