@@ -102,3 +102,15 @@ test('intérêt reçu : la personne voit la fiche anonyme (sans prénom) et rép
   assert.ok(patches.some(([t, , v]) => t === 'annonce_interets' && v.reciproque === true));
   assert.match(alertes.at(-1), /réciproque/);
 });
+
+test('une personne choisie sans compte voit l’annonce anonyme de celle qui l’a choisie, avec son lien', async () => {
+  const { ctx, jeton } = monde();
+  const lire = ctx.read;
+  ctx.read = async (u) => (u.startsWith('/rest/v1/annonce_interets?cible_ref=eq.5020') ? [{ annonces: { ref: 12, genre: 'homme', prenom: 'Secret', email: 'secret@example.com', phone: '0600000000', birth_date: '1985-01-01', ville: 'Lyon', pays: 'France', profil: 'Sérieux.', recherche: 'Une femme douce.', status: 'publiee', matching: {} } }] : lire(u));
+  const d = await (await handleAnnonces('annonce_fiche_outil', { n: '5020', t: jeton }, ctx)).json();
+  assert.equal(d.interets.length, 1);
+  assert.equal(d.interets[0].ville, 'Lyon');
+  assert.doesNotMatch(JSON.stringify(d.interets), /Secret|secret@|0600000000/);
+  const faux = await handleAnnonces('annonce_fiche_outil', { n: '5020', t: 'faux' }, ctx);
+  assert.equal(faux.status, 403);
+});

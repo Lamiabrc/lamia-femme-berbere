@@ -3537,3 +3537,10 @@ body:has(.swipe-page) .cta-profil { background-color: #252B78; background-image:
 /* Espace coaching Prestige dans Mon espace */
 .espace-coaching-jour { margin: 14px 0 6px; text-transform: capitalize; }
 .espace-coaching-heures { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
+
+/* Fiche choisie : l'annonce de la personne intéressée, avant la confirmation */
+.confirmer-choisie { margin: 0 0 22px; padding: 18px 18px 20px; border-radius: 18px; background: #E8D6B5; border: 1.5px solid #C9992B; color: #1C2059; }
+.confirmer-choisie h2 { margin: 0 0 6px; color: #1C2059 !important; font-size: clamp(1.4rem, 5.5vw, 1.8rem); }
+.po-app .confirmer-choisie p { color: #2B2A45; }
+.confirmer-app .confirmer-choisie .confirmer-fiche p { color: var(--po-muted); }
+.confirmer-choisie .confirmer-actions { margin-bottom: 0; }
