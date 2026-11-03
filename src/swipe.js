@@ -3,7 +3,7 @@
 // Swipe sans limite. Matchs en même temps : 1 en Découverte (Lamia en débloque d'autres en live), 3 avec une formule.
 // « Qui m'a choisi·e » (Passion, Prestige) : ces profils passent en tête.
 import { api, esc, PUBLIC_KEY } from './confidences-commun.js';
-import { O, lib, secteurLisible, foiEtVie } from './matching-options.mjs';
+import { O, lib, secteurLisible, foiEtVie, badgesProfil } from './matching-options.mjs';
 import { createClient } from '/vendor/supabase.mjs';
 
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', PUBLIC_KEY);
@@ -25,6 +25,7 @@ function carte(a) {
     <div class="annonce-sceau" aria-hidden="true"><img src="/images/outil/${a.genre === 'femme' ? 'avatar-femme' : 'avatar-homme'}.webp" alt="" width="80" height="80" draggable="false"></div>
     <div class="swipe-texte">
       <p class="annonce-ref${a.piece_identite ? ' is-piece' : ''}">Profil n° ${a.ref} · ${a.piece_identite ? 'vérifié avec pièce d’identité' : a.outil ? (a.confirme ? '✓ vérifié par Lamia · ✅ confirmé' : '✓ vérifié par Lamia · ⏳ en attente de confirmation') : '✓ profil vérifié'}</p>
+      ${badgesProfil(a)}
       <h2>${a.genre === 'femme' ? 'Une femme' : 'Un homme'}, ${esc(a.age)} ans</h2>
       <p class="annonce-lieu"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lieu"/></svg>${esc([a.ville, ...infos].filter(Boolean).join(' · '))}</p>
       ${a.village ? `<p class="annonce-lieu"><svg class="ico" aria-hidden="true"><use href="/icones.svg#maison"/></svg> Originaire de ${esc(a.village)}</p>` : ''}

@@ -206,3 +206,19 @@ test('le swipe ne s’arrête jamais : les profils passés reviennent, jamais ce
   r = await lire(await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID)));
   assert.equal(r.profils.length, 0);
 });
+
+test('recommandation : posée sur la fiche, visible dans la liste, retirable', async () => {
+  const { badgesProfil } = await import('../content/matching-options.mjs');
+  assert.match(badgesProfil({ recommande: true }), /Recommandé par Lamia/);
+  assert.match(badgesProfil({ piece_identite: true }), /🪪/);
+  assert.equal(badgesProfil({}), '');
+  const { db, ctx } = base({ profils_outil: [FICHE(100001, 'u-rachid', 'homme'), FICHE(100002, null, 'femme', { recommande_at: '2026-11-03' })] });
+  const r = await lire(await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID)));
+  assert.equal(r.profils[0].recommande, true);
+  const admin = { ...ctx({ id: 'adm', email: 'a@x.fr' }), admin: true };
+  await handleAnnonces('annonce_recommander', { ref: db.annonces[0].ref, oui: true }, admin); // le profil interne renvoie vers sa fiche
+  assert.ok(db.profils_outil[0].recommande_at);
+  await handleAnnonces('annonce_recommander', { ref: 100001, oui: false }, admin);
+  assert.equal(db.profils_outil[0].recommande_at, null);
+  assert.equal((await handleAnnonces('annonce_recommander', { ref: 100001, oui: true }, ctx(RACHID))).status, 403);
+});
