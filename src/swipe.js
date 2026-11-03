@@ -9,7 +9,7 @@ import { createClient } from '/vendor/supabase.mjs';
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', PUBLIC_KEY);
 const zone = document.querySelector('[data-swipe]');
 const compteur = document.querySelector('[data-swipe-compteur]');
-let dejaCharge = false, enRecharge = false, envoi = Promise.resolve(), tous = [], profils = [], token = null, occupe = false, quota = { limite: null, restants: null }, choisi = { nombre: 0, refs: [] }, matchs = { actifs: 0, limite: 1, formule: 'decouverte' }, dernier = null, coeurs = 0;
+let tour = 1, tourAnnonce = false, dejaCharge = false, enRecharge = false, envoi = Promise.resolve(), tous = [], profils = [], token = null, occupe = false, quota = { limite: null, restants: null }, choisi = { nombre: 0, refs: [] }, matchs = { actifs: 0, limite: 1, formule: 'decouverte' }, dernier = null, coeurs = 0;
 const bandeau = document.querySelector('[data-swipe-infos]');
 
 const message = (html) => { zone.innerHTML = `<div class="swipe-message">${html}</div>`; document.querySelector('[data-swipe-boutons]').hidden = true; };
@@ -102,7 +102,13 @@ function afficher() {
   infos();
   if (quota.limite && quota.restants <= 0 && profils.length) return plusDeProfilsAujourdhui();
   const nouveaux = profils.filter((p) => !p.revu).length;
-  compteur.textContent = nouveaux ? `${nouveaux} profil${nouveaux > 1 ? 's' : ''} à découvrir` : profils.length ? 'Une seconde chance à ces profils ?' : '';
+  // On arrive aux profils déjà passés : c'est un nouveau tour, on le dit.
+  if (profils[0]?.revu && !tourAnnonce) {
+    tourAnnonce = true; tour += 1;
+    toast(`🔄 Tour ${tour} ! Tu as tout vu : voici une seconde chance`);
+    vibrer(30);
+  }
+  compteur.textContent = nouveaux ? `${nouveaux} profil${nouveaux > 1 ? 's' : ''} à découvrir` : profils.length ? `🔄 Tour ${tour} · ${profils.length} seconde${profils.length > 1 ? 's' : ''} chance${profils.length > 1 ? 's' : ''}` : '';
   // Fin de la pile : on repart pour un tour, le swipe ne s'arrête jamais.
   if (!profils.length && !tous.length && dejaCharge && !enRecharge) { recharger(); return; }
   if (!profils.length && tous.length) return message(`<p class="swipe-coeur">🎚</p><h2>Aucun profil avec ces filtres</h2><p>${tous.length} profil${tous.length > 1 ? 's restent' : ' reste'} à découvrir si tu élargis ta recherche : ouvre les filtres et enlève un critère.</p>`);
@@ -269,6 +275,7 @@ async function recharger() {
   zone.innerHTML = '<p class="annonce-vide">Les profils arrivent…</p>';
   try {
     await envoi.catch(() => {});
+    tourAnnonce = false;
     ({ profils: tous, quota, choisi, matchs = matchs } = await api({ action: 'annonce_swipe_liste' }, token));
     appliquer();
   } catch { message('<h2>Les profils ne s’affichent pas pour le moment</h2><p>Réessaie dans un instant.</p>'); }
