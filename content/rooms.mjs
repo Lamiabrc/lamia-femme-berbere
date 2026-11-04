@@ -20,17 +20,17 @@ export const rooms = [
   { slug: 'ecrin', path: '/ecrin/', floor: 0, name: 'L’Écrin', welcome: 'Les bijoux qui racontent d’où l’on vient.', headline: 'Bijoux kabyles artisanaux et créations d’Ath Yenni',
     summary: 'La collection exclusive de bijoux kabyles de la Maison, fabriquée à Ath Yenni par ses artisans bijoutiers.', status: 'open', accent: 'vert', productCategories: ['bijoux'] },
   { slug: 'boutique', path: '/boutique/', floor: 0, name: 'La Boutique', welcome: 'Tout ce que la Maison propose.', headline: 'Sélection Lamia Femme Berbère',
-    summary: 'L’ensemble des bijoux, livres et trouvailles, rangés par pièce.', status: 'open', accent: 'rouge', productCategories: ['bijoux', 'livres', 'trouvailles'] },
+    summary: 'Bijoux kabyles en argent émaillé d’Ath Yenni, livres de transmission et trouvailles de brocante : toute la sélection de Lamia, rangée par pièce.', status: 'open', accent: 'rouge', productCategories: ['bijoux', 'livres', 'trouvailles'] },
   { slug: 'dressing', path: '/dressing/', floor: 0, name: 'Le Dressing de Lamia', welcome: 'Ce qu’on porte, ce qu’on prend soin de soi.',
     summary: 'Les vêtements, les accessoires et les cosmétiques de la Maison : foulards, robes, sacs, savons, soins, huiles et rituels de beauté. Les premières pièces se préparent.', status: 'soon', accent: 'safran' },
   { slug: 'coiffeuse', path: '/coiffeuse/', floor: 0, name: 'La Coiffeuse de Lamia', welcome: 'Le rouge, les bijoux, les gestes qui nous ressemblent.',
     summary: 'Le rouge à lèvres signature de Lamia et le maquillage. En préparation.', status: 'soon', accent: 'rouge' },
 
-  { slug: 'patio', path: '/rencontres/', floor: 0, name: 'Les Rencontres', welcome: 'Trouver l’âme sœur, en confiance.', headline: 'Rencontres kabyles sérieuses, profils vérifiés',
+  { slug: 'patio', path: '/rencontres/', floor: 0, name: 'Les Rencontres', welcome: 'Trouver l’âme sœur, en confiance.', headline: 'Profils kabyles vérifiés : comment ça marche',
     summary: 'Confie ton profil à Lamia, découvre des profils vérifiés et anonymes, et laisse-la faire le lien, en toute discrétion.', status: 'open', accent: 'vert' },
 
   // ---------- premier étage : rencontres, parole, lecture
-  { slug: 'salon', path: '/salon/', floor: 1, name: 'Le Salon de Lamia', welcome: 'Installe-toi, on parle vrai.', headline: 'Lives en multistream, débats et mariage kabyle',
+  { slug: 'salon', path: '/salon/', floor: 1, name: 'Le Salon de Lamia', welcome: 'Installe-toi, on parle vrai.', headline: 'Les lives de Lamia : couple, mariage et culture kabyle',
     summary: 'Les lives, les débats et les prises de parole de Lamia sur l’amour, le mariage, la transmission et la société.', status: 'open', accent: 'rouge' },
   { slug: 'speed-dating', path: '/speed-dating/', floor: 1, name: 'Le Boudoir des Rencontres', welcome: 'Des rencontres vraies, dans un cadre sûr.', headline: 'Speed dating sérieux en ligne',
     summary: 'Des soirées en visio, des tête-à-tête rapides et un cadre chaleureux pensé pour des rencontres sérieuses.', status: 'open', accent: 'rouge' },
@@ -42,7 +42,7 @@ export const rooms = [
   // ---------- deuxième étage : trouvailles, galerie, atelier, communauté
   { slug: 'grenier', path: '/grenier/', floor: 2, name: 'Trouvailles vintage', welcome: 'Ce que j’ai déniché pour toi.', headline: 'Brocante, objets anciens et coups de cœur de Lamia',
     summary: 'Disques, cartes postales, objets français, souvenirs kabyles, décoration, cadres, bibelots et pièces chinées : le Grenier rassemble mes trouvailles au fil des brocantes et des voyages.', status: 'open', accent: 'safran', productCategories: ['trouvailles'] },
-  { slug: 'galerie', path: '/galerie/', floor: 2, name: 'La Galerie', welcome: 'Regarder, comprendre, transmettre.',
+  { slug: 'galerie', path: '/galerie/', floor: 2, name: 'La Galerie', welcome: 'Regarder, comprendre, transmettre.', headline: 'Le patrimoine des bijoux kabyles',
     summary: 'Le patrimoine des bijoux kabyles, l’émail, les symboles, et les créations de la Maison.', status: 'open', accent: 'safran' },
   { slug: 'atelier', path: '/atelier/', floor: 2, name: 'L’Atelier', welcome: 'Là où naissent les pièces.',
     summary: 'Les coulisses des créations, les artisans et les collaborations.', status: 'soon', accent: 'vert' },

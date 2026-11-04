@@ -305,12 +305,13 @@ globalThis.__pageFr = page;
 page(
   '/',
   layout({
-    title: 'Rencontre kabyle sérieuse en vue du mariage · Lamia, marieuse kabyle',
-    description: 'Trouve ton âme sœur kabyle avec Lamia : chaque profil vérifié, badge renforcé avec pièce d’identité, mises en relation faites par Lamia, speed dating en ligne et live chaque soir. Première mise en relation offerte.',
+    title: 'Rencontre kabyle sérieuse pour le mariage · Lamia',
+    description: 'Rencontre kabyle en vue du mariage : profils vérifiés, présentations faites par Lamia, marieuse kabyle. Ton premier match est offert.',
     path: '/',
     room: roomBySlug.hall,
     scripts: ['/assets/annonces.js'],
-    body: `<div class="po-app accueil">
+    body: `<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@graph': [{ '@type': 'Organization', '@id': SITE_URL + '/#organisation', name: 'Lamia Femme Berbère', url: SITE_URL + '/', logo: SITE_URL + '/images/lamia/lamia-portrait-tatouages-rond-480.webp', founder: { '@type': 'Person', name: 'Lamia Bréchet Ighil', url: SITE_URL + '/lamia-brechet/' }, sameAs: ['https://www.tiktok.com/@lamiafemmeberbere', 'https://www.facebook.com/femmeberberes/'] }, { '@type': 'WebSite', '@id': SITE_URL + '/#site', name: 'Lamia Femme Berbère', url: SITE_URL + '/', publisher: { '@id': SITE_URL + '/#organisation' }, inLanguage: ['fr', 'en'] }] })}</script>
+<div class="po-app accueil">
 <section class="po-hero accueil-hero" aria-labelledby="accueil-titre">
   <div class="po-fond" aria-hidden="true"></div>
   <div class="po-garland" aria-hidden="true">
@@ -321,11 +322,11 @@ page(
     <div class="po-hero-texte">
       <p class="po-eyebrow">${esc(T('accueil.surtitre', 'Accueil', 'Petite ligne au-dessus du titre', 'La marieuse kabyle · rencontres sérieuses'))}</p>
       <h1 id="accueil-titre">${esc(T('accueil.titre', 'Accueil', 'Grand titre', 'Trouve ton âme sœur kabyle, avec Lamia'))}</h1>
-      <p class="po-sub">${esc(T('accueil.sous-titre', 'Accueil', 'Phrase sous le titre', 'Profils vérifiés. Mises en relation faites par Lamia. En vue du mariage.'))}</p>
+      <p class="po-sub">${esc(T('accueil.sous-titre', 'Accueil', 'Phrase sous le titre', 'Profils vérifiés. Lamia vous présente. En vue du mariage.'))}</p>
       <p class="po-actions"><a class="po-btn" href="/rencontres/#confier"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> Je confie mon profil</a><a class="po-btn-verre" href="/rencontres/#profils-anonymes">Voir les profils</a></p>
       <ul class="accueil-preuves">
         <li>✓ Chaque profil vérifié par Lamia</li>
-        <li>✓ 1re mise en relation offerte</li>
+        <li>✓ 1er match offert</li>
         <li>✓ Live chaque soir, 21 h</li>
         <li>✓ France, Algérie, Canada, Europe</li>
       </ul>
@@ -341,7 +342,7 @@ page(
   <div class="patio-etapes">
     <h2>Comment ça marche</h2>
     <ol>
-      <li><strong>Tu confies ton profil</strong><span>En 5 minutes : qui tu es, qui tu cherches, une photo. Rien n’est publié avec ton nom.</span></li>
+      <li><strong>Tu confies ton profil</strong><span>En 5 minutes : qui tu es, qui tu cherches, 2 photos. Rien n’est publié avec ton nom.</span></li>
       <li><strong>Lamia vérifie</strong><span>Les faux profils n’entrent pas. Avec ta pièce d’identité (facultative), ton profil gagne le badge « vérifié avec pièce d’identité ».</span></li>
       <li><strong>Elle cherche pour toi</strong><span>Son outil de matching compare les profils, et Lamia choisit avec son regard.</span></li>
       <li><strong>Elle vous présente</strong><span>Si vous êtes d’accord tous les deux, elle vous met en contact. La première fois, c’est offert.</span></li>
@@ -351,7 +352,7 @@ page(
 
   <div class="accueil-bloc">
     <h2 class="annonces-titre">Les formules</h2>
-    <p class="annonces-sous">Sans engagement. La première mise en relation est toujours offerte.</p>
+    <p class="annonces-sous">Sans engagement. Le premier match est toujours offert.</p>
     <div class="abo-grille">${FORMULES.map((f) => `<a class="abo-carte abo-mini${f.vedette ? ' is-vedette' : ''}" href="${f.mois ? `/abonnement/?formule=${f.id}` : '/rencontres/#confier'}">${f.vedette ? '<span class="abo-ruban">Le plus choisi</span>' : ''}<h3>${esc(f.nom)}</h3><p class="abo-prix">${f.mois ? `<span${f.lancement ? ' data-prestige-prix="mois"' : ''}>${eurosAbo(prixMensuel(f, 0))}<small> / mois</small></span>` : 'Gratuit'}</p>${placesLancement(f)}<ul>${f.avantages.slice(0, 2).map((a) => `<li>${esc(a)}</li>`).join('')}</ul><span class="po-btn">${f.mois ? `Choisir ${esc(f.nom)}` : 'Commencer'}</span></a>`).join('')}</div>
   </div>
 
@@ -457,7 +458,7 @@ page(
   <div class="outil-live-tete">
     <img src="/images/lamia/lamia-portrait-tatouages-rond-480.webp" alt="Lamia Femme Berbère" width="120" height="120" loading="lazy">
     <div>
-      <p class="po-eyebrow">En direct chaque soir · matching kabyle IA</p>
+      <p class="po-eyebrow">En direct chaque soir · par Lamia, marieuse kabyle</p>
       <h2 id="outil-live-titre">Mon outil de matching, en live</h2>
       <p>Pendant le live, mon outil de matching est affiché à l’écran, sur toutes les plateformes à la fois. C’est lui qui me sert à présenter les annonces de mariage, à chercher les profils compatibles et à suivre chaque rencontre. Voici comment il marche, et surtout comment naît un match.</p>
     </div>
@@ -534,8 +535,8 @@ ${otherRooms('bibliotheque')}`,
 page(
   '/ecrin/',
   layout({
-    title: 'L’Écrin · Bijoux kabyles émaillés',
-    description: 'Bijoux kabyles en argent émaillé, alliances et créations de la Maison Lamia Femme Berbère.',
+    title: 'Bijoux kabyles en argent émaillé d’Ath Yenni · L’Écrin',
+    description: 'Bijoux kabyles en argent émaillé et corail, faits main à Ath Yenni par des artisans du village. Collection exclusive de Lamia Femme Berbère.',
     path: '/ecrin/',
     room: roomBySlug.ecrin,
     body: `${roomHead(roomBySlug.ecrin)}
@@ -567,7 +568,7 @@ ${otherRooms('ecrin')}`,
 page(
   '/grenier/',
   layout({
-    title: 'Trouvailles vintage : brocante, VHS, verrerie et livres anciens · Lamia',
+    title: 'Trouvailles vintage et objets de brocante · Lamia',
     description: 'Les coups de cœur de brocante de Lamia : livres anciennes éditions, bibelots, cadres, sculptures, cartes postales, pièces uniques.',
     path: '/grenier/',
     room: roomBySlug.grenier,
@@ -615,8 +616,8 @@ page(
 page(
   '/speed-dating/',
   layout({
-    title: 'Speed dating en ligne sérieux — Le Boudoir des Rencontres | Lamia Femme Berbère',
-    description: 'Des soirées de speed dating en visio pour des rencontres sérieuses, en deux salons par âge, de l’Algérie à la France et au Canada, animées par Lamia. Inscription toujours ouverte. Chaque soirée est un Bal masqué Virtuel Kabyle.',
+    title: 'Speed dating kabyle en ligne · Le Bal masqué de Lamia',
+    description: 'Speed dating kabyle en visio, deux salons par âge, 20 personnes maximum par salon. Viens masqué·e, Lamia anime la soirée. Inscription toujours ouverte.',
     path: '/speed-dating/',
     room: roomBySlug['speed-dating'],
     scripts: ['/assets/membre.js', '/assets/soirees.js'],
@@ -643,7 +644,7 @@ page(
     <p class="bal-welcome">${esc(roomBySlug['speed-dating'].welcome)}</p>
     <p class="bal-lead">${esc(P.speedDating.intro)}</p>
     <div class="bal-facts" aria-label="En bref">
-      <span>En visio, depuis chez vous</span><span>Deux salons par âge</span><span>20 personnes max par salon</span><span>Lamia veille</span>
+      <span>En visio, depuis chez toi</span><span>Deux salons par âge</span><span>20 personnes max par salon</span><span>Lamia veille</span>
     </div>
     <p class="bal-actions"><a class="btn btn-gold" href="/speed-dating/inscription/">M’inscrire à un salon</a><a class="btn bal-btn-line" href="/speed-dating/salle/">Tester ma caméra</a></p>
   </div>
@@ -657,7 +658,7 @@ page(
   <div class="lancement-texte">
     <p class="bal-kicker">Le thème de toutes nos soirées</p>
     <h2 id="lancement-title">${esc(T('speed.lancement-titre', 'Le Boudoir des Rencontres', 'Thème des soirées : titre', 'Le Bal masqué Virtuel Kabyle'))}</h2>
-    <p>Chaque soirée du Boudoir est un <strong>bal masqué virtuel kabyle</strong>, en visio, depuis chez vous. Venez masqué·e, en robe kabyle, avec vos bijoux ou dans votre plus belle tenue : le mystère fait partie du jeu, et le démasquage vient à la fin.</p>
+    <p>Chaque soirée du Boudoir est un <strong>bal masqué virtuel kabyle</strong>, en visio, depuis chez toi. Viens masqué·e, en robe kabyle, avec tes bijoux ou dans ta plus belle tenue : le mystère fait partie du jeu, et le démasquage vient à la fin.</p>
     <p><a class="btn btn-gold" href="#events-title">Réserver ma place</a></p>
   </div>
 </section>
@@ -667,7 +668,6 @@ page(
   <h2 id="events-title">Choisis ton salon</h2>
   <p class="salons-gratuit" data-salons-gratuit hidden>La prochaine soirée est gratuite</p>
   <p>Deux salons, plusieurs secteurs de recherche. Quand assez de femmes et d’hommes sont inscrits dans un même secteur, le salon est confirmé et tu es prévenu·e.</p>
-  <p class="salons-beta">Nous sommes en période de bêta-test : merci pour votre participation active ! N’hésitez pas à nous signaler le moindre problème, et soyez indulgents avec nos petits réglages techniques.</p>
   <div class="salons-deux">
     <a class="salons-carte" href="/speed-dating/inscription/?salon=20-39"><span><strong>Salon 20-39 ans</strong><small>Je m’inscris</small></span></a>
     <a class="salons-carte" href="/speed-dating/inscription/?salon=40%2B"><span><strong>Salon 40 ans et plus</strong><small>Je m’inscris</small></span></a>
@@ -678,11 +678,11 @@ page(
 <section class="bal-deroule" aria-labelledby="deroule-title">
   <h2 id="deroule-title">Comment se passe une soirée</h2>
   <ol>
-    <li><strong>Vous choisissez</strong><span>Avec votre profil validé, vous choisissez votre salon, puis les secteurs où vous cherchez. Cela prend une minute.</span></li>
-    <li><strong>Votre salon est confirmé</strong><span>Dès qu’il y a assez de femmes et d’hommes dans un secteur, Lamia fixe la date et vous êtes prévenu·e. Vous recevez aussi un rappel le jour même, une heure avant, puis au démarrage.</span></li>
-    <li><strong>Vous entrez dans le grand salon</strong><span>À l’heure dite, Lamia accueille tout le monde et ouvre la soirée.</span></li>
-    <li><strong>Vous faites connaissance</strong><span>Des tête-à-tête de quelques minutes, au son d’une cloche. Les cavaliers rencontrés s’inscrivent dans votre carnet de bal.</span></li>
-    <li><strong>Vous choisissez qui revoir</strong><span>En privé, dans votre carnet. Si le souhait est réciproque, Lamia vous met en relation.</span></li>
+    <li><strong>Tu choisis</strong><span>Avec ton profil validé, tu choisis ton salon, puis les secteurs où tu cherches. Cela prend une minute.</span></li>
+    <li><strong>Ton salon est confirmé</strong><span>Dès qu’il y a assez de femmes et d’hommes dans un secteur, Lamia fixe la date et tu es prévenu·e. Tu reçois aussi un rappel le jour même, une heure avant, puis au démarrage.</span></li>
+    <li><strong>Tu entres dans le grand salon</strong><span>À l’heure dite, Lamia accueille tout le monde et ouvre la soirée.</span></li>
+    <li><strong>Tu fais connaissance</strong><span>Des tête-à-tête de quelques minutes, au son d’une cloche. Les cavaliers rencontrés s’inscrivent dans ton carnet de bal.</span></li>
+    <li><strong>Tu choisis qui revoir</strong><span>En privé, dans ton carnet. Si le souhait est réciproque, Lamia vous présente.</span></li>
   </ol>
 </section>
 
@@ -692,13 +692,13 @@ page(
     <li><strong>Salon 20-39 ans</strong></li>
     <li><strong>Salon 40 ans et plus</strong></li>
   </ul>
-  <p class="bal-note">Toutes les zones sont réunies : Algérie, France, Europe, Canada et ailleurs. Votre salon est choisi automatiquement d’après votre date de naissance, avec 20 personnes au maximum par salon, pour garder des échanges de qualité.</p>
+  <p class="bal-note">Toutes les zones sont réunies : Algérie, France, Europe, Canada et ailleurs. Ton salon est choisi automatiquement d’après ta date de naissance, avec 20 personnes au maximum par salon, pour garder des échanges de qualité.</p>
 </section>
 
 <section class="bal-code" aria-labelledby="code-title">
   <h2 id="code-title">Un cadre chaleureux et respectueux</h2>
   <ul>
-    <li><strong>Des rencontres sérieuses</strong> : on vient pour rencontrer quelqu’un, pas pour faire défiler des profils.</li>
+    <li><strong>Des rencontres sérieuses</strong> : on vient pour se parler vraiment, en face à face.</li>
     <li><strong>Caméra allumée</strong>, dans un endroit calme, et aucun propos déplacé.</li>
     <li><strong>Lamia veille</strong> : l’accueil, l’animation et le suivi de chaque soirée. Elle peut passer saluer un tête-à-tête pendant le bal : son nom s’affiche quand elle entre.</li>
     <li><strong>Une ambiance</strong> : chaque soirée est un bal masqué virtuel kabyle : masque, robe kabyle ou tenue élégante.</li>
@@ -708,7 +708,7 @@ page(
 
 <section class="member-panel bal-espace" aria-labelledby="member-title">
   <h2 id="member-title">Le soir de la soirée</h2>
-  <p><a class="text-link" href="/speed-dating/inscription/">Inscrivez-vous à un salon</a> avec votre profil validé, puis le soir venu, entrez par la porte de la salle avec votre email et votre date de naissance. À la fin, votre <strong>carnet de bal</strong> vous permet d’indiquer, en privé, qui vous aimeriez revoir.</p>
+  <p><a class="text-link" href="/speed-dating/inscription/">Inscris-toi à un salon</a> avec ton profil validé, puis le soir venu, entre par la porte de la salle avec ton email et ta date de naissance. À la fin, ton <strong>carnet de bal</strong> te permet d’indiquer, en privé, qui tu aimerais revoir.</p>
   <p class="bal-actions"><a class="btn btn-gold" href="/speed-dating/bal/">Entrer dans la salle</a><a class="btn bal-btn-line" href="/speed-dating/salle/">Tester ma caméra</a><a class="btn bal-btn-line" href="/mon-espace/">Mon espace</a></p>
 </section>
 <section class="origin">
@@ -1445,8 +1445,8 @@ page(
 page(
   '/rencontres/',
   layout({
-    title: 'Rencontre kabyle sérieuse : profils vérifiés · Les Rencontres de Lamia',
-    description: 'Rencontre kabyle sérieuse en vue du mariage : confie ton profil à Lamia, marieuse kabyle. Profils vérifiés (badge renforcé avec pièce d’identité), profils anonymes, mise en relation par Lamia, la première offerte.',
+    title: 'Profils kabyles vérifiés · Les Rencontres de Lamia',
+    description: 'Parcours les profils kabyles vérifiés par Lamia, de façon anonyme. France, Algérie, Canada, Europe. Tu choisis, elle vous présente.',
     path: '/rencontres/',
     room: roomBySlug.patio,
     scripts: ['/assets/annonces.js'],
@@ -1461,7 +1461,7 @@ page(
   <div class="po-hero-grid">
     <div class="po-hero-texte">
       <p class="po-eyebrow">Les Rencontres de Lamia</p>
-      <h1 id="po-titre">Rencontres kabyles sérieuses, profils vérifiés</h1>
+      <h1 id="po-titre">Profils kabyles vérifiés : comment ça marche</h1>
       <p class="po-sub">Tu confies ton profil, Lamia vérifie, cherche et vous présente.</p>
       <p class="po-actions"><button type="button" class="po-btn" data-annonce-ouvrir aria-expanded="false"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> Je confie mon profil</button><a class="po-btn-verre" href="#profils-anonymes">Voir les profils</a></p>
     </div>
@@ -1477,16 +1477,25 @@ page(
   <div class="patio-etapes po-panel" id="annonces">
     <h2>Comment ça marche</h2>
     <ol>
-      <li><strong>Tu confies ton profil</strong><span>En 5 minutes : qui tu es, qui tu cherches, une photo. Ton identité n’est jamais publiée.</span></li>
-      <li><strong>Lamia vérifie</strong><span>Elle vérifie ton profil, puis le passe dans son outil de matching. Ta pièce d’identité est facultative : si tu la donnes, ton profil porte le badge renforcé.</span></li>
+      <li><strong>Tu confies ton profil</strong><span>En 5 minutes : qui tu es, qui tu cherches, 2 photos. Ton identité n’est jamais publiée.</span></li>
+      <li><strong>Lamia vérifie</strong><span>Elle vérifie ton profil. Son outil compare les profils, et c’est elle qui choisit. Ta pièce d’identité est facultative : si tu la donnes, ton profil porte le badge renforcé.</span></li>
       <li><strong>Tu sais combien te correspondent</strong><span>Lamia te dit avec combien de personnes tu pourrais correspondre. Personne ne sait qui matche avec qui.</span></li>
       <li><strong>Lamia vous présente</strong><span>Si vous êtes d’accord tous les deux, elle vous met en contact. Ton numéro reste chez elle jusque-là. La première fois, c’est offert.</span></li>
     </ol>
     <p class="po-actions"><button type="button" class="po-btn" data-annonce-ouvrir aria-expanded="false"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> Je confie mon profil</button></p>
   </div>
-  <h2 class="annonces-titre">Les formules</h2>
-  <p class="annonces-sous">Sans engagement. La première mise en relation est toujours offerte.</p>
-  <div class="abo-grille">${FORMULES.map((f) => `<a class="abo-carte abo-mini${f.vedette ? ' is-vedette' : ''}" href="${f.mois ? `/abonnement/?formule=${f.id}` : '#confier'}">${f.vedette ? '<span class="abo-ruban">Le plus choisi</span>' : ''}<h3>${esc(f.nom)}</h3><p class="abo-prix">${f.mois ? `<span${f.lancement ? ' data-prestige-prix="mois"' : ''}>${eurosAbo(prixMensuel(f, 0))}<small> / mois</small></span>` : 'Gratuit'}</p>${placesLancement(f)}<ul>${f.avantages.slice(0, 2).map((x) => `<li>${esc(x)}</li>`).join('')}</ul><span class="po-btn">${f.mois ? `Choisir ${esc(f.nom)}` : 'Commencer'}</span></a>`).join('')}</div>
+  <div class="patio-etapes po-panel" id="questions">
+    <h2>Tes questions</h2>
+    <ol>
+      <li><strong>Mon nom est-il visible ?</strong><span>Non. Sur les profils, on ne voit ni prénom, ni photo, ni contact : seulement un numéro de profil.</span></li>
+      <li><strong>Pourquoi 2 photos ?</strong><span>Lamia en a besoin pour vérifier ton profil et écarter les faux profils. Tes photos ne s’affichent pas sur les profils publics.</span></li>
+      <li><strong>La pièce d’identité est-elle obligatoire ?</strong><span>Non, elle est facultative. Si tu la donnes, ton profil porte le badge renforcé.</span></li>
+      <li><strong>Que se passe-t-il quand nous sommes d’accord tous les deux ?</strong><span>Lamia vous présente, et une discussion privée de 7 jours s’ouvre dans votre espace. Vous échangez vos numéros ensuite.</span></li>
+      <li><strong>D’où viennent les profils ?</strong><span>De France, d’Algérie, du Canada, d’Europe et d’ailleurs.</span></li>
+      <li><strong>Je vis en Algérie, comment faire ?</strong><span>Ton profil et ton premier match sont gratuits. Le paiement en ligne n’y est pas possible : <a class="text-link" href="/salon/">viens au live</a>, chaque soir à 21 h, pour d’autres matchs.</span></li>
+      <li><strong>Combien ça coûte ?</strong><span>Découverte est gratuite et ton premier match est offert. <a class="text-link" href="/abonnement/">Voir toutes les formules</a>.</span></li>
+    </ol>
+  </div>
   <h2 class="annonces-titre" id="profils-anonymes">Les profils vérifiés</h2>
   <p class="annonces-sous">Ni prénom, ni photo, ni contact. Un profil te touche ? Clique sur « Ce profil m’intéresse » : Lamia regarde si vous pouvez correspondre. Ton identité reste secrète : on ne voit que des numéros de profil.</p>
   <p class="po-actions btn-swipe"><a class="po-btn" href="/rencontres/swipe/">💘 Swiper les profils, un par un</a></p>
@@ -1541,8 +1550,8 @@ const carteFormule = (f) => `<article class="abo-carte${f.vedette ? ' is-vedette
 page(
   '/abonnement/',
   layout({
-    title: 'Abonnement · Trouve ton âme sœur avec Lamia',
-    description: 'Les formules de Lamia pour trouver ton âme sœur : Découverte gratuite, Passion à 9 € et Prestige à 22 € pour les 20 premiers abonnés, puis 49 € par mois. Mises en relation, speed datings inclus, sans engagement.',
+    title: 'Tarifs des rencontres kabyles · Formules Lamia',
+    description: 'Découverte gratuite, Passion à 9 €, Prestige à 22 € pour les 20 premiers abonnés, puis 49 € par mois. Sans engagement, résiliable en un clic.',
     path: '/abonnement/',
     room: roomBySlug.patio,
     scripts: ['/assets/abonnement.js'],
@@ -1551,13 +1560,13 @@ page(
   <div class="po-fond" aria-hidden="true"></div>
   <div class="po-hero-grid">
     <div class="po-hero-texte">
-      <p class="po-eyebrow">Matching kabyle IA · par Lamia</p>
-      <h1 id="abo-titre">Choisis ta formule</h1>
+      <p class="po-eyebrow">Par Lamia, marieuse kabyle</p>
+      <h1 id="abo-titre">Les formules de rencontre kabyle</h1>
       <p class="po-sub">Un match est toujours offert. En live, 1 match supplémentaire toutes les 2 semaines.</p>
       <p class="po-lead">Ou choisis le rythme qui te ressemble : 10 matchs par mois et 2 en cours, ou illimités et 5 en cours, avec le coaching et l’option mariage de Lamia. Sans engagement, résiliable en un clic depuis ton espace.</p>
       <p class="po-lead">Tu vis en Algérie ? Le paiement en ligne n’y est pas possible : <a class="text-link" href="/salon/">viens au live</a>, chaque soir à 21 h, pour d’autres matchs.</p>
     </div>
-    <figure class="po-lamia"><img src="/images/lamia/lamia-portrait-tatouages-rond-480.webp" alt="Lamia Femme Berbère" width="200" height="200"><figcaption>Lamia · ton entremetteuse</figcaption></figure>
+    <figure class="po-lamia"><img src="/images/lamia/lamia-portrait-tatouages-rond-480.webp" alt="Lamia Femme Berbère" width="200" height="200"><figcaption>Lamia · ta marieuse</figcaption></figure>
   </div>
 </section>
 <section class="po-corps abo-corps">
@@ -1585,7 +1594,7 @@ page(
   <div class="patio-etapes">
     <h2>Questions fréquentes</h2>
     <ol>
-      <li><strong>C’est quoi, une mise en relation ?</strong><span>Lamia te propose une personne qui te correspond vraiment. Si vous êtes d’accord tous les deux, elle vous met en contact. Ton numéro reste chez elle jusque-là.</span></li>
+      <li><strong>C’est quoi, un match ?</strong><span>Lamia te propose une personne qui te correspond vraiment. Si vous êtes d’accord tous les deux, elle vous met en contact. Ton numéro reste chez elle jusque-là.</span></li>
       <li><strong>Plusieurs matchs en même temps, ça veut dire quoi ?</strong><span>Tu peux avoir 1 match en cours avec Découverte, 2 avec Passion et 5 avec Prestige. Quand tu mets fin à un match, une place se libère.</span></li>
       <li><strong>Comment se passe le coaching Prestige ?</strong><span>Dans ton espace, tu choisis un créneau parmi ceux ouverts par Lamia : une visio de 15 minutes par mois, non enregistrée. Tu peux annuler jusqu’à 24 heures avant et choisir un autre créneau.</span></li>
       <li><strong>Et les speed datings inclus ?</strong><span>Ta place aux soirées de speed dating en ligne de ton salon, dans la limite indiquée chaque mois. Lamia la note quand tu t’inscris.</span></li>
@@ -1608,7 +1617,7 @@ page(
     scripts: ['/assets/nouveautes.js'],
     body: `<div class="po-app"><section class="po-hero"><div class="po-fond" aria-hidden="true"></div>
   <p class="po-eyebrow">🔔 Les nouveautés</p><h1>Quoi de neuf chez Lamia ?</h1>
-  <p class="po-lead">Les nouvelles trouvailles de la boutique, les articles, les actus et les lives. Active les notifications dans <a href="/mon-espace/">Mon espace</a> pour ne rien manquer.</p>
+  <p class="po-lead">Les nouvelles trouvailles de la boutique, les bijoux kabyles, les articles, les actus et les lives de Lamia. Active les notifications dans <a href="/mon-espace/">Mon espace</a> pour ne rien manquer.</p>
 </section>
 <div class="nouveautes-app"><div class="nouveautes-filtres" data-nouveautes-filtres></div><div class="nouveautes-liste" data-nouveautes><p class="annonce-vide">Un instant…</p></div></div></div>`,
   })
@@ -1617,6 +1626,7 @@ page(
 page(
   '/rencontres/swipe/',
   layout({
+    noindex: true,
     title: 'Swipe · Les profils vérifiés',
     description: 'Découvre les profils vérifiés un par un : à droite s’il t’intéresse, à gauche sinon. Si vous vous choisissez tous les deux, Lamia vous met en relation.',
     path: '/rencontres/swipe/',
@@ -1701,8 +1711,8 @@ const LIVE_PHOTO = existsSync(join(ROOT, 'public/images/lamia/lamia-live-900.web
 page(
   '/lamia-brechet/',
   layout({
-    title: 'Qui est Lamia ? Lamia Bréchet Ighil | Lamia Femme Berbère',
-    description: 'Lamia Bréchet Ighil, derrière « Lamia Femme Berbère » : les lives, la culture kabyle, Yemma Werdi, les rencontres, les bijoux d’Ath Yenni, et une Maison où l’on vient la retrouver.',
+    title: 'Lamia Bréchet Ighil, marieuse kabyle · Lamia Femme Berbère',
+    description: 'Lamia Bréchet Ighil, marieuse kabyle derrière Lamia Femme Berbère : lives, rencontres en vue du mariage, culture kabyle et bijoux d’Ath Yenni.',
     path: '/lamia-brechet/',
     room: roomBySlug.hall,
     body: `<article class="lamia-page">
@@ -1901,11 +1911,11 @@ page(
 page(
   '/application/',
   layout({
-    title: 'L’application de la Maison Lamia Femme Berbère',
+    title: 'L’application de rencontre kabyle de Lamia',
     description: 'Installe l’application de Lamia sur ton téléphone : les profils vérifiés, le swipe, ton espace, le live et le speed dating à portée de doigt.',
     path: '/application/',
     room: roomBySlug.boutique,
-    body: `<section class="room-head"><p class="room-name"><span class="pip" aria-hidden="true"></span>L’application</p><h1>La Maison dans ta poche</h1><p class="lead">Installe l’application de Lamia sur ton téléphone : une icône sur ton écran d’accueil, les profils vérifiés, le swipe, ton espace et le live en plein écran, sans passer par un magasin d’applications de lourd.</p>
+    body: `<section class="room-head"><p class="room-name"><span class="pip" aria-hidden="true"></span>L’application</p><h1>L’application de rencontre kabyle de Lamia</h1><p class="lead">Installe l’application de Lamia sur ton téléphone : une icône sur ton écran d’accueil, les profils vérifiés, le swipe, ton espace et le live en plein écran, sans passer par un magasin d’applications de lourd.</p>
 <p class="bal-actions"><button type="button" class="btn btn-ink btn-installer" data-installer-bouton>📲 Installer l’application</button><span data-installee hidden>✓ L’application est déjà installée sur cet appareil.</span></p></section>
 <section class="article"><h2>Sur Android</h2><ol><li>Ouvre lamia-femme-berbere.com dans Chrome.</li><li>Touche le bouton « Installer l’application » ci-dessus, ou le menu ⋮ puis « Installer l’application ».</li><li>Confirme : l’icône de la Maison apparaît sur ton écran d’accueil.</li></ol>
 <h2>Sur iPhone</h2><ol><li>Ouvre lamia-femme-berbere.com dans Safari.</li><li>Touche le bouton Partager (le carré avec une flèche vers le haut).</li><li>Choisis « Sur l’écran d’accueil », puis « Ajouter ».</li></ol>
@@ -2045,7 +2055,7 @@ await cp(join(ROOT, 'content', 'en', 'products.json'), join(DIST, 'assets', 'i18
 const MOTIFS_EN = JSON.parse(await readFile(join(ROOT, 'content', 'en', 'patterns.json'), 'utf8'));
 await writeFile(join(DIST, 'assets', 'i18n', 'en.json'), JSON.stringify({ strings: STRINGS, pages: [...PAGES_EN], motifs: MOTIFS_EN.motifs, noms: MOTIFS_EN.noms }));
 
-const indexable = pages.filter((p) => !soonRooms.some((r) => p.path.replace(/^\/en\//, '/') === r.path) && !p.path.endsWith('.html') && !p.path.startsWith('/en/produit/') && !['/produit/', '/speed-dating/merci/', '/commande/merci/', '/abonnement/merci/', '/rencontres/swipe/', '/rencontres/confirmer/', '/speed-dating/souhaits/', '/cgv/', '/mentions-legales/', '/confidentialite/', '/retours/', '/conditions-utilisation/', '/confidences-lamia/', '/hors-ligne/'].includes(p.path.replace(/^\/en\//, '/')));
+const indexable = pages.filter((p) => !soonRooms.some((r) => p.path.replace(/^\/en\//, '/') === r.path) && !p.path.endsWith('.html') && !p.path.startsWith('/en/produit/') && !['/produit/', '/mon-espace/', '/speed-dating/bal/', '/speed-dating/salle/', '/suppression-compte/', '/speed-dating/merci/', '/commande/merci/', '/abonnement/merci/', '/rencontres/swipe/', '/rencontres/confirmer/', '/speed-dating/souhaits/', '/cgv/', '/mentions-legales/', '/confidentialite/', '/retours/', '/conditions-utilisation/', '/confidences-lamia/', '/hors-ligne/'].includes(p.path.replace(/^\/en\//, '/')));
 await writeFile(
   join(DIST, 'sitemap.xml'),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${indexable.filter((p) => !p.path.startsWith('/produit/')).map((p) => `<url><loc>${SITE_URL}${p.path}</loc></url>`).join('')}${PRODUITS_INDEXES.map((p) => `<url><loc>${SITE_URL}${p.path}</loc>${p.lastmod ? `<lastmod>${p.lastmod}</lastmod>` : ''}</url><url><loc>${SITE_URL}/en${p.path}</loc>${p.lastmod ? `<lastmod>${p.lastmod}</lastmod>` : ''}</url>`).join('')}</urlset>\n`
