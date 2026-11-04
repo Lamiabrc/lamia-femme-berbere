@@ -743,6 +743,7 @@ page(
         <button class="btn btn-ink" type="submit">Recevoir mon lien de connexion</button>
         <p class="form-status" role="status" data-reset-status></p>
       </form>
+      <p class="espace-card" data-moderateur-avis hidden>🛡️ Lamia te propose un compte modérateur. Crée ton accès ou connecte-toi ci-dessous, puis confirme.</p>
       <form class="espace-card" data-espace-login>
         <h2>J’ai un mot de passe</h2>
         <label>Email<input name="email" type="email" autocomplete="email" required></label>
@@ -817,6 +818,7 @@ page(
     <section id="discussion" data-espace-discussion-bloc hidden>
       <h2>Mes matchs en cours</h2>
       <p>Vos matchs réciproques : vous avez 7 jours pour faire connaissance ici, en privé. Quand vous êtes prêts, échangez vos numéros pour passer au téléphone. Lamia ne lit pas vos messages, sauf si l’un de vous la signale.</p>
+      <div class="espace-profil" id="moderateur" data-espace-moderateur hidden></div>
       <div class="espace-profil" id="beta" data-espace-beta hidden></div>
       <div class="espace-profil" data-espace-blocages hidden><h3>Profils bloqués</h3><ul data-blocages-liste></ul></div>
       <p class="parcours-livre">💍 Vous suivez le parcours de mariage de Lamia, détaillé dans l’ebook <a class="text-link" href="/werdi-ouvre-les-yeux/"><em>Werdi, ouvre les yeux !</em></a></p>
