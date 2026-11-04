@@ -9,11 +9,12 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { PAIRES_GUIDES } from '../content/guides.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const lire = (f) => (existsSync(join(ROOT, f)) ? JSON.parse(readFileSync(join(ROOT, f), 'utf8')) : {});
 
-export const STRINGS = lire('content/en/strings.json');
+export const STRINGS = { ...lire('content/en/strings.json'), ...PAIRES_GUIDES };
 export const PRODUCTS = lire('content/en/products.json');
 
 // Pages qui restent uniquement en français (outils privés de Lamia).

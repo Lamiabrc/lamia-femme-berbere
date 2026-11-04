@@ -12,6 +12,7 @@ import * as P from '../content/pages.mjs';
 import { legalPages, livraisonTexte, tvaTexte } from '../content/legal.mjs';
 import { reglagesPropres } from '../content/shipping.mjs';
 import { facade } from './facade.mjs';
+import { GUIDES } from '../content/guides.mjs';
 import { pageAnglaise, pageFrancaise, produitAnglais, enPath, FR_ONLY, STRINGS, MANQUANTS } from './english.mjs';
 import { EDITABLE, defaults, applyOverrides } from '../content/editable.mjs';
 import { FORMULES, UNITES, prixAnnuel, prixMensuel, euros as eurosAbo } from '../content/abonnements.mjs';
@@ -220,6 +221,8 @@ function footer() {
   <nav aria-label="Rencontres">
     <p class="footer-title">Rencontres</p>
     <ul><li><a href="/rencontres/">Rencontres kabyles sérieuses</a></li><li><a href="/rencontres/#confier">Confier mon profil</a></li><li><a href="/speed-dating/">Speed dating</a></li><li><a href="/abonnement/">Les formules</a></li><li><a href="/salon/">Le live chaque soir</a></li><li><a href="/confidences/">Écrire à Lamia</a></li></ul>
+    <p class="footer-title">Guides</p>
+    <ul>${GUIDES.map((g) => `<li><a href="${g.path}">${esc(g.lien[0])}</a></li>`).join('')}</ul>
     <p class="footer-title">Boutique</p>
     <ul><li><a href="/ecrin/">Bijoux kabyles d’Ath Yenni</a></li><li><a href="/bibliotheque/">Le livre Werdi</a></li><li><a href="/grenier/">Trouvailles vintage</a></li></ul>
   </nav>
@@ -718,6 +721,21 @@ page(
 </div>`,
   })
 );
+
+// Pages par pays et guides (content/guides.mjs)
+for (const g of GUIDES) {
+  page(g.path, layout({
+    title: g.title[0], description: g.description[0], path: g.path, room: roomBySlug[g.room],
+    body: `<article class="article">
+  <p class="room-name"><span class="pip" aria-hidden="true"></span>${esc(g.kicker[0])}</p>
+  <h1>${esc(g.h1[0])}</h1>
+  <p class="prose-lead">${esc(g.lead[0])}</p>
+  ${g.sections.map(([h, ps]) => `<h2>${esc(h[0])}</h2>${ps.map((p) => `<p>${esc(p[0])}</p>`).join('')}`).join('\n  ')}
+  <p class="article-links">${g.liens.map((l, i) => `<a class="btn ${i ? 'btn-line' : 'btn-ink'}" href="${esc(l[1])}">${esc(l[0])}</a>`).join('')}</p>
+  ${g.sourcesLiens.length ? `<h2>Sources</h2><ul>${g.sourcesLiens.map(([t, u]) => `<li><a href="${esc(u)}" rel="noopener">${esc(t)}</a></li>`).join('')}</ul>` : ''}
+</article>`,
+  }));
+}
 
 // Mon espace : connexion des membres et de Lamia
 page(
@@ -1493,7 +1511,7 @@ page(
       <li><strong>Pourquoi 2 photos ?</strong><span>Lamia en a besoin pour vérifier ton profil et écarter les faux profils. Tes photos ne s’affichent pas sur les profils publics.</span></li>
       <li><strong>La pièce d’identité est-elle obligatoire ?</strong><span>Non, elle est facultative. Si tu la donnes, ton profil porte le badge renforcé.</span></li>
       <li><strong>Que se passe-t-il quand nous sommes d’accord tous les deux ?</strong><span>Lamia vous présente, et une discussion privée de 7 jours s’ouvre dans votre espace. Vous échangez vos numéros ensuite.</span></li>
-      <li><strong>D’où viennent les profils ?</strong><span>De France, d’Algérie, du Canada, d’Europe et d’ailleurs.</span></li>
+      <li><strong>D’où viennent les profils ?</strong><span>De France, d’Algérie, du Canada, d’Europe et d’ailleurs. <a class="text-link" href="/rencontre-kabyle-canada/">Canada</a> · <a class="text-link" href="/rencontre-kabyle-algerie/">Algérie</a> · <a class="text-link" href="/rencontre-kabyle-europe/">Belgique et Europe</a></span></li>
       <li><strong>Je vis en Algérie, comment faire ?</strong><span>Ton profil et ton premier match sont gratuits. Le paiement en ligne n’y est pas possible : <a class="text-link" href="/salon/">viens au live</a>, chaque soir à 21 h, pour d’autres matchs.</span></li>
       <li><strong>Combien ça coûte ?</strong><span>Découverte est gratuite et ton premier match est offert. <a class="text-link" href="/abonnement/">Voir toutes les formules</a>.</span></li>
     </ol>
