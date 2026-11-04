@@ -33,6 +33,7 @@ async function api(body, method = 'POST') {
 function ouvrir(tab) {
   $$('[data-panel]').forEach((p) => { p.hidden = p.dataset.panel !== tab; });
   $$('[data-tab]').forEach((b) => b.setAttribute('aria-current', String(b.dataset.tab === tab)));
+  { const plus = $('[data-menu-plus]'); if (plus && plus.querySelector(`[data-tab="${tab}"]`)) plus.open = true; }
   try { history.replaceState(null, '', `#${tab}`); } catch { /* */ }
   if (tab === 'produits' && !produits.length) { chargerProduits(); chargerReglages(); }
   if (tab === 'textes') chargerTextes();
@@ -68,6 +69,65 @@ async function charger() {
   $('[data-dernieres]').innerHTML = v.orders.slice(0, 5).map((o) => `<p class="ligne"><span>n° ${esc(o.order_number)} · ${esc(o.customer_name || o.customer_email || '')}<br><small>${esc((o.order_items || []).map((x) => x.product_name).join(', '))}</small></span><strong>${money(o.amount_total_cents, o.currency)}</strong></p>`).join('') || '<p>Pas encore de commande.</p>';
   ventes(); soirees(); alertes(); visites();
 }
+
+// ---------------------------------------------------------------- chiffres clés et graphiques de l'accueil
+const nb = (n) => Number(n || 0).toLocaleString('fr-FR');
+const jourFr = (d, opts = { day: 'numeric', month: 'short' }) => new Date(`${d}T12:00:00`).toLocaleDateString('fr-FR', opts);
+function evolution(s) {
+  const d = Number(s?.sept || 0) - Number(s?.avant || 0);
+  return `${d > 0 ? '+' : ''}${nb(d)} par rapport à la semaine d’avant`;
+}
+let bulle;
+function montrerBulle(e, texte) {
+  if (!bulle) { bulle = document.createElement('div'); bulle.className = 'graphe-bulle'; document.body.appendChild(bulle); }
+  bulle.textContent = texte; bulle.hidden = false;
+  const r = (e.currentTarget || e.target).getBoundingClientRect();
+  bulle.style.left = `${Math.min(Math.max(8, r.left + r.width / 2 - bulle.offsetWidth / 2), innerWidth - bulle.offsetWidth - 8)}px`;
+  bulle.style.top = `${Math.max(8, r.top - bulle.offsetHeight - 6)}px`;
+}
+function graphe(titre, serie, jours) {
+  const v = (serie?.valeurs || []).map(Number), max = Math.max(1, ...v), total = v.reduce((a, b) => a + b, 0);
+  return `<div class="tdb-carte graphe"><h2>${esc(titre)}</h2><p class="graphe-total">${nb(total)} sur 30 jours · ${nb(serie?.sept)} ces 7 derniers jours</p>
+    <div class="graphe-barres" role="img" aria-label="${esc(titre)} : ${nb(total)} sur 30 jours">${v.map((n, i) => `<button type="button" class="graphe-col" tabindex="-1" data-bulle="${esc(jourFr(jours[i]))} : ${nb(n)}"><i style="height:${n ? Math.max(2, (n / max) * 100) : 0}%"></i></button>`).join('')}</div>
+    <div class="graphe-axe"><span>${esc(jourFr(jours[0]))}</span><span>max ${nb(Math.max(...v, 0))}</span><span>${esc(jourFr(jours[jours.length - 1]))}</span></div>
+    <details><summary>Voir les chiffres</summary><table><tbody>${v.map((n, i) => [n, i]).reverse().slice(0, 14).map(([n, i]) => `<tr><td>${esc(jourFr(jours[i], { weekday: 'short', day: 'numeric', month: 'short' }))}</td><td style="text-align:right">${nb(n)}</td></tr>`).join('')}</tbody></table></details></div>`;
+}
+const hbarres = (lignes, avecPart = false) => {
+  const max = Math.max(1, ...lignes.map((l) => Number(l.n))), base = Number(lignes[0]?.n) || 1;
+  return `<div class="hbarres">${lignes.map((l) => `<div><div class="hbarre-tete"><span>${esc(l.nom)}</span><b>${nb(l.n)}${avecPart ? ` · ${Math.round((Number(l.n) / base) * 100)} %` : ''}</b></div><div class="hbarre-fond"><i style="width:${(Number(l.n) / max) * 100}%"></i></div></div>`).join('')}</div>`;
+};
+async function chargerCockpit() {
+  const box = $('[data-tuiles]');
+  if (!box) return;
+  try {
+    const r = await fetch('/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ action: 'annonce_cockpit_stats' }) });
+    if (!r.ok) throw new Error('lecture');
+    const { stats: s } = await r.json();
+    const tuile = (nom, n, detail) => `<div class="tuile"><span>${esc(nom)}</span><strong>${nb(n)}</strong><small>${esc(detail)}</small></div>`;
+    box.innerHTML = [
+      tuile('Comptes', s.totaux.comptes, `+${nb(s.series.comptes?.sept)} en 7 jours`),
+      tuile('Profils sur le site', s.totaux.profils, `${nb(s.totaux.fiches_confirmees)} fiches du live confirmées sur ${nb(s.totaux.fiches)}`),
+      tuile('Swipes en 7 jours', s.series.swipes?.sept, evolution(s.series.swipes)),
+      tuile('Matchs demandés en 7 jours', s.series.demandes?.sept, evolution(s.series.demandes)),
+      tuile('Mises en relation en 7 jours', s.series.relations?.sept, evolution(s.series.relations)),
+      tuile('Messages en 7 jours', s.series.messages?.sept, `${nb(s.totaux.discussions_ouvertes)} discussion(s) ouverte(s)`),
+      tuile('Abonnés actifs', s.totaux.abonnes, Object.entries(s.formules || {}).map(([f, n]) => `${f} : ${n}`).join(' · ') || 'Aucun pour l’instant'),
+    ].join('');
+    $('[data-graphes]').innerHTML = graphe('Swipes par jour', s.series.swipes, s.jours) + graphe('Matchs demandés par jour', s.series.demandes, s.jours) + graphe('Nouveaux comptes par jour', s.series.comptes, s.jours);
+    $('[data-parcours]').innerHTML = hbarres(s.parcours, true);
+    const f = Number(s.genres.femmes), h = Number(s.genres.hommes), t = Math.max(1, f + h);
+    $('[data-genres]').innerHTML = `<div class="repartition" role="img" aria-label="${f} femmes, ${h} hommes"><i style="width:${(f / t) * 100}%;background:#D2482C"></i><i style="width:${(h / t) * 100}%;background:#4A55C4"></i></div><div class="repartition-legende"><span style="--c:#D2482C">Femmes : ${nb(f)} (${Math.round((f / t) * 100)} %)</span><span style="--c:#4A55C4">Hommes : ${nb(h)} (${Math.round((h / t) * 100)} %)</span></div>`;
+    $('[data-pays]').innerHTML = hbarres(s.pays);
+  } catch { $('[data-graphes]').innerHTML = '<p class="aide">Les graphiques ne sont pas disponibles pour le moment. Réessaie dans un instant.</p>'; }
+}
+document.addEventListener('pointerover', (e) => { const c = e.target.closest?.('[data-bulle]'); if (c) { montrerBulle({ currentTarget: c }, c.dataset.bulle); } else if (bulle) bulle.hidden = true; });
+document.addEventListener('click', (e) => { const c = e.target.closest?.('[data-bulle]'); if (c) montrerBulle({ currentTarget: c }, c.dataset.bulle); });
+// Les rubriques repliables restent comme Lamia les a laissées.
+$$('details[data-repli],details[data-menu-plus]').forEach((d) => {
+  const cle = `tdb-repli-${d.dataset.repli || 'menu'}`;
+  try { if (localStorage.getItem(cle) === 'ouvert') d.open = true; } catch { /* */ }
+  d.addEventListener('toggle', () => { try { localStorage.setItem(cle, d.open ? 'ouvert' : 'ferme'); } catch { /* */ } });
+});
 
 // ---------------------------------------------------------------- « À faire aujourd'hui » : tout ce qui attend Lamia, dans l'ordre
 async function aFaire() {
@@ -711,7 +771,7 @@ async function demarrer() {
   if (!admin) return;
   const tab = location.hash.slice(1);
   ouvrir(['accueil', 'activite', 'rencontres', 'comptes', 'application', 'coaching', 'ventes', 'produits', 'soirees', 'bilan', 'alertes', 'textes', 'visites'].includes(tab) ? tab : 'accueil');
-  aFaire(); pastilleJournal();
+  aFaire(); pastilleJournal(); chargerCockpit();
   await charger();
 }
 $('[data-login]').addEventListener('submit', async (e) => {

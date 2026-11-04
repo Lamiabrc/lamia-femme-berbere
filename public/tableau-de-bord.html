@@ -16,15 +16,20 @@
     <button type="button" data-tab="activite">🗺️ Activité</button>
     <button type="button" data-tab="rencontres">💞 Rencontres</button>
     <button type="button" data-tab="comptes">👥 Comptes</button>
-    <button type="button" data-tab="application">📱 Application <span class="tdb-pastille" data-journal-pastille hidden></span></button>
-    <button type="button" data-tab="coaching">🎥 Coaching</button>
-    <button type="button" data-tab="ventes">Ventes</button>
-    <button type="button" data-tab="produits">Produits</button>
-    <button type="button" data-tab="soirees">Soirées</button>
-    <button type="button" data-tab="bilan">Bilan du bal</button>
-    <button type="button" data-tab="alertes">Alertes</button>
-    <button type="button" data-tab="textes">Textes &amp; images</button>
-    <button type="button" data-tab="visites">Visites</button>
+    <details class="tdb-plus" data-menu-plus>
+      <summary>Plus</summary>
+      <div>
+      <button type="button" data-tab="application">📱 Application <span class="tdb-pastille" data-journal-pastille hidden></span></button>
+      <button type="button" data-tab="coaching">🎥 Coaching</button>
+      <button type="button" data-tab="ventes">Ventes</button>
+      <button type="button" data-tab="produits">Produits</button>
+      <button type="button" data-tab="soirees">Soirées</button>
+      <button type="button" data-tab="bilan">Bilan du bal</button>
+      <button type="button" data-tab="alertes">Alertes</button>
+      <button type="button" data-tab="textes">Textes &amp; images</button>
+      <button type="button" data-tab="visites">Visites</button>
+      </div>
+    </details>
   </nav>
   <div class="tdb-moi" data-moi hidden><span data-moi-email></span> <button type="button" class="link-button" data-deconnexion>Se déconnecter</button></div>
 </header>
@@ -44,23 +49,32 @@
   <!-- ===================================================== Accueil -->
   <section data-panel="accueil" hidden>
     <h1 class="tdb-titre">Bonjour Lamia</h1>
+    <div class="tdb-tuiles" data-tuiles aria-label="Chiffres clés"></div>
     <div class="tdb-outils" aria-label="Mes outils">
       <a href="/confidences-lamia/"><strong>💬 Confidences</strong><span>Lire et répondre</span></a>
       <a href="/confidences-lamia/#annonces"><strong>💌 Profils et matchs</strong><span>Valider, photos, demandes</span></a>
       <button type="button" data-go="activite"><strong>🗺️ Activité</strong><span>Mises en relation, pilote</span></button>
       <button type="button" data-go="comptes"><strong>👥 Comptes</strong><span>Tous les membres</span></button>
+    </div>
+    <details class="tdb-repli" data-repli="outils"><summary>Autres outils</summary><div class="tdb-outils">
       <a href="/salon/"><strong>🎥 Mon live</strong><span>Le Salon de Lamia</span></a>
       <a href="/admin-bal.html"><strong>🎭 Poste du bal</strong><span>Portes, tours, souhaits</span></a>
       <a href="/admin-soirees/"><strong>🎟 Soirées</strong><span>Inscrits, précommandes</span></a>
       <a href="/admin.html"><strong>🚩 Signalements</strong><span>Profils signalés</span></a>
       <a href="/pilotage.html"><strong>📈 Pilotage</strong><span>Feuille de route</span></a>
       <a href="/" target="_blank" rel="noopener"><strong>🌐 Voir le site</strong><span>Comme un visiteur</span></a>
-    </div>
+    </div></details>
     <div class="tdb-carte tdb-afaire">
       <h2>À faire aujourd’hui</h2>
       <p class="aide">Dans l’ordre. Chaque bouton t’emmène au bon endroit. Le reste se fait dans ton outil de matching (onglet Site).</p>
       <ol data-afaire><li>Un instant…</li></ol>
     </div>
+    <div class="tdb-graphes" data-graphes><p class="aide">Les graphiques arrivent…</p></div>
+    <div class="tdb-deux">
+      <div class="tdb-carte"><h2>Le parcours des membres</h2><p class="aide">Sur tous les comptes, combien de personnes à chaque étape.</p><div data-parcours></div></div>
+      <div class="tdb-carte"><h2>Qui sont tes profils</h2><div data-genres></div><h3 class="tdb-sous">Pays</h3><div data-pays></div></div>
+    </div>
+    <details class="tdb-repli" data-repli="ventes"><summary>Ventes, soirées, visites</summary>
     <div class="tdb-kpis">
       <a class="kpi" data-go="ventes"><span>Ventes et commandes</span><strong data-k="ventes-total">—</strong><small data-k="ventes-detail"></small></a>
       <a class="kpi" data-go="soirees"><span>Inscrits aux soirées</span><strong data-k="inscrits">—</strong><small data-k="inscrits-detail"></small></a>
@@ -81,6 +95,7 @@
         <a class="btn btn-line" href="/" target="_blank" rel="noopener">Voir le site</a>
       </div>
     </div>
+    </details>
   </section>
 
   <!-- ===================================================== Ventes -->
