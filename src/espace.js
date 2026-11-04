@@ -156,7 +156,7 @@ async function invitationModerateur(session) {
     try {
       await appelProfil({ action: 'annonce_moderateur_accepter', t, oui }, session);
       try { sessionStorage.removeItem(JETON_MOD); } catch { /* */ }
-      box.innerHTML = oui ? '<h3>🛡️ C’est confirmé, merci !</h3><p>Ta formule Passion est active. <a class="text-link" href="/rencontres/">Voir les annonces</a></p>' : '<p>C’est noté, merci d’avoir répondu.</p>';
+      box.innerHTML = oui ? '<h3>🛡️ C’est confirmé, merci !</h3><p>Ta formule Passion est active.</p><p><a class="btn btn-ink" href="/rencontres/">Voir les annonces</a> <a class="btn btn-line" href="/rencontres/#confier">Créer une annonce</a></p>' : '<p>C’est noté, merci d’avoir répondu.</p>';
     } catch { if (st) st.textContent = 'Ça n’a pas fonctionné. Réessaie, ou écris à Lamia.'; }
   };
   ecouter(box, 'click', (e) => { if (e.target.closest('[data-mod-oui]')) repondre(true); if (e.target.closest('[data-mod-non]')) repondre(false); });
@@ -313,12 +313,12 @@ async function monProfil(session) {
   if (!box) return;
   try {
     const { profil: p } = await appelProfil({ action: 'annonce_mon_profil' }, session);
-    if (!p) { box.innerHTML = '<p data-sans-profil>Tu n’as pas encore de profil chez Lamia. <a class="text-link" href="/rencontres/#confier">Confier mon profil</a> (la première mise en relation est offerte).</p>'; return; }
+    if (!p) { box.innerHTML = '<p data-sans-profil>Tu n’as pas encore d’annonce chez Lamia. <a class="btn btn-ink" href="/rencontres/#confier">Créer une annonce</a> (la première mise en relation est offerte).</p>'; return; }
     box.innerHTML = `${p.test ? '<p class="espace-test">🧪 <strong>Compte de test.</strong> Il sert uniquement à essayer l’application : il ne voit que les profils de test et ne contacte aucun vrai membre.</p>' : ''}<article class="espace-achat"><div><p class="event-date">Profil n° ${esc(p.ref)}</p><h3>${esc(ETAT_PROFIL[p.status] || p.status)}${p.status === 'publiee' && p.piece_identite ? ' · 🛡 avec pièce d’identité' : ''}</h3>
       ${p.live ? `<p>🎥 Profil créé en live avec Lamia${p.live_retrouve ? '' : ' (Lamia vérifie ta fiche)'} : <strong>tes 3 premières mises en relation sont offertes</strong>.</p>` : '<p>Ta première mise en relation est offerte.</p>'}
       ${p.nb_compatibles !== null && p.nb_compatibles !== undefined ? `<p>D’après l’outil de Lamia, tu pourrais correspondre à ${esc(p.nb_compatibles)} personne(s).</p>` : ''}
       ${p.matchs ? `<p class="espace-match">💞 Matchs en cours : <strong>${esc(p.matchs.actifs)} / ${esc(p.matchs.limite)}</strong>${p.matchs.actifs >= p.matchs.limite ? (p.matchs.formule === 'prestige' ? ' · mets fin à un match pour en choisir un autre.' : ' · mets fin à un match pour en choisir un autre, ou <a class="text-link" href="/abonnement/">passe à une formule supérieure</a>.') : ''}</p>` : ''}</div>
-      <div class="espace-achat-droite">${p.fiche_live ? '' : '<button class="btn btn-ink" type="button" data-profil-modifier>Modifier mon profil</button>'}</div></article>
+      <div class="espace-achat-droite">${p.fiche_live ? '<a class="btn btn-ink" href="#mes-fiches">Modifier mon annonce</a>' : '<button class="btn btn-ink" type="button" data-profil-modifier>Modifier mon annonce</button>'}</div></article>
       ${(p.matchs_lies || []).length ? `<ul class="espace-matchs-liste">${p.matchs_lies.map((m) => `<li><span>💞 Match avec le profil n° ${esc(m.ref)}</span><button class="btn btn-line" type="button" data-profil-dematcher="${esc(m.ref)}">Mettre fin à ce match</button></li>`).join('')}</ul>` : ''}
       ${p.medias_ok === false ? `<section class="espace-photos" id="photos"><h3>📷 Il manque tes photos</h3><p>Ajoute <strong>2 photos de toi, visage visible,</strong> pour swiper et répondre aux personnes intéressées. Elles restent privées : elles ne sont pas affichées dans les profils.</p><div data-profil-medias></div></section>` : ''}
       <div class="espace-suivi" data-profil-suivi></div>
@@ -508,7 +508,7 @@ async function mesFiches(session) {
     box.innerHTML = fiches.map((f) => `<article class="espace-achat"><div><p class="event-date">Fiche n° ${esc(f.ref)} · créée en live avec Lamia</p><h3>${esc(ETAT_FICHE[f.etat] || f.etat)}</h3>
       <p>${esc([f.age && `${f.age} ans`, f.ville, f.pays].filter(Boolean).join(' · '))}</p>
       <p>💌 <strong>${esc(f.interets.total)}</strong> personne(s) intéressée(s)${f.interets.mis_en_relation ? ` · 💞 ${esc(f.interets.mis_en_relation)} mise(s) en relation` : ''}${f.interets.dernier ? ` · dernier intérêt le ${esc(new Date(f.interets.dernier).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' }))}` : ''}</p></div>
-      <div class="espace-achat-droite"><a class="btn btn-ink" href="${esc(f.lien)}">Voir ma fiche</a></div></article>`).join('');
+      <div class="espace-achat-droite"><a class="btn btn-ink" href="${esc(f.lien)}">Voir ma fiche</a> <a class="btn btn-line" href="${esc(f.lien)}#modifier">Modifier mon annonce</a></div></article>`).join('');
   } catch { box.innerHTML = ''; }
 }
 
@@ -558,7 +558,7 @@ async function avisLamia(session) {
     const f = x.fiche;
     const infos = [f.genre === 'femme' ? 'Une femme' : 'Un homme', f.age && `${f.age} ans`, f.ville, f.pays, f.situation].filter(Boolean);
     const ages = f.age_min || f.age_max ? ` · ${f.age_min || 18} à ${f.age_max || 99} ans` : '';
-    const rep = x.reponse === 'oui' ? '<p class="espace-match">👍 Tu acceptes la différence : c’est noté, la suite se fait toute seule.</p><p>Pense à mettre à jour ce que tu recherches pour recevoir aussi ce genre de profils : <a class="text-link" href="#mon-profil">Modifier mon profil</a>.</p>'
+    const rep = x.reponse === 'oui' ? '<p class="espace-match">👍 Tu acceptes la différence : c’est noté, la suite se fait toute seule.</p><p>Pense à mettre à jour ce que tu recherches pour recevoir aussi ce genre de profils : <a class="text-link" href="#mon-profil">Modifier mon annonce</a>.</p>'
       : x.reponse === 'non' ? '<p>Tu as répondu non : c’est noté, merci.</p>'
       : `<p class="interet-boutons"><button type="button" class="btn btn-ink" data-avis="oui" data-id="${esc(x.id)}">Oui, j’accepte la différence</button><button type="button" class="btn btn-line" data-avis="non" data-id="${esc(x.id)}">Non merci</button></p>`;
     return `<article class="espace-achat interet-recu proposition"><div><p class="event-date">💬 Lamia te demande ton avis · profil n° ${esc(f.ref)}</p>
