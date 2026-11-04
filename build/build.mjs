@@ -825,7 +825,7 @@ page(
 
     <section id="coaching" data-espace-coaching-bloc hidden>
       <h2>Mon coaching avec Lamia</h2>
-      <p>Ta formule Prestige comprend une visio de 15 minutes par mois avec Lamia, pour ton profil et tes rencontres. Elle n’est jamais enregistrée.</p>
+      <p data-coaching-intro>Une visio de 15 minutes avec Lamia, pour ton profil et tes rencontres. Elle n’est jamais enregistrée.</p>
       <div class="espace-profil" data-espace-coaching></div>
     </section>
 
@@ -1577,7 +1577,7 @@ page(
   </div>
   <div class="abo-grille">${FORMULES.map(carteFormule).join('')}</div>
   ${tableauFormules()}
-  <h2 class="annonces-titre">Sans abonnement, à l’unité</h2>
+  <h2 class="annonces-titre" id="unites">Sans abonnement, à l’unité</h2>
   <div class="abo-unites">${UNITES.map((u) => `<article class="abo-carte abo-unite"><h3>${esc(u.nom)}</h3><p class="abo-prix">${eurosAbo(u.prix)}</p><p>${esc(u.texte)}</p>${u.depuisEspace ? '<a class="po-btn-verre" href="/mon-espace/">Mon espace</a>' : `<button type="button" class="po-btn-verre" data-unite="${u.id}">Acheter</button>`}</article>`).join('')}</div>
   <form class="abo-form annonce-form" data-abo-form hidden>
     <h2 data-abo-titre>Ta formule</h2>
@@ -1596,7 +1596,7 @@ page(
     <ol>
       <li><strong>C’est quoi, un match ?</strong><span>Lamia te propose une personne qui te correspond vraiment. Si vous êtes d’accord tous les deux, elle vous met en contact. Ton numéro reste chez elle jusque-là.</span></li>
       <li><strong>Plusieurs matchs en même temps, ça veut dire quoi ?</strong><span>Tu peux avoir 1 match en cours avec Découverte, 2 avec Passion et 5 avec Prestige. Quand tu mets fin à un match, une place se libère.</span></li>
-      <li><strong>Comment se passe le coaching Prestige ?</strong><span>Dans ton espace, tu choisis un créneau parmi ceux ouverts par Lamia : une visio de 15 minutes par mois, non enregistrée. Tu peux annuler jusqu’à 24 heures avant et choisir un autre créneau.</span></li>
+      <li><strong>Comment se passe le coaching ?</strong><span>Dans ton espace, tu choisis un créneau parmi ceux ouverts par Lamia : une visio de 15 minutes, non enregistrée, incluse chaque mois avec Prestige ou à 15 € à l’unité. Tu peux annuler jusqu’à 24 heures avant et choisir un autre créneau.</span></li>
       <li><strong>Et les speed datings inclus ?</strong><span>Ta place aux soirées de speed dating en ligne de ton salon, dans la limite indiquée chaque mois. Lamia la note quand tu t’inscris.</span></li>
       <li><strong>Je peux arrêter quand je veux ?</strong><span>Oui. Dans ton espace, « Gérer mon abonnement » : tu résilies en un clic. Ton abonnement reste actif jusqu’à la fin de la période payée.</span></li>
       <li><strong>Lamia garantit-elle un mariage ?</strong><span>Personne ne peut le promettre. Lamia s’engage sur le sérieux : profils vérifiés, matching soigné, et un vrai suivi.</span></li>

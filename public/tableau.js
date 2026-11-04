@@ -58,8 +58,8 @@ document.addEventListener('click', (e) => {
 async function charger() {
   try { data = await api({ action: 'dashboard' }); } catch (e) { return message(e.message, true); }
   const v = data.ventes, i = data.inscrits, a = data.alertes, vis = data.visites;
-  $('[data-k="ventes-total"]').textContent = money(v.total_cents);
-  $('[data-k="ventes-detail"]').textContent = `${v.nombre} commande${v.nombre > 1 ? 's' : ''} · ${v.en_attente} en attente · ${v.payees} à expédier`;
+  $('[data-k="ventes-total"]').textContent = money(v.total_cents + (v.app?.total || 0));
+  $('[data-k="ventes-detail"]').textContent = `${v.app ? `${money(v.app.total)} dans l’appli · ${v.app.abonnes} abonné${v.app.abonnes > 1 ? 's' : ''} · ` : ''}${v.nombre} commande${v.nombre > 1 ? 's' : ''} boutique · ${v.payees} à expédier`;
   $('[data-k="inscrits"]').textContent = i.total;
   $('[data-k="inscrits-detail"]').textContent = `+${i.nouveaux_7j} cette semaine`;
   $('[data-k="alertes"]').textContent = a.nouvelles;
@@ -324,7 +324,28 @@ function barres(box, jours) {
 }
 
 // ---------------------------------------------------------------- ventes
+function ventesAppli() {
+  const a = data.ventes.app;
+  const k = (t, v, d, go = '') => `<div class="kpi"><span>${esc(t)}</span><strong>${esc(v)}</strong><small>${esc(d)}</small></div>`;
+  if (!a) { $('[data-app-kpis]').innerHTML = k('Ventes de l’appli', '—', 'Les chiffres ne se chargent pas. Réessaie dans un instant.'); return; }
+  $('[data-app-kpis]').innerHTML = k('Encaissé dans l’appli', money(a.total), 'Abonnements, unité, soirées') + k('Ce mois-ci', money(a.mois), 'Dans l’appli') + k('Abonnés actifs', String(a.abonnes), a.a_traiter ? `${a.a_traiter} paiement(s) à régulariser` : 'Aucun paiement en retard') + k('Revenu mensuel', money(a.par_mois), 'Si tous les abonnés restent') + k('Boutique', money(data.ventes.total_cents), `${data.ventes.nombre} commande(s)`);
+  $('[data-app-formules]').innerHTML = a.formules.map((f) => `<tr><td>${esc(f.nom)}</td><td>${esc(f.abonnes)}</td><td>${money(f.par_mois)}</td></tr>`).join('');
+  $('[data-app-services]').innerHTML = a.services.map((s) => `<tr><td>${esc(s.service)}</td><td>${esc(s.ventes)}</td><td>${money(s.mois)}</td><td>${money(s.montant)}</td></tr>`).join('') || '<tr><td colspan="4">Pas encore de vente.</td></tr>';
+  const f = $('[data-app-filtre]').value;
+  $('[data-app-lignes]').innerHTML = a.lignes.filter((l) => !f || l.famille === f).map((l) => `<tr><td>${esc(date(l.date))}</td><td>${esc(l.service)}${l.detail ? `<br><small>${esc(l.detail)}</small>` : ''}${l.quantite > 1 ? ` × ${esc(l.quantite)}` : ''}</td><td>${esc(l.client)}</td><td>${money(l.montant)}</td></tr>`).join('') || '<tr><td colspan="4">Rien pour l’instant.</td></tr>';
+  $('[data-app-livrer]').hidden = !a.a_livrer.length;
+  $('[data-app-livrer-liste]').innerHTML = a.a_livrer.map((u) => `<li><span><b>${esc(u.service)}</b>${u.reste > 1 ? ` × ${esc(u.reste)}` : ''} <small>${esc(u.client)} · ${esc(date(u.date))}</small></span><button class="btn btn-line" type="button" data-app-fait="${esc(u.id)}">Fait</button></li>`).join('');
+}
+$('[data-app-filtre]')?.addEventListener('change', ventesAppli);
+$('[data-app-livrer-liste]')?.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-app-fait]');
+  if (!b) return;
+  b.disabled = true;
+  try { await conf({ action: 'annonce_unite_utiliser', id: b.dataset.appFait }); await charger(); }
+  catch { message('Ça n’a pas été enregistré. Réessaie.', true); b.disabled = false; }
+});
 function ventes() {
+  ventesAppli();
   const filtre = $('[data-filtre-ventes]').value;
   const list = data.ventes.orders.filter((o) => !filtre || o.status === filtre);
   $('[data-ventes-resume]').textContent = `${list.length} commande${list.length > 1 ? 's' : ''} · ${money(list.reduce((t, o) => t + (o.amount_total_cents || 0), 0))}`;
