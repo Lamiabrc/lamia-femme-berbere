@@ -321,11 +321,21 @@ async function monProfil(session) {
       <div class="espace-achat-droite">${p.fiche_live ? '<a class="btn btn-ink" href="#mes-fiches">Modifier mon annonce</a>' : '<button class="btn btn-ink" type="button" data-profil-modifier>Modifier mon annonce</button>'}</div></article>
       ${(p.matchs_lies || []).length ? `<ul class="espace-matchs-liste">${p.matchs_lies.map((m) => `<li><span>💞 Match avec le profil n° ${esc(m.ref)}</span><button class="btn btn-line" type="button" data-profil-dematcher="${esc(m.ref)}">Mettre fin à ce match</button></li>`).join('')}</ul>` : ''}
       ${p.medias_ok === false ? `<section class="espace-photos" id="photos"><h3>📷 Il manque tes photos</h3><p>Ajoute <strong>2 photos de toi, visage visible,</strong> pour swiper et répondre aux personnes intéressées. Elles restent privées : elles ne sont pas affichées dans les profils.</p><div data-profil-medias></div></section>` : ''}
+      ${p.demander_affichage ? `<section class="espace-photos" id="affichage" data-affichage><h3>💌 Veux-tu que ton annonce soit visible ?</h3><p>Ton annonce n° ${esc(p.ref)} est validée. Si tu es d’accord, elle apparaît sur le site de façon anonyme : sans prénom, photo, ville ni contact.</p><p><button class="btn btn-ink" type="button" data-affichage-oui>Oui, je veux qu’elle soit visible</button> <button class="link-button" type="button" data-affichage-non>Non merci</button></p></section>` : ''}
       <div class="espace-suivi" data-profil-suivi></div>
       <label class="annonce-case espace-photo"><input type="checkbox" data-profil-photo${p.photo_partage ? ' checked' : ''}> <span>Si un match me convient, Lamia peut transmettre <strong>ma photo</strong> à la personne avec qui elle me met en relation (et à elle seule).</span></label>
       <p class="form-status" data-profil-statut></p><div data-profil-edition hidden></div>`;
     { const zm = box.querySelector('[data-profil-medias]');
       if (zm) { const { monterAjoutMedias } = await import('/assets/annonces.js'); await monterAjoutMedias(zm, { token: session.access_token, deja: p.photos || 0, apres: () => monProfil(session) }); if (location.hash === '#photos') zm.closest('section').scrollIntoView({ block: 'center' }); } }
+    box.querySelector('[data-affichage]')?.addEventListener('click', async (e) => {
+      const oui = e.target.closest('[data-affichage-oui]'), non = e.target.closest('[data-affichage-non]');
+      if (!oui && !non) return;
+      const zone = box.querySelector('[data-affichage]');
+      try {
+        const r = await appelProfil({ action: 'annonce_affichage_accord', oui: Boolean(oui) }, session);
+        zone.innerHTML = oui ? `<h3>✅ C’est noté</h3><p>${r.visible ? `Ton annonce n° ${esc(r.ref)} est maintenant publiée, de façon anonyme.` : 'Ton accord est bien enregistré.'}</p>` : '<p>C’est noté : ton annonce reste masquée.</p>';
+      } catch { zone.insertAdjacentHTML('beforeend', '<p class="form-status">Ta réponse n’est pas passée. Réessaie.</p>'); }
+    });
     suivi(box.querySelector('[data-profil-suivi]'), p);
     box.querySelector('[data-profil-photo]').addEventListener('change', async (e) => {
       const st = box.querySelector('[data-profil-statut]'); e.target.disabled = true;
