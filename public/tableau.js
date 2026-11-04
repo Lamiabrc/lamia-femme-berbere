@@ -803,14 +803,38 @@ let nomsRefs = {};
 const refBouton = (r) => `<button type="button" class="fiche-ref" data-voir-ref="${esc(r)}">${nomsRefs[r] ? `${esc(nomsRefs[r])} · ` : ''}n° ${esc(r)}</button>`;
 const quand = (d) => (d ? date(d, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '');
 const avecRefs = (t) => esc(t).replace(/n°\s*(\d+)/g, (_, r) => refBouton(r));
+// Le profil complet : tout ce que la personne a rempli, ses photos et ses vidéos. La pièce d'identité n'est jamais affichée.
+const LIBELLES = { situation: 'Situation', origineTags: 'Origine', villageOrigine: 'Village d’origine', langue: 'Langues', enfants: 'Enfants', nbEnfants: 'Nombre d’enfants', ageEnfants: 'Âge des enfants', desirEnfants: 'Désir d’enfants', niveauEtudeCategorie: 'Études', niveauEtudeDetail: 'Détail des études', etudesPaysObtention: 'Pays du diplôme', profession: 'Profession', tailleCm: 'Taille (cm)', religion: 'Religion', pratique: 'Pratique', religionTexte: 'Sur la religion', autresModeVie: 'Mode de vie', fumeur: 'Tabac', sport: 'Sport', alcool: 'Alcool', chemma: 'Chemma', caracteristiques: 'Caractéristiques', mobiliteGeographique: 'Mobilité', visionFinanciere: 'Vision financière', zoneGeo: 'Zone recherchée', paysRechercheDetail: 'Pays recherché', regionRechercheDetail: 'Région recherchée', origineRechercheTags: 'Origine recherchée', religionRecherche: 'Religion recherchée', pratiqueRecherche: 'Pratique recherchée', etudesRecherche: 'Études recherchées', rechercheFemmeHidjabiste: 'Hidjab recherché', caracteristiquesRecherche: 'Caractéristiques recherchées', accepteDivorce: 'Accepte divorcé·e', accepteEnfants: 'Accepte des enfants', accepteVeuf: 'Accepte veuf·ve', kabyleUniquement: 'Kabyle uniquement', contactReseau: 'Réseau social', tiktokLive: 'TikTok du live' };
+const CACHES = new Set(['hygieneVie', 'situation']);
+const lignesProfil = (paires) => paires.filter(([, v]) => v !== null && v !== undefined && v !== '' && !(Array.isArray(v) && !v.length))
+  .map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(Array.isArray(v) ? v.join(' · ') : v === true ? 'Oui' : v === false ? 'Non' : v)}</dd></div>`).join('');
+function profilComplet(a) {
+  const m = a.matching && typeof a.matching === 'object' ? a.matching : {};
+  const medias = (a.medias || []).map((x) => (x.kind === 'video'
+    ? `<video controls preload="none" src="${esc(x.url)}"></video>`
+    : `<a href="${esc(x.url)}" target="_blank" rel="noopener"><img src="${esc(x.url)}" alt="Photo du profil n° ${esc(a.ref)}" loading="lazy"></a>`)).join('');
+  const reponses = Object.entries(m).filter(([k]) => !CACHES.has(k)).map(([k, v]) => [LIBELLES[k] || k, v]);
+  const badges = [a.identite_verifiee_at ? '🪪 pièce d’identité validée' : '', a.recommande_at ? '⭐ recommandé' : '', a.moderateur_at ? '🛡️ modérateur' : '', a.visible_anonyme === false ? 'masqué dans les profils' : '', a.outil_id || a.exportee_at ? 'importé dans l’outil' : 'pas encore importé dans l’outil'].filter(Boolean).join(' · ');
+  return `<article class="profil-complet"><h4>Profil n° ${esc(a.ref)}</h4><p class="aide">${esc(badges)}</p>
+    ${medias ? `<div class="profil-medias">${medias}</div>` : '<p class="aide">Aucune photo ni vidéo.</p>'}
+    ${a.profil ? `<h5>Qui je suis</h5><p>${esc(a.profil)}</p>` : ''}${a.recherche ? `<h5>Qui je cherche${a.age_min || a.age_max ? ` · ${esc(a.age_min || 18)} à ${esc(a.age_max || 99)} ans` : ''}</h5><p>${esc(a.recherche)}</p>` : ''}
+    <dl class="profil-champs">${lignesProfil([['Prénom', a.prenom], ['Âge', a.age], ['Genre', a.genre], ['Ville', a.ville], ['Pays', a.pays], ['Situation', a.situation], ['Email', a.email], ['Téléphone', a.phone], ...reponses, ['Ma note', a.note_lamia]])}</dl></article>`;
+}
+function ficheComplete(f) {
+  return `<article class="profil-complet"><h4>Fiche de l’outil n° ${esc(f.ref)}</h4><p class="aide">Ses photos et ses contacts sont dans ton outil.</p>
+    ${f.profil ? `<h5>Qui je suis</h5><p>${esc(f.profil)}</p>` : ''}${f.recherche ? `<h5>Qui je cherche${f.age_min || f.age_max ? ` · ${esc(f.age_min || 18)} à ${esc(f.age_max || 99)} ans` : ''}</h5><p>${esc(f.recherche)}</p>` : ''}
+    <dl class="profil-champs">${lignesProfil([['Âge', f.age], ['Genre', f.genre], ['Ville', f.ville], ['Village', f.village], ['Pays', f.pays], ['Secteur', f.secteur], ['Situation', f.situation], ['Enfants', f.enfants], ['Études', f.etudes], ['Origine', f.origine], ['Religion', f.religion], ['Pratique', f.pratique], ['Mode de vie', f.mode_vie], ['Caractéristiques', f.caracteristiques], ['Modification demandée', f.modif_demandee]])}</dl></article>`;
+}
 function rendreDetail(d) {
   const box = $('[data-compte-detail]'), c = d.compte;
   nomsRefs = d.noms || {};
   const carte = (titre, html, ouvert = false) => `<details class="tdb-repli" ${ouvert ? 'open' : ''}><summary>${titre}</summary><div>${html}</div></details>`;
   const pourquoi = d.journal?.length ? `<div class="tdb-carte fiche-pourquoi"><h3 style="margin-top:0">Pourquoi tu as reçu une alerte</h3><ul class="fiche-liste">${d.journal.slice(0, 4).map((j) => `<li><strong>${avecRefs(j.titre)}</strong><small>${esc(quand(j.created_at))}</small>${(j.lignes || []).map((l) => `<div>${avecRefs(l)}</div>`).join('')}</li>`).join('')}</ul></div>` : '';
   const qui = [...(d.annonces || []).map((a) => `<li><strong>Profil n° ${esc(a.ref)}</strong> · ${esc(a.prenom || '')}, ${esc(a.age ?? '?')} ans · ${esc(a.genre || '')}<small>${esc([a.ville, a.pays].filter(Boolean).join(', '))} · ${esc(ANNONCE[a.status] || a.status)}${a.test ? ' · test' : ''}${a.en_match ? ' · en match' : ''}</small></li>`), ...(d.fiches || []).map((f) => `<li><strong>Fiche de l’outil n° ${esc(f.ref)}</strong> · ${esc(f.age ?? '?')} ans · ${esc(f.genre || '')}<small>${esc([f.ville, f.pays].filter(Boolean).join(', '))} · ${f.retiree ? 'retirée' : f.confirmee ? 'confirmée' : 'en attente de confirmation'}</small></li>`)].join('');
+  const complet = [...(d.annonces || []).map(profilComplet), ...(d.fiches || []).map(ficheComplete)].join('');
+  const blocComplet = complet ? `<div class="tdb-carte"><h3 style="margin-top:0">Son profil complet</h3>${complet}</div>` : '';
   if (d.sans_compte) {
-    box.innerHTML = `${pourquoi}<div class="tdb-carte"><h3 style="margin-top:0">À qui est ce profil</h3><ul class="fiche-liste">${qui}</ul><p class="aide">Cette personne n’a pas de compte. Son prénom et ses contacts sont dans ton outil de live (cherche ce n° dans « Le site »).</p></div>${(d.choisi_par || []).length ? `<div class="tdb-carte"><h3 style="margin-top:0">Choisie par</h3><ul class="fiche-liste">${d.choisi_par.map((x) => `<li>${refBouton(x.ref)} ${esc(x.prenom || '')}<small>${esc(STATUT_DEMANDE[x.statut] || x.statut)} · ${esc(quand(x.le))}</small></li>`).join('')}</ul></div>` : ''}`;
+    box.innerHTML = `${pourquoi}<div class="tdb-carte"><h3 style="margin-top:0">À qui est ce profil</h3><ul class="fiche-liste">${qui}</ul><p class="aide">Cette personne n’a pas de compte. Son prénom et ses contacts sont dans ton outil de live (cherche ce n° dans « Le site »).</p></div>${blocComplet}${(d.choisi_par || []).length ? `<div class="tdb-carte"><h3 style="margin-top:0">Choisie par</h3><ul class="fiche-liste">${d.choisi_par.map((x) => `<li>${refBouton(x.ref)} ${esc(x.prenom || '')}<small>${esc(STATUT_DEMANDE[x.statut] || x.statut)} · ${esc(quand(x.le))}</small></li>`).join('')}</ul></div>` : ''}`;
     return;
   }
   const a = d.activite;
@@ -818,6 +842,7 @@ function rendreDetail(d) {
   box.innerHTML = `${c.bloque ? '<p class="fiche-bloque">🚫 Ce compte est bloqué.</p>' : ''}${pourquoi}
     <div class="tdb-carte"><h3 style="margin-top:0">À qui est ce profil</h3><ul class="fiche-liste">${qui || '<li>Compte sans profil.</li>'}</ul>
       <p class="aide">Formule : ${esc({ decouverte: 'Découverte', passion: 'Passion', prestige: 'Prestige' }[d.formule] || d.formule)} · Dernière activité : ${esc(quand(c.derniere_action) || 'aucune')}</p></div>
+    ${blocComplet}
     <div class="tdb-carte"><h3 style="margin-top:0">Son activité</h3><div class="fiche-chiffres">
       ${[['Swipes oui', a.swipes_oui], ['Swipes non', a.swipes_non], ['Demandes', a.demandes], ['Choisi·e par', a.recus], ['Matchs en cours', a.en_cours.length], ['Dématchs', a.dematchs], ['Messages', a.messages], ['Photos', a.photos]].map(([n, v]) => `<div><b>${esc(v)}</b><span>${esc(n)}</span></div>`).join('')}</div>
       ${a.en_cours.length ? `<p>En match avec : ${a.en_cours.map(refBouton).join(', ')}</p>` : ''}</div>

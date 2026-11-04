@@ -284,3 +284,14 @@
 .fiche-offrir [data-offrir-adresse] { grid-column: 1 / -1; display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }
 .fiche-bloque { padding: 10px 14px; border-radius: 10px; background: #FBE4E0; color: #7A1F12; font-weight: 600; }
 .fiche-danger { color: #A5301C; border-color: #A5301C; }
+
+/* Profil complet dans la fiche */
+.profil-complet + .profil-complet { margin-top: 18px; padding-top: 14px; border-top: 1px solid #E6DCC8; }
+.profil-complet h4 { margin: 0 0 4px; font: 600 18px var(--serif); color: #1C2059; }
+.profil-complet h5 { margin: 12px 0 2px; font-size: 13px; color: var(--gris); font-weight: 600; }
+.profil-complet p { margin: 0 0 6px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.profil-medias { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+.profil-medias img, .profil-medias video { display: block; width: 150px; height: 190px; object-fit: cover; border-radius: 10px; background: #F3ECDD; }
+.profil-champs { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px 14px; margin: 10px 0 0; }
+.profil-champs dt { font-size: 12px; color: var(--gris); }
+.profil-champs dd { margin: 0; overflow-wrap: anywhere; }

@@ -283,3 +283,27 @@ test('pendant le live : le lien d’une seule fiche, sans toucher aux autres', a
   assert.equal(r.confirmation, 'confirmee'); // la fiche de test est déjà confirmée
   assert.equal(db.profils_outil.find((f) => f.ref === 100002).visible, true); // l'autre fiche reste en ligne
 });
+
+test('tableau de bord : profil complet avec photos, jamais la pièce d’identité', async () => {
+  const { db, ctx } = base({ annonces: [{ id: 'a1', ref: 7, user_id: null, prenom: 'Nina', genre: 'femme', birth_date: '1990-01-01', profil: 'Je suis douce', matching: { profession: 'Infirmière' }, phone: '+33600000000', ip_hash: 'secret' }] });
+  db.annonce_files = [{ annonce_id: 'a1', kind: 'photo', storage_path: 'p1', position: 1 }, { annonce_id: 'a1', kind: 'identite', storage_path: 'id1', position: 0 }];
+  const c = ctx(null);
+  c.admin = true;
+  const lus = [];
+  const lire0 = c.read;
+  c.read = async (u) => {
+    if (u.includes('annonce_files?annonce_id=in.')) { lus.push(u); return db.annonce_files.filter((f) => f.kind !== 'identite'); }
+    return lire0(u);
+  };
+  const call0 = c.call;
+  c.call = async (u, o) => (u.includes('/storage/v1/object/sign/') ? new Response(JSON.stringify(JSON.parse(o.body).paths.map((path) => ({ path, signedURL: `/signe/${path}` })))) : call0(u, o));
+  const r = await lire(await handleAnnonces('annonce_profil_detail', { ref: 7 }, c));
+  const a = r.annonces[0];
+  assert.equal(a.profil, 'Je suis douce');
+  assert.equal(a.phone, '+33600000000');
+  assert.equal(a.medias.length, 1);
+  assert.equal(a.ip_hash, undefined);
+  assert.match(lus[0], /kind=in\.\(photo,video\)/);
+  assert.doesNotMatch(JSON.stringify(a), /id1/);
+});
+
