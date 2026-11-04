@@ -796,13 +796,14 @@ page(
     <section class="espace-admin" data-espace-admin hidden>
       <h2>Espace administratrice</h2>
       <div class="espace-liens">
-        <a href="/tableau-de-bord"><strong>Tableau de bord</strong><span>Ventes, produits, textes du site, visites, alertes</span></a>
+        <a href="/tableau-de-bord"><strong>Ma tour de contrôle</strong><span>Tout gérer : à faire, comptes, rencontres, ventes, textes</span></a>
         <a href="/admin-soirees/"><strong>Mes soirées et précommandes</strong><span>Inscrits, salons, précommandes du livre et du collier</span></a>
         <a href="/admin-bal.html"><strong>Maîtresse du bal</strong><span>Ouvrir les portes, lancer les tours, souhaits réciproques</span></a>
         <a href="/confidences-lamia/"><strong>Confidences</strong><span>Lire et répondre, vocaux, notifications</span></a>
         <a href="/admin.html"><strong>Signalements</strong><span>Profils signalés, écrits et audio</span></a>
         <a href="/pilotage.html"><strong>Pilotage</strong><span>Feuille de route et indicateurs</span></a>
       </div>
+      <p class="espace-admin-note">Ce compte sert à gérer la Maison. Pour essayer l’application comme un membre, connecte-toi avec un compte de test.</p>
     </section>
 
     <section id="mon-profil">

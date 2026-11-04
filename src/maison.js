@@ -557,6 +557,16 @@ renderSocials();
       const t = a.querySelector('[data-account-texte]'); if (t) t.textContent = 'Mon espace'; else a.textContent = 'Mon espace';
     }
   } catch { /* stockage indisponible */ }
+  // Compte administratrice : l'application s'ouvre sur son tableau de bord, et l'onglet « Moi » devient « Gérer ».
+  try {
+    const role = JSON.parse(localStorage.getItem('sb-tybwvxinigahhntfeeur-auth-token') || 'null')?.user?.app_metadata?.role;
+    if (role === 'admin') {
+      if (location.pathname === '/' && new URLSearchParams(location.search).get('source') === 'app') location.replace('/tableau-de-bord');
+      const moi = document.querySelector('[data-barre-compte]');
+      if (moi) { moi.href = '/tableau-de-bord'; moi.querySelector('b').textContent = 'Gérer'; }
+      document.querySelector('.cta-profil')?.setAttribute('hidden', '');
+    }
+  } catch { /* stockage indisponible */ }
   // Barre du bas (téléphone) : l'onglet de la page en cours.
   const ici = location.pathname + location.hash;
   const liens = [...document.querySelectorAll('.barre-app a')];
