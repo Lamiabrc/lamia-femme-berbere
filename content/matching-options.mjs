@@ -278,7 +278,7 @@ export const ageEtLieuOk = (moi, lui) => dansMesCriteres(moi, lui) && dansMesCri
 // Les badges d'un profil, sur les cartes du swipe et de la liste.
 export function badgesProfil(a) {
   const b = [];
-  if (a.moderateur) b.push('<span class="profil-badge is-moderateur">🛡️ Modérateur</span>');
+  if (a.moderateur) b.push(`<span class="profil-badge is-moderateur">🛡️ ${a.genre === 'femme' ? 'Modératrice' : 'Modérateur'}</span>`);
   if (a.recommande) b.push('<span class="profil-badge is-lamia">⭐ Recommandé par Lamia</span>');
   if (a.piece_identite) b.push('<span class="profil-badge is-identite">🪪 Validé avec pièce d’identité</span>');
   return b.length ? `<p class="profil-badges">${b.join('')}</p>` : '';

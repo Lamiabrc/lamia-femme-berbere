@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { actionModeration, MESSAGE_BETA } from '../lib/moderateurs.mjs';
+import { actionModeration, MESSAGE_BETA, offrirSiModerateur } from '../lib/moderateurs.mjs';
 import { etatAbonnement } from '../lib/abonnements.mjs';
 import { badgesProfil } from '../content/matching-options.mjs';
 
@@ -31,11 +31,16 @@ test('modérateur : badge et formule offerte, retirés ensemble', async () => {
   assert.equal(db.formules_offertes.length, 0);
 });
 
-test('modérateur : pas de badge sans compte', async () => {
+test('modérateur sans compte : badge tout de suite, formule au rattachement', async () => {
   const { db, c } = ctx({ admin: true });
-  const r = await lire(await actionModeration('annonce_moderateur', { ref: 11, oui: true }, c));
-  assert.equal(r.status, 409);
-  assert.equal(db.annonces[1].moderateur_at, undefined);
+  db.profils_outil.push({ ref: 100001 });
+  const r = await lire(await actionModeration('annonce_moderateur', { ref: 100001, oui: true }, c));
+  assert.equal(r.formule, null);
+  assert.ok(db.profils_outil[0].moderateur_at);
+  assert.equal(db.formules_offertes.length, 0);
+  assert.equal(await offrirSiModerateur(c, 100001, 'Bo@x.fr'), true);
+  assert.deepEqual(db.formules_offertes.map((o) => [o.email, o.ref]), [['bo@x.fr', 100001]]);
+  assert.equal(await offrirSiModerateur(c, 100002, 'c@x.fr'), false);
 });
 
 test('seule Lamia gère les modérateurs et les invitations', async () => {
@@ -69,4 +74,4 @@ test('formule offerte : vaut Passion, un vrai abonnement reste prioritaire', asy
   assert.equal(e2.abonnement.formule, 'prestige');
 });
 
-test('badge modérateur', () => { assert.match(badgesProfil({ moderateur: true }), /Modérateur/); assert.doesNotMatch(badgesProfil({}), /Modérateur/); });
+test('badge modérateur', () => { assert.match(badgesProfil({ moderateur: true }), /Modérateur/); assert.match(badgesProfil({ moderateur: true, genre: 'femme' }), /Modératrice/); assert.doesNotMatch(badgesProfil({}), /Modérateur/); });

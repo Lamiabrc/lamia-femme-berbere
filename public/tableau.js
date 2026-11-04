@@ -222,13 +222,13 @@ document.addEventListener('click', async (e) => {
 });
 
 // ---------------------------------------------------------------- Modérateurs et bêta-testeurs
-const ERR_MOD = { sans_compte: 'Ce profil n’a pas de compte : impossible de lui offrir la formule.', not_found: 'Ce numéro de profil est introuvable.' };
+const ERR_MOD = { not_found: 'Ce numéro de profil est introuvable.' };
 async function chargerModerateurs() {
   const box = $('[data-mod-liste]');
   if (!box) return;
   try {
     const { moderateurs = [] } = await conf({ action: 'annonce_moderateurs' });
-    box.innerHTML = moderateurs.length ? moderateurs.map((p) => `<li>🛡️ Profil n° ${esc(p.ref)}${p.ville ? ` · ${esc(p.ville)}` : ''} · ${p.formule ? 'Passion offerte' : 'formule à vérifier'} <button type="button" data-mod-retirer="${esc(p.ref)}">Retirer</button></li>`).join('') : '<li>Aucun modérateur pour l’instant.</li>';
+    box.innerHTML = moderateurs.length ? moderateurs.map((p) => `<li>🛡️ Profil n° ${esc(p.ref)}${p.ville ? ` · ${esc(p.ville)}` : ''} · ${p.formule ? 'Passion offerte' : 'Passion en attente d’un compte'} <button type="button" data-mod-retirer="${esc(p.ref)}">Retirer</button></li>`).join('') : '<li>Aucun modérateur pour l’instant.</li>';
   } catch { box.innerHTML = '<li>La liste ne s’affiche pas pour le moment.</li>'; }
 }
 async function chargerBeta() {
@@ -248,7 +248,7 @@ document.addEventListener('submit', async (e) => {
   if (e.target.matches('[data-mod-form]')) {
     e.preventDefault();
     const st = $('[data-mod-statut]');
-    try { await conf({ action: 'annonce_moderateur', ref: e.target.ref.value, oui: true }); st.textContent = `🛡️ Profil n° ${e.target.ref.value} modérateur, Passion offerte.`; e.target.reset(); chargerModerateurs(); }
+    try { const r = await conf({ action: 'annonce_moderateur', ref: e.target.ref.value, oui: true }); st.textContent = `🛡️ Profil n° ${e.target.ref.value} modérateur${r.formule ? ', Passion offerte.' : ' : Passion offerte dès qu’il aura un compte.'}`; e.target.reset(); chargerModerateurs(); }
     catch (err) { st.textContent = ERR_MOD[err.code] || ERR_MOD[err.message] || 'Ça n’a pas fonctionné.'; }
   }
   if (e.target.matches('[data-beta-form]')) {
