@@ -32,6 +32,7 @@ async function render() {
   $('[data-espace-email]').textContent = u.email || '';
   $('[data-espace-nom]').textContent = u.user_metadata?.first_name || '';
   $('[data-espace-admin]').hidden = u.app_metadata?.role !== 'admin';
+  document.body.classList.toggle('espace-est-admin', u.app_metadata?.role === 'admin');
   achats(session);
   monProfil(session);
   mesFiches(session);
@@ -233,7 +234,7 @@ async function monProfil(session) {
   try {
     const { profil: p } = await appelProfil({ action: 'annonce_mon_profil' }, session);
     if (!p) { box.innerHTML = '<p data-sans-profil>Tu n’as pas encore de profil chez Lamia. <a class="text-link" href="/rencontres/#confier">Confier mon profil</a> (la première mise en relation est offerte).</p>'; return; }
-    box.innerHTML = `<article class="espace-achat"><div><p class="event-date">Profil n° ${esc(p.ref)}</p><h3>${esc(ETAT_PROFIL[p.status] || p.status)}${p.status === 'publiee' && p.piece_identite ? ' · 🛡 avec pièce d’identité' : ''}</h3>
+    box.innerHTML = `${p.test ? '<p class="espace-test">🧪 <strong>Compte de test.</strong> Il sert uniquement à essayer l’application : il ne voit que les profils de test et ne contacte aucun vrai membre.</p>' : ''}<article class="espace-achat"><div><p class="event-date">Profil n° ${esc(p.ref)}</p><h3>${esc(ETAT_PROFIL[p.status] || p.status)}${p.status === 'publiee' && p.piece_identite ? ' · 🛡 avec pièce d’identité' : ''}</h3>
       ${p.live ? `<p>🎥 Profil créé en live avec Lamia${p.live_retrouve ? '' : ' (Lamia vérifie ta fiche)'} : <strong>tes 3 premières mises en relation sont offertes</strong>.</p>` : '<p>Ta première mise en relation est offerte.</p>'}
       ${p.nb_compatibles !== null && p.nb_compatibles !== undefined ? `<p>D’après l’outil de Lamia, tu pourrais correspondre à ${esc(p.nb_compatibles)} personne(s).</p>` : ''}
       ${p.matchs ? `<p class="espace-match">💞 Matchs en cours : <strong>${esc(p.matchs.actifs)} / ${esc(p.matchs.limite)}</strong>${p.matchs.actifs >= p.matchs.limite ? (p.matchs.formule === 'prestige' ? ' · mets fin à un match pour en choisir un autre.' : ' · mets fin à un match pour en choisir un autre, ou <a class="text-link" href="/abonnement/">passe à une formule supérieure</a>.') : ''}</p>` : ''}</div>

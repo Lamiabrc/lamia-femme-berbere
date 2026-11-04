@@ -199,3 +199,24 @@
 
 .tdb-coaching-form { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
 .tdb-coaching-form label { display: grid; gap: 4px; font-size: 14px; }
+
+.tdb-top { background: #1C2059; }
+/* Mes outils : l'accès à tout, sur téléphone comme sur ordinateur */
+.tdb-outils { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(170px, 46%), 1fr)); gap: 10px; margin-bottom: 16px; }
+.tdb-outils a, .tdb-outils button { display: grid; gap: 3px; min-height: 68px; align-content: center; padding: 12px 14px; border: 1px solid var(--qvt-sable); border-radius: 14px; background: #fff; color: var(--encre); font: inherit; text-align: left; text-decoration: none; cursor: pointer; }
+.tdb-outils a:hover, .tdb-outils button:hover { border-color: #252B78; }
+.tdb-outils strong { font-size: 15px; }
+.tdb-outils span { font-size: 13px; color: var(--gris); }
+
+/* Sur ordinateur : menu fixe à gauche, et toute la largeur de l'écran pour travailler */
+@media (min-width: 1100px) {
+  body.tdb { padding-left: 232px; }
+  .tdb-top { position: fixed; inset: 0 auto 0 0; width: 232px; box-sizing: border-box; flex-direction: column; align-items: stretch; flex-wrap: nowrap; gap: 14px; padding: 18px 12px; background: #1C2059; overflow-y: auto; }
+  .tdb-marque { padding: 0 6px; }
+  .tdb-marque span { display: grid; line-height: 1.2; }
+  .tdb-onglets { flex-direction: column; flex-wrap: nowrap; gap: 2px; }
+  .tdb-onglets button { width: 100%; text-align: left; border-radius: 10px; padding: 10px 12px; }
+  .tdb-moi { display: grid; gap: 4px; margin-top: auto; padding: 0 6px; overflow-wrap: anywhere; }
+  .tdb-main { max-width: 1680px; padding: 24px 32px 60px; }
+  .tdb-kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}

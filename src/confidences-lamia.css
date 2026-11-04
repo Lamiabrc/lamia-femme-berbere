@@ -129,3 +129,10 @@ legend { font-size: 14px; font-weight: 600; padding: 0 4px; }
 .cl-pot.is-petit { width: 34px; height: 34px; } .cl-pot.is-petit b { font-size: 13px; }
 
 .cl-integre .cl-haut, .cl-integre .cl-nav, .cl-integre [data-retour] { display: none !important; }
+
+/* Sur ordinateur : la gestion prend la largeur de l'écran, cartes sur deux colonnes */
+@media (min-width: 1100px) {
+  .cl-main { max-width: 1500px; padding-left: 28px; padding-right: 28px; }
+  [data-annonces-vue] [data-annonces] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; align-items: start; }
+  [data-annonces-vue] .cl-annonce { margin-bottom: 0; }
+}

@@ -223,3 +223,11 @@ test('photos obligatoires : sans 2 photos ni vidéo, ni swipe ni choix', async (
   assert.equal((await handleAnnonces('annonce_swipe', { ref: 12, choix: 'oui' }, ctx(u))).status, 403);
   assert.equal((await handleAnnonces('annonce_swipe', { ref: 12, choix: 'non' }, ctx(u))).status, 200);
 });
+
+test('compte de test : un choix vers un vrai membre n’est jamais enregistré', async () => {
+  const { ctx, db } = monde();
+  db.annonces.push({ id: 'a1', ref: 15, user_id: 'u1', email: 't@example.com', status: 'publiee', prenom: 'Test', genre: 'femme', en_match: false, test: true });
+  db.annonces.push({ id: 'a2', ref: 40, user_id: 'u2', email: 'vrai@example.com', status: 'publiee', prenom: 'Vrai', genre: 'homme', en_match: false, test: false });
+  await handleAnnonces('annonce_swipe', { ref: 40, choix: 'oui' }, ctx({ id: 'u1', email: 't@example.com' }));
+  assert.equal(db.annonce_interets.length, 0);
+});

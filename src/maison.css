@@ -3544,3 +3544,11 @@ body:has(.swipe-page) .cta-profil { background-color: #252B78; background-image:
 .po-app .confirmer-choisie p { color: #2B2A45; }
 .confirmer-app .confirmer-choisie .confirmer-fiche p { color: var(--po-muted); }
 .confirmer-choisie .confirmer-actions { margin-bottom: 0; }
+
+/* Compte administratrice : Mon espace devient un accès à la gestion. Comptes de test bien signalés. */
+body.espace-est-admin [data-espace-in] > section:not(.espace-admin) { display: none; }
+.espace-admin-note { margin: 14px 0 0; font-size: 14px; }
+.espace-test { margin: 0 0 14px; padding: 12px 16px; border-radius: 14px; background: #E8D6B5; color: #1C2059; border: 1.5px solid #C9992B; }
+.cta-profil[hidden] { display: none; }
+body.espace-est-admin .espace-admin h2 { color: #F4DC92; }
+body.espace-est-admin .espace-admin-note { color: #E8D6B5; }
