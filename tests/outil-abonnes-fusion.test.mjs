@@ -77,3 +77,18 @@ test('empreintes : deux fiches avec le même lien ne font plus échouer tout le 
   assert.equal(envois.length, 2);
   assert.equal(envois.find((x) => x.h === h('a')).outil_id, 'fiche-1');
 });
+
+test('publier : une annonce fusionnée avec sa fiche ne revient pas, une nouvelle annonce reste affichée', async () => {
+  const { patches, deps } = harnais({
+    'annonces?ref=in.(38,99)&select=ref,outil_id,user_id': [{ ref: 38, outil_id: 'fiche-1', user_id: 'u1' }, { ref: 99, outil_id: null, user_id: 'u9' }],
+    'profils_outil?user_id=not.is.null': [{ user_id: 'u1', outil_id: 'fiche-1' }],
+  });
+  const profil = (id) => ({ outil_id: id, id, genre: 'femme', age: 30 });
+  await handleAnnonces('outil_publier', { cle, profils: [profil('fiche-1'), profil('site-annonce-38'), profil('site-annonce-99')] }, deps);
+  const masque = patches.find((x) => x.table === 'annonces' && x.valeur.visible_anonyme === false);
+  const affiche = patches.find((x) => x.table === 'annonces' && x.valeur.visible_anonyme === true);
+  assert.match(masque.filtre, /exportee_at=not\.is\.null/);
+  assert.match(masque.filtre, /not\.in\.\(99\)/);
+  assert.match(affiche.filtre, /ref=in\.\(99\)/);
+});
+
