@@ -19,7 +19,12 @@ export const prixAnnuel = (f, pris = Infinity) => prixMensuel(f, pris) * 10;
 export const UNITES = [
   { id: 'mise_en_relation', nom: 'Un match supplémentaire', prix: 500, texte: 'Un match de plus, sans abonnement. Il n’expire pas.' },
   { id: 'speed_dating', nom: 'Une soirée de speed dating', prix: 1200, texte: 'Une place pour une soirée de speed dating en ligne, à utiliser quand tu veux.' },
-  // S'achète seulement depuis Mon espace, pour un match en cours qui a accepté de transmettre sa photo.
+  { id: 'coaching', nom: 'Une visio de coaching avec Lamia', prix: 1500, texte: '15 minutes en visio avec Lamia, sans enregistrement. Tu choisis ton créneau dans Mon espace après l’achat.' },
+  { id: 'live_priorite', nom: 'Passage en priorité en live', prix: 500, texte: 'Lamia présente ton annonce en priorité à son prochain live.' },
+  // S'achètent seulement depuis Mon espace : ils concernent un compte, un match ou une discussion.
+  { id: 'prolonger_discussion', nom: 'Prolonger la discussion', prix: 300, jours: 7, depuisEspace: true, texte: '7 jours de plus avec ton match, pour vous deux. Depuis ta discussion, dans Mon espace.' },
+  { id: 'profil_avant', nom: 'Profil mis en avant', prix: 500, jours: 7, depuisEspace: true, texte: 'Ton profil passe en tête du swipe pendant 7 jours, auprès des personnes qui correspondent à ses critères.' },
+  { id: 'qui_choisi', nom: 'Voir qui t’a choisi·e', prix: 200, heures: 24, depuisEspace: true, texte: 'Les numéros anonymes des profils qui t’ont choisi·e, en tête de ton swipe, pendant 24 heures.' },
   { id: 'photo_match', nom: 'La photo de ton match', prix: 300, heures: 1, depuisEspace: true, texte: 'Visible pendant 1 heure, si ton match accepte de la transmettre. Depuis Mon espace, pendant le match.' },
 ];
 export const formule = (id) => FORMULES.find((f) => f.id === id) || null;

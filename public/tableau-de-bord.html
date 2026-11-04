@@ -270,6 +270,17 @@
 
   <section data-panel="ventes" hidden>
     <h1 class="tdb-titre">Ventes et commandes</h1>
+    <div class="tdb-kpis" data-app-kpis></div>
+    <div class="tdb-carte" data-app-livrer hidden><h2>À faire pour tes clients</h2><ul class="tdb-retraits" data-app-livrer-liste></ul></div>
+    <div class="tdb-deux">
+      <div class="tdb-carte"><h2>Abonnements</h2><div class="tdb-table"><table><thead><tr><th>Formule</th><th>Abonnés</th><th>Par mois</th></tr></thead><tbody data-app-formules></tbody></table></div></div>
+      <div class="tdb-carte"><h2>Par service</h2><div class="tdb-table"><table><thead><tr><th>Service</th><th>Ventes</th><th>Ce mois-ci</th><th>Total</th></tr></thead><tbody data-app-services></tbody></table></div></div>
+    </div>
+    <div class="tdb-carte">
+      <div class="tdb-entete"><h2>Ventes de l’appli</h2><label>Afficher <select data-app-filtre><option value="">Tout</option><option value="abonnement">Abonnements</option><option value="unite">À l’unité</option><option value="soiree">Soirées</option></select></label></div>
+      <div class="tdb-table"><table><thead><tr><th>Date</th><th>Service</th><th>Client</th><th>Montant</th></tr></thead><tbody data-app-lignes></tbody></table></div>
+    </div>
+    <h2 style="margin-top:28px">Boutique</h2>
     <div class="tdb-filtres">
       <label>Afficher<select data-filtre-ventes><option value="">Toutes</option><option value="pending">En attente de paiement</option><option value="paid">Payées, à expédier</option><option value="fulfilled">Expédiées</option><option value="cancelled">Annulées</option></select></label>
       <p data-ventes-resume></p>

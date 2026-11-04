@@ -80,7 +80,7 @@ test('notification Stripe : abonnement enregistré une seule fois, puis mis à j
 test('état : crédits à l’unité restants', async () => {
   const fetcher = async (u) => ({ ok: true, json: async () => (u.includes('achats_unite') ? [{ type: 'mise_en_relation', quantite: 3, utilisees: 1 }, { type: 'speed_dating', quantite: 1, utilisees: 1 }] : []) });
   const e = await etatAbonnement('a@b.fr', { env, fetcher });
-  assert.deepEqual(e.unites, { mise_en_relation: 2, speed_dating: 0 });
+  assert.deepEqual(e.unites, { mise_en_relation: 2, speed_dating: 0, coaching: 0, live_priorite: 0 });
   assert.equal(e.abonnement, null);
 });
 test('retour de paiement : la session est relue chez Stripe puis enregistrée', async () => {
@@ -135,4 +135,75 @@ test('l’heure de photo commence au paiement', async () => {
   assert.equal(lignes[0].photo_ref, 12);
   assert.equal(lignes[0].email, 'nina@example.com');
   assert.equal(lignes[0].photo_jusqu_a, '2026-11-03T11:00:00.000Z');
+});
+
+const authReq = new Request('https://lamia-femme-berbere.com/api/preorder', { method: 'POST', headers: { Authorization: 'Bearer t' } });
+const NINA_U = { id: '00000000-0000-0000-0000-000000000001', email: 'nina@example.com' };
+const mondeService = (tables = {}) => async (u) => {
+  const url = String(u);
+  if (url.includes('/auth/v1/user')) return { ok: true, status: 200, json: async () => NINA_U };
+  for (const [k, v] of Object.entries(tables)) if (url.includes(`/rest/v1/${k}?`)) return { ok: true, json: async () => v };
+  return { ok: true, json: async () => [] };
+};
+const payerService = (unite_, tables, extra = {}, s = fauxStripe()) => actionAbonnement({ action: 'abonnement_payer', cgv_accepted: true, unite: unite_, ...extra }, authReq, { env, fetcher: mondeService(tables), stripe: s });
+test('prix des services à l’unité choisis par Lamia', () => {
+  assert.deepEqual(['coaching', 'live_priorite', 'prolonger_discussion', 'profil_avant', 'qui_choisi'].map((x) => unite(x).prix), [1500, 500, 300, 500, 200]);
+});
+test('coaching et priorité en live s’achètent à l’unité comme le reste', async () => {
+  const s = fauxStripe();
+  await actionAbonnement({ ...base, unite: 'coaching' }, req, { env, fetcher: vide, stripe: s });
+  assert.equal(s.appels[0].line_items[0].price_data.unit_amount, 1500);
+});
+test('services liés au compte : jamais sans compte, et vérifiés avant de payer', async () => {
+  for (const x of ['prolonger_discussion', 'profil_avant', 'qui_choisi']) assert.equal((await actionAbonnement({ ...base, unite: x }, req, { env, fetcher: vide, stripe: fauxStripe() })).status, 401);
+  const id = '00000000-0000-4000-8000-000000000009';
+  assert.equal((await payerService('prolonger_discussion', { discussions: [] }, { id })).status, 409);
+  assert.equal((await payerService('prolonger_discussion', { discussions: [{ id, close_raison: 'dematch' }] }, { id })).status, 409);
+  const s = fauxStripe();
+  assert.equal((await payerService('prolonger_discussion', { discussions: [{ id, close_raison: null }] }, { id }, s)).status, 200);
+  assert.equal(s.appels[0].metadata.cible, id); assert.equal(s.appels[0].line_items[0].price_data.unit_amount, 300);
+  assert.equal((await (await payerService('profil_avant', {})).json()).error, 'profil_requis');
+  assert.equal((await payerService('profil_avant', { annonces: [{ id: 'a' }] })).status, 200);
+  assert.equal((await (await payerService('qui_choisi', { abonnements: [{ formule: 'passion', statut: 'actif' }] })).json()).error, 'deja_inclus');
+  assert.equal((await payerService('qui_choisi', {})).status, 200);
+});
+const fauxDb = (donnees = {}) => { const ecrits = []; let reclame = false; return { ecrits, fetcher: async (u, o = {}) => {
+  const url = String(u); const corps = o.body ? JSON.parse(o.body) : null;
+  if (o.method) ecrits.push([url.replace(/^.*\/rest\/v1\//, ''), o.method, corps]);
+  if (o.method === 'PATCH' && corps.applique_at) { const r = reclame ? [] : [{}]; reclame = true; return { ok: true, json: async () => r }; }
+  if (o.method === 'POST') return { ok: true, json: async () => [{}] };
+  for (const [k, v] of Object.entries(donnees)) if (url.includes(`/rest/v1/${k}?`)) return { ok: true, json: async () => v };
+  return { ok: true, json: async () => [] };
+} }; };
+const payeService = (type, extra) => ({ type: 'checkout.session.completed', data: { object: { id: 'cs_9', payment_status: 'paid', amount_total: 300, customer_email: 'nina@example.com', metadata: { kind: 'achat_unite', type, quantite: '1', email: 'nina@example.com', user_id: 'u1', ...extra } } } });
+test('discussion prolongée de 7 jours à partir de sa fin, une seule fois', async () => {
+  const d = fauxDb({ discussions: [{ id: 'd1', ferme_at: '2026-11-05T10:00:00Z', close_raison: null }] });
+  const t = new Date('2026-11-04T10:00:00Z');
+  await traiterEvenementAbonnement(payeService('prolonger_discussion', { cible: 'd1' }), { env, fetcher: d.fetcher, now: () => t });
+  await traiterEvenementAbonnement(payeService('prolonger_discussion', { cible: 'd1' }), { env, fetcher: d.fetcher, now: () => t });
+  const maj = d.ecrits.filter(([u]) => u.startsWith('discussions'));
+  assert.equal(maj.length, 1);
+  assert.equal(maj[0][2].ferme_at, '2026-11-12T10:00:00.000Z');
+  assert.equal(d.ecrits.find(([u]) => u.startsWith('achats_unite?on_conflict'))[2].montant_centimes, 300);
+});
+test('discussion déjà terminée : 7 jours à partir d’aujourd’hui', async () => {
+  const d = fauxDb({ discussions: [{ id: 'd1', ferme_at: '2026-10-01T10:00:00Z', close_raison: null }] });
+  await traiterEvenementAbonnement(payeService('prolonger_discussion', { cible: 'd1' }), { env, fetcher: d.fetcher, now: () => new Date('2026-11-04T10:00:00Z') });
+  assert.equal(d.ecrits.find(([u]) => u.startsWith('discussions'))[2].ferme_at, '2026-11-11T10:00:00.000Z');
+});
+test('profil mis en avant : 7 jours sur son annonce et sa fiche, cumulables', async () => {
+  const d = fauxDb({ annonces: [{ avant_jusqu_a: '2026-11-06T10:00:00Z' }], profils_outil: [] });
+  await traiterEvenementAbonnement(payeService('profil_avant', {}), { env, fetcher: d.fetcher, now: () => new Date('2026-11-04T10:00:00Z') });
+  for (const t of ['annonces', 'profils_outil']) assert.equal(d.ecrits.find(([u]) => u.startsWith(`${t}?user_id=eq.u1`))[2].avant_jusqu_a, '2026-11-13T10:00:00.000Z');
+});
+test('qui m’a choisi·e : 24 heures à partir du paiement', async () => {
+  const d = fauxDb();
+  await traiterEvenementAbonnement(payeService('qui_choisi', {}), { env, fetcher: d.fetcher, now: () => new Date('2026-11-04T10:00:00Z') });
+  assert.equal(d.ecrits[0][2].acces_jusqu_a, '2026-11-05T10:00:00.000Z');
+});
+test('échéance payée : encaissement noté, une ligne par facture', async () => {
+  const d = fauxDb();
+  await traiterEvenementAbonnement({ type: 'invoice.paid', data: { object: { id: 'in_1', subscription: 'sub_1', amount_paid: 2200, customer_email: 'N@x.fr', status_transitions: { paid_at: 1793713586 } } } }, { env, fetcher: d.fetcher });
+  const e = d.ecrits.find(([u]) => u.startsWith('encaissements'))[2];
+  assert.equal(e.montant_centimes, 2200); assert.equal(e.stripe_invoice_id, 'in_1'); assert.equal(e.email, 'n@x.fr');
 });

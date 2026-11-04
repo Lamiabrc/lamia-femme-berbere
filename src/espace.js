@@ -47,7 +47,27 @@ async function render() {
   invitationBeta(session);
 }
 
-// Coaching Prestige : réserver sa visio du mois, l'annuler, y entrer.
+// Services à l'unité liés au compte (photo mise à part) : un seul chemin de paiement, depuis tous les blocs de Mon espace.
+const ERR_SERVICE = { discussion_fermee: 'Cette discussion est fermée.', profil_requis: 'Il faut d’abord un profil validé.', deja_inclus: 'C’est déjà inclus dans ta formule.' };
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-service-acheter]');
+  if (!b) return;
+  const st = b.parentElement.querySelector('[data-service-statut]');
+  const dire = (t) => { if (st) st.textContent = t; };
+  if (!confirm(`${b.dataset.serviceNom} : ${b.dataset.servicePrix}.\n\nEn continuant, tu acceptes les conditions de vente (lamia-femme-berbere.com/cgv) et tu demandes que le service commence dès le paiement.`)) return;
+  b.disabled = true; dire('Ouverture du paiement…');
+  try {
+    const { data } = await supabase.auth.getSession();
+    const r = await fetch('/api/preorder', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${data.session?.access_token}` }, body: JSON.stringify({ action: 'abonnement_payer', unite: b.dataset.serviceAcheter, id: b.dataset.serviceCible || undefined, cgv_accepted: true }) });
+    const d = await r.json().catch(() => ({}));
+    if (r.ok && d.url) { location.href = d.url; return; }
+    dire(ERR_SERVICE[d.error] || 'Le paiement n’a pas pu s’ouvrir. Réessaie dans un instant.');
+  } catch { dire('Le paiement n’a pas pu s’ouvrir. Réessaie dans un instant.'); }
+  b.disabled = false;
+});
+const boutonService = (unite, nom, prix, libelle, cible = '') => `<p><button class="btn btn-line" type="button" data-service-acheter="${esc(unite)}" data-service-nom="${esc(nom)}" data-service-prix="${esc(prix)}"${cible ? ` data-service-cible="${esc(cible)}"` : ''}>${esc(libelle)}</button> <small data-service-statut role="status"></small></p>`;
+
+// Coaching : réserver sa visio (celle du mois en Prestige, ou une visio achetée), l'annuler, y entrer.
 const ERR_COACHING = { deja_ce_mois: 'Tu as déjà ta visio pour ce mois-là.', creneau_pris: 'Ce créneau vient d’être pris. Choisis-en un autre.', creneau_passe: 'Ce créneau est trop proche. Choisis-en un autre.', trop_tard: 'Moins de 24 heures avant la visio, elle ne peut plus être annulée. Écris à Lamia si besoin.', trop_tot: 'La visio s’ouvre 10 minutes avant l’heure. Reviens un peu plus tard.', terminee: 'Cette visio est terminée.', paiement_a_regulariser: 'Ton paiement est à régulariser avant de réserver.', video_indisponible: 'La visio ne s’ouvre pas pour le moment. Réessaie dans un instant.', video_not_configured: 'La visio ne s’ouvre pas pour le moment. Écris à Lamia.' };
 async function monCoaching(session) {
   const bloc = $('[data-espace-coaching-bloc]'), box = $('[data-espace-coaching]');
@@ -55,13 +75,18 @@ async function monCoaching(session) {
   const jour = (d) => new Date(d).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
   const heure = (d) => new Date(d).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
   const peindre = (d, note = '') => {
-    bloc.hidden = !d.inclus;
-    if (!d.inclus) { box.innerHTML = ''; return; }
+    // Sans visio incluse ni achetée : l'offre à l'unité, sauf là où le paiement en ligne n'existe pas.
+    const offre = d.offre && !window.LFB_PLAY;
+    bloc.hidden = !d.inclus && !offre;
+    const intro = bloc.querySelector('[data-coaching-intro]');
+    if (intro) intro.textContent = d.prestige ? 'Ta formule Prestige comprend une visio de 15 minutes par mois avec Lamia, pour ton profil et tes rencontres. Elle n’est jamais enregistrée.' : 'Une visio de 15 minutes avec Lamia, pour ton profil et tes rencontres. Elle n’est jamais enregistrée.';
+    if (!d.inclus) { box.innerHTML = offre ? '<p>15 € la visio, ou incluse chaque mois avec la formule Prestige.</p><p><a class="btn btn-ink" href="/abonnement/#unites">Prendre une visio</a> <a class="text-link" href="/abonnement/?formule=prestige">Voir Prestige</a></p>' : ''; return; }
     const parJour = new Map();
     for (const c of d.creneaux || []) { const k = jour(c.debut); if (!parJour.has(k)) parJour.set(k, []); parJour.get(k).push(c); }
     box.innerHTML = `${d.prochaine ? `<h3>🎥 Ta prochaine visio</h3><p><strong>${esc(jour(d.prochaine.debut))} à ${esc(heure(d.prochaine.debut))}</strong>, pour 15 minutes.</p><p class="po-actions"><button class="btn btn-ink" type="button" data-coaching-entrer="${esc(d.prochaine.id)}">Entrer dans la visio</button>${d.prochaine.annulable ? `<button class="btn btn-line" type="button" data-coaching-annuler="${esc(d.prochaine.id)}">Annuler</button>` : ''}</p><p><small>La visio s’ouvre 10 minutes avant l’heure.${d.prochaine.annulable ? ' Tu peux annuler jusqu’à 24 heures avant.' : ''}</small></p>` : ''}
-      ${d.impaye ? '<p>Ton paiement est à régulariser pour réserver une visio : va dans « Gérer mon abonnement ».</p>' : ''}
-      ${parJour.size ? `<h3>${d.prochaine ? 'Réserver ma visio d’un autre mois' : 'Choisir mon créneau'}</h3><p><small>Horaires à l’heure de ton téléphone.</small></p>${[...parJour].map(([k, l]) => `<p class="espace-coaching-jour"><strong>${esc(k)}</strong></p><p class="espace-coaching-heures">${l.map((c) => `<button class="btn btn-line" type="button" data-coaching-reserver="${esc(c.id)}" data-quand="${esc(`${k} à ${heure(c.debut)}`)}">${esc(heure(c.debut))}</button>`).join('')}</p>`).join('')}` : (!d.prochaine && !d.impaye ? '<p>Lamia n’a pas encore ouvert de créneaux. Tu seras prévenu·e dès que c’est le cas.</p>' : '')}
+      ${d.impaye ? '<p>Ton paiement est à régulariser pour réserver ta visio du mois : va dans « Gérer mon abonnement ».</p>' : ''}
+      ${d.credits ? `<p>🎟 Tu as <strong>${esc(d.credits)} visio${d.credits > 1 ? 's' : ''} achetée${d.credits > 1 ? 's' : ''}</strong> à réserver.</p>` : ''}
+      ${parJour.size ? `<h3>${d.prochaine ? 'Réserver une autre visio' : 'Choisir mon créneau'}</h3><p><small>Horaires à l’heure de ton téléphone.</small></p>${[...parJour].map(([k, l]) => `<p class="espace-coaching-jour"><strong>${esc(k)}</strong></p><p class="espace-coaching-heures">${l.map((c) => `<button class="btn btn-line" type="button" data-coaching-reserver="${esc(c.id)}" data-quand="${esc(`${k} à ${heure(c.debut)}`)}">${esc(heure(c.debut))}</button>`).join('')}</p>`).join('')}` : (!d.prochaine && !d.impaye ? '<p>Lamia n’a pas encore ouvert de créneaux. Tu seras prévenu·e dès que c’est le cas.</p>' : '')}
       <p class="form-status" role="status" data-coaching-statut>${esc(note)}</p>`;
   };
   const faire = async (corps, ok = '') => {
@@ -329,8 +354,10 @@ async function suivi(el, p) {
   const cp = p.choisi_par || { nombre: 0, refs: [] };
   const blocChoisi = !cp.nombre ? '' : cp.inclus
     ? `<h3>💞 Qui t’a choisi·e</h3><p>${cp.refs.map((r) => `<strong>n° ${esc(r)}</strong>`).join(', ')} : ${cp.nombre > 1 ? 'ces profils sont' : 'ce profil est'} en tête de ton <a class="text-link" href="/rencontres/swipe/">swipe</a>. Choisis-${cp.nombre > 1 ? 'les' : 'le'} à ton tour pour un intérêt réciproque.</p>`
-    : `<h3>💞 ${cp.nombre} personne${cp.nombre > 1 ? 's t’ont' : ' t’a'} choisi·e</h3><p>Découvre qui avec la formule <a class="text-link" href="/abonnement/?formule=passion">Passion</a>.</p>`;
-  el.innerHTML = `<h3>Mon suivi</h3><ul>${lignes}</ul>${blocChoisi}${blocPhoto}
+    : `<h3>💞 ${cp.nombre} personne${cp.nombre > 1 ? 's t’ont' : ' t’a'} choisi·e</h3><p>Découvre qui avec la formule <a class="text-link" href="/abonnement/?formule=passion">Passion</a>${peutPayer ? ', ou pour 2 € pendant 24 heures' : ''}.</p>${peutPayer ? boutonService('qui_choisi', 'Voir qui t’a choisi·e pendant 24 heures', '2 €', 'Voir qui · 2 €') : ''}`;
+  const finAvant = p.en_avant_jusqu_a ? new Date(p.en_avant_jusqu_a).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' }) : '';
+  const blocAvant = finAvant ? `<h3>🌟 Ton profil est mis en avant</h3><p>En tête du swipe jusqu’au ${esc(finAvant)}.</p>` : peutPayer ? `<h3>🌟 Mets ton profil en avant</h3><p>En tête du swipe pendant 7 jours, auprès des personnes qui correspondent à ses critères. Lamia ne promet pas de match, mais tu seras vu·e plus tôt.</p>${boutonService('profil_avant', 'Profil mis en avant pendant 7 jours', '5 €', 'Mettre en avant · 5 €')}` : '';
+  el.innerHTML = `<h3>Mon suivi</h3><ul>${lignes}</ul>${blocChoisi}${blocAvant}${blocPhoto}
     <p><a class="po-btn" href="/rencontres/swipe/">💘 Swiper les profils</a></p>
     <h3>Mes demandes de match</h3>${demandes ? `<ul>${demandes}</ul>` : '<p>Aucune pour l’instant. <a class="text-link" href="/rencontres/#profils-anonymes">Voir les profils</a></p>'}`;
   el.querySelectorAll('[data-photo-acheter]').forEach((b) => b.addEventListener('click', async () => {
@@ -650,6 +677,7 @@ async function discussions(session) {
       ${d.ouverte ? `<form class="disc-saisie" data-disc-envoi><textarea name="texte" rows="2" maxlength="1000" placeholder="Ton message…" required></textarea><button class="btn btn-ink" type="submit">Envoyer</button></form>
       <p class="disc-aide">Pour ta sécurité, les numéros, liens et emails écrits dans les messages sont masqués : utilise le bouton ci-dessous pour échanger vos numéros.</p>` : ''}
       ${numeros}
+      ${d.prolongeable && !window.LFB_PLAY && new Date(d.ferme_at) - Date.now() < 72 * 3600e3 ? `<div class="disc-prolonger">${d.ouverte ? '' : '<p>Votre discussion est terminée, mais vous pouvez la rouvrir.</p>'}${boutonService('prolonger_discussion', 'Prolonger la discussion de 7 jours', '3 €', '⏳ 7 jours de plus · 3 €', d.id)}</div>` : ''}
       ${d.ouverte ? `<p><button type="button" class="link-button" data-disc-signaler>🚩 Signaler un problème à Lamia</button>${d.avec_ref ? ` · <button type="button" class="link-button" data-moderer-bloquer="${esc(d.avec_ref)}">🚫 Bloquer</button>` : ''}</p>` : ''}
     </article>`;
   };

@@ -3553,3 +3553,5 @@ body.espace-est-admin [data-espace-in] > section:not(.espace-admin) { display: n
 .cta-profil[hidden] { display: none; }
 body.espace-est-admin .espace-admin h2 { color: #F4DC92; }
 body.espace-est-admin .espace-admin-note { color: #E8D6B5; }
+
+.disc-prolonger { margin: 10px 0; }

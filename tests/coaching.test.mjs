@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import { actionCoaching, creneauxDe, moisParis, rappelsCoaching } from '../lib/coaching.mjs';
 
 const ID = (n) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
-function monde({ formule = 'prestige', statut = 'actif', now = '2026-11-03T12:00:00Z' } = {}) {
+function monde({ formule = 'prestige', statut = 'actif', now = '2026-11-03T12:00:00Z', achetees = 0 } = {}) {
+  const credits = { n: achetees, utilises: 0, rendus: 0 };
   const lignes = [], abonnements = [{ email: 'nina@example.com', nom: 'Nina', formule: 'prestige', statut: 'actif' }];
   let n = 0;
   const filtrer = (qs) => {
@@ -30,7 +31,7 @@ function monde({ formule = 'prestige', statut = 'actif', now = '2026-11-03T12:00
     if (o.method === 'POST') { for (const r of JSON.parse(o.body)) if (!lignes.some((x) => x.debut === r.debut)) lignes.push({ id: ID((n += 1)), user_id: null, email: null, prenom: null, rappel_at: null, ...r }); return new Response('[]'); }
     if (o.method === 'PATCH') {
       const v = JSON.parse(o.body), l = filtrer(qs);
-      if (l[0] && lignes.some((x) => x.user_id === v.user_id && x.mois === l[0].mois)) return new Response('{}', { status: 409 });
+      if (l[0] && v.source === 'inclus' && lignes.some((x) => x.user_id === v.user_id && x.mois === l[0].mois && x.source === 'inclus')) return new Response('{}', { status: 409 });
       l.forEach((x) => Object.assign(x, v)); return new Response(JSON.stringify(l));
     }
     if (o.method === 'DELETE') { for (const x of filtrer(qs)) lignes.splice(lignes.indexOf(x), 1); return new Response('[]'); }
@@ -40,9 +41,9 @@ function monde({ formule = 'prestige', statut = 'actif', now = '2026-11-03T12:00
   const prevenus = [], alertes = [];
   const t = { now: new Date(now) };
   const daily = [];
-  const ctx = (user, admin = false) => ({ env: { DAILY_API_KEY: 'k' }, call, read, patch, insert: async () => ({}), admin, user, now: () => t.now, alerter: async (x) => { alertes.push(x.titre); }, prevenirMembre: async (m, x) => { prevenus.push([m.email, x.titre]); }, etat: async () => ({ abonnement: formule ? { formule, statut } : null }),
+  const ctx = (user, admin = false) => ({ env: { DAILY_API_KEY: 'k' }, call, read, patch, insert: async () => ({}), admin, user, now: () => t.now, alerter: async (x) => { alertes.push(x.titre); }, prevenirMembre: async (m, x) => { prevenus.push([m.email, x.titre]); }, etat: async () => ({ abonnement: formule ? { formule, statut } : null, unites: { coaching: credits.n } }), consommer: async () => { if (credits.n < 1) return null; credits.n -= 1; credits.utilises += 1; return 'achat-1'; }, rendre: async () => { credits.n += 1; credits.rendus += 1; return true; },
     fetcher: async (u, o) => { daily.push([u, o]); return new Response(JSON.stringify(u.includes('meeting-tokens') ? { token: 'jeton' } : { name: 'coaching-x', url: 'https://lfb.daily.co/coaching-x' })); } });
-  return { lignes, ctx, prevenus, alertes, t, daily };
+  return { lignes, ctx, prevenus, alertes, t, daily, credits };
 }
 const NINA = { id: 'u-nina', email: 'Nina@example.com', user_metadata: { first_name: 'Nina' } };
 const KARIM = { id: 'u-karim', email: 'karim@example.com', user_metadata: { first_name: 'Karim' } };
@@ -149,4 +150,41 @@ test('prévenir : seulement ceux qui n’ont pas réservé ; rappel envoyé une 
   w.t.now = new Date('2026-11-09T18:00:00Z');
   assert.equal(await rappelsCoaching(c), 1);
   assert.equal(await rappelsCoaching(c), 0);
+});
+
+test('visio à l’unité : sans Prestige, un crédit par visio, rendu si elle est annulée à temps', async () => {
+  const w = monde({ formule: null, achetees: 1 });
+  await ouvrir(w);
+  const [a, b] = w.lignes;
+  let v = await go(w, 'annonce_coaching', {});
+  assert.equal(v.inclus, true); assert.equal(v.credits, 1); assert.equal(v.creneaux.length, 3);
+  v = await go(w, 'annonce_coaching_reserver', { id: a.id });
+  assert.equal(a.source, 'unite'); assert.equal(a.achat_id, 'achat-1'); assert.equal(w.credits.n, 0);
+  assert.equal((await go(w, 'annonce_coaching_reserver', { id: b.id })).status, 403); // plus de crédit, pas de Prestige
+  await go(w, 'annonce_coaching_annuler', { id: a.id });
+  assert.equal(w.credits.n, 1); assert.equal(a.achat_id, null);
+});
+test('sans visio : l’offre à l’unité, pas de créneau', async () => {
+  const w = monde({ formule: 'passion' });
+  await ouvrir(w);
+  const v = await go(w, 'annonce_coaching', {});
+  assert.equal(v.inclus, false); assert.equal(v.offre, true); assert.equal(v.creneaux, undefined);
+});
+test('Prestige : la visio du mois d’abord, puis une visio achetée dans le même mois', async () => {
+  const w = monde({ achetees: 1 });
+  await ouvrir(w);
+  const [a, b, c] = w.lignes;
+  await go(w, 'annonce_coaching_reserver', { id: a.id });
+  assert.equal(a.source, 'inclus'); assert.equal(w.credits.n, 1);
+  await go(w, 'annonce_coaching_reserver', { id: b.id });
+  assert.equal(b.source, 'unite'); assert.equal(w.credits.n, 0);
+  assert.equal((await go(w, 'annonce_coaching_reserver', { id: c.id })).error, 'deja_ce_mois');
+});
+test('créneau pris entre-temps : le crédit est rendu', async () => {
+  const w = monde({ formule: null, achetees: 1 });
+  await ouvrir(w);
+  const a = w.lignes[0];
+  a.user_id = 'autre';
+  assert.equal((await go(w, 'annonce_coaching_reserver', { id: a.id })).error, 'creneau_pris');
+  assert.equal(w.credits.n, 1); assert.equal(w.credits.rendus, 1);
 });
