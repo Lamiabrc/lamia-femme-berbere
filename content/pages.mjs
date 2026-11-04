@@ -68,7 +68,7 @@ export const speedDating = {
   salleAccueil:
     'Bienvenue au bal. Installez-vous, ajustez votre masque : j’ouvre la soirée dans un instant.',
   intro:
-    'Ici, on ne fait pas défiler des profils. On s’inscrit à une soirée pensée pour un public précis, on enchaîne des tête-à-tête rapides en visio, puis on repart avec, peut-être, l’envie de se revoir.',
+    'Ici, tu rencontres en visio, pas seulement sur fiche. Tu t’inscris à une soirée, tu enchaînes des tête-à-tête rapides, puis tu repars avec, peut-être, l’envie de te revoir.',
   origin:
     'Ces soirées sont nées de mes lives : pendant des années, j’ai présenté des personnes qui cherchaient sérieusement à se marier. Le Boudoir reprend cet esprit, avec un cadre fait pour le site.',
   criteria: [
