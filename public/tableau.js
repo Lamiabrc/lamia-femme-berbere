@@ -228,7 +228,7 @@ async function chargerModerateurs() {
   if (!box) return;
   try {
     const { moderateurs = [] } = await conf({ action: 'annonce_moderateurs' });
-    box.innerHTML = moderateurs.length ? moderateurs.map((p) => `<li>🛡️ Profil n° ${esc(p.ref)}${p.ville ? ` · ${esc(p.ville)}` : ''} · ${p.formule ? 'Passion offerte' : 'Passion en attente d’un compte'} <button type="button" data-mod-retirer="${esc(p.ref)}">Retirer</button></li>`).join('') : '<li>Aucun modérateur pour l’instant.</li>';
+    box.innerHTML = moderateurs.length ? moderateurs.map((p) => `<li>🛡️ Profil n° ${esc(p.ref)}${p.ville ? ` · ${esc(p.ville)}` : ''} · ${p.formule ? 'Passion offerte' : 'Passion en attente d’un compte'}${p.lien ? ` · <a href="${esc(p.lien)}">son lien personnel</a>` : ''} <button type="button" data-mod-retirer="${esc(p.ref)}">Retirer</button></li>`).join('') : '<li>Aucun modérateur pour l’instant.</li>';
   } catch { box.innerHTML = '<li>La liste ne s’affiche pas pour le moment.</li>'; }
 }
 async function chargerBeta() {
