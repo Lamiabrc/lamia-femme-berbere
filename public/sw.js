@@ -39,7 +39,7 @@ self.addEventListener('notificationclick', (event) => {
   event.waitUntil((async () => {
     const wins = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
     const coin = new URL(url).pathname.startsWith('/confidences-lamia/') ? '/confidences-lamia/' : '/';
-    for (const w of wins) if (new URL(w.url).pathname.startsWith(coin)) { await w.focus(); w.navigate?.(url); return; }
+    for (const w of wins) if (new URL(w.url).pathname.startsWith(coin)) { await w.focus(); try { await w.navigate(url); return; } catch { break; } }
     await self.clients.openWindow(url);
   })());
 });

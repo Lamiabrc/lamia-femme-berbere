@@ -665,7 +665,7 @@ function listeComptes() {
     fiche: (c) => c.fiches.length,
     incomplet,
   }[filtreComptes];
-  const l = comptes.comptes.filter(garde).filter((c) => !q || [nomDe(c), c.email, c.profil?.city, c.profil?.display_name].join(' ').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes(q));
+  const l = comptes.comptes.filter(garde).filter((c) => !q || [nomDe(c), c.email, c.profil?.city, c.profil?.display_name, ...c.annonces.map((a) => a.ref), ...c.fiches.map((f) => f.ref)].join(' ').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes(q));
   $('[data-comptes]').innerHTML = l.length ? l.map((c) => {
     const age = ageDe(c.profil?.birth_date);
     const soirees = c.inscriptions.slice(0, 3).map((i) => `<span class="compte-badge ${i.statut === 'cancelled' ? 'is-annule' : 'is-bal'}">${esc(salonCourt(i.salon) || i.titre)}</span>`).join('');
@@ -713,7 +713,112 @@ function ouvrirCompte(id) {
   ].join('') || '<li>Ni annonce ni fiche de l’outil liée à ce compte.</li>';
   $('[data-compte-fiche]').hidden = false;
   $('[data-compte-fond]').hidden = false;
+  $('[data-compte-form]').hidden = false;
+  chargerDetail({ user_id: id });
 }
+// ---------------------------------------------------------------- la fiche : qui, son activité, pourquoi une alerte, cadeaux, blocage
+const STATUT_DEMANDE = { a_traiter: 'en attente', mis_en_relation: 'en match', dematche: 'dématché', pas_compatible: 'pas compatible', en_reserve: 'en réserve' };
+let nomsRefs = {};
+const refBouton = (r) => `<button type="button" class="fiche-ref" data-voir-ref="${esc(r)}">${nomsRefs[r] ? `${esc(nomsRefs[r])} · ` : ''}n° ${esc(r)}</button>`;
+const quand = (d) => (d ? date(d, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '');
+const avecRefs = (t) => esc(t).replace(/n°\s*(\d+)/g, (_, r) => refBouton(r));
+function rendreDetail(d) {
+  const box = $('[data-compte-detail]'), c = d.compte;
+  nomsRefs = d.noms || {};
+  const carte = (titre, html, ouvert = false) => `<details class="tdb-repli" ${ouvert ? 'open' : ''}><summary>${titre}</summary><div>${html}</div></details>`;
+  const pourquoi = d.journal?.length ? `<div class="tdb-carte fiche-pourquoi"><h3 style="margin-top:0">Pourquoi tu as reçu une alerte</h3><ul class="fiche-liste">${d.journal.slice(0, 4).map((j) => `<li><strong>${avecRefs(j.titre)}</strong><small>${esc(quand(j.created_at))}</small>${(j.lignes || []).map((l) => `<div>${avecRefs(l)}</div>`).join('')}</li>`).join('')}</ul></div>` : '';
+  const qui = [...(d.annonces || []).map((a) => `<li><strong>Profil n° ${esc(a.ref)}</strong> · ${esc(a.prenom || '')}, ${esc(a.age ?? '?')} ans · ${esc(a.genre || '')}<small>${esc([a.ville, a.pays].filter(Boolean).join(', '))} · ${esc(ANNONCE[a.status] || a.status)}${a.test ? ' · test' : ''}${a.en_match ? ' · en match' : ''}</small></li>`), ...(d.fiches || []).map((f) => `<li><strong>Fiche de l’outil n° ${esc(f.ref)}</strong> · ${esc(f.age ?? '?')} ans · ${esc(f.genre || '')}<small>${esc([f.ville, f.pays].filter(Boolean).join(', '))} · ${f.retiree ? 'retirée' : f.confirmee ? 'confirmée' : 'en attente de confirmation'}</small></li>`)].join('');
+  if (d.sans_compte) {
+    box.innerHTML = `${pourquoi}<div class="tdb-carte"><h3 style="margin-top:0">À qui est ce profil</h3><ul class="fiche-liste">${qui}</ul><p class="aide">Cette personne n’a pas de compte. Son prénom et ses contacts sont dans ton outil de live (cherche ce n° dans « Le site »).</p></div>${(d.choisi_par || []).length ? `<div class="tdb-carte"><h3 style="margin-top:0">Choisie par</h3><ul class="fiche-liste">${d.choisi_par.map((x) => `<li>${refBouton(x.ref)} ${esc(x.prenom || '')}<small>${esc(STATUT_DEMANDE[x.statut] || x.statut)} · ${esc(quand(x.le))}</small></li>`).join('')}</ul></div>` : ''}`;
+    return;
+  }
+  const a = d.activite;
+  const liste = (l, f, vide) => (l.length ? `<ul class="fiche-liste">${l.map(f).join('')}</ul>` : `<p class="aide">${vide}</p>`);
+  box.innerHTML = `${c.bloque ? '<p class="fiche-bloque">🚫 Ce compte est bloqué.</p>' : ''}${pourquoi}
+    <div class="tdb-carte"><h3 style="margin-top:0">À qui est ce profil</h3><ul class="fiche-liste">${qui || '<li>Compte sans profil.</li>'}</ul>
+      <p class="aide">Formule : ${esc({ decouverte: 'Découverte', passion: 'Passion', prestige: 'Prestige' }[d.formule] || d.formule)} · Dernière activité : ${esc(quand(c.derniere_action) || 'aucune')}</p></div>
+    <div class="tdb-carte"><h3 style="margin-top:0">Son activité</h3><div class="fiche-chiffres">
+      ${[['Swipes oui', a.swipes_oui], ['Swipes non', a.swipes_non], ['Demandes', a.demandes], ['Choisi·e par', a.recus], ['Matchs en cours', a.en_cours.length], ['Dématchs', a.dematchs], ['Messages', a.messages], ['Photos', a.photos]].map(([n, v]) => `<div><b>${esc(v)}</b><span>${esc(n)}</span></div>`).join('')}</div>
+      ${a.en_cours.length ? `<p>En match avec : ${a.en_cours.map(refBouton).join(', ')}</p>` : ''}</div>
+    <div class="tdb-carte"><h3 style="margin-top:0">🎁 Offrir</h3>
+      <p class="aide">Reste à utiliser : ${d.credits.match} match(s), ${d.credits.speed_dating} soirée(s), ${d.credits.coaching} coaching(s). La personne est prévenue.</p>
+      <form class="fiche-offrir" data-offrir>
+        <label>Quoi<select name="quoi"><option value="match">Match</option><option value="speed_dating">Speed dating</option><option value="coaching">Coaching</option><option value="produit">Produit</option></select></label>
+        <label data-offrir-nombre>Combien<select name="quantite">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => `<option>${n}</option>`).join('')}</select></label>
+        <label data-offrir-produit hidden>Produit<select name="product_id">${(d.produits || []).map((p) => `<option value="${esc(p.id)}" data-numerique="${p.product_type === 'digital' ? '1' : ''}">${esc(p.name)}${Number.isInteger(p.stock_qty) ? ` (stock ${p.stock_qty})` : ''}</option>`).join('')}</select></label>
+        <div data-offrir-adresse hidden><label>Adresse<input name="line1" maxlength="200"></label><label>Code postal<input name="postal_code" maxlength="20"></label><label>Ville<input name="city" maxlength="100"></label><label>Pays<input name="country" maxlength="60" value="France"></label></div>
+        <button class="btn btn-ink" type="submit">Offrir</button><p class="aide" data-offrir-statut role="status" style="grid-column:1/-1;margin:0"></p>
+      </form>
+      ${d.cadeaux.length ? `<p class="aide">Déjà offert : ${d.cadeaux.map((x) => `${x.quantite} ${{ mise_en_relation: 'match', speed_dating: 'speed dating', coaching: 'coaching' }[x.type] || x.type} (${esc(date(x.le, { day: 'numeric', month: 'short' }))})`).join(' · ')}</p>` : ''}</div>
+    ${carte(`Ses choix (${d.choix.length}) et qui l’a choisi·e (${d.choisi_par.length})`, `<h4>Ses choix</h4>${liste(d.choix, (x) => `<li>${refBouton(x.ref)}<small>${esc(STATUT_DEMANDE[x.statut] || x.statut)} · ${esc(quand(x.le))}</small></li>`, 'Aucun choix.')}<h4>L’ont choisi·e</h4>${liste(d.choisi_par, (x) => `<li>${refBouton(x.ref)} ${esc(x.prenom || '')}<small>${esc(STATUT_DEMANDE[x.statut] || x.statut)} · ${esc(quand(x.le))}</small></li>`, 'Personne pour l’instant.')}`)}
+    ${carte(`Blocages et signalements (${d.blocages.fait.length + d.blocages.subi.length + d.signalements.fait.length + d.signalements.subi.length})`, `<h4>A bloqué</h4>${liste(d.blocages.fait, (x) => `<li>${refBouton(x.ref)}<small>${esc(x.motif || 'Sans motif')} · ${esc(quand(x.le))}</small></li>`, 'Personne.')}<h4>Bloqué·e par</h4>${liste(d.blocages.subi, (x) => `<li>${refBouton(x.ref)}<small>${esc(x.motif || 'Sans motif')} · ${esc(quand(x.le))}</small></li>`, 'Personne.')}<h4>A signalé</h4>${liste(d.signalements.fait, (x) => `<li>${refBouton(x.ref)}<small>${esc(x.motif || 'Sans motif')} · ${esc(quand(x.le))}</small></li>`, 'Personne.')}<h4>Signalé·e par</h4>${liste(d.signalements.subi, (x) => `<li>${refBouton(x.ref)}<small>${esc(x.motif || 'Sans motif')} · ${esc(quand(x.le))}</small></li>`, 'Personne.')}`)}
+    ${carte(`Ses discussions (${d.discussions.length})`, liste(d.discussions, (x) => `<li>Avec ${refBouton(x.avec)}<small>Ouverte ${esc(quand(x.ouverte))}${x.ferme ? ` · fermée ${esc(quand(x.ferme))}` : ''}</small></li>`, 'Aucune discussion.'))}
+    ${c.admin ? '' : `<p><button class="btn btn-line fiche-danger" type="button" data-bloquer-compte="${c.bloque ? 'non' : 'oui'}">${c.bloque ? 'Débloquer ce compte' : '🚫 Bloquer ce compte'}</button></p>`}`;
+}
+let detailCourant = null;
+async function chargerDetail(cible) {
+  const box = $('[data-compte-detail]');
+  box.innerHTML = '<p class="aide">Chargement de sa fiche…</p>';
+  try { detailCourant = await conf({ action: 'annonce_profil_detail', ...cible }); rendreDetail(detailCourant); }
+  catch { box.innerHTML = '<p class="aide">Cette fiche n’a pas pu être chargée. Réessaie dans un instant.</p>'; }
+}
+// Depuis une notification : /tableau-de-bord#profil-48 ouvre directement la fiche du n° 48.
+async function ouvrirParRef(ref) {
+  if (!comptes) await chargerComptes();
+  const c = comptes?.comptes.find((x) => x.annonces.some((a) => String(a.ref) === String(ref)) || x.fiches.some((f) => String(f.ref) === String(ref)));
+  if (c) return ouvrirCompte(c.id);
+  compteOuvert = null;
+  $('[data-compte-email]').textContent = `Profil n° ${ref}`;
+  $('[data-compte-nom]').textContent = 'Sans compte';
+  $('[data-compte-infos]').textContent = '';
+  $('[data-compte-form]').hidden = true;
+  $('[data-compte-soirees]').innerHTML = '<li>Pas de compte.</li>';
+  $('[data-compte-liens]').innerHTML = '';
+  $('[data-compte-fiche]').hidden = false; $('[data-compte-fond]').hidden = false;
+  chargerDetail({ ref });
+}
+function suivreHashProfil() {
+  const m = location.hash.match(/^#profil-(\d+)$/);
+  if (!m) return false;
+  ouvrir('comptes');
+  try { history.replaceState(null, '', `#profil-${m[1]}`); } catch { /* */ }
+  ouvrirParRef(m[1]);
+  return true;
+}
+addEventListener('hashchange', () => { if (token) suivreHashProfil(); });
+$('[data-compte-detail]').addEventListener('click', async (e) => {
+  const voir = e.target.closest('[data-voir-ref]');
+  if (voir) return ouvrirParRef(voir.dataset.voirRef);
+  const bl = e.target.closest('[data-bloquer-compte]');
+  if (!bl) return;
+  const bloquer = bl.dataset.bloquerCompte === 'oui';
+  if (!confirm(bloquer ? 'Bloquer ce compte ? La personne ne pourra plus se connecter, son profil et sa fiche sont retirés, et ses matchs en cours sont terminés. Tu pourras la débloquer, mais pas rétablir ses matchs.' : 'Débloquer ce compte ? Il pourra se reconnecter et retrouver son profil.')) return;
+  bl.disabled = true;
+  try { await conf({ action: 'annonce_profil_bloquer', user_id: detailCourant.compte.id, bloquer }); message(bloquer ? 'Compte bloqué.' : 'Compte débloqué.'); chargerDetail({ user_id: detailCourant.compte.id }); }
+  catch { message('Ça n’a pas abouti. Réessaie dans un instant.', true); bl.disabled = false; }
+});
+$('[data-compte-detail]').addEventListener('change', (e) => {
+  const f = e.target.closest('[data-offrir]');
+  if (!f) return;
+  const produit = f.elements.quoi.value === 'produit';
+  $('[data-offrir-nombre]', f).hidden = produit;
+  $('[data-offrir-produit]', f).hidden = !produit;
+  $('[data-offrir-adresse]', f).hidden = !produit || f.elements.product_id.selectedOptions[0]?.dataset.numerique === '1';
+});
+$('[data-compte-detail]').addEventListener('submit', async (e) => {
+  const f = e.target.closest('[data-offrir]');
+  if (!f) return;
+  e.preventDefault();
+  const st = $('[data-offrir-statut]', f), quoi = f.elements.quoi.value;
+  if (!confirm('Offrir ce cadeau ? La personne en est prévenue tout de suite.')) return;
+  st.textContent = 'Un instant…';
+  const ERREURS = { adresse_requise: 'Indique son adresse pour l’envoi.', stock_vide: 'Ce produit n’est plus en stock.', produit_indisponible: 'Ce produit n’est plus disponible.' };
+  try {
+    await conf({ action: 'annonce_offrir', user_id: detailCourant.compte.id, quoi, quantite: f.elements.quantite.value, product_id: f.elements.product_id.value, adresse: { line1: f.elements.line1.value, postal_code: f.elements.postal_code.value, city: f.elements.city.value, country: f.elements.country.value } });
+    message('🎁 Cadeau offert, la personne est prévenue.');
+    chargerDetail({ user_id: detailCourant.compte.id });
+  } catch (err) { st.textContent = ERREURS[err.code] || ERREURS[err.message] || 'Ça n’a pas abouti. Réessaie dans un instant.'; }
+});
 function fermerCompte() { compteOuvert = null; $('[data-compte-fiche]').hidden = true; $('[data-compte-fond]').hidden = true; }
 
 $('[data-comptes]').addEventListener('click', (e) => { const l = e.target.closest('[data-compte]'); if (l) ouvrirCompte(l.dataset.compte); });
@@ -728,7 +833,7 @@ $('[data-comptes-filtres]').addEventListener('click', (e) => {
 $('[data-comptes-maj]').addEventListener('click', chargerComptes);
 $('[data-compte-fermer]').addEventListener('click', fermerCompte);
 $('[data-compte-fond]').addEventListener('click', fermerCompte);
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && compteOuvert) fermerCompte(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('[data-compte-fiche]').hidden) fermerCompte(); });
 $('[data-compte-fiche]').addEventListener('click', (e) => { if (e.target.closest('[data-rencontres-aller]')) fermerCompte(); });
 
 $('[data-compte-form]').addEventListener('submit', async (e) => {
@@ -769,6 +874,7 @@ async function demarrer() {
   if (session) $('[data-moi-email]').textContent = session.user.email;
   if (session && !admin) message('Ce compte n’a pas le rôle administratrice.', true);
   if (!admin) return;
+  if (location.hash.startsWith('#profil-')) { aFaire(); pastilleJournal(); chargerCockpit(); await charger().catch(() => {}); suivreHashProfil(); return; }
   const tab = location.hash.slice(1);
   ouvrir(['accueil', 'activite', 'rencontres', 'comptes', 'application', 'coaching', 'ventes', 'produits', 'soirees', 'bilan', 'alertes', 'textes', 'visites'].includes(tab) ? tab : 'accueil');
   aFaire(); pastilleJournal(); chargerCockpit();
