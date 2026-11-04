@@ -45,6 +45,7 @@ async function render() {
   demasquages(session);
   mesBlocages(session);
   invitationBeta(session);
+  invitationModerateur(session);
 }
 
 // Services à l'unité liés au compte (photo mise à part) : un seul chemin de paiement, depuis tous les blocs de Mon espace.
@@ -135,6 +136,32 @@ document.addEventListener('click', async (e) => {
   } catch { alert('Ça n’a pas abouti. Réessaie dans un instant.'); }
 });
 // Les profils que j'ai bloqués, avec la possibilité de revenir en arrière.
+// Lien d'invitation modérateur : gardé le temps de créer son accès, puis la personne confirme ou refuse.
+const JETON_MOD = 'lfb-moderateur';
+try { const t = new URLSearchParams(location.search).get('moderateur'); if (t) sessionStorage.setItem(JETON_MOD, t); } catch { /* */ }
+const jetonModerateur = () => { try { return sessionStorage.getItem(JETON_MOD); } catch { return new URLSearchParams(location.search).get('moderateur'); } };
+{ const avis = document.querySelector('[data-moderateur-avis]'); if (avis && jetonModerateur()) avis.hidden = false; }
+async function invitationModerateur(session) {
+  const box = document.querySelector('[data-espace-moderateur]');
+  const t = jetonModerateur();
+  if (!box || !t) return;
+  const avis = document.querySelector('[data-moderateur-avis]'); if (avis) avis.hidden = true;
+  box.hidden = false;
+  try { await appelProfil({ action: 'annonce_moderateur_voir', t }, session); }
+  catch { box.innerHTML = '<p>Ce lien n’est plus valable. Écris à Lamia sur TikTok.</p>'; try { sessionStorage.removeItem(JETON_MOD); } catch { /* */ } return; }
+  box.innerHTML = `<h3>🛡️ Lamia te propose un compte modérateur</h3><p>Tu as accès aux annonces et la formule Passion incluse, sans rien payer. Confirme-le si tu es d’accord.</p>
+    <p><button class="btn btn-ink" type="button" data-mod-oui>Je confirme</button> <button class="link-button" type="button" data-mod-non>Non merci</button></p><p class="form-status" data-mod-statut role="status"></p>`;
+  const repondre = async (oui) => {
+    const st = box.querySelector('[data-mod-statut]');
+    try {
+      await appelProfil({ action: 'annonce_moderateur_accepter', t, oui }, session);
+      try { sessionStorage.removeItem(JETON_MOD); } catch { /* */ }
+      box.innerHTML = oui ? '<h3>🛡️ C’est confirmé, merci !</h3><p>Ta formule Passion est active. <a class="text-link" href="/rencontres/">Voir les annonces</a></p>' : '<p>C’est noté, merci d’avoir répondu.</p>';
+    } catch { if (st) st.textContent = 'Ça n’a pas fonctionné. Réessaie, ou écris à Lamia.'; }
+  };
+  ecouter(box, 'click', (e) => { if (e.target.closest('[data-mod-oui]')) repondre(true); if (e.target.closest('[data-mod-non]')) repondre(false); });
+}
+
 // Invitation au bêta-test de l'appli Google Play : seule la personne invitée voit ce bloc.
 async function invitationBeta(session) {
   const box = document.querySelector('[data-espace-beta]');

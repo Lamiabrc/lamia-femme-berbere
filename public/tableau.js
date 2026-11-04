@@ -227,8 +227,9 @@ async function chargerModerateurs() {
   const box = $('[data-mod-liste]');
   if (!box) return;
   try {
-    const { moderateurs = [] } = await conf({ action: 'annonce_moderateurs' });
-    box.innerHTML = moderateurs.length ? moderateurs.map((p) => `<li>🛡️ Profil n° ${esc(p.ref)}${p.ville ? ` · ${esc(p.ville)}` : ''} · ${p.formule ? 'Passion offerte' : 'Passion en attente d’un compte'}${p.lien ? ` · <a href="${esc(p.lien)}">son lien personnel</a>` : ''} <button type="button" data-mod-retirer="${esc(p.ref)}">Retirer</button></li>`).join('') : '<li>Aucun modérateur pour l’instant.</li>';
+    const { moderateurs = [], sansAnnonce = [] } = await conf({ action: 'annonce_moderateurs' });
+    const sans = sansAnnonce.map((m) => `<li>🛡️ ${esc(m)} · sans annonce · Passion offerte <button type="button" data-mod-retirer-email="${esc(m)}">Retirer</button></li>`).join('');
+    box.innerHTML = sans + (moderateurs.length ? moderateurs.map((p) => `<li>🛡️ Profil n° ${esc(p.ref)}${p.ville ? ` · ${esc(p.ville)}` : ''} · ${p.formule ? 'Passion offerte' : 'Passion en attente d’un compte'}${p.lien ? ` · <a href="${esc(p.lien)}">son lien personnel</a>` : ''} <button type="button" data-mod-retirer="${esc(p.ref)}">Retirer</button></li>`).join('') : (sans ? '' : '<li>Aucun modérateur pour l’instant.</li>'));
   } catch { box.innerHTML = '<li>La liste ne s’affiche pas pour le moment.</li>'; }
 }
 async function chargerBeta() {
@@ -259,6 +260,19 @@ document.addEventListener('submit', async (e) => {
     try { const r = await conf({ action: 'annonce_beta_inviter', refs }); st.textContent = `${r.invites.length} invité(s)${r.deja.length ? `, ${r.deja.length} déjà invité(s)` : ''}${r.sansCompte.length ? `, sans compte : ${r.sansCompte.join(', ')}` : ''}.`; e.target.reset(); chargerBeta(); }
     catch { st.textContent = 'L’envoi n’a pas fonctionné.'; }
   }
+});
+document.addEventListener('submit', async (e) => {
+  if (!e.target.matches('[data-mod-inviter]')) return;
+  e.preventDefault();
+  const st = $('[data-mod-statut]');
+  try { const r = await conf({ action: 'annonce_moderateur_inviter', pseudo: e.target.pseudo.value }); st.innerHTML = `Lien à envoyer (une seule fois) : <a href="${esc(r.lien)}">${esc(r.lien)}</a>`; e.target.reset(); }
+  catch { st.textContent = 'Ça n’a pas fonctionné.'; }
+});
+document.addEventListener('click', async (e) => {
+  const x = e.target.closest('[data-mod-retirer-email]');
+  if (!x) return;
+  x.disabled = true;
+  try { await conf({ action: 'annonce_moderateur', email: x.dataset.modRetirerEmail, oui: false }); chargerModerateurs(); } catch { x.disabled = false; }
 });
 document.addEventListener('click', async (e) => {
   const b = e.target.closest('[data-mod-retirer]');

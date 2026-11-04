@@ -6,7 +6,7 @@ import { badgesProfil } from '../content/matching-options.mjs';
 
 const lire = async (r) => ({ status: r.status, ...(await r.json()) });
 function ctx({ user = null, admin = false, comptes = {} } = {}) {
-  const db = { annonces: [{ ref: 10, fiche_ref: null }, { ref: 11, fiche_ref: null }], profils_outil: [], formules_offertes: [], beta_testeurs: [] };
+  const db = { annonces: [{ ref: 10, fiche_ref: null }, { ref: 11, fiche_ref: null }], profils_outil: [], formules_offertes: [], beta_testeurs: [], moderateur_invitations: [] };
   const envoyes = [];
   const filtre = (url) => { const [p, q = ''] = url.replace('/rest/v1/', '').split('?'); const conds = q.split('&').filter((c) => !c.startsWith('select') && !c.startsWith('order') && !c.startsWith('limit')).map((c) => { const [k, ...v] = c.split('='); return [k, decodeURIComponent(v.join('=')).replace(/^eq\./, '')]; }); return [p, (l) => conds.every(([k, v]) => (v === 'not.is.null' ? l[k] != null : String(l[k]) === v))]; };
   return { db, envoyes, c: {
@@ -75,3 +75,27 @@ test('formule offerte : vaut Passion, un vrai abonnement reste prioritaire', asy
 });
 
 test('badge modérateur', () => { assert.match(badgesProfil({ moderateur: true }), /Modérateur/); assert.match(badgesProfil({ moderateur: true, genre: 'femme' }), /Modératrice/); assert.doesNotMatch(badgesProfil({}), /Modérateur/); });
+
+test('invitation : la personne confirme, sa fiche est reliée, la formule arrive, le lien ne sert qu’une fois', async () => {
+  const { db, c } = ctx({ admin: true });
+  db.profils_outil.push({ ref: 100001 });
+  const { lien } = await lire(await actionModeration('annonce_moderateur_inviter', { ref: 100001 }, c));
+  const t = new URL(lien).searchParams.get('moderateur');
+  const moi = { ...c, admin: false, user: { id: 'u1', email: 'Bo@x.fr' } };
+  await actionModeration('annonce_moderateur_accepter', { t, oui: true }, moi);
+  assert.equal(db.profils_outil[0].user_id, 'u1');
+  assert.deepEqual(db.formules_offertes.map((o) => [o.email, o.ref]), [['bo@x.fr', 100001]]);
+  assert.equal((await actionModeration('annonce_moderateur_accepter', { t, oui: true }, moi)).status, 404);
+});
+
+test('invitation sans annonce : formule seule ; refus : rien n’est offert', async () => {
+  const { db, c } = ctx({ admin: true });
+  const un = await lire(await actionModeration('annonce_moderateur_inviter', { pseudo: '@maya' }, c));
+  const deux = await lire(await actionModeration('annonce_moderateur_inviter', { pseudo: 'autre' }, c));
+  const moi = (email) => ({ ...c, admin: false, user: { id: email, email } });
+  await actionModeration('annonce_moderateur_accepter', { t: new URL(deux.lien).searchParams.get('moderateur'), oui: false }, moi('non@x.fr'));
+  assert.equal(db.formules_offertes.length, 0);
+  await actionModeration('annonce_moderateur_accepter', { t: new URL(un.lien).searchParams.get('moderateur'), oui: true }, moi('oui@x.fr'));
+  assert.deepEqual(db.formules_offertes.map((o) => [o.email, o.ref]), [['oui@x.fr', null]]);
+});
+
