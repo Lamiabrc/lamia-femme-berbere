@@ -817,6 +817,7 @@ page(
     <section id="discussion" data-espace-discussion-bloc hidden>
       <h2>Mes matchs en cours</h2>
       <p>Vos matchs réciproques : vous avez 7 jours pour faire connaissance ici, en privé. Quand vous êtes prêts, échangez vos numéros pour passer au téléphone. Lamia ne lit pas vos messages, sauf si l’un de vous la signale.</p>
+      <div class="espace-profil" id="beta" data-espace-beta hidden></div>
       <div class="espace-profil" data-espace-blocages hidden><h3>Profils bloqués</h3><ul data-blocages-liste></ul></div>
       <p class="parcours-livre">💍 Vous suivez le parcours de mariage de Lamia, détaillé dans l’ebook <a class="text-link" href="/werdi-ouvre-les-yeux/"><em>Werdi, ouvre les yeux !</em></a></p>
       <div data-espace-discussion></div>
