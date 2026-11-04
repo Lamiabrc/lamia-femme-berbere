@@ -50,6 +50,8 @@ function choisie(d) {
 function afficher(d) {
   afficherFiche(d);
   if (!d.retire && !d.efface) zone.insertAdjacentHTML('afterbegin', choisie(d));
+  // Arrivée depuis « Modifier mon annonce » : le formulaire s'ouvre directement.
+  if (location.hash === '#modifier') zone.querySelector('[data-modifier]')?.click();
 }
 function afficherFiche(d) {
   const f = d.fiche;

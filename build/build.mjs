@@ -830,7 +830,7 @@ page(
       <p><button type="button" class="btn btn-line btn-installer" data-installer-bouton>📲 Installer l’application sur mon téléphone</button></p>
       <div class="espace-notifs" data-espace-notifs></div>
       <div class="espace-profil" data-espace-profil><p class="loading">Un instant…</p></div>
-      <div class="espace-profil" data-espace-fiches></div>
+      <div class="espace-profil" id="mes-fiches" data-espace-fiches></div>
     </section>
 
     <section id="discussion" data-espace-discussion-bloc hidden>
