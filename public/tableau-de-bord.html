@@ -15,7 +15,7 @@
     <button type="button" data-tab="accueil" aria-current="true">Aujourd’hui</button>
     <button type="button" data-tab="activite">🗺️ Activité</button>
     <button type="button" data-tab="rencontres">💞 Rencontres</button>
-    <button type="button" data-tab="comptes">👥 Comptes</button>
+    <button type="button" data-tab="comptes">👤 Profils</button>
     <details class="tdb-plus" data-menu-plus>
       <summary>Plus</summary>
       <div>
@@ -54,7 +54,7 @@
       <a href="/confidences-lamia/"><strong>💬 Confidences</strong><span>Lire et répondre</span></a>
       <a href="/confidences-lamia/#annonces"><strong>💌 Profils et matchs</strong><span>Valider, photos, demandes</span></a>
       <button type="button" data-go="activite"><strong>🗺️ Activité</strong><span>Mises en relation, pilote</span></button>
-      <button type="button" data-go="comptes"><strong>👥 Comptes</strong><span>Tous les membres</span></button>
+      <button type="button" data-go="comptes"><strong>👤 Profils</strong><span>Activité, cadeaux, blocages</span></button>
     </div>
     <details class="tdb-repli" data-repli="outils"><summary>Autres outils</summary><div class="tdb-outils">
       <a href="/salon/"><strong>🎥 Mon live</strong><span>Le Salon de Lamia</span></a>
@@ -138,11 +138,11 @@
 
   <!-- ===================================================== Comptes -->
   <section data-panel="comptes" hidden>
-    <div class="tdb-entete"><h1 class="tdb-titre">Les comptes</h1><button class="btn btn-line" type="button" data-comptes-maj>Actualiser</button></div>
-    <p class="aide">Toutes les personnes qui ont créé un compte sur le site, avec ou sans annonce. Clique sur une personne pour corriger son profil (prénom, genre, date de naissance, ville) et gérer ses inscriptions aux soirées.</p>
+    <div class="tdb-entete"><h1 class="tdb-titre">Les profils</h1><button class="btn btn-line" type="button" data-comptes-maj>Actualiser</button></div>
+    <p class="aide">Toutes les personnes qui ont un compte. Cherche un prénom, un email ou un n° de profil, puis clique pour voir son activité, lui offrir quelque chose ou la bloquer.</p>
     <div class="tdb-kpis" data-comptes-kpis></div>
     <div class="tdb-filtres">
-      <label>Chercher<input type="search" data-comptes-cherche placeholder="Prénom, email, ville…" autocomplete="off"></label>
+      <label>Chercher<input type="search" data-comptes-cherche placeholder="Prénom, email, ville, n° de profil…" autocomplete="off"></label>
       <div class="tdb-filtres-journal" data-comptes-filtres>
         <button type="button" class="is-on" data-filtre="tous">Tous</button>
         <button type="button" data-filtre="soiree">Inscrits à une soirée</button>
@@ -156,6 +156,8 @@
     <div class="compte-fond" data-compte-fond hidden></div>
     <aside class="compte-fiche" data-compte-fiche hidden aria-label="Fiche du compte">
       <div class="compte-tete"><div><p class="compte-kicker" data-compte-email></p><h2 data-compte-nom></h2><p class="aide" data-compte-infos></p></div><button type="button" class="btn btn-line" data-compte-fermer>Fermer</button></div>
+      <div data-compte-detail></div>
+      <details class="tdb-repli" data-compte-modifier><summary>Corriger ses informations</summary>
       <form class="tdb-carte reglages" data-compte-form>
         <h3 style="margin-top:0">Profil</h3>
         <div class="champs">
@@ -169,6 +171,7 @@
         </div>
         <p class="actions"><button class="btn btn-ink" type="submit">Enregistrer le profil</button> <span class="aide" data-compte-statut></span></p>
       </form>
+      </details>
       <div class="tdb-carte">
         <h3 style="margin-top:0">Soirées</h3>
         <ul class="compte-liste" data-compte-soirees></ul>

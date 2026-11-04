@@ -231,3 +231,9 @@ test('compte de test : un choix vers un vrai membre n’est jamais enregistré',
   await handleAnnonces('annonce_swipe', { ref: 40, choix: 'oui' }, ctx({ id: 'u1', email: 't@example.com' }));
   assert.equal(db.annonce_interets.length, 0);
 });
+
+test('alerte sur un profil : le lien ouvre directement sa fiche', async () => {
+  const { lienAlerte } = await import('../lib/alerte-lamia.mjs');
+  assert.equal(lienAlerte('💞 Intérêt réciproque · n° 77 ↔ n° 5038', '/confidences-lamia/#annonces'), '/tableau-de-bord#profil-77');
+  assert.equal(lienAlerte('Nouvelle confidence', '/confidences-lamia/'), '/confidences-lamia/');
+});

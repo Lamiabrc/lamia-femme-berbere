@@ -268,3 +268,19 @@
 .repartition i { display: block; border-radius: 4px; }
 .repartition-legende { display: flex; flex-wrap: wrap; gap: 14px; font-size: 14px; }
 .repartition-legende span::before { content: ''; display: inline-block; width: 10px; height: 10px; margin-right: 6px; border-radius: 3px; background: var(--c); }
+
+/* Fiche d'une personne */
+.fiche-chiffres { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; }
+.fiche-chiffres div { padding: 8px 10px; border-radius: 10px; background: #F3ECDD; }
+.fiche-chiffres b { display: block; font: 600 22px var(--serif); color: #1C2059; }
+.fiche-chiffres span { font-size: 12px; color: var(--gris); }
+.fiche-pourquoi { border: 2px solid #252B78; }
+.fiche-pourquoi li, .fiche-liste li { margin: 0 0 10px; }
+.fiche-pourquoi small, .fiche-liste small { display: block; color: var(--gris); }
+.fiche-liste { margin: 0; padding: 0; list-style: none; }
+.fiche-ref { padding: 0; border: 0; background: none; color: #252B78; font: inherit; font-weight: 600; text-decoration: underline; cursor: pointer; }
+.fiche-offrir { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; align-items: end; }
+.fiche-offrir label { display: grid; gap: 4px; font-size: 14px; }
+.fiche-offrir [data-offrir-adresse] { grid-column: 1 / -1; display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }
+.fiche-bloque { padding: 10px 14px; border-radius: 10px; background: #FBE4E0; color: #7A1F12; font-weight: 600; }
+.fiche-danger { color: #A5301C; border-color: #A5301C; }
