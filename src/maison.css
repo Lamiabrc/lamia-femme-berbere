@@ -3110,7 +3110,7 @@ a.po-btn { display: inline-block; text-decoration: none; }
   .barre-app a[aria-current="page"] { color: #ffd27a; background: rgba(255,210,122,.12); }
   body { padding-bottom: calc(68px + env(safe-area-inset-bottom)); }
 }
-@media (max-width: 420px) { .cta-profil span { font-size: 0; } .cta-profil span::after { content: 'Confier'; font-size: 13px; } .cta-profil { padding: 8px 12px !important; } }
+@media (max-width: 420px) { .cta-profil span { font-size: 0; } .cta-profil span::after { content: 'Confier'; font-size: 13px; } html[lang="en"] .cta-profil span::after { content: 'Entrust'; } .cta-profil { padding: 8px 12px !important; } }
 
 /* Formulaire : ce qui manque pour l'envoi */
 .annonce-manques { margin: 14px 0; padding: 14px 16px; border-radius: 14px; background: #f8f4ed; border: 2px solid #2c38ba; color: #141955; }
