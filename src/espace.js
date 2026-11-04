@@ -44,6 +44,7 @@ async function render() {
   monCoaching(session);
   demasquages(session);
   mesBlocages(session);
+  invitationBeta(session);
 }
 
 // Coaching Prestige : réserver sa visio du mois, l'annuler, y entrer.
@@ -109,6 +110,33 @@ document.addEventListener('click', async (e) => {
   } catch { alert('Ça n’a pas abouti. Réessaie dans un instant.'); }
 });
 // Les profils que j'ai bloqués, avec la possibilité de revenir en arrière.
+// Invitation au bêta-test de l'appli Google Play : seule la personne invitée voit ce bloc.
+async function invitationBeta(session) {
+  const box = document.querySelector('[data-espace-beta]');
+  if (!box) return;
+  let d;
+  try { d = await appelProfil({ action: 'annonce_beta_moi' }, session); } catch { return; }
+  if (!d.beta) return;
+  box.hidden = false;
+  const montrer = (statut, adresse) => {
+    if (statut === 'accepte') { box.innerHTML = `<h3>📱 Bêta-test de l’appli</h3><p>Merci ! Lamia t’enverra le lien d’installation à ${esc(adresse || 'ton adresse')}.</p>`; return; }
+    if (statut === 'refuse') { box.innerHTML = '<h3>📱 Bêta-test de l’appli</h3><p>C’est noté, merci d’avoir répondu.</p>'; return; }
+    const gmail = /@gmail\.com$/i.test(d.email || '') ? d.email : '';
+    box.innerHTML = `<h3>📱 L’appli arrive sur Google Play</h3><p>Lamia cherche des testeurs : il faut un téléphone Android, installer l’appli depuis un lien et rester inscrit·e 14 jours. Tu gardes ton compte et tes discussions.</p>
+      <form data-beta-form><label>L’adresse Gmail de ton téléphone <input name="adresse" type="email" required value="${esc(gmail)}" autocomplete="email"></label>
+      <p class="aide">Elle sert uniquement à t’inscrire au test.</p>
+      <button class="btn btn-ink" type="submit">Oui, je veux bien tester</button> <button class="link-button" type="button" data-beta-non>Non merci</button></form><p class="form-status" data-beta-statut role="status"></p>`;
+  };
+  montrer(d.beta.statut, d.beta.adresse_google);
+  const repondre = async (oui, adresse) => {
+    const st = box.querySelector('[data-beta-statut]');
+    try { const r = await appelProfil({ action: 'annonce_beta_repondre', oui, adresse }, session); montrer(r.statut, adresse); }
+    catch (err) { if (st) st.textContent = err.code === 'adresse_invalide' ? 'Vérifie cette adresse.' : 'Ta réponse n’est pas passée. Réessaie.'; }
+  };
+  ecouter(box, 'submit', (e) => { if (!e.target.matches('[data-beta-form]')) return; e.preventDefault(); repondre(true, e.target.adresse.value); });
+  ecouter(box, 'click', (e) => { if (e.target.closest('[data-beta-non]')) repondre(false); });
+}
+
 async function mesBlocages(session) {
   const box = document.querySelector('[data-espace-blocages]');
   if (!box) return;
@@ -329,6 +357,7 @@ function monAbonnement(etat, session) {
   const a = etat?.abonnement, u = etat?.unites || {};
   const date = (d) => new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
   const unites = [u.mise_en_relation ? `${u.mise_en_relation} mise(s) en relation` : '', u.speed_dating ? `${u.speed_dating} place(s) de speed dating` : ''].filter(Boolean).join(' · ');
+  if (a?.offert) { box.innerHTML = `<article class="espace-achat"><div><p class="event-date">Offerte par Lamia</p><h3>Formule ${esc(NOMS_FORMULES[a.formule] || a.formule)}</h3><p>${a.raison === 'moderateur' ? 'Merci pour ta modération 🛡️ ' : ''}Rien à payer.</p>${unites ? `<p>À l’unité : ${esc(unites)}</p>` : ''}</div></article>`; return; }
   box.innerHTML = a
     ? `<article class="espace-achat"><div><p class="event-date">Abonnement ${a.periode === 'an' ? 'annuel' : 'mensuel'}</p><h3>Formule ${esc(NOMS_FORMULES[a.formule] || a.formule)}</h3>
         <p>${esc(ETATS_ABO[a.statut] || a.statut)}${a.fin_periode ? ` · ${a.resiliation_prevue ? 'se termine le' : 'prochaine échéance le'} ${esc(date(a.fin_periode))}` : ''}</p>${unites ? `<p>À l’unité : ${esc(unites)}</p>` : ''}</div>

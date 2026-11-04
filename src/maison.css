@@ -3469,6 +3469,7 @@ body[data-ambiance="espace"] .espace .room-name { color: #1d257d; }
 .profil-badges { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 !important; }
 .profil-badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; line-height: 1.4; }
 .profil-badge.is-lamia { background: #1c2376; color: #fff; }
+.profil-badge.is-moderateur { background: #e6f3ef; color: #14524a; border: 1px solid #7fb9ab; }
 .profil-badge.is-identite { background: #fbefdc; color: #5a3a12; border: 1px solid #d9b25f; }
 .po-app .swipe-carte .annonce-ref.is-piece { color: #5a3a12 !important; background: #fbefdc !important; border-color: #d9b25f !important; }
 

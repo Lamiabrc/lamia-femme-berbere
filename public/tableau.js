@@ -38,7 +38,7 @@ function ouvrir(tab) {
   if (tab === 'produits' && !produits.length) { chargerProduits(); chargerReglages(); }
   if (tab === 'textes') chargerTextes();
   if (tab === 'bilan') chargerBilan();
-  if (tab === 'application') { chargerJournal(); chargerRecommandes(); }
+  if (tab === 'application') { chargerJournal(); chargerRecommandes(); chargerModerateurs(); chargerBeta(); }
   if (tab === 'soirees') chargerSalons();
   if (tab === 'activite') chargerActivite();
   if (tab === 'coaching') chargerCoaching();
@@ -219,6 +219,52 @@ document.addEventListener('click', async (e) => {
   if (!b) return;
   b.disabled = true;
   try { await conf({ action: 'annonce_recommander', ref: b.dataset.recoRetirer, oui: false }); chargerRecommandes(); } catch { b.disabled = false; }
+});
+
+// ---------------------------------------------------------------- Modérateurs et bêta-testeurs
+const ERR_MOD = { sans_compte: 'Ce profil n’a pas de compte : impossible de lui offrir la formule.', not_found: 'Ce numéro de profil est introuvable.' };
+async function chargerModerateurs() {
+  const box = $('[data-mod-liste]');
+  if (!box) return;
+  try {
+    const { moderateurs = [] } = await conf({ action: 'annonce_moderateurs' });
+    box.innerHTML = moderateurs.length ? moderateurs.map((p) => `<li>🛡️ Profil n° ${esc(p.ref)}${p.ville ? ` · ${esc(p.ville)}` : ''} · ${p.formule ? 'Passion offerte' : 'formule à vérifier'} <button type="button" data-mod-retirer="${esc(p.ref)}">Retirer</button></li>`).join('') : '<li>Aucun modérateur pour l’instant.</li>';
+  } catch { box.innerHTML = '<li>La liste ne s’affiche pas pour le moment.</li>'; }
+}
+async function chargerBeta() {
+  const box = $('[data-beta-liste]');
+  if (!box) return;
+  try {
+    const { liste = [] } = await conf({ action: 'annonce_beta_liste' });
+    const oui = liste.filter((x) => x.statut === 'accepte');
+    const tf = $('[data-beta-adresses]');
+    if (tf) tf.value = oui.map((x) => x.adresse_google).filter(Boolean).join(', ');
+    const nb = $('[data-beta-compte]');
+    if (nb) nb.textContent = `${oui.length} accepté(s) · ${liste.filter((x) => x.statut === 'invite').length} en attente · ${liste.filter((x) => x.statut === 'refuse').length} refusé(s)`;
+    box.innerHTML = liste.length ? liste.map((x) => `<li>Profil n° ${esc(x.ref ?? '?')} : ${x.statut === 'accepte' ? `oui, ${esc(x.adresse_google || '')}` : x.statut === 'refuse' ? 'non' : 'en attente'}</li>`).join('') : '<li>Personne n’est invité pour l’instant.</li>';
+  } catch { box.innerHTML = '<li>La liste ne s’affiche pas pour le moment.</li>'; }
+}
+document.addEventListener('submit', async (e) => {
+  if (e.target.matches('[data-mod-form]')) {
+    e.preventDefault();
+    const st = $('[data-mod-statut]');
+    try { await conf({ action: 'annonce_moderateur', ref: e.target.ref.value, oui: true }); st.textContent = `🛡️ Profil n° ${e.target.ref.value} modérateur, Passion offerte.`; e.target.reset(); chargerModerateurs(); }
+    catch (err) { st.textContent = ERR_MOD[err.code] || ERR_MOD[err.message] || 'Ça n’a pas fonctionné.'; }
+  }
+  if (e.target.matches('[data-beta-form]')) {
+    e.preventDefault();
+    const st = $('[data-beta-statut]');
+    const refs = (e.target.refs.value.match(/\d+/g) || []).map(Number);
+    if (!refs.length) return;
+    try { const r = await conf({ action: 'annonce_beta_inviter', refs }); st.textContent = `${r.invites.length} invité(s)${r.deja.length ? `, ${r.deja.length} déjà invité(s)` : ''}${r.sansCompte.length ? `, sans compte : ${r.sansCompte.join(', ')}` : ''}.`; e.target.reset(); chargerBeta(); }
+    catch { st.textContent = 'L’envoi n’a pas fonctionné.'; }
+  }
+});
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-mod-retirer]');
+  if (!b) return;
+  b.disabled = true;
+  try { await conf({ action: 'annonce_moderateur', ref: b.dataset.modRetirer, oui: false }); chargerModerateurs(); } catch { b.disabled = false; }
 });
 
 async function chargerJournal() {

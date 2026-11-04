@@ -201,6 +201,22 @@
           <p class="aide" data-reco-statut role="status"></p>
           <ul class="tdb-journal" data-reco-liste><li>Chargement…</li></ul>
         </div>
+        <div class="tdb-carte" id="moderateurs">
+          <h2>🛡️ Mes modérateurs</h2>
+          <p class="aide">Ils portent le badge « Modérateur » et reçoivent la formule Passion offerte, sans paiement. Retirer le badge retire la formule. Il faut un compte.</p>
+          <form data-mod-form class="tdb-filtres-journal"><input name="ref" inputmode="numeric" pattern="[0-9]+" placeholder="N° du profil" required aria-label="Numéro du profil"> <button type="submit">Nommer modérateur</button></form>
+          <p class="aide" data-mod-statut role="status"></p>
+          <ul class="tdb-journal" data-mod-liste><li>Chargement…</li></ul>
+        </div>
+        <div class="tdb-carte" id="beta">
+          <h2>📱 Bêta-test Google Play</h2>
+          <p class="aide">Chaque profil reçoit un message pour accepter ou refuser, et donne lui-même son adresse Gmail. 50 profils au plus par envoi.</p>
+          <form data-beta-form class="tdb-filtres-journal"><textarea name="refs" rows="2" placeholder="N° des profils, séparés par une virgule" required aria-label="Numéros des profils"></textarea> <button type="submit">Envoyer l’invitation</button></form>
+          <p class="aide" data-beta-statut role="status"></p>
+          <p class="aide" data-beta-compte></p>
+          <label class="aide">Adresses à coller dans Google Play <textarea data-beta-adresses rows="2" readonly></textarea></label>
+          <ul class="tdb-journal" data-beta-liste><li>Chargement…</li></ul>
+        </div>
         <div class="tdb-carte">
           <h2>Ne veulent plus apparaître</h2>
           <p class="aide">Les personnes qui ont retiré leur fiche ou demandé l’effacement. Elles ne sont plus visibles sur le site. Pour un effacement : supprime la fiche de ton outil, puis clique « C’est fait ».</p>
