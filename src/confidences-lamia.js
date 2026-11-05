@@ -213,6 +213,40 @@ supabase.auth.onAuthStateChange((event) => { if (event === 'SIGNED_OUT') vue('lo
 demarrer();
 
 // ---------------------------------------------------------------- annonces de rencontre à vérifier
+// ---------------------------------------------------------------- écrire à quelqu'un : message préparé, puis l'application du réseau
+const boutonEcrire = (ref, role = '') => (ref ? `<div class="cl-ecrire"><button class="cl-btn" type="button" data-ecrire="${ref}" data-role="${role}">💬 Envoyer un message au n° ${ref}</button></div>` : '');
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-ecrire]');
+  if (!b) return;
+  const zone = b.parentElement;
+  const dejaLa = zone.querySelector('[data-ecrire-zone]');
+  if (dejaLa) { dejaLa.remove(); return; }
+  b.disabled = true;
+  const panneau = document.createElement('div');
+  panneau.className = 'cl-ecrire-zone'; panneau.dataset.ecrireZone = '';
+  try {
+    const r = await api({ action: 'annonce_contact_preparer', ref: b.dataset.ecrire, role: b.dataset.role }, await jetonFrais());
+    panneau.innerHTML = `${r.dernier_at ? `<p class="cl-aide">✉️ Déjà ouvert le ${quand(r.dernier_at)}</p>` : ''}
+      <label>Message préparé <small>(tu peux le changer)</small><textarea data-ecrire-texte rows="6">${esc(r.message)}</textarea></label>
+      <div class="cl-outils">${r.lien ? `<a class="cl-btn cl-plein" href="${esc(r.lien)}" target="_blank" rel="noopener" data-ecrire-ouvrir="${r.ref}">Copier et ouvrir ${esc(r.reseau)}</a>` : `<button class="cl-btn cl-plein" type="button" data-ecrire-ouvrir="${r.ref}">Copier le message</button>`}</div>
+      <p class="cl-statut" role="status" data-ecrire-statut>${r.lien ? (r.reseau === 'WhatsApp' ? '' : `Dans ${esc(r.reseau)} : touche Message, colle, envoie.`) : 'Je n’ai pas encore son réseau sur le site.'}</p>`;
+  } catch (err) {
+    panneau.innerHTML = `<p class="cl-statut is-error">${err.code === 'fiche_retiree' ? 'Cette personne a retiré sa fiche : pas de message.' : esc(erreur(err.code))}</p>`;
+  }
+  b.disabled = false;
+  zone.append(panneau);
+});
+document.addEventListener('click', (e) => {
+  const o = e.target.closest('[data-ecrire-ouvrir]');
+  if (!o) return;
+  const p = o.closest('[data-ecrire-zone]'), t = p.querySelector('[data-ecrire-texte]'), st = p.querySelector('[data-ecrire-statut]');
+  // Copié pendant le toucher, avant de quitter la page : sinon iPhone refuse.
+  const secours = () => { t.select(); try { return document.execCommand('copy'); } catch { return false; } };
+  if (navigator.clipboard?.writeText) navigator.clipboard.writeText(t.value).catch(secours); else secours();
+  if (st) say(st, 'Message copié.');
+  jetonFrais().then((j) => api({ action: 'annonce_contact_note', ref: o.dataset.ecrireOuvrir }, j)).catch(() => {});
+});
+
 const STATUT_ANNONCE = { a_verifier: 'À vérifier', publiee: 'Validé', refusee: 'Refusé' };
 let dernieresAnnonces = [];
 async function chargerAnnonces() {
@@ -228,6 +262,7 @@ async function chargerAnnonces() {
     $('[data-export-info]').textContent = aExporter ? `${aExporter} annonce(s) publiée(s) pas encore dans l’outil.` : 'Toutes les annonces publiées sont déjà dans l’outil.';
     box.innerHTML = annonces.map((a) => `<article class="cl-carte cl-annonce" data-id="${a.id}" id="annonce-${a.ref}">
       <p class="cl-coord"><b>N° ${a.ref}</b> · ${STATUT_ANNONCE[a.status] || a.status}${a.submitted_at ? ` · reçue le ${quand(a.submitted_at)}` : ''}</p>
+      ${boutonEcrire(a.ref)}
       <h3>${esc(a.prenom)}, ${a.age} ans · ${a.genre === 'femme' ? 'femme' : 'homme'}</h3>
       <p class="cl-badges">${[a.test ? '🧪 PROFIL DE TEST (invisible du public)' : '',a.live_declare ? (a.outil_lie ? '🎥 Créé en live · fiche retrouvée dans l’outil · 3 offertes' : '🎥 Dit avoir été en live · fiche à retrouver · 3 offertes') : a.outil_lie ? '🔗 Déjà dans ton outil (même lien)' : '', a.compte ? '👤 Compte lié' : '', a.photo_partage ? '📷 Photo transmissible au match' : '🚫📷 Photo à ne pas transmettre', a.en_match ? '💞 Match en cours' : '', a.modifiee_at ? `✏️ Modifié le ${quand(a.modifiee_at)}` : ''].filter(Boolean).map((t) => `<span>${esc(t)}</span>`).join('')}</p>
       <p class="cl-coord">${esc(a.ville)}, ${esc(a.pays)}${a.situation ? ` · ${esc(a.situation)}` : ''} · né(e) le ${esc(a.birth_date)}<br>${esc(a.email)}${a.phone ? ` · ${esc(a.phone)}` : ''}</p>
@@ -370,6 +405,7 @@ async function chargerDemandes() {
     }).sort((x, y) => (y.aTraiter > 0) - (x.aTraiter > 0) || (y.meilleur?.potentiel?.score ?? -1) - (x.meilleur?.potentiel?.score ?? -1));
     box.innerHTML = ordre.map((g) => `<section class="cl-carte cl-groupe">
       <h4>${qui(g.qui)}</h4>
+      ${g.qui?.ref ? boutonEcrire(g.qui.ref, 'demandeur') : ''}
       <p class="cl-coord">${g.liste.length} match(s) demandé(s)${g.aTraiter ? ` · <b>${g.aTraiter} à traiter</b>` : ''}${g.reserve ? ` · 🗂 ${g.reserve} en réserve` : ''}${(personnes[g.qui?.ref]?.matchs_en_cours || 0) > 1 ? ` · <b>💞 ${personnes[g.qui.ref].matchs_en_cours} matchs en cours</b>` : g.enRelation ? ' · <b>💞 déjà mis(e) en relation</b>' : g.aTraiter ? ' · 🤖 le site s’en occupe : rien à faire' : ''}${g.qui?.status && g.qui.status !== 'publiee' ? ' · <b class="cl-a-verifier">⏳ profil pas encore vérifié</b>' : ''}</p>
       ${g.liste.map((d) => { const [sc, cl, txt] = niveau(d.potentiel?.score); return `<article class="cl-demande${d === g.meilleur ? ' is-meilleur' : ''}" data-demande="${d.id}">
         <div class="cl-pot ${cl}" title="${txt}"><b>${sc}</b><small>/100</small></div>
@@ -379,6 +415,7 @@ async function chargerDemandes() {
           ${d.statut === 'a_traiter' ? `<p class="cl-coord">${d.reciproque || d.reponse === 'oui' ? '🤖 Les deux ont dit oui : la mise en relation se fera toute seule dès que les différences éventuelles sont acceptées.' : d.cible_compte === false ? '📭 Cette personne n’a pas de compte : elle ne peut pas répondre tant qu’elle n’a pas confirmé sa fiche.' : '⏳ En attente de la réponse de l’autre personne. Si elle dit oui, la mise en relation est automatique.'}</p>` : ''}
           ${d.potentiel && (d.potentiel.forts.length || d.potentiel.vigilance.length) ? `<details><summary>Pourquoi ce score</summary>${d.potentiel.forts.length ? `<p class="cl-forts">✓ ${d.potentiel.forts.map(esc).join('<br>✓ ')}</p>` : ''}${d.potentiel.vigilance.length ? `<p class="cl-vigilance">⚠ ${d.potentiel.vigilance.map(esc).join('<br>⚠ ')}</p>` : ''}</details>` : ''}
           <label>Statut<select data-demande-statut>${Object.entries(STATUT_DEMANDE).map(([k, v]) => `<option value="${k}"${k === d.statut ? ' selected' : ''}>${v}</option>`).join('')}</select></label>
+          ${boutonEcrire(d.cible_ref ?? d.cible?.ref, 'cible')}
         </div>
       </article>`; }).join('')}
       ${(() => { const pp = personnes[g.qui?.ref] || {}; const prop = pp.proposes || [], sug = pp.suggestions || [];

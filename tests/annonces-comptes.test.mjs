@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { handleAnnonces, pseudoTikTok, normLien, empreinteLien } from '../lib/annonces.mjs';
+import { handleAnnonces, pseudoTikTok, normLien, empreinteLien, lienContact } from '../lib/annonces.mjs';
 
 // Petite base en mémoire, juste assez pour les actions testées.
 function monde({ compte = true, tiktok = {} } = {}) {
@@ -236,4 +236,12 @@ test('alerte sur un profil : le lien ouvre directement sa fiche', async () => {
   const { lienAlerte } = await import('../lib/alerte-lamia.mjs');
   assert.equal(lienAlerte('💞 Intérêt réciproque · n° 77 ↔ n° 5038', '/confidences-lamia/#annonces'), '/tableau-de-bord#profil-77');
   assert.equal(lienAlerte('Nouvelle confidence', '/confidences-lamia/'), '/confidences-lamia/');
+});
+
+test('écrire à quelqu’un : le lien ouvre le bon réseau', () => {
+  assert.deepEqual(lienContact('https://www.tiktok.com/@Nina.Kab', '', 'x'), { reseau: 'TikTok', lien: 'https://www.tiktok.com/@nina.kab' });
+  assert.equal(lienContact('https://instagram.com/nina', '', 'x').lien, 'https://www.instagram.com/nina/');
+  assert.equal(lienContact('facebook.com/profile.php?id=123', '', 'x').lien, 'https://www.facebook.com/profile.php?id=123');
+  assert.equal(lienContact('', '+33 6 12 34 56 78', 'Salam !').lien, 'https://wa.me/33612345678?text=Salam%20!');
+  assert.deepEqual(lienContact('', '', 'x'), { reseau: '', lien: '' });
 });
