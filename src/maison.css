@@ -3216,6 +3216,7 @@ label.is-manquant { outline: 2px solid #2c38ba; outline-offset: 3px; border-radi
 .confirmer-modif input { width: 100%; border-radius: 12px; border: 1px solid rgba(255,210,122,.45); background: rgba(255,255,255,.06); color: #fff4ec; padding: 10px 12px; font: inherit; }
 .po-btn-verre.is-on { background: linear-gradient(90deg, rgba(255,90,74,.34), rgba(255,210,122,.14)); }
 .interet-boutons { display: flex; flex-wrap: wrap; gap: 10px; }
+.interet-erreur { margin: 10px 0 0; padding: 10px 12px; border-radius: 12px; background: #fdecec; color: #7a1020; font-size: 15px; }
 
 /* Cloche des nouveautés (en-tête) */
 .cloche { position: relative; display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; text-decoration: none; font-size: 18px; }

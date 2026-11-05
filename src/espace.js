@@ -549,8 +549,19 @@ async function propositions(session) {
     if (!b) return;
     b.parentElement.querySelectorAll('button').forEach((x) => { x.disabled = true; });
     try { const r = await appelProfil({ action: 'annonce_proposition_rep', id: b.dataset.id, reponse: b.dataset.proposition }, session); liste = liste.map((x) => (x.id === b.dataset.id ? { ...x, reponse: b.dataset.proposition } : x)); afficher(); if (r?.mis_en_relation) location.hash = '#discussion', location.reload(); }
-    catch { b.parentElement.querySelectorAll('button').forEach((x) => { x.disabled = false; }); }
+    catch (err) { b.parentElement.querySelectorAll('button').forEach((x) => { x.disabled = false; }); direErreurReponse(b.parentElement, err); }
   });
+}
+
+// Une réponse refusée se dit toujours : sinon le bouton semble ne rien faire.
+function direErreurReponse(boutons, err) {
+  boutons.parentElement.querySelector('.interet-erreur')?.remove();
+  const p = document.createElement('p');
+  p.className = 'interet-erreur'; p.setAttribute('role', 'alert');
+  p.innerHTML = err?.code === 'photos_requises'
+    ? '📷 <strong>Il te manque tes 2 photos</strong> pour dire oui. Elles restent privées. <a class="text-link" href="#photos">Ajouter mes photos</a>'
+    : 'Ta réponse n’est pas passée. Vérifie ta connexion et réessaie.';
+  boutons.after(p);
 }
 
 // « Lamia te demande ton avis » : un de tes critères (secteur…) n'est pas respecté par un profil ; d'accord quand même ?
@@ -585,7 +596,7 @@ async function avisLamia(session) {
     if (!b) return;
     b.parentElement.querySelectorAll('button').forEach((y) => { y.disabled = true; });
     try { await appelProfil({ action: 'annonce_repondre_avis', id: b.dataset.id, reponse: b.dataset.avis }, session); liste = liste.map((y) => (y.id === b.dataset.id ? { ...y, reponse: b.dataset.avis } : y)); afficher(); }
-    catch { b.parentElement.querySelectorAll('button').forEach((y) => { y.disabled = false; }); }
+    catch (err) { b.parentElement.querySelectorAll('button').forEach((y) => { y.disabled = false; }); direErreurReponse(b.parentElement, err); }
   });
 }
 
@@ -616,7 +627,7 @@ async function interetsRecus(session) {
     if (!b) return;
     b.parentElement.querySelectorAll('button').forEach((x) => { x.disabled = true; });
     try { await appelProfil({ action: 'annonce_repondre_interet', id: b.dataset.id, reponse: b.dataset.repondre }, session); liste = liste.map((x) => (x.id === b.dataset.id ? { ...x, reponse: b.dataset.repondre } : x)); afficher(); }
-    catch { b.parentElement.querySelectorAll('button').forEach((x) => { x.disabled = false; }); }
+    catch (err) { b.parentElement.querySelectorAll('button').forEach((x) => { x.disabled = false; }); direErreurReponse(b.parentElement, err); }
   });
 }
 
