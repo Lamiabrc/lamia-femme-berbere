@@ -204,6 +204,7 @@ test('création de compte par le site : compte déjà confirmé, 5 au plus par h
   assert.equal(appels[0][0], '/auth/v1/admin/users');
   assert.equal(appels[0][1].email_confirm, true);
   assert.equal(appels[0][1].email, 'nina@example.com');
+  assert.ok(appels.some(([u, c]) => u.startsWith('/rest/v1/member_profiles') && c?.real_first_name === 'Nina'), 'le prénom va dans la fiche du compte');
   const plein = { ...ctx, read: async () => [1, 2, 3, 4, 5] };
   r = await handleAnnonces('annonce_creer_compte', { email: 'x@example.com', password: '12345678' }, plein);
   assert.equal(r.status, 429);
