@@ -719,6 +719,9 @@ async function discussions(session) {
         ${d.ouverte ? `<small>La discussion se ferme le ${esc(new Date(d.dematch.fin).toLocaleString('fr-FR', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }))}.</small>` : ''}</div>` : ''}
       ${d.ouverte && (!d.dematch || d.dematch.restants) ? `<form class="disc-saisie" data-disc-envoi><textarea name="texte" rows="2" maxlength="1000" placeholder="Ton message…" required></textarea><button class="btn btn-ink" type="submit">Envoyer</button></form>
       <p class="disc-aide">Pour ta sécurité, les numéros, liens et emails écrits dans les messages sont masqués : utilise le bouton ci-dessous pour échanger vos numéros.</p>` : ''}
+      ${d.ouverte && !d.dematch && !d.prenom?.partage ? (d.prenom?.demander
+        ? `<div class="disc-prenom"><p>👋 <strong>Veux-tu partager ton prénom${d.prenom.mien ? ` (${esc(d.prenom.mien)})` : ''} avec ton match ?</strong> Rien ne presse : tu peux aussi le faire plus tard, après vos premiers échanges.</p><p><button type="button" class="btn btn-ink" data-disc-prenom="partager">Oui, partager</button> <button type="button" class="btn btn-line" data-disc-prenom="plus_tard">Plus tard</button></p></div>`
+        : '<p class="disc-prenom-lien"><button type="button" class="link-button" data-disc-prenom="partager">👋 Partager mon prénom</button></p>') : ''}
       ${d.dematch ? '' : numeros}
       ${d.prolongeable && !window.LFB_PLAY && new Date(d.ferme_at) - Date.now() < 72 * 3600e3 ? `<div class="disc-prolonger">${d.ouverte ? '' : '<p>Votre discussion est terminée, mais vous pouvez la rouvrir.</p>'}${boutonService('prolonger_discussion', 'Prolonger la discussion de 7 jours', '3 €', '⏳ 7 jours de plus · 3 €', d.id)}</div>` : ''}
       ${d.ouverte && !d.dematch ? (dematchOuvert === d.id ? `<form class="disc-dematch" data-disc-dematch-form>
@@ -774,6 +777,13 @@ async function discussions(session) {
     if (champ) champ.hidden = e.target.value !== 'parcours';
   });
   ecouter(box, 'click', async (e) => {
+    const choixPrenom = e.target.closest('[data-disc-prenom]');
+    if (choixPrenom) {
+      choixPrenom.disabled = true;
+      try { await appelProfil({ action: 'annonce_discussion_prenom', id: choixPrenom.closest('[data-disc]').dataset.disc, choix: choixPrenom.dataset.discPrenom }, session); await charger(); }
+      catch (err) { choixPrenom.disabled = false; alert(err.code === 'prenom_absent' ? 'Ajoute d’abord ton prénom dans ton annonce.' : 'Ça n’a pas marché. Réessaie dans un instant.'); }
+      return;
+    }
     const ouvrir = e.target.closest('[data-disc-dematch]');
     if (ouvrir) { dematchOuvert = ouvrir.closest('[data-disc]').dataset.disc; afficher(); return; }
     if (e.target.closest('[data-disc-dematch-annuler]')) { dematchOuvert = null; afficher(); return; }
