@@ -162,7 +162,7 @@ document.addEventListener('click', (e) => {
   aller = 'annonces'; const f = $('[data-rencontres]'); if (f) f.removeAttribute('src');
   ouvrir('rencontres');
   const cible = b.dataset.rencontresAller;
-  if (cible !== 'annonces') setTimeout(() => { try { f.contentWindow.document.querySelector(cible === 'demandes' ? '[data-demandes]' : '[data-nouv-form]')?.scrollIntoView({ behavior: 'smooth' }); } catch { /* */ } }, 2500);
+  if (cible !== 'annonces') setTimeout(() => { try { const el = f.contentWindow.document.querySelector(cible === 'demandes' ? '[data-demandes]' : '[data-nouv-form]'); const pli = el?.closest('details'); if (pli) pli.open = true; el?.scrollIntoView({ behavior: 'smooth' }); } catch { /* */ } }, 2500);
 });
 
 // ---------------------------------------------------------------- Salons des soirées : confirmer une date, suivre les inscrits
