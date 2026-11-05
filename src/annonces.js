@@ -518,7 +518,7 @@ function carte(a) {
       <h4>Qui je suis</h4><p>${esc(a.profil)}</p>
       <h4>Qui je cherche${ages}</h4><p>${esc(a.recherche)}</p>
       ${foiEtVie(a)}
-      <button type="button" class="btn btn-ink" data-interet="${a.ref}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur"/></svg> Ce profil m’intéresse</button><span class="profil-moderer"><button type="button" class="link-button" data-liste-bloquer="${a.ref}">🚫 Bloquer</button> · <button type="button" class="link-button" data-liste-signaler="${a.ref}">🚩 Signaler</button></span>
+      <button type="button" class="btn btn-ink" data-interet="${a.ref}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur"/></svg> Ce profil m’intéresse</button><span class="profil-moderer"><button type="button" class="link-button" data-liste-bloquer="${a.ref}">🚩 Bloquer et signaler</button></span>
     </div>
   </article>`;
 }
@@ -591,18 +591,17 @@ document.querySelectorAll('[data-annonce-ouvrir]').forEach((b) => b.addEventList
 document.addEventListener('click', (e) => { const b = e.target.closest('[data-interet]'); if (b) interesse(b.dataset.interet); });
 // Bloquer ou signaler un profil depuis la liste (il faut être connecté).
 document.addEventListener('click', async (e) => {
-  const bloquer = e.target.closest('[data-liste-bloquer]'), signaler = e.target.closest('[data-liste-signaler]');
-  if (!bloquer && !signaler) return;
+  const bouton = e.target.closest('[data-liste-bloquer]');
+  if (!bouton) return;
   const s = await sessionActive();
-  if (!s) return alert('Connecte-toi pour bloquer ou signaler un profil.');
-  const ref = (bloquer || signaler).dataset[bloquer ? 'listeBloquer' : 'listeSignaler'];
-  if (bloquer && !confirm(`Bloquer le profil n° ${ref} ? Vous ne vous verrez plus et vous ne pourrez plus vous écrire. La personne n’est pas prévenue.`)) return;
-  const motif = signaler ? prompt('Que s’est-il passé ? Lamia reçoit une alerte et regarde ce profil.') : '';
+  if (!s) return alert('Connecte-toi pour bloquer et signaler un profil.');
+  const ref = bouton.dataset.listeBloquer;
+  const motif = prompt(`Bloquer et signaler le profil n° ${ref} ? Vous ne vous verrez plus et Lamia est prévenue. La personne n’est pas avertie.\n\nQue s’est-il passé ? (facultatif)`);
   if (motif === null) return;
   try {
-    await api({ action: bloquer ? 'annonce_bloquer' : 'annonce_signaler_profil', ref, motif }, s.access_token);
-    if (bloquer) e.target.closest('.annonce-carte')?.remove();
-    alert(bloquer ? 'Profil bloqué.' : 'Merci. Lamia est prévenue.');
+    await api({ action: 'annonce_bloquer_signaler', ref, motif }, s.access_token);
+    bouton.closest('.annonce-carte')?.remove();
+    alert('C’est fait. Lamia est prévenue.');
   } catch { alert('Ça n’a pas abouti. Réessaie dans un instant.'); }
 });
 const liste = document.querySelector('[data-annonces-liste]');

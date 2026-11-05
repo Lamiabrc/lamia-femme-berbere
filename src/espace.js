@@ -119,20 +119,19 @@ const ETAT_DEMASQUE = {
   pas_cette_fois: 'Pas de démasquage cette fois.',
 };
 // Bloquer ou signaler un profil depuis Mon espace (demandes reçues, propositions, discussions).
-const moderation = (ref) => (ref ? `<p class="profil-moderer"><button type="button" class="link-button" data-moderer-bloquer="${esc(ref)}">🚫 Bloquer</button> · <button type="button" class="link-button" data-moderer-signaler="${esc(ref)}">🚩 Signaler</button></p>` : '');
+const moderation = (ref) => (ref ? `<p class="profil-moderer"><button type="button" class="link-button" data-moderer-bloquer="${esc(ref)}">🚩 Bloquer et signaler</button></p>` : '');
 document.addEventListener('click', async (e) => {
-  const bloquer = e.target.closest('[data-moderer-bloquer]'), signaler = e.target.closest('[data-moderer-signaler]');
-  if (!bloquer && !signaler) return;
+  const bouton = e.target.closest('[data-moderer-bloquer]');
+  if (!bouton) return;
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) return;
-  const ref = (bloquer || signaler).dataset[bloquer ? 'modererBloquer' : 'modererSignaler'];
-  if (bloquer && !confirm(`Bloquer le profil n° ${ref} ? Vous ne vous verrez plus et vous ne pourrez plus vous écrire. La personne n’est pas prévenue.`)) return;
-  const motif = signaler ? prompt('Que s’est-il passé ? Lamia reçoit une alerte et regarde ce profil.') : '';
+  const ref = bouton.dataset.modererBloquer;
+  const motif = prompt(`Bloquer et signaler le profil n° ${ref} ? Vous ne vous verrez plus et Lamia est prévenue. La personne n’est pas avertie.\n\nQue s’est-il passé ? (facultatif)`);
   if (motif === null) return;
   try {
-    await appelProfil({ action: bloquer ? 'annonce_bloquer' : 'annonce_signaler_profil', ref, motif }, session);
-    alert(bloquer ? 'Profil bloqué.' : 'Merci. Lamia est prévenue.');
-    if (bloquer) render();
+    await appelProfil({ action: 'annonce_bloquer_signaler', ref, motif }, session);
+    alert('C’est fait. Lamia est prévenue.');
+    render();
   } catch { alert('Ça n’a pas abouti. Réessaie dans un instant.'); }
 });
 // Les profils que j'ai bloqués, avec la possibilité de revenir en arrière.
@@ -729,7 +728,7 @@ async function discussions(session) {
         <label class="disc-dematch-etape" data-dematch-etape hidden>Quelle étape ? <select name="etape">${(d.parcours?.etapes || []).map((x) => `<option value="${esc(x.id)}">${esc(x.mot)}</option>`).join('')}</select></label>
         <p class="disc-dematch-actions"><button class="btn btn-ink" type="submit">Confirmer le dématch</button> <button type="button" class="link-button" data-disc-dematch-annuler>Je reste</button></p></form>`
         : `<p class="disc-dematch-lien"><button type="button" class="btn btn-line" data-disc-dematch>Dématcher</button></p>`) : ''}
-      ${d.ouverte ? `<p><button type="button" class="link-button" data-disc-signaler>🚩 Signaler à Lamia</button></p>` : ''}
+      ${d.ouverte ? `<p><button type="button" class="link-button" data-disc-signaler>🚩 Bloquer et signaler</button></p>` : ''}
     </article>`;
   };
   const afficher = () => {
@@ -788,7 +787,7 @@ async function discussions(session) {
     }
     if (!e.target.closest('[data-disc-signaler]')) return;
     const id = e.target.closest('[data-disc]').dataset.disc;
-    const motif = prompt('Que s’est-il passé ? La discussion sera fermée, vous ne vous reverrez plus, et Lamia la lira.');
+    const motif = prompt('Bloquer et signaler ? La discussion sera fermée, vous ne vous reverrez plus, et Lamia la lira.\n\nQue s’est-il passé ? (facultatif)');
     if (motif === null) return;
     try {
       await appelProfil({ action: 'annonce_discussion_signaler', id, motif }, session);

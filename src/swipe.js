@@ -46,7 +46,7 @@ function carte(a) {
       ${a.profil ? `<h3>Qui je suis</h3><p>${esc(a.profil)}</p>` : ''}
       ${a.recherche ? `<h3>Qui je cherche${ages}</h3><p>${esc(a.recherche)}</p>` : ''}
       ${foiEtVie(a).replace(/<h4>/g, '<h3>').replace(/<\/h4>/g, '</h3>')}
-      <p class="profil-moderer"><button type="button" class="link-button" data-moderer="${a.ref}">🚩 Bloquer ou signaler</button></p>
+      <p class="profil-moderer"><button type="button" class="link-button" data-moderer="${a.ref}">🚩 Bloquer et signaler</button></p>
     </div>
   </article>`;
 }
@@ -176,14 +176,13 @@ function quotaAtteint({ algerie, formule } = {}) {
 }
 // Bloquer ou signaler le profil affiché. Bloquer le retire tout de suite, et la personne n'en sait rien.
 function moderer(ref) {
-  const d = fenetre(`<h2>Profil n° ${esc(ref)}</h2><p>Bloquer : vous ne vous verrez plus et vous ne pourrez plus vous écrire. La personne n’est pas prévenue.</p><p>Signaler : Lamia reçoit une alerte et regarde ce profil.</p><label class="profil-motif">Que s’est-il passé ? (facultatif)<textarea rows="3" maxlength="500" data-motif></textarea></label><p class="po-actions"><button type="button" class="po-btn" data-bloquer>🚫 Bloquer</button><button type="button" class="po-btn" data-signaler>🚩 Signaler</button></p><p class="form-status" role="status" data-moderer-statut></p>`);
+  const d = fenetre(`<h2>Profil n° ${esc(ref)}</h2><p>Vous ne vous verrez plus et vous ne pourrez plus vous écrire. Lamia reçoit une alerte et regarde ce profil. La personne n’est pas prévenue.</p><label class="profil-motif">Que s’est-il passé ? (facultatif)<textarea rows="3" maxlength="500" data-motif></textarea></label><p class="po-actions"><button type="button" class="po-btn" data-bloquer>🚩 Bloquer et signaler</button></p><p class="form-status" role="status" data-moderer-statut></p>`);
   const envoyer = async (action, fin) => {
     d.querySelectorAll('button').forEach((x) => { x.disabled = true; });
     try { await api({ action, ref, motif: d.querySelector('[data-motif]').value }, token); fin(); }
     catch { d.querySelectorAll('button').forEach((x) => { x.disabled = false; }); d.querySelector('[data-moderer-statut]').textContent = 'Ça n’a pas abouti. Réessaie dans un instant.'; }
   };
-  d.querySelector('[data-bloquer]').addEventListener('click', () => envoyer('annonce_bloquer', () => { d.remove(); tous = tous.filter((p) => p.ref !== ref); profils = profils.filter((p) => p.ref !== ref); if (dernier?.profil.ref === ref) { dernier = null; majAnnuler(); } afficher(); toast('Profil bloqué. Vous ne vous verrez plus.'); }));
-  d.querySelector('[data-signaler]').addEventListener('click', () => envoyer('annonce_signaler_profil', () => { d.remove(); toast('Merci. Lamia est prévenue.'); }));
+  d.querySelector('[data-bloquer]').addEventListener('click', () => envoyer('annonce_bloquer_signaler', () => { d.remove(); tous = tous.filter((p) => p.ref !== ref); profils = profils.filter((p) => p.ref !== ref); if (dernier?.profil.ref === ref) { dernier = null; majAnnuler(); } afficher(); toast('C’est fait. Vous ne vous verrez plus, Lamia est prévenue.'); }));
 }
 zone.addEventListener('click', (e) => { const b = e.target.closest('[data-moderer]'); if (b) moderer(Number(b.dataset.moderer)); });
 zone.addEventListener('click', (e) => {
