@@ -3575,3 +3575,9 @@ body.espace-est-admin .espace-admin h2 { color: #F4DC92; }
 body.espace-est-admin .espace-admin-note { color: #E8D6B5; }
 
 .disc-prolonger { margin: 10px 0; }
+
+/* Discussion : messages vocaux et conseil avant l'échange des numéros */
+.disc-audio { height: 36px; max-width: 230px; vertical-align: middle; }
+.disc-vocal { border: 1px solid var(--ligne, #e6d9d4); border-radius: 14px; padding: 12px; margin: 10px 0; }
+.disc-vocal-lien { margin: 6px 0; }
+.disc-conseil { display: block; margin: 6px 0; color: var(--gris-rose); }

@@ -1,6 +1,7 @@
 // Mon espace : connexion, mot de passe, soirées réservées, liens d'administration.
 import { createClient } from '/vendor/supabase.mjs';
-import { creerCompte, api } from './confidences-commun.js';
+import { creerCompte, api, PUBLIC_KEY } from './confidences-commun.js';
+import { monterEnregistreur } from './enregistreur.js';
 import { secteurLisible } from './matching-options.mjs';
 
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc');
@@ -710,14 +711,14 @@ async function discussions(session) {
   };
   const raisonsDematch = [['physique', 'Physique'], ['enfants', 'Enfants'], ['localisation', 'Localisation'], ['caractere', 'Caractère'], ['valeurs', 'Valeurs'], ['parcours', 'Une étape du parcours'], ['autre', 'Autre raison']]
     .map(([v, t]) => `<label><input type="radio" name="raison" value="${v}" required> ${t}</label>`).join('');
-  let dematchOuvert = null;
+  let dematchOuvert = null, vocalOuvert = null, rec = null;
   const vue = (d) => {
-    const msgs = d.messages.map((m) => `<p class="disc-msg ${m.moi ? 'is-moi' : ''}${m.lamia ? ' is-systeme' : ''}"><span>${esc(m.texte)}</span><small>${esc(heure(m.le))}</small></p>`).join('') || `<p class="disc-vide">${salut ? `${esc(salut)}, dis` : 'Dis'} bonjour à ${esc(d.avec)} 👋</p>`;
+    const msgs = d.messages.map((m) => `<p class="disc-msg ${m.moi ? 'is-moi' : ''}${m.lamia ? ' is-systeme' : ''}"><span>${m.audio ? `🎤 <audio class="disc-audio" controls preload="none" src="${esc(m.audio)}"></audio>` : esc(m.texte)}</span><small>${esc(heure(m.le))}</small></p>`).join('') || `<p class="disc-vide">${salut ? `${esc(salut)}, dis` : 'Dis'} bonjour à ${esc(d.avec)} 👋</p>`;
     const numeros = d.echange
       ? `<div class="disc-numeros is-ok">📞 Vous avez échangé vos numéros. Celui de ${esc(d.avec)} : <a href="tel:${esc(d.son_numero)}"><strong>${esc(d.son_numero)}</strong></a></div>`
       : d.mon_numero
         ? `<div class="disc-numeros">📞 Tu as donné ton numéro. ${esc(d.avec)} le verra dès qu’il ou elle aura donné le sien${d.il_a_partage ? '' : ' (on l’a prévenu·e)'}.</div>`
-        : d.ouverte ? `<form class="disc-numeros" data-disc-numero><label>📞 ${d.il_a_partage ? `<strong>${esc(d.avec)} a donné son numéro</strong> : donne le tien pour le voir` : `${salut ? `${esc(salut)}, prêt${e}` : `Prêt${e}`} à passer au téléphone ? Donne ton numéro`} <input name="telephone" type="tel" autocomplete="tel" placeholder="06 12 34 56 78" required></label><button class="btn btn-ink" type="submit">Échanger nos numéros</button><small>Ton numéro n’est montré que quand vous l’avez donné tous les deux.</small></form>` : '';
+        : d.ouverte ? `<form class="disc-numeros" data-disc-numero><label>📞 ${d.il_a_partage ? `<strong>${esc(d.avec)} a donné son numéro</strong> : donne le tien pour le voir` : `${salut ? `${esc(salut)}, prêt${e}` : `Prêt${e}`} à passer au téléphone ? Donne ton numéro`} <input name="telephone" type="tel" autocomplete="tel" placeholder="06 12 34 56 78" required></label><button class="btn btn-ink" type="submit">Échanger nos numéros</button><small class="disc-conseil">💡 Avant de donner ton numéro, pose les vraies questions : projet de mariage, famille, lieu de vie, religion, enfants. Prends ton temps.</small><small>Ton numéro n’est montré que quand vous l’avez donné tous les deux.</small></form>` : '';
     return `<article class="disc" data-disc="${esc(d.id)}">
       <header class="disc-tete"><strong>Avec ${esc(d.avec)}</strong><span>${d.ouverte ? `⏳ ${esc(reste(d))}` : d.close_raison === 'signalee' ? 'fermée (signalée)' : d.close_raison ? 'fermée' : 'terminée'}</span></header>
       ${d.ses_autres_matchs > 0 ? `<p class="disc-honnete">Par honnêteté : ${esc(d.avec)} a aussi ${d.ses_autres_matchs} autre${d.ses_autres_matchs > 1 ? 's' : ''} match${d.ses_autres_matchs > 1 ? 's' : ''} en cours.</p>` : ''}
@@ -730,6 +731,16 @@ async function discussions(session) {
         ${d.ouverte ? `<small>La discussion se ferme le ${esc(new Date(d.dematch.fin).toLocaleString('fr-FR', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }))}.</small>` : ''}</div>` : ''}
       ${d.ouverte && (!d.dematch || d.dematch.restants) ? `<form class="disc-saisie" data-disc-envoi><textarea name="texte" rows="2" maxlength="1000" placeholder="Ton message…" required></textarea><button class="btn btn-ink" type="submit">Envoyer</button></form>
       <p class="disc-aide">Pour ta sécurité, les numéros, liens et emails écrits dans les messages sont masqués : utilise le bouton ci-dessous pour échanger vos numéros.</p>` : ''}
+      ${d.ouverte && !d.dematch ? (vocalOuvert === d.id ? `<div class="disc-vocal">
+        <div class="rec" data-rec>
+          <div class="rec-ecran"><span class="rec-point" aria-hidden="true"></span><strong class="rec-temps" data-rec-time>0:00</strong><span class="rec-niveau" data-rec-meter aria-hidden="true"></span></div>
+          <p class="rec-etat" data-rec-state role="status">Appuie sur « Démarrer » quand tu veux.</p>
+          <div class="rec-boutons"><button class="btn btn-ink" type="button" data-rec-start>● Démarrer</button><button class="btn btn-line" type="button" data-rec-pause hidden>❚❚ Pause</button><button class="btn btn-line" type="button" data-rec-resume hidden>● Reprendre</button><button class="btn btn-ink" type="button" data-rec-stop hidden>■ Arrêter</button><button class="btn btn-line" type="button" data-rec-redo hidden>↺ Recommencer</button></div>
+          <audio data-rec-audio controls hidden></audio>
+        </div>
+        <p class="disc-aide">2 minutes au plus. Ne donne pas ton numéro dans un vocal : utilise le bouton « Échanger nos numéros ».</p>
+        <p><button type="button" class="btn btn-ink" data-disc-vocal-envoyer>Envoyer le vocal</button> <button type="button" class="link-button" data-disc-vocal-annuler>Annuler</button></p>
+      </div>` : `<p class="disc-vocal-lien"><button type="button" class="link-button" data-disc-vocal>🎤 Laisser un message vocal</button></p>`) : ''}
       ${d.ouverte && !d.dematch && !d.prenom?.partage ? (d.prenom?.demander
         ? `<div class="disc-prenom"><p>👋 <strong>Veux-tu partager ton prénom${d.prenom.mien ? ` (${esc(d.prenom.mien)})` : ''} avec ton match ?</strong> Rien ne presse : tu peux aussi le faire plus tard, après vos premiers échanges.</p><p><button type="button" class="btn btn-ink" data-disc-prenom="partager">Oui, partager</button> <button type="button" class="btn btn-line" data-disc-prenom="plus_tard">Plus tard</button></p></div>`
         : '<p class="disc-prenom-lien"><button type="button" class="link-button" data-disc-prenom="partager">👋 Partager mon prénom</button></p>') : ''}
@@ -751,19 +762,28 @@ async function discussions(session) {
     const brouillons = Object.fromEntries([...box.querySelectorAll('[data-disc]')].map((a) => [a.dataset.disc, a.querySelector('textarea')?.value || '']));
     box.innerHTML = liste.map(vue).join('');
     box.querySelectorAll('[data-disc]').forEach((a) => { const t = a.querySelector('textarea'); if (t && brouillons[a.dataset.disc]) t.value = brouillons[a.dataset.disc]; const f = a.querySelector('[data-disc-fil]'); f.scrollTop = f.scrollHeight; });
+    const zoneVocal = vocalOuvert && box.querySelector(`[data-disc="${vocalOuvert}"] [data-rec]`);
+    rec = zoneVocal ? monterEnregistreur(zoneVocal, { max: 120 }) : null;
   };
   const charger = async () => { try { const r = await appelProfil({ action: 'annonce_discussions' }, session); liste = r.discussions || []; if (document.documentElement.lang !== 'en') { salut = r.adresse || ''; e = r.accord ?? e; const h1 = $('[data-espace-nom]')?.closest('h1'); if (salut && h1) h1.textContent = salut; } afficher(); } catch { /* */ } };
   await charger();
   if (location.hash === '#discussion' && liste.length) bloc.scrollIntoView({ behavior: 'smooth' });
   // Les nouveaux messages arrivent toutes les 10 secondes tant que la page est ouverte.
-  if (liste.some((d) => d.ouverte)) minuterieDiscussions = setInterval(() => { if (!document.hidden && !dematchOuvert && !box.contains(document.activeElement)) charger(); }, 10000);
+  if (liste.some((d) => d.ouverte)) minuterieDiscussions = setInterval(() => { if (!document.hidden && !dematchOuvert && !vocalOuvert && !box.contains(document.activeElement)) charger(); }, 10000);
   ecouter(box, 'submit', async (e) => {
     e.preventDefault();
     const a = e.target.closest('[data-disc]'), id = a?.dataset.disc;
     const bouton = e.target.querySelector('button'); bouton.disabled = true;
     try {
       if (e.target.matches('[data-disc-dematch-form]')) {
-        await appelProfil({ action: 'annonce_discussion_dematcher', id, raison: e.target.raison.value, etape: e.target.etape?.value }, session);
+        const demande = { action: 'annonce_discussion_dematcher', id, raison: e.target.raison.value, etape: e.target.etape?.value };
+        try { await appelProfil(demande, session); }
+        catch (err) {
+          if (err.code !== 'avertissement_numero') throw err;
+          // Numéros échangés il y a moins de 24 heures : avertissement, puis confirmation.
+          if (!confirm(err.message || 'Tu as eu son numéro il y a moins de 24 heures. Dématcher maintenant peut être pénalisé. Continuer ?')) { bouton.disabled = false; return; }
+          await appelProfil({ ...demande, confirme: true }, session);
+        }
         dematchOuvert = null;
         await charger();
         return;
@@ -774,6 +794,8 @@ async function discussions(session) {
         e.target.texte.value = '';
         if (r.masque) alert('Un numéro, un lien ou un email a été masqué dans ton message. Pour passer au téléphone, utilise « Échanger nos numéros ».');
       } else if (e.target.matches('[data-disc-numero]')) {
+        const d = liste.find((x) => x.id === id);
+        if (d && (d.nb_echanges || 0) < 10 && !d.il_a_partage && !confirm('💡 Conseil de Lamia : vous avez encore peu échangé. Avant de donner ton numéro, pose les vraies questions (projet de mariage, famille, lieu de vie, religion, enfants).\n\nÀ savoir : récupérer des numéros puis dématcher très vite peut être pénalisé.\n\nDonner ton numéro maintenant ?')) { bouton.disabled = false; return; }
         await appelProfil({ action: 'annonce_discussion_numero', id, telephone: e.target.telephone.value }, session);
       }
       await charger();
@@ -798,6 +820,28 @@ async function discussions(session) {
     const ouvrir = e.target.closest('[data-disc-dematch]');
     if (ouvrir) { dematchOuvert = ouvrir.closest('[data-disc]').dataset.disc; afficher(); return; }
     if (e.target.closest('[data-disc-dematch-annuler]')) { dematchOuvert = null; afficher(); return; }
+    // Message vocal : enregistrer, réécouter, envoyer (2 minutes au plus).
+    const ouvrirVocal = e.target.closest('[data-disc-vocal]');
+    if (ouvrirVocal) { vocalOuvert = ouvrirVocal.closest('[data-disc]').dataset.disc; afficher(); return; }
+    if (e.target.closest('[data-disc-vocal-annuler]')) { rec?.vider(); vocalOuvert = null; afficher(); return; }
+    const envoyerVocal = e.target.closest('[data-disc-vocal-envoyer]');
+    if (envoyerVocal) {
+      const blob = rec?.blob();
+      if (!blob) return alert('Enregistre d’abord ton message vocal.');
+      const id = envoyerVocal.closest('[data-disc]').dataset.disc;
+      envoyerVocal.disabled = true;
+      try {
+        const lien = await appelProfil({ action: 'annonce_discussion_vocal_lien', id, mime: blob.type || 'audio/webm', taille: blob.size, duree: rec.duree() }, session);
+        const r = await fetch(lien.url, { method: 'PUT', headers: { apikey: PUBLIC_KEY, 'Content-Type': lien.type, 'x-upsert': 'false' }, body: blob });
+        if (!r.ok) throw Object.assign(new Error('upload'), { code: 'upload' });
+        await appelProfil({ action: 'annonce_discussion_envoyer', id, audio_path: lien.path, duree: rec.duree() }, session);
+        rec.vider(); vocalOuvert = null; await charger();
+      } catch (err) {
+        envoyerVocal.disabled = false;
+        alert(err.code === 'vocal_trop_long' ? 'Ton vocal est trop long : 2 minutes au plus.' : err.code === 'file_type' ? 'Ce format audio n’est pas accepté. Réessaie depuis un autre navigateur.' : err.code === 'discussion_fermee' ? 'Cette discussion est terminée.' : 'Le vocal n’est pas parti. Réessaie.');
+      }
+      return;
+    }
     const question = e.target.closest('[data-parcours-question]');
     if (question) { const t = question.closest('[data-disc]').querySelector('textarea'); if (t) { t.value = question.dataset.parcoursQuestion; t.focus(); } return; }
     const valider = e.target.closest('[data-parcours-valider]');
