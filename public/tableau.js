@@ -1053,8 +1053,9 @@ const ERR_COACHING = { plage_invalide: 'Vérifie le jour et les heures : il faut
 function peindreCoaching(d) {
   const parJour = new Map();
   for (const c of d.creneaux || []) { const k = date(c.debut, { weekday: 'long', day: 'numeric', month: 'long' }); if (!parJour.has(k)) parJour.set(k, []); parJour.get(k).push(c); }
-  const passe = (c) => new Date(c.debut).getTime() + 30 * 60e3 < Date.now();
-  $('[data-coaching-planning]').innerHTML = [...parJour].map(([k, l]) => `<h3>${esc(k)}</h3><ul class="tdb-retraits">${l.map((c) => `<li><span><b>${esc(date(c.debut, { hour: '2-digit', minute: '2-digit' }))}</b> · ${c.user_id ? `${esc(c.prenom || '')} <small>${esc(c.email || '')}</small>` : '<small>Libre</small>'}</span>${passe(c) ? '' : `<span>${c.user_id ? `<button class="btn btn-ink" type="button" data-coaching-entrer="${esc(c.id)}">Entrer</button> ` : ''}<button class="link-button" type="button" data-coaching-fermer="${esc(c.id)}" data-reserve="${c.user_id ? '1' : ''}">${c.user_id ? 'Annuler' : 'Retirer'}</button></span>`}</li>`).join('')}</ul>`).join('') || '<p>Aucun créneau ouvert pour l’instant.</p>';
+  const passe = (c) => new Date(c.debut).getTime() + ((c.duree_min || 15) + 15) * 60e3 < Date.now();
+  const typeDe = (c) => ({ 30: ' · 30 min', 60: ' · Couple, 1 h' })[c.duree_min] || '';
+  $('[data-coaching-planning]').innerHTML = [...parJour].map(([k, l]) => `<h3>${esc(k)}</h3><ul class="tdb-retraits">${l.map((c) => `<li><span><b>${esc(date(c.debut, { hour: '2-digit', minute: '2-digit' }))}${typeDe(c)}</b> · ${c.user_id ? `${esc(c.prenom || '')} <small>${esc(c.email || '')}</small>` : '<small>Libre</small>'}</span>${passe(c) ? '' : `<span>${c.user_id ? `<button class="btn btn-ink" type="button" data-coaching-entrer="${esc(c.id)}">Entrer</button> ` : ''}<button class="link-button" type="button" data-coaching-fermer="${esc(c.id)}" data-reserve="${c.user_id ? '1' : ''}">${c.user_id ? 'Annuler' : 'Retirer'}</button></span>`}</li>`).join('')}</ul>`).join('') || '<p>Aucun créneau ouvert pour l’instant.</p>';
   $('[data-coaching-abonnes]').innerHTML = (d.abonnes || []).map((a) => `<li><span><b>${esc(a.nom || a.email)}</b> <small>${a.reserve ? `Visio du mois : ${esc(date(a.reserve))}` : 'Pas encore de visio ce mois-ci'}</small></span></li>`).join('') || '<li>Pas encore d’abonné Prestige actif.</li>';
 }
 async function chargerCoaching(corps = { action: 'annonce_coaching_planning' }) {
@@ -1062,7 +1063,7 @@ async function chargerCoaching(corps = { action: 'annonce_coaching_planning' }) 
   try { peindreCoaching(await conf(corps)); st.textContent = ''; }
   catch (e) { st.textContent = ERR_COACHING[e.message] || 'Ça n’a pas fonctionné. Réessaie dans un instant.'; }
 }
-$('[data-coaching-form]')?.addEventListener('submit', (e) => { e.preventDefault(); const f = e.target; chargerCoaching({ action: 'annonce_coaching_ouvrir', date: f.date.value, de: f.de.value, a: f.a.value }); });
+$('[data-coaching-form]')?.addEventListener('submit', (e) => { e.preventDefault(); const f = e.target; chargerCoaching({ action: 'annonce_coaching_ouvrir', duree: Number(f.duree.value), date: f.date.value, de: f.de.value, a: f.a.value }); });
 $('[data-coaching-prevenir]')?.addEventListener('click', async (e) => {
   if (!confirm('Envoyer une notification et un email aux abonnés Prestige qui n’ont pas encore réservé ce mois-ci ?')) return;
   e.target.disabled = true;

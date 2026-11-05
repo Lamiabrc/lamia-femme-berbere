@@ -1616,7 +1616,7 @@ page(
     <ol>
       <li><strong>C’est quoi, un match ?</strong><span>Lamia te propose une personne qui te correspond vraiment. Si vous êtes d’accord tous les deux, elle vous met en contact. Ton numéro reste chez elle jusque-là.</span></li>
       <li><strong>Plusieurs matchs en même temps, ça veut dire quoi ?</strong><span>Tu peux avoir 1 match en cours avec Découverte, 2 avec Passion et 5 avec Prestige. Quand tu mets fin à un match, une place se libère.</span></li>
-      <li><strong>Comment se passe le coaching ?</strong><span>Dans ton espace, tu choisis un créneau parmi ceux ouverts par Lamia : une visio de 15 minutes, non enregistrée, incluse chaque mois avec Prestige ou à 15 € à l’unité. Tu peux annuler jusqu’à 24 heures avant et choisir un autre créneau.</span></li>
+      <li><strong>Comment se passe le coaching ?</strong><span>Dans ton espace, tu choisis un créneau parmi ceux ouverts par Lamia : une visio de 15 minutes, non enregistrée, incluse chaque mois avec Prestige ou à 15 € à l’unité. Il existe aussi un coaching de 30 minutes à 39 € et « Sauver mon couple », 1 heure à deux ou seul·e, à 89 €. Tu peux annuler jusqu’à 24 heures avant et choisir un autre créneau.</span></li>
       <li><strong>Et les speed datings inclus ?</strong><span>Ta place aux soirées de speed dating en ligne de ton salon, dans la limite indiquée chaque mois. Lamia la note quand tu t’inscris.</span></li>
       <li><strong>Je peux arrêter quand je veux ?</strong><span>Oui. Dans ton espace, « Gérer mon abonnement » : tu résilies en un clic. Ton abonnement reste actif jusqu’à la fin de la période payée.</span></li>
       <li><strong>Lamia garantit-elle un mariage ?</strong><span>Personne ne peut le promettre. Lamia s’engage sur le sérieux : profils vérifiés, matching soigné, et un vrai suivi.</span></li>
@@ -1910,6 +1910,24 @@ page(
   })
 );
 
+// Le conjoint rejoint la visio « Sauver mon couple » avec le lien transmis, sans compte
+page(
+  '/rencontres/visio/',
+  layout({
+    title: 'Visio avec Lamia · Les Rencontres de Lamia',
+    description: 'Rejoindre la visio avec Lamia, à deux.',
+    path: '/rencontres/visio/',
+    room: roomBySlug.patio,
+    noindex: true,
+    scripts: ['/assets/visio-invite.js'],
+    body: `<div class="po-app"><section class="po-hero"><div class="po-fond" aria-hidden="true"></div>
+  <p class="po-eyebrow">Les Rencontres de Lamia</p><h1>Votre visio avec Lamia</h1>
+  <p class="po-lead">Un moment à deux avec Lamia. Rien n’est enregistré.</p>
+</section>
+<section class="confirmer-app" data-visio-invite><p class="annonce-vide">Un instant…</p></section></div>`,
+  })
+);
+
 // Confirmation d'une fiche créée en live (lien personnel envoyé par Lamia)
 page(
   '/rencontres/confirmer/',
@@ -2066,7 +2084,7 @@ await cp(join(ROOT, 'public'), DIST, { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await writeFile(join(DIST, 'assets', 'editable.json'), JSON.stringify({ fields: [...EDITABLE, ...REGISTRE], defaults: DEFAULTS }));
-for (const f of ['version-play.js', 'abonnement.js', 'abonnement-merci.js', 'swipe.js', 'nouveautes.js', 'confirmer.js', 'maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'soirees.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'annonces.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
+for (const f of ['version-play.js', 'abonnement.js', 'abonnement-merci.js', 'swipe.js', 'nouveautes.js', 'confirmer.js', 'visio-invite.js', 'maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'soirees.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'annonces.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
 await cp(join(ROOT, 'content', 'shipping.mjs'), join(DIST, 'assets', 'shipping.mjs'));
 await cp(join(ROOT, 'content', 'rubriques.mjs'), join(DIST, 'assets', 'rubriques.mjs'));
 await cp(join(ROOT, 'content', 'matching-options.mjs'), join(DIST, 'assets', 'matching-options.mjs'));
@@ -2076,7 +2094,7 @@ await cp(join(ROOT, 'content', 'en', 'products.json'), join(DIST, 'assets', 'i18
 const MOTIFS_EN = JSON.parse(await readFile(join(ROOT, 'content', 'en', 'patterns.json'), 'utf8'));
 await writeFile(join(DIST, 'assets', 'i18n', 'en.json'), JSON.stringify({ strings: STRINGS, pages: [...PAGES_EN], motifs: MOTIFS_EN.motifs, noms: MOTIFS_EN.noms }));
 
-const indexable = pages.filter((p) => !soonRooms.some((r) => p.path.replace(/^\/en\//, '/') === r.path) && !p.path.endsWith('.html') && !p.path.startsWith('/en/produit/') && !['/produit/', '/mon-espace/', '/speed-dating/bal/', '/speed-dating/salle/', '/suppression-compte/', '/speed-dating/merci/', '/commande/merci/', '/abonnement/merci/', '/rencontres/swipe/', '/rencontres/confirmer/', '/speed-dating/souhaits/', '/cgv/', '/mentions-legales/', '/confidentialite/', '/retours/', '/conditions-utilisation/', '/confidences-lamia/', '/hors-ligne/'].includes(p.path.replace(/^\/en\//, '/')));
+const indexable = pages.filter((p) => !soonRooms.some((r) => p.path.replace(/^\/en\//, '/') === r.path) && !p.path.endsWith('.html') && !p.path.startsWith('/en/produit/') && !['/produit/', '/mon-espace/', '/speed-dating/bal/', '/speed-dating/salle/', '/suppression-compte/', '/speed-dating/merci/', '/commande/merci/', '/abonnement/merci/', '/rencontres/swipe/', '/rencontres/confirmer/', '/rencontres/visio/', '/speed-dating/souhaits/', '/cgv/', '/mentions-legales/', '/confidentialite/', '/retours/', '/conditions-utilisation/', '/confidences-lamia/', '/hors-ligne/'].includes(p.path.replace(/^\/en\//, '/')));
 await writeFile(
   join(DIST, 'sitemap.xml'),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${indexable.filter((p) => !p.path.startsWith('/produit/')).map((p) => `<url><loc>${SITE_URL}${p.path}</loc></url>`).join('')}${PRODUITS_INDEXES.map((p) => `<url><loc>${SITE_URL}${p.path}</loc>${p.lastmod ? `<lastmod>${p.lastmod}</lastmod>` : ''}</url><url><loc>${SITE_URL}/en${p.path}</loc>${p.lastmod ? `<lastmod>${p.lastmod}</lastmod>` : ''}</url>`).join('')}</urlset>\n`

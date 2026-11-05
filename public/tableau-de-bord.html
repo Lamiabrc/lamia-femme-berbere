@@ -252,12 +252,13 @@
         <div class="tdb-carte">
           <h2>Ouvrir des créneaux</h2>
           <form data-coaching-form class="tdb-coaching-form">
+            <label>Service<select name="duree"><option value="15">Visio de 15 min</option><option value="30">Coaching de 30 min</option><option value="60">Sauver mon couple (1 h)</option></select></label>
             <label>Jour<input type="date" name="date" required></label>
             <label>De<input type="time" name="de" value="18:00" required></label>
             <label>À<input type="time" name="a" value="19:00" required></label>
             <button class="btn btn-ink" type="submit">Ouvrir</button>
           </form>
-          <p class="aide">Un créneau toutes les 20 minutes : 15 minutes de visio et 5 minutes entre deux personnes.</p>
+          <p class="aide">Tes clients ne voient que les créneaux du service qu’ils ont pris. 5 minutes sont gardées entre deux personnes.</p>
           <p class="aide" role="status" data-coaching-statut></p>
         </div>
         <div class="tdb-carte">

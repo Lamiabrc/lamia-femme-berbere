@@ -20,6 +20,8 @@ export const UNITES = [
   { id: 'mise_en_relation', nom: 'Un match supplémentaire', prix: 500, texte: 'Un match de plus, sans abonnement. Il n’expire pas.' },
   { id: 'speed_dating', nom: 'Une soirée de speed dating', prix: 1200, texte: 'Une place pour une soirée de speed dating en ligne, à utiliser quand tu veux.' },
   { id: 'coaching', nom: 'Une visio de coaching avec Lamia', prix: 1500, texte: '15 minutes en visio avec Lamia, sans enregistrement. Tu choisis ton créneau dans Mon espace après l’achat.' },
+  { id: 'coaching_30', nom: 'Un coaching de 30 minutes avec Lamia', prix: 3900, texte: '30 minutes en visio avec Lamia, sans enregistrement, pour faire le point en profondeur. Tu choisis ton créneau dans Mon espace après l’achat.' },
+  { id: 'sauver_couple', nom: 'Sauver mon couple', prix: 8900, texte: '1 heure en visio avec Lamia, à deux ou seul·e, sans enregistrement. Un accompagnement, sans garantie de résultat et sans remplacer une thérapie. Tu choisis ton créneau dans Mon espace après l’achat.' },
   { id: 'live_priorite', nom: 'Passage en priorité en live', prix: 500, texte: 'Lamia présente ton annonce en priorité à son prochain live.' },
   // S'achètent seulement depuis Mon espace : ils concernent un compte, un match ou une discussion.
   { id: 'prolonger_discussion', nom: 'Prolonger la discussion', prix: 300, jours: 7, depuisEspace: true, texte: '7 jours de plus avec ton match, pour vous deux. Depuis ta discussion, dans Mon espace.' },
