@@ -12,6 +12,7 @@ const compteur = document.querySelector('[data-swipe-compteur]');
 let tour = 1, tourAnnonce = false, dejaCharge = false, enRecharge = false, envoi = Promise.resolve(), tous = [], profils = [], token = null, occupe = false, quota = { limite: null, restants: null }, choisi = { nombre: 0, refs: [] }, matchs = { actifs: 0, limite: 1, formule: 'decouverte' }, dernier = null, coeurs = 0;
 const bandeau = document.querySelector('[data-swipe-infos]');
 
+let pauseVue = false;
 const message = (html) => { zone.innerHTML = `<div class="swipe-message">${html}</div>`; document.querySelector('[data-swipe-boutons]').hidden = true; };
 
 // La fiche : l'essentiel en grand, dans un bijou rond (femme) ou triangulaire (homme). Le reste s'ouvre avec « Voir le profil ».
@@ -225,7 +226,10 @@ async function choisir(choix) {
   dernier = { profil, choix }; garderDernier(); majAnnuler();
   envoi = api({ action: 'annonce_swipe', ref, choix }, token).then((r) => {
     if (r?.matchs) { matchs = { ...matchs, ...r.matchs }; infos(); }
-    if (r?.match) { dernier = null; majAnnuler(); celebrerMatch(r.ref); }
+    const finPause = r?.pause_jusqu_a ? new Date(r.pause_jusqu_a).toLocaleString('fr-FR', { weekday: 'long', hour: '2-digit', minute: '2-digit' }) : '';
+    if (r?.match && finPause) { dernier = null; majAnnuler(); toast(`💞 C’est réciproque ! Après 3 matchs en 3 jours, une pause de 24 h s’applique : votre discussion s’ouvrira ${finPause}.`); }
+    else if (r?.match) { dernier = null; majAnnuler(); celebrerMatch(r.ref); }
+    else if (finPause && !pauseVue) { pauseVue = true; toast(`⏸️ Pause de 24 h après 3 matchs en 3 jours : tu peux continuer à swiper, tes nouveaux matchs s’ouvriront ${finPause}.`); }
   }).catch((err) => { if (err.code === 'quota_matchs') return quotaAtteint(err); if (err.code === 'limite_matchs') { matchs = { ...matchs, actifs: err.actifs ?? matchs.limite }; infos(); limiteAtteinte(); } });
   await new Promise((r) => setTimeout(r, 300));
   profils.shift();
