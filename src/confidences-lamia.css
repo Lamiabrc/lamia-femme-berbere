@@ -140,3 +140,9 @@ legend { font-size: 14px; font-weight: 600; padding: 0 4px; }
   [data-annonces-vue] [data-annonces] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; align-items: start; }
   [data-annonces-vue] .cl-annonce { margin-bottom: 0; }
 }
+
+.cl-ecrire { margin: 8px 0; }
+.cl-ecrire-zone { margin-top: 8px; padding: 10px; border-radius: 12px; background: #fff4e5; border: 1px solid #e3cf9f; }
+.cl-ecrire-zone label { display: grid; gap: 6px; font-size: 14px; font-weight: 600; }
+.cl-ecrire-zone textarea { width: 100%; box-sizing: border-box; font: 16px/1.4 inherit; padding: 8px; border: 1px solid #d9c19a; border-radius: 10px; margin-bottom: 8px; }
+.cl-ecrire-zone a.cl-btn { text-decoration: none; }
