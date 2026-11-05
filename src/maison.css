@@ -3298,6 +3298,21 @@ label.is-manquant { outline: 2px solid #2c38ba; outline-offset: 3px; border-radi
 .disc-saisie textarea { flex: 1; min-height: 46px; border-radius: 14px; border: 1px solid #e0cdb5; padding: 10px 12px; font: inherit; font-size: 16px; resize: vertical; }
 .disc-saisie .btn, .disc-numeros .btn { min-height: 46px; }
 .disc-aide { font-size: 13px; color: #8a7a6a; margin: 0; }
+.disc-msg.is-systeme { text-align: center; }
+.disc-msg.is-systeme span { display: inline-block; background: #eef0fb; color: #1c2376; font-style: italic; }
+.disc-dematch-lien { margin: 10px 0 0; }
+.disc-dematch, .disc-dematch-etat { margin: 10px 0; padding: 12px 14px; border-radius: 12px; background: #fbf1e3; color: #4a3518; }
+.disc-dematch h4 { margin: 0 0 6px; }
+.disc-dematch p { margin: 0 0 8px; }
+.disc-dematch fieldset { border: 0; padding: 0; margin: 0 0 8px; display: flex; flex-wrap: wrap; gap: 6px 14px; }
+.disc-dematch legend { font-weight: 600; padding: 0; margin-bottom: 6px; }
+.disc-dematch-etape { display: block; margin-bottom: 8px; }
+.disc-dematch-actions { margin: 0 !important; }
+.disc-dematch-etat small { display: block; margin-top: 4px; opacity: .8; }
+.swipe-antighost { margin: 0 0 .6rem; padding: 7px 14px; border-radius: 16px; background: rgba(255, 255, 255, .12); border: 1px solid rgba(233, 196, 106, .55); color: #fff !important; font-size: 13px; line-height: 1.35; text-align: center; }
+.swipe-antighost strong { color: #f4d58d; }
+.disc-dematch fieldset label { display: inline-flex; align-items: center; gap: 6px; font-weight: 500; }
+.disc-dematch fieldset input { width: auto; margin: 0; }
 .disc-numeros { display: grid; gap: 8px; padding: 10px 12px; border-radius: 14px; background: #f3ead9; color: #2b2118; }
 .disc-numeros.is-ok { background: #e6f2e4; }
 .disc-numeros input { width: 100%; min-height: 46px; border-radius: 12px; border: 1px solid #e0cdb5; padding: 8px 12px; font-size: 16px; margin-top: 4px; }

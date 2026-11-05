@@ -1657,6 +1657,7 @@ page(
   <details class="swipe-explique"><summary>Comment ça marche ?</summary><p>À droite (cœur) s’il t’intéresse, à gauche (croix) sinon, sans limite. Ton identité reste secrète : on ne voit que des numéros de profil. Si vous vous choisissez tous les deux, Lamia est prévenue et vous met en relation.</p></details>
 </header>
 <div class="swipe-app">
+  <p class="swipe-antighost">🤝 <strong>Appli anti-ghosting</strong> : ici, on ne disparaît pas. Pour dématcher, on se dit au revoir.</p>
   <div class="swipe-infos" data-swipe-infos></div>
   <div class="swipe-filtres-zone" data-swipe-filtres></div>
   <p class="swipe-compteur" data-swipe-compteur></p>
