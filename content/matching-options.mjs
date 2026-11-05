@@ -33,6 +33,11 @@ export const O = {
   pratiqueRecherche: ['Pas important', 'Pratiquant(e)', 'Pratique moderee', 'Non pratiquant(e)'],
   etudesRecherche: ['Pas important', 'Bac', 'Bac+', 'Bac+5', 'Plus de Bac+5'],
   hidjab: ['Pas important', 'Oui', 'Non'],
+  // Métier : seule la catégorie peut être dite en live ; le métier exact reste chez Lamia.
+  secteurPro: ['Sante', 'Batiment / artisanat', 'Commerce / vente', 'Transport / logistique', 'Enseignement / education', 'Fonction publique', 'Bureau / administratif', 'Informatique / ingenierie', 'Hotellerie / restauration', 'Independant(e) / entrepreneur', 'Etudiant(e)', 'Sans emploi / en recherche', 'Au foyer', 'Autre'],
+  // Situation administrative : privée. Jamais affichée (site, Patio, live) ; seuls Lamia et le matching s'en servent.
+  situationAdmin: ['Situation administrative stable', 'Pas encore stable', 'Je prefere en parler a Lamia'],
+  situationAdminRecherche: ['Pas important', 'Situation administrative stable'],
 };
 
 // Libellés affichés sur le site (avec accents), la valeur envoyée reste celle de l'outil.
@@ -47,6 +52,8 @@ export const LIBELLE = {
   'Oui - France': 'Oui, en France', 'Oui - region': 'Oui, dans ma région', 'Oui - international': 'Oui, à l’international', 'A discuter': 'À discuter',
   'Homme: femme ne travaille pas': 'Je préfère que ma femme ne travaille pas', 'Homme: femme travaille pour son epanouissement': 'Ma femme travaille pour son épanouissement', 'Homme: femme travaille pour aider': 'Ma femme travaille pour aider le foyer', 'Homme: femme travaille en 50/50': 'On partage les charges à 50/50',
   'Femme: ne veut pas travailler': 'Je ne souhaite pas travailler', 'Femme: veut travailler obligatoirement': 'Je veux absolument travailler', 'Femme: veut travailler si necessaire': 'Je travaillerai si nécessaire', 'Femme: veut travailler pour mon epanouissement': 'Je travaille pour mon épanouissement',
+  'Sante': 'Santé', 'Batiment / artisanat': 'Bâtiment / artisanat', 'Enseignement / education': 'Enseignement / éducation', 'Informatique / ingenierie': 'Informatique / ingénierie', 'Hotellerie / restauration': 'Hôtellerie / restauration', 'Independant(e) / entrepreneur': 'Indépendant(e) / entrepreneur', 'Etudiant(e)': 'Étudiant(e)',
+  'Situation administrative stable': 'Situation administrative stable (nationalité ou titre de séjour durable)', 'Je prefere en parler a Lamia': 'Je préfère en parler à Lamia',
   'Fumeur: non': 'Non-fumeur', 'Fumeur: occasionnel': 'Fumeur occasionnel', 'Fumeur: oui': 'Fumeur', 'Sport: oui': 'Sport régulier', 'Sport: occasionnel': 'Sport de temps en temps', 'Sport: non': 'Pas de sport', 'Alcool: non': 'Pas d’alcool', 'Alcool: occasionnel': 'Alcool occasionnel', 'Alcool: oui': 'Alcool', 'Chemma: non': 'Sans chique (chemma)', 'Chemma: oui': 'Chique (chemma)',
 };
 export const lib = (v) => LIBELLE[v] || v;
@@ -88,6 +95,9 @@ export function choixPropres(m = {}) {
     niveauEtudeDetail: cat ? un(m.niveauEtudeDetail, O.etudeDetail[cat]) : '',
     etudesPaysObtention: un(m.etudesPaysObtention, O.etudesPaysObtention),
     profession: txt(m.profession, 80),
+    secteurPro: un(m.secteurPro, O.secteurPro),
+    situationAdministrative: un(m.situationAdministrative, O.situationAdmin),
+    situationAdminRecherche: un(m.situationAdminRecherche, O.situationAdminRecherche),
     tailleCm: int(m.tailleCm, 120, 230),
     religion: un(m.religion, O.religion),
     pratique: un(m.pratique, O.pratique),
@@ -147,7 +157,7 @@ export function versOutil(a, { photoDataUrl = '', aujourdHui = new Date() } = {}
     niveauEtudeCategorie: m.niveauEtudeCategorie || '',
     niveauEtudeDetail: m.niveauEtudeDetail || '',
     etudesPaysObtention: m.etudesPaysObtention || '',
-    profession: m.profession || '',
+    profession: [m.secteurPro && lib(m.secteurPro), m.profession].filter(Boolean).join(' – '),
     tailleCm: m.tailleCm ?? null,
     religion: m.religion || '',
     pratique: m.pratique || '',
@@ -176,7 +186,7 @@ export function versOutil(a, { photoDataUrl = '', aujourdHui = new Date() } = {}
     plateformeSaisie: 'Autre',
     canalSaisie: 'Message privé',
     photoDataUrl,
-    notes: `${a.status === 'a_verifier' ? '⏳ À VÉRIFIER : profil pas encore validé sur le site (teste-le, puis valide-le). ' : ''}${a.email ? `Email : ${a.email}. ` : ''}${a.photo_partage ? '📷 Photo transmissible à son match : OUI. ' : '📷 Photo transmissible à son match : NON. '}${m.religionTexte ? `Foi et pratique : ${m.religionTexte}. ` : ''}${m.autresModeVie ? `Mode de vie : ${m.autresModeVie}. ` : ''}Annonce n° ${a.ref} déposée sur lamia-femme-berbere.com${a.identite_verifiee_at ? `, vérifié AVEC pièce d’identité le ${String(a.identite_verifiee_at).slice(0, 10)}` : ', vérifié sans pièce d’identité'}.${(a.interets || []).length ? ` MATCH DEMANDÉ : intéressé(e) par le profil ${a.interets.map((r) => `site-annonce-${r}`).join(', ')}.` : ''}`,
+    notes: `${a.status === 'a_verifier' ? '⏳ À VÉRIFIER : profil pas encore validé sur le site (teste-le, puis valide-le). ' : ''}${a.email ? `Email : ${a.email}. ` : ''}${a.photo_partage ? '📷 Photo transmissible à son match : OUI. ' : '📷 Photo transmissible à son match : NON. '}${m.religionTexte ? `Foi et pratique : ${m.religionTexte}. ` : ''}${m.autresModeVie ? `Mode de vie : ${m.autresModeVie}. ` : ''}${m.situationAdministrative ? `🔒 Situation administrative (privée, jamais en live) : ${lib(m.situationAdministrative)}. ` : ''}${m.situationAdminRecherche === 'Situation administrative stable' ? '🔒 Cherche une personne en situation administrative stable. ' : ''}${a.live_ok ? `🎥 Accepte d’être présenté(e) en live (accord du ${String(a.live_ok_at || '').slice(0, 10)}). ` : '🚫 N’a PAS accepté d’être présenté(e) en live. '}Annonce n° ${a.ref} déposée sur lamia-femme-berbere.com${a.identite_verifiee_at ? `, vérifié AVEC pièce d’identité le ${String(a.identite_verifiee_at).slice(0, 10)}` : ', vérifié sans pièce d’identité'}.${(a.interets || []).length ? ` MATCH DEMANDÉ : intéressé(e) par le profil ${a.interets.map((r) => `site-annonce-${r}`).join(', ')}.` : ''}`,
     statut: 'Nouveau',
     source_record_id: `site-annonce-${a.ref}`,
     status_import: 'site',
@@ -201,8 +211,8 @@ export function foiEtVie(a) {
 export function fichePotentiel(src, { outil = false, age = null } = {}) {
   if (outil) return { age: src.age ?? null, age_min: src.age_min, age_max: src.age_max, pays: src.pays || '', religion: src.religion || '', pratique: src.pratique || '', enfants: src.enfants || '', situation: src.situation || '', origine: src.origine || [], hygiene: src.mode_vie || [], etudes: src.etudes || '', prefs: {} };
   const m = src.matching || {};
-  return { age, age_min: src.age_min, age_max: src.age_max, pays: src.pays || '', religion: m.religion || '', pratique: m.pratique || '', enfants: m.enfants || '', situation: m.situation || '', origine: m.origineTags || [], hygiene: m.hygieneVie || [], etudes: m.niveauEtudeCategorie || '',
-    prefs: { religion: m.religionRecherche || '', pratique: m.pratiqueRecherche || '', origines: m.origineRechercheTags || [], kabyleUniquement: Boolean(m.kabyleUniquement), accepteEnfants: m.accepteEnfants, accepteDivorce: m.accepteDivorce, accepteVeuf: m.accepteVeuf, zone: m.zoneGeo || '', mobilite: m.mobiliteGeographique || '', fumeur: (m.hygieneVie || []).find((x) => /^Fumeur/.test(x)) || '' } };
+  return { age, age_min: src.age_min, age_max: src.age_max, pays: src.pays || '', admin: m.situationAdministrative || '', religion: m.religion || '', pratique: m.pratique || '', enfants: m.enfants || '', situation: m.situation || '', origine: m.origineTags || [], hygiene: m.hygieneVie || [], etudes: m.niveauEtudeCategorie || '',
+    prefs: { religion: m.religionRecherche || '', pratique: m.pratiqueRecherche || '', origines: m.origineRechercheTags || [], kabyleUniquement: Boolean(m.kabyleUniquement), accepteEnfants: m.accepteEnfants, accepteDivorce: m.accepteDivorce, accepteVeuf: m.accepteVeuf, adminStable: m.situationAdminRecherche === 'Situation administrative stable', zone: m.zoneGeo || '', mobilite: m.mobiliteGeographique || '', fumeur: (m.hygieneVie || []).find((x) => /^Fumeur/.test(x)) || '' } };
 }
 function sens(A, B, forts, vigilance, quiA, quiB) {
   let pts = 0, max = 0;
@@ -234,6 +244,8 @@ function sens(A, B, forts, vigilance, quiA, quiB) {
   // Tabac (5)
   const fB = B.hygiene.find((x) => /^Fumeur/.test(x));
   if (A.prefs.fumeur === 'Fumeur: non' && fB && fB !== 'Fumeur: non') { vigilance.push(`${quiB} fume, ${quiA} non`); ajoute(1, 5); } else ajoute(fB ? 5 : 4, 5);
+  // Situation administrative stable demandée (5) : point de vigilance à aborder en privé, jamais affiché ailleurs.
+  if (A.prefs.adminStable) { if (B.admin === 'Situation administrative stable') ajoute(5, 5); else { vigilance.push(B.admin ? `Situation administrative de ${quiB} à vérifier en privé (${quiA} la veut stable)` : `${quiA} veut une situation administrative stable : à demander à ${quiB} en privé`); ajoute(B.admin ? 0 : 2, 5); } }
   // Géographie (5)
   const zone = A.prefs.zone;
   if (zone && zone !== "N'importe ou" && B.pays) { if (zone === B.pays || (zone === 'Europe' && ['France', 'Europe'].includes(B.pays))) ajoute(5, 5); else if (/^Oui/.test(A.prefs.mobilite || '')) ajoute(3, 5); else { vigilance.push(`${quiB} vit hors de la zone voulue par ${quiA}`); ajoute(1, 5); } }
