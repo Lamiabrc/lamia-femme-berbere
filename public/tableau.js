@@ -722,7 +722,7 @@ const ageDe = (birth) => {
   if (d.getUTCMonth() < b.getUTCMonth() || (d.getUTCMonth() === b.getUTCMonth() && d.getUTCDate() < b.getUTCDate())) a--;
   return a;
 };
-const nomDe = (c) => c.profil?.real_first_name || c.profil?.display_name || '(sans prénom)';
+const nomDe = (c) => c.prenom || '(sans prénom)';
 const incomplet = (c) => !c.profil || !c.profil.gender || !c.profil.birth_date || !(c.profil.real_first_name || c.profil.display_name);
 const salonCourt = (s) => String(s || '').replace(/^Grand salon · /, '');
 

@@ -263,9 +263,9 @@ async function chargerAnnonces() {
     box.innerHTML = annonces.map((a) => `<article class="cl-carte cl-annonce" data-id="${a.id}" id="annonce-${a.ref}">
       <p class="cl-coord"><b>N° ${a.ref}</b> · ${STATUT_ANNONCE[a.status] || a.status}${a.submitted_at ? ` · reçue le ${quand(a.submitted_at)}` : ''}</p>
       ${boutonEcrire(a.ref)}
-      <h3>${esc(a.prenom)}, ${a.age} ans · ${a.genre === 'femme' ? 'femme' : 'homme'}</h3>
+      <h3>${a.genre === 'femme' ? 'Femme' : 'Homme'}, ${a.age} ans</h3>
       <p class="cl-badges">${[a.test ? '🧪 PROFIL DE TEST (invisible du public)' : '',a.live_declare ? (a.outil_lie ? '🎥 Créé en live · fiche retrouvée dans l’outil · 3 offertes' : '🎥 Dit avoir été en live · fiche à retrouver · 3 offertes') : a.outil_lie ? '🔗 Déjà dans ton outil (même lien)' : '', a.compte ? '👤 Compte lié' : '', a.photo_partage ? '📷 Photo transmissible au match' : '🚫📷 Photo à ne pas transmettre', a.en_match ? '💞 Match en cours' : '', a.modifiee_at ? `✏️ Modifié le ${quand(a.modifiee_at)}` : ''].filter(Boolean).map((t) => `<span>${esc(t)}</span>`).join('')}</p>
-      <p class="cl-coord">${esc(a.ville)}, ${esc(a.pays)}${a.situation ? ` · ${esc(a.situation)}` : ''} · né(e) le ${esc(a.birth_date)}<br>${esc(a.email)}${a.phone ? ` · ${esc(a.phone)}` : ''}</p>
+      <p class="cl-coord">Prénom : ${esc(a.prenom)} · ${esc(a.ville)}, ${esc(a.pays)}${a.situation ? ` · ${esc(a.situation)}` : ''} · né(e) le ${esc(a.birth_date)}<br>${esc(a.email)}${a.phone ? ` · ${esc(a.phone)}` : ''}</p>
       <div class="cl-annonce-medias">${a.medias.map((m) => !m.url ? '' : m.kind === 'video' ? `<video src="${esc(m.url)}" controls playsinline preload="metadata"></video>` : `<a href="${esc(m.url)}" target="_blank" rel="noopener"><img src="${esc(m.url)}" alt="Photo"></a>`).join('')}</div>
       ${a.identite?.url ? `<div class="cl-annonce-id"><p><b>Pièce d’identité</b> (vérifie le prénom, l’âge et que le numéro est caché) :</p>${a.identite.mime === 'application/pdf' ? `<a class="cl-btn" href="${esc(a.identite.url)}" target="_blank" rel="noopener">Ouvrir le PDF</a>` : `<a href="${esc(a.identite.url)}" target="_blank" rel="noopener"><img src="${esc(a.identite.url)}" alt="Pièce d’identité"></a>`}</div>` : a.identite_verifiee_at ? `<p class="cl-aide">✓ Identité vérifiée le ${quand(a.identite_verifiee_at)} (pièce supprimée).</p>` : ''}
       ${a.matching && Object.keys(a.matching).length ? `<p class="cl-coord">${[a.matching.situation, a.matching.enfants === 'Oui' ? `${a.matching.nbEnfants || ''} enfant(s)` : a.matching.enfants === 'Non' ? 'sans enfant' : '', a.matching.niveauEtudeDetail || a.matching.niveauEtudeCategorie, a.matching.profession, a.matching.religion, a.matching.pratique, ...(a.matching.origineTags || [])].filter(Boolean).map(lib).map(esc).join(' · ')}${a.matching.contactReseau ? `<br>Réseau : ${esc(a.matching.contactReseau)}` : ''}</p>` : ''}
@@ -390,7 +390,7 @@ async function chargerDemandes() {
     const n = demandes.filter((d) => d.statut === 'a_traiter').length;
     $('[data-n-demandes]').textContent = n ? `(${n})` : '';
     if (!demandes.length) { box.innerHTML = '<p class="cl-vide">Aucune demande pour le moment.</p>'; return; }
-    const qui = (p) => p?.prenom ? `n° ${p.ref} · ${esc(p.prenom)}, ${p.age} ans, ${esc(p.ville)} (${esc(lib(p.pays))})${p.contact ? `<br><small>${esc(p.contact)}</small>` : ''}` : `n° ${p?.ref} <small>(profil retiré ou inconnu)</small>`;
+    const qui = (p) => (p?.genre || p?.age ? `n° ${p.ref} · ${p.genre === 'femme' ? 'Femme' : p.genre === 'homme' ? 'Homme' : 'Profil'}, ${p.age} ans${p.ville ? `, ${esc(p.ville)}` : ''}${p.pays ? ` (${esc(lib(p.pays))})` : ''}${p.contact ? `<br><small>${esc(p.contact)}</small>` : ''}` : `n° ${p?.ref} <small>(profil retiré ou inconnu)</small>`);
     // Regroupées par personne : ses matchs demandés du plus fort au plus faible potentiel, pour n'en choisir qu'un.
     const niveau = (sc) => (sc == null ? ['?', 'is-inconnu', 'à vérifier dans ton outil'] : sc >= 75 ? [sc, 'is-fort', 'fort potentiel'] : sc >= 50 ? [sc, 'is-moyen', 'potentiel moyen'] : [sc, 'is-faible', 'faible potentiel']);
     const groupes = new Map();
