@@ -68,3 +68,20 @@ test('débloquer : seulement ses propres blocages', async () => {
   assert.match(h.appels[0].u, /auteur_user=eq\.moi&cible_ref=eq\.9/);
   assert.equal(h.appels[0].o.method, 'DELETE');
 });
+
+test('un seul bouton : bloquer et signaler enregistre les deux, une seule alerte', async () => {
+  const h = harnais();
+  const r = await lire(await actionBlocage('annonce_bloquer_signaler', { ref: 9, motif: 'insultes' }, h.deps));
+  assert.equal(r.status, 200);
+  assert.equal(h.inserts.filter((x) => x.t === 'signalements').length, 1);
+  assert.ok(h.appels.some((x) => x.u.includes('blocages')));
+  assert.equal(h.alertes.length, 1);
+});
+
+test('bloquer et signaler : au-delà de 20 signalements par jour, le blocage passe quand même', async () => {
+  const h = harnais({ 'signalements?auteur_user': Array(21).fill({ id: 1 }) });
+  const r = await lire(await actionBlocage('annonce_bloquer_signaler', { ref: 9 }, h.deps));
+  assert.equal(r.status, 200);
+  assert.ok(h.appels.some((x) => x.u.includes('blocages')));
+});
+
