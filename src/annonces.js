@@ -91,7 +91,10 @@ export function formulaireHtml() {
       <label>Ton niveau d’études<select name="niveauEtudeCategorie">${opts(O.etudeCategorie)}</select></label>
       <label>Ton diplôme<select name="niveauEtudeDetail"><option value="">Choisis d’abord ton niveau</option></select></label>
       <label>Diplôme obtenu en<select name="etudesPaysObtention">${opts(O.etudesPaysObtention)}</select></label>
-      <label>Ta profession<input name="profession" maxlength="80"></label>
+      <label>Ton secteur d’activité<select name="secteurPro">${opts(O.secteurPro)}</select></label>
+      <label>Ton métier exact <small>(facultatif, seule Lamia le voit)</small><input name="profession" maxlength="80"></label>
+      <label>Ta situation administrative <small>(facultatif)</small><select name="situationAdministrative">${opts(O.situationAdmin, 'Je préfère ne pas dire')}</select></label>
+      <p class="annonce-aide annonce-large">🔒 Ta situation administrative n’est <strong>jamais affichée</strong> : ni sur le site, ni dans les Rencontres, ni en live. Seule Lamia la connaît, pour te proposer des personnes qui te correspondent.</p>
       <label>Ta taille <small>(en cm, facultatif)</small><input name="tailleCm" type="number" min="120" max="230" inputmode="numeric" placeholder="170"></label>
       <label>Ta religion <small>(facultatif)</small><select name="religion">${opts(O.religion, 'Je préfère ne pas dire')}</select></label>
       <label>Ta pratique <small>(facultatif)</small><select name="pratique">${opts(O.pratique, 'Je préfère ne pas dire')}</select></label>
@@ -115,6 +118,7 @@ export function formulaireHtml() {
       <label>Sa religion<select name="religionRecherche">${opts(O.religionRecherche)}</select></label>
       <label>Sa pratique<select name="pratiqueRecherche">${opts(O.pratiqueRecherche)}</select></label>
       <label>Son niveau d’études<select name="etudesRecherche">${opts(O.etudesRecherche)}</select></label>
+      <label>Sa situation administrative<select name="situationAdminRecherche">${opts(O.situationAdminRecherche)}</select></label>
       <label data-hidjab hidden>Qu’elle porte le hijab ?<select name="rechercheFemmeHidjabiste">${opts(O.hidjab)}</select></label>
     </div>
     <p class="annonce-sous">Ses origines <small>(laisse vide si peu importe)</small></p>${puces('origineRechercheTags', O.origine)}
@@ -153,9 +157,10 @@ export function formulaireHtml() {
     <p class="annonce-aide">Tes coordonnées ne sont jamais affichées ni transmises : c’est Lamia qui te contacte pour une mise en relation.</p>
   </div>
   <label class="annonce-case" data-consent-depot><input type="checkbox" name="majeur"> <span>J’ai 18 ans ou plus et cette annonce est sincère : je cherche une vraie rencontre.</span></label>
-  <label class="annonce-case" data-consent-depot><input type="checkbox" name="publication"> <span>Je confie mon profil à Lamia : il n’est publié nulle part, seule Lamia le voit et l’utilise dans son outil de matching pour me proposer des mises en relation. Je peux le retirer et faire effacer mes données à tout moment.</span></label>
+  <label class="annonce-case" data-consent-depot><input type="checkbox" name="publication"> <span>Je confie mon profil à Lamia : il n’est publié nulle part sans mon accord (cases facultatives ci-dessous), seule Lamia le voit en entier et l’utilise dans son outil de matching pour me proposer des mises en relation. Je peux le retirer et faire effacer mes données à tout moment.</span></label>
   <label class="annonce-case" data-identite-accord hidden><input type="checkbox" name="identite_ok"> <span>J’accepte que Lamia voie la photo de ma pièce d’identité pour vérifier mon profil, sachant qu’elle est supprimée juste après. <a href="/confidentialite/" target="_blank" rel="noopener">Confidentialité</a></span></label>
   <label class="annonce-case"><input type="checkbox" name="anonyme_ok"> <span>Facultatif : j’accepte que Lamia affiche mon profil <strong>anonymement</strong> dans les Rencontres du site (âge, pays, textes et caractéristiques, <strong>sans prénom, photo, ville ni contact</strong>), pour que d’autres puissent dire qu’il les intéresse.</span></label>
+  <label class="annonce-case"><input type="checkbox" name="live_ok"> <span>Facultatif : j’accepte que Lamia <strong>présente mon profil en live</strong> (TikTok, Facebook, YouTube, replay compris) : mon prénom ou un petit nom, mon âge, mon pays, mon secteur d’activité et ce que je cherche. <strong>Jamais</strong> ma photo sans mon accord, ma ville, mon contact, ni ma situation administrative. Je peux retirer cet accord à tout moment depuis mon espace.</span></label>
   <label class="annonce-case"><input type="checkbox" name="photo_partage"> <span>Facultatif : si un match me convient, j’accepte que Lamia transmette <strong>ma photo</strong> à la personne avec qui elle me met en relation, et à elle seule. Jamais sur le site, jamais à quelqu’un d’autre. Je peux changer d’avis à tout moment depuis mon espace.</span></label>
   <input type="hidden" name="interet_ref" value="">
   <p class="annonce-interet" data-interet-info hidden></p>
@@ -402,7 +407,7 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
         ville: f.ville.value, pays: f.pays.value, profil: f.profil.value, recherche: f.recherche.value,
         matching: lireMatching(form),
         age_min: f.age_min.value, age_max: f.age_max.value, email: session.user.email, sans_reseau: sansReseau(), telephone: sansReseau() ? f.telephone.value : '',
-        majeur: true, publication: true, identite_ok: Boolean(identite.length && f.identite_ok.checked), website: f.zz_site.value, anonyme_ok: f.anonyme_ok.checked, photo_partage: f.photo_partage.checked, interet_ref: f.interet_ref.value,
+        majeur: true, publication: true, identite_ok: Boolean(identite.length && f.identite_ok.checked), website: f.zz_site.value, anonyme_ok: f.anonyme_ok.checked, live_ok: f.live_ok.checked, photo_partage: f.photo_partage.checked, interet_ref: f.interet_ref.value,
         medias: fichiers.map((x) => ({ role: x.role, type: typeDe(x.blob), size: x.blob.size })),
       }, session?.access_token);
       if (!envoi) envoi = { cle, res, faits: new Set() };
@@ -433,7 +438,7 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
   });
 }
 
-const CHAMPS = ['villageOrigine', 'langue', 'situation', 'enfants', 'nbEnfants', 'ageEnfants', 'desirEnfants', 'niveauEtudeCategorie', 'niveauEtudeDetail', 'etudesPaysObtention', 'profession', 'tailleCm', 'religion', 'pratique', 'mobiliteGeographique', 'visionFinanciere', 'fumeur', 'sport', 'alcool', 'chemma', 'religionTexte', 'autresModeVie', 'zoneGeo', 'religionRecherche', 'pratiqueRecherche', 'etudesRecherche', 'rechercheFemmeHidjabiste', 'contactReseau'];
+const CHAMPS = ['villageOrigine', 'langue', 'situation', 'enfants', 'nbEnfants', 'ageEnfants', 'desirEnfants', 'niveauEtudeCategorie', 'niveauEtudeDetail', 'etudesPaysObtention', 'profession', 'secteurPro', 'situationAdministrative', 'situationAdminRecherche', 'tailleCm', 'religion', 'pratique', 'mobiliteGeographique', 'visionFinanciere', 'fumeur', 'sport', 'alcool', 'chemma', 'religionTexte', 'autresModeVie', 'zoneGeo', 'religionRecherche', 'pratiqueRecherche', 'etudesRecherche', 'rechercheFemmeHidjabiste', 'contactReseau'];
 const LISTES = ['origineTags', 'caracteristiques', 'origineRechercheTags', 'caracteristiquesRecherche'];
 const CASES = ['kabyleUniquement', 'accepteDivorce', 'accepteVeuf', 'accepteEnfants'];
 function lireMatching(form) {
@@ -460,6 +465,7 @@ function monterEdition(form, st, p, token) {
   for (const n of LISTES) for (const v of m[n] || []) { const c = form.querySelector(`[name=${n}][value="${CSS.escape(v)}"]`); if (c) c.checked = true; }
   for (const n of CASES) F[n].checked = Boolean(m[n]);
   F.anonyme_ok.checked = Boolean(p.anonyme_ok);
+  F.live_ok.checked = Boolean(p.live_ok);
   if (p.sans_reseau) { F.sans_reseau.checked = true; F.telephone.value = p.telephone || ''; F.sans_reseau.dispatchEvent(new Event('change')); }
   F.photo_partage.checked = Boolean(p.photo_partage);
   const btn = $('.annonce-envoyer', form); btn.textContent = 'Enregistrer mes modifications';
@@ -469,7 +475,7 @@ function monterEdition(form, st, p, token) {
     if (F.sans_reseau.checked ? !telephoneNormal(F.telephone.value) : !F.contactReseau.value.trim()) return say(st, F.sans_reseau.checked ? ERR.telephone_invalide : ERR.contact_requis, true);
     btn.disabled = true; say(st, 'Enregistrement…');
     try {
-      await api({ action: 'annonce_modifier', prenom: F.prenom.value, ville: F.ville.value, pays: F.pays.value, profil: F.profil.value, recherche: F.recherche.value, age_min: F.age_min.value, age_max: F.age_max.value, anonyme_ok: F.anonyme_ok.checked, photo_partage: F.photo_partage.checked, sans_reseau: F.sans_reseau.checked, telephone: F.sans_reseau.checked ? F.telephone.value : '', matching: lireMatching(form) }, token);
+      await api({ action: 'annonce_modifier', prenom: F.prenom.value, ville: F.ville.value, pays: F.pays.value, profil: F.profil.value, recherche: F.recherche.value, age_min: F.age_min.value, age_max: F.age_max.value, anonyme_ok: F.anonyme_ok.checked, live_ok: F.live_ok.checked, photo_partage: F.photo_partage.checked, sans_reseau: F.sans_reseau.checked, telephone: F.sans_reseau.checked ? F.telephone.value : '', matching: lireMatching(form) }, token);
       say(st, '✓ Ton profil est à jour. Lamia est prévenue.');
     } catch (err) { say(st, ERR[err.code] || 'L’enregistrement n’a pas abouti. Réessaie dans un instant.', true); }
     btn.disabled = false;
