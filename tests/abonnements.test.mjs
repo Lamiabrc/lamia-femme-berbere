@@ -80,7 +80,7 @@ test('notification Stripe : abonnement enregistré une seule fois, puis mis à j
 test('état : crédits à l’unité restants', async () => {
   const fetcher = async (u) => ({ ok: true, json: async () => (u.includes('achats_unite') ? [{ type: 'mise_en_relation', quantite: 3, utilisees: 1 }, { type: 'speed_dating', quantite: 1, utilisees: 1 }] : []) });
   const e = await etatAbonnement('a@b.fr', { env, fetcher });
-  assert.deepEqual(e.unites, { mise_en_relation: 2, speed_dating: 0, coaching: 0, live_priorite: 0 });
+  assert.deepEqual(e.unites, { mise_en_relation: 2, speed_dating: 0, coaching: 0, coaching_30: 0, sauver_couple: 0, live_priorite: 0 });
   assert.equal(e.abonnement, null);
 });
 test('retour de paiement : la session est relue chez Stripe puis enregistrée', async () => {
@@ -206,4 +206,10 @@ test('échéance payée : encaissement noté, une ligne par facture', async () =
   await traiterEvenementAbonnement({ type: 'invoice.paid', data: { object: { id: 'in_1', subscription: 'sub_1', amount_paid: 2200, customer_email: 'N@x.fr', status_transitions: { paid_at: 1793713586 } } } }, { env, fetcher: d.fetcher });
   const e = d.ecrits.find(([u]) => u.startsWith('encaissements'))[2];
   assert.equal(e.montant_centimes, 2200); assert.equal(e.stripe_invoice_id, 'in_1'); assert.equal(e.email, 'n@x.fr');
+});
+
+test('coaching de 30 minutes et Sauver mon couple : les prix de Lamia', () => {
+  assert.equal(unite('coaching_30').prix, 3900);
+  assert.equal(unite('sauver_couple').prix, 8900);
+  assert.ok(!unite('sauver_couple').depuisEspace);
 });

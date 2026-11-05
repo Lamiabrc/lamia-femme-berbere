@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { actionCoaching, creneauxDe, moisParis, rappelsCoaching } from '../lib/coaching.mjs';
 
 const ID = (n) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
-function monde({ formule = 'prestige', statut = 'actif', now = '2026-11-03T12:00:00Z', achetees = 0 } = {}) {
+function monde({ formule = 'prestige', statut = 'actif', now = '2026-11-03T12:00:00Z', achetees = 0, autres = {} } = {}) {
   const credits = { n: achetees, utilises: 0, rendus: 0 };
   const lignes = [], abonnements = [{ email: 'nina@example.com', nom: 'Nina', formule: 'prestige', statut: 'actif' }];
   let n = 0;
@@ -41,7 +41,7 @@ function monde({ formule = 'prestige', statut = 'actif', now = '2026-11-03T12:00
   const prevenus = [], alertes = [];
   const t = { now: new Date(now) };
   const daily = [];
-  const ctx = (user, admin = false) => ({ env: { DAILY_API_KEY: 'k' }, call, read, patch, insert: async () => ({}), admin, user, now: () => t.now, alerter: async (x) => { alertes.push(x.titre); }, prevenirMembre: async (m, x) => { prevenus.push([m.email, x.titre]); }, etat: async () => ({ abonnement: formule ? { formule, statut } : null, unites: { coaching: credits.n } }), consommer: async () => { if (credits.n < 1) return null; credits.n -= 1; credits.utilises += 1; return 'achat-1'; }, rendre: async () => { credits.n += 1; credits.rendus += 1; return true; },
+  const ctx = (user, admin = false) => ({ env: { DAILY_API_KEY: 'k' }, call, read, patch, insert: async () => ({}), admin, user, now: () => t.now, alerter: async (x) => { alertes.push(x.titre); }, prevenirMembre: async (m, x) => { prevenus.push([m.email, x.titre]); }, etat: async () => ({ abonnement: formule ? { formule, statut } : null, unites: { coaching: credits.n, ...autres } }), consommer: async (_m, type) => { if (type !== 'coaching') { if (!autres[type]) return null; autres[type] -= 1; return 'achat-2'; } if (credits.n < 1) return null; credits.n -= 1; credits.utilises += 1; return 'achat-1'; }, rendre: async () => { credits.n += 1; credits.rendus += 1; return true; }, jeton: (id) => `signe-${id}`, jetonOk: (id, x) => x === `signe-${id}`,
     fetcher: async (u, o) => { daily.push([u, o]); return new Response(JSON.stringify(u.includes('meeting-tokens') ? { token: 'jeton' } : { name: 'coaching-x', url: 'https://lfb.daily.co/coaching-x' })); } });
   return { lignes, ctx, prevenus, alertes, t, daily, credits };
 }
@@ -160,6 +160,7 @@ test('visio à l’unité : sans Prestige, un crédit par visio, rendu si elle e
   assert.equal(v.inclus, true); assert.equal(v.credits, 1); assert.equal(v.creneaux.length, 3);
   v = await go(w, 'annonce_coaching_reserver', { id: a.id });
   assert.equal(a.source, 'unite'); assert.equal(a.achat_id, 'achat-1'); assert.equal(w.credits.n, 0);
+  assert.equal(v.prochaine.id, a.id); // plus de crédit, mais sa visio reste là pour y entrer
   assert.equal((await go(w, 'annonce_coaching_reserver', { id: b.id })).status, 403); // plus de crédit, pas de Prestige
   await go(w, 'annonce_coaching_annuler', { id: a.id });
   assert.equal(w.credits.n, 1); assert.equal(a.achat_id, null);
@@ -187,4 +188,68 @@ test('créneau pris entre-temps : le crédit est rendu', async () => {
   a.user_id = 'autre';
   assert.equal((await go(w, 'annonce_coaching_reserver', { id: a.id })).error, 'creneau_pris');
   assert.equal(w.credits.n, 1); assert.equal(w.credits.rendus, 1);
+});
+
+const ouvrirService = (w, duree, date = '2026-11-12', de = '18:00', a = '20:00') => go(w, 'annonce_coaching_ouvrir', { date, de, a, duree }, LAMIA, true);
+test('créneaux par service : la durée, 5 minutes de pause, pas de chevauchement', async () => {
+  assert.deepEqual(creneauxDe('2026-11-10', '18:00', '19:30', 30).map((d) => d.toISOString().slice(11, 16)), ['17:00', '17:35']);
+  assert.deepEqual(creneauxDe('2026-11-10', '18:00', '20:10', 60).map((d) => d.toISOString().slice(11, 16)), ['17:00', '18:05']);
+  const w = monde();
+  await ouvrirService(w, 60);
+  assert.equal(w.lignes.length, 1);
+  await go(w, 'annonce_coaching_ouvrir', { date: '2026-11-12', de: '18:30', a: '19:00', duree: 15 }, LAMIA, true); // dans l'heure déjà ouverte
+  assert.equal(w.lignes.length, 1);
+  await ouvrirService(w, 30, '2026-11-12', '19:05', '19:35');
+  assert.equal(w.lignes.length, 2);
+});
+test('chacun ne voit et ne réserve que les créneaux du service acheté', async () => {
+  const w = monde({ formule: null, autres: { sauver_couple: 1 } });
+  await ouvrirService(w, 60); await ouvrirService(w, 15, '2026-11-13'); await ouvrirService(w, 30, '2026-11-14');
+  const v = await go(w, 'annonce_coaching', {});
+  assert.deepEqual([...new Set(v.creneaux.map((c) => c.duree))], [60]);
+  const c15 = w.lignes.find((c) => c.duree_min === 15), c60 = w.lignes.find((c) => c.duree_min === 60);
+  assert.equal((await go(w, 'annonce_coaching_reserver', { id: w.lignes.find((c) => c.duree_min === 30).id })).error, 'service_requis');
+  assert.equal((await go(w, 'annonce_coaching_reserver', { id: c15.id })).error, 'deja_ce_mois');
+  const r = await go(w, 'annonce_coaching_reserver', { id: c60.id });
+  assert.equal(c60.source, 'unite'); assert.equal(r.prochaine.duree, 60);
+  assert.match(r.prochaine.invitation, /\/rencontres\/visio\/\?c=/);
+});
+test('Prestige ne donne que la visio de 15 minutes', async () => {
+  const w = monde();
+  await ouvrirService(w, 60); await ouvrirService(w, 15, '2026-11-13');
+  const v = await go(w, 'annonce_coaching', {});
+  assert.deepEqual([...new Set(v.creneaux.map((c) => c.duree))], [15]);
+  assert.equal((await go(w, 'annonce_coaching_reserver', { id: w.lignes.find((c) => c.duree_min === 60).id })).error, 'service_requis');
+});
+test('Sauver mon couple : le conjoint entre sans compte, 3 personnes, avec le bon lien seulement', async () => {
+  const w = monde({ formule: null, autres: { sauver_couple: 1 } });
+  await ouvrirService(w, 60);
+  const c = w.lignes[0];
+  const { prochaine } = await go(w, 'annonce_coaching_reserver', { id: c.id });
+  const lien = new URL(prochaine.invitation), jeton = lien.searchParams.get('t');
+  const inv = (b) => go(w, 'annonce_coaching_invite', { c: c.id, t: jeton, ...b }, null);
+  assert.equal((await inv({ t: 'faux' })).status, 403);
+  assert.equal((await inv({})).duree, 60);
+  assert.equal((await inv({ entrer: true })).error, 'trop_tot');
+  w.t.now = new Date(new Date(c.debut).getTime() - 5 * 60e3);
+  const r = await inv({ entrer: true, nom: 'Rachid' });
+  assert.match(r.url, /daily/);
+  assert.equal(JSON.parse(w.daily[0][1].body).properties.max_participants, 3);
+  const j = JSON.parse(w.daily[1][1].body).properties;
+  assert.equal(j.is_owner, false); assert.equal(j.user_name, 'Rachid');
+  // Une heure et quart après le début, c'est encore bon ; après, c'est fini.
+  w.t.now = new Date(new Date(c.debut).getTime() + 80 * 60e3);
+  assert.equal((await inv({ entrer: true })).error, 'terminee');
+  // Annulé : l'ancien lien ne marche plus.
+  w.t.now = new Date('2026-11-03T12:00:00Z');
+  await go(w, 'annonce_coaching_annuler', { id: c.id });
+  assert.equal((await inv({})).status, 403);
+});
+test('une visio de 15 minutes n’a pas de lien d’invitation', async () => {
+  const w = monde();
+  await ouvrir(w);
+  const c = w.lignes[0];
+  const r = await go(w, 'annonce_coaching_reserver', { id: c.id });
+  assert.equal(r.prochaine.invitation, undefined);
+  assert.equal((await go(w, 'annonce_coaching_invite', { c: c.id, t: `signe-${c.id}.${c.reserve_at}` }, null)).status, 403);
 });
