@@ -30,10 +30,12 @@ async function api(body, method = 'POST') {
 }
 
 // ---------------------------------------------------------------- navigation
+const surTelephone = () => matchMedia('(max-width: 760px)').matches;
 function ouvrir(tab) {
   $$('[data-panel]').forEach((p) => { p.hidden = p.dataset.panel !== tab; });
   $$('[data-tab]').forEach((b) => b.setAttribute('aria-current', String(b.dataset.tab === tab)));
-  { const plus = $('[data-menu-plus]'); if (plus && plus.querySelector(`[data-tab="${tab}"]`)) plus.open = true; }
+  document.body.dataset.onglet = tab;
+  { const plus = $('[data-menu-plus]'); if (plus) { const dedans = !!plus.querySelector(`[data-tab="${tab}"]`); plus.classList.toggle('is-actif', dedans); if (surTelephone()) plus.open = false; else if (dedans) plus.open = true; } }
   try { history.replaceState(null, '', `#${tab}`); } catch { /* */ }
   if (tab === 'produits' && !produits.length) { chargerProduits(); chargerReglages(); }
   if (tab === 'textes') chargerTextes();
@@ -124,10 +126,14 @@ document.addEventListener('pointerover', (e) => { const c = e.target.closest?.('
 document.addEventListener('click', (e) => { const c = e.target.closest?.('[data-bulle]'); if (c) montrerBulle({ currentTarget: c }, c.dataset.bulle); });
 // Les rubriques repliables restent comme Lamia les a laissées.
 $$('details[data-repli],details[data-menu-plus]').forEach((d) => {
+  if (d.hasAttribute('data-menu-plus') && surTelephone()) return; // Sur téléphone, « Plus » est un volet : toujours fermé à l'arrivée.
   const cle = `tdb-repli-${d.dataset.repli || 'menu'}`;
   try { if (localStorage.getItem(cle) === 'ouvert') d.open = true; } catch { /* */ }
   d.addEventListener('toggle', () => { try { localStorage.setItem(cle, d.open ? 'ouvert' : 'ferme'); } catch { /* */ } });
 });
+
+// Sur téléphone, toucher à côté du volet « Plus » le referme.
+document.addEventListener('click', (e) => { const plus = $('[data-menu-plus]'); if (plus?.open && surTelephone() && !e.target.closest('[data-menu-plus]')) plus.open = false; });
 
 // ---------------------------------------------------------------- « À faire aujourd'hui » : tout ce qui attend Lamia, dans l'ordre
 async function aFaire() {
@@ -196,7 +202,7 @@ document.addEventListener('submit', async (e) => {
 let filtreJournal = '';
 const conf = async (body) => { const r = await fetch('/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(body) }); const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'erreur'); return d; };
 async function pastilleJournal() {
-  try { const d = await conf({ action: 'annonce_journal', categorie: 'aucune' }); const p = $('[data-journal-pastille]'); p.textContent = d.non_lus; p.hidden = !d.non_lus; } catch { /* */ }
+  try { const d = await conf({ action: 'annonce_journal', categorie: 'aucune' }); $$('[data-journal-pastille]').forEach((p) => { p.textContent = d.non_lus; p.hidden = !d.non_lus; }); } catch { /* */ }
 }
 // ---------------------------------------------------------------- Profils recommandés par Lamia
 async function chargerRecommandes() {
@@ -299,7 +305,7 @@ async function chargerJournal() {
     $('[data-appareils]').textContent = `Tes appareils qui reçoivent les alertes : ${d.appareils.lamia}. Membres abonnés aux notifications : ${d.appareils.membres}.`;
     $('[data-notifs-lamia]').innerHTML = Object.entries(cats).map(([k, c]) => `<label><input type="checkbox" name="${k}" ${d.notifs[k] ? 'checked' : ''}> <span>${c.emoji} ${esc(c.nom)}</span></label>`).join('') + '<p class="aide">Enregistré dès que tu coches. Les « matchs demandés » restent visibles ici et dans « Aujourd’hui ».</p>';
     chargerDiscussions();
-    if (d.non_lus) { await conf({ action: 'annonce_journal_lu' }).catch(() => {}); $('[data-journal-pastille]').hidden = true; }
+    if (d.non_lus) { await conf({ action: 'annonce_journal_lu' }).catch(() => {}); $$('[data-journal-pastille]').forEach((p) => { p.hidden = true; }); }
   } catch { box.innerHTML = '<li>Le journal ne s’affiche pas pour le moment.</li>'; }
 }
 document.addEventListener('click', async (e) => {
