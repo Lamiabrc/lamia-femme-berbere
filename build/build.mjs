@@ -1383,27 +1383,6 @@ page(
   <section class="cl-reglages" data-annonces-vue hidden>
     <h2>Annonces de rencontre</h2>
     <p class="cl-aide">Les profils ne sont jamais publiés. 1) Vérifie le profil (et la pièce d’identité si la personne l’a donnée : elle est facultative), puis « Valider » : la pièce est supprimée, et le profil garde le badge « vérifié avec pièce d’identité ». 2) Exporte vers ton outil et fais le matching. 3) Indique le nombre de profils compatibles et « Envoyer le résultat » : la personne reçoit ce nombre par email (sans savoir qui), avec l’invitation à t’écrire (première mise en relation offerte, ensuite abonnement).</p>
-    <div class="cl-carte cl-export">
-      <h3>🔗 Liaison avec mon outil de matching</h3>
-      <p class="cl-aide">Ton outil récupère tout seul les profils validés et les matchs demandés grâce à une clé secrète. Crée la clé une fois, colle-la dans l’écran « Le site » de ton outil. Si tu crées une nouvelle clé, l’ancienne ne marche plus.</p>
-      <div class="cl-outils"><button class="cl-btn cl-plein" type="button" data-outil-cle>Créer une clé de liaison</button></div>
-      <div data-outil-zone hidden><input data-outil-valeur readonly style="width:100%;font-family:monospace"> <button class="cl-btn" type="button" data-outil-copier>Copier</button></div>
-      <p class="cl-statut" role="status" data-outil-statut></p>
-    </div>
-<div class="cl-carte cl-export cl-nouveautes">
-      <h3>📣 Nouveautés et notifications <span data-n-nouv></span></h3>
-      <p class="cl-aide">Les produits mis en vente s’ajoutent tout seuls et partent en notification chaque soir à 18 h (regroupés). Pour un article, une actu ou un live, écris-le ici : il part tout de suite, avec sa couleur, chez les membres qui ont activé les notifications.</p>
-      <form class="cl-nouv-form" data-nouv-form>
-        <label>Type<select name="type"><option value="actu">📣 Actu (vert)</option><option value="article">📰 Article (bleu)</option><option value="live">🎥 Live (rouge)</option><option value="boutique">🛍️ Boutique (doré)</option></select></label>
-        <label>Titre<input name="titre" maxlength="140" required placeholder="Ce soir à 21 h : live spécial mariage"></label>
-        <label>Texte <small>(facultatif)</small><textarea name="texte" maxlength="600" rows="2"></textarea></label>
-        <label>Lien <small>(facultatif, ex. /salon/ ou /produit/…)</small><input name="lien" maxlength="300" placeholder="/salon/"></label>
-        <label class="cl-case"><input type="checkbox" name="envoyer" checked> Envoyer la notification maintenant</label>
-        <button class="cl-btn cl-plein" type="submit">Publier</button>
-        <p class="cl-statut" data-nouv-statut></p>
-      </form>
-      <div data-nouv-liste></div>
-    </div>
         <div class="cl-carte cl-export">
       <h3>📷 Profils sans leurs photos <span data-n-sans-photos></span></h3>
       <p class="cl-aide">Tant qu’il manque 2 photos, la personne voit une demande dans l’application et ne peut ni swiper ni répondre. Le bouton lui envoie aussi une notification sur son téléphone, une seule fois, si elle les a activées.</p>
@@ -1427,6 +1406,27 @@ page(
       <div class="cl-outils"><button class="cl-btn cl-plein" type="button" data-exporter-nouvelles>Exporter les nouvelles annonces</button><button class="cl-btn" type="button" data-exporter-toutes>Tout réexporter</button></div>
       <p class="cl-statut" role="status" data-export-statut></p>
     </div>
+    <details class="cl-carte cl-export cl-nouveautes cl-replie">
+      <summary><h3>📣 Annoncer aux membres (actu, live…) <span data-n-nouv></span></h3></summary>
+      <p class="cl-aide">Les produits mis en vente s’ajoutent tout seuls et partent en notification chaque soir à 18 h (regroupés). Pour un article, une actu ou un live, écris-le ici : il part tout de suite, avec sa couleur, chez les membres qui ont activé les notifications.</p>
+      <form class="cl-nouv-form" data-nouv-form>
+        <label>Type<select name="type"><option value="actu">📣 Actu (vert)</option><option value="article">📰 Article (bleu)</option><option value="live">🎥 Live (rouge)</option><option value="boutique">🛍️ Boutique (doré)</option></select></label>
+        <label>Titre<input name="titre" maxlength="140" required placeholder="Ce soir à 21 h : live spécial mariage"></label>
+        <label>Texte <small>(facultatif)</small><textarea name="texte" maxlength="600" rows="2"></textarea></label>
+        <label>Lien <small>(facultatif, ex. /salon/ ou /produit/…)</small><input name="lien" maxlength="300" placeholder="/salon/"></label>
+        <label class="cl-case"><input type="checkbox" name="envoyer" checked> Envoyer la notification maintenant</label>
+        <button class="cl-btn cl-plein" type="submit">Publier</button>
+        <p class="cl-statut" data-nouv-statut></p>
+      </form>
+      <div data-nouv-liste></div>
+    </details>
+    <details class="cl-carte cl-export cl-replie">
+      <summary><h3>🔗 Clé de liaison avec mon outil</h3></summary>
+      <p class="cl-aide">Ton outil récupère tout seul les profils validés et les matchs demandés grâce à une clé secrète. Crée la clé une fois, colle-la dans l’écran « Le site » de ton outil. Si tu crées une nouvelle clé, l’ancienne ne marche plus.</p>
+      <div class="cl-outils"><button class="cl-btn cl-plein" type="button" data-outil-cle>Créer une clé de liaison</button></div>
+      <div data-outil-zone hidden><input data-outil-valeur readonly style="width:100%;font-family:monospace"> <button class="cl-btn" type="button" data-outil-copier>Copier</button></div>
+      <p class="cl-statut" role="status" data-outil-statut></p>
+    </details>
     <div data-annonces></div>
   </section>
 
