@@ -3315,6 +3315,10 @@ label.is-manquant { outline: 2px solid #2c38ba; outline-offset: 3px; border-radi
 .disc-dematch fieldset input { width: auto; margin: 0; }
 .disc-numeros { display: grid; gap: 8px; padding: 10px 12px; border-radius: 14px; background: #f3ead9; color: #2b2118; }
 .disc-numeros.is-ok { background: #e6f2e4; }
+.disc-prenom { padding: 10px 12px; border-radius: 14px; background: #f3ead9; color: #2b2118; margin: 8px 0; }
+.disc-prenom p { margin: 0 0 8px; }
+.disc-prenom p:last-child { margin: 0; }
+.disc-prenom-lien { margin: 6px 0; }
 .disc-numeros input { width: 100%; min-height: 46px; border-radius: 12px; border: 1px solid #e0cdb5; padding: 8px 12px; font-size: 16px; margin-top: 4px; }
 .disc-numeros small { color: #6f6152; }
 .parcours { border: 1px solid #e0cdb5; border-radius: 14px; padding: 10px 12px; background: #fffaf2; color: #2b2118; }

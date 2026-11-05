@@ -29,7 +29,7 @@ test('discussion : ouverte 7 jours, contacts masqués, numéros montrés quand l
   const [s1, r1] = await json(await actionDiscussion('annonce_discussion_envoyer', { id: D, texte: 'Salam ! mon 06 12 34 56 78' }, { ...ctx, user: { id: A } }));
   assert.equal(s1, 200); assert.equal(r1.masque, true);
   assert.ok(!db.discussion_messages[0].texte.includes('06 12'));
-  assert.deepEqual(pushes[0], [B, '💬 Melina t’a écrit']);
+  assert.deepEqual(pushes[0], [B, '💬 Ton match t’a écrit']);
 
   const [, v] = await json(await actionDiscussion('annonce_discussion_numero', { id: D, telephone: '06 12 34 56 78' }, { ...ctx, user: { id: A } }));
   assert.equal(v.echange, false);
@@ -133,7 +133,7 @@ test('dématch courtois : raison obligatoire, deux messages, l’autre prévenu,
   assert.equal(s0, 400);
   const [s1, r1] = await json(await actionDiscussion('annonce_discussion_dematcher', { id: D, raison: 'parcours', etape: 'valeurs' }, moi));
   assert.equal(s1, 200); assert.equal(r1.restants, 2);
-  assert.match(pushes.at(-1)[1], /Melina met fin/);
+  assert.match(pushes.at(-1)[1], /La personne met fin/);
   assert.equal(pushes.at(-1)[0], B);
   assert.equal(db.discussions[0].ferme_at, '2026-11-03T10:00:00.000Z');
   assert.match(db.discussion_messages.at(-1).texte, /Valeurs/);
@@ -156,4 +156,27 @@ test('dématch courtois : après 48 heures le match se termine, un rappel à qui
   const r2 = await suiviDematchs({ ...ctx, read: lire, now: () => new Date('2026-11-03T10:00:00Z'), terminerDematch: async (x) => termines.push(x.id) });
   assert.equal(r2.termines, 1);
   assert.deepEqual(termines, [D]);
+});
+
+test('prénom : caché par défaut, demandé, partagé par choix, ou plus tard après quelques messages', async () => {
+  const { db, pushes, ctx } = base();
+  await ouvrirDiscussion(ctx, { interetId: 'i1', a: { user_id: A, ref: 3, prenom: 'Melina' }, b: { user_id: B, ref: 27, prenom: 'Rachid' } });
+  const liste = async (u) => (await json(await actionDiscussion('annonce_discussions', {}, { ...ctx, user: { id: u } })))[1].discussions[0];
+  let vu = await liste(B);
+  assert.equal(vu.avec, 'Profil n° 3');
+  assert.ok(!JSON.stringify(vu).includes('Melina'), 'jamais envoyé avant son accord');
+  assert.equal(vu.prenom.demander, true);
+
+  await actionDiscussion('annonce_discussion_prenom', { id: D, choix: 'plus_tard' }, { ...ctx, user: { id: A } });
+  assert.equal((await liste(A)).prenom.demander, false);
+  assert.equal((await liste(B)).avec, 'Profil n° 3');
+
+  const [s] = await json(await actionDiscussion('annonce_discussion_prenom', { id: D, choix: 'partager' }, { ...ctx, user: { id: A } }));
+  assert.equal(s, 200);
+  vu = await liste(B);
+  assert.equal(vu.avec, 'Melina');
+  assert.equal(vu.prenom.partage, false, 'le choix de l’un n’engage pas l’autre');
+  assert.equal((await liste(A)).avec, 'Profil n° 27');
+  assert.deepEqual(pushes.at(-1), [B, '👋 Melina t’a donné son prénom']);
+  assert.ok(db.discussion_messages.some((m) => m.texte.includes('Melina')));
 });
