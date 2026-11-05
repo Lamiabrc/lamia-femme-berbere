@@ -729,7 +729,7 @@ async function discussions(session) {
         <label class="disc-dematch-etape" data-dematch-etape hidden>Quelle étape ? <select name="etape">${(d.parcours?.etapes || []).map((x) => `<option value="${esc(x.id)}">${esc(x.mot)}</option>`).join('')}</select></label>
         <p class="disc-dematch-actions"><button class="btn btn-ink" type="submit">Confirmer le dématch</button> <button type="button" class="link-button" data-disc-dematch-annuler>Je reste</button></p></form>`
         : `<p class="disc-dematch-lien"><button type="button" class="btn btn-line" data-disc-dematch>Dématcher</button></p>`) : ''}
-      ${d.ouverte ? `<p><button type="button" class="link-button" data-disc-signaler>🚩 Signaler un problème à Lamia</button>${d.avec_ref ? ` · <button type="button" class="link-button" data-moderer-bloquer="${esc(d.avec_ref)}">🚫 Bloquer</button>` : ''}</p>` : ''}
+      ${d.ouverte ? `<p><button type="button" class="link-button" data-disc-signaler>🚩 Signaler à Lamia</button></p>` : ''}
     </article>`;
   };
   const afficher = () => {
@@ -788,9 +788,14 @@ async function discussions(session) {
     }
     if (!e.target.closest('[data-disc-signaler]')) return;
     const id = e.target.closest('[data-disc]').dataset.disc;
-    const motif = prompt('Que s’est-il passé ? La discussion sera fermée et Lamia la lira.');
+    const motif = prompt('Que s’est-il passé ? La discussion sera fermée, vous ne vous reverrez plus, et Lamia la lira.');
     if (motif === null) return;
-    try { await appelProfil({ action: 'annonce_discussion_signaler', id, motif }, session); clearInterval(minuterieDiscussions); await charger(); alert('Merci. Lamia est prévenue.'); } catch { alert('Le signalement n’est pas parti. Réessaie.'); }
+    try {
+      await appelProfil({ action: 'annonce_discussion_signaler', id, motif }, session);
+      // Un signalement protège aussi : les deux personnes ne se revoient plus, et le match s'arrête.
+      const avec = liste.find((x) => x.id === id)?.avec_ref;
+      if (avec) await appelProfil({ action: 'annonce_bloquer', ref: avec, motif: 'Discussion signalée' }, session).catch(() => {});
+      clearInterval(minuterieDiscussions); await charger(); alert('Merci. Lamia est prévenue.'); } catch { alert('Le signalement n’est pas parti. Réessaie.'); }
   });
   ecouter(box, 'keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && e.target.matches('textarea')) { e.preventDefault(); e.target.form.requestSubmit(); } });
 }
