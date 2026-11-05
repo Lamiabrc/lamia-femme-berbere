@@ -354,7 +354,7 @@ async function monProfil(session) {
       if (!confirm(`Mettre fin à ton match avec le profil n° ${bouton.dataset.profilDematcher} ? Lamia sera prévenue, et une place se libère.`)) return;
       e.target.disabled = true;
       try { await appelProfil({ action: 'annonce_dematcher', ref: Number(bouton.dataset.profilDematcher) }, session); monProfil(session); }
-      catch { box.querySelector('[data-profil-statut]').textContent = 'Ça n’a pas fonctionné. Réessaie, ou écris à Lamia.'; e.target.disabled = false; }
+      catch (err) { if (err.code === 'dematch_dans_discussion') { e.target.disabled = false; document.querySelector('[data-espace-discussion-bloc]')?.scrollIntoView({ behavior: 'smooth' }); alert('Vous avez une discussion ouverte : utilise le bouton « Dématcher » sous votre discussion, pour vous dire au revoir.'); return; } box.querySelector('[data-profil-statut]').textContent = 'Ça n’a pas fonctionné. Réessaie, ou écris à Lamia.'; e.target.disabled = false; }
     }));
   } catch { box.innerHTML = '<p>Ton profil ne s’affiche pas pour le moment. Réessaie dans un instant.</p>'; }
 }
@@ -698,8 +698,11 @@ async function discussions(session) {
     const detail = x ? `<div class="parcours-detail"><strong>${esc(x.titre)}</strong><p>${esc(x.texte)}</p>${questions}${etat}</div>` : '';
     return `<details class="parcours" ${p.fini ? '' : 'open'}><summary>💍 Votre parcours vers le mariage <span>${p.fini ? 'Terminé, félicitations !' : `Étape ${esc(p.courante + 1)} sur ${esc(p.total)} : ${esc(x.mot)}`}</span></summary><p class="parcours-livre">Le parcours de mariage de Lamia, détaillé dans l’ebook <a class="text-link" href="/werdi-ouvre-les-yeux/"><em>Werdi, ouvre les yeux !</em></a></p><ol class="parcours-frise">${frise}</ol>${detail}</details>`;
   };
+  const raisonsDematch = [['physique', 'Physique'], ['enfants', 'Enfants'], ['localisation', 'Localisation'], ['caractere', 'Caractère'], ['valeurs', 'Valeurs'], ['parcours', 'Une étape du parcours'], ['autre', 'Autre raison']]
+    .map(([v, t]) => `<label><input type="radio" name="raison" value="${v}" required> ${t}</label>`).join('');
+  let dematchOuvert = null;
   const vue = (d) => {
-    const msgs = d.messages.map((m) => `<p class="disc-msg ${m.moi ? 'is-moi' : ''}"><span>${esc(m.texte)}</span><small>${esc(heure(m.le))}</small></p>`).join('') || `<p class="disc-vide">${salut ? `${esc(salut)}, dis` : 'Dis'} bonjour à ${esc(d.avec)} 👋</p>`;
+    const msgs = d.messages.map((m) => `<p class="disc-msg ${m.moi ? 'is-moi' : ''}${m.lamia ? ' is-systeme' : ''}"><span>${esc(m.texte)}</span><small>${esc(heure(m.le))}</small></p>`).join('') || `<p class="disc-vide">${salut ? `${esc(salut)}, dis` : 'Dis'} bonjour à ${esc(d.avec)} 👋</p>`;
     const numeros = d.echange
       ? `<div class="disc-numeros is-ok">📞 Vous avez échangé vos numéros. Celui de ${esc(d.avec)} : <a href="tel:${esc(d.son_numero)}"><strong>${esc(d.son_numero)}</strong></a></div>`
       : d.mon_numero
@@ -711,10 +714,21 @@ async function discussions(session) {
       ${d.mes_autres_matchs > 0 ? `<p class="disc-honnete">De ton côté, tu as ${d.mes_autres_matchs} autre${d.mes_autres_matchs > 1 ? 's' : ''} match${d.mes_autres_matchs > 1 ? 's' : ''} en cours : ${esc(d.avec)} le voit aussi.</p>` : ''}
       ${vueParcours(d)}
       <div class="disc-fil" data-disc-fil>${msgs}</div>
-      ${d.ouverte ? `<form class="disc-saisie" data-disc-envoi><textarea name="texte" rows="2" maxlength="1000" placeholder="Ton message…" required></textarea><button class="btn btn-ink" type="submit">Envoyer</button></form>
+      ${d.dematch ? `<div class="disc-dematch-etat">${d.dematch.par_moi
+        ? `<strong>🤝 Tu as mis fin à ce match.</strong> ${d.dematch.restants ? `Il te reste <strong>${esc(d.dematch.restants)} message${d.dematch.restants > 1 ? 's' : ''}</strong> pour dire au revoir.` : `Merci d’être resté${e} courtois${e === 'e' ? 'e' : e ? '·e' : ''}.`}`
+        : `<strong>💌 ${esc(d.avec)} a mis fin à ce match.</strong> Raison : ${esc(d.dematch.raison)}. ${d.dematch.restants ? `Tu peux répondre, il te reste ${esc(d.dematch.restants)} message${d.dematch.restants > 1 ? 's' : ''}.` : ''}`}
+        ${d.ouverte ? `<small>La discussion se ferme le ${esc(new Date(d.dematch.fin).toLocaleString('fr-FR', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }))}.</small>` : ''}</div>` : ''}
+      ${d.ouverte && (!d.dematch || d.dematch.restants) ? `<form class="disc-saisie" data-disc-envoi><textarea name="texte" rows="2" maxlength="1000" placeholder="Ton message…" required></textarea><button class="btn btn-ink" type="submit">Envoyer</button></form>
       <p class="disc-aide">Pour ta sécurité, les numéros, liens et emails écrits dans les messages sont masqués : utilise le bouton ci-dessous pour échanger vos numéros.</p>` : ''}
-      ${numeros}
+      ${d.dematch ? '' : numeros}
       ${d.prolongeable && !window.LFB_PLAY && new Date(d.ferme_at) - Date.now() < 72 * 3600e3 ? `<div class="disc-prolonger">${d.ouverte ? '' : '<p>Votre discussion est terminée, mais vous pouvez la rouvrir.</p>'}${boutonService('prolonger_discussion', 'Prolonger la discussion de 7 jours', '3 €', '⏳ 7 jours de plus · 3 €', d.id)}</div>` : ''}
+      ${d.ouverte && !d.dematch ? (dematchOuvert === d.id ? `<form class="disc-dematch" data-disc-dematch-form>
+        <h4>🤝 Tu peux dématcher, avec élégance</h4>
+        <p>Tu as encore <strong>deux messages</strong> à écrire pour rester ${e === '' ? 'courtois et gentleman' : e === 'e' ? 'courtoise et élégante' : 'courtois·e et élégant·e'}. Si tu confirmes, ton match sera informé de ton dématch et attendra un au revoir, voire une raison.</p>
+        <fieldset><legend>Pourquoi tu dématches ?</legend>${raisonsDematch}</fieldset>
+        <label class="disc-dematch-etape" data-dematch-etape hidden>Quelle étape ? <select name="etape">${(d.parcours?.etapes || []).map((x) => `<option value="${esc(x.id)}">${esc(x.mot)}</option>`).join('')}</select></label>
+        <p class="disc-dematch-actions"><button class="btn btn-ink" type="submit">Confirmer le dématch</button> <button type="button" class="link-button" data-disc-dematch-annuler>Je reste</button></p></form>`
+        : `<p class="disc-dematch-lien"><button type="button" class="btn btn-line" data-disc-dematch>Dématcher</button></p>`) : ''}
       ${d.ouverte ? `<p><button type="button" class="link-button" data-disc-signaler>🚩 Signaler un problème à Lamia</button>${d.avec_ref ? ` · <button type="button" class="link-button" data-moderer-bloquer="${esc(d.avec_ref)}">🚫 Bloquer</button>` : ''}</p>` : ''}
     </article>`;
   };
@@ -729,12 +743,18 @@ async function discussions(session) {
   await charger();
   if (location.hash === '#discussion' && liste.length) bloc.scrollIntoView({ behavior: 'smooth' });
   // Les nouveaux messages arrivent toutes les 10 secondes tant que la page est ouverte.
-  if (liste.some((d) => d.ouverte)) minuterieDiscussions = setInterval(() => { if (!document.hidden && !box.contains(document.activeElement)) charger(); }, 10000);
+  if (liste.some((d) => d.ouverte)) minuterieDiscussions = setInterval(() => { if (!document.hidden && !dematchOuvert && !box.contains(document.activeElement)) charger(); }, 10000);
   ecouter(box, 'submit', async (e) => {
     e.preventDefault();
     const a = e.target.closest('[data-disc]'), id = a?.dataset.disc;
     const bouton = e.target.querySelector('button'); bouton.disabled = true;
     try {
+      if (e.target.matches('[data-disc-dematch-form]')) {
+        await appelProfil({ action: 'annonce_discussion_dematcher', id, raison: e.target.raison.value, etape: e.target.etape?.value }, session);
+        dematchOuvert = null;
+        await charger();
+        return;
+      }
       if (e.target.matches('[data-disc-envoi]')) {
         const texte = e.target.texte.value.trim();
         const r = await appelProfil({ action: 'annonce_discussion_envoyer', id, texte }, session);
@@ -745,11 +765,19 @@ async function discussions(session) {
       }
       await charger();
     } catch (err) {
-      alert(err.code === 'telephone_invalide' ? 'Ce numéro ne semble pas valide. Exemple : 06 12 34 56 78 ou +213 5 12 34 56 78.' : err.code === 'discussion_fermee' ? 'Cette discussion est terminée.' : err.code === 'rate_limited' ? 'Doucement 🙂 Réessaie dans quelques minutes.' : 'Le message n’est pas parti. Réessaie.');
+      alert(err.code === 'telephone_invalide' ? 'Ce numéro ne semble pas valide. Exemple : 06 12 34 56 78 ou +213 5 12 34 56 78.' : err.code === 'au_revoir_fini' ? 'Tu as écrit tes deux messages d’au revoir.' : err.code === 'raison_requise' ? 'Choisis une raison.' : err.code === 'discussion_fermee' ? 'Cette discussion est terminée.' : err.code === 'rate_limited' ? 'Doucement 🙂 Réessaie dans quelques minutes.' : 'Le message n’est pas parti. Réessaie.');
     }
     bouton.disabled = false;
   });
+  ecouter(box, 'change', (e) => {
+    if (e.target.name !== 'raison') return;
+    const champ = e.target.closest('form').querySelector('[data-dematch-etape]');
+    if (champ) champ.hidden = e.target.value !== 'parcours';
+  });
   ecouter(box, 'click', async (e) => {
+    const ouvrir = e.target.closest('[data-disc-dematch]');
+    if (ouvrir) { dematchOuvert = ouvrir.closest('[data-disc]').dataset.disc; afficher(); return; }
+    if (e.target.closest('[data-disc-dematch-annuler]')) { dematchOuvert = null; afficher(); return; }
     const question = e.target.closest('[data-parcours-question]');
     if (question) { const t = question.closest('[data-disc]').querySelector('textarea'); if (t) { t.value = question.dataset.parcoursQuestion; t.focus(); } return; }
     const valider = e.target.closest('[data-parcours-valider]');

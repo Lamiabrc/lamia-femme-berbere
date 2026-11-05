@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { compterMatchs, ouvrirDiscussion, actionDiscussion } from '../lib/discussions.mjs';
+import { compterMatchs, ouvrirDiscussion, actionDiscussion, suiviDematchs } from '../lib/discussions.mjs';
 
 const A = '11111111-1111-4111-8111-111111111111', B = '22222222-2222-4222-8222-222222222222', D = '33333333-3333-4333-8333-333333333333';
 function base() {
@@ -115,4 +115,45 @@ test('parcours : il survit à la fin des 7 jours si les numéros sont échangés
   db.discussions[0].close_raison = 'dematch';
   const [s3] = await json(await actionDiscussion('annonce_parcours_valider', { id: D, etape: 'connaitre' }, { ...ctx, user: { id: B } }));
   assert.equal(s3, 409);
+});
+
+test('dématch courtois : raison obligatoire, deux messages, l’autre prévenu, puis fin du match', async () => {
+  const { db, pushes, ctx } = base();
+  await ouvrirDiscussion(ctx, { interetId: 'i1', a: { user_id: A, ref: 3, prenom: 'Melina' }, b: { user_id: B, ref: 27, prenom: 'Rachid' } });
+  ctx.read = async (path) => {
+    if (path.includes('discussion_messages')) return [...db.discussion_messages];
+    return db.discussions;
+  };
+  const insert0 = ctx.insert;
+  ctx.insert = async (t, r) => insert0(t, { created_at: '2026-11-01T10:00:00.000Z', ...r });
+  const termines = [];
+  const moi = { ...ctx, user: { id: A }, terminerDematch: async (d) => { termines.push(d.id); } };
+  const lui = { ...moi, user: { id: B } };
+  const [s0] = await json(await actionDiscussion('annonce_discussion_dematcher', { id: D }, moi));
+  assert.equal(s0, 400);
+  const [s1, r1] = await json(await actionDiscussion('annonce_discussion_dematcher', { id: D, raison: 'parcours', etape: 'valeurs' }, moi));
+  assert.equal(s1, 200); assert.equal(r1.restants, 2);
+  assert.match(pushes.at(-1)[1], /Melina met fin/);
+  assert.equal(pushes.at(-1)[0], B);
+  assert.equal(db.discussions[0].ferme_at, '2026-11-03T10:00:00.000Z');
+  assert.match(db.discussion_messages.at(-1).texte, /Valeurs/);
+  const [, v] = await json(await actionDiscussion('annonce_discussions', {}, lui));
+  assert.equal(v.discussions[0].dematch.par_moi, false);
+  assert.equal(v.discussions[0].dematch.raison, 'L’étape « Valeurs » du parcours');
+  for (const u of [moi, moi, lui, lui]) assert.equal((await actionDiscussion('annonce_discussion_envoyer', { id: D, texte: 'Au revoir' }, u)).status, 200);
+  assert.deepEqual(termines, [D]);
+  assert.equal((await actionDiscussion('annonce_discussion_envoyer', { id: D, texte: 'Encore' }, moi)).status, 409);
+});
+
+test('dématch courtois : après 48 heures le match se termine, un rappel à qui n’a rien écrit', async () => {
+  const { pushes, ctx } = base();
+  const d = { id: D, dematch_par: 'a', a_user: A, b_user: B, dematch_at: '2026-11-01T09:00:00Z', ferme_at: '2026-11-03T09:00:00Z', close_raison: null };
+  const termines = [];
+  const lire = async (p) => (p.includes('discussion_messages') ? [] : [d]);
+  const r1 = await suiviDematchs({ ...ctx, read: lire, terminerDematch: async (x) => termines.push(x.id) });
+  assert.deepEqual(r1, { rappels: 1, termines: 0 });
+  assert.equal(pushes.at(-1)[0], A);
+  const r2 = await suiviDematchs({ ...ctx, read: lire, now: () => new Date('2026-11-03T10:00:00Z'), terminerDematch: async (x) => termines.push(x.id) });
+  assert.equal(r2.termines, 1);
+  assert.deepEqual(termines, [D]);
 });

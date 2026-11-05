@@ -238,6 +238,9 @@ test('Passion : 2 matchs en cours ; finir l’un garde l’autre et libère une 
   const { profil } = await lire(await handleAnnonces('annonce_mon_profil', {}, passion(NINA)));
   assert.equal(profil.matchs.limite, 2);
   assert.equal(profil.matchs_lies.length, 2);
+  // Discussion ouverte : le dématch passe par elle, pour se dire au revoir.
+  assert.equal((await lire(await handleAnnonces('annonce_dematcher', { ref: 100001 }, passion(NINA)))).error, 'dematch_dans_discussion');
+  for (const d of db.discussions) d.close_raison = 'expiree';
   await handleAnnonces('annonce_dematcher', { ref: 100001 }, passion(NINA));
   assert.equal(db.annonce_interets.filter((i) => i.statut === 'mis_en_relation').length, 1);
   assert.equal(nina.en_match, false); // une place libre, l'autre match continue
