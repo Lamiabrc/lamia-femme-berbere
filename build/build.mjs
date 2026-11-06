@@ -2093,7 +2093,8 @@ await cp(join(ROOT, 'src', 'i18n.js'), join(DIST, 'assets', 'i18n.js'));
 await mkdir(join(DIST, 'assets', 'i18n'), { recursive: true });
 await cp(join(ROOT, 'content', 'en', 'products.json'), join(DIST, 'assets', 'i18n', 'products-en.json'));
 const MOTIFS_EN = JSON.parse(await readFile(join(ROOT, 'content', 'en', 'patterns.json'), 'utf8'));
-await writeFile(join(DIST, 'assets', 'i18n', 'en.json'), JSON.stringify({ strings: STRINGS, pages: [...PAGES_EN], motifs: MOTIFS_EN.motifs, noms: MOTIFS_EN.noms }));
+const MOTIFS_APPLI = JSON.parse(await readFile(join(ROOT, 'content', 'en', 'app-patterns.json'), 'utf8'));
+await writeFile(join(DIST, 'assets', 'i18n', 'en.json'), JSON.stringify({ strings: STRINGS, pages: [...PAGES_EN], motifs: [...MOTIFS_APPLI.motifs, ...MOTIFS_EN.motifs], noms: MOTIFS_EN.noms, membre: MOTIFS_APPLI.membre, segments: MOTIFS_APPLI.segments }));
 
 const indexable = pages.filter((p) => !soonRooms.some((r) => p.path.replace(/^\/en\//, '/') === r.path) && !p.path.endsWith('.html') && !p.path.startsWith('/en/produit/') && !['/produit/', '/mon-espace/', '/speed-dating/bal/', '/speed-dating/salle/', '/suppression-compte/', '/speed-dating/merci/', '/commande/merci/', '/abonnement/merci/', '/rencontres/swipe/', '/rencontres/confirmer/', '/rencontres/visio/', '/speed-dating/souhaits/', '/cgv/', '/mentions-legales/', '/confidentialite/', '/retours/', '/conditions-utilisation/', '/confidences-lamia/', '/hors-ligne/'].includes(p.path.replace(/^\/en\//, '/')));
 await writeFile(

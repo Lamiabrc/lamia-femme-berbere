@@ -3,19 +3,36 @@
 // Chargé uniquement sur les pages /en/. Les textes absents du dictionnaire restent en français.
 (() => {
   if (document.documentElement.lang !== 'en') return;
-  let D = null, PAGES = new Set(), MOTIFS = [], NOMS = [];
+  let D = null, PAGES = new Set(), MOTIFS = [], NOMS = [], MEMBRE = null, SEGMENTS = null;
   const ATTRS = ['alt', 'title', 'aria-label', 'placeholder'];
   const norm = (s) => s.replace(/\s+/g, ' ').trim();
   const fait = new WeakMap();
 
-  function enTexte(brut) {
-    const t = norm(brut);
-    if (!t || !/[A-Za-zÀ-ÿ]{2}/.test(t)) return null;
-    let en = D[t];
-    if (typeof en !== 'string') {
-      for (const [re, rep] of MOTIFS) if (re.test(t)) { en = t.replace(re, rep); break; }
+  // Motif : [regex, remplacement, groupes à repasser par le dictionnaire (facultatif)].
+  function parMotif(t) {
+    for (const [re, rep, groupes] of MOTIFS) {
+      if (!re.test(t)) continue;
+      if (!groupes) return t.replace(re, rep);
+      return t.replace(re, (...a) => rep.replace(/\$(\d)/g, (_, i) => {
+        const v = a[+i];
+        return groupes.includes(+i) && typeof D[v] === 'string' ? D[v] : v;
+      }));
     }
-    if (typeof en !== 'string') {
+    return null;
+  }
+
+  // Liste « a · b · c » (ville, pays, situation…) : chaque morceau connu est traduit, le reste ne bouge pas.
+  function parSegments(t) {
+    return t.split(' · ').map((x) => (typeof D[x] === 'string' ? D[x] : parMotif(x) ?? x)).join(' · ');
+  }
+
+  function enTexte(brut, segments = false) {
+    const t = norm(brut);
+    if (!t || (typeof D[t] !== 'string' && !/[A-Za-zÀ-ÿ]{2}/.test(t))) return null;
+    let en = D[t];
+    if (typeof en !== 'string') en = parMotif(t);
+    if (typeof en !== 'string' && segments && t.includes(' · ')) en = parSegments(t);
+    if (typeof en !== 'string' || en === t) {
       let x = t;
       for (const [fr, e] of NOMS) if (x.includes(fr)) x = x.split(fr).join(e);
       if (x !== t) en = x;
@@ -36,8 +53,9 @@
     if (n.nodeType === 3) {
       const p = n.parentNode;
       if (!p || /^(SCRIPT|STYLE|TEXTAREA)$/.test(p.nodeName) || p.isContentEditable) return;
+      if (MEMBRE && p.closest?.(MEMBRE)) return; // ce qu'un membre a écrit reste tel quel
       if (fait.get(n) === n.nodeValue) return;
-      const en = enTexte(n.nodeValue);
+      const en = enTexte(n.nodeValue, Boolean(SEGMENTS && p.closest?.(SEGMENTS)));
       if (en !== null) n.nodeValue = en;
       fait.set(n, n.nodeValue);
       return;
@@ -50,6 +68,12 @@
     }
     const w = document.createTreeWalker(n, NodeFilter.SHOW_TEXT);
     for (let t = w.nextNode(); t; t = w.nextNode()) noeud(t);
+  }
+
+  // Messages du navigateur (alert, confirm, prompt) : paragraphe par paragraphe, les sauts de ligne restent.
+  for (const f of ['alert', 'confirm', 'prompt']) {
+    const natif = window[f];
+    window[f] = (m, ...reste) => natif.call(window, D && typeof m === 'string' ? m.split(/(\n+)/).map((x) => enTexte(x) ?? x).join('') : m, ...reste);
   }
 
   const obs = new MutationObserver((muts) => {
@@ -67,8 +91,10 @@
       if (!j) return;
       D = j.strings || {};
       PAGES = new Set(j.pages || []);
-      MOTIFS = (j.motifs || []).map(([re, rep]) => [new RegExp(re), rep]);
+      MOTIFS = (j.motifs || []).map(([re, rep, groupes]) => [new RegExp(re), rep, groupes]);
       NOMS = (j.noms || []).sort((a, b) => b[0].length - a[0].length);
+      MEMBRE = j.membre || null;
+      SEGMENTS = j.segments || null;
       obs.observe(document.documentElement, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: [...ATTRS, 'href'] });
       noeud(document.body);
       const t = enTexte(document.title);

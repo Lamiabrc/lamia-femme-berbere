@@ -519,8 +519,8 @@ function carte(a) {
       ${a.village ? `<p class="annonce-lieu"><svg class="ico" aria-hidden="true"><use href="/icones.svg#maison"/></svg> Originaire de ${esc(a.village)}</p>` : ''}
       ${secteurLisible(a.secteur) ? `<p class="annonce-lieu annonce-secteur"><svg class="ico" aria-hidden="true"><use href="/icones.svg#boussole"/></svg> Cherche en : <b>${esc(secteurLisible(a.secteur))}</b></p>` : ''}
       ${tags.length ? `<p class="annonce-tags">${tags.map((t) => `<span>${esc(lib(t))}</span>`).join('')}</p>` : ''}
-      <h4>Qui je suis</h4><p>${esc(a.profil)}</p>
-      <h4>Qui je cherche${ages}</h4><p>${esc(a.recherche)}</p>
+      <h4>Qui je suis</h4><p data-membre>${esc(a.profil)}</p>
+      <h4>Qui je cherche${ages}</h4><p data-membre>${esc(a.recherche)}</p>
       ${foiEtVie(a)}
       <button type="button" class="btn btn-ink" data-interet="${a.ref}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur"/></svg> Ce profil m’intéresse</button><span class="profil-moderer"><button type="button" class="link-button" data-liste-bloquer="${a.ref}">🚩 Bloquer et signaler</button></span>
     </div>
