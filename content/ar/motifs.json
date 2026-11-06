@@ -1,6 +1,18 @@
 {
 "motifs": [
 [
+"^(?:Avec )?Profil n° (\\d+)$",
+"الملف رقم $1"
+],
+[
+"^Dis bonjour à Profil n° (\\d+)$",
+"ألقِ التحية على الملف رقم $1"
+],
+[
+"^Avec Profil n° (\\d+)$",
+"مع الملف رقم $1"
+],
+[
 "^(Une femme|Un homme), (\\d+) ans$",
 "$1، $2",
 [

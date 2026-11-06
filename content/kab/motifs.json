@@ -1,0 +1,867 @@
+{
+"motifs": [
+[
+"^(Une femme|Un homme), (\\d+) ans$",
+"$1, $2 n yiseggasen",
+[
+1
+]
+],
+[
+"^(\\d+) ans$",
+"$1 n yiseggasen"
+],
+[
+"^Originaire de (.+)$",
+"Si $1"
+],
+[
+"^originaire de (.+)$",
+"si $1"
+],
+[
+"^études : (.+)$",
+"leqraya: $1",
+[
+1
+]
+],
+[
+"^(Islam|Chrétienne|Agnostique|Athée|Autre), (pratiquant\\(e\\)|pratique modérée|non pratiquant\\(e\\))$",
+"$1, $2",
+[
+1,
+2
+]
+],
+[
+"^Qui je cherche \\((\\d+) à (\\d+) ans\\)$",
+"Win neɣ tin i ttnadiɣ ($1 ar $2 n yiseggasen)"
+],
+[
+"^Qui je cherche · (\\d+) à (\\d+) ans$",
+"Win neɣ tin i ttnadiɣ · $1 ar $2 n yiseggasen"
+],
+[
+"^Qui je cherche · (\\d+) à (\\d+) ans :$",
+"Win neɣ tin i ttnadiɣ · $1 ar $2 n yiseggasen:"
+],
+[
+"^· (\\d+) à (\\d+) ans$",
+"· $1 ar $2 n yiseggasen"
+],
+[
+"^Profil n° (\\d+)$",
+"Profil n° $1"
+],
+[
+"^Profil n° (\\d+) · intéressé·e par ta fiche n° (\\d+) · le (.+)$",
+"Profil n° $1 · profil-ik/-im n° $2 yeɛǧeb-as · ass n $3"
+],
+[
+"^Profil n° (\\d+) · (.+)$",
+"Profil n° $1 · $2",
+[
+2
+]
+],
+[
+"^Fiche n° (\\d+) · créée en live avec Lamia$",
+"Profil n° $1 · yettwaxdem deg live akked Lamia"
+],
+[
+"^Proposé par Lamia · profil n° (\\d+) · le (.+)$",
+"Yusa-d sɣur Lamia · profil n° $1 · ass n $2"
+],
+[
+"^Match avec le profil n° (\\d+)$",
+"Match akked profil n° $1"
+],
+[
+"^n° (\\d+)$",
+"n° $1"
+],
+[
+"^1 profil correspond$",
+"Tufiḍ 1 profil"
+],
+[
+"^(\\d+) profils correspondent$",
+"Tufiḍ $1 n profils"
+],
+[
+"^0 profil correspond$",
+"Ulac profil"
+],
+[
+"^1 personne t’a choisi·e$",
+"1 n umdan yextar-ik/-ikem"
+],
+[
+"^(\\d+) personnes t’ont choisi·e$",
+"$1 n medden xtaren-ik/-ikem"
+],
+[
+"^1 personne t’a choisi·e$",
+"1 n umdan yextar-ik/-ikem"
+],
+[
+"^(\\d+) personnes t’ont choisi·e$",
+"$1 n medden xtaren-ik/-ikem"
+],
+[
+"^profil à swiper aujourd’hui \\((\\d+) par jour avec ta formule\\)\\.$",
+"profil i d-yeqqimen ass-a i swipe ($1 deg wass s formule-ik/-im)."
+],
+[
+"^profils à swiper aujourd’hui \\((\\d+) par jour avec ta formule\\)\\.$",
+"profils i d-yeqqimen ass-a i swipe ($1 deg wass s formule-ik/-im)."
+],
+[
+"^Tu as swipé tes (\\d+) profils du jour\\. Reviens demain : ton compteur repart à zéro à minuit\\.$",
+"Tekfiḍ $1 n profils n wass-a deg swipe. Uɣal-d azekka: compteur-ik/-im ad yuɣal ɣer 0 deg ness n yiḍ."
+],
+[
+"^Tour (\\d+) ! Tu as tout vu : voici une seconde chance$",
+"Tour $1 ! Twalaḍ kullec: atan tagnit-nniḍen"
+],
+[
+"^1 profil à découvrir$",
+"1 profil ara tissineḍ"
+],
+[
+"^(\\d+) profils à découvrir$",
+"$1 n profils ara tissineḍ"
+],
+[
+"^Tour (\\d+) · encore 1 profil$",
+"Tour $1 · mazal 1 profil"
+],
+[
+"^Tour (\\d+) · encore (\\d+) profils$",
+"Tour $1 · mazal $2 n profils"
+],
+[
+"^1 profil reste à découvrir si tu élargis ta recherche : ouvre les filtres et enlève un critère\\.$",
+"Mazal 1 profil ara tissineḍ ma tesimɣureḍ anadi-k/-m: ldi les filtres, kkes yiwen n critère."
+],
+[
+"^(\\d+) profils restent à découvrir si tu élargis ta recherche : ouvre les filtres et enlève un critère\\.$",
+"Mazal $1 n profils ara tissineḍ ma tesimɣureḍ anadi-k/-m: ldi les filtres, kkes yiwen n critère."
+],
+[
+"^1 coup de cœur$",
+"1 coup de cœur"
+],
+[
+"^(\\d+) coups de cœur$",
+"$1 n coups de cœur"
+],
+[
+"^envoyés? aujourd’hui $",
+"yettwaznen ass-a "
+],
+[
+"^Le profil n° (\\d+) t’intéresse : crée d’abord ton compte, puis ton profil\\. Lamia regardera si vous pouvez correspondre\\.$",
+"Tebɣiḍ profil n° $1: xdem qbel compte-ik/-im, syin profil-ik/-im. Lamia ad twali ma yezmer ad yili kra gar-awen."
+],
+[
+"^Le profil n° (\\d+) t’intéresse : crée ton profil ci-dessous\\. Lamia est prévenue et regarde si vous pouvez correspondre\\. Ton identité reste secrète\\.$",
+"Tebɣiḍ profil n° $1: xdem profil-ik/-im ddaw-a. Lamia teẓra, ad twali ma yezmer ad yili kra gar-awen. Isem-ik/-im ad yeqqim d lbaḍna."
+],
+[
+"^Tu es connecté\\(e\\) : ton profil sera lié à ton compte (.+)\\.$",
+"Tkecmeḍ: profil-ik/-im ad yeqqen ɣer compte-ik/-im $1."
+],
+[
+"^« Parle-nous de toi » : encore (\\d+) caractères? au moins$",
+"« Ini-d kra ɣef yiman-ik/-im »: mazal $1 n caractères ma drus"
+],
+[
+"^« La personne que tu cherches » : encore (\\d+) caractères? au moins$",
+"« Win neɣ tin i tettnadiḍ »: mazal $1 n caractères ma drus"
+],
+[
+"^Il manque une information pour envoyer ton profil :$",
+"Txuṣ yiwet n tɣawsa i wakken ad tazneḍ profil-ik/-im:"
+],
+[
+"^Il manque (\\d+) informations pour envoyer ton profil :$",
+"Xuṣent $1 n tɣawsiwin i wakken ad tazneḍ profil-ik/-im:"
+],
+[
+"^Envoi de tes fichiers \\((\\d+)/(\\d+)\\)…$",
+"La ttwaznen fichiers-ik/-im ($1/$2)…"
+],
+[
+"^Envoi de tes fichiers \\((\\d+)/(\\d+)\\), nouvel essai…$",
+"La ttwaznen fichiers-ik/-im ($1/$2), ad neɛreḍ tikkelt-nniḍen…"
+],
+[
+"^Merci (.+), ton profil est bien arrivé chez Lamia \\(n° (\\d+)\\) !$",
+"Tanemmirt $1, profil-ik/-im yewweḍ ɣer Lamia (n° $2) !"
+],
+[
+"^Merci (.+), ton profil est bien arrivé chez Lamia !$",
+"Tanemmirt $1, profil-ik/-im yewweḍ ɣer Lamia !"
+],
+[
+"^L’envoi n’a pas abouti \\((.+)\\)\\. Réessaie, ou écris à Lamia en lui donnant ce code\\.$",
+"Ur yettwazen ara ($1). Ɛreḍ tikkelt-nniḍen, neɣ aru i Lamia u efk-as code-agi."
+],
+[
+"^C’est noté : Lamia sait que le profil n° (\\d+) t’intéresse\\. Elle regarde si vous pouvez correspondre\\. Ton identité reste secrète : seul ton numéro de profil peut apparaître\\.$",
+"Yettwaru: Lamia teẓra tebɣiḍ profil n° $1. Ad twali ma yezmer ad yili kra gar-awen. Isem-ik/-im ad yeqqim d lbaḍna: d numéro n profil-ik/-im kan i yezmer ad d-iban."
+],
+[
+"^Bloquer et signaler le profil n° (\\d+) \\? Vous ne vous verrez plus et Lamia est prévenue\\. La personne n’est pas avertie\\.$",
+"Tebɣiḍ ad tbloquiḍ profil n° $1 u ad as-tiniḍ i Lamia ? Ur tettemwalim ara tikkelt-nniḍen, u Lamia ad teẓer. Ur as-qqaren ara i wemdan-nni."
+],
+[
+"^Étape (\\d+) sur (\\d+)$",
+"Étape $1 seg $2"
+],
+[
+"^(.{3,80}) : (\\d+) €\\.$",
+"$1: $2 €.",
+[
+1
+]
+],
+[
+"^En continuant, tu acceptes les conditions de vente \\(lamia-femme-berbere\\.com/cgv\\) et tu demandes que le service commence dès le paiement\\.$",
+"Ma tkemmleḍ, ad tqebleḍ conditions de vente (lamia-femme-berbere.com/cgv) u tebɣiḍ ad yebdu service mi ara txellṣeḍ."
+],
+[
+"^, (.+) \\((\\d+) minutes\\)\\.$",
+", $1 ($2 n tedqiqin).",
+[
+1
+]
+],
+[
+"^Réserver ta visio du (.+) à (\\d\\d:\\d\\d), (.+) \\?$",
+"Ad teṭṭfeḍ visio-k/-m ass n $1 ɣef $2, $3 ?",
+[
+3
+]
+],
+[
+"^(.+) à (\\d\\d:\\d\\d)$",
+"$1 ɣef $2"
+],
+[
+"^(\\d+) × (visio de 15 minutes|coaching de 30 minutes|Sauver mon couple)$",
+"$1 × $2",
+[
+2
+]
+],
+[
+"^(\\d\\d:\\d\\d) · (Couple, 1 h|30 min)$",
+"$1 · $2",
+[
+2
+]
+],
+[
+"^Merci ! Lamia t’enverra le lien d’installation à ton adresse\\.$",
+"Tanemmirt ! Lamia ad d-tazen lien n l'installation ɣer adresse-ik/-im."
+],
+[
+"^Merci ! Lamia t’enverra le lien d’installation à (.+)\\.$",
+"Tanemmirt ! Lamia ad d-tazen lien n l'installation ɣer $1."
+],
+[
+"^(.+) souhaite aussi te revoir$",
+"$1 yebɣa/tebɣa daɣen ad temlilem tikkelt-nniḍen"
+],
+[
+"^Secteurs : (.+)\\.$",
+"Secteurs: $1."
+],
+[
+"^Tu acceptes de rencontrer des personnes de moins de 40 ans\\.$",
+"Tqebleḍ ad temlileḍ d medden ddaw n 40 n yiseggasen."
+],
+[
+"^Tu acceptes de rencontrer des personnes de 40 ans et plus\\.$",
+"Tqebleḍ ad temlileḍ d medden n 40 n yiseggasen neɣ ugar."
+],
+[
+"^Tu rencontres seulement des personnes de moins de 40 ans\\.$",
+"Ad temlileḍ kan d medden ddaw n 40 n yiseggasen."
+],
+[
+"^Tu rencontres seulement des personnes de 40 ans et plus\\.$",
+"Ad temlileḍ kan d medden n 40 n yiseggasen neɣ ugar."
+],
+[
+"^(Salon \\d+-\\d+ ans|Salon 40 ans et plus) · (.+)$",
+"$1 · $2",
+[
+1,
+2
+]
+],
+[
+"^Valide ta place avant le (.+)\\.$",
+"Ṭṭef amkan-ik/-im qbel $1."
+],
+[
+"^, chaque soir à 21 h : elle peut t’offrir ta place\\. Sans validation avant le (.+), ta place passera à la personne suivante\\.$",
+", yal iḍ ɣef 21 h: tezmer ad tefk amkan-ik/-im baṭel. Ma ur t-teṭṭifeḍ ara qbel $1, amkan-ik/-im ad iruḥ i wemdan i d-iteddun."
+],
+[
+"^Règle ta place avant le (.+), sinon elle passera à la personne suivante\\.$",
+"Xelleṣ amkan-ik/-im qbel $1, neɣ ad iruḥ i wemdan i d-iteddun."
+],
+[
+"^D’après l’outil de Lamia, tu pourrais correspondre à (\\d+) personne\\(s\\)\\.$",
+"Akken i d-yenna l'outil n Lamia, tzemreḍ ad tesɛuḍ match d $1 n medden."
+],
+[
+"^Ton annonce n° (\\d+) est validée\\. Si tu es d’accord, elle apparaît sur le site de façon anonyme : sans prénom, photo, ville ni contact\\.$",
+"Annonce-ik/-im n° $1 tettwaqbel. Ma tqebleḍ, ad d-tban deg site s war isem: ulac isem, photo, tamdint neɣ contact."
+],
+[
+"^Ton annonce n° (\\d+) est maintenant publiée, de façon anonyme\\.$",
+"Annonce-ik/-im n° $1 tettwasufeɣ tura, s war isem."
+],
+[
+"^Mettre fin à ton match avec le profil n° (\\d+) \\? Lamia sera prévenue, et une place se libère\\.$",
+"Tebɣiḍ ad tḥebseḍ match-ik/-im d profil n° $1 ? Lamia ad teẓer, u ad d-yeqqim yiwen n umkan d ilem."
+],
+[
+"^: (\\d+) sur (\\d+) restante\\(s\\)$",
+": $1 seg $2 i d-yeqqimen"
+],
+[
+"^Formule (Découverte|Cœur|Passion|Prestige)$",
+"Formule $1",
+[
+1
+]
+],
+[
+"^: (\\d+) mise\\(s\\) en relation ce mois-ci sur (\\d+) · (\\d+) speed dating inclus par mois$",
+": $1 n mise(s) en relation aggur-agi seg $2 · $3 speed dating yeddan yal aggur"
+],
+[
+"^: (\\d+) mise\\(s\\) en relation ce mois-ci \\(sans limite\\) · (\\d+) speed dating inclus par mois$",
+": $1 n mise(s) en relation aggur-agi (war talast) · $2 speed dating yeddan yal aggur"
+],
+[
+"^: (\\d+) match\\(s\\) supplémentaire\\(s\\) · (\\d+) place\\(s\\) de speed dating$",
+": $1 n match(s) nniḍen · $2 n yimukan n speed dating"
+],
+[
+"^La photo de ton match \\(profil n° (\\d+)\\)$",
+"Photo n match-ik/-im (profil n° $1)"
+],
+[
+"^Visible jusqu’à (.+)\\. Rien que pour toi : merci de ne pas la partager\\.$",
+"Tettban alamma $1. I yiman-ik/-im kan: ttxil-k/-m ur tt-sskan ara i yiwen."
+],
+[
+"^: ces profils sont en tête de ton$",
+": profils-agi d imezwura deg"
+],
+[
+"^: ce profil est en tête de ton$",
+": profil-agi d amezwaru deg"
+],
+[
+"^\\. Choisis-les à ton tour pour un intérêt réciproque\\.$",
+". Fren-ten daɣen i wakken ad yili lebɣi seg sin yidisan."
+],
+[
+"^\\. Choisis-le à ton tour pour un intérêt réciproque\\.$",
+". Fren-it daɣen i wakken ad yili lebɣi seg sin yidisan."
+],
+[
+"^En tête du swipe jusqu’au (.+)\\.$",
+"D amezwaru deg swipe alamma $1."
+],
+[
+"^(\\d+) mise\\(s\\) en relation$",
+"$1 n mise(s) en relation"
+],
+[
+"^(\\d+) place\\(s\\) de speed dating$",
+"$1 n yimukan n speed dating"
+],
+[
+"^À l’unité : (\\d+) mise\\(s\\) en relation · (\\d+) place\\(s\\) de speed dating(\\.?)$",
+"S yiwen yiwen: $1 n mise(s) en relation · $2 n yimukan n speed dating$3"
+],
+[
+"^À l’unité : (\\d+) mise\\(s\\) en relation(\\.?)$",
+"S yiwen yiwen: $1 n mise(s) en relation$2"
+],
+[
+"^À l’unité : (\\d+) place\\(s\\) de speed dating(\\.?)$",
+"S yiwen yiwen: $1 n yimukan n speed dating$2"
+],
+[
+"^À l’unité : (.+)\\. Pas d’abonnement en cours\\.$",
+"S yiwen yiwen: $1. Ulac abonnement tura."
+],
+[
+"^se termine le (.+)$",
+"ad yekfu ass n $1"
+],
+[
+"^prochaine échéance le (.+)$",
+"axelleṣ i d-iteddun ass n $1"
+],
+[
+"^(\\d+) mise\\(s\\) en relation$",
+"$1 n mise(s) en relation"
+],
+[
+"^dernier intérêt le (.+)$",
+"lebɣi aneggaru ass n $1"
+],
+[
+"^Lamia te demande ton avis · profil n° (\\d+)$",
+"Lamia tebɣa ad teẓer acu i tettwaliḍ · profil n° $1"
+],
+[
+"^« (.+) Est-ce que tu acceptes cette différence \\? »$",
+"« $1 Tqebleḍ lxilaf-agi ? »"
+],
+[
+"^encore 1 jour$",
+"mazal 1 n wass"
+],
+[
+"^encore (\\d+) jours$",
+"mazal $1 n wussan"
+],
+[
+"^encore 1 jour et (\\d+) h$",
+"mazal 1 n wass d $1 h"
+],
+[
+"^encore (\\d+) jours et (\\d+) h$",
+"mazal $1 n wussan d $2 h"
+],
+[
+"^encore (\\d+) h$",
+"mazal $1 h"
+],
+[
+"^✓ Tu as validé\\. On attend (.+)\\.$",
+"✓ Tqebleḍ. La nettraǧu $1."
+],
+[
+"^(.+) a déjà validé\\.$",
+"$1 yeqbel/teqbel yakan."
+],
+[
+"^Étape (\\d+) sur (\\d+) : (.+)$",
+"Étape $1 seg $2: $3",
+[
+3
+]
+],
+[
+"^(.+), dis bonjour à (.+) $",
+"$1, ini azul i $2 "
+],
+[
+"^Dis bonjour à (.+) $",
+"Ini azul i $1 "
+],
+[
+"^Vous avez échangé vos numéros\\. Celui de (.+) :$",
+"Tbeddlem numéros-nwen. Numéro n $1:"
+],
+[
+"^Tu as donné ton numéro\\. (.+) le verra dès qu’il ou elle aura donné le sien \\(on l’a prévenu·e\\)\\.$",
+"Tefkiḍ numéro-k/-m. $1 ad t-iwali/twali mi ara d-yefk/tefk numéro-s (nenna-yas)."
+],
+[
+"^Tu as donné ton numéro\\. (.+) le verra dès qu’il ou elle aura donné le sien\\.$",
+"Tefkiḍ numéro-k/-m. $1 ad t-iwali/twali mi ara d-yefk/tefk numéro-s."
+],
+[
+"^(.+) a donné son numéro$",
+"$1 yefka/tefka numéro-s"
+],
+[
+"^(.+), prêt(?:e|·e)? à passer au téléphone \\? Donne ton numéro$",
+"$1, twejdeḍ ad tɛeddiḍ ɣer téléphone ? Efk-d numéro-k/-m"
+],
+[
+"^Prêt(?:e|·e)? à passer au téléphone \\? Donne ton numéro$",
+"Twejdeḍ ad tɛeddiḍ ɣer téléphone ? Efk-d numéro-k/-m"
+],
+[
+"^Avec (.+)$",
+"Akked $1"
+],
+[
+"^Par honnêteté : (.+) a aussi 1 autre match en cours\\.$",
+"S tidet: $1 yesɛa/tesɛa daɣen 1 match nniḍen."
+],
+[
+"^Par honnêteté : (.+) a aussi (\\d+) autres matchs en cours\\.$",
+"S tidet: $1 yesɛa/tesɛa daɣen $2 n matchs nniḍen."
+],
+[
+"^De ton côté, tu as 1 autre match en cours : (.+) le voit aussi\\.$",
+"Seg tama-k/-m, tesɛiḍ 1 match nniḍen: $1 yeẓra/teẓra daɣen."
+],
+[
+"^De ton côté, tu as (\\d+) autres matchs en cours : (.+) le voit aussi\\.$",
+"Seg tama-k/-m, tesɛiḍ $1 n matchs nniḍen: $2 yeẓra/teẓra daɣen."
+],
+[
+"^1 message$",
+"1 message"
+],
+[
+"^(\\d+) messages$",
+"$1 n messages"
+],
+[
+"^Merci d’être resté(?:e|·e)? courtois(?:e|·e)?\\.$",
+"Tanemmirt imi teqqimeḍ s leqder."
+],
+[
+"^(.+) a mis fin à ce match\\.$",
+"$1 yeḥbes/teḥbes match-agi."
+],
+[
+"^Raison : (.+)\\. Tu peux répondre, il te reste 1 message\\.$",
+"Ssebba: $1. Tzemreḍ ad d-terreḍ, mazal 1 message.",
+[
+1
+]
+],
+[
+"^Raison : (.+)\\. Tu peux répondre, il te reste (\\d+) messages\\.$",
+"Ssebba: $1. Tzemreḍ ad d-terreḍ, mazal $2 n messages.",
+[
+1
+]
+],
+[
+"^Raison : (.+)\\.$",
+"Ssebba: $1.",
+[
+1
+]
+],
+[
+"^La discussion se ferme le (.+)\\.$",
+"Discussion ad temdel ass n $1."
+],
+[
+"^Veux-tu partager ton prénom \\((.+)\\) avec ton match \\?$",
+"Tebɣiḍ ad tefkeḍ isem-ik/-im ($1) i match-ik/-im ?"
+],
+[
+"^Veux-tu partager ton prénom avec ton match \\?$",
+"Tebɣiḍ ad tefkeḍ isem-ik/-im i match-ik/-im ?"
+],
+[
+"^Ta place est réservée, (.+) : salon (.+)\\.$",
+"Amkan-ik/-im yettwaṭṭef, $1: salon $2."
+],
+[
+"^Ta place est réservée, (.+)\\.$",
+"Amkan-ik/-im yettwaṭṭef, $1."
+],
+[
+"^Voir l’image (\\d+)$",
+"Wali tugna $1"
+],
+[
+"^Lamia t’envoie par email le lien de paiement sécurisé\\. Total : (.+?)\\.(.*)$",
+"Lamia ad d-tazen lien n lexlaṣ yettwaḥerzen s email. Total: $1.$2"
+],
+[
+"^Tu es dans le navigateur de$",
+"Tellid deg navigateur n"
+],
+[
+"^\\. Si le paiement ne s’ouvre pas, ouvre cette page dans (Chrome|Safari) : (.+)\\.$",
+". Ma ur d-yeldi ara lexlaṣ, ldi page-agi deg $1: $2.",
+[
+2
+]
+],
+[
+"^Plus que 1 place à ([\\d,]+) €, puis ([\\d,]+) € par mois$",
+"Yeqqim-d kan 1 n umkan s $1 €, syin $2 € yal aggur"
+],
+[
+"^Plus que (\\d+) places à ([\\d,]+) €, puis ([\\d,]+) € par mois$",
+"Qqimen-d kan $1 n yimukan s $2 €, syin $3 € yal aggur"
+],
+[
+"^Télécharger « (.+) »$",
+"Sader « $1 »"
+],
+[
+"^Lien copié : colle-le dans (Safari|Chrome)\\.?$",
+"Lien yettwanɣel: sers-it deg $1."
+],
+[
+"^Ce soir (\\d+) h · (.+)$",
+"Iḍ-a ɣef $1 h · $2"
+],
+[
+"^Ce soir (\\d+) h (\\d+) · (.+)$",
+"Iḍ-a ɣef $1 h $2 · $3"
+],
+[
+"^En ce moment · (.+)$",
+"Tura · $1"
+],
+[
+"^(lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche) (\\d+) h · (.+)$",
+"$1 ɣef $2 h · $3",
+[
+1
+]
+],
+[
+"^(lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche) (\\d+) h (\\d+) · (.+)$",
+"$1 ɣef $2 h $3 · $4",
+[
+1
+]
+],
+[
+"^plus que 1 place$",
+"mazal 1 n umkan"
+],
+[
+"^plus que (\\d+) places$",
+"mazal $1 n yimukan"
+],
+[
+"^(\\d+)-(\\d+) ans :$",
+"$1-$2 n yiseggasen:"
+],
+[
+"^40 ans et plus :$",
+"40 n yiseggasen neɣ ugar:"
+],
+[
+"^Salon (\\d+)-(\\d+) ans$",
+"Salon $1-$2 n yiseggasen"
+],
+[
+"^Tour (\\d+)$",
+"Tour $1"
+],
+[
+"^✓ Ta formule (.+) est active pour un an\\. Tu la retrouves dans ton espace, où tu peux réserver ta visio avec Lamia\\.$",
+"✓ Formule-ik/-im $1 tebda i yiwen n useggas. Ad tt-tafeḍ deg espace-ik/-im, anda i tzemreḍ ad teṭṭfeḍ visio-k/-m akked Lamia.",
+[
+1
+]
+],
+[
+"^✓ Ta formule (.+) est active\\. Tu la retrouves dans ton espace, où tu peux réserver ta visio avec Lamia\\.$",
+"✓ Formule-ik/-im $1 tebda. Ad tt-tafeḍ deg espace-ik/-im, anda i tzemreḍ ad teṭṭfeḍ visio-k/-m akked Lamia.",
+[
+1
+]
+],
+[
+"^✓ Ta formule (.+) est active pour un an\\. Tu la retrouves dans ton espace\\.$",
+"✓ Formule-ik/-im $1 tebda i yiwen n useggas. Ad tt-tafeḍ deg espace-ik/-im.",
+[
+1
+]
+],
+[
+"^✓ Ta formule (.+) est active\\. Tu la retrouves dans ton espace\\.$",
+"✓ Formule-ik/-im $1 tebda. Ad tt-tafeḍ deg espace-ik/-im.",
+[
+1
+]
+],
+[
+"^✓ Achat confirmé : (\\d+) × (.+)\\.$",
+"✓ Achat yettwaqbel: $1 × $2.",
+[
+2
+]
+],
+[
+"^([\\d,]+) Mo$",
+"$1 Mo"
+],
+[
+"^(\\d+) Ko$",
+"$1 Ko"
+],
+[
+"^Fiche n° (\\d+) · (une femme|un homme)$",
+"Profil n° $1 · $2",
+[
+2
+]
+],
+[
+"^village : (.+)$",
+"taddart: $1"
+],
+[
+"^études : (.+)$",
+"leqraya: $1",
+[
+1
+]
+],
+[
+"^✓ Ta fiche est reliée à ton compte \\((.+)\\)\\.$",
+"✓ Profil-ik/-im yeqqen ɣer compte-ik/-im ($1)."
+],
+[
+"^(\\d+) femmes? et (\\d+) hommes? inscrits · (\\d+) \\+ (\\d+) pour confirmer$",
+"$1 n tlawin d $2 n yergazen i d-ikecmen · $3 + $4 akken ad yeddu"
+],
+[
+"^, pour (\\d+) minutes\\.$",
+", i $1 n tedqiqin."
+],
+[
+"^(.+) · gratuite$",
+"$1 · baṭel"
+],
+[
+"^(.+ €.*) l’unité\\.$",
+"$1 yal yiwen."
+],
+[
+"^(.+?) dont (.+?) d’envoi · dont TVA (.+?) % : (.+)$",
+"$1 deg-s $2 n tuzna · deg-s TVA $3 %: $4"
+],
+[
+"^(.+?) dont (.+?) d’envoi$",
+"$1 deg-s $2 n tuzna"
+],
+[
+"^(.+?) · dont TVA (.+?) % : (.+)$",
+"$1 · deg-s TVA $2 %: $3"
+],
+[
+"^Il n’en reste que (\\d+)\\. Choisis une quantité plus petite\\.$",
+"$1 kan i d-yeqqimen. Fren quantité tamecṭuḥt."
+],
+[
+"^Livre broché (.+)$",
+"Adlis broché $1"
+],
+[
+"^Commande n° (\\S+)\\. Tu reçois le reçu de paiement par email\\. Lamia prépare ton colis et te tient au courant de l’expédition\\.$",
+"Commande n° $1. Ad d-yaweḍ reçu n lexlaṣ ɣer email-ik/-im. Lamia la theggi colis-ik/-im, ad teẓreḍ mi ara yeffeɣ."
+],
+[
+"^Commande n° (\\S+)\\. Tu reçois le reçu de paiement par email\\. Télécharge ton livre maintenant : tu le retrouveras aussi à tout moment dans « Mon espace », connectée avec la même adresse email\\.?(.*)$",
+"Commande n° $1. Ad d-yaweḍ reçu n lexlaṣ ɣer email-ik/-im. Sader adlis-ik/-im tura: ad t-tafeḍ daɣen melmi i tebɣiḍ deg « Espace-iw », mi ara tkecmeḍ s yiwet-nni n adresse email.$2"
+],
+[
+"^Numéro de commande :$",
+"Numéro n commande:"
+],
+[
+"^(\\d+) à (\\d+) ans$",
+"$1 ar $2 n yiseggasen"
+],
+[
+"^Tranches d’âge : (.+)$",
+"Leɛmer: $1"
+],
+[
+"^Salon (.+)$",
+"Salon $1"
+],
+[
+"^Le salon (.+) est complet\\.$",
+"Salon $1 yeččur."
+],
+[
+"^Tête-à-tête avec ton cavalier$",
+"Tête-à-tête akked cavalier-ik/-im"
+],
+[
+"^Tête-à-tête avec (.+)$",
+"Tête-à-tête akked $1"
+],
+[
+"^· tour (\\d+)$",
+"· tour $1"
+],
+[
+"^(\\d+) masques? au bal$",
+"$1 n masque(s) deg bal"
+],
+[
+"^Envoi des fichiers \\((\\d+)/(\\d+)\\)…$",
+"La ttwaznen fichiers ($1/$2)…"
+],
+[
+"^Extrait, page (\\d+)$",
+"Extrait, asebter $1"
+],
+[
+"^\\((\\d+) pages\\)$",
+"($1 n yisebtar)"
+]
+],
+"noms": [
+[
+"La Maison Lamia Femme Berbère",
+"La Maison Lamia Femme Berbère"
+],
+[
+"Le Salon du Speed Dating",
+"Salon n Speed Dating"
+],
+[
+"Le Cabinet des Confidences",
+"Le Cabinet des Confidences"
+],
+[
+"Le Grenier des Trouvailles",
+"Le Grenier des Trouvailles"
+],
+[
+"La Bibliothèque de Yemma",
+"Bibliothèque n Yemma"
+],
+[
+"La Salle de bain de Lamia",
+"Salle de bain n Lamia"
+],
+[
+"La Coiffeuse de Lamia",
+"Coiffeuse n Lamia"
+],
+[
+"Le Salon de Lamia",
+"Salon n Lamia"
+],
+[
+"L’Écrin",
+"L’Écrin"
+],
+[
+"La Boutique",
+"La Boutique"
+],
+[
+"Mon espace",
+"Espace-iw"
+]
+]
+}

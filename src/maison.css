@@ -3936,3 +3936,9 @@ html[lang="kab"] .lfb-azul { display: block; }
 html[dir="rtl"] .skip { left: auto; right: -999px; }
 html[dir="rtl"] .skip:focus { right: 8px; }
 html[dir="rtl"], html[dir="rtl"] body { overflow-x: clip; }
+@media (max-width: 420px) {
+  html[lang="ar"] .cta-profil span::after { content: 'إنشاء'; }
+  html[lang="ar"].a-compte .cta-profil span::after { content: 'ملفي'; }
+  html[lang="kab"] .cta-profil span::after { content: 'Xdem'; }
+  html[lang="kab"].a-compte .cta-profil span::after { content: 'Profil-inu'; }
+}
