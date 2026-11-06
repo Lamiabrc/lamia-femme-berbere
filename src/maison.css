@@ -3855,3 +3855,47 @@ body:has(.conf-choix) main, body:has(.conf-choix) .room-body, body:has(.conf-cho
 .espace-pause .btn, [data-espace-notifs] .btn, .espace-card .btn { width: fit-content; }
 .conf { background: #FBF9F6 radial-gradient(90% 420px at 100% 0%, rgba(233, 223, 250, .7), transparent 72%) no-repeat !important; --encre-douce: #2F2B3D; --gris-rose: #625D72; }
 .espace-card { padding: 14px; gap: 8px; }
+
+/* Le rouge à lèvres, visible mais toujours petit */
+:root { --levres: #D1173A; }
+.pip { width: 10px; height: 10px; background: var(--levres); box-shadow: none; }
+@media (max-width: 760px) {
+  .barre-app a[aria-current="page"], body:has(.swipe-page) .barre-app a[aria-current="page"] { color: var(--levres); }
+  .barre-app a[aria-current="page"] .ico { color: var(--levres); fill: rgba(209, 23, 58, .12); }
+  .barre-app a[aria-current="page"]::after { top: auto; bottom: 2px; width: 18px; height: 2.5px; margin-left: -9px; border-radius: 2px; }
+  .barre-app [data-barre-point], body:has(.swipe-page) .barre-app [data-barre-point] { width: 10px; height: 10px; }
+}
+/* Un petit trait rouge sous les titres de section */
+.po-corps h2, .room-body > h2, .annonces-titre, .abo-corps > h2, .espace-section > h2, .swipe-tete h1 { position: relative; }
+.po-corps h2::after, .room-body > h2::after, .annonces-titre::after { content: ''; display: block; width: 30px; height: 3px; margin-top: 7px; border-radius: 2px; background: var(--levres); }
+.lfb-azul-hero::after, .lfb-azul::after { content: ''; display: inline-block; width: 6px; height: 6px; margin-left: 8px; border-radius: 50%; background: var(--levres); vertical-align: .15em; }
+/* Le cœur du swipe : bien rouge */
+.po-app.swipe-page .swipe-boutons [data-swipe-oui] { border-color: var(--levres); }
+.po-app.swipe-page .swipe-boutons [data-swipe-oui] .ico { color: var(--levres) !important; fill: var(--levres) !important; }
+.swipe-tete h1 .ico, .swipe-tete .ico:first-child { color: var(--levres) !important; }
+.po-app .swipe-tete h1 svg { color: var(--levres) !important; }
+
+/* Le doré revient, clair et lumineux : jamais marron */
+:root { --or-clair: #F3E0B9; --or: #D9BC7E; --or-fonce: #B8965A; --or-degrade: linear-gradient(100deg, #F6E7C6, #E6CC93 55%, #F3E0B9); }
+.po-btn, .abo-carte .po-btn { background: var(--or-degrade); color: #2F2B3D; }
+.po-btn:hover { background: var(--or-degrade); opacity: .92; }
+.btn-gold { background: var(--or-degrade); border-color: #E6CC93; color: #2F2B3D; }
+.btn-gold:hover { background: var(--or-degrade); border-color: #E6CC93; opacity: .92; }
+.ame-soeur-btn, .po-corps .po-btn, .po-app .patio-etapes .ame-soeur-btn { background: var(--or-degrade) !important; color: #2F2B3D !important; -webkit-text-fill-color: #2F2B3D; }
+.frise, .frise-fine { background: linear-gradient(90deg, transparent, var(--or) 20%, var(--or) 80%, transparent) !important; }
+.frise::after, .frise-fine::after, .abo-carte li::before { color: var(--or-fonce); }
+.po-hero::after { background: linear-gradient(90deg, transparent, var(--or), transparent); }
+.lfb-azul { color: var(--or-fonce); }
+.lfb-azul-hero, .footer-sign { color: var(--or-clair) !important; }
+.po-lamia img { border-color: var(--or) !important; box-shadow: 0 0 0 5px rgba(243, 224, 185, .45); }
+.ico { color: var(--or-fonce); }
+.btn .ico, button .ico, .site-header .ico, .barre-app .ico, .po-btn .ico, .swipe-page .swipe-carte .ico { color: inherit; }
+.barre-app .ico { color: #625D72; }
+.po-app.swipe-page .ico { color: var(--or-fonce); }
+.abo-ruban { background: var(--or-degrade); color: #2F2B3D; }
+.abo-carte.is-vedette { border-color: var(--or); }
+.abo-prix { color: #2F2B3D !important; }
+.po-app.po-app .patio-etapes li::before { background: var(--or-degrade) !important; color: #2F2B3D !important; }
+.abo-periode button b { color: var(--or-fonce); }
+.site-footer h3, .site-footer h2, .footer-title { color: var(--or-clair); }
+.po-corps h2::after, .room-body > h2::after, .annonces-titre::after { background: linear-gradient(90deg, var(--levres) 0 10px, var(--or) 10px); width: 44px; }

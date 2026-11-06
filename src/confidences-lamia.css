@@ -184,3 +184,8 @@ legend { font-size: 14px; font-weight: 600; padding: 0 4px; }
 .cl-bulle { width: fit-content; max-width: 88%; padding: 8px 12px; }
 .cl-bulle.is-lamia { margin-left: auto; }
 .cl-badges span { padding: 2px 9px; }
+
+/* Le doré revient, clair */
+.ico { color: #B8965A; }
+.cl-btn .ico, button .ico { color: inherit; }
+.cl-plein { background: #2F2B3D; }

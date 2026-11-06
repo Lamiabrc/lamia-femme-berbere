@@ -334,7 +334,7 @@
 .tdb-onglets button, .tdb-plus > summary, .tdb-plus > div button { color: var(--qvt-taupe); }
 .tdb-onglets button:hover { color: var(--qvt-encre); }
 .tdb-top .ico { color: var(--qvt-bronze); }
-.tdb-pastille { background: #C8233F !important; color: #fff; }
+.tdb-pastille { background: #D1173A !important; color: #fff; }
 @media (max-width: 760px) {
   .tdb-onglets { background: #FDFBF8 !important; border-top: 1px solid var(--qvt-sable); box-shadow: 0 -8px 24px rgba(47, 43, 61, .06); }
   .tdb-plus > div { background: #FDFBF8 !important; border-top: 1px solid var(--qvt-sable); box-shadow: 0 -8px 24px rgba(47, 43, 61, .10); }
@@ -367,3 +367,13 @@
 .tdb-repli > summary { padding: 10px 14px; }
 .tuile { padding: 10px 12px; }
 .tuile strong { font-size: 24px; }
+
+/* Le rouge à lèvres, visible mais petit */
+.tdb-onglets button[aria-current="true"] .ico, .tdb-plus.is-actif > summary .ico { color: #D1173A !important; }
+.tdb-titre::after { content: ''; display: block; width: 30px; height: 3px; margin-top: 7px; border-radius: 2px; background: #D1173A; }
+.tdb-pastille { background: #D1173A !important; }
+
+/* Le doré revient, clair */
+.tdb-top .ico { color: #B8965A; }
+.tdb-outils .ico { color: #B8965A; }
+.tdb-titre::after { width: 44px; background: linear-gradient(90deg, #D1173A 0 10px, #D9BC7E 10px); }
