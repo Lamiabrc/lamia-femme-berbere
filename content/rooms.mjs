@@ -15,7 +15,7 @@ export const floors = [
 
 export const rooms = [
   // ---------- rez-de-chaussée : la vente
-  { slug: 'hall', path: '/', floor: 0, name: 'Le Hall', welcome: 'Bienvenue chez Lamia.', headline: 'Trouve ton âme sœur kabyle, avec Lamia',
+  { slug: 'hall', path: '/', floor: 0, name: 'Le Hall', welcome: 'Bienvenue chez Lamia.', headline: 'Trouve ton âme sœur kabyle et amazigh',
     summary: 'Bijoux kabyles, livres, brocante, rencontres, lives et créations : la Maison réunit l’univers de Lamia entre Kabylie, Algérie et France.', status: 'open', accent: 'rouge' },
   { slug: 'ecrin', path: '/ecrin/', floor: 0, name: 'L’Écrin', welcome: 'Les bijoux qui racontent d’où l’on vient.', headline: 'Bijoux kabyles artisanaux et créations d’Ath Yenni',
     summary: 'La collection exclusive de bijoux kabyles de la Maison, fabriquée à Ath Yenni par ses artisans bijoutiers.', status: 'open', accent: 'vert', productCategories: ['bijoux'] },

@@ -325,7 +325,7 @@ page(
     <div class="po-hero-texte">
       <p class="lfb-azul lfb-azul-hero" lang="ber">ⴰⵣⵓⵍ</p>
       <p class="po-eyebrow">${esc(T('accueil.surtitre', 'Accueil', 'Petite ligne au-dessus du titre', 'La marieuse kabyle · rencontres sérieuses'))}</p>
-      <h1 id="accueil-titre">${esc(T('accueil.titre', 'Accueil', 'Grand titre', 'Trouve ton âme sœur kabyle, avec Lamia'))}</h1>
+      <h1 id="accueil-titre">${esc(T('accueil.titre', 'Accueil', 'Grand titre', 'Trouve ton âme sœur kabyle et amazigh'))}</h1>
       <p class="po-sub">${esc(T('accueil.sous-titre', 'Accueil', 'Phrase sous le titre', 'Profils vérifiés. Lamia vous présente. En vue du mariage.'))}</p>
       <p class="po-actions"><a class="po-btn" data-cta-profil href="/rencontres/#confier"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> <span>Créer mon profil ou connexion</span></a><a class="po-btn-verre" href="/rencontres/#profils-anonymes">Voir les profils</a></p>
       <p class="accueil-couple"><a href="/abonnement/#unite-sauver_couple"><strong>${esc(T('accueil.couple-titre', 'Accueil', 'Encadré couple : la question', 'T’es en couple et tu veux tenter une dernière chose avant de rompre ?'))}</strong><span>${esc(T('accueil.couple-action', 'Accueil', 'Encadré couple : le bouton', 'Réserve une séance de love coaching en ligne'))}</span><small><b>1 heure en visio avec Lamia</b><i> · ${UNITES.find((u) => u.id === 'sauver_couple').prix / 100} €</i></small></a></p>
@@ -333,7 +333,7 @@ page(
         <li>✓ Chaque profil vérifié par Lamia</li>
         <li>✓ 1er match offert</li>
         <li>✓ Live chaque soir, 21 h</li>
-        <li>✓ France, Algérie, Canada, Europe</li>
+        <li>✓ France, Algérie, Maghreb, Canada, Europe</li>
       </ul>
     </div>
     <figure class="po-lamia">
@@ -1469,7 +1469,7 @@ page(
   '/rencontres/',
   layout({
     title: 'Profils kabyles vérifiés · Les Rencontres de Lamia',
-    description: 'Parcours les profils kabyles vérifiés par Lamia, de façon anonyme. France, Algérie, Canada, Europe. Tu choisis, elle vous présente.',
+    description: 'Parcours les profils kabyles vérifiés par Lamia, de façon anonyme. France, Algérie, Maghreb, Canada, Europe. Tu choisis, elle vous présente.',
     path: '/rencontres/',
     room: roomBySlug.patio,
     scripts: ['/assets/annonces.js'],
