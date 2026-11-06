@@ -630,7 +630,7 @@ renderSocials();
     const d = await r.json();
     if (!d.ok) return;
     const eur = (c) => `${(c / 100).toLocaleString('fr-FR')} €`;
-    if (d.restantes > 0) { lignes.forEach((l) => { l.textContent = `Plus que ${d.restantes} place${d.restantes > 1 ? 's' : ''} à ${eur(d.prix)}, puis ${eur(d.prix_normal)} par mois`; }); return; }
+    if (d.restantes > 0) { lignes.forEach((l) => { l.textContent = `Plus que ${d.restantes} place${d.restantes > 1 ? 's' : ''} à ${eur(d.prix)}, un prix que tu gardes. Ensuite, ${eur(d.prix_normal)} par mois pour les nouvelles inscriptions.`; }); return; }
     lignes.forEach((l) => { l.hidden = true; });
     prix.forEach((p) => { const an = p.dataset.prestigePrix === 'an'; const em = p.querySelector('em'); p.innerHTML = `${eur(an ? d.prix_an : d.prix)}<small> / ${an ? 'an' : 'mois'}</small>${em ? em.outerHTML : ''}`; });
   } catch { /* le prix réel reste décidé par le serveur au moment du paiement */ }
