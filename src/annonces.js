@@ -22,6 +22,7 @@ const ERR = {
   invalid_email: 'Vérifie ton adresse email : Lamia en a besoin pour te répondre.',
   textes_courts: 'Raconte-toi un peu plus : au moins quelques phrases pour ton profil et pour la personne que tu cherches.',
   medias_requis: 'Ajoute 2 photos de toi, visage visible.',
+  annonce_en_pause: 'Ton annonce est en pause. Reprends-la dans « Mon espace ».',
   photos_requises: 'Ajoute d’abord 2 photos de toi, dans « Mon espace ».',
   medias_trop: 'Deux photos au maximum.',
   identite_requise: 'Ajoute la photo de ta pièce d’identité, le numéro caché par ta main.',

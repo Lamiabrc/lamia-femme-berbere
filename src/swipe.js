@@ -283,6 +283,7 @@ addEventListener('keydown', (e) => { if (document.querySelector('.swipe-fenetre'
     monterFiltres();
     appliquer();
   } catch (err) {
+    if (err.code === 'annonce_en_pause') return message('<h2>Ton annonce est en pause</h2><p>Reprends-la dans ton espace pour découvrir les profils.</p><p><a class="po-btn" href="/mon-espace/">Aller à mon espace</a></p>');
     if (err.code === 'photos_requises') return message('<h2>Il manque tes photos</h2><p>Pour découvrir les profils, ajoute <strong>2 photos de toi</strong> dans ton espace. Elles restent privées.</p><p><a class="po-btn" href="/mon-espace/#photos">Ajouter mes photos</a></p>');
     if (err.code === 'fiche_a_confirmer') return message('<h2>Plus qu’une étape</h2><p>Ta fiche du live n’est pas encore confirmée. Confirme-la depuis ton espace, puis reviens swiper. Inutile de refaire un profil.</p><p><a class="po-btn" href="/mon-espace/">Confirmer ma fiche</a></p>');
     if (err.code === 'fiche_live') return message('<h2>Ta fiche du live est bien là ✅</h2><p>Il lui manque ton âge ou ton genre pour que tu puisses swiper. Écris à Lamia pour qu’elle la complète : inutile de refaire un profil.</p><p><a class="po-btn" href="/mon-espace/">Aller dans mon espace</a></p>');

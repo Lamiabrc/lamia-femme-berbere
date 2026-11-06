@@ -325,9 +325,18 @@ async function monProfil(session) {
       ${(p.matchs_lies || []).length ? `<ul class="espace-matchs-liste">${p.matchs_lies.map((m) => `<li><span>💞 Match avec le profil n° ${esc(m.ref)}</span><button class="btn btn-line" type="button" data-profil-dematcher="${esc(m.ref)}">Mettre fin à ce match</button></li>`).join('')}</ul>` : ''}
       ${p.medias_ok === false ? `<section class="espace-photos" id="photos"><h3>📷 Il manque tes photos</h3><p>Ajoute <strong>2 photos de toi, visage visible,</strong> pour swiper et répondre aux personnes intéressées. Elles restent privées : elles ne sont pas affichées dans les profils.</p><div data-profil-medias></div></section>` : ''}
       ${p.demander_affichage ? `<section class="espace-photos" id="affichage" data-affichage><h3>💌 Veux-tu que ton annonce soit visible ?</h3><p>Ton annonce n° ${esc(p.ref)} est validée. Si tu es d’accord, elle apparaît sur le site de façon anonyme : sans prénom, photo, ville ni contact.</p><p><button class="btn btn-ink" type="button" data-affichage-oui>Oui, je veux qu’elle soit visible</button> <button class="link-button" type="button" data-affichage-non>Non merci</button></p></section>` : ''}
+      ${p.en_pause
+        ? '<section class="espace-photos espace-pause"><h3>⏸️ Ton annonce est en pause</h3><p>Personne ne la voit et tu ne reçois plus de nouveau match. Tes discussions en cours continuent.</p><p><button class="btn btn-ink" type="button" data-annonce-pause="non">▶️ Reprendre mon annonce</button></p></section>'
+        : '<p class="espace-pause"><button class="btn btn-line" type="button" data-annonce-pause="oui">⏸️ Mettre mon annonce en pause</button><br><small>Elle devient invisible, sans rien effacer. Tes discussions continuent et tu la reprends quand tu veux.</small></p>'}
       <div class="espace-suivi" data-profil-suivi></div>
       <label class="annonce-case espace-photo"><input type="checkbox" data-profil-photo${p.photo_partage ? ' checked' : ''}> <span>Si un match me convient, Lamia peut transmettre <strong>ma photo</strong> à la personne avec qui elle me met en relation (et à elle seule).</span></label>
       <p class="form-status" data-profil-statut></p><div data-profil-edition hidden></div>`;
+    box.querySelector('[data-annonce-pause]')?.addEventListener('click', async (e) => {
+      const b = e.currentTarget, st = box.querySelector('[data-profil-statut]');
+      b.disabled = true;
+      try { await appelProfil({ action: 'annonce_pause', pause: b.dataset.annoncePause === 'oui' }, session); await monProfil(session); }
+      catch { b.disabled = false; if (st) st.textContent = 'Ça n’a pas marché. Réessaie dans un instant.'; }
+    });
     { const zm = box.querySelector('[data-profil-medias]');
       if (zm) { const { monterAjoutMedias } = await import('/assets/annonces.js'); await monterAjoutMedias(zm, { token: session.access_token, deja: p.photos || 0, apres: () => monProfil(session) }); if (location.hash === '#photos') zm.closest('section').scrollIntoView({ block: 'center' }); } }
     box.querySelector('[data-affichage]')?.addEventListener('click', async (e) => {
@@ -562,7 +571,9 @@ function direErreurReponse(boutons, err) {
   boutons.parentElement.querySelector('.interet-erreur')?.remove();
   const p = document.createElement('p');
   p.className = 'interet-erreur'; p.setAttribute('role', 'alert');
-  p.innerHTML = err?.code === 'photos_requises'
+  p.innerHTML = err?.code === 'annonce_en_pause'
+    ? '⏸️ <strong>Ton annonce est en pause.</strong> Reprends-la pour dire oui : le bouton est dans ton profil, plus haut.'
+    : err?.code === 'photos_requises'
     ? '📷 <strong>Il te manque tes 2 photos</strong> pour dire oui. Elles restent privées. <a class="text-link" href="#photos">Ajouter mes photos</a>'
     : 'Ta réponse n’est pas passée. Vérifie ta connexion et réessaie.';
   boutons.after(p);

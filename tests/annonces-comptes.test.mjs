@@ -255,3 +255,25 @@ test('origine : obligatoire au dépôt, lisible sur les cartes', async () => {
   const r = await handleAnnonces('annonce_deposer', { ...complet, matching: { contactReseau: 'https://www.tiktok.com/@nina.kab' } }, ctx(NINA));
   assert.equal((await r.json()).error, 'origine_requise');
 });
+
+test('pause : plus de swipe ni de réponse oui, et reprise possible', async () => {
+  const { db, ctx } = monde();
+  db.annonces.push({ id: '11111111-1111-4111-8111-111111111111', ref: 11, user_id: NINA.id, email: NINA.email, prenom: 'Nina', genre: 'femme', status: 'publiee', birth_date: '1995-03-02' });
+  let r = await handleAnnonces('annonce_pause', { pause: true }, ctx(NINA));
+  assert.equal((await r.json()).en_pause, true);
+  assert.ok(db.annonces[0].pause_at, 'la date de pause est notée');
+  assert.equal(db.annonces[0].status, 'publiee', 'rien n’est effacé');
+  r = await handleAnnonces('annonce_swipe_liste', {}, ctx(NINA));
+  assert.equal((await r.json()).error, 'annonce_en_pause');
+  r = await handleAnnonces('annonce_swipe', { ref: 12, choix: 'oui' }, ctx(NINA));
+  assert.equal((await r.json()).error, 'annonce_en_pause');
+  r = await handleAnnonces('annonce_pause', { pause: false }, ctx(NINA));
+  assert.equal((await r.json()).en_pause, false);
+  assert.equal(db.annonces[0].pause_at, null);
+});
+
+test('pause : sans annonce ni fiche, rien à mettre en pause', async () => {
+  const { ctx } = monde();
+  const r = await handleAnnonces('annonce_pause', { pause: true }, ctx(NINA));
+  assert.equal(r.status, 404);
+});
