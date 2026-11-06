@@ -18,7 +18,7 @@ import { LANGUES, PAGES_RENCONTRES, dictionnaire, motifs, pageTraduite, liensLan
 import { EDITABLE, defaults, applyOverrides } from '../content/editable.mjs';
 import { FORMULES, UNITES, prixAnnuel, prixMensuel, euros as eurosAbo } from '../content/abonnements.mjs';
 
-const placesLancement = (f) => (f.lancement ? `<p class="abo-places" data-prestige-places>Prix de lancement pour les ${f.lancement.places} premiers abonnés, puis ${eurosAbo(f.mois)} par mois</p>` : '');
+const placesLancement = (f) => (f.lancement ? `<p class="abo-places" data-prestige-places>${eurosAbo(f.lancement.prix)} pour les ${f.lancement.places} premiers abonnés, qui gardent ce prix. Ensuite, ${eurosAbo(f.mois)} par mois pour les nouvelles inscriptions.</p>` : '');
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = join(ROOT, 'dist');
@@ -1554,8 +1554,8 @@ const tableauFormules = () => {
   const oui = '<span class="abo-oui" aria-label="Oui">✓</span>', non = '<span class="abo-non" aria-label="Non">–</span>';
   const v = (x) => (x ? oui : non);
   const lignes = [
-    ['Prix par mois', 'Gratuit', eurosAbo(pa.mois), `${eurosAbo(pr.lancement.prix)} pour les ${pr.lancement.places} premiers abonnés, puis ${eurosAbo(pr.mois)}`],
-    ['Prix à l’année', '–', eurosAbo(prixAnnuel(pa)), `${eurosAbo(prixAnnuel(pr, 0))}, puis ${eurosAbo(prixAnnuel(pr))}`],
+    ['Prix par mois', 'Gratuit', eurosAbo(pa.mois), `${eurosAbo(pr.lancement.prix)} pour les ${pr.lancement.places} premiers abonnés, ${eurosAbo(pr.mois)} pour les inscriptions suivantes`],
+    ['Prix à l’année', '–', eurosAbo(prixAnnuel(pa)), `${eurosAbo(prixAnnuel(pr, 0))} pour les ${pr.lancement.places} premiers abonnés, ${eurosAbo(prixAnnuel(pr))} pour les inscriptions suivantes`],
     ['Matchs', `${d.mises} offert`, `${pa.mises} par mois`, 'Illimités'],
     ['Matchs en cours en même temps', d.matchs, pa.matchs, pr.matchs],
     ['Speed datings inclus par mois', '–', pa.speedDatings, pr.speedDatings],
@@ -1590,7 +1590,7 @@ page(
   '/abonnement/',
   layout({
     title: 'Tarifs des rencontres kabyles · Formules Lamia',
-    description: 'Découverte gratuite, Passion à 9 €, Prestige à 22 € pour les 20 premiers abonnés, puis 49 € par mois. Sans engagement, résiliable en un clic.',
+    description: 'Découverte gratuite, Passion à 9 €, Prestige à 22 € pour les 20 premiers abonnés, 49 € par mois pour les inscriptions suivantes. Sans engagement, résiliable en un clic.',
     path: '/abonnement/',
     room: roomBySlug.patio,
     scripts: ['/assets/abonnement.js'],
