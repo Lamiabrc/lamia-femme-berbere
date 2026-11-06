@@ -2,7 +2,8 @@
 // (catalogue, fiche produit, panier, espace membre, soirées…).
 // Chargé uniquement sur les pages /en/. Les textes absents du dictionnaire restent en français.
 (() => {
-  if (document.documentElement.lang !== 'en') return;
+  const LANGUE = document.documentElement.lang;
+  if (!['en', 'ar', 'kab'].includes(LANGUE)) return;
   let D = null, PAGES = new Set(), MOTIFS = [], NOMS = [], MEMBRE = null, SEGMENTS = null;
   const ATTRS = ['alt', 'title', 'aria-label', 'placeholder'];
   const norm = (s) => s.replace(/\s+/g, ' ').trim();
@@ -42,11 +43,11 @@
   }
 
   function lien(a) {
-    if (a.hasAttribute('hreflang')) return; // lien FR / EN
+    if (a.hasAttribute('hreflang')) return; // lien vers une autre langue
     const h = a.getAttribute('href');
     const m = h && h.match(/^(\/[^?#]*)([?#].*)?$/);
-    if (!m || /^\/(en\/|images\/|assets\/|api\/)/.test(m[1])) return;
-    if (m[1].startsWith('/produit/') || PAGES.has(m[1])) a.setAttribute('href', `/en${h}`);
+    if (!m || /^\/(en\/|ar\/|kab\/|images\/|assets\/|api\/)/.test(m[1])) return;
+    if ((LANGUE === 'en' && m[1].startsWith('/produit/')) || PAGES.has(m[1])) a.setAttribute('href', `/${LANGUE}${h}`);
   }
 
   function noeud(n) {
@@ -85,7 +86,7 @@
     }
   });
 
-  fetch('/assets/i18n/en.json')
+  fetch(`/assets/i18n/${LANGUE}.json`)
     .then((r) => (r.ok ? r.json() : null))
     .then((j) => {
       if (!j) return;

@@ -6,7 +6,7 @@ import { secteurLisible, origineLisible } from './matching-options.mjs';
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc');
 const $ = (s, r = document) => r.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
-const when = (iso) => new Date(iso).toLocaleString((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
+const when = (iso) => new Date(iso).toLocaleString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
 const say = (el, msg, err = false) => { el.textContent = msg; el.classList.toggle('is-error', err); };
 let recovering = false;
 
@@ -73,8 +73,8 @@ const ERR_COACHING = { service_requis: 'Ce créneau correspond à un autre servi
 async function monCoaching(session) {
   const bloc = $('[data-espace-coaching-bloc]'), box = $('[data-espace-coaching]');
   if (!bloc || !box) return;
-  const jour = (d) => new Date(d).toLocaleDateString((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { weekday: 'long', day: 'numeric', month: 'long' });
-  const heure = (d) => new Date(d).toLocaleTimeString((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { hour: '2-digit', minute: '2-digit' });
+  const jour = (d) => new Date(d).toLocaleDateString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { weekday: 'long', day: 'numeric', month: 'long' });
+  const heure = (d) => new Date(d).toLocaleTimeString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { hour: '2-digit', minute: '2-digit' });
   const peindre = (d, note = '') => {
     // Sans visio incluse ni achetée : l'offre à l'unité, sauf là où le paiement en ligne n'existe pas.
     const offre = d.offre && !window.LFB_PLAY;
@@ -234,7 +234,7 @@ async function demasquages(session) {
   if (location.hash === '#demasquage' && couples.length) document.getElementById('demasquage')?.scrollIntoView({ behavior: 'smooth' });
 }
 
-const money = (c, cur = 'EUR') => new Intl.NumberFormat((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { style: 'currency', currency: cur || 'EUR' }).format((c || 0) / 100);
+const money = (c, cur = 'EUR') => new Intl.NumberFormat(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { style: 'currency', currency: cur || 'EUR' }).format((c || 0) / 100);
 const STATUTS = { pending: 'Paiement en attente', paid: 'Payée', fulfilled: 'Expédiée', shipped: 'Expédiée', cancelled: 'Annulée', refunded: 'Remboursée' };
 // L'état de l'abonnement sert aussi au suivi du profil (quotas du mois).
 let aboPret; const etatAbo = new Promise((r) => { aboPret = r; });
@@ -247,7 +247,7 @@ async function achats(session) {
     monAbonnement(abonnement, session);
     box.innerHTML = orders.length
       ? orders.map((o) => `<article class="espace-achat">
-          <div><p class="event-date">${esc(new Date(o.created_at).toLocaleDateString((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { day: 'numeric', month: 'long', year: 'numeric' }))} · n° ${esc(o.order_number)}</p>
+          <div><p class="event-date">${esc(new Date(o.created_at).toLocaleDateString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { day: 'numeric', month: 'long', year: 'numeric' }))} · n° ${esc(o.order_number)}</p>
           <h3>${(o.order_items || []).map((i) => `${esc(i.product_name)}${i.quantity > 1 ? ` × ${i.quantity}` : ''}`).join(', ') || 'Commande'}</h3>
           ${(o.order_items || []).filter((i) => i.telechargement).map((i) => `<a class="btn btn-ink btn-telecharger" href="${esc(i.telechargement)}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#download"/></svg> Télécharger mon livre numérique</a>`).join('')}</div>
           <div class="espace-achat-droite"><strong>${money(o.amount_total_cents, o.currency)}</strong><span class="statut is-${esc(o.status)}">${esc(STATUTS[o.status] || o.status)}</span></div>
@@ -387,8 +387,8 @@ async function suivi(el, p) {
     q && q.nom !== 'Cœur' ? '<li><strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#camera"/></svg> Photo de ton match</strong> : incluse dans ta formule, si ton match l’accepte</li>' : '<li><strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#camera"/></svg> Photo de ton match</strong> : incluse à partir de la formule Passion, ou 3 € pour la voir 1 heure · <a class="text-link" href="/abonnement/?formule=passion">en savoir plus</a></li>',
     u.mise_en_relation || u.speed_dating ? `<li><strong>Achetés à l’unité</strong> : ${u.mise_en_relation || 0} match(s) supplémentaire(s) · ${u.speed_dating || 0} place(s) de speed dating</li>` : '',
   ].filter(Boolean).join('');
-  const demandes = (p.interets || []).map((i) => `<li>Profil n° ${esc(i.cible_ref)} · ${esc(ETAT_DEMANDE[i.statut] || i.statut)}${i.date ? ` <small>(${esc(new Date(i.date).toLocaleDateString((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { day: 'numeric', month: 'long' }))})</small>` : ''}</li>`).join('');
-  const heure = (d) => new Date(d).toLocaleTimeString((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { hour: '2-digit', minute: '2-digit' });
+  const demandes = (p.interets || []).map((i) => `<li>Profil n° ${esc(i.cible_ref)} · ${esc(ETAT_DEMANDE[i.statut] || i.statut)}${i.date ? ` <small>(${esc(new Date(i.date).toLocaleDateString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { day: 'numeric', month: 'long' }))})</small>` : ''}</li>`).join('');
+  const heure = (d) => new Date(d).toLocaleTimeString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { hour: '2-digit', minute: '2-digit' });
   // Une photo par match en cours. Pas d'achat dans l'appli Play, ni depuis l'Algérie (paiement en ligne impossible).
   const peutPayer = !window.LFB_PLAY && !p.algerie;
   const unePhoto = (pm) => {
@@ -404,7 +404,7 @@ async function suivi(el, p) {
   const blocChoisi = !cp.nombre ? '' : cp.inclus
     ? `<h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Qui t’a choisi·e</h3><p>${cp.refs.map((r) => `<strong>n° ${esc(r)}</strong>`).join(', ')} : ${cp.nombre > 1 ? 'ces profils sont' : 'ce profil est'} en tête de ton <a class="text-link" href="/rencontres/swipe/">swipe</a>. Choisis-${cp.nombre > 1 ? 'les' : 'le'} à ton tour pour un intérêt réciproque.</p>`
     : `<h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> ${cp.nombre} personne${cp.nombre > 1 ? 's t’ont' : ' t’a'} choisi·e</h3><p>Découvre qui avec la formule <a class="text-link" href="/abonnement/?formule=passion">Passion</a>${peutPayer ? ', ou pour 2 € pendant 24 heures' : ''}.</p>${peutPayer ? boutonService('qui_choisi', 'Voir qui t’a choisi·e pendant 24 heures', '2 €', 'Voir qui · 2 €') : ''}`;
-  const finAvant = p.en_avant_jusqu_a ? new Date(p.en_avant_jusqu_a).toLocaleDateString((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { day: 'numeric', month: 'long' }) : '';
+  const finAvant = p.en_avant_jusqu_a ? new Date(p.en_avant_jusqu_a).toLocaleDateString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { day: 'numeric', month: 'long' }) : '';
   const blocAvant = finAvant ? `<h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#star"/></svg> Ton profil est mis en avant</h3><p>En tête du swipe jusqu’au ${esc(finAvant)}.</p>` : peutPayer ? `<h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#star"/></svg> Mets ton profil en avant</h3><p>En tête du swipe pendant 7 jours, auprès des personnes qui correspondent à ses critères. Lamia ne promet pas de match, mais tu seras vu·e plus tôt.</p>${boutonService('profil_avant', 'Profil mis en avant pendant 7 jours', '5 €', 'Mettre en avant · 5 €')}` : '';
   el.innerHTML = `<h3>Mon suivi</h3><ul>${lignes}</ul>${blocChoisi}${blocAvant}${blocPhoto}
     <p><a class="po-btn" href="/rencontres/swipe/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Swiper les profils</a></p>
@@ -431,7 +431,7 @@ function monAbonnement(etat, session) {
   const box = document.querySelector('[data-espace-abonnement]');
   if (!box) return;
   const a = etat?.abonnement, u = etat?.unites || {};
-  const date = (d) => new Date(d).toLocaleDateString((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { day: 'numeric', month: 'long', year: 'numeric' });
+  const date = (d) => new Date(d).toLocaleDateString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { day: 'numeric', month: 'long', year: 'numeric' });
   const unites = [u.mise_en_relation ? `${u.mise_en_relation} mise(s) en relation` : '', u.speed_dating ? `${u.speed_dating} place(s) de speed dating` : ''].filter(Boolean).join(' · ');
   if (a?.offert) { box.innerHTML = `<article class="espace-achat"><div><p class="event-date">Offerte par Lamia</p><h3>Formule ${esc(NOMS_FORMULES[a.formule] || a.formule)}</h3><p>${a.raison === 'moderateur' ? 'Merci pour ta modération ' : ''}Rien à payer.</p>${unites ? `<p>À l’unité : ${esc(unites)}</p>` : ''}</div></article>`; return; }
   box.innerHTML = a
@@ -467,7 +467,7 @@ $('[data-espace-reset]').addEventListener('submit', async (e) => {
   // Le lien part par l'email du site (pas de limite « trop de demandes » partagée par tout le site).
   say(st, 'Un instant…');
   let rep;
-  try { rep = await api({ action: 'annonce_lien_connexion', email: String(f.get('email')).trim(), retour: 'espace', en: document.documentElement.lang === 'en' }); }
+  try { rep = await api({ action: 'annonce_lien_connexion', email: String(f.get('email')).trim(), retour: 'espace', langue: document.documentElement.lang, en: document.documentElement.lang === 'en' }); }
   catch (err) { return say(st, err.code === 'trop_de_demandes' ? 'Plusieurs liens sont déjà partis pour cette adresse. Regarde dans tes emails (et les courriers indésirables), ou réessaie dans une heure.' : err.code === 'email_invalide' ? 'Vérifie ton adresse email.' : 'L’envoi n’a pas fonctionné. Réessaie dans un instant.', true); }
   if (rep && rep.existe === false) return say(st, 'Aucun espace n’existe avec cet email. Crée-le juste en dessous, c’est rapide.', true);
   say(st, 'C’est parti ! Ouvre l’email que tu viens de recevoir et clique sur le lien (pense aux courriers indésirables).');
@@ -488,7 +488,7 @@ $('[data-espace-logout]').addEventListener('click', async (e) => {
   e.target.textContent = 'Déconnexion…';
   try { await Promise.race([supabase.auth.signOut({ scope: 'local' }), new Promise((r) => setTimeout(r, 3000))]); } catch { /* on nettoie quand même */ }
   try { Object.keys(localStorage).filter((k) => k.startsWith('sb-')).forEach((k) => localStorage.removeItem(k)); } catch { /* stockage indisponible */ }
-  location.replace(`${document.documentElement.lang === 'en' ? '/en' : ''}/mon-espace/`);
+  location.replace(`${['en', 'ar', 'kab'].includes(document.documentElement.lang) ? `/${document.documentElement.lang}` : ''}/mon-espace/`);
 });
 
 $('[data-espace-mdp]').addEventListener('submit', async (e) => {
@@ -529,7 +529,7 @@ async function mesFiches(session) {
     if (fiches.length) { const sans = document.querySelector('[data-sans-profil]'); if (sans) sans.remove(); else setTimeout(() => document.querySelector('[data-sans-profil]')?.remove(), 1500); }
     box.innerHTML = fiches.map((f) => `<article class="espace-achat"><div><p class="event-date">Fiche n° ${esc(f.ref)} · créée en live avec Lamia</p><h3>${esc(ETAT_FICHE[f.etat] || f.etat)}</h3>
       <p>${esc([f.age && `${f.age} ans`, f.ville, f.pays].filter(Boolean).join(' · '))}</p>
-      <p><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> <strong>${esc(f.interets.total)}</strong> personne(s) intéressée(s)${f.interets.mis_en_relation ? ` · ${esc(f.interets.mis_en_relation)} mise(s) en relation` : ''}${f.interets.dernier ? ` · dernier intérêt le ${esc(new Date(f.interets.dernier).toLocaleDateString((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { day: 'numeric', month: 'long' }))}` : ''}</p></div>
+      <p><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> <strong>${esc(f.interets.total)}</strong> personne(s) intéressée(s)${f.interets.mis_en_relation ? ` · ${esc(f.interets.mis_en_relation)} mise(s) en relation` : ''}${f.interets.dernier ? ` · dernier intérêt le ${esc(new Date(f.interets.dernier).toLocaleDateString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { day: 'numeric', month: 'long' }))}` : ''}</p></div>
       <div class="espace-achat-droite"><a class="btn btn-ink" href="${esc(f.lien)}">Voir ma fiche</a> <a class="btn btn-line" href="${esc(f.lien)}#modifier">Modifier mon annonce</a></div></article>`).join('');
   } catch { box.innerHTML = ''; }
 }
@@ -546,7 +546,7 @@ async function propositions(session) {
     const rep = x.reponse === 'oui' ? '<p class="espace-match">Tu as dit oui ! Si l’autre personne dit oui aussi, vous êtes mis en relation tout de suite et une discussion s’ouvre ici.</p>'
       : x.reponse === 'non' ? '<p>Tu as répondu : pas pour moi.</p>'
       : `<p class="interet-boutons"><button type="button" class="btn btn-ink" data-proposition="oui" data-id="${esc(x.id)}">Ce profil m’intéresse</button><button type="button" class="btn btn-line" data-proposition="non" data-id="${esc(x.id)}">Pas pour moi</button></p>`;
-    return `<article class="espace-achat interet-recu proposition"><div><p class="event-date">Proposé par Lamia · profil n° ${esc(f.ref)} · le ${esc(new Date(x.le).toLocaleDateString((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { day: 'numeric', month: 'long' }))}</p>
+    return `<article class="espace-achat interet-recu proposition"><div><p class="event-date">Proposé par Lamia · profil n° ${esc(f.ref)} · le ${esc(new Date(x.le).toLocaleDateString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { day: 'numeric', month: 'long' }))}</p>
       <h3>${esc(infos.join(' · '))}</h3>
       ${x.message ? `<p class="proposition-mot">« ${esc(x.message)} » <small>Lamia</small></p>` : ''}
       ${f.profil ? `<p><strong>Qui je suis :</strong> <span data-membre>${esc(f.profil)}</span></p>` : ''}
@@ -627,7 +627,7 @@ async function interetsRecus(session) {
     const rep = i.reponse === 'oui' ? '<p class="espace-match"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Tu as dit oui : c’est réciproque, Lamia est prévenue.</p>'
       : i.reponse === 'non' ? '<p>Tu as répondu : pas pour moi.</p>'
       : `<p class="interet-boutons"><button type="button" class="btn btn-ink" data-repondre="oui" data-id="${esc(i.id)}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Ça m’intéresse aussi</button><button type="button" class="btn btn-line" data-repondre="non" data-id="${esc(i.id)}">Pas pour moi</button></p>`;
-    return `<article class="espace-achat interet-recu"><div><p class="event-date">Profil n° ${esc(f.ref)} · intéressé·e par ta fiche n° ${esc(i.pour)} · le ${esc(new Date(i.le).toLocaleDateString((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { day: 'numeric', month: 'long' }))}</p>
+    return `<article class="espace-achat interet-recu"><div><p class="event-date">Profil n° ${esc(f.ref)} · intéressé·e par ta fiche n° ${esc(i.pour)} · le ${esc(new Date(i.le).toLocaleDateString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { day: 'numeric', month: 'long' }))}</p>
       <h3>${esc(infos.join(' · '))}</h3>
       ${f.profil ? `<p><strong>Qui je suis :</strong> <span data-membre>${esc(f.profil)}</span></p>` : ''}
       ${f.recherche ? `<p><strong>Qui je cherche${esc(ages)} :</strong> <span data-membre>${esc(f.recherche)}</span></p>` : ''}
@@ -707,7 +707,7 @@ async function discussions(session) {
   if (!bloc || !box) return;
   let liste = [], ouverte = null, salut = '', e = '·e';
   clearInterval(minuterieDiscussions);
-  const heure = (d) => new Date(d).toLocaleString((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { weekday: 'short', hour: '2-digit', minute: '2-digit' });
+  const heure = (d) => new Date(d).toLocaleString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { weekday: 'short', hour: '2-digit', minute: '2-digit' });
   const reste = (d) => { const ms = new Date(d.ferme_at) - Date.now(); if (ms <= 0) return 'terminée'; const j = Math.floor(ms / 86400e3), h = Math.floor((ms % 86400e3) / 3600e3); return j ? `encore ${j} jour${j > 1 ? 's' : ''}${h ? ` et ${h} h` : ''}` : `encore ${h} h`; };
   // Parcours vers le mariage : ouvert avec la discussion, les deux valident chaque étape.
   const vueParcours = (d) => {
@@ -742,7 +742,7 @@ async function discussions(session) {
       ${d.dematch ? `<div class="disc-dematch-etat">${d.dematch.par_moi
         ? `<strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#handshake"/></svg> Tu as mis fin à ce match.</strong> ${d.dematch.restants ? `Il te reste <strong>${esc(d.dematch.restants)} message${d.dematch.restants > 1 ? 's' : ''}</strong> pour dire au revoir.` : `Merci d’être resté${e} courtois${e === 'e' ? 'e' : e ? '·e' : ''}.`}`
         : `<strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> ${esc(d.avec)} a mis fin à ce match.</strong> Raison : ${esc(d.dematch.raison)}. ${d.dematch.restants ? `Tu peux répondre, il te reste ${esc(d.dematch.restants)} message${d.dematch.restants > 1 ? 's' : ''}.` : ''}`}
-        ${d.ouverte ? `<small>La discussion se ferme le ${esc(new Date(d.dematch.fin).toLocaleString((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }))}.</small>` : ''}</div>` : ''}
+        ${d.ouverte ? `<small>La discussion se ferme le ${esc(new Date(d.dematch.fin).toLocaleString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }))}.</small>` : ''}</div>` : ''}
       ${d.ouverte && (!d.dematch || d.dematch.restants) ? `<form class="disc-saisie" data-disc-envoi><textarea name="texte" rows="2" maxlength="1000" placeholder="Ton message…" required></textarea><button class="btn btn-ink" type="submit">Envoyer</button></form>
       <p class="disc-aide">Pour ta sécurité, les numéros, liens et emails écrits dans les messages sont masqués : utilise le bouton ci-dessous pour échanger vos numéros.</p>` : ''}
       ${d.ouverte && !d.dematch && !d.prenom?.partage ? (d.prenom?.demander

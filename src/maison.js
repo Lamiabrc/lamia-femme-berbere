@@ -14,7 +14,7 @@ export const SUPABASE_KEY = 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc';
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => [...root.querySelectorAll(s)];
 export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
-export const money = (cents, currency = 'EUR') => new Intl.NumberFormat((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { style: 'currency', currency }).format((cents || 0) / 100);
+export const money = (cents, currency = 'EUR') => new Intl.NumberFormat(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { style: 'currency', currency }).format((cents || 0) / 100);
 
 const ROOMS = {
   bijoux: { slug: 'ecrin', name: 'L’Écrin', path: '/ecrin/', accent: 'vert' },
@@ -442,7 +442,7 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeCart(
 export async function loadEvents() {
   return rest('speed_dating_events?select=id,title,description,starts_at,min_age,max_age,capacity,ticket_price_cents,currency,status&status=in.(published,sold_out)&sur_invitation=eq.false&order=starts_at');
 }
-export const eventDate = (iso) => new Date(iso).toLocaleString((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
+export const eventDate = (iso) => new Date(iso).toLocaleString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
 
 async function renderNextEvent() {
   const cards = $$('[data-next-event]');
@@ -822,8 +822,8 @@ renderSocials();
 
 // Lien FR / EN : garde la même pièce (utile pour les fiches produits servies par la page générique).
 document.querySelectorAll('.lang-link').forEach((a) => {
-  const ici = location.pathname.replace(/^\/en(?=\/)/, '');
-  a.setAttribute('href', `${a.hreflang === 'en' ? '/en' : ''}${ici}${location.search}${location.hash}`);
+  const ici = location.pathname.replace(/^\/(en|ar|kab)(?=\/)/, '');
+  a.setAttribute('href', `${a.hreflang === 'fr' ? '' : `/${a.hreflang}`}${ici}${location.search}${location.hash}`);
 });
 
 // ---------------------------------------------------------------- cloche des nouveautés : un point rouge s'il y a du nouveau depuis la dernière visite

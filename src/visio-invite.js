@@ -4,7 +4,7 @@ import { api, esc } from './confidences-commun.js';
 const zone = document.querySelector('[data-visio-invite]');
 const q = new URLSearchParams(location.search);
 const c = q.get('c'), t = q.get('t');
-const quand = (d) => new Date(d).toLocaleString(document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
+const quand = (d) => new Date(d).toLocaleString({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
 const ERREURS = {
   lien_invalide: 'Ce lien ne fonctionne plus : la visio a peut-être été annulée. Demande un nouveau lien à la personne qui l’a réservée.',
   terminee: 'Cette visio est terminée.',

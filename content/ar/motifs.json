@@ -1,0 +1,879 @@
+{
+"motifs": [
+[
+"^(?:Avec )?Profil n° (\\d+)$",
+"الملف رقم $1"
+],
+[
+"^Dis bonjour à Profil n° (\\d+)$",
+"ألقِ التحية على الملف رقم $1"
+],
+[
+"^Avec Profil n° (\\d+)$",
+"مع الملف رقم $1"
+],
+[
+"^(Une femme|Un homme), (\\d+) ans$",
+"$1، $2",
+[
+1
+]
+],
+[
+"^(\\d+) ans$",
+"$1 سنة"
+],
+[
+"^Originaire de (.+)$",
+"من $1"
+],
+[
+"^originaire de (.+)$",
+"من $1"
+],
+[
+"^études : (.+)$",
+"الدراسة: $1",
+[
+1
+]
+],
+[
+"^(Islam|Chrétienne|Agnostique|Athée|Autre), (pratiquant\\(e\\)|pratique modérée|non pratiquant\\(e\\))$",
+"$1، $2",
+[
+1,
+2
+]
+],
+[
+"^Qui je cherche \\((\\d+) à (\\d+) ans\\)$",
+"الشخص الذي أبحث عنه (من $1 إلى $2 سنة)"
+],
+[
+"^Qui je cherche · (\\d+) à (\\d+) ans$",
+"الشخص الذي أبحث عنه · من $1 إلى $2 سنة"
+],
+[
+"^Qui je cherche · (\\d+) à (\\d+) ans :$",
+"الشخص الذي أبحث عنه · من $1 إلى $2 سنة:"
+],
+[
+"^· (\\d+) à (\\d+) ans$",
+"· من $1 إلى $2 سنة"
+],
+[
+"^Profil n° (\\d+)$",
+"الملف رقم $1"
+],
+[
+"^Profil n° (\\d+) · intéressé·e par ta fiche n° (\\d+) · le (.+)$",
+"الملف رقم $1 · مهتم ببطاقتك رقم $2 · في $3"
+],
+[
+"^Profil n° (\\d+) · (.+)$",
+"الملف رقم $1 · $2",
+[
+2
+]
+],
+[
+"^Fiche n° (\\d+) · créée en live avec Lamia$",
+"البطاقة رقم $1 · أُنشئت مباشرة مع لمياء"
+],
+[
+"^Proposé par Lamia · profil n° (\\d+) · le (.+)$",
+"اقترحته لمياء · الملف رقم $1 · في $2"
+],
+[
+"^Match avec le profil n° (\\d+)$",
+"تطابق مع الملف رقم $1"
+],
+[
+"^n° (\\d+)$",
+"رقم $1"
+],
+[
+"^1 profil correspond$",
+"ملف واحد مطابق"
+],
+[
+"^(\\d+) profils correspondent$",
+"$1 ملفات مطابقة"
+],
+[
+"^0 profil correspond$",
+"لا ملف مطابق"
+],
+[
+"^1 personne t’a choisi·e$",
+"شخص واحد اختارك"
+],
+[
+"^(\\d+) personnes t’ont choisi·e$",
+"$1 أشخاص اختاروك"
+],
+[
+"^1 personne t’a choisi·e$",
+"شخص واحد اختارك"
+],
+[
+"^(\\d+) personnes t’ont choisi·e$",
+"$1 أشخاص اختاروك"
+],
+[
+"^profil à swiper aujourd’hui \\((\\d+) par jour avec ta formule\\)\\.$",
+"ملف واحد متبقٍ للتصفح اليوم ($1 في اليوم مع باقتك)."
+],
+[
+"^profils à swiper aujourd’hui \\((\\d+) par jour avec ta formule\\)\\.$",
+"ملفات متبقية للتصفح اليوم ($1 في اليوم مع باقتك)."
+],
+[
+"^Tu as swipé tes (\\d+) profils du jour\\. Reviens demain : ton compteur repart à zéro à minuit\\.$",
+"لقد تصفحت ملفاتك الـ$1 لهذا اليوم. عد غدًا: يعود عدّادك إلى الصفر عند منتصف الليل."
+],
+[
+"^Tour (\\d+) ! Tu as tout vu : voici une seconde chance$",
+"الجولة $1! رأيت كل شيء: إليك فرصة ثانية"
+],
+[
+"^1 profil à découvrir$",
+"ملف واحد لتكتشفه"
+],
+[
+"^(\\d+) profils à découvrir$",
+"$1 ملفات لتكتشفها"
+],
+[
+"^Tour (\\d+) · encore 1 profil$",
+"الجولة $1 · بقي ملف واحد"
+],
+[
+"^Tour (\\d+) · encore (\\d+) profils$",
+"الجولة $1 · بقي $2 ملفات"
+],
+[
+"^1 profil reste à découvrir si tu élargis ta recherche : ouvre les filtres et enlève un critère\\.$",
+"يبقى ملف واحد لتكتشفه إن وسّعت بحثك: افتح عوامل التصفية واحذف معيارًا."
+],
+[
+"^(\\d+) profils restent à découvrir si tu élargis ta recherche : ouvre les filtres et enlève un critère\\.$",
+"يبقى $1 ملفات لتكتشفها إن وسّعت بحثك: افتح عوامل التصفية واحذف معيارًا."
+],
+[
+"^1 coup de cœur$",
+"إعجاب واحد"
+],
+[
+"^(\\d+) coups de cœur$",
+"$1 إعجابات"
+],
+[
+"^envoyés? aujourd’hui $",
+"أُرسل اليوم "
+],
+[
+"^Le profil n° (\\d+) t’intéresse : crée d’abord ton compte, puis ton profil\\. Lamia regardera si vous pouvez correspondre\\.$",
+"الملف رقم $1 يهمّك: أنشئ حسابك أولًا ثم ملفك. ستنظر لمياء إن كان بينكما توافق."
+],
+[
+"^Le profil n° (\\d+) t’intéresse : crée ton profil ci-dessous\\. Lamia est prévenue et regarde si vous pouvez correspondre\\. Ton identité reste secrète\\.$",
+"الملف رقم $1 يهمّك: أنشئ ملفك أدناه. لمياء على علم وستنظر إن كان بينكما توافق. هويتك تبقى سرية."
+],
+[
+"^Tu es connecté\\(e\\) : ton profil sera lié à ton compte (.+)\\.$",
+"أنت متصل: سيُربط ملفك بحسابك $1."
+],
+[
+"^« Parle-nous de toi » : encore (\\d+) caractères? au moins$",
+"«حدثنا عن نفسك»: ينقصك $1 حرفًا على الأقل"
+],
+[
+"^« La personne que tu cherches » : encore (\\d+) caractères? au moins$",
+"«الشخص الذي تبحث عنه»: ينقصك $1 حرفًا على الأقل"
+],
+[
+"^Il manque une information pour envoyer ton profil :$",
+"تنقصك معلومة واحدة لإرسال ملفك:"
+],
+[
+"^Il manque (\\d+) informations pour envoyer ton profil :$",
+"تنقصك $1 معلومات لإرسال ملفك:"
+],
+[
+"^Envoi de tes fichiers \\((\\d+)/(\\d+)\\)…$",
+"جارٍ إرسال ملفاتك ($1/$2)…"
+],
+[
+"^Envoi de tes fichiers \\((\\d+)/(\\d+)\\), nouvel essai…$",
+"جارٍ إرسال ملفاتك ($1/$2)، محاولة جديدة…"
+],
+[
+"^Merci (.+), ton profil est bien arrivé chez Lamia \\(n° (\\d+)\\) !$",
+"شكرًا $1، وصل ملفك إلى لمياء (رقم $2)!"
+],
+[
+"^Merci (.+), ton profil est bien arrivé chez Lamia !$",
+"شكرًا $1، وصل ملفك إلى لمياء!"
+],
+[
+"^L’envoi n’a pas abouti \\((.+)\\)\\. Réessaie, ou écris à Lamia en lui donnant ce code\\.$",
+"لم يتم الإرسال ($1). أعد المحاولة، أو اكتب إلى لمياء وأعطها هذا الرمز."
+],
+[
+"^C’est noté : Lamia sait que le profil n° (\\d+) t’intéresse\\. Elle regarde si vous pouvez correspondre\\. Ton identité reste secrète : seul ton numéro de profil peut apparaître\\.$",
+"تم تسجيل ذلك: لمياء تعلم أن الملف رقم $1 يهمّك. ستنظر إن كان بينكما توافق. هويتك تبقى سرية: لا يظهر إلا رقم ملفك."
+],
+[
+"^Bloquer et signaler le profil n° (\\d+) \\? Vous ne vous verrez plus et Lamia est prévenue\\. La personne n’est pas avertie\\.$",
+"حظر الملف رقم $1 والإبلاغ عنه؟ لن يرى أحدكما الآخر وستُبلَّغ لمياء. أما الشخص فلن يُخطَر."
+],
+[
+"^Étape (\\d+) sur (\\d+)$",
+"الخطوة $1 من $2"
+],
+[
+"^(.{3,80}) : (\\d+) €\\.$",
+"$1: $2 €.",
+[
+1
+]
+],
+[
+"^En continuant, tu acceptes les conditions de vente \\(lamia-femme-berbere\\.com/cgv\\) et tu demandes que le service commence dès le paiement\\.$",
+"بالمتابعة، فإنك توافق على شروط البيع (lamia-femme-berbere.com/cgv) وتطلب بدء الخدمة فور الدفع."
+],
+[
+"^, (.+) \\((\\d+) minutes\\)\\.$",
+"، $1 ($2 دقيقة).",
+[
+1
+]
+],
+[
+"^Réserver ta visio du (.+) à (\\d\\d:\\d\\d), (.+) \\?$",
+"هل تحجز مكالمتك المرئية يوم $1 الساعة $2، $3؟",
+[
+3
+]
+],
+[
+"^(.+) à (\\d\\d:\\d\\d)$",
+"$1 الساعة $2"
+],
+[
+"^(\\d+) × (visio de 15 minutes|coaching de 30 minutes|Sauver mon couple)$",
+"$1 × $2",
+[
+2
+]
+],
+[
+"^(\\d\\d:\\d\\d) · (Couple, 1 h|30 min)$",
+"$1 · $2",
+[
+2
+]
+],
+[
+"^Merci ! Lamia t’enverra le lien d’installation à ton adresse\\.$",
+"شكرًا! ستبعث لك لمياء رابط التثبيت إلى عنوانك."
+],
+[
+"^Merci ! Lamia t’enverra le lien d’installation à (.+)\\.$",
+"شكرًا! ستبعث لك لمياء رابط التثبيت إلى $1."
+],
+[
+"^(.+) souhaite aussi te revoir$",
+"$1 يرغب هو أيضًا في رؤيتك مجددًا"
+],
+[
+"^Secteurs : (.+)\\.$",
+"المناطق: $1."
+],
+[
+"^Tu acceptes de rencontrer des personnes de moins de 40 ans\\.$",
+"أنت تقبل لقاء أشخاص دون الأربعين."
+],
+[
+"^Tu acceptes de rencontrer des personnes de 40 ans et plus\\.$",
+"أنت تقبل لقاء أشخاص في الأربعين فما فوق."
+],
+[
+"^Tu rencontres seulement des personnes de moins de 40 ans\\.$",
+"تلتقي فقط بأشخاص دون الأربعين."
+],
+[
+"^Tu rencontres seulement des personnes de 40 ans et plus\\.$",
+"تلتقي فقط بأشخاص في الأربعين فما فوق."
+],
+[
+"^(Salon \\d+-\\d+ ans|Salon 40 ans et plus) · (.+)$",
+"$1 · $2",
+[
+1,
+2
+]
+],
+[
+"^Valide ta place avant le (.+)\\.$",
+"أكّد مكانك قبل $1."
+],
+[
+"^, chaque soir à 21 h : elle peut t’offrir ta place\\. Sans validation avant le (.+), ta place passera à la personne suivante\\.$",
+"، كل مساء في التاسعة: يمكنها أن تمنحك مكانك. وإن لم تؤكده قبل $1، فسينتقل مكانك إلى الشخص التالي."
+],
+[
+"^Règle ta place avant le (.+), sinon elle passera à la personne suivante\\.$",
+"سدّد ثمن مكانك قبل $1، وإلا فسينتقل إلى الشخص التالي."
+],
+[
+"^D’après l’outil de Lamia, tu pourrais correspondre à (\\d+) personne\\(s\\)\\.$",
+"حسب أداة لمياء، قد تتوافق مع $1 من الأشخاص."
+],
+[
+"^Ton annonce n° (\\d+) est validée\\. Si tu es d’accord, elle apparaît sur le site de façon anonyme : sans prénom, photo, ville ni contact\\.$",
+"إعلانك رقم $1 تمّت الموافقة عليه. إن وافقت، يظهر على الموقع بشكل مجهول: دون اسم أو صورة أو مدينة أو وسيلة اتصال."
+],
+[
+"^Ton annonce n° (\\d+) est maintenant publiée, de façon anonyme\\.$",
+"إعلانك رقم $1 منشور الآن بشكل مجهول."
+],
+[
+"^Mettre fin à ton match avec le profil n° (\\d+) \\? Lamia sera prévenue, et une place se libère\\.$",
+"هل تريد إنهاء تطابقك مع الملف رقم $1؟ ستُبلَّغ لمياء ويتحرر مكان."
+],
+[
+"^: (\\d+) sur (\\d+) restante\\(s\\)$",
+": بقي $1 من $2"
+],
+[
+"^Formule (Découverte|Cœur|Passion|Prestige)$",
+"الباقة $1",
+[
+1
+]
+],
+[
+"^: (\\d+) mise\\(s\\) en relation ce mois-ci sur (\\d+) · (\\d+) speed dating inclus par mois$",
+": $1 تعارف هذا الشهر من أصل $2 · $3 من لقاءات التعارف السريع مشمولة شهريًا"
+],
+[
+"^: (\\d+) mise\\(s\\) en relation ce mois-ci \\(sans limite\\) · (\\d+) speed dating inclus par mois$",
+": $1 تعارف هذا الشهر (دون حد) · $2 من لقاءات التعارف السريع مشمولة شهريًا"
+],
+[
+"^: (\\d+) match\\(s\\) supplémentaire\\(s\\) · (\\d+) place\\(s\\) de speed dating$",
+": $1 تطابق إضافي · $2 مكان في التعارف السريع"
+],
+[
+"^La photo de ton match \\(profil n° (\\d+)\\)$",
+"صورة تطابقك (الملف رقم $1)"
+],
+[
+"^Visible jusqu’à (.+)\\. Rien que pour toi : merci de ne pas la partager\\.$",
+"مرئية حتى $1. لك وحدك: من فضلك لا تشاركها."
+],
+[
+"^: ces profils sont en tête de ton$",
+": هذه الملفات في مقدمة"
+],
+[
+"^: ce profil est en tête de ton$",
+": هذا الملف في مقدمة"
+],
+[
+"^\\. Choisis-les à ton tour pour un intérêt réciproque\\.$",
+". اخترهم بدورك ليكون الاهتمام متبادلًا."
+],
+[
+"^\\. Choisis-le à ton tour pour un intérêt réciproque\\.$",
+". اخترْه بدورك ليكون الاهتمام متبادلًا."
+],
+[
+"^En tête du swipe jusqu’au (.+)\\.$",
+"في صدارة التصفح حتى $1."
+],
+[
+"^(\\d+) mise\\(s\\) en relation$",
+"$1 تعارف"
+],
+[
+"^(\\d+) place\\(s\\) de speed dating$",
+"$1 مكان في التعارف السريع"
+],
+[
+"^À l’unité : (\\d+) mise\\(s\\) en relation · (\\d+) place\\(s\\) de speed dating(\\.?)$",
+"بالوحدة: $1 تعارف · $2 مكان في التعارف السريع$3"
+],
+[
+"^À l’unité : (\\d+) mise\\(s\\) en relation(\\.?)$",
+"بالوحدة: $1 تعارف$2"
+],
+[
+"^À l’unité : (\\d+) place\\(s\\) de speed dating(\\.?)$",
+"بالوحدة: $1 مكان في التعارف السريع$2"
+],
+[
+"^À l’unité : (.+)\\. Pas d’abonnement en cours\\.$",
+"بالوحدة: $1. لا اشتراك حالي."
+],
+[
+"^se termine le (.+)$",
+"تنتهي في $1"
+],
+[
+"^prochaine échéance le (.+)$",
+"الاستحقاق القادم في $1"
+],
+[
+"^(\\d+) mise\\(s\\) en relation$",
+"$1 تعارف"
+],
+[
+"^dernier intérêt le (.+)$",
+"آخر اهتمام في $1"
+],
+[
+"^Lamia te demande ton avis · profil n° (\\d+)$",
+"لمياء تطلب رأيك · الملف رقم $1"
+],
+[
+"^« (.+) Est-ce que tu acceptes cette différence \\? »$",
+"«$1 هل تقبل هذا الاختلاف؟»"
+],
+[
+"^encore 1 jour$",
+"بقي يوم واحد"
+],
+[
+"^encore (\\d+) jours$",
+"بقي $1 أيام"
+],
+[
+"^encore 1 jour et (\\d+) h$",
+"بقي يوم و$1 ساعة"
+],
+[
+"^encore (\\d+) jours et (\\d+) h$",
+"بقي $1 أيام و$2 ساعة"
+],
+[
+"^encore (\\d+) h$",
+"بقي $1 ساعة"
+],
+[
+"^✓ Tu as validé\\. On attend (.+)\\.$",
+"✓ لقد أكّدت. ننتظر $1."
+],
+[
+"^(.+) a déjà validé\\.$",
+"$1 أكّد بالفعل."
+],
+[
+"^Étape (\\d+) sur (\\d+) : (.+)$",
+"الخطوة $1 من $2: $3",
+[
+3
+]
+],
+[
+"^(.+), dis bonjour à (.+) $",
+"$1، قل مرحبًا لـ$2 "
+],
+[
+"^Dis bonjour à (.+) $",
+"قل مرحبًا لـ$1 "
+],
+[
+"^Vous avez échangé vos numéros\\. Celui de (.+) :$",
+"لقد تبادلتما الأرقام. رقم $1:"
+],
+[
+"^Tu as donné ton numéro\\. (.+) le verra dès qu’il ou elle aura donné le sien \\(on l’a prévenu·e\\)\\.$",
+"لقد أعطيت رقمك. سيراه $1 حالما يعطيك رقمه (أخبرناه بذلك)."
+],
+[
+"^Tu as donné ton numéro\\. (.+) le verra dès qu’il ou elle aura donné le sien\\.$",
+"لقد أعطيت رقمك. سيراه $1 حالما يعطيك رقمه."
+],
+[
+"^(.+) a donné son numéro$",
+"$1 أعطى رقمه"
+],
+[
+"^(.+), prêt(?:e|·e)? à passer au téléphone \\? Donne ton numéro$",
+"$1، هل أنت مستعد للانتقال إلى الهاتف؟ أعطِ رقمك"
+],
+[
+"^Prêt(?:e|·e)? à passer au téléphone \\? Donne ton numéro$",
+"هل أنت مستعد للانتقال إلى الهاتف؟ أعطِ رقمك"
+],
+[
+"^Avec (.+)$",
+"مع $1"
+],
+[
+"^Par honnêteté : (.+) a aussi 1 autre match en cours\\.$",
+"للأمانة: لدى $1 أيضًا تطابق آخر جارٍ."
+],
+[
+"^Par honnêteté : (.+) a aussi (\\d+) autres matchs en cours\\.$",
+"للأمانة: لدى $1 أيضًا $2 تطابقات أخرى جارية."
+],
+[
+"^De ton côté, tu as 1 autre match en cours : (.+) le voit aussi\\.$",
+"من جهتك، لديك تطابق آخر جارٍ: $1 يراه أيضًا."
+],
+[
+"^De ton côté, tu as (\\d+) autres matchs en cours : (.+) le voit aussi\\.$",
+"من جهتك، لديك $1 تطابقات أخرى جارية: $2 يراه أيضًا."
+],
+[
+"^1 message$",
+"رسالة واحدة"
+],
+[
+"^(\\d+) messages$",
+"$1 رسائل"
+],
+[
+"^Merci d’être resté(?:e|·e)? courtois(?:e|·e)?\\.$",
+"شكرًا على لطفك واحترامك."
+],
+[
+"^(.+) a mis fin à ce match\\.$",
+"$1 أنهى هذا التطابق."
+],
+[
+"^Raison : (.+)\\. Tu peux répondre, il te reste 1 message\\.$",
+"السبب: $1. يمكنك الرد، بقيت لك رسالة واحدة.",
+[
+1
+]
+],
+[
+"^Raison : (.+)\\. Tu peux répondre, il te reste (\\d+) messages\\.$",
+"السبب: $1. يمكنك الرد، بقيت لك $2 رسائل.",
+[
+1
+]
+],
+[
+"^Raison : (.+)\\.$",
+"السبب: $1.",
+[
+1
+]
+],
+[
+"^La discussion se ferme le (.+)\\.$",
+"تُغلق المحادثة في $1."
+],
+[
+"^Veux-tu partager ton prénom \\((.+)\\) avec ton match \\?$",
+"هل تريد مشاركة اسمك الأول ($1) مع تطابقك؟"
+],
+[
+"^Veux-tu partager ton prénom avec ton match \\?$",
+"هل تريد مشاركة اسمك الأول مع تطابقك؟"
+],
+[
+"^Ta place est réservée, (.+) : salon (.+)\\.$",
+"مكانك محجوز يا $1: صالون $2."
+],
+[
+"^Ta place est réservée, (.+)\\.$",
+"مكانك محجوز يا $1."
+],
+[
+"^Voir l’image (\\d+)$",
+"عرض الصورة $1"
+],
+[
+"^Lamia t’envoie par email le lien de paiement sécurisé\\. Total : (.+?)\\.(.*)$",
+"ترسل لك لمياء رابط الدفع الآمن بالبريد الإلكتروني. المجموع: $1.$2"
+],
+[
+"^Tu es dans le navigateur de$",
+"أنت داخل متصفح"
+],
+[
+"^\\. Si le paiement ne s’ouvre pas, ouvre cette page dans (Chrome|Safari) : (.+)\\.$",
+". إن لم يفتح الدفع، افتح هذه الصفحة في $1: $2.",
+[
+2
+]
+],
+[
+"^Plus que 1 place à ([\\d,]+) €, puis ([\\d,]+) € par mois$",
+"بقي مكان واحد فقط بسعر $1 €، ثم $2 € شهريًا"
+],
+[
+"^Plus que (\\d+) places à ([\\d,]+) €, puis ([\\d,]+) € par mois$",
+"بقيت $1 أماكن فقط بسعر $2 €، ثم $3 € شهريًا"
+],
+[
+"^Télécharger « (.+) »$",
+"تحميل «$1»"
+],
+[
+"^Lien copié : colle-le dans (Safari|Chrome)\\.?$",
+"تم نسخ الرابط: الصقه في $1."
+],
+[
+"^Ce soir (\\d+) h · (.+)$",
+"الليلة الساعة $1:00 · $2"
+],
+[
+"^Ce soir (\\d+) h (\\d+) · (.+)$",
+"الليلة الساعة $1:$2 · $3"
+],
+[
+"^En ce moment · (.+)$",
+"الآن · $1"
+],
+[
+"^(lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche) (\\d+) h · (.+)$",
+"$1 الساعة $2:00 · $3",
+[
+1
+]
+],
+[
+"^(lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche) (\\d+) h (\\d+) · (.+)$",
+"$1 الساعة $2:$3 · $4",
+[
+1
+]
+],
+[
+"^plus que 1 place$",
+"بقي مكان واحد"
+],
+[
+"^plus que (\\d+) places$",
+"بقيت $1 أماكن"
+],
+[
+"^(\\d+)-(\\d+) ans :$",
+"من $1 إلى $2 سنة:"
+],
+[
+"^40 ans et plus :$",
+"40 سنة فما فوق:"
+],
+[
+"^Salon (\\d+)-(\\d+) ans$",
+"صالون $1-$2 سنة"
+],
+[
+"^Tour (\\d+)$",
+"الجولة $1"
+],
+[
+"^✓ Ta formule (.+) est active pour un an\\. Tu la retrouves dans ton espace, où tu peux réserver ta visio avec Lamia\\.$",
+"✓ باقتك $1 مفعّلة لمدة سنة. ستجدها في مساحتك، حيث يمكنك حجز مكالمتك المرئية مع لمياء.",
+[
+1
+]
+],
+[
+"^✓ Ta formule (.+) est active\\. Tu la retrouves dans ton espace, où tu peux réserver ta visio avec Lamia\\.$",
+"✓ باقتك $1 مفعّلة. ستجدها في مساحتك، حيث يمكنك حجز مكالمتك المرئية مع لمياء.",
+[
+1
+]
+],
+[
+"^✓ Ta formule (.+) est active pour un an\\. Tu la retrouves dans ton espace\\.$",
+"✓ باقتك $1 مفعّلة لمدة سنة. ستجدها في مساحتك.",
+[
+1
+]
+],
+[
+"^✓ Ta formule (.+) est active\\. Tu la retrouves dans ton espace\\.$",
+"✓ باقتك $1 مفعّلة. ستجدها في مساحتك.",
+[
+1
+]
+],
+[
+"^✓ Achat confirmé : (\\d+) × (.+)\\.$",
+"✓ تم تأكيد الشراء: $1 × $2.",
+[
+2
+]
+],
+[
+"^([\\d,]+) Mo$",
+"$1 ميغابايت"
+],
+[
+"^(\\d+) Ko$",
+"$1 كيلوبايت"
+],
+[
+"^Fiche n° (\\d+) · (une femme|un homme)$",
+"البطاقة رقم $1 · $2",
+[
+2
+]
+],
+[
+"^village : (.+)$",
+"القرية: $1"
+],
+[
+"^études : (.+)$",
+"الدراسة: $1",
+[
+1
+]
+],
+[
+"^✓ Ta fiche est reliée à ton compte \\((.+)\\)\\.$",
+"✓ بطاقتك مرتبطة بحسابك ($1)."
+],
+[
+"^(\\d+) femmes? et (\\d+) hommes? inscrits · (\\d+) \\+ (\\d+) pour confirmer$",
+"$1 من النساء و$2 من الرجال مسجلون · $3 + $4 للتأكيد"
+],
+[
+"^, pour (\\d+) minutes\\.$",
+"، لمدة $1 دقيقة."
+],
+[
+"^(.+) · gratuite$",
+"$1 · مجانية"
+],
+[
+"^(.+ €.*) l’unité\\.$",
+"$1 للوحدة."
+],
+[
+"^(.+?) dont (.+?) d’envoi · dont TVA (.+?) % : (.+)$",
+"$1 منها $2 للشحن · شاملة ضريبة القيمة المضافة $3%: $4"
+],
+[
+"^(.+?) dont (.+?) d’envoi$",
+"$1 منها $2 للشحن"
+],
+[
+"^(.+?) · dont TVA (.+?) % : (.+)$",
+"$1 · شاملة ضريبة القيمة المضافة $2%: $3"
+],
+[
+"^Il n’en reste que (\\d+)\\. Choisis une quantité plus petite\\.$",
+"لم يتبقَّ سوى $1. اختر كمية أقل."
+],
+[
+"^Livre broché (.+)$",
+"كتاب ورقي $1"
+],
+[
+"^Commande n° (\\S+)\\. Tu reçois le reçu de paiement par email\\. Lamia prépare ton colis et te tient au courant de l’expédition\\.$",
+"الطلب رقم $1. يصلك إيصال الدفع بالبريد الإلكتروني. لمياء تجهّز طردك وستبقيك على اطلاع بشأن الشحن."
+],
+[
+"^Commande n° (\\S+)\\. Tu reçois le reçu de paiement par email\\. Télécharge ton livre maintenant : tu le retrouveras aussi à tout moment dans « Mon espace », connectée avec la même adresse email\\.?(.*)$",
+"الطلب رقم $1. يصلك إيصال الدفع بالبريد الإلكتروني. حمّل كتابك الآن: ستجده أيضًا في أي وقت في «مساحتي»، بعد تسجيل الدخول بنفس البريد الإلكتروني.$2"
+],
+[
+"^Numéro de commande :$",
+"رقم الطلب:"
+],
+[
+"^(\\d+) à (\\d+) ans$",
+"من $1 إلى $2 سنة"
+],
+[
+"^Tranches d’âge : (.+)$",
+"الفئات العمرية: $1"
+],
+[
+"^Salon (.+)$",
+"صالون $1"
+],
+[
+"^Le salon (.+) est complet\\.$",
+"صالون $1 ممتلئ."
+],
+[
+"^Tête-à-tête avec ton cavalier$",
+"لقاء ثنائي مع شريكك"
+],
+[
+"^Tête-à-tête avec (.+)$",
+"لقاء ثنائي مع $1"
+],
+[
+"^· tour (\\d+)$",
+"· الجولة $1"
+],
+[
+"^(\\d+) masques? au bal$",
+"$1 قناع في الحفل"
+],
+[
+"^Envoi des fichiers \\((\\d+)/(\\d+)\\)…$",
+"جارٍ إرسال الملفات ($1/$2)…"
+],
+[
+"^Extrait, page (\\d+)$",
+"مقتطف، الصفحة $1"
+],
+[
+"^\\((\\d+) pages\\)$",
+"($1 صفحة)"
+]
+],
+"noms": [
+[
+"La Maison Lamia Femme Berbère",
+"دار Lamia Femme Berbère"
+],
+[
+"Le Salon du Speed Dating",
+"صالون التعارف السريع"
+],
+[
+"Le Cabinet des Confidences",
+"مقصورة البوح"
+],
+[
+"Le Grenier des Trouvailles",
+"علّية الكنوز"
+],
+[
+"La Bibliothèque de Yemma",
+"مكتبة يمّا"
+],
+[
+"La Salle de bain de Lamia",
+"حمّام لمياء"
+],
+[
+"La Coiffeuse de Lamia",
+"منضدة زينة لمياء"
+],
+[
+"Le Salon de Lamia",
+"صالون لمياء"
+],
+[
+"L’Écrin",
+"علبة الجواهر"
+],
+[
+"La Boutique",
+"المتجر"
+],
+[
+"Mon espace",
+"مساحتي"
+]
+]
+}
