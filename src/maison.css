@@ -3746,3 +3746,4 @@ body[data-ambiance="boutique"] .room-name, body[data-ambiance="boutique"] .produ
 .swipe-tete > details { background: none !important; border: 0 !important; }
 .swipe-tete > details > summary { background: #fff !important; border: 1px solid rgba(27, 26, 24, .18) !important; border-radius: 999px; }
 .swipe-tete > details.swipe-explique:not(h1):not(.ico) { background: none !important; border: 0 !important; }
+.annonce-box { scroll-margin-top: 84px; }
