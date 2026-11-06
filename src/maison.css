@@ -3899,3 +3899,14 @@ body:has(.conf-choix) main, body:has(.conf-choix) .room-body, body:has(.conf-cho
 .abo-periode button b { color: var(--or-fonce); }
 .site-footer h3, .site-footer h2, .footer-title { color: var(--or-clair); }
 .po-corps h2::after, .room-body > h2::after, .annonces-titre::after { background: linear-gradient(90deg, var(--levres) 0 10px, var(--or) 10px); width: 44px; }
+
+/* Textes restés clairs sur les pages désormais claires */
+.accueil-carte p { color: #625D72 !important; }
+.po-app .text-link, .po-app a.text-link { color: #6C5BA7; }
+.po-app .po-hero .text-link { color: #fff; }
+.po-corps li b, .po-corps li a, .po-corps p a { color: #2F2B3D; }
+.abo-periode button b { color: #8A6D33; }
+body[data-ambiance="douce"] main { background-image: radial-gradient(70% 500px at 100% 0%, rgba(233, 223, 250, .55), transparent 72%), radial-gradient(70% 500px at 0% 45%, rgba(207, 236, 232, .55), transparent 72%); background-repeat: no-repeat; }
+.po-app .text-link:not(.po-hero *):not(.lamia-live *), .po-corps a.text-link { color: #6C5BA7 !important; }
+.patio-etapes li :is(a, b), body[data-ambiance="douce"] .room-body li :is(a, b) { color: #2F2B3D !important; }
+.salon-ancre { color: #2F2B3D !important; border: 1px solid rgba(47, 43, 61, .25) !important; background: #fff !important; }

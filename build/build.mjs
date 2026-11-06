@@ -117,6 +117,8 @@ const HOME_UNIVERSES = [
 
 // ---------------------------------------------------------------- gabarit commun
 
+// Pièces sombres passées au style clair et pastel de la Maison.
+const ambianceDouce = (a) => (['salon', 'ecrin', 'bibliotheque', 'grenier', 'galerie', 'patio', 'dressing', 'coiffeuse', 'atelier'].includes(a) ? 'douce' : a);
 function layout({ title, description, path, room, body, scripts = [], noindex = false, ambiance, ogTitle, ogDescription, ogImage, ogImageAlt, ogImageWidth = 600, ogImageHeight = 600 }) {
   const canonical = SITE_URL + path;
   const accent = room?.accent || 'rouge';
@@ -158,7 +160,7 @@ ${noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" hr
 <link rel="stylesheet" href="/fonts/polices.css">
 <link rel="stylesheet" href="/assets/maison.css?v=${VERSION}">
 </head>
-<body data-room="${esc(room?.slug || '')}" data-ambiance="${esc(ambiance || room?.slug || '')}" data-accent="${esc(accent)}">
+<body data-room="${esc(room?.slug || '')}" data-ambiance="${esc(ambianceDouce(ambiance || room?.slug || ''))}" data-accent="${esc(accent)}">
 <a class="skip" href="#contenu">Aller au contenu</a>
 ${header(room)}
 <main id="contenu">

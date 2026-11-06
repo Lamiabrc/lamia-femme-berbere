@@ -377,3 +377,4 @@
 .tdb-top .ico { color: #B8965A; }
 .tdb-outils .ico { color: #B8965A; }
 .tdb-titre::after { width: 44px; background: linear-gradient(90deg, #D1173A 0 10px, #D9BC7E 10px); }
+.tdb-marque em { color: #8E7FC0; }
