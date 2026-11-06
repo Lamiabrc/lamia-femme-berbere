@@ -3607,3 +3607,5 @@ body.espace-est-admin .espace-admin-note { color: #E8D6B5; }
   .accueil-couple span { font-size: .92rem; }
   .accueil-couple small { display: none; }
 }
+
+.annonce-box { scroll-margin-top: 84px; }
