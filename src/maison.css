@@ -3942,3 +3942,5 @@ html[dir="rtl"], html[dir="rtl"] body { overflow-x: clip; }
   html[lang="kab"] .cta-profil span::after { content: 'Xdem'; }
   html[lang="kab"].a-compte .cta-profil span::after { content: 'Profil-inu'; }
 }
+
+.maison-menu-langues a[aria-current="true"] strong { color: #6C5BA7; text-decoration: underline; text-underline-offset: 3px; }

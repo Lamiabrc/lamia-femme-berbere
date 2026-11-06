@@ -820,11 +820,23 @@ renderSocials();
   addEventListener('appinstalled', () => { boutons().forEach((x) => { x.hidden = true; }); document.querySelectorAll('[data-installee]').forEach((x) => { x.hidden = false; }); });
 })();
 
-// Lien FR / EN : garde la même pièce (utile pour les fiches produits servies par la page générique).
-document.querySelectorAll('.lang-link').forEach((a) => {
+// Choix de la langue : garde la même page quand elle existe dans cette langue, et s'en souvient sur ce téléphone.
+{
+  const PAGES_LANGUES = ['/', '/rencontres/', '/rencontres/swipe/', '/rencontres/confirmer/', '/rencontres/visio/', '/mon-espace/', '/abonnement/', '/abonnement/merci/', '/application/', '/hors-ligne/'];
   const ici = location.pathname.replace(/^\/(en|ar|kab)(?=\/)/, '');
-  a.setAttribute('href', `${a.hreflang === 'fr' ? '' : `/${a.hreflang}`}${ici}${location.search}${location.hash}`);
-});
+  const langueIci = document.documentElement.lang;
+  const memoire = { lire() { try { return localStorage.getItem('lfb_langue'); } catch { return null; } }, ecrire(l) { try { localStorage.setItem('lfb_langue', l); } catch { /* stockage indisponible */ } } };
+  const existe = (l) => l === 'fr' || (l === 'en' ? !/^\/(admin|pilotage|tableau-de-bord|confidences-lamia)/.test(ici) : PAGES_LANGUES.includes(ici));
+  document.querySelectorAll('.lang-link, .maison-menu-langues a').forEach((a) => {
+    const l = a.hreflang;
+    if (existe(l)) a.setAttribute('href', `${l === 'fr' ? '' : `/${l}`}${ici}${location.search}${location.hash}`);
+    a.addEventListener('click', () => memoire.ecrire(l));
+  });
+  document.querySelectorAll('.maison-menu-langues a').forEach((a) => { if (a.hreflang === langueIci) a.setAttribute('aria-current', 'true'); });
+  // À l'ouverture de l'appli ou d'une page française du parcours : on revient à la langue choisie.
+  const choisie = memoire.lire();
+  if (choisie && ['en', 'ar', 'kab'].includes(choisie) && langueIci === 'fr' && PAGES_LANGUES.includes(ici) && !/^\/(tableau-de-bord|confidences-lamia)/.test(ici)) location.replace(`/${choisie}${ici}${location.search}${location.hash}`);
+}
 
 // ---------------------------------------------------------------- cloche des nouveautés : un point rouge s'il y a du nouveau depuis la dernière visite
 (function cloche() {
