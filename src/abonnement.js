@@ -34,7 +34,7 @@ const ERREURS = {
   cgv_required: 'Coche la case des conditions de vente pour continuer.',
   invalid_contact: 'Vérifie ton nom et ton adresse email.',
   deja_abonne: 'Tu as déjà un abonnement en cours. Pour le changer, va dans ton espace, « Gérer mon abonnement ».',
-  paiement_indisponible: 'Le paiement en ligne est momentanément indisponible. Écris à Lamia depuis les Confidences.',
+  paiement_indisponible: 'Le paiement en ligne est momentanément indisponible. Réessaie plus tard ou écris à lamia.brechet@outlook.fr.',
 };
 form.addEventListener('submit', async (e) => {
   e.preventDefault();

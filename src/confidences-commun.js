@@ -17,6 +17,7 @@ export const ERREURS = {
   login_required: 'Ta connexion a expiré. Reçois un nouveau lien de connexion.',
   upload_failed: 'Les fichiers ne sont pas arrivés. Vérifie ta connexion et réessaie.',
   forbidden: 'Cette action n’est pas autorisée.',
+  reserve_abonnes: 'Les Confidences sont réservées aux abonnés.',
 };
 export const erreur = (code) => ERREURS[code] || 'L’envoi n’a pas fonctionné. Réessaie dans un instant.';
 

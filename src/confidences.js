@@ -7,9 +7,25 @@ const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', PUBLIC
 const $ = (s, root = document) => root.querySelector(s);
 const say = (el, msg, err = false) => { if (!el) return; el.textContent = msg; el.classList.toggle('is-error', err); };
 
+// Réservé aux abonnés : le serveur décide, cette page ne fait qu'expliquer.
+let accesEnCours = null;
+const acces = () => (accesEnCours ||= (async () => {
+  const { data: { session: s } } = await supabase.auth.getSession();
+  if (!s) return { connecte: false, abonne: false, jeton: null, email: '' };
+  try { const r = await api({ action: 'confidences_acces' }, s.access_token); return { ...r, jeton: s.access_token, email: s.user.email }; }
+  catch { return { connecte: true, abonne: false, jeton: s.access_token, email: s.user.email }; }
+})());
+if (window.LFB_PLAY) document.querySelectorAll('[data-hors-play]').forEach((x) => x.remove());
+
 // ---------------------------------------------------------------- les trois choix
-function ouvrir(nom, scroll = true) {
-  document.querySelectorAll('[data-choix]').forEach((b) => b.setAttribute('aria-expanded', String(b.dataset.choix === nom)));
+async function ouvrir(nomDemande, scroll = true) {
+  let nom = nomDemande;
+  if (nom === 'ecrire' || nom === 'parler') {
+    const a = await acces();
+    if (!a.abonne) { nom = 'reserve'; const d = $('[data-si-deconnecte]'); if (d) d.hidden = a.connecte; }
+    else document.querySelectorAll('[data-conf-ecrit] input[name=email], [data-conf-vocal] input[name=email]').forEach((c) => { c.value = a.email; c.readOnly = true; });
+  }
+  document.querySelectorAll('[data-choix]').forEach((b) => b.setAttribute('aria-expanded', String(b.dataset.choix === nomDemande)));
   document.querySelectorAll('[data-panneau]').forEach((p) => { p.hidden = p.dataset.panneau !== nom; });
   const p = $(`[data-panneau="${nom}"]`);
   if (scroll && p) p.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -54,7 +70,7 @@ if (formEcrit) {
     if (!c.consent) return say(st, erreur('consent_required'), true);
     btn.disabled = true; say(st, 'Envoi en cours…');
     try {
-      await envoyer({ action: 'envoyer', channel: 'ecrit', ...c }, pj.get().map((f) => ({ blob: f, name: f.name })), null, (i, n) => say(st, `Envoi des fichiers (${i}/${n})…`));
+      await envoyer({ action: 'envoyer', channel: 'ecrit', ...c }, pj.get().map((f) => ({ blob: f, name: f.name })), (await acces()).jeton, (i, n) => say(st, `Envoi des fichiers (${i}/${n})…`));
       merci(formEcrit, c.name);
     } catch (err) { say(st, erreur(err.code), true); btn.disabled = false; }
   });
@@ -72,7 +88,7 @@ if (formVocal) {
     if (!c.consent) return say(st, erreur('consent_required'), true);
     btn.disabled = true; say(st, 'Envoi de ton vocal…');
     try {
-      await envoyer({ action: 'envoyer', channel: 'vocal', ...c }, [{ blob: rec.blob(), name: 'message-vocal', duration: rec.duree() }], null);
+      await envoyer({ action: 'envoyer', channel: 'vocal', ...c }, [{ blob: rec.blob(), name: 'message-vocal', duration: rec.duree() }], (await acces()).jeton);
       rec.vider();
       merci(formVocal, c.name);
     } catch (err) { say(st, erreur(err.code), true); btn.disabled = false; }
@@ -96,14 +112,16 @@ $('[data-conv-lien]')?.addEventListener('submit', async (e) => {
   say(st, 'C’est parti : ouvre l’email reçu et clique sur le lien (pense à regarder les courriers indésirables). Tu reviendras directement ici.');
 });
 
-function rendreFil(threads) {
+function rendreFil(threads, abonne = true) {
+  $('[data-conv-form]').hidden = !abonne;
+  $('[data-conv-reserve]').hidden = abonne;
   const box = $('[data-conv-fil]');
   const msgs = threads.flatMap((t) => t.messages.map((m) => ({ ...m, t }))).sort((a, b) => a.created_at.localeCompare(b.created_at));
   fil = threads.find((t) => t.channel === 'conversation') || threads[0] || null;
   $('[data-conv-premier]').hidden = Boolean(fil);
   box.innerHTML = msgs.length
     ? msgs.map((m) => `<article class="conf-bulle is-${m.author}"><p class="conf-bulle-qui">${m.author === 'lamia' ? 'Lamia' : 'Toi'} · <time>${esc(quand(m.created_at))}</time></p>${m.body ? `<p class="conf-bulle-texte">${esc(m.body)}</p>` : ''}${piecesHtml(m.files)}</article>`).join('')
-    : '<p class="conf-vide">Ta conversation commence ici. Écris à Lamia, ou laisse-lui un vocal.</p>';
+    : abonne ? '<p class="conf-vide">Ta conversation commence ici. Écris à Lamia, ou laisse-lui un vocal.</p>' : '';
   box.scrollTop = box.scrollHeight;
 }
 
@@ -115,12 +133,12 @@ async function chargerConversation() {
   if (!session) return;
   $('[data-conv-email]').textContent = session.user.email;
   if (!charge) $('[data-conv-fil]').innerHTML = '<p class="conf-vide">Un instant…</p>';
-  try { const r = await api({ action: 'mes_conversations' }, session.access_token); rendreFil(r.threads); charge = true; }
+  try { const r = await api({ action: 'mes_conversations' }, session.access_token); rendreFil(r.threads, r.abonne); charge = true; }
   catch (err) { say($('[data-conv-statut]'), erreur(err.code), true); }
   clearInterval(minuteur);
   minuteur = setInterval(() => { if (document.visibilityState === 'visible' && !$('[data-panneau="conversation"]').hidden) chargerSilencieux(); }, 30000);
 }
-async function chargerSilencieux() { try { const r = await api({ action: 'mes_conversations' }, session.access_token); rendreFil(r.threads); } catch { /* */ } }
+async function chargerSilencieux() { try { const r = await api({ action: 'mes_conversations' }, session.access_token); rendreFil(r.threads, r.abonne); } catch { /* */ } }
 
 $('[data-conv-form]')?.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -155,7 +173,7 @@ $('[data-conv-sortir]')?.addEventListener('click', async () => {
 });
 
 // Arrivée par le lien de connexion, ou par un lien direct vers la conversation.
-supabase.auth.onAuthStateChange((event) => { if (event === 'SIGNED_IN' && location.hash.includes('conversation')) setTimeout(() => ouvrir('conversation', false), 0); });
+supabase.auth.onAuthStateChange((event) => { if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') accesEnCours = null; if (event === 'SIGNED_IN' && location.hash.includes('conversation')) setTimeout(() => ouvrir('conversation', false), 0); });
 // Venue d'une annonce du Patio : message à Lamia déjà commencé.
 const refAnnonce = new URLSearchParams(location.search).get('profil');
 if (/^\d{1,6}$/.test(refAnnonce || '')) {
