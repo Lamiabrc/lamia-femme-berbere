@@ -3910,3 +3910,25 @@ body[data-ambiance="douce"] main { background-image: radial-gradient(70% 500px a
 .po-app .text-link:not(.po-hero *):not(.lamia-live *), .po-corps a.text-link { color: #6C5BA7 !important; }
 .patio-etapes li :is(a, b), body[data-ambiance="douce"] .room-body li :is(a, b) { color: #2F2B3D !important; }
 .salon-ancre { color: #2F2B3D !important; border: 1px solid rgba(47, 43, 61, .25) !important; background: #fff !important; }
+
+/* ================================================================ Arabe : lecture de droite à gauche, police adaptée */
+html[lang="ar"] { --serif: 'Noto Naskh Arabic', 'Geeza Pro', 'Times New Roman', serif; --sans: 'Noto Sans Arabic', 'SF Arabic', 'Geeza Pro', Tahoma, system-ui, sans-serif; --po-title: 'Noto Naskh Arabic', 'Geeza Pro', 'Times New Roman', serif; --po-body: 'Noto Sans Arabic', 'SF Arabic', 'Geeza Pro', Tahoma, system-ui, sans-serif; }
+html[lang="ar"] body { font-family: var(--sans); line-height: 1.75; }
+html[lang="ar"] :is(h1, h2, h3, h4) { font-family: var(--serif) !important; letter-spacing: 0 !important; line-height: 1.35; }
+html[lang="ar"] .po-eyebrow, html[lang="ar"] .room-name { letter-spacing: 0 !important; }
+html[dir="rtl"] .ico { margin-right: 0; margin-left: .2em; }
+html[dir="rtl"] .pip { margin-right: 0; margin-left: 10px; }
+html[dir="rtl"] .abo-carte li { padding-left: 0; padding-right: 20px; }
+html[dir="rtl"] .abo-carte li::before { left: auto; right: 0; }
+html[dir="rtl"] .po-corps h2::after, html[dir="rtl"] .room-body > h2::after, html[dir="rtl"] .annonces-titre::after { background: linear-gradient(270deg, var(--levres) 0 10px, var(--or) 10px); }
+html[dir="rtl"] .lfb-azul::after { margin-left: 0; margin-right: 8px; }
+html[dir="rtl"] .disc-msg.is-moi, html[dir="rtl"] :is(input[type=email], input[type=tel], input[type=url], input[type=password]) { direction: ltr; text-align: right; }
+html[dir="rtl"] details > summary { text-align: right; }
+/* Le geste du swipe reste le même : à droite j'aime, à gauche je passe */
+html[dir="rtl"] .swipe-pile, html[dir="rtl"] .swipe-boutons { direction: ltr; }
+html[dir="rtl"] .swipe-carte { direction: rtl; }
+/* Langues : liens discrets dans l'entête */
+.lang-link + .lang-link { margin-inline-start: 2px; }
+html[lang="kab"] .lfb-azul { display: block; }
+
+.maison-menu-langues ul { display: flex; flex-wrap: wrap; gap: 6px 14px; }

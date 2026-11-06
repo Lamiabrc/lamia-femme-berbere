@@ -14,6 +14,7 @@ import { reglagesPropres } from '../content/shipping.mjs';
 import { facade } from './facade.mjs';
 import { GUIDES } from '../content/guides.mjs';
 import { pageAnglaise, pageFrancaise, produitAnglais, enPath, FR_ONLY, STRINGS, MANQUANTS } from './english.mjs';
+import { LANGUES, PAGES_RENCONTRES, dictionnaire, motifs, pageTraduite, liensLangues } from './langues.mjs';
 import { EDITABLE, defaults, applyOverrides } from '../content/editable.mjs';
 import { FORMULES, UNITES, prixAnnuel, prixMensuel, euros as eurosAbo } from '../content/abonnements.mjs';
 
@@ -196,6 +197,7 @@ function header(room) {
       <div class="maison-menu-panneau">
         <div class="maison-menu-etage"><p>Rencontres</p><ul><li><a href="/rencontres/#profils-anonymes"><strong>Les profils</strong></a></li><li><a href="/rencontres/swipe/"><strong>Swiper les profils</strong></a></li><li><a href="/rencontres/#confier"><strong>Créer mon profil</strong></a></li><li><a href="/speed-dating/"><strong>Speed dating</strong></a></li><li><a href="/abonnement/"><strong>Les formules</strong></a></li><li><a href="/salon/"><strong>Le live</strong></a></li><li><a href="/confidences/"><strong>Écrire à Lamia</strong></a></li></ul></div>
         <div class="maison-menu-etage"><p>L’univers de Lamia</p><ul><li><a href="/lamia-brechet/"><strong>Qui est Lamia</strong></a></li><li><a href="/ecrin/"><strong>Bijoux kabyles</strong></a></li><li><a href="/werdi-ouvre-les-yeux/"><strong>Le livre Werdi</strong></a></li><li><a href="/boutique/"><strong>La boutique</strong></a></li><li><a href="/galerie/"><strong>La galerie</strong></a></li></ul></div>
+        <div class="maison-menu-etage maison-menu-langues"><p>Langue</p><ul><li><a href="/" hreflang="fr" lang="fr"><strong>Français</strong></a></li><li><a href="/en/" hreflang="en" lang="en"><strong>English</strong></a></li><li><a href="/ar/" hreflang="ar" lang="ar" dir="rtl"><strong>العربية</strong></a></li></ul></div>
         <div class="maison-menu-etage"><p>Mon compte</p><ul><li><a href="/mon-espace/"><strong>Mon espace</strong></a></li><li><a href="/application/"><strong>L’application</strong></a></li></ul></div>
       </div>
     </details>
@@ -2065,9 +2067,17 @@ const pagesEn = [
   ...pagesFr.filter((p) => !/^\/produit\/./.test(p.path)).map((p) => ({ path: enPath(p.path), html: pageAnglaise(p.html, p.path, SITE_URL, PAGES_EN) })),
   ...PAGES_PRODUITS_EN.map((p) => ({ path: p.path, html: pageAnglaise(p.html, p.fr, SITE_URL, PAGES_EN, { signaler: false }) })),
 ];
-for (const p of pagesFr) p.html = pageFrancaise(p.html, p.path, SITE_URL);
+// Versions arabe et kabyle du parcours des rencontres.
+const pagesLangues = [];
+for (const langue of Object.keys(LANGUES)) {
+  const D = dictionnaire(langue), manquants = new Set();
+  if (!Object.keys(D).length) continue;
+  for (const p of pagesFr) if (PAGES_RENCONTRES.includes(p.path)) pagesLangues.push({ path: `/${langue}${p.path}`, html: pageTraduite(p.html, p.path, SITE_URL, langue, D, manquants) });
+  if (manquants.size) console.log(`Version ${langue} : ${manquants.size} texte(s) sans traduction :\n  - ${[...manquants].slice(0, 30).join('\n  - ')}`);
+}
+for (const p of pagesFr) p.html = liensLangues(pageFrancaise(p.html, p.path, SITE_URL), p.path, SITE_URL);
 if (MANQUANTS.size) console.log(`Version anglaise : ${MANQUANTS.size} texte(s) sans traduction, laissés en français :\n  - ${[...MANQUANTS].slice(0, 40).join('\n  - ')}`);
-pages.push(...pagesEn);
+pages.push(...pagesEn, ...pagesLangues);
 
 // ---------------------------------------------------------------- écriture
 
@@ -2090,13 +2100,17 @@ await mkdir(join(DIST, 'assets', 'i18n'), { recursive: true });
 await cp(join(ROOT, 'content', 'en', 'products.json'), join(DIST, 'assets', 'i18n', 'products-en.json'));
 const MOTIFS_EN = JSON.parse(await readFile(join(ROOT, 'content', 'en', 'patterns.json'), 'utf8'));
 const MOTIFS_APPLI = JSON.parse(await readFile(join(ROOT, 'content', 'en', 'app-patterns.json'), 'utf8'));
+for (const langue of Object.keys(LANGUES)) {
+  const m = motifs(langue);
+  if (Object.keys(dictionnaire(langue)).length) await writeFile(join(DIST, 'assets', 'i18n', `${langue}.json`), JSON.stringify({ strings: dictionnaire(langue), pages: PAGES_RENCONTRES, motifs: m.motifs || [], noms: m.noms || [], membre: MOTIFS_APPLI.membre, segments: MOTIFS_APPLI.segments }));
+}
 await writeFile(join(DIST, 'assets', 'i18n', 'en.json'), JSON.stringify({ strings: STRINGS, pages: [...PAGES_EN], motifs: [...MOTIFS_APPLI.motifs, ...MOTIFS_EN.motifs], noms: MOTIFS_EN.noms, membre: MOTIFS_APPLI.membre, segments: MOTIFS_APPLI.segments }));
 
-const indexable = pages.filter((p) => !soonRooms.some((r) => p.path.replace(/^\/en\//, '/') === r.path) && !p.path.endsWith('.html') && !p.path.startsWith('/en/produit/') && !['/produit/', '/mon-espace/', '/speed-dating/bal/', '/speed-dating/salle/', '/suppression-compte/', '/speed-dating/merci/', '/commande/merci/', '/abonnement/merci/', '/rencontres/swipe/', '/rencontres/confirmer/', '/rencontres/visio/', '/speed-dating/souhaits/', '/cgv/', '/mentions-legales/', '/confidentialite/', '/retours/', '/conditions-utilisation/', '/confidences-lamia/', '/hors-ligne/'].includes(p.path.replace(/^\/en\//, '/')));
+const indexable = pages.filter((p) => !p.path.startsWith('/kab/') && !/^\/ar\/(mon-espace|abonnement\/merci|hors-ligne)/.test(p.path) && !soonRooms.some((r) => p.path.replace(/^\/en\//, '/') === r.path) && !p.path.endsWith('.html') && !p.path.startsWith('/en/produit/') && !['/produit/', '/mon-espace/', '/speed-dating/bal/', '/speed-dating/salle/', '/suppression-compte/', '/speed-dating/merci/', '/commande/merci/', '/abonnement/merci/', '/rencontres/swipe/', '/rencontres/confirmer/', '/rencontres/visio/', '/speed-dating/souhaits/', '/cgv/', '/mentions-legales/', '/confidentialite/', '/retours/', '/conditions-utilisation/', '/confidences-lamia/', '/hors-ligne/'].includes(p.path.replace(/^\/en\//, '/')));
 await writeFile(
   join(DIST, 'sitemap.xml'),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${indexable.filter((p) => !p.path.startsWith('/produit/')).map((p) => `<url><loc>${SITE_URL}${p.path}</loc></url>`).join('')}${PRODUITS_INDEXES.map((p) => `<url><loc>${SITE_URL}${p.path}</loc>${p.lastmod ? `<lastmod>${p.lastmod}</lastmod>` : ''}</url><url><loc>${SITE_URL}/en${p.path}</loc>${p.lastmod ? `<lastmod>${p.lastmod}</lastmod>` : ''}</url>`).join('')}</urlset>\n`
 );
-await writeFile(join(DIST, 'robots.txt'), `User-agent: *\nAllow: /\nDisallow: /admin.html\nDisallow: /pilotage.html\nDisallow: /admin-soirees.html\nDisallow: /speed-dating/merci/\nDisallow: /speed-dating/bal/\nDisallow: /mon-espace/\nDisallow: /tableau-de-bord\nDisallow: /admin-bal.html\nDisallow: /confidences-lamia/\nDisallow: /en/speed-dating/merci/\nDisallow: /en/speed-dating/bal/\nDisallow: /en/mon-espace/\nSitemap: ${SITE_URL}/sitemap.xml\n`);
+await writeFile(join(DIST, 'robots.txt'), `User-agent: *\nAllow: /\nDisallow: /kab/\nDisallow: /ar/mon-espace/\nDisallow: /admin.html\nDisallow: /pilotage.html\nDisallow: /admin-soirees.html\nDisallow: /speed-dating/merci/\nDisallow: /speed-dating/bal/\nDisallow: /mon-espace/\nDisallow: /tableau-de-bord\nDisallow: /admin-bal.html\nDisallow: /confidences-lamia/\nDisallow: /en/speed-dating/merci/\nDisallow: /en/speed-dating/bal/\nDisallow: /en/mon-espace/\nSitemap: ${SITE_URL}/sitemap.xml\n`);
 
 console.log(`Maison générée : ${pages.length} pages dans dist/`);
