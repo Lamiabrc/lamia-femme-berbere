@@ -41,7 +41,7 @@ function choisie(d) {
       ? '<p><strong>Dernière étape :</strong> crée ton accès ci-dessous pour répondre.</p>'
       : '<p><strong>Pour répondre, il te reste à confirmer ta fiche, créer ton compte et ajouter 2 photos.</strong> C’est gratuit et ça prend une minute. Personne ne verra ton prénom, tes contacts ni tes photos dans les profils.</p><p class="confirmer-actions"><button type="button" class="po-btn" data-aller-confirmer>Confirmer ma fiche et créer mon compte</button></p>';
   return `<section class="confirmer-choisie">
-    <h2>💌 ${n > 1 ? `${n} personnes s’intéressent` : 'Quelqu’un s’intéresse'} à toi</h2>
+    <h2><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> ${n > 1 ? `${n} personnes s’intéressent` : 'Quelqu’un s’intéresse'} à toi</h2>
     <p>${n > 1 ? 'Voici leurs annonces, anonymes comme la tienne.' : 'Voici son annonce, anonyme comme la tienne.'}</p>
     ${l.slice(0, 3).map(fiche).join('')}${plus}${suite}
   </section>`;
@@ -64,14 +64,14 @@ function afficherFiche(d) {
     return;
   }
   if (d.confirme) {
-    zone.innerHTML = `${fiche(f)}<div class="confirmer-etat"><p><strong>✅ Merci, ta fiche est confirmée.</strong> Elle porte maintenant la mention « ✅ confirmé » dans les profils de Lamia, toujours anonyme : personne ne voit ton prénom, ton TikTok ni ton numéro.</p>
+    zone.innerHTML = `${fiche(f)}<div class="confirmer-etat"><p><strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#circle-check"/></svg> Merci, ta fiche est confirmée.</strong> Elle porte maintenant la mention « confirmé » dans les profils de Lamia, toujours anonyme : personne ne voit ton prénom, ton TikTok ni ton numéro.</p>
       <p>C’est fait ! Tes <strong>3 premières mises en relation sont offertes</strong>.</p>
       <p class="confirmer-actions"><button type="button" class="po-btn-verre" data-retirer>Je ne veux plus apparaître</button></p>${effacer}</div>${acces(d)}`;
     monterAcces(d);
     return;
   }
   if (d.modif) {
-    zone.innerHTML = `${fiche(f)}<div class="confirmer-etat"><p><strong>✏️ Ta demande de modification est envoyée à Lamia.</strong> Ta fiche reste affichée « en attente de confirmation » le temps que Lamia la corrige, puis elle te renvoie ce même lien pour que tu la valides.</p>
+    zone.innerHTML = `${fiche(f)}<div class="confirmer-etat"><p><strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#pencil"/></svg> Ta demande de modification est envoyée à Lamia.</strong> Ta fiche reste affichée « en attente de confirmation » le temps que Lamia la corrige, puis elle te renvoie ce même lien pour que tu la valides.</p>
       <p class="confirmer-actions"><button type="button" class="po-btn" data-confirmer-oui>Finalement, je la confirme telle quelle</button><button type="button" class="po-btn-verre" data-modifier>Préciser ma demande</button></p>${formulaire}${effacer}</div>${acces(d)}`;
     monterAcces(d);
     return;
@@ -98,7 +98,7 @@ async function monterSimple() {
     location.assign('/mon-espace/#photos');
   };
   if (session) {
-    z.innerHTML = `<p>Tu es connecté·e avec <strong>${esc(session.user.email)}</strong>.</p><p class="confirmer-actions"><button type="button" class="po-btn" data-tout>✅ Je confirme ma fiche</button></p><p class="confirmer-note" data-simple-msg></p>`;
+    z.innerHTML = `<p>Tu es connecté·e avec <strong>${esc(session.user.email)}</strong>.</p><p class="confirmer-actions"><button type="button" class="po-btn" data-tout><svg class="ico" aria-hidden="true"><use href="/icones.svg#circle-check"/></svg> Je confirme ma fiche</button></p><p class="confirmer-note" data-simple-msg></p>`;
     z.querySelector('[data-tout]').addEventListener('click', (e) => { e.target.disabled = true; const msg = z.querySelector('[data-simple-msg]'); finir(session, (x) => { msg.textContent = x; e.target.disabled = false; }); });
     return;
   }
@@ -107,7 +107,7 @@ async function monterSimple() {
     <label>Ton prénom<input name="prenom" autocomplete="given-name" required></label>
     <label>Ton email<input name="email" type="email" autocomplete="email" required></label>
     <label>Un mot de passe (8 caractères minimum)<input name="mdp" type="password" minlength="8" autocomplete="new-password" required></label>
-    <button type="submit" class="po-btn" data-tout>✅ Je confirme ma fiche</button>
+    <button type="submit" class="po-btn" data-tout><svg class="ico" aria-hidden="true"><use href="/icones.svg#circle-check"/></svg> Je confirme ma fiche</button>
     <p class="confirmer-note" data-simple-msg role="status"></p></form>`;
   const f = z.querySelector('form'), msg = f.querySelector('[data-simple-msg]'), bouton = f.querySelector('[data-tout]');
   f.addEventListener('submit', async (e) => {
@@ -127,7 +127,7 @@ async function monterSimple() {
 // Accès direct : la personne crée son compte (ou se connecte) et sa fiche y est reliée.
 // Elle suit ensuite sa fiche et les intérêts reçus dans « Mon espace », et reçoit un email à chaque intérêt.
 const acces = (d) => `<div class="confirmer-etat confirmer-acces" data-acces>
-  <h2>${d.compte ? '🔑 Ton accès' : '🔑 Crée ton accès pour suivre ta fiche'}</h2>
+  <h2>${d.compte ? 'Ton accès' : 'Crée ton accès pour suivre ta fiche'}</h2>
   <p>Avec ton accès, tu vois dans ton espace qui s’intéresse à ta fiche (anonymement), tu réponds « ça m’intéresse aussi » ou non, et tu reçois un email à chaque nouvel intérêt.</p>
   <div data-acces-zone><p class="annonce-vide">Un instant…</p></div></div>`;
 async function monterAcces(d) {

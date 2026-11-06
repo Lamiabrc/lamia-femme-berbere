@@ -24,8 +24,8 @@ function carte(a) {
   const lieu = a.ville || (a.pays && lib(a.pays)) || '';
   return `<article class="swipe-carte" data-ref="${a.ref}">
     <span class="swipe-tampon is-oui" aria-hidden="true">Intéressé·e</span><span class="swipe-tampon is-non" aria-hidden="true">Pas pour moi</span>
-    ${a.ta_choisi ? '<span class="swipe-ta-choisi">💞 Ce profil t’a choisi·e</span>' : ''}
-    ${a.revu ? '<span class="swipe-ta-choisi">👀 Tu l’as déjà passé : une seconde chance ?</span>' : a.hors_criteres ? '<span class="swipe-ta-choisi">🌍 Un peu hors de tes critères</span>' : ''}
+    ${a.ta_choisi ? '<span class="swipe-ta-choisi"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Ce profil t’a choisi·e</span>' : ''}
+    ${a.revu ? '<span class="swipe-ta-choisi">Tu l’as déjà passé : une seconde chance ?</span>' : a.hors_criteres ? '<span class="swipe-ta-choisi"><svg class="ico" aria-hidden="true"><use href="/icones.svg#globe"/></svg> Un peu hors de tes critères</span>' : ''}
     <div class="swipe-resume">
       <svg class="swipe-bijou" viewBox="0 -22 180 276" aria-hidden="true" focusable="false"><use href="#bijou-${femme ? 'femme' : 'homme'}"/></svg>
       <h2>${femme ? 'Une femme' : 'Un homme'}, ${esc(a.age)} ans</h2>
@@ -48,7 +48,7 @@ function carte(a) {
       ${a.profil ? `<h3>Qui je suis</h3><p data-membre>${esc(a.profil)}</p>` : ''}
       ${a.recherche ? `<h3>Qui je cherche${ages}</h3><p data-membre>${esc(a.recherche)}</p>` : ''}
       ${foiEtVie(a).replace(/<h4>/g, '<h3>').replace(/<\/h4>/g, '</h3>')}
-      <p class="profil-moderer"><button type="button" class="link-button" data-moderer="${a.ref}">🚩 Bloquer et signaler</button></p>
+      <p class="profil-moderer"><button type="button" class="link-button" data-moderer="${a.ref}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#flag"/></svg> Bloquer et signaler</button></p>
     </div>
   </article>`;
 }
@@ -104,14 +104,14 @@ function monterFiltres() {
 function infos() {
   const lignes = [];
   if (choisi.nombre) lignes.push(choisi.refs.length
-    ? `<p class="swipe-info is-choisi"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur-plein"/></svg> <strong>${choisi.nombre} personne${choisi.nombre > 1 ? 's t’ont' : ' t’a'} choisi·e</strong> : ${choisi.nombre > 1 ? 'elles sont' : 'elle est'} en tête de ta pile, marquée${choisi.nombre > 1 ? 's' : ''} 💞.</p>`
+    ? `<p class="swipe-info is-choisi"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur-plein"/></svg> <strong>${choisi.nombre} personne${choisi.nombre > 1 ? 's t’ont' : ' t’a'} choisi·e</strong> : ${choisi.nombre > 1 ? 'elles sont' : 'elle est'} en tête de ta pile, marquée${choisi.nombre > 1 ? 's' : ''}.</p>`
     : `<p class="swipe-info is-choisi"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur-plein"/></svg> <strong>${choisi.nombre} personne${choisi.nombre > 1 ? 's t’ont' : ' t’a'} choisi·e</strong> <span class="swipe-flou" aria-hidden="true">n° ••• · n° •••</span><br><a href="/abonnement/?formule=passion">Découvre qui avec la formule Passion</a></p>`);
   if (matchs.limite) lignes.push(`<p class="swipe-info${matchs.actifs >= matchs.limite ? ' is-plein' : ''}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur-plein"/></svg> Matchs en cours : <strong>${matchs.actifs} / ${matchs.limite}</strong>${matchs.actifs >= matchs.limite ? ' · tu peux continuer à découvrir les profils, mais plus en choisir pour l’instant' : ''}</p>`);
   if (quota.limite) lignes.push(`<p class="swipe-info">Il te reste <strong>${quota.restants}</strong> profil${quota.restants > 1 ? 's' : ''} à swiper aujourd’hui (${quota.limite} par jour avec ta formule). <a href="/abonnement/">Plus de profils</a></p>`);
   bandeau.innerHTML = lignes.join('');
 }
 function plusDeProfilsAujourdhui() {
-  message(`<p class="swipe-coeur">⏳</p><h2>C’est tout pour aujourd’hui</h2><p>Tu as swipé tes ${quota.limite} profils du jour. Reviens demain : ton compteur repart à zéro à minuit.</p><p>Envie d’en voir plus ? Avec <strong>Cœur</strong>, 30 profils par jour ; avec <strong>Passion</strong>, sans limite, et tu découvres qui t’a choisi·e.</p><p class="po-actions"><a class="po-btn" href="/abonnement/">Voir les formules</a><a class="po-btn-verre" href="/mon-espace/">Mon espace</a></p>`);
+  message(`<p class="swipe-coeur"><svg class="ico" aria-hidden="true"><use href="/icones.svg#hourglass"/></svg></p><h2>C’est tout pour aujourd’hui</h2><p>Tu as swipé tes ${quota.limite} profils du jour. Reviens demain : ton compteur repart à zéro à minuit.</p><p>Envie d’en voir plus ? Avec <strong>Cœur</strong>, 30 profils par jour ; avec <strong>Passion</strong>, sans limite, et tu découvres qui t’a choisi·e.</p><p class="po-actions"><a class="po-btn" href="/abonnement/">Voir les formules</a><a class="po-btn-verre" href="/mon-espace/">Mon espace</a></p>`);
 }
 function afficher() {
   infos();
@@ -120,14 +120,14 @@ function afficher() {
   // On arrive aux profils déjà passés : c'est un nouveau tour, on le dit.
   if (profils[0]?.revu && !tourAnnonce) {
     tourAnnonce = true; tour += 1;
-    toast(`🔄 Tour ${tour} ! Tu as tout vu : voici une seconde chance`);
+    toast(`Tour ${tour} ! Tu as tout vu : voici une seconde chance`);
     vibrer(30);
   }
-  compteur.textContent = nouveaux ? `${nouveaux} profil${nouveaux > 1 ? 's' : ''} à découvrir` : profils.length ? `🔄 Tour ${tour} · encore ${profils.length} profil${profils.length > 1 ? 's' : ''}` : '';
+  compteur.textContent = nouveaux ? `${nouveaux} profil${nouveaux > 1 ? 's' : ''} à découvrir` : profils.length ? `Tour ${tour} · encore ${profils.length} profil${profils.length > 1 ? 's' : ''}` : '';
   // Fin de la pile : on repart pour un tour, le swipe ne s'arrête jamais.
   if (!profils.length && !tous.length && dejaCharge && !enRecharge) { recharger(); return; }
-  if (!profils.length && tous.length) return message(`<p class="swipe-coeur">🎚</p><h2>Aucun profil avec ces filtres</h2><p>${tous.length} profil${tous.length > 1 ? 's restent' : ' reste'} à découvrir si tu élargis ta recherche : ouvre les filtres et enlève un critère.</p>`);
-  if (!profils.length) return message(`<p class="swipe-coeur">💌</p><h2>Tu as vu tous les profils pour le moment</h2>${coeurs ? `<p><strong>${coeurs} coup${coeurs > 1 ? 's' : ''} de cœur</strong> envoyé${coeurs > 1 ? 's' : ''} aujourd’hui 💘</p>` : ''}<p>Lamia a noté tes choix. Si une personne que tu as choisie te choisit aussi, Lamia est prévenue tout de suite et revient vers toi pour la mise en relation. Ton identité n’est jamais révélée : les autres ne voient qu’un numéro de profil.</p><p>De nouveaux profils arrivent chaque semaine : reviens bientôt.</p><p><a class="po-btn" href="/mon-espace/">Suivre mes demandes</a></p>`);
+  if (!profils.length && tous.length) return message(`<p class="swipe-coeur"></p><h2>Aucun profil avec ces filtres</h2><p>${tous.length} profil${tous.length > 1 ? 's restent' : ' reste'} à découvrir si tu élargis ta recherche : ouvre les filtres et enlève un critère.</p>`);
+  if (!profils.length) return message(`<p class="swipe-coeur"><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg></p><h2>Tu as vu tous les profils pour le moment</h2>${coeurs ? `<p><strong>${coeurs} coup${coeurs > 1 ? 's' : ''} de cœur</strong> envoyé${coeurs > 1 ? 's' : ''} aujourd’hui</p>` : ''}<p>Lamia a noté tes choix. Si une personne que tu as choisie te choisit aussi, Lamia est prévenue tout de suite et revient vers toi pour la mise en relation. Ton identité n’est jamais révélée : les autres ne voient qu’un numéro de profil.</p><p>De nouveaux profils arrivent chaque semaine : reviens bientôt.</p><p><a class="po-btn" href="/mon-espace/">Suivre mes demandes</a></p>`);
   zone.innerHTML = profils.slice(0, 2).reverse().map(carte).join('');
   document.querySelector('[data-swipe-boutons]').hidden = false;
   glisser(zone.lastElementChild);
@@ -135,7 +135,7 @@ function afficher() {
 
 // ---------------------------------------------------------------- effets : cœurs, vibration, encouragements, match
 const vibrer = (m) => { try { navigator.vibrate?.(m); } catch { /* */ } };
-function eclat(x, y, emojis = ['💚', '💖', '✨', '💘'], n = 14) {
+function eclat(x, y, emojis = ['', '', '', ''], n = 14) {
   for (let i = 0; i < n; i += 1) {
     const s = document.createElement('span');
     s.className = 'swipe-eclat'; s.textContent = emojis[i % emojis.length];
@@ -150,7 +150,7 @@ function toast(texte) {
   const t = document.createElement('div'); t.className = 'swipe-toast'; t.textContent = texte;
   document.body.appendChild(t); setTimeout(() => t.classList.add('is-sortie'), 1600); setTimeout(() => t.remove(), 2100);
 }
-const PALIERS = { 5: '🔥 5 coups de cœur ! Tu es lancé·e', 10: '💘 10 coups de cœur : Lamia adore ton énergie', 25: '🌟 25 ! Ton âme sœur est peut-être tout près', 50: '👑 50 coups de cœur : tu es une star du swipe' };
+const PALIERS = { 5: '5 coups de cœur ! Tu es lancé·e', 10: '10 coups de cœur : Lamia adore ton énergie', 25: '25 ! Ton âme sœur est peut-être tout près', 50: '50 coups de cœur : tu es une star du swipe' };
 function fenetre(html, classe = '') {
   document.querySelector('.swipe-fenetre')?.remove();
   const d = document.createElement('div'); d.className = `swipe-fenetre ${classe}`; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true');
@@ -161,24 +161,24 @@ function fenetre(html, classe = '') {
 }
 function celebrerMatch(ref) {
   vibrer([40, 60, 40, 60, 120]);
-  const d = fenetre(`<p class="swipe-match-coeurs" aria-hidden="true">💞</p><h2>C’est réciproque !</h2><p>Le profil <strong>n° ${esc(ref)}</strong> t’a choisi·e aussi. Lamia est prévenue à l’instant : elle regarde votre compatibilité et revient vers toi pour la mise en relation.</p>`, 'is-match');
+  const d = fenetre(`<p class="swipe-match-coeurs" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg></p><h2>C’est réciproque !</h2><p>Le profil <strong>n° ${esc(ref)}</strong> t’a choisi·e aussi. Lamia est prévenue à l’instant : elle regarde votre compatibilité et revient vers toi pour la mise en relation.</p>`, 'is-match');
   const r = d.querySelector('.swipe-fenetre-boite').getBoundingClientRect();
-  for (let k = 0; k < 3; k += 1) setTimeout(() => eclat(r.left + r.width / 2, r.top + 60, ['💞', '💖', '💘', '✨', '🌹'], 22), k * 280);
+  for (let k = 0; k < 3; k += 1) setTimeout(() => eclat(r.left + r.width / 2, r.top + 60, ['', '', '', '', ''], 22), k * 280);
 }
 function limiteAtteinte() {
   vibrer(80);
-  return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true">💞</p><h2>Tes matchs en cours sont au complet</h2><p>Tu peux continuer à découvrir les profils. Pour choisir quelqu’un d’autre, mets fin à un match depuis ton espace, ou passe à une formule qui en permet plus : <strong>2 en cours avec Passion, 5 avec Prestige</strong>.</p><p class="po-actions"><a class="po-btn-verre" href="/mon-espace/">Mon espace</a><a class="po-btn-verre" href="/abonnement/">Voir les formules</a></p>`);
+  return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg></p><h2>Tes matchs en cours sont au complet</h2><p>Tu peux continuer à découvrir les profils. Pour choisir quelqu’un d’autre, mets fin à un match depuis ton espace, ou passe à une formule qui en permet plus : <strong>2 en cours avec Passion, 5 avec Prestige</strong>.</p><p class="po-actions"><a class="po-btn-verre" href="/mon-espace/">Mon espace</a><a class="po-btn-verre" href="/abonnement/">Voir les formules</a></p>`);
 }
 // Plus de match disponible : le live, et les formules pour celles et ceux qui peuvent payer en ligne.
 function quotaAtteint({ algerie, formule } = {}) {
   vibrer(80);
-  if (algerie || window.LFB_PLAY) return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true">🎥</p><h2>Viens me voir en live</h2><p>Tu as utilisé ton match. Pour en avoir d’autres, <strong>viens soutenir le live de Lamia</strong>, chaque soir à 21 h : elle peut t’offrir un match, une fois toutes les 2 semaines.</p><p class="po-actions"><a class="po-btn-verre" href="/salon/">Voir le live</a></p>`);
-  if (formule === 'passion') return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true">💞</p><h2>Tes 10 matchs du mois sont utilisés</h2><p>Ils reviennent le mois prochain. Avec <strong>Prestige</strong>, les matchs sont illimités. Tu peux aussi prendre un match supplémentaire à 5 €, ou venir au live de Lamia (1 match offert toutes les 2 semaines).</p><p class="po-actions"><a class="po-btn-verre" href="/abonnement/">Voir les formules</a><a class="po-btn-verre" href="/salon/">Voir le live</a></p>`);
-  return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true">🎥</p><h2>Tu as utilisé ton match offert</h2><p>Prends un <strong>match supplémentaire à 5 €</strong>, viens au <strong>live de Lamia</strong>, chaque soir à 21 h (1 match offert toutes les 2 semaines), ou choisis une formule : 10 matchs par mois avec Passion, illimités avec Prestige.</p><p class="po-actions"><a class="po-btn-verre" href="/salon/">Voir le live</a><a class="po-btn-verre" href="/abonnement/">Voir les formules</a></p>`);
+  if (algerie || window.LFB_PLAY) return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg></p><h2>Viens me voir en live</h2><p>Tu as utilisé ton match. Pour en avoir d’autres, <strong>viens soutenir le live de Lamia</strong>, chaque soir à 21 h : elle peut t’offrir un match, une fois toutes les 2 semaines.</p><p class="po-actions"><a class="po-btn-verre" href="/salon/">Voir le live</a></p>`);
+  if (formule === 'passion') return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg></p><h2>Tes 10 matchs du mois sont utilisés</h2><p>Ils reviennent le mois prochain. Avec <strong>Prestige</strong>, les matchs sont illimités. Tu peux aussi prendre un match supplémentaire à 5 €, ou venir au live de Lamia (1 match offert toutes les 2 semaines).</p><p class="po-actions"><a class="po-btn-verre" href="/abonnement/">Voir les formules</a><a class="po-btn-verre" href="/salon/">Voir le live</a></p>`);
+  return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg></p><h2>Tu as utilisé ton match offert</h2><p>Prends un <strong>match supplémentaire à 5 €</strong>, viens au <strong>live de Lamia</strong>, chaque soir à 21 h (1 match offert toutes les 2 semaines), ou choisis une formule : 10 matchs par mois avec Passion, illimités avec Prestige.</p><p class="po-actions"><a class="po-btn-verre" href="/salon/">Voir le live</a><a class="po-btn-verre" href="/abonnement/">Voir les formules</a></p>`);
 }
 // Bloquer ou signaler le profil affiché. Bloquer le retire tout de suite, et la personne n'en sait rien.
 function moderer(ref) {
-  const d = fenetre(`<h2>Profil n° ${esc(ref)}</h2><p>Vous ne vous verrez plus et vous ne pourrez plus vous écrire. Lamia reçoit une alerte et regarde ce profil. La personne n’est pas prévenue.</p><label class="profil-motif">Que s’est-il passé ? (facultatif)<textarea rows="3" maxlength="500" data-motif></textarea></label><p class="po-actions"><button type="button" class="po-btn" data-bloquer>🚩 Bloquer et signaler</button></p><p class="form-status" role="status" data-moderer-statut></p>`);
+  const d = fenetre(`<h2>Profil n° ${esc(ref)}</h2><p>Vous ne vous verrez plus et vous ne pourrez plus vous écrire. Lamia reçoit une alerte et regarde ce profil. La personne n’est pas prévenue.</p><label class="profil-motif">Que s’est-il passé ? (facultatif)<textarea rows="3" maxlength="500" data-motif></textarea></label><p class="po-actions"><button type="button" class="po-btn" data-bloquer><svg class="ico" aria-hidden="true"><use href="/icones.svg#flag"/></svg> Bloquer et signaler</button></p><p class="form-status" role="status" data-moderer-statut></p>`);
   const envoyer = async (action, fin) => {
     d.querySelectorAll('button').forEach((x) => { x.disabled = true; });
     try { await api({ action, ref, motif: d.querySelector('[data-motif]').value }, token); fin(); }
@@ -286,10 +286,10 @@ addEventListener('keydown', (e) => { if (document.querySelector('.swipe-fenetre'
     if (err.code === 'annonce_en_pause') return message('<h2>Ton annonce est en pause</h2><p>Reprends-la dans ton espace pour découvrir les profils.</p><p><a class="po-btn" href="/mon-espace/">Aller à mon espace</a></p>');
     if (err.code === 'photos_requises') return message('<h2>Il manque tes photos</h2><p>Pour découvrir les profils, ajoute <strong>2 photos de toi</strong> dans ton espace. Elles restent privées.</p><p><a class="po-btn" href="/mon-espace/#photos">Ajouter mes photos</a></p>');
     if (err.code === 'fiche_a_confirmer') return message('<h2>Plus qu’une étape</h2><p>Ta fiche du live n’est pas encore confirmée. Confirme-la depuis ton espace, puis reviens swiper. Inutile de refaire un profil.</p><p><a class="po-btn" href="/mon-espace/">Confirmer ma fiche</a></p>');
-    if (err.code === 'fiche_live') return message('<h2>Ta fiche du live est bien là ✅</h2><p>Il lui manque ton âge ou ton genre pour que tu puisses swiper. Écris à Lamia pour qu’elle la complète : inutile de refaire un profil.</p><p><a class="po-btn" href="/mon-espace/">Aller dans mon espace</a></p>');
-    if (err.code === 'moderateur_sans_annonce') return message('<h2>🛡️ Ton compte modérateur</h2><p>Tu peux lire toutes les annonces anonymes. Sans annonce à toi, tu ne swipes pas et tu ne matches pas. Tu peux en créer une quand tu veux.</p><p><a class="po-btn" href="/rencontres/#confier">Créer une annonce</a> <a class="po-btn" href="/rencontres/">Voir les annonces</a></p>');
-    if (err.code === 'pas_de_profil') return message('<h2>Crée d’abord ton profil</h2><p>Pour swiper, Lamia a besoin de connaître ton profil : c’est lui qui sera proposé aux personnes qui te correspondent.</p><p><a class="po-btn" href="/rencontres/#confier">💌 Créer mon profil</a></p>');
-    if (err.code === 'en_match') return message('<h2>💞 Tes matchs en cours sont au complet</h2><p>Tu peux mettre fin à l’un d’eux depuis ton espace pour choisir d’autres profils.</p><p><a class="po-btn" href="/mon-espace/">Mon espace</a></p>');
+    if (err.code === 'fiche_live') return message('<h2>Ta fiche du live est bien là</h2><p>Il lui manque ton âge ou ton genre pour que tu puisses swiper. Écris à Lamia pour qu’elle la complète : inutile de refaire un profil.</p><p><a class="po-btn" href="/mon-espace/">Aller dans mon espace</a></p>');
+    if (err.code === 'moderateur_sans_annonce') return message('<h2><svg class="ico" aria-hidden="true"><use href="/icones.svg#shield"/></svg> Ton compte modérateur</h2><p>Tu peux lire toutes les annonces anonymes. Sans annonce à toi, tu ne swipes pas et tu ne matches pas. Tu peux en créer une quand tu veux.</p><p><a class="po-btn" href="/rencontres/#confier">Créer une annonce</a> <a class="po-btn" href="/rencontres/">Voir les annonces</a></p>');
+    if (err.code === 'pas_de_profil') return message('<h2>Crée d’abord ton profil</h2><p>Pour swiper, Lamia a besoin de connaître ton profil : c’est lui qui sera proposé aux personnes qui te correspondent.</p><p><a class="po-btn" href="/rencontres/#confier"><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> Créer mon profil</a></p>');
+    if (err.code === 'en_match') return message('<h2><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Tes matchs en cours sont au complet</h2><p>Tu peux mettre fin à l’un d’eux depuis ton espace pour choisir d’autres profils.</p><p><a class="po-btn" href="/mon-espace/">Mon espace</a></p>');
     message('<h2>Les profils ne s’affichent pas pour le moment</h2><p>Réessaie dans un instant.</p>');
   }
 })();

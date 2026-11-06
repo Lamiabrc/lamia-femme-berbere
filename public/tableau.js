@@ -118,7 +118,7 @@ async function chargerCockpit() {
     $('[data-graphes]').innerHTML = graphe('Swipes par jour', s.series.swipes, s.jours) + graphe('Matchs demandés par jour', s.series.demandes, s.jours) + graphe('Nouveaux comptes par jour', s.series.comptes, s.jours);
     $('[data-parcours]').innerHTML = hbarres(s.parcours, true);
     const f = Number(s.genres.femmes), h = Number(s.genres.hommes), t = Math.max(1, f + h);
-    $('[data-genres]').innerHTML = `<div class="repartition" role="img" aria-label="${f} femmes, ${h} hommes"><i style="width:${(f / t) * 100}%;background:#D2482C"></i><i style="width:${(h / t) * 100}%;background:#4A55C4"></i></div><div class="repartition-legende"><span style="--c:#D2482C">Femmes : ${nb(f)} (${Math.round((f / t) * 100)} %)</span><span style="--c:#4A55C4">Hommes : ${nb(h)} (${Math.round((h / t) * 100)} %)</span></div>`;
+    $('[data-genres]').innerHTML = `<div class="repartition" role="img" aria-label="${f} femmes, ${h} hommes"><i style="width:${(f / t) * 100}%;background:#D2482C"></i><i style="width:${(h / t) * 100}%;background:#7E5B2E"></i></div><div class="repartition-legende"><span style="--c:#D2482C">Femmes : ${nb(f)} (${Math.round((f / t) * 100)} %)</span><span style="--c:#7E5B2E">Hommes : ${nb(h)} (${Math.round((h / t) * 100)} %)</span></div>`;
     $('[data-pays]').innerHTML = hbarres(s.pays);
   } catch { $('[data-graphes]').innerHTML = '<p class="aide">Les graphiques ne sont pas disponibles pour le moment. Réessaie dans un instant.</p>'; }
 }
@@ -144,16 +144,16 @@ async function aFaire() {
     const { a_faire: f } = await r.json();
     const heure = (d) => new Date(d).toLocaleString('fr-FR', { weekday: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
     const lignes = [
-      ...f.soirees.map((s) => [`🎭 <b>${esc(s.titre)}</b>, ${esc(heure(s.debut))} · ${esc(s.salon)} : <b>${s.inscrits} inscrit(s)</b>, ${Math.max(0, s.places - s.inscrits)} place(s) libre(s). À 20 h 45, ouvre le bal.`, '<a class="btn btn-ink" href="/admin-bal.html">Poste du bal</a>']),
-      f.a_verifier.length && [`⏳ <b>${f.a_verifier.length} profil(s) incomplet(s)</b>, pas validé(s) automatiquement : ${f.a_verifier.map((r) => `n° ${r}${f.manques?.[r]?.length ? ` (manque : ${f.manques[r].join(', ')})` : ''}`).join(' · ')}. Valide-les toi-même si ça te va, ou demande-leur ce qui manque.`, '<button class="btn btn-ink" type="button" data-rencontres-aller="annonces">Vérifier</button>'],
-      f.reciproques && [`💞 <b>${f.reciproques} intérêt(s) réciproque(s)</b> : les deux se sont choisis. Le site les met en relation tout seul dès que les différences éventuelles sont acceptées.`, '<button class="btn btn-ink" type="button" data-rencontres-aller="demandes">Voir</button>'],
-      f.demandes && [`💌 <b>${f.demandes} match(s) demandé(s)</b> par ${f.personnes} personne(s) : en attente de la réponse de l’autre personne. Rien à faire de ton côté.`, '<button class="btn btn-line" type="button" data-rencontres-aller="demandes">Voir</button>'],
-      f.propositions_oui && [`✅ <b>${f.propositions_oui} proposition(s) acceptée(s)</b> : la personne est intéressée par le profil que tu lui as proposé.`, '<button class="btn btn-line" type="button" data-rencontres-aller="demandes">Voir</button>'],
-      (f.fiches_a_modifier || f.fiches_a_effacer) && [`✏️ <b>${f.fiches_a_modifier} fiche(s) à corriger</b>${f.fiches_a_effacer ? ` et <b>${f.fiches_a_effacer} à effacer</b>` : ''} dans ton outil (demandes des personnes).`, '<span class="aide">Outil › Site › Publipostage</span>'],
-      f.fiches_en_attente && [`📮 <b>${f.fiches_en_attente} fiche(s) pas encore confirmée(s)</b> (${f.fiches_confirmees} confirmée(s)) : envoie les liens de confirmation.`, '<span class="aide">Outil › Site › Publipostage › « À prévenir »</span>'],
-      f.nouveautes_en_attente && [`📣 <b>${f.nouveautes_en_attente} nouveauté(s)</b> partiront au prochain envoi de 18 h en notification.`, '<button class="btn btn-line" type="button" data-rencontres-aller="nouveautes">Voir</button>'],
+      ...f.soirees.map((s) => [`<b>${esc(s.titre)}</b>, ${esc(heure(s.debut))} · ${esc(s.salon)} : <b>${s.inscrits} inscrit(s)</b>, ${Math.max(0, s.places - s.inscrits)} place(s) libre(s). À 20 h 45, ouvre le bal.`, '<a class="btn btn-ink" href="/admin-bal.html">Poste du bal</a>']),
+      f.a_verifier.length && [`<b>${f.a_verifier.length} profil(s) incomplet(s)</b>, pas validé(s) automatiquement : ${f.a_verifier.map((r) => `n° ${r}${f.manques?.[r]?.length ? ` (manque : ${f.manques[r].join(', ')})` : ''}`).join(' · ')}. Valide-les toi-même si ça te va, ou demande-leur ce qui manque.`, '<button class="btn btn-ink" type="button" data-rencontres-aller="annonces">Vérifier</button>'],
+      f.reciproques && [`<b>${f.reciproques} intérêt(s) réciproque(s)</b> : les deux se sont choisis. Le site les met en relation tout seul dès que les différences éventuelles sont acceptées.`, '<button class="btn btn-ink" type="button" data-rencontres-aller="demandes">Voir</button>'],
+      f.demandes && [`<b>${f.demandes} match(s) demandé(s)</b> par ${f.personnes} personne(s) : en attente de la réponse de l’autre personne. Rien à faire de ton côté.`, '<button class="btn btn-line" type="button" data-rencontres-aller="demandes">Voir</button>'],
+      f.propositions_oui && [`<b>${f.propositions_oui} proposition(s) acceptée(s)</b> : la personne est intéressée par le profil que tu lui as proposé.`, '<button class="btn btn-line" type="button" data-rencontres-aller="demandes">Voir</button>'],
+      (f.fiches_a_modifier || f.fiches_a_effacer) && [`<b>${f.fiches_a_modifier} fiche(s) à corriger</b>${f.fiches_a_effacer ? ` et <b>${f.fiches_a_effacer} à effacer</b>` : ''} dans ton outil (demandes des personnes).`, '<span class="aide">Outil › Site › Publipostage</span>'],
+      f.fiches_en_attente && [`<b>${f.fiches_en_attente} fiche(s) pas encore confirmée(s)</b> (${f.fiches_confirmees} confirmée(s)) : envoie les liens de confirmation.`, '<span class="aide">Outil › Site › Publipostage › « À prévenir »</span>'],
+      f.nouveautes_en_attente && [`<b>${f.nouveautes_en_attente} nouveauté(s)</b> partiront au prochain envoi de 18 h en notification.`, '<button class="btn btn-line" type="button" data-rencontres-aller="nouveautes">Voir</button>'],
     ].filter(Boolean);
-    box.innerHTML = lignes.length ? lignes.map(([t, b]) => `<li><span>${t}</span>${b}</li>`).join('') : '<li>Rien en attente. 🌿</li>';
+    box.innerHTML = lignes.length ? lignes.map(([t, b]) => `<li><span>${t}</span>${b}</li>`).join('') : '<li>Rien en attente.</li>';
   } catch { box.innerHTML = '<li>La liste ne s’affiche pas pour le moment.</li>'; }
 }
 document.addEventListener('click', (e) => {
@@ -217,7 +217,7 @@ document.addEventListener('submit', async (e) => {
   if (!e.target.matches('[data-reco-form]')) return;
   e.preventDefault();
   const st = $('[data-reco-statut]');
-  try { await conf({ action: 'annonce_recommander', ref: e.target.ref.value, oui: true }); st.textContent = `⭐ Profil n° ${e.target.ref.value} recommandé.`; e.target.reset(); chargerRecommandes(); }
+  try { await conf({ action: 'annonce_recommander', ref: e.target.ref.value, oui: true }); st.textContent = `Profil n° ${e.target.ref.value} recommandé.`; e.target.reset(); chargerRecommandes(); }
   catch { st.textContent = 'Ce numéro de profil est introuvable.'; }
 });
 document.addEventListener('click', async (e) => {
@@ -234,8 +234,8 @@ async function chargerModerateurs() {
   if (!box) return;
   try {
     const { moderateurs = [], sansAnnonce = [] } = await conf({ action: 'annonce_moderateurs' });
-    const sans = sansAnnonce.map((m) => `<li>🛡️ ${esc(m)} · sans annonce · Passion offerte <button type="button" data-mod-retirer-email="${esc(m)}">Retirer</button></li>`).join('');
-    box.innerHTML = sans + (moderateurs.length ? moderateurs.map((p) => `<li>🛡️ Profil n° ${esc(p.ref)}${p.ville ? ` · ${esc(p.ville)}` : ''} · ${p.formule ? 'Passion offerte' : 'Passion en attente d’un compte'}${p.lien ? ` · <a href="${esc(p.lien)}">son lien personnel</a>` : ''} <button type="button" data-mod-retirer="${esc(p.ref)}">Retirer</button></li>`).join('') : (sans ? '' : '<li>Aucun modérateur pour l’instant.</li>'));
+    const sans = sansAnnonce.map((m) => `<li><svg class="ico" aria-hidden="true"><use href="/icones.svg#shield"/></svg> ${esc(m)} · sans annonce · Passion offerte <button type="button" data-mod-retirer-email="${esc(m)}">Retirer</button></li>`).join('');
+    box.innerHTML = sans + (moderateurs.length ? moderateurs.map((p) => `<li><svg class="ico" aria-hidden="true"><use href="/icones.svg#shield"/></svg> Profil n° ${esc(p.ref)}${p.ville ? ` · ${esc(p.ville)}` : ''} · ${p.formule ? 'Passion offerte' : 'Passion en attente d’un compte'}${p.lien ? ` · <a href="${esc(p.lien)}">son lien personnel</a>` : ''} <button type="button" data-mod-retirer="${esc(p.ref)}">Retirer</button></li>`).join('') : (sans ? '' : '<li>Aucun modérateur pour l’instant.</li>'));
   } catch { box.innerHTML = '<li>La liste ne s’affiche pas pour le moment.</li>'; }
 }
 async function chargerBeta() {
@@ -255,7 +255,7 @@ document.addEventListener('submit', async (e) => {
   if (e.target.matches('[data-mod-form]')) {
     e.preventDefault();
     const st = $('[data-mod-statut]');
-    try { const r = await conf({ action: 'annonce_moderateur', ref: e.target.ref.value, oui: true }); st.textContent = `🛡️ Profil n° ${e.target.ref.value} modérateur${r.formule ? ', Passion offerte.' : ' : Passion offerte dès qu’il aura un compte.'}`; e.target.reset(); chargerModerateurs(); }
+    try { const r = await conf({ action: 'annonce_moderateur', ref: e.target.ref.value, oui: true }); st.textContent = `Profil n° ${e.target.ref.value} modérateur${r.formule ? ', Passion offerte.' : ' : Passion offerte dès qu’il aura un compte.'}`; e.target.reset(); chargerModerateurs(); }
     catch (err) { st.textContent = ERR_MOD[err.code] || ERR_MOD[err.message] || 'Ça n’a pas fonctionné.'; }
   }
   if (e.target.matches('[data-beta-form]')) {
@@ -319,7 +319,7 @@ document.addEventListener('click', async (e) => {
     try { await conf({ action: 'annonce_effacement_fait', ref: Number(ef.dataset.effacementFait) }); message('Effacement noté.'); chargerJournal(); } catch { message('L’effacement n’a pas pu être noté.', true); }
   }
 });
-const ETATS_DISC = { ouverte: '🟢 en cours', numeros: '📞 numéros échangés', terminee: 'terminée sans échange', dematch: 'dématché', signalee: '🚩 signalée' };
+const ETATS_DISC = { ouverte: 'en cours', numeros: 'numéros échangés', terminee: 'terminée sans échange', dematch: 'dématché', signalee: 'signalée' };
 async function chargerDiscussions(id = null) {
   const box = $('[data-discussions]');
   try {
@@ -377,7 +377,7 @@ function ventes() {
       <td><strong>${esc(o.customer_name || '')}</strong><br><a href="mailto:${esc(o.customer_email)}">${esc(o.customer_email)}</a></td>
       <td>${(o.order_items || []).map((x) => `${esc(x.product_name)}${x.quantity > 1 ? ` × ${x.quantity}` : ''}`).join('<br>')}</td>
       <td>${esc(livraison)}</td><td><strong>${money(o.amount_total_cents, o.currency)}</strong></td>
-      <td>${['paid', 'fulfilled'].includes(o.status) && (o.order_items || []).some((x) => x.products?.product_type === 'digital') ? `<button class="btn btn-line" type="button" data-envoyer-ebook="${esc(o.id)}">📧 Envoyer le livre</button><br>` : ''}<select data-statut="${esc(o.id)}" class="statut-select is-${esc(o.status)}">${Object.entries(STATUTS).map(([k, l]) => `<option value="${k}" ${k === o.status ? 'selected' : ''}>${l}</option>`).join('')}</select></td>
+      <td>${['paid', 'fulfilled'].includes(o.status) && (o.order_items || []).some((x) => x.products?.product_type === 'digital') ? `<button class="btn btn-line" type="button" data-envoyer-ebook="${esc(o.id)}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> Envoyer le livre</button><br>` : ''}<select data-statut="${esc(o.id)}" class="statut-select is-${esc(o.status)}">${Object.entries(STATUTS).map(([k, l]) => `<option value="${k}" ${k === o.status ? 'selected' : ''}>${l}</option>`).join('')}</select></td>
     </tr>`;
   }).join('') || '<tr><td colspan="7">Aucune commande pour ce filtre.</td></tr>';
 }
@@ -387,7 +387,7 @@ $('[data-ventes]').addEventListener('click', async (e) => {
   if (!b) return;
   b.disabled = true; b.textContent = 'Envoi…';
   try { await api({ action: 'envoyer_ebook', id: b.dataset.envoyerEbook }); b.textContent = '✓ Livre envoyé'; message('Le lien de téléchargement est parti par email.'); }
-  catch (err) { b.disabled = false; b.textContent = '📧 Envoyer le livre'; message(err.message, true); }
+  catch (err) { b.disabled = false; b.textContent = 'Envoyer le livre'; message(err.message, true); }
 });
 $('[data-ventes]').addEventListener('change', async (e) => {
   const sel = e.target.closest('[data-statut]');
@@ -448,7 +448,7 @@ function visites() {
   const SOURCES = { direct: 'Lien direct ou appli', tiktok: 'TikTok', facebook: 'Facebook', instagram: 'Instagram', google: 'Google', youtube: 'YouTube', whatsapp: 'WhatsApp', live: 'Le live', snapchat: 'Snapchat', bing: 'Bing' };
   const top = (box, rows, nom, extra = () => '') => { const max = Math.max(1, ...rows.map((r) => r[1])); box.innerHTML = rows.map((r) => `<li><span>${nom(r)}</span><b>${r[1]}${extra(r)}</b><i style="--w:${(r[1] / max) * 100}%"></i></li>`).join('') || '<li>Pas encore de données</li>'; };
   const pays = (() => { try { return new Intl.DisplayNames(['fr'], { type: 'region' }); } catch { return null; } })();
-  const drapeau = (c) => (/^[A-Z]{2}$/.test(c || '') ? String.fromCodePoint(...[...c].map((ch) => 0x1f1e6 + ch.charCodeAt(0) - 65)) : '🌍');
+  const drapeau = (c) => (/^[A-Z]{2}$/.test(c || '') ? String.fromCodePoint(...[...c].map((ch) => 0x1f1e6 + ch.charCodeAt(0) - 65)) : '');
   const nomPays = (c) => (/^[A-Z]{2}$/.test(c || '') ? (pays?.of(c) || c) : 'Inconnu');
   top($('[data-top-pages]'), v.pages || [], (r) => esc(NOMS[r[0]] || r[0]), (r) => (r[2] ? ` <small>· ${duree(r[2])}</small>` : ''));
   top($('[data-top-sources]'), (v.sources || []).map((r) => [r[0], r[2] ?? r[1]]), (r) => esc(SOURCES[r[0]] || r[0]), () => ' <small>visiteurs</small>');
@@ -820,7 +820,7 @@ function profilComplet(a) {
     ? `<video controls preload="none" src="${esc(x.url)}"></video>`
     : `<a href="${esc(x.url)}" target="_blank" rel="noopener"><img src="${esc(x.url)}" alt="Photo du profil n° ${esc(a.ref)}" loading="lazy"></a>`)).join('');
   const reponses = Object.entries(m).filter(([k]) => !CACHES.has(k)).map(([k, v]) => [LIBELLES[k] || k, v]);
-  const badges = [a.identite_verifiee_at ? '🪪 pièce d’identité validée' : '', a.recommande_at ? '⭐ recommandé' : '', a.moderateur_at ? '🛡️ modérateur' : '', a.visible_anonyme === false ? 'masqué dans les profils' : '', a.outil_id || a.exportee_at ? 'importé dans l’outil' : 'pas encore importé dans l’outil'].filter(Boolean).join(' · ');
+  const badges = [a.identite_verifiee_at ? 'pièce d’identité validée' : '', a.recommande_at ? 'recommandé' : '', a.moderateur_at ? 'modérateur' : '', a.visible_anonyme === false ? 'masqué dans les profils' : '', a.outil_id || a.exportee_at ? 'importé dans l’outil' : 'pas encore importé dans l’outil'].filter(Boolean).join(' · ');
   return `<article class="profil-complet"><h4>Profil n° ${esc(a.ref)}</h4><p class="aide">${esc(badges)}</p>
     ${medias ? `<div class="profil-medias">${medias}</div>` : '<p class="aide">Aucune photo ni vidéo.</p>'}
     ${a.profil ? `<h5>Qui je suis</h5><p>${esc(a.profil)}</p>` : ''}${a.recherche ? `<h5>Qui je cherche${a.age_min || a.age_max ? ` · ${esc(a.age_min || 18)} à ${esc(a.age_max || 99)} ans` : ''}</h5><p>${esc(a.recherche)}</p>` : ''}
@@ -845,14 +845,14 @@ function rendreDetail(d) {
   }
   const a = d.activite;
   const liste = (l, f, vide) => (l.length ? `<ul class="fiche-liste">${l.map(f).join('')}</ul>` : `<p class="aide">${vide}</p>`);
-  box.innerHTML = `${c.bloque ? '<p class="fiche-bloque">🚫 Ce compte est bloqué.</p>' : ''}${pourquoi}
+  box.innerHTML = `${c.bloque ? '<p class="fiche-bloque"><svg class="ico" aria-hidden="true"><use href="/icones.svg#ban"/></svg> Ce compte est bloqué.</p>' : ''}${pourquoi}
     <div class="tdb-carte"><h3 style="margin-top:0">À qui est ce profil</h3><ul class="fiche-liste">${qui || '<li>Compte sans profil.</li>'}</ul>
       <p class="aide">Formule : ${esc({ decouverte: 'Découverte', passion: 'Passion', prestige: 'Prestige' }[d.formule] || d.formule)} · Dernière activité : ${esc(quand(c.derniere_action) || 'aucune')}</p></div>
     ${blocComplet}
     <div class="tdb-carte"><h3 style="margin-top:0">Son activité</h3><div class="fiche-chiffres">
       ${[['Swipes oui', a.swipes_oui], ['Swipes non', a.swipes_non], ['Demandes', a.demandes], ['Choisi·e par', a.recus], ['Matchs en cours', a.en_cours.length], ['Dématchs', a.dematchs], ['Messages', a.messages], ['Photos', a.photos]].map(([n, v]) => `<div><b>${esc(v)}</b><span>${esc(n)}</span></div>`).join('')}</div>
       ${a.en_cours.length ? `<p>En match avec : ${a.en_cours.map(refBouton).join(', ')}</p>` : ''}</div>
-    <div class="tdb-carte"><h3 style="margin-top:0">🎁 Offrir</h3>
+    <div class="tdb-carte"><h3 style="margin-top:0"><svg class="ico" aria-hidden="true"><use href="/icones.svg#gift"/></svg> Offrir</h3>
       <p class="aide">Reste à utiliser : ${d.credits.match} match(s), ${d.credits.speed_dating} soirée(s), ${d.credits.coaching} coaching(s). La personne est prévenue.</p>
       <form class="fiche-offrir" data-offrir>
         <label>Quoi<select name="quoi"><option value="match">Match</option><option value="speed_dating">Speed dating</option><option value="coaching">Coaching</option><option value="produit">Produit</option></select></label>
@@ -865,7 +865,7 @@ function rendreDetail(d) {
     ${carte(`Ses choix (${d.choix.length}) et qui l’a choisi·e (${d.choisi_par.length})`, `<h4>Ses choix</h4>${liste(d.choix, (x) => `<li>${refBouton(x.ref)}<small>${esc(STATUT_DEMANDE[x.statut] || x.statut)} · ${esc(quand(x.le))}</small></li>`, 'Aucun choix.')}<h4>L’ont choisi·e</h4>${liste(d.choisi_par, (x) => `<li>${refBouton(x.ref)} ${esc(x.prenom || '')}<small>${esc(STATUT_DEMANDE[x.statut] || x.statut)} · ${esc(quand(x.le))}</small></li>`, 'Personne pour l’instant.')}`)}
     ${carte(`Blocages et signalements (${d.blocages.fait.length + d.blocages.subi.length + d.signalements.fait.length + d.signalements.subi.length})`, `<h4>A bloqué</h4>${liste(d.blocages.fait, (x) => `<li>${refBouton(x.ref)}<small>${esc(x.motif || 'Sans motif')} · ${esc(quand(x.le))}</small></li>`, 'Personne.')}<h4>Bloqué·e par</h4>${liste(d.blocages.subi, (x) => `<li>${refBouton(x.ref)}<small>${esc(x.motif || 'Sans motif')} · ${esc(quand(x.le))}</small></li>`, 'Personne.')}<h4>A signalé</h4>${liste(d.signalements.fait, (x) => `<li>${refBouton(x.ref)}<small>${esc(x.motif || 'Sans motif')} · ${esc(quand(x.le))}</small></li>`, 'Personne.')}<h4>Signalé·e par</h4>${liste(d.signalements.subi, (x) => `<li>${refBouton(x.ref)}<small>${esc(x.motif || 'Sans motif')} · ${esc(quand(x.le))}</small></li>`, 'Personne.')}`)}
     ${carte(`Ses discussions (${d.discussions.length})`, liste(d.discussions, (x) => `<li>Avec ${refBouton(x.avec)}<small>Ouverte ${esc(quand(x.ouverte))}${x.ferme ? ` · fermée ${esc(quand(x.ferme))}` : ''}</small></li>`, 'Aucune discussion.'))}
-    ${c.admin ? '' : `<p><button class="btn btn-line fiche-danger" type="button" data-bloquer-compte="${c.bloque ? 'non' : 'oui'}">${c.bloque ? 'Débloquer ce compte' : '🚫 Bloquer ce compte'}</button></p>`}`;
+    ${c.admin ? '' : `<p><button class="btn btn-line fiche-danger" type="button" data-bloquer-compte="${c.bloque ? 'non' : 'oui'}">${c.bloque ? 'Débloquer ce compte' : 'Bloquer ce compte'}</button></p>`}`;
 }
 let detailCourant = null;
 async function chargerDetail(cible) {
@@ -930,7 +930,7 @@ $('[data-compte-detail]').addEventListener('submit', async (e) => {
   const ERREURS = { adresse_requise: 'Indique son adresse pour l’envoi.', stock_vide: 'Ce produit n’est plus en stock.', produit_indisponible: 'Ce produit n’est plus disponible.' };
   try {
     await conf({ action: 'annonce_offrir', user_id: detailCourant.compte.id, quoi, quantite: f.elements.quantite.value, product_id: f.elements.product_id.value, adresse: { line1: f.elements.line1.value, postal_code: f.elements.postal_code.value, city: f.elements.city.value, country: f.elements.country.value } });
-    message('🎁 Cadeau offert, la personne est prévenue.');
+    message('Cadeau offert, la personne est prévenue.');
     chargerDetail({ user_id: detailCourant.compte.id });
   } catch (err) { st.textContent = ERREURS[err.code] || ERREURS[err.message] || 'Ça n’a pas abouti. Réessaie dans un instant.'; }
 });
@@ -1023,11 +1023,11 @@ function peindreActivite(d) {
   const r = d.reglages || {};
   const f = $('[data-pilote-reglages]');
   f.actif.checked = r.actif !== false; f.parPersonne.value = r.parPersonne ?? 3; f.scoreMin.value = r.scoreMin ?? 55;
-  $('[data-pilote-statut]').textContent = `${r.actif === false ? '⏸️ Pilote en pause.' : '✅ Pilote actif.'}${r.dernier ? ` Dernier passage le ${new Date(r.dernier.le).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} : ${r.dernier.propositions} proposition(s) envoyée(s) à ${r.dernier.personnes} personne(s), ${r.dernier.relations} mise(s) en relation.` : ''}`;
+  $('[data-pilote-statut]').textContent = `${r.actif === false ? 'Pilote en pause.' : 'Pilote actif.'}${r.dernier ? ` Dernier passage le ${new Date(r.dernier.le).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} : ${r.dernier.propositions} proposition(s) envoyée(s) à ${r.dernier.personnes} personne(s), ${r.dernier.relations} mise(s) en relation.` : ''}`;
   $('[data-pilote-relations]').innerHTML = (d.relations || []).map((x) => `<li><span><b>${escA(x.a)}</b>${x.actif && x.a_matchs > 1 ? ` <em class="tdb-plusieurs">${x.a_matchs} matchs en cours</em>` : ''} ↔ <b>${escA(x.b)}</b>${x.actif && x.b_matchs > 1 ? ` <em class="tdb-plusieurs">${x.b_matchs} matchs en cours</em>` : ''}<small>${escA(jourA(x.le))}${x.reciproque ? ' · réciproque' : ''}${x.discussion ? ' · discussion ouverte' : ''} · ${escA(x.etat)}</small></span>${x.actif ? `<button type="button" class="link-button" data-dematcher="${escA(x.id)}">Annuler ce match</button>` : ''}</li>`).join('') || '<li>Pas encore de mise en relation.</li>';
   $('[data-pilote-propositions]').innerHTML = (d.propositions || []).map((x) => `<li><span><b>${escA(x.a)}</b> ↔ <b>${escA(x.b)}</b><small>${x.score != null ? `${x.score}/100 · ` : ''}${escA(jourA(x.le))} · ${escA(x.etat)}${x.auto ? ' · auto' : ''}</small></span>${/attente/.test(x.etat) ? `<button type="button" class="link-button" data-retirer-prop="${escA(x.id)}">Retirer</button>` : ''}</li>`).join('') || '<li>Pas encore de proposition. Clique « Envoyer les matchs maintenant ».</li>';
   const att = d.en_attente || [], bv = $('[data-valider-tout]');
-  bv.hidden = !att.length; bv.textContent = `✅ Profils en attente (${att.length}) : valider les complets, relancer les autres`;
+  bv.hidden = !att.length; bv.textContent = `Profils en attente (${att.length}) : valider les complets, relancer les autres`;
   bv.title = att.map((a) => `${a.prenom || ''} n° ${a.ref}`).join(', ');
   $('[data-pilote-bloques]').innerHTML = (d.bloques || []).map((x) => `<li><span><b>${escA(x.a)}</b> ↔ <b>${escA(x.b)}</b><small>${escA(x.raison)}</small></span></li>`).join('') || '<li>Rien de bloqué.</li>';
 }
@@ -1040,7 +1040,7 @@ $('[data-pilote-reglages]')?.addEventListener('submit', (e) => { e.preventDefaul
 $('[data-valider-tout]')?.addEventListener('click', async (e) => {
   if (!confirm(`Profils en attente : ${e.target.title}\n\nLes profils complets (photo, email, contact) sont validés. Aucun profil incomplet n’est validé : chacun reçoit un message avec ce qui lui manque, et il sera validé tout seul dès qu’il l’ajoute.`)) return;
   e.target.disabled = true;
-  try { const d = await conf({ action: 'annonce_pilote', op: 'valider_tout' }); peindreActivite(d); $('[data-pilote-statut]').textContent = `✅ ${d.valides} profil(s) complet(s) validé(s) · 📝 ${d.relances} profil(s) incomplet(s) prévenu(s) de ce qui manque${d.relations ? ` · ${d.relations} mise(s) en relation faite(s)` : ''}.`; }
+  try { const d = await conf({ action: 'annonce_pilote', op: 'valider_tout' }); peindreActivite(d); $('[data-pilote-statut]').textContent = `${d.valides} profil(s) complet(s) validé(s) · ${d.relances} profil(s) incomplet(s) prévenu(s) de ce qui manque${d.relations ? ` · ${d.relations} mise(s) en relation faite(s)` : ''}.`; }
   catch { $('[data-pilote-statut]').textContent = 'Ça n’a pas fonctionné. Réessaie.'; }
   e.target.disabled = false;
 });
