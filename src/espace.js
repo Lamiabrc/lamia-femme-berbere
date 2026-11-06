@@ -661,7 +661,7 @@ async function interetsRecus(session) {
     const sub = reg ? await reg.pushManager.getSubscription() : null;
     if (sub && Notification.permission === 'granted') {
       let prefs = {}; try { prefs = JSON.parse(localStorage.getItem('lfb-notif-prefs') || '{}'); } catch { /* */ }
-      const T = [['boutique', 'Boutique', '#C9A86A'], ['article', 'Articles', '#7E5B2E'], ['actu', 'Actus', '#2e9d5b'], ['live', 'Lives', '#c8213f']];
+      const T = [['boutique', 'Boutique', '#C9BCE8'], ['article', 'Articles', '#6C5BA7'], ['actu', 'Actus', '#2e9d5b'], ['live', 'Lives', '#c8213f']];
       dire(`<p><svg class="ico" aria-hidden="true"><use href="/icones.svg#bell"/></svg> <strong>Notifications activées sur ce téléphone.</strong> Tu es toujours prévenu·e pour tes rencontres (intérêt, réciproque, match). En plus, je veux être prévenu·e des nouveautés :</p><div class="notif-prefs">${T.map(([k, n, c]) => `<label style="--c:${c}"><input type="checkbox" data-pref="${k}"${prefs[k] === false ? '' : ' checked'}> ${n}</label>`).join('')}</div><p><button type="button" class="btn btn-line" data-notif-off>Désactiver sur ce téléphone</button></p>`);
       box.querySelectorAll('[data-pref]').forEach((c) => c.addEventListener('change', async () => {
         const p = Object.fromEntries([...box.querySelectorAll('[data-pref]')].map((x) => [x.dataset.pref, x.checked]));

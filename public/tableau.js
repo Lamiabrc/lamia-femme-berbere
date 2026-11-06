@@ -118,7 +118,7 @@ async function chargerCockpit() {
     $('[data-graphes]').innerHTML = graphe('Swipes par jour', s.series.swipes, s.jours) + graphe('Matchs demandés par jour', s.series.demandes, s.jours) + graphe('Nouveaux comptes par jour', s.series.comptes, s.jours);
     $('[data-parcours]').innerHTML = hbarres(s.parcours, true);
     const f = Number(s.genres.femmes), h = Number(s.genres.hommes), t = Math.max(1, f + h);
-    $('[data-genres]').innerHTML = `<div class="repartition" role="img" aria-label="${f} femmes, ${h} hommes"><i style="width:${(f / t) * 100}%;background:#D2482C"></i><i style="width:${(h / t) * 100}%;background:#7E5B2E"></i></div><div class="repartition-legende"><span style="--c:#D2482C">Femmes : ${nb(f)} (${Math.round((f / t) * 100)} %)</span><span style="--c:#7E5B2E">Hommes : ${nb(h)} (${Math.round((h / t) * 100)} %)</span></div>`;
+    $('[data-genres]').innerHTML = `<div class="repartition" role="img" aria-label="${f} femmes, ${h} hommes"><i style="width:${(f / t) * 100}%;background:#D2482C"></i><i style="width:${(h / t) * 100}%;background:#6C5BA7"></i></div><div class="repartition-legende"><span style="--c:#D2482C">Femmes : ${nb(f)} (${Math.round((f / t) * 100)} %)</span><span style="--c:#6C5BA7">Hommes : ${nb(h)} (${Math.round((h / t) * 100)} %)</span></div>`;
     $('[data-pays]').innerHTML = hbarres(s.pays);
   } catch { $('[data-graphes]').innerHTML = '<p class="aide">Les graphiques ne sont pas disponibles pour le moment. Réessaie dans un instant.</p>'; }
 }
