@@ -216,7 +216,7 @@ function footer() {
 <footer class="site-footer">
   <div class="footer-house">
     <p class="footer-sign">ⵣ</p>
-    <p>Lamia Femme Berbère<br>Les rencontres sérieuses de Lamia, marieuse kabyle.</p>
+    <p>Lamia Femme Berbère<br>Les rencontres sérieuses de Lamia, marieuse kabyle, au cœur de la culture amazighe.</p>
   </div>
   <nav aria-label="Rencontres">
     <p class="footer-title">Rencontres</p>
@@ -1733,7 +1733,7 @@ page(
   '/lamia-brechet/',
   layout({
     title: 'Lamia Bréchet Ighil, marieuse kabyle · Lamia Femme Berbère',
-    description: 'Lamia Bréchet Ighil, marieuse kabyle derrière Lamia Femme Berbère : lives, rencontres en vue du mariage, culture kabyle et bijoux d’Ath Yenni.',
+    description: 'Lamia Bréchet Ighil, marieuse kabyle derrière Lamia Femme Berbère : lives, rencontres en vue du mariage, culture kabyle et amazighe, bijoux d’Ath Yenni.',
     path: '/lamia-brechet/',
     room: roomBySlug.hall,
     body: `<article class="lamia-page">
