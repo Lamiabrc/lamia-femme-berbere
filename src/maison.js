@@ -822,7 +822,7 @@ renderSocials();
 
 // Choix de la langue : garde la même page quand elle existe dans cette langue, et s'en souvient sur ce téléphone.
 {
-  const PAGES_LANGUES = ['/', '/rencontres/', '/rencontres/swipe/', '/rencontres/confirmer/', '/rencontres/visio/', '/mon-espace/', '/abonnement/', '/abonnement/merci/', '/application/', '/hors-ligne/'];
+  const PAGES_LANGUES = ['/', '/rencontres/', '/rencontres/swipe/', '/rencontres/confirmer/', '/rencontres/visio/', '/mon-espace/', '/abonnement/', '/abonnement/merci/', '/application/', '/hors-ligne/', '/speed-dating/', '/speed-dating/inscription/', '/speed-dating/merci/', '/speed-dating/bal/', '/speed-dating/salle/', '/speed-dating/souhaits/', '/salon/', '/confidences/', '/nouveautes/', '/rencontre-kabyle-algerie/', '/rencontre-kabyle-canada/', '/rencontre-kabyle-europe/', '/lamia-brechet/', '/guides/mariage-kabyle/', '/guides/france-algerie/'];
   const ici = location.pathname.replace(/^\/(en|ar|kab)(?=\/)/, '');
   const langueIci = document.documentElement.lang;
   const memoire = { lire() { try { return localStorage.getItem('lfb_langue'); } catch { return null; } }, ecrire(l) { try { localStorage.setItem('lfb_langue', l); } catch { /* stockage indisponible */ } } };
