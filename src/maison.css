@@ -3932,3 +3932,7 @@ html[dir="rtl"] .swipe-carte { direction: rtl; }
 html[lang="kab"] .lfb-azul { display: block; }
 
 .maison-menu-langues ul { display: flex; flex-wrap: wrap; gap: 6px 14px; }
+/* De droite à gauche : rien ne déborde de la page */
+html[dir="rtl"] .skip { left: auto; right: -999px; }
+html[dir="rtl"] .skip:focus { right: 8px; }
+html[dir="rtl"], html[dir="rtl"] body { overflow-x: clip; }
