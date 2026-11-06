@@ -326,3 +326,17 @@
 .tdb-top .ico { color: #F3E0B9; }
 .tdb-onglets button[aria-current="true"] .ico, .tdb-plus.is-actif > summary .ico { color: #1B1A18; }
 @media (max-width: 760px) { .tdb-onglets > button .ico { display: block; margin: 0 auto 2px; width: 18px; height: 18px; } }
+
+/* Menu clair, comme QVT Box ; la pastille reste rouge à lèvres */
+.tdb-top { background: #fdf9f0 !important; color: var(--qvt-encre); border-bottom: 1px solid var(--qvt-sable); }
+.tdb-marque { color: var(--qvt-encre); }
+.tdb-moi, .tdb-moi .link-button { color: var(--qvt-taupe); }
+.tdb-onglets button, .tdb-plus > summary, .tdb-plus > div button { color: var(--qvt-taupe); }
+.tdb-onglets button:hover { color: var(--qvt-encre); }
+.tdb-top .ico { color: var(--qvt-bronze); }
+.tdb-pastille { background: #C8233F !important; color: #fff; }
+@media (max-width: 760px) {
+  .tdb-onglets { background: #fdf9f0 !important; border-top: 1px solid var(--qvt-sable); box-shadow: 0 -8px 24px rgba(27, 26, 24, .06); }
+  .tdb-plus > div { background: #fdf9f0 !important; border-top: 1px solid var(--qvt-sable); box-shadow: 0 -8px 24px rgba(27, 26, 24, .10); }
+  .tdb-plus > div button { background: #fff; border: 1px solid var(--qvt-sable); color: var(--qvt-encre); }
+}

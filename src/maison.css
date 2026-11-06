@@ -3630,3 +3630,116 @@ body.espace-est-admin .espace-admin-note { color: #E8D6B5; }
 .swipe-page .swipe-carte .swipe-texte .ico { color: var(--qvt-bronze); }
 .ame-soeur-btn .ico, .btn-gold .ico { color: inherit; }
 .hall-hero .btn .ico, .hall-hero .ame-soeur-btn .ico, .head-arch .btn .ico, .room-head .btn .ico { color: inherit; }
+
+/* ================================================================ QVT Box : pastels, doré chic, et une toute petite touche de rouge à lèvres */
+:root { --levres: #C8233F; --qvt-menthe: #CFECE8; --qvt-lilas: #E9DFFA; --qvt-peche: #FFF4E7; --qvt-ciel: #C9E8F0; --ombre-douce: 0 16px 40px rgba(27, 26, 24, .10); }
+.pip { background: var(--levres); box-shadow: none; width: 7px; height: 7px; margin-right: 10px; }
+
+/* Plus de guirlande ni de frise colorée : un filet doré */
+.po-hero, .accueil-hero { padding-top: clamp(28px, 6vw, 56px); }
+.po-hero::after { height: 1px; background: linear-gradient(90deg, transparent, #C9A86A, transparent); }
+.frise, .frise-fine { height: 1px !important; background: linear-gradient(90deg, transparent, #C9A86A 20%, #C9A86A 80%, transparent) !important; opacity: .7; }
+
+/* Le grand visuel : photo, voile doux, halos pastel */
+.po-hero { box-shadow: var(--ombre-douce); }
+.po-hero::before { background: radial-gradient(40% 35% at 8% 22%, rgba(207, 236, 232, .22), transparent 70%), radial-gradient(45% 40% at 95% 25%, rgba(243, 224, 185, .22), transparent 70%), linear-gradient(0deg, rgba(21, 21, 21, .72) 0%, rgba(21, 21, 21, .36) 55%, rgba(21, 21, 21, .22) 100%); }
+.po-hero h1 { background: none; -webkit-text-fill-color: currentColor; color: #fff; animation: none; }
+.po-btn { background: var(--qvt-champagne); color: var(--qvt-nuit); border: 0; box-shadow: none; }
+.po-btn:hover { background: var(--qvt-champagne-clair); }
+.po-btn-verre { background: rgba(255, 255, 255, .12); border: 1px solid rgba(255, 255, 255, .35); color: #fff; }
+.accueil-couple a { background: rgba(255, 255, 255, .12); border-color: rgba(255, 255, 255, .35); color: #fff; }
+.accueil-couple a:hover, .accueil-couple a:focus-visible { background: rgba(255, 255, 255, .2); }
+.accueil-couple span { color: var(--qvt-champagne); }
+
+/* Barre du bas : claire, comme QVT Box. Un point rouge sur la page en cours. */
+@media (max-width: 760px) {
+  .barre-app, body:has(.swipe-page) .barre-app { background: rgba(253, 249, 240, .97); background-image: none; border-top: 1px solid var(--qvt-sable); box-shadow: 0 -8px 24px rgba(27, 26, 24, .06); }
+  .barre-app a { color: var(--qvt-taupe); position: relative; }
+  .barre-app .ico { color: var(--qvt-taupe); }
+  .barre-app a[aria-current="page"], body:has(.swipe-page) .barre-app a[aria-current="page"] { background: none; color: var(--qvt-encre); }
+  .barre-app a[aria-current="page"] .ico { color: var(--qvt-encre); }
+  .barre-app a[aria-current="page"]::after { content: ''; position: absolute; top: 1px; left: 50%; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--levres); }
+  .barre-app [data-barre-point], body:has(.swipe-page) .barre-app [data-barre-point] { background: var(--levres); box-shadow: 0 0 0 2px #fdf9f0; }
+}
+
+/* Swipe : fond crème et pastel, fiche ivoire, cœur rouge */
+.swipe-page { background-color: var(--qvt-creme); background-image: radial-gradient(70% 45% at 5% 0%, rgba(207, 236, 232, .55), transparent 70%), radial-gradient(70% 45% at 100% 30%, rgba(233, 223, 250, .45), transparent 70%), radial-gradient(70% 45% at 30% 100%, rgba(243, 224, 185, .55), transparent 70%); color: var(--qvt-encre); }
+.swipe-tete h1, .swipe-page .swipe-compteur, .swipe-page .swipe-aide, .swipe-adresse { color: var(--qvt-encre) !important; }
+.swipe-page .swipe-info { background: rgba(255, 255, 255, .7); border: 1px solid var(--qvt-sable); color: var(--qvt-encre); }
+.swipe-page .swipe-info strong, .swipe-page .swipe-info b { color: var(--qvt-encre); }
+.swipe-page .swipe-tete a, .swipe-page .swipe-tete button { background: #fff; border: 1px solid rgba(27, 26, 24, .18); color: var(--qvt-encre); }
+.swipe-filtres-bouton { background: #fff; border: 1px solid rgba(27, 26, 24, .18); color: var(--qvt-encre); }
+.po-app.swipe-page .ico { color: var(--qvt-bronze); }
+.swipe-page .swipe-carte { background: #fffcf6; border: 1px solid var(--qvt-sable); box-shadow: 0 24px 60px rgba(27, 26, 24, .14); }
+.swipe-page .swipe-carte .swipe-texte { background: #fffcf6; }
+.po-app .swipe-carte .swipe-lieu, .po-app .swipe-carte .swipe-village { color: var(--qvt-taupe); }
+.po-app .swipe-carte .swipe-statut { color: #4c7a70; }
+.swipe-page .swipe-boutons [data-swipe-non], .swipe-page .swipe-boutons .swipe-annuler, .swipe-page .swipe-boutons [data-swipe-non].is-actif { background: #fff; border: 1px solid var(--qvt-sable); box-shadow: 0 8px 20px rgba(27, 26, 24, .08); color: var(--qvt-encre); }
+.po-app.swipe-page .swipe-boutons [data-swipe-non] .ico, .po-app.swipe-page .swipe-boutons .swipe-annuler .ico { color: var(--qvt-encre); }
+.swipe-page .swipe-boutons [data-swipe-oui], .swipe-page .swipe-boutons [data-swipe-oui].is-actif { background: #fff; border: 1px solid var(--qvt-sable); box-shadow: 0 8px 20px rgba(27, 26, 24, .08); }
+.po-app.swipe-page .swipe-boutons [data-swipe-oui] .ico { color: var(--levres); fill: var(--levres); }
+
+/* Pages de l'appli en clair : crème, cartes blanches, halos pastel. Seul le grand visuel garde sa photo. */
+.po-app { --po-fg: #1B1A18; --po-muted: #6F6454; --po-coral: #7E5B2E; --po-gold: #7E5B2E; --po-card: #fff; --po-border: #E8DCC8; --po-input: #E8DCC8; color-scheme: light; color: var(--po-fg); background-color: #FAF6EE; background-image: radial-gradient(60% 30% at 0% 0%, rgba(207, 236, 232, .5), transparent 70%), radial-gradient(60% 30% at 100% 35%, rgba(233, 223, 250, .35), transparent 70%), radial-gradient(70% 30% at 20% 90%, rgba(243, 224, 185, .45), transparent 70%); background-attachment: scroll; }
+.po-hero { --po-fg: #fff; --po-muted: #F3EBDD; color: #fff; }
+.po-app.po-app .po-hero h1, .po-hero h1, .accueil-hero h1 { background: none !important; color: #fff !important; -webkit-text-fill-color: #fff !important; animation: none !important; text-shadow: 0 2px 14px rgba(21, 21, 21, .45); }
+.po-hero .po-btn .ico, .po-btn .ico { color: inherit !important; }
+.po-app .po-corps .po-btn-verre, .po-app > .po-btn-verre { background: #fff; color: #1B1A18 !important; border: 1px solid rgba(27, 26, 24, .2); }
+.po-app.po-app :is(.patio-etapes, .annonce-carte, .now-card, .annonce-form, .annonce-merci, .annonce-vide, .annonce-retrait, .annonce-intro) { background: #fff !important; border: 1px solid #E8DCC8 !important; box-shadow: 0 16px 40px rgba(27, 26, 24, .08) !important; backdrop-filter: none !important; }
+.po-app.po-app .patio-etapes li { background: #FFFCF6 !important; border-color: #E8DCC8 !important; }
+.po-app.po-app .patio-etapes li strong { color: #1B1A18 !important; }
+.po-app.po-app .patio-etapes li::before, .po-app.po-app .annonce-etape h3 span { background: #F3E0B9 !important; color: #151515 !important; }
+.po-app.po-app .annonce-texte :is(h3, p), .po-app.po-app .annonce-intro :is(h2, p), .po-app.po-app .now-card :is(h3, p), .po-app.po-app .annonce-form :is(label, legend, span, small, h3, p) { color: #1B1A18 !important; }
+.po-app.po-app .annonce-texte p, .po-app.po-app .annonce-lieu, .po-app.po-app .annonce-form small, .po-app.po-app .annonce-aide { color: #6F6454 !important; }
+.po-app.po-app .annonce-texte h4, .po-app.po-app .now-card .now-room, .po-app.po-app .annonce-case a, .po-app.po-app .annonce-merci a, .po-app.po-app .now-card a { color: #7E5B2E !important; }
+.po-app.po-app .annonce-tags span { background: #FBF3E4 !important; color: #5E5447 !important; border: 1px solid #E8DCC8 !important; }
+.po-app.po-app .annonce-ref { background: #CFECE8 !important; border-color: transparent !important; color: #1B1A18 !important; }
+.po-app.po-app .annonce-ref.is-piece { background: #F3E0B9 !important; border-color: transparent !important; color: #1B1A18 !important; }
+.po-app.po-app .annonce-form :is(input:not([type=checkbox]):not([type=radio]):not([type=file]), select, textarea) { background: #fff !important; color: #1B1A18 !important; border: 1px solid #E8DCC8 !important; }
+.po-app .annonce-form ::placeholder { color: #9C8D77; }
+.po-app .annonce-form option, .po-app .annonce-form optgroup { background: #fff; color: #1B1A18; }
+.po-app.po-app .annonce-puces span { background: #fff !important; border-color: #E8DCC8 !important; color: #1B1A18 !important; }
+.po-app.po-app .annonce-puces span:hover { background: #FBF3E4 !important; }
+.po-app.po-app .annonce-puces input:checked + span { background: #F3E0B9 !important; border-color: #C9A86A !important; color: #151515 !important; }
+.po-app.po-app .annonce-id { background: #FBF3E4 !important; border-color: #E8DCC8 !important; }
+.po-app.po-app .annonce-depot { background: #fff !important; border-color: #C9A86A !important; color: #7E5B2E !important; }
+.po-app.po-app .form-status.is-error { color: #C8233F !important; }
+.po-app.po-app .annonce-texte .btn, .po-app.po-app .annonce-envoyer, .po-app.po-app .annonce-form .btn { background: #1B1A18 !important; color: #FAF6EE !important; border-radius: 999px; }
+.po-corps .po-btn, .po-app .patio-etapes .ame-soeur-btn, .po-app .ame-soeur-btn:not(.po-hero *) { color: #151515 !important; -webkit-text-fill-color: #151515; background: #F3E0B9 !important; border: 0; }
+
+/* Swipe : tout le haut lisible sur le fond clair */
+.swipe-page .swipe-tete :is(a, button), .swipe-page [data-swipe-infos] *, .swipe-page .swipe-info, .swipe-page .swipe-info * { color: #1B1A18 !important; }
+.swipe-antighost, .swipe-page .swipe-antighost * { color: #1B1A18 !important; }
+.swipe-page .swipe-antighost strong { color: #1B1A18 !important; }
+.swipe-tete :is(a, button) { background: #fff !important; border: 1px solid rgba(27, 26, 24, .18) !important; }
+
+/* Barre du bas pleine, rien ne passe derrière */
+@media (max-width: 760px) { .barre-app, body:has(.swipe-page) .barre-app { background: #FDF9F0 !important; backdrop-filter: none !important; } }
+
+/* Boutique : plus de store orange, plus d'ombre colorée derrière l'arche */
+body[data-ambiance="boutique"] .frise-fine { height: 1px !important; background: linear-gradient(90deg, transparent, #C9A86A, transparent) !important; }
+body[data-ambiance="boutique"] .room-head::before { display: none; }
+body[data-ambiance="boutique"] .room-head { padding-top: 24px; background: radial-gradient(60% 60% at 90% 10%, rgba(207, 236, 232, .45), transparent 70%), radial-gradient(60% 60% at 5% 60%, rgba(243, 224, 185, .4), transparent 70%); }
+body[data-ambiance="boutique"] .room-name, body[data-ambiance="boutique"] .product-card:hover h3 { color: #7E5B2E; }
+.head-arch.has-image { background: #fff !important; border: 1px solid #E8DCC8 !important; box-shadow: 0 24px 60px rgba(27, 26, 24, .14) !important; padding: 6px; }
+.head-arch.has-image::before, .head-arch.has-image::after { display: none !important; }
+
+/* Abonnement en clair */
+.abo-periode { background: #fff; border-color: #E8DCC8; }
+.abo-periode button { color: #6F6454; }
+.abo-periode button b { color: #7E5B2E; }
+.abo-periode button[aria-checked="true"] { background: #1B1A18; color: #FAF6EE; }
+.abo-periode button[aria-checked="true"] b { color: #F3E0B9; }
+.abo-carte { background: #fff; border: 1px solid #E8DCC8; box-shadow: 0 16px 40px rgba(27, 26, 24, .08); color: #1B1A18; }
+.abo-carte.is-vedette { border: 1px solid #C9A86A; box-shadow: 0 24px 60px rgba(27, 26, 24, .14); background: #FFFCF6; }
+.abo-ruban { background: #F3E0B9; color: #151515; }
+.abo-carte h3 { color: #1B1A18 !important; }
+.abo-prix { color: #1B1A18 !important; }
+.abo-prix small { color: #6F6454; }
+.abo-prix em { color: #4c7a70; }
+.abo-carte li { color: #5E5447; }
+.abo-carte li::before { color: #C9A86A; }
+.abo-carte .po-btn-verre { background: #fff; color: #1B1A18; border: 1px solid rgba(27, 26, 24, .2); }
+.abo-alerte { background: #FBF3E4; border-color: #E8DCC8; color: #5E5447 !important; }
+.swipe-tete > *:not(h1):not(.ico), .swipe-tete > * * { color: #1B1A18 !important; -webkit-text-fill-color: #1B1A18; }
+.swipe-tete > *:not(h1):not(.ico) { background: #fff !important; border: 1px solid rgba(27, 26, 24, .18) !important; }
