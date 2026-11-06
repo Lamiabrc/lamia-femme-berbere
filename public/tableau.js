@@ -890,6 +890,9 @@ async function ouvrirParRef(ref) {
   chargerDetail({ ref });
 }
 function suivreHashProfil() {
+  // Depuis une conversation : le compte d'une personne qui n'a ni annonce ni fiche.
+  const compte = location.hash.match(/^#compte-([0-9a-f-]{36})$/i);
+  if (compte) { ouvrir('comptes'); (comptes ? Promise.resolve() : chargerComptes()).then(() => ouvrirCompte(compte[1])); return true; }
   const m = location.hash.match(/^#profil-(\d+)$/);
   if (!m) return false;
   ouvrir('comptes');
@@ -986,7 +989,7 @@ async function demarrer() {
   if (session) $('[data-moi-email]').textContent = session.user.email;
   if (session && !admin) message('Ce compte n’a pas le rôle administratrice.', true);
   if (!admin) return;
-  if (location.hash.startsWith('#profil-')) { aFaire(); pastilleJournal(); chargerCockpit(); await charger().catch(() => {}); suivreHashProfil(); return; }
+  if (location.hash.startsWith('#profil-') || location.hash.startsWith('#compte-')) { aFaire(); pastilleJournal(); chargerCockpit(); await charger().catch(() => {}); suivreHashProfil(); return; }
   const tab = location.hash.slice(1);
   ouvrir(['accueil', 'activite', 'rencontres', 'comptes', 'application', 'coaching', 'ventes', 'produits', 'soirees', 'bilan', 'alertes', 'textes', 'visites'].includes(tab) ? tab : 'accueil');
   aFaire(); pastilleJournal(); chargerCockpit();

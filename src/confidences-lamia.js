@@ -82,6 +82,12 @@ function rendreFil(t) {
   courant = t;
   $('[data-fil-nom]').textContent = t.name;
   $('[data-fil-coord]').innerHTML = `<a href="mailto:${esc(t.email)}">${esc(t.email)}</a>${t.phone ? ` · <a href="tel:${esc(t.phone.replace(/[^+\d]/g, ''))}">${esc(t.phone)}</a>` : ''} · ${t.channel === 'conversation' ? 'conversation privée' : t.channel === 'vocal' ? 'confidence vocale' : 'confidence écrite'}`;
+  { // Ouvrir le profil de la personne, dans un nouvel onglet pour garder la conversation.
+    const cible = t.profil?.ref ? `#profil-${t.profil.ref}` : t.profil?.user_id ? `#compte-${t.profil.user_id}` : '';
+    $('[data-fil-coord]').insertAdjacentHTML('beforeend', cible
+      ? ` <a class="cl-btn cl-fil-profil" href="/tableau-de-bord${cible}" target="_blank" rel="noopener">👤 Ouvrir son profil${t.profil.ref ? ` n° ${t.profil.ref}` : ''}</a>`
+      : ' <small class="cl-fil-profil">Aucun profil avec cet email.</small>');
+  }
   $('[data-fil-statut]').value = t.status;
   const box = $('[data-messages]');
   box.innerHTML = t.messages.map((m) => `<article class="cl-bulle is-${m.author}"><p class="cl-qui">${m.author === 'lamia' ? 'Toi' : esc(t.name)} · <time>${esc(quand(m.created_at))}</time></p>${m.body ? `<p class="cl-texte">${esc(m.body)}</p>` : ''}${piecesHtml(m.files)}</article>`).join('');
