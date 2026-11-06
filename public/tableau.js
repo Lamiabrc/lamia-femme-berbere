@@ -324,7 +324,7 @@ async function chargerDiscussions(id = null) {
   const box = $('[data-discussions]');
   try {
     const d = await conf({ action: 'annonce_discussions_admin', id });
-    box.innerHTML = d.discussions.map((x) => `<li><span>n° ${x.a_ref} ${esc(x.a_prenom || '')} ↔ n° ${x.b_ref} ${esc(x.b_prenom || '')}<br><small>${esc(ETATS_DISC[x.etat] || x.etat)} · ${x.messages} message(s) · depuis le ${esc(date(x.ouverte_at, { day: 'numeric', month: 'short' }))}</small></span>${x.etat === 'signalee' ? `<button type="button" class="btn btn-ink" data-lire-discussion="${esc(x.id)}">Lire</button>` : ''}</li>`).join('') || '<li>Aucune discussion pour le moment.</li>';
+    box.innerHTML = d.discussions.map((x) => `<li><span>n° ${x.a_ref} ${esc(x.a_prenom || '')} ↔ n° ${x.b_ref} ${esc(x.b_prenom || '')}<br><span class="etat-pastel is-${esc(x.etat)}">${esc(ETATS_DISC[x.etat] || x.etat)}</span> <small>${x.messages} message(s) · depuis le ${esc(date(x.ouverte_at, { day: 'numeric', month: 'short' }))}</small></span>${x.etat === 'signalee' ? `<button type="button" class="btn btn-ink" data-lire-discussion="${esc(x.id)}">Lire</button>` : ''}</li>`).join('') || '<li>Aucune discussion pour le moment.</li>';
     const lue = $('[data-discussion-lue]');
     if (d.messages) { const x = d.discussions.find((y) => y.id === id); lue.hidden = false; lue.innerHTML = `<h3>Discussion signalée</h3>${d.messages.map((m) => `<p><small><b>${esc(m.qui)}</b> · ${esc(date(m.created_at))}</small><br>${esc(m.texte)}</p>`).join('') || '<p>Aucun message.</p>'}`; void x; }
   } catch { box.innerHTML = '<li>Les discussions ne s’affichent pas pour le moment.</li>'; }

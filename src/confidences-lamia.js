@@ -253,6 +253,9 @@ document.addEventListener('click', (e) => {
   jetonFrais().then((j) => api({ action: 'annonce_contact_note', ref: o.dataset.ecrireOuvrir }, j)).catch(() => {});
 });
 
+// Pastels : une couleur douce par sens, pour distinguer d'un coup d'œil.
+const pastelBadge = (t) => (/PAUSE/.test(t) ? 'is-sable' : /TEST/.test(t) ? 'is-ciel' : /live/i.test(t) ? 'is-lilas' : /Match/.test(t) ? 'is-rose' : /Recommand|Mod[ée]rat/i.test(t) ? 'is-champagne' : /identit|V[ée]rifi/i.test(t) ? 'is-menthe' : /ne pas/.test(t) ? 'is-peche' : 'is-sable');
+document.addEventListener('change', (e) => { const s = e.target.closest?.('[data-demande-statut]'); if (s) s.className = `cl-etat-choix is-${s.value}`; });
 const STATUT_ANNONCE = { a_verifier: 'À vérifier', publiee: 'Validé', refusee: 'Refusé' };
 let dernieresAnnonces = [];
 async function chargerAnnonces() {
@@ -267,10 +270,10 @@ async function chargerAnnonces() {
     const aExporter = annonces.filter((a) => a.status === 'publiee' && !a.exportee_at).length;
     $('[data-export-info]').textContent = aExporter ? `${aExporter} annonce(s) publiée(s) pas encore dans l’outil.` : 'Toutes les annonces publiées sont déjà dans l’outil.';
     box.innerHTML = annonces.map((a) => `<article class="cl-carte cl-annonce" data-id="${a.id}" id="annonce-${a.ref}">
-      <p class="cl-coord"><b>N° ${a.ref}</b> · ${STATUT_ANNONCE[a.status] || a.status}${a.submitted_at ? ` · reçue le ${quand(a.submitted_at)}` : ''}</p>
+      <p class="cl-coord"><b>N° ${a.ref}</b> <span class="cl-etat is-${esc(a.status)}">${STATUT_ANNONCE[a.status] || esc(a.status)}</span>${a.submitted_at ? ` · reçue le ${quand(a.submitted_at)}` : ''}</p>
       ${boutonEcrire(a.ref)}
       <h3>${a.genre === 'femme' ? 'Femme' : 'Homme'}, ${a.age} ans</h3>
-      <p class="cl-badges">${[a.en_pause ? 'EN PAUSE (invisible, à sa demande)' : '',a.test ? 'PROFIL DE TEST (invisible du public)' : '',a.live_declare ? (a.outil_lie ? 'Créé en live · fiche retrouvée dans l’outil · 3 offertes' : 'Dit avoir été en live · fiche à retrouver · 3 offertes') : a.outil_lie ? 'Déjà dans ton outil (même lien)' : '', a.compte ? 'Compte lié' : '', a.photo_partage ? 'Photo transmissible au match' : 'Photo à ne pas transmettre', a.en_match ? 'Match en cours' : '', a.modifiee_at ? `Modifié le ${quand(a.modifiee_at)}` : ''].filter(Boolean).map((t) => `<span>${esc(t)}</span>`).join('')}</p>
+      <p class="cl-badges">${[a.en_pause ? 'EN PAUSE (invisible, à sa demande)' : '',a.test ? 'PROFIL DE TEST (invisible du public)' : '',a.live_declare ? (a.outil_lie ? 'Créé en live · fiche retrouvée dans l’outil · 3 offertes' : 'Dit avoir été en live · fiche à retrouver · 3 offertes') : a.outil_lie ? 'Déjà dans ton outil (même lien)' : '', a.compte ? 'Compte lié' : '', a.photo_partage ? 'Photo transmissible au match' : 'Photo à ne pas transmettre', a.en_match ? 'Match en cours' : '', a.modifiee_at ? `Modifié le ${quand(a.modifiee_at)}` : ''].filter(Boolean).map((t) => `<span class="${pastelBadge(t)}">${esc(t)}</span>`).join('')}</p>
       <p class="cl-coord">Prénom : ${esc(a.prenom)} · ${esc(a.ville)}, ${esc(a.pays)}${a.situation ? ` · ${esc(a.situation)}` : ''} · né(e) le ${esc(a.birth_date)}<br>${esc(a.email)}${a.phone ? ` · ${esc(a.phone)}` : ''}</p>
       <div class="cl-annonce-medias">${a.medias.map((m) => !m.url ? '' : m.kind === 'video' ? `<video src="${esc(m.url)}" controls playsinline preload="metadata"></video>` : `<a href="${esc(m.url)}" target="_blank" rel="noopener"><img src="${esc(m.url)}" alt="Photo"></a>`).join('')}</div>
       ${a.identite?.url ? `<div class="cl-annonce-id"><p><b>Pièce d’identité</b> (vérifie le prénom, l’âge et que le numéro est caché) :</p>${a.identite.mime === 'application/pdf' ? `<a class="cl-btn" href="${esc(a.identite.url)}" target="_blank" rel="noopener">Ouvrir le PDF</a>` : `<a href="${esc(a.identite.url)}" target="_blank" rel="noopener"><img src="${esc(a.identite.url)}" alt="Pièce d’identité"></a>`}</div>` : a.identite_verifiee_at ? `<p class="cl-aide">✓ Identité vérifiée le ${quand(a.identite_verifiee_at)} (pièce supprimée).</p>` : ''}
@@ -420,7 +423,7 @@ async function chargerDemandes() {
           <p><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> → ${qui(d.cible)}</p>
           ${d.statut === 'a_traiter' ? `<p class="cl-coord">${d.reciproque || d.reponse === 'oui' ? 'Les deux ont dit oui : la mise en relation se fera toute seule dès que les différences éventuelles sont acceptées.' : d.cible_compte === false ? 'Cette personne n’a pas de compte : elle ne peut pas répondre tant qu’elle n’a pas confirmé sa fiche.' : 'En attente de la réponse de l’autre personne. Si elle dit oui, la mise en relation est automatique.'}</p>` : ''}
           ${d.potentiel && (d.potentiel.forts.length || d.potentiel.vigilance.length) ? `<details><summary>Pourquoi ce score</summary>${d.potentiel.forts.length ? `<p class="cl-forts">✓ ${d.potentiel.forts.map(esc).join('<br>✓ ')}</p>` : ''}${d.potentiel.vigilance.length ? `<p class="cl-vigilance"><svg class="ico" aria-hidden="true"><use href="/icones.svg#triangle-alert"/></svg> ${d.potentiel.vigilance.map(esc).join('<br><svg class="ico" aria-hidden="true"><use href="/icones.svg#triangle-alert"/></svg> ')}</p>` : ''}</details>` : ''}
-          <label>Statut<select data-demande-statut>${Object.entries(STATUT_DEMANDE).map(([k, v]) => `<option value="${k}"${k === d.statut ? ' selected' : ''}>${v}</option>`).join('')}</select></label>
+          <label>Statut<select data-demande-statut class="cl-etat-choix is-${esc(d.statut)}">${Object.entries(STATUT_DEMANDE).map(([k, v]) => `<option value="${k}"${k === d.statut ? ' selected' : ''}>${v}</option>`).join('')}</select></label>
           ${boutonEcrire(d.cible_ref ?? d.cible?.ref, 'cible')}
         </div>
       </article>`; }).join('')}

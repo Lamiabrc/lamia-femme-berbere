@@ -319,6 +319,7 @@ page(
   <div class="po-fond" aria-hidden="true"></div>
   <div class="po-hero-grid">
     <div class="po-hero-texte">
+      <p class="lfb-azul lfb-azul-hero" lang="ber">ⴰⵣⵓⵍ</p>
       <p class="po-eyebrow">${esc(T('accueil.surtitre', 'Accueil', 'Petite ligne au-dessus du titre', 'La marieuse kabyle · rencontres sérieuses'))}</p>
       <h1 id="accueil-titre">${esc(T('accueil.titre', 'Accueil', 'Grand titre', 'Trouve ton âme sœur kabyle, avec Lamia'))}</h1>
       <p class="po-sub">${esc(T('accueil.sous-titre', 'Accueil', 'Phrase sous le titre', 'Profils vérifiés. Lamia vous présente. En vue du mariage.'))}</p>
@@ -787,6 +788,7 @@ page(
   </form>
 
   <div data-espace-in hidden>
+    <p class="lfb-azul" lang="ber">ⴰⵣⵓⵍ</p>
     <h1>Bonjour <span data-espace-nom></span></h1>
     <p class="espace-email">Connecté·e avec <strong data-espace-email></strong> </p>
     <p><button class="btn btn-line" type="button" data-espace-logout>Se déconnecter</button></p>

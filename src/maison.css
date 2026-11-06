@@ -3747,3 +3747,38 @@ body[data-ambiance="boutique"] .room-name, body[data-ambiance="boutique"] .produ
 .swipe-tete > details > summary { background: #fff !important; border: 1px solid rgba(27, 26, 24, .18) !important; border-radius: 999px; }
 .swipe-tete > details.swipe-explique:not(h1):not(.ico) { background: none !important; border: 0 !important; }
 .annonce-box { scroll-margin-top: 84px; }
+
+/* ================================================================ Tifinagh : quelques touches pour la communauté amazighe */
+@font-face { font-family: 'Tifinagh'; src: url('/fonts/noto-sans-tifinagh.woff') format('woff'); font-display: swap; unicode-range: U+2D30-2D7F; }
+.lfb-azul, .footer-sign { font-family: 'Tifinagh', var(--sans); }
+.lfb-azul { margin: 0 0 6px; font-size: 15px; letter-spacing: .28em; color: #A98B57; }
+.lfb-azul-hero { color: var(--qvt-champagne) !important; font-size: 17px; }
+.footer-sign { color: var(--qvt-champagne); }
+.frise, .frise-fine { position: relative; overflow: visible !important; }
+.frise::after, .frise-fine::after { content: 'ⵣ'; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 0 12px; background: var(--qvt-ivoire); color: #C9A86A; font: 400 15px/1 'Tifinagh', var(--sans); }
+.abo-carte li::before { content: 'ⵣ'; font-family: 'Tifinagh', var(--sans); font-size: 13px; color: #C9A86A; }
+
+/* Statuts en pastel : menthe = bon, pêche = à faire, rose = refus ou fin, lilas = en cours, champagne = distinction, ciel et sable = info */
+:root { --p-menthe: #DDF1EE; --p-menthe-t: #1F5F57; --p-peche: #FFE9D8; --p-peche-t: #7A4322; --p-rose: #F9E3E8; --p-rose-t: #7A2E40; --p-lilas: #ECE4FA; --p-lilas-t: #4A3B75; --p-ciel: #DFF0F5; --p-ciel-t: #22566A; --p-champagne: #F7E7C5; --p-champagne-t: #5F4B2E; --p-sable: #F0E9DC; --p-sable-t: #5E5447; }
+.profil-badge { border: 0 !important; font-weight: 600; }
+.profil-badge.is-lamia { background: var(--p-champagne) !important; background-image: none !important; color: var(--p-champagne-t) !important; }
+.profil-badge.is-moderateur { background: var(--p-lilas); color: var(--p-lilas-t); }
+.profil-badge.is-identite { background: var(--p-menthe); color: var(--p-menthe-t); }
+.statut { background: var(--p-peche); color: var(--p-peche-t); }
+.statut.is-paid, .statut.is-fulfilled { background: var(--p-menthe); color: var(--p-menthe-t); }
+.statut.is-shipped { background: var(--p-ciel); color: var(--p-ciel-t); }
+.statut.is-cancelled, .statut.is-refunded { background: var(--p-rose); color: var(--p-rose-t); }
+.espace-match { display: inline-block; padding: 6px 12px; border-radius: 999px; background: var(--p-lilas); color: var(--p-lilas-t); font-size: 15px; }
+.po-app.po-app .annonce-ref { background: var(--p-menthe) !important; color: var(--p-menthe-t) !important; }
+.po-app.po-app .annonce-ref.is-piece { background: var(--p-champagne) !important; color: var(--p-champagne-t) !important; }
+.po-app .swipe-carte .swipe-statut { display: inline-block; padding: 3px 10px; border-radius: 999px; background: var(--p-menthe); color: var(--p-menthe-t); }
+.po-app.po-app .swipe-page .swipe-statut { background: var(--p-menthe); color: var(--p-menthe-t); }
+
+/* Un peu de paillettes, de temps en temps : un reflet doré qui passe, quelques éclats. Coupé si la personne a demandé moins d'animations. */
+@keyframes lfb-reflet { 0%, 88% { transform: translateX(-130%) skewX(-18deg); } 100% { transform: translateX(260%) skewX(-18deg); } }
+@keyframes lfb-eclats { 0%, 80%, 100% { opacity: 0; } 86%, 94% { opacity: 1; } 90% { opacity: .55; } }
+.po-btn, .abo-carte.is-vedette .po-btn, .btn-gold { position: relative; overflow: hidden; }
+.po-btn::after, .btn-gold::after { content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 34%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .85), transparent); transform: translateX(-130%) skewX(-18deg); animation: lfb-reflet 11s ease-in-out infinite; pointer-events: none; }
+.po-lamia { position: relative; }
+.po-lamia::after, .abo-carte.is-vedette::after, .lfb-paillettes::after { content: ''; position: absolute; inset: -6px; pointer-events: none; border-radius: inherit; opacity: 0; background-image: radial-gradient(1.6px 1.6px at 12% 18%, #fff 50%, transparent 100%), radial-gradient(1.2px 1.2px at 28% 8%, #F3E0B9 50%, transparent 100%), radial-gradient(1.8px 1.8px at 78% 12%, #fff 50%, transparent 100%), radial-gradient(1.2px 1.2px at 92% 34%, #E9C877 50%, transparent 100%), radial-gradient(1.6px 1.6px at 6% 62%, #E9C877 50%, transparent 100%), radial-gradient(1.2px 1.2px at 88% 72%, #fff 50%, transparent 100%), radial-gradient(1.8px 1.8px at 62% 94%, #F3E0B9 50%, transparent 100%), radial-gradient(1.2px 1.2px at 22% 90%, #fff 50%, transparent 100%); animation: lfb-eclats 13s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .po-btn::after, .btn-gold::after, .po-lamia::after, .abo-carte.is-vedette::after, .lfb-paillettes::after { animation: none; opacity: 0; } }

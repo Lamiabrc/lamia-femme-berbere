@@ -340,3 +340,15 @@
   .tdb-plus > div { background: #fdf9f0 !important; border-top: 1px solid var(--qvt-sable); box-shadow: 0 -8px 24px rgba(27, 26, 24, .10); }
   .tdb-plus > div button { background: #fff; border: 1px solid var(--qvt-sable); color: var(--qvt-encre); }
 }
+
+/* Statuts en pastel */
+.etat-pastel { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 600; background: #F0E9DC; color: #5E5447; }
+.etat-pastel.is-ouverte { background: #ECE4FA; color: #4A3B75; }
+.etat-pastel.is-numeros { background: #DDF1EE; color: #1F5F57; }
+.etat-pastel.is-signalee { background: #F9E3E8; color: #7A2E40; }
+.etat-pastel.is-dematch { background: #FFE9D8; color: #7A4322; }
+.statut-select.is-pending { background: #FFE9D8; color: #7A4322; }
+.statut-select.is-paid, .statut-select.is-fulfilled { background: #DDF1EE; color: #1F5F57; }
+.statut-select.is-shipped { background: #DFF0F5; color: #22566A; }
+.statut-select.is-cancelled, .statut-select.is-refunded { background: #F9E3E8; color: #7A2E40; }
+.tdb-pastille { font-family: inherit; }
