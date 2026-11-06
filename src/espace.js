@@ -803,7 +803,7 @@ async function discussions(session) {
     if (ouvrir) { dematchOuvert = ouvrir.closest('[data-disc]').dataset.disc; afficher(); return; }
     if (e.target.closest('[data-disc-dematch-annuler]')) { dematchOuvert = null; afficher(); return; }
     const question = e.target.closest('[data-parcours-question]');
-    if (question) { const t = question.closest('[data-disc]').querySelector('textarea'); if (t) { t.value = question.dataset.parcoursQuestion; t.focus(); } return; }
+    if (question) { const t = question.closest('[data-disc]').querySelector('textarea'); if (t) { t.value = question.textContent.trim(); t.focus(); } return; }
     const valider = e.target.closest('[data-parcours-valider]');
     if (valider) {
       valider.disabled = true;
