@@ -740,7 +740,6 @@
 "Paiement": "الدفع",
 "Paiement à régulariser": "دفع يجب تسويته",
 "Par Lamia, marieuse kabyle": "من لمياء، الخطّابة القبائلية",
-"Parcours les profils kabyles vérifiés par Lamia, de façon anonyme. France, Algérie, Canada, Europe. Tu choisis, elle vous présente.": "تصفّح الملفات القبائلية التي تحقّقت منها لمياء، بشكل مجهول. فرنسا، الجزائر، كندا، أوروبا. أنت تختار وهي تعرّفكما.",
 "Parle-nous de toi avec ton cœur": "حدّثنا عن نفسك من القلب",
 "Partager mon prénom": "مشاركة اسمي الأول",
 "Partout": "في كل مكان",
@@ -1051,7 +1050,6 @@
 "Traditionnel(le)": "تقليدي / تقليدية",
 "Trop de tentatives. Réessaie dans une heure.": "محاولات كثيرة جدًا. أعد المحاولة بعد ساعة.",
 "Trouvailles vintage": "كنوز عتيقة",
-"Trouve ton âme sœur kabyle, avec Lamia": "اعثر على شريك حياتك القبائلي، مع لمياء",
 "Tu acceptes la différence : c’est noté, la suite se fait toute seule.": "أنت تقبل الاختلاف: تم تسجيل ذلك، والباقي يتم من تلقاء نفسه.",
 "Tu as accès aux annonces et la formule Passion incluse, sans rien payer. Confirme-le si tu es d’accord.": "يمكنك الاطلاع على الإعلانات مع باقة Passion المشمولة، دون دفع أي شيء. أكّد إذا كنت موافقًا.",
 "Tu as atteint le nombre de matchs en cours de ta formule : mets fin à l’un d’eux dans « Mon espace » pour en découvrir d’autres.": "بلغت عدد التطابقات الجارية في باقتك: أنهِ أحدها في «مساحتي» لتكتشف غيرها.",
@@ -1288,7 +1286,6 @@
 "✓ Chaque profil vérifié par Lamia": "✓ كل ملف موثّق من لمياء",
 "✓ C’est acheté : choisis ton créneau dans Mon espace, section Coaching.": "✓ تم الشراء: اختر موعدك في مساحتي، قسم الإرشاد.",
 "✓ C’est noté : Lamia présentera ton annonce en priorité à son prochain live.": "✓ تم تسجيل ذلك: ستقدّم لمياء إعلانك أولًا في بثها المباشر القادم.",
-"✓ France, Algérie, Canada, Europe": "✓ فرنسا، الجزائر، كندا، أوروبا",
 "✓ La photo de ton match est visible pendant 1 heure dans ton espace.": "✓ صورة تطابقك ظاهرة لمدة ساعة في مساحتك.",
 "✓ Live chaque soir, 21 h": "✓ بث مباشر كل مساء، 21:00",
 "✓ L’application est déjà installée sur cet appareil.": "✓ التطبيق مثبّت بالفعل على هذا الجهاز.",
@@ -1317,5 +1314,8 @@
 "Voir la Boutique": "عرض المتجر",
 "kabyle": "قبائلي",
 "Kabyle": "قبائلي",
-"amazigh": "أمازيغي"
+"amazigh": "أمازيغي",
+"Trouve ton âme sœur kabyle et amazigh": "اعثر على شريك حياتك القبائلي والأمازيغي",
+"Parcours les profils kabyles vérifiés par Lamia, de façon anonyme. France, Algérie, Maghreb, Canada, Europe": "Parcours les profils kabyles vérifiés par Lamia, de façon anonyme. فرنسا، الجزائر، المغرب الكبير، كندا، أوروبا",
+"✓ France, Algérie, Maghreb, Canada, Europe": "✓ فرنسا، الجزائر، المغرب الكبير، كندا، أوروبا"
 }

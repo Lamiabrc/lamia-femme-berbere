@@ -740,7 +740,6 @@
 "Paiement": "Lexlaṣ",
 "Paiement à régulariser": "Lexlaṣ ilaq ad yettwaseggem",
 "Par Lamia, marieuse kabyle": "S ɣur Lamia, marieuse taqbaylit",
-"Parcours les profils kabyles vérifiés par Lamia, de façon anonyme. France, Algérie, Canada, Europe. Tu choisis, elle vous présente.": "Wali profils iqbayliyen i tsenqed Lamia, war isem. Fransa, Lezzayer, Canada, Lurup. Kečč ad tferneḍ, nettat ad kwen-tessemlil.",
 "Parle-nous de toi avec ton cœur": "Ini-yaɣ-d ɣef yiman-ik s wul",
 "Partager mon prénom": "Bḍu isem-iw",
 "Partout": "Deg yal amkan",
@@ -1051,7 +1050,6 @@
 "Traditionnel(le)": "N lɛada",
 "Trop de tentatives. Réessaie dans une heure.": "Aṭas n tikkal. Ɛreḍ tikkelt-nniḍen deffir yiwet n saɛa.",
 "Trouvailles vintage": "Ayen n zik i d-nufa",
-"Trouve ton âme sœur kabyle, avec Lamia": "Af-d azgen-ik aqbayli, akked Lamia",
 "Tu acceptes la différence : c’est noté, la suite se fait toute seule.": "Tqebleḍ lxilaf-nni: yettwaru, ayen i d-iteddun ad yeḍru waḥd-s.",
 "Tu as accès aux annonces et la formule Passion incluse, sans rien payer. Confirme-le si tu es d’accord.": "Tzemreḍ ad twaliḍ annonces, formule Passion teddukel yid-sen, war ma txellṣeḍ acemma. Sentem ma tqebleḍ.",
 "Tu as atteint le nombre de matchs en cours de ta formule : mets fin à l’un d’eux dans « Mon espace » pour en découvrir d’autres.": "Tewwḍeḍ ɣer umḍan n matchs n tura n formule-inek: kfu yiwen deg-sen deg « Espace-inu » akken ad d-tafeḍ wiyaḍ.",
@@ -1288,7 +1286,6 @@
 "✓ Chaque profil vérifié par Lamia": "✓ Yal profil yettwasefqed sɣur Lamia",
 "✓ C’est acheté : choisis ton créneau dans Mon espace, section Coaching.": "✓ Taɣeḍ-t: fren lawan-ik deg Espace-inu, deg Coaching.",
 "✓ C’est noté : Lamia présentera ton annonce en priorité à son prochain live.": "✓ Yettwaru: Lamia ad d-teskan annonce-inek d tamezwarut deg live i d-iteddun.",
-"✓ France, Algérie, Canada, Europe": "✓ Fransa, Lezzayer, Kanada, Urup",
 "✓ La photo de ton match est visible pendant 1 heure dans ton espace.": "✓ Photo n match-inek ad d-tban 1 saɛa deg espace-inek.",
 "✓ Live chaque soir, 21 h": "✓ Live yal tameddit, 21 h",
 "✓ L’application est déjà installée sur cet appareil.": "✓ L’application tebded yakan deg appareil-agi.",
@@ -1316,5 +1313,8 @@
 "Kabyle": "Aqbayli",
 "Langue": "Tutlayt",
 "Français": "Français",
-"English": "English"
+"English": "English",
+"Trouve ton âme sœur kabyle et amazigh": "Af-d azgen-ik aqbayli d umaziɣ",
+"Parcours les profils kabyles vérifiés par Lamia, de façon anonyme. France, Algérie, Maghreb, Canada, Europe": "Parcours les profils kabyles vérifiés par Lamia, de façon anonyme. Fransa, Lezzayer, Tamurt n Lmeɣrib, Kanada, Urup",
+"✓ France, Algérie, Maghreb, Canada, Europe": "✓ Fransa, Lezzayer, Tamurt n Lmeɣrib, Kanada, Urup"
 }

@@ -1236,14 +1236,12 @@
 "Live": "Live",
 "Moi": "Me",
 "La marieuse kabyle · rencontres sérieuses": "The Kabyle matchmaker · serious dating",
-"Trouve ton âme sœur kabyle, avec Lamia": "Find your Kabyle soulmate, with Lamia",
 "Profils vérifiés. Lamia vous présente. En vue du mariage.": "Verified profiles. Lamia introduces you. With marriage in mind.",
 "Je confie mon profil": "Entrust my profile",
 "Voir les profils": "See the profiles",
 "✓ Chaque profil vérifié par Lamia": "✓ Every profile verified by Lamia",
 "✓ 1er match offert": "✓ First match free",
 "✓ Live chaque soir, 21 h": "✓ Live every evening, 9 pm (Paris time)",
-"✓ France, Algérie, Canada, Europe": "✓ France, Algeria, Canada, Europe",
 "Lamia Femme Berbère, marieuse kabyle": "Lamia Femme Berbère, Kabyle matchmaker",
 "Lamia · ta marieuse": "Lamia · your matchmaker",
 "Comment ça marche": "How it works",
@@ -1476,7 +1474,6 @@
 "Ton profil, confié à Lamia et à son outil de matching.": "Your profile, entrusted to Lamia and her matching tool.",
 "Trouver mon âme sœur avec Lamia": "Find my soulmate with Lamia",
 "Tu cherches quelqu’un de sérieux pour construire ta vie ? Présente-toi avec ton cœur et dis qui tu aimerais rencontrer. Ton profil n’est jamais publié : Lamia le vérifie, le passe dans son outil de matching et te dit avec combien de personnes tu pourrais correspondre. Pour les découvrir, tu lui écris. La première mise en relation est offerte.": "Looking for someone serious to build your life with? Introduce yourself from the heart and say who you would like to meet. Your profile is never published: Lamia verifies it, runs it through her matching tool and tells you how many people could suit you. To discover them, you write to her. Your first introduction is free.",
-"Parcours les profils kabyles vérifiés par Lamia, de façon anonyme. France, Algérie, Canada, Europe. Tu choisis, elle vous présente.": "Browse Kabyle profiles verified by Lamia, anonymously. France, Algeria, Canada, Europe. You choose, she introduces you.",
 "Profils kabyles vérifiés · Les Rencontres de Lamia": "Verified Kabyle profiles · Lamia’s introductions",
 "Les Rencontres de Lamia": "Lamia’s Introductions",
 "Profils kabyles vérifiés : comment ça marche": "Verified Kabyle profiles: how it works",
@@ -1765,5 +1762,8 @@
 "Quand tu crées ton profil, nous recevons ton prénom, ton genre, ta date de naissance, ta ville et ton pays, tes réponses sur ta situation, tes études, tes valeurs et la personne que tu cherches, tes textes, tes photos ou ta vidéo, ton email (celui de ton compte, obligatoire pour créer un profil ou dire qu’un profil t’intéresse), ton lien de réseau social ou, si tu n’en as aucun, ton numéro de téléphone (jamais affiché ni transmis, il reste chez Lamia), ainsi qu’une photo de ta pièce d’identité dont le numéro est caché par ta main, si tu choisis de la donner (elle est facultative et donne au profil le badge « vérifié avec pièce d’identité »). Ces données servent uniquement à vérifier ton profil, à le passer dans l’outil de matching de Lamia et à te proposer des mises en relation (base : ton consentement).": "When you create your profile, we receive your first name, gender, date of birth, city and country, your answers about your situation, education, values and the person you are looking for, your texts, your photos or video, your email (your account’s, required to create a profile or to say a profile interests you), your social media link or, if you have none, your phone number (never shown or passed on, it stays with Lamia), and a photo of your ID with the number hidden by your hand, if you choose to provide it (it is optional and gives the profile the “verified with ID” badge). This data is used only to verify your profile, run it through Lamia’s matching tool and suggest introductions to you (basis: your consent).",
 "Langue": "Language",
 "Français": "Français",
-"English": "English"
+"English": "English",
+"Trouve ton âme sœur kabyle et amazigh": "Find your Kabyle and Amazigh soulmate",
+"✓ France, Algérie, Maghreb, Canada, Europe": "✓ France, Algeria, Maghreb, Canada, Europe",
+"Parcours les profils kabyles vérifiés par Lamia, de façon anonyme. France, Algérie, Maghreb, Canada, Europe": "Parcours les profils kabyles vérifiés par Lamia, de façon anonyme. France, Algeria, Maghreb, Canada, Europe"
 }
