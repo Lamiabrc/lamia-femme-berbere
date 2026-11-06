@@ -38,7 +38,7 @@ export const O = {
 // Libellés affichés sur le site (avec accents), la valeur envoyée reste celle de l'outil.
 export const LIBELLE = {
   'Algerie': 'Algérie', 'Amerique': 'Amérique', 'Autre que Algerie': 'Ailleurs qu’en Algérie', "N'importe ou": 'Peu importe',
-  'Kabyle (Algerie)': 'Kabyle (Algérie)', 'Chaoui (Algerie)': 'Chaoui (Algérie)', 'Touareg (Algerie / Mali / Niger / Libye / Burkina Faso)': 'Touareg', 'Autre Amazigh / Berbere': 'Autre amazigh / berbère', 'Europeen': 'Européen(ne)', 'Autre origine': 'Autre origine',
+  'Kabyle (Algerie)': 'Kabyle (Algérie)', 'Chaoui (Algerie)': 'Chaoui (Algérie)', 'Touareg (Algerie / Mali / Niger / Libye / Burkina Faso)': 'Touareg', 'Autre Amazigh / Berbere': 'Amazigh (autre : chleuh, rifain, mozabite…)', 'Kabyle': 'Kabyle', 'Chaoui': 'Chaoui', 'Algerien(ne)': 'Algérien(ne)', 'Europeen': 'Européen(ne)', 'Autre origine': 'Autre origine',
   'Jamais marie(e)': 'Jamais marié(e)', 'Marie(e) sur papier uniquement': 'Marié(e) sur papier uniquement', 'Divorce(e)': 'Divorcé(e)', 'Separe(e)': 'Séparé(e)', 'Veuf/Veuve': 'Veuf / veuve',
   'Oui, mais a discuter': 'Oui, mais à discuter', 'Peut-etre': 'Peut-être',
   'College': 'Collège', 'Lycee': 'Lycée', 'Primaire non termine': 'Primaire non terminé', 'Primaire termine': 'Primaire terminé', 'College non termine': 'Collège non terminé', 'College termine': 'Collège terminé', 'Lycee non termine': 'Lycée non terminé', 'Bac general': 'Bac général',
@@ -284,3 +284,8 @@ export function badgesProfil(a) {
   return b.length ? `<p class="profil-badges">${b.join('')}</p>` : '';
 }
 
+// L'origine, bien visible sur chaque carte. Sans la parenthèse des pays, pour rester courte.
+export const origineLisible = (origines) => [...new Set((origines || []).map((o) => {
+  const t = String(lib(o) || o);
+  return /^Amazigh/.test(t) ? 'Amazigh' : t.replace(/\s*\(.*\)$/, '');
+}))].join(' · ');

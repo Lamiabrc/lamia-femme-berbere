@@ -3575,3 +3575,8 @@ body.espace-est-admin .espace-admin h2 { color: #F4DC92; }
 body.espace-est-admin .espace-admin-note { color: #E8D6B5; }
 
 .disc-prolonger { margin: 10px 0; }
+
+/* L'origine sur les cartes de profil */
+.annonce-origine { margin: 4px 0; }
+.annonce-origine b { font-weight: 700; }
+.swipe-origine { margin: 2px 0 0; font-weight: 700; color: #252B78; }

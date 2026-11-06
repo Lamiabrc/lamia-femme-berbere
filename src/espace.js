@@ -1,7 +1,7 @@
 // Mon espace : connexion, mot de passe, soirées réservées, liens d'administration.
 import { createClient } from '/vendor/supabase.mjs';
 import { creerCompte, api } from './confidences-commun.js';
-import { secteurLisible } from './matching-options.mjs';
+import { secteurLisible, origineLisible } from './matching-options.mjs';
 
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc');
 const $ = (s, r = document) => r.querySelector(s);
@@ -532,7 +532,7 @@ async function propositions(session) {
   let liste = [];
   const carte = (x) => {
     const f = x.fiche;
-    const infos = [f.genre === 'femme' ? 'Une femme' : 'Un homme', f.age && `${f.age} ans`, f.ville, f.village && `originaire de ${f.village}`, f.pays, f.situation].filter(Boolean);
+    const infos = [f.genre === 'femme' ? 'Une femme' : 'Un homme', f.age && `${f.age} ans`, origineLisible(f.origine), f.ville, f.village && `originaire de ${f.village}`, f.pays, f.situation].filter(Boolean);
     const ages = f.age_min || f.age_max ? ` · ${f.age_min || 18} à ${f.age_max || 99} ans` : '';
     const rep = x.reponse === 'oui' ? '<p class="espace-match">Tu as dit oui ! Si l’autre personne dit oui aussi, vous êtes mis en relation tout de suite et une discussion s’ouvre ici.</p>'
       : x.reponse === 'non' ? '<p>Tu as répondu : pas pour moi.</p>'

@@ -3,7 +3,7 @@
 // Swipe sans limite. Matchs en même temps : 1 en Découverte (Lamia en débloque d'autres en live), 3 avec une formule.
 // « Qui m'a choisi·e » (Passion, Prestige) : ces profils passent en tête.
 import { api, esc, PUBLIC_KEY } from './confidences-commun.js';
-import { O, lib, secteurLisible, foiEtVie, badgesProfil } from './matching-options.mjs';
+import { O, lib, secteurLisible, foiEtVie, badgesProfil, origineLisible } from './matching-options.mjs';
 import { createClient } from '/vendor/supabase.mjs';
 
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', PUBLIC_KEY);
@@ -18,7 +18,7 @@ const message = (html) => { zone.innerHTML = `<div class="swipe-message">${html}
 const statut = (a) => (a.piece_identite ? 'Vérifié avec pièce d’identité' : a.outil && !a.confirme ? 'En attente de confirmation' : 'Profil vérifié');
 function carte(a) {
   const femme = a.genre === 'femme';
-  const tags = [...(a.origine || []), ...(a.caracteristiques || [])].slice(0, 8);
+  const tags = (a.caracteristiques || []).slice(0, 8);
   const infos = [a.pays && lib(a.pays), a.situation && lib(a.situation), a.enfants === 'Oui' ? 'avec enfant(s)' : a.enfants === 'Non' ? 'sans enfant' : '', a.etudes && `études : ${lib(a.etudes).toLowerCase()}`].filter(Boolean);
   const ages = a.age_min || a.age_max ? ` (${a.age_min || 18} à ${a.age_max || 99} ans)` : '';
   const lieu = a.ville || (a.pays && lib(a.pays)) || '';
@@ -30,6 +30,7 @@ function carte(a) {
       <svg class="swipe-bijou" viewBox="0 -22 180 276" aria-hidden="true" focusable="false"><use href="#bijou-${femme ? 'femme' : 'homme'}"/></svg>
       <h2>${femme ? 'Une femme' : 'Un homme'}, ${esc(a.age)} ans</h2>
       ${lieu ? `<p class="swipe-lieu">${esc(lieu)}</p>` : ''}
+      ${origineLisible(a.origine) ? `<p class="swipe-origine">${esc(origineLisible(a.origine))}</p>` : ''}
       ${a.village ? `<p class="swipe-village">Originaire de ${esc(a.village)}</p>` : ''}
       <p class="swipe-statut"><span aria-hidden="true">✓</span> ${statut(a)}</p>
       <button type="button" class="swipe-voir" data-voir aria-expanded="false">Voir le profil</button>
@@ -40,6 +41,7 @@ function carte(a) {
       ${badgesProfil(a)}
       <h2>${femme ? 'Une femme' : 'Un homme'}, ${esc(a.age)} ans</h2>
       <p class="annonce-lieu"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lieu"/></svg>${esc([a.ville, ...infos].filter(Boolean).join(' · '))}</p>
+      ${origineLisible(a.origine) ? `<p class="annonce-origine">Origine : <b>${esc(origineLisible(a.origine))}</b></p>` : ''}
       ${a.village ? `<p class="annonce-lieu"><svg class="ico" aria-hidden="true"><use href="/icones.svg#maison"/></svg> Originaire de ${esc(a.village)}</p>` : ''}
       ${secteurLisible(a.secteur) ? `<p class="annonce-lieu annonce-secteur"><svg class="ico" aria-hidden="true"><use href="/icones.svg#boussole"/></svg> Cherche en : <b>${esc(secteurLisible(a.secteur))}</b></p>` : ''}
       ${tags.length ? `<p class="annonce-tags">${tags.map((t) => `<span>${esc(lib(t))}</span>`).join('')}</p>` : ''}

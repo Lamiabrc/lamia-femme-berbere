@@ -29,7 +29,7 @@ function monde({ compte = true, tiktok = {} } = {}) {
   const ctx = (user = null, formule = 'decouverte') => ({ formuleDe: async () => formule, env: { SUPABASE_SERVICE_ROLE_KEY: 'x' }, call, read, insert, patch, admin: false, user, ipHash: 'ip', now: () => new Date('2026-10-29T20:00:00Z'), email: async () => true, alerter: async (a) => alertes.push(a.titre) });
   return { db, alertes, ctx, sansMedias: () => { medias = false; } };
 }
-const base = { action: 'annonce_deposer', majeur: true, publication: true, prenom: 'Nina', genre: 'femme', birth_date: '1995-03-02', email: 'nina@example.com', matching: { contactReseau: 'https://www.tiktok.com/@nina.kab' } };
+const base = { action: 'annonce_deposer', majeur: true, publication: true, prenom: 'Nina', genre: 'femme', birth_date: '1995-03-02', email: 'nina@example.com', matching: { origineTags: ['Kabyle (Algerie)'], contactReseau: 'https://www.tiktok.com/@nina.kab' } };
 const complet = { ...base, ville: 'Lyon', pays: 'France', profil: 'Je suis souriante et sérieuse.', recherche: 'Un homme sérieux et doux.', medias: [{ role: 'media', type: 'image/jpeg', size: 1000 }, { role: 'media', type: 'image/jpeg', size: 1000 }] };
 
 const NINA = { id: 'u-nina', email: 'nina@example.com' };
@@ -50,7 +50,7 @@ test('sans être connecté(e), pas de profil (même si un compte existe avec cet
 });
 test('pas de réseau social : un numéro de téléphone valide est obligatoire', async () => {
   const { ctx, db } = monde();
-  const sans = { ...complet, matching: {}, sans_reseau: true };
+  const sans = { ...complet, matching: { origineTags: ['Kabyle (Algerie)'] }, sans_reseau: true };
   let r = await handleAnnonces('annonce_deposer', { ...sans, telephone: '12' }, ctx(NINA));
   assert.equal((await r.json()).error, 'telephone_invalide');
   r = await handleAnnonces('annonce_deposer', { ...complet, matching: {} }, ctx(NINA));
@@ -92,7 +92,7 @@ test('match actif : plus de nouvel intérêt jusqu’au dématch', async () => {
 
 test('lien déjà connu : relié à la fiche de l’outil, et pas de doublon sur le site', async () => {
   const { ctx, db } = monde({ tiktok: { [empreinteLien('instagram:nina.k')]: 'outil-7' } });
-  const insta = { ...complet, matching: { contactReseau: 'https://instagram.com/nina.k' } };
+  const insta = { ...complet, matching: { origineTags: ['Kabyle (Algerie)'], contactReseau: 'https://instagram.com/nina.k' } };
   let r = await handleAnnonces('annonce_deposer', insta, ctx(NINA));
   assert.equal(r.status, 200);
   assert.equal(db.annonces[0].outil_id, 'outil-7');
@@ -180,7 +180,7 @@ test('la personne choisie est prévenue par email (sans savoir qui), au plus une
   const c = (user) => ({ ...ctx(user), email: async (to, sujet) => { mails.push([to, sujet]); return true; } });
   await handleAnnonces('annonce_deposer', { ...complet }, c(NINA));
   const SAM = { id: 'u-sam', email: 'sam@example.com' };
-  await handleAnnonces('annonce_deposer', { ...complet, prenom: 'Sam', genre: 'homme', email: 'sam@example.com', matching: { contactReseau: 'https://www.tiktok.com/@sam.kab' } }, c(SAM));
+  await handleAnnonces('annonce_deposer', { ...complet, prenom: 'Sam', genre: 'homme', email: 'sam@example.com', matching: { origineTags: ['Kabyle (Algerie)'], contactReseau: 'https://www.tiktok.com/@sam.kab' } }, c(SAM));
   const [nina, sam] = db.annonces; nina.status = 'publiee'; sam.status = 'publiee';
   mails.length = 0;
   await handleAnnonces('annonce_swipe', { ref: nina.ref, choix: 'oui' }, c(SAM));
@@ -245,4 +245,13 @@ test('écrire à quelqu’un : le lien ouvre le bon réseau', () => {
   assert.equal(lienContact('facebook.com/profile.php?id=123', '', 'x').lien, 'https://www.facebook.com/profile.php?id=123');
   assert.equal(lienContact('', '+33 6 12 34 56 78', 'Salam !').lien, 'https://wa.me/33612345678?text=Salam%20!');
   assert.deepEqual(lienContact('', '', 'x'), { reseau: '', lien: '' });
+});
+
+test('origine : obligatoire au dépôt, lisible sur les cartes', async () => {
+  const { origineLisible } = await import('../content/matching-options.mjs');
+  assert.equal(origineLisible(['Kabyle (Algerie)']), 'Kabyle');
+  assert.equal(origineLisible(['Touareg (Algerie / Mali / Niger / Libye / Burkina Faso)', 'Autre Amazigh / Berbere']), 'Touareg · Amazigh');
+  const { ctx } = monde();
+  const r = await handleAnnonces('annonce_deposer', { ...complet, matching: { contactReseau: 'https://www.tiktok.com/@nina.kab' } }, ctx(NINA));
+  assert.equal((await r.json()).error, 'origine_requise');
 });
