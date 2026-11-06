@@ -199,7 +199,7 @@ export function foiEtVie(a) {
 // Calculé dans les deux sens (ce que A cherche chez B, et ce que B cherche chez A), puis moyenné.
 // Ce n'est pas l'outil de matching complet de Lamia : un premier tri, à confirmer dans l'outil.
 export function fichePotentiel(src, { outil = false, age = null } = {}) {
-  if (outil) return { age: src.age ?? null, age_min: src.age_min, age_max: src.age_max, pays: src.pays || '', religion: src.religion || '', pratique: src.pratique || '', enfants: src.enfants || '', situation: src.situation || '', origine: src.origine || [], hygiene: src.mode_vie || [], etudes: src.etudes || '', prefs: {} };
+  if (outil) return { age: src.age ?? null, age_min: src.age_min, age_max: src.age_max, pays: src.pays || '', religion: src.religion || '', pratique: src.pratique || '', enfants: src.enfants || '', situation: src.situation || '', origine: src.origine || [], hygiene: src.mode_vie || [], etudes: src.etudes || '', prefs: { religion: src.religion_recherche || '', pratique: src.pratique_recherche || '' } };
   const m = src.matching || {};
   return { age, age_min: src.age_min, age_max: src.age_max, pays: src.pays || '', religion: m.religion || '', pratique: m.pratique || '', enfants: m.enfants || '', situation: m.situation || '', origine: m.origineTags || [], hygiene: m.hygieneVie || [], etudes: m.niveauEtudeCategorie || '',
     prefs: { religion: m.religionRecherche || '', pratique: m.pratiqueRecherche || '', origines: m.origineRechercheTags || [], kabyleUniquement: Boolean(m.kabyleUniquement), accepteEnfants: m.accepteEnfants, accepteDivorce: m.accepteDivorce, accepteVeuf: m.accepteVeuf, zone: m.zoneGeo || '', mobilite: m.mobiliteGeographique || '', fumeur: (m.hygieneVie || []).find((x) => /^Fumeur/.test(x)) || '' } };
