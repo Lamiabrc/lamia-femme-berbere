@@ -374,9 +374,8 @@ async function monProfil(session) {
 // Suivi : mises en relation offertes et du mois, speed datings inclus, demandes envoyées.
 // « coeur » : ancienne formule (supprimée le 31/10/2026), gardée pour un éventuel ancien abonnement.
 const QUOTAS = { coeur: { nom: 'Cœur', mises: 3, sd: 1 }, passion: { nom: 'Passion', mises: 10, sd: 1 }, prestige: { nom: 'Prestige', mises: null, sd: 2 } };
-const ETAT_DEMANDE = { a_traiter: 'Lamia étudie la compatibilité', mis_en_relation: 'Mise en relation faite', en_reserve: 'Gardé en réserve : Lamia te le reproposera si ton match se termine', pas_compatible: 'Pas de match cette fois. Rien ne change pour toi : tes autres demandes continuent.', dematche: 'Match terminé' };
-// Refus de sa propre main (« d'accord quand même ? » → non) : ne pas le présenter comme une décision venue d'ailleurs.
-const ETAT_DEMANDE_PAR_MOI = 'Tu as choisi de ne pas continuer : une différence ne te convenait pas.';
+const ETAT_DEMANDE = { a_traiter: 'Lamia étudie la compatibilité', mis_en_relation: 'Mise en relation faite', en_reserve: 'Gardé en réserve : Lamia te le reproposera si ton match se termine', pas_compatible: 'Demande sans suite', dematche: 'Match terminé' };
+const FIN_DEMANDE = { autre: 'Cette personne a dit non à ta demande. Vous n’étiez pas en relation : ce n’est pas un dématch.', moi: 'Tu as dit non : une différence ne te convenait pas. Vous n’étiez pas en relation : ce n’est pas un dématch.', lamia: 'Lamia a annulé cette demande. Vous n’étiez pas en relation : ce n’est pas un dématch.', indispo: 'Ce profil n’est plus disponible. Vous n’étiez pas en relation : ce n’est pas un dématch.' };
 async function suivi(el, p) {
   const etat = await etatAbo;
   const a = etat?.abonnement, q = a ? QUOTAS[a.formule] : null, u = etat?.unites || {};
@@ -389,7 +388,7 @@ async function suivi(el, p) {
     q && q.nom !== 'Cœur' ? '<li><strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#camera"/></svg> Photo de ton match</strong> : incluse dans ta formule, si ton match l’accepte</li>' : '<li><strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#camera"/></svg> Photo de ton match</strong> : incluse à partir de la formule Passion, ou 3 € pour la voir 1 heure · <a class="text-link" href="/abonnement/?formule=passion">en savoir plus</a></li>',
     u.mise_en_relation || u.speed_dating ? `<li><strong>Achetés à l’unité</strong> : ${u.mise_en_relation || 0} match(s) supplémentaire(s) · ${u.speed_dating || 0} place(s) de speed dating</li>` : '',
   ].filter(Boolean).join('');
-  const demandes = (p.interets || []).map((i) => `<li>Profil n° ${esc(i.cible_ref)} · ${esc(i.par_moi ? ETAT_DEMANDE_PAR_MOI : ETAT_DEMANDE[i.statut] || i.statut)}${i.date ? ` <small>(${esc(new Date(i.date).toLocaleDateString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { day: 'numeric', month: 'long' }))})</small>` : ''}</li>`).join('');
+  const demandes = (p.interets || []).map((i) => `<li>Profil n° ${esc(i.cible_ref)} · ${esc(FIN_DEMANDE[i.fin] || ETAT_DEMANDE[i.statut] || i.statut)}${i.date ? ` <small>(${esc(new Date(i.date).toLocaleDateString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { day: 'numeric', month: 'long' }))})</small>` : ''}</li>`).join('');
   const heure = (d) => new Date(d).toLocaleTimeString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { hour: '2-digit', minute: '2-digit' });
   // Une photo par match en cours. Pas d'achat dans l'appli Play, ni depuis l'Algérie (paiement en ligne impossible).
   const peutPayer = !window.LFB_PLAY && !p.algerie;
