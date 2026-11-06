@@ -3960,3 +3960,10 @@ html[dir="rtl"], html[dir="rtl"] body { overflow-x: clip; }
 .espace-deja summary, .espace-demandes-finies summary { cursor: pointer; font-weight: 600; }
 .espace-deja ul, .espace-demandes-finies ul { margin: 8px 0 0; padding-left: 18px; }
 .espace-demandes-attente small { color: #6B6680; }
+
+/* Fiche à confirmer : carte claire et texte bien lisible (le fond sombre rendait le texte gris illisible) */
+.po-app .confirmer-app .confirmer-fiche, .confirmer-app .confirmer-fiche { background: #FFFFFF; border: 1.5px solid #C9BCE8; color: #2F2B3D; box-shadow: 0 6px 18px rgba(47, 43, 61, .06); }
+.po-app .confirmer-app .confirmer-fiche p, .confirmer-app .confirmer-fiche p, .confirmer-app .confirmer-choisie .confirmer-fiche p { color: #2F2B3D; opacity: 1; }
+.confirmer-app .confirmer-fiche .confirmer-num { color: #6C5BA7 !important; }
+.confirmer-app .confirmer-fiche .confirmer-infos { color: #4A4560 !important; }
+.po-app .confirmer-app .confirmer-fiche h3, .confirmer-app .confirmer-fiche h3 { color: #2F2B3D; }
