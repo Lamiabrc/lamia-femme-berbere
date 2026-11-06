@@ -57,3 +57,8 @@ if (voulue && document.querySelector(`[data-choisir="${CSS.escape(voulue)}"]`)) 
 if (new URLSearchParams(location.search).get('paiement') === 'annule') {
   const a = $('[data-abo-alerte]'); a.textContent = 'Le paiement a été annulé : rien n’a été débité. Tu peux choisir à nouveau quand tu veux.'; a.hidden = false;
 }
+
+// Arrivée sur un service précis (depuis l'accueil) : on l'amène à l'écran une fois la page en place.
+if (location.hash.startsWith('#unite-')) {
+  window.addEventListener('load', () => document.querySelector(location.hash)?.scrollIntoView({ block: 'start' }));
+}
