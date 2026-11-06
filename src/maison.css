@@ -3743,3 +3743,6 @@ body[data-ambiance="boutique"] .room-name, body[data-ambiance="boutique"] .produ
 .abo-alerte { background: #FBF3E4; border-color: #E8DCC8; color: #5E5447 !important; }
 .swipe-tete > *:not(h1):not(.ico), .swipe-tete > * * { color: #1B1A18 !important; -webkit-text-fill-color: #1B1A18; }
 .swipe-tete > *:not(h1):not(.ico) { background: #fff !important; border: 1px solid rgba(27, 26, 24, .18) !important; }
+.swipe-tete > details { background: none !important; border: 0 !important; }
+.swipe-tete > details > summary { background: #fff !important; border: 1px solid rgba(27, 26, 24, .18) !important; border-radius: 999px; }
+.swipe-tete > details.swipe-explique:not(h1):not(.ico) { background: none !important; border: 0 !important; }
