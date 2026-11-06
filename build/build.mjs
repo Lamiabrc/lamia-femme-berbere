@@ -327,6 +327,7 @@ page(
       <h1 id="accueil-titre">${esc(T('accueil.titre', 'Accueil', 'Grand titre', 'Trouve ton âme sœur kabyle, avec Lamia'))}</h1>
       <p class="po-sub">${esc(T('accueil.sous-titre', 'Accueil', 'Phrase sous le titre', 'Profils vérifiés. Lamia vous présente. En vue du mariage.'))}</p>
       <p class="po-actions"><a class="po-btn" href="/rencontres/#confier"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> Je confie mon profil</a><a class="po-btn-verre" href="/rencontres/#profils-anonymes">Voir les profils</a></p>
+      <p class="accueil-couple"><a href="/abonnement/#unite-sauver_couple"><strong>${esc(T('accueil.couple-titre', 'Accueil', 'Encadré couple : la question', 'T’es en couple et tu veux tenter une dernière chose avant de rompre ?'))}</strong><span>${esc(T('accueil.couple-action', 'Accueil', 'Encadré couple : le bouton', 'Réserve une séance de love coaching en ligne'))}</span><small><b>1 heure en visio avec Lamia</b><i> · ${UNITES.find((u) => u.id === 'sauver_couple').prix / 100} €</i></small></a></p>
       <ul class="accueil-preuves">
         <li>✓ Chaque profil vérifié par Lamia</li>
         <li>✓ 1er match offert</li>
@@ -1599,7 +1600,7 @@ page(
   <div class="abo-grille">${FORMULES.map(carteFormule).join('')}</div>
   ${tableauFormules()}
   <h2 class="annonces-titre" id="unites">Sans abonnement, à l’unité</h2>
-  <div class="abo-unites">${UNITES.map((u) => `<article class="abo-carte abo-unite"><h3>${esc(u.nom)}</h3><p class="abo-prix">${eurosAbo(u.prix)}</p><p>${esc(u.texte)}</p>${u.depuisEspace ? '<a class="po-btn-verre" href="/mon-espace/">Mon espace</a>' : `<button type="button" class="po-btn-verre" data-unite="${u.id}">Acheter</button>`}</article>`).join('')}</div>
+  <div class="abo-unites">${UNITES.map((u) => `<article class="abo-carte abo-unite" id="unite-${u.id}"><h3>${esc(u.nom)}</h3><p class="abo-prix">${eurosAbo(u.prix)}</p><p>${esc(u.texte)}</p>${u.depuisEspace ? '<a class="po-btn-verre" href="/mon-espace/">Mon espace</a>' : `<button type="button" class="po-btn-verre" data-unite="${u.id}">Acheter</button>`}</article>`).join('')}</div>
   <form class="abo-form annonce-form" data-abo-form hidden>
     <h2 data-abo-titre>Ta formule</h2>
     <p class="annonce-aide" data-abo-resume></p>
