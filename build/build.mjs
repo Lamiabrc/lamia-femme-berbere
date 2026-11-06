@@ -117,6 +117,8 @@ const HOME_UNIVERSES = [
 
 // ---------------------------------------------------------------- gabarit commun
 
+// Pièces sombres passées au style clair et pastel de la Maison.
+const ambianceDouce = (a) => (['salon', 'ecrin', 'bibliotheque', 'grenier', 'galerie', 'patio', 'dressing', 'coiffeuse', 'atelier'].includes(a) ? 'douce' : a);
 function layout({ title, description, path, room, body, scripts = [], noindex = false, ambiance, ogTitle, ogDescription, ogImage, ogImageAlt, ogImageWidth = 600, ogImageHeight = 600 }) {
   const canonical = SITE_URL + path;
   const accent = room?.accent || 'rouge';
@@ -146,7 +148,7 @@ ${noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" hr
 <meta name="twitter:description" content="${esc(socialDescription)}">
 <meta name="twitter:image" content="${esc(socialImage)}">
 <meta name="twitter:image:alt" content="${esc(socialImageAlt)}">
-<meta name="theme-color" content="#1B1A18">
+<meta name="theme-color" content="#2F2B3D">
 <link rel="icon" href="/images/marque/lamia-logo-net-160.webp" type="image/webp">
 <link rel="manifest" href="/maison.webmanifest">
 <script src="/assets/version-play.js"></script>
@@ -158,7 +160,7 @@ ${noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" hr
 <link rel="stylesheet" href="/fonts/polices.css">
 <link rel="stylesheet" href="/assets/maison.css?v=${VERSION}">
 </head>
-<body data-room="${esc(room?.slug || '')}" data-ambiance="${esc(ambiance || room?.slug || '')}" data-accent="${esc(accent)}">
+<body data-room="${esc(room?.slug || '')}" data-ambiance="${esc(ambianceDouce(ambiance || room?.slug || ''))}" data-accent="${esc(accent)}">
 <a class="skip" href="#contenu">Aller au contenu</a>
 ${header(room)}
 <main id="contenu">
@@ -181,7 +183,7 @@ function header(room) {
   </a>
   <nav class="site-nav" aria-label="Navigation principale">
     ${link('/rencontres/', 'Rencontres', 'patio')}
-    <a href="/rencontres/swipe/">💘 Swipe</a>
+    <a href="/rencontres/swipe/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Swipe</a>
     ${link('/speed-dating/', 'Speed dating', 'speed-dating')}
     ${link('/abonnement/', 'Formules', 'abonnement')}
     ${link('/salon/', 'Lives', 'salon')}
@@ -317,12 +319,9 @@ page(
 <div class="po-app accueil">
 <section class="po-hero accueil-hero" aria-labelledby="accueil-titre">
   <div class="po-fond" aria-hidden="true"></div>
-  <div class="po-garland" aria-hidden="true">
-    <svg viewBox="0 0 1000 40" preserveAspectRatio="none"><path d="M0,3 Q500,23 1000,3" fill="none" stroke="#cdb372" stroke-width="2.2" vector-effect="non-scaling-stroke"/></svg>
-    ${['j6','j3','j5','j7','j3','j5','j6','j7','j3'].map((k, i, a) => { const t = (i + 1) / (a.length + 1); return `<span class="po-gj" style="left:${(t * 100).toFixed(1)}%;top:${(7 + 40 * t * (1 - t)).toFixed(1)}px;--d:${(2.6 + ((i * 37) % 17) / 10).toFixed(1)}s;--l:-${(((i * 53) % 30) / 10).toFixed(1)}s"><img src="/images/outil/${k}.webp" alt=""></span>`; }).join('')}
-  </div>
   <div class="po-hero-grid">
     <div class="po-hero-texte">
+      <p class="lfb-azul lfb-azul-hero" lang="ber">ⴰⵣⵓⵍ</p>
       <p class="po-eyebrow">${esc(T('accueil.surtitre', 'Accueil', 'Petite ligne au-dessus du titre', 'La marieuse kabyle · rencontres sérieuses'))}</p>
       <h1 id="accueil-titre">${esc(T('accueil.titre', 'Accueil', 'Grand titre', 'Trouve ton âme sœur kabyle, avec Lamia'))}</h1>
       <p class="po-sub">${esc(T('accueil.sous-titre', 'Accueil', 'Phrase sous le titre', 'Profils vérifiés. Lamia vous présente. En vue du mariage.'))}</p>
@@ -409,7 +408,7 @@ page(
     description: 'Les lives de Lamia Femme Berbère : couple, célibat, engagement, humour et culture kabyle, tous les soirs de 21 h à 23 h.',
     path: '/salon/',
     room: roomBySlug.salon,
-    body: `${roomHead(roomBySlug.salon, '<p class="patio-actions"><a class="ame-soeur-btn" href="#ce-soir">🔴 Ce soir en live</a><a class="salon-ancre" href="#coeur-direct">Les débats</a><a class="salon-ancre" href="#outil-live">Le matching en live</a><a class="salon-ancre" href="#replays">Les replays</a></p>')}
+    body: `${roomHead(roomBySlug.salon, '<p class="patio-actions"><a class="ame-soeur-btn" href="#ce-soir">Ce soir en live</a><a class="salon-ancre" href="#coeur-direct">Les débats</a><a class="salon-ancre" href="#outil-live">Le matching en live</a><a class="salon-ancre" href="#replays">Les replays</a></p>')}
 <section class="room-body salon-ce-soir" id="ce-soir" aria-labelledby="ce-soir-titre">
   <div class="salon-live">
     <p class="prose-lead">${esc(P.salon.intro)}</p>
@@ -494,12 +493,12 @@ page(
   <div class="videos-haut">
   <div class="videos" data-youtube-videos hidden>
     <h2>Mes dernières vidéos YouTube</h2>
-    <div class="video-cadre" data-youtube-cadre><button class="btn btn-gold" type="button" data-youtube-charger>▶ Afficher mes vidéos</button><p class="video-note">En affichant les vidéos, YouTube peut déposer ses propres cookies.</p></div>
+    <div class="video-cadre" data-youtube-cadre><button class="btn btn-gold" type="button" data-youtube-charger><svg class="ico" aria-hidden="true"><use href="/icones.svg#play"/></svg> Afficher mes vidéos</button><p class="video-note">En affichant les vidéos, YouTube peut déposer ses propres cookies.</p></div>
   </div>
 </div>
   <div class="videos" data-tiktok-videos>
     <h2>Mes vidéos TikTok</h2>
-    <div class="video-cadre is-tiktok" data-tiktok-cadre><button class="btn btn-gold" type="button" data-tiktok-charger>▶ Afficher mes vidéos TikTok</button><p class="video-note">En affichant les vidéos, TikTok peut déposer ses propres cookies.</p></div>
+    <div class="video-cadre is-tiktok" data-tiktok-cadre><button class="btn btn-gold" type="button" data-tiktok-charger><svg class="ico" aria-hidden="true"><use href="/icones.svg#play"/></svg> Afficher mes vidéos TikTok</button><p class="video-note">En affichant les vidéos, TikTok peut déposer ses propres cookies.</p></div>
   </div>
 </section>
 <figure class="banniere-salon">${IMGT('image.salon.banniere', 'Le Salon de Lamia', 'Grande bannière', `<img src="/images/lamia/banniere-lamia-berbere-1672.webp" srcset="/images/lamia/banniere-lamia-berbere-900.webp 900w, /images/lamia/banniere-lamia-berbere-1672.webp 1672w" sizes="(max-width: 1300px) 100vw, 1240px" width="1672" height="941" loading="lazy" alt="Lamia Berbère : humour, société, politique, contradictions du quotidien. Un regard berbère, kabyle, algérien, français et maghrébin.">`)}</figure>
@@ -762,7 +761,7 @@ page(
         <button class="btn btn-ink" type="submit">Recevoir mon lien de connexion</button>
         <p class="form-status" role="status" data-reset-status></p>
       </form>
-      <p class="espace-card" data-moderateur-avis hidden>🛡️ Lamia te propose un compte modérateur. Crée ton accès ou connecte-toi ci-dessous, puis confirme.</p>
+      <p class="espace-card" data-moderateur-avis hidden><svg class="ico" aria-hidden="true"><use href="/icones.svg#shield"/></svg> Lamia te propose un compte modérateur. Crée ton accès ou connecte-toi ci-dessous, puis confirme.</p>
       <form class="espace-card" data-espace-login>
         <h2>J’ai un mot de passe</h2>
         <label>Email<input name="email" type="email" autocomplete="email" required></label>
@@ -791,6 +790,7 @@ page(
   </form>
 
   <div data-espace-in hidden>
+    <p class="lfb-azul" lang="ber">ⴰⵣⵓⵍ</p>
     <h1>Bonjour <span data-espace-nom></span></h1>
     <p class="espace-email">Connecté·e avec <strong data-espace-email></strong> </p>
     <p><button class="btn btn-line" type="button" data-espace-logout>Se déconnecter</button></p>
@@ -828,7 +828,7 @@ page(
 
     <section id="mon-profil">
       <h2>Mon profil âme sœur</h2>
-      <p><button type="button" class="btn btn-line btn-installer" data-installer-bouton>📲 Installer l’application sur mon téléphone</button></p>
+      <p><button type="button" class="btn btn-line btn-installer" data-installer-bouton><svg class="ico" aria-hidden="true"><use href="/icones.svg#smartphone"/></svg> Installer l’application sur mon téléphone</button></p>
       <div class="espace-notifs" data-espace-notifs></div>
       <div class="espace-profil" data-espace-profil><p class="loading">Un instant…</p></div>
       <div class="espace-profil" id="mes-fiches" data-espace-fiches></div>
@@ -840,7 +840,7 @@ page(
       <div class="espace-profil" id="moderateur" data-espace-moderateur hidden></div>
       <div class="espace-profil" id="beta" data-espace-beta hidden></div>
       <div class="espace-profil" data-espace-blocages hidden><h3>Profils bloqués</h3><ul data-blocages-liste></ul></div>
-      <p class="parcours-livre">💍 Vous suivez le parcours de mariage de Lamia, détaillé dans l’ebook <a class="text-link" href="/werdi-ouvre-les-yeux/"><em>Werdi, ouvre les yeux !</em></a></p>
+      <p class="parcours-livre"><svg class="ico" aria-hidden="true"><use href="/icones.svg#gem"/></svg> Vous suivez le parcours de mariage de Lamia, détaillé dans l’ebook <a class="text-link" href="/werdi-ouvre-les-yeux/"><em>Werdi, ouvre les yeux !</em></a></p>
       <div data-espace-discussion></div>
     </section>
 
@@ -871,7 +871,7 @@ page(
     <section id="propositions">
       <h2>Profils proposés par Lamia</h2>
       <p>Lamia a choisi pour toi des profils qui te correspondent, selon son algorithme. Leur fiche est anonyme. Dis oui ou non : <strong>si l’autre personne dit oui aussi, vous êtes mis en relation tout de suite</strong>, avec une discussion privée de 7 jours.</p>
-      <p><a class="btn btn-line" href="/confidences/">✉️ Contacter Lamia</a></p>
+      <p><a class="btn btn-line" href="/confidences/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> Contacter Lamia</a></p>
       <div class="espace-interets" data-espace-propositions><p class="loading">Un instant…</p></div>
     </section>
     <section id="interets">
@@ -901,7 +901,7 @@ page(
     </section>
 
     <section id="demasquage" data-espace-demasquage-section hidden>
-      <h2>💞 Mes démasquages</h2>
+      <h2><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Mes démasquages</h2>
       <p class="espace-note">Tu as choisi quelqu’un au bal, et cette personne t’a choisi·e aussi. Veux-tu te démasquer ? Ta réponse reste privée : si vous dites oui tous les deux, Lamia vous met en relation.</p>
       <div class="espace-soirees" data-espace-demasquage></div>
     </section>
@@ -964,7 +964,7 @@ page(
 
 <section class="bal-step salle" data-step="salle" data-salle hidden>
   <div class="planb" data-planb hidden role="alert"><p><strong>La salle a un souci ?</strong> Lamia a ouvert une salle de secours.</p><a class="btn btn-gold" data-planb-lien target="_blank" rel="noopener">Rejoindre la salle de secours</a></div>
-  <div class="transition" data-transition hidden aria-live="polite"><div><svg viewBox="0 0 64 32" width="120" height="60" aria-hidden="true"><path d="M2 8c10-6 20-4 30 4C42 4 52 2 62 8c0 12-8 20-18 20-6 0-9-4-12-8-3 4-6 8-12 8C10 28 2 20 2 8Z" fill="#e3bd6e" stroke="#fff6dc" stroke-width="1.2"/><ellipse cx="19" cy="15" rx="6" ry="4" fill="#120d1a"/><ellipse cx="45" cy="15" rx="6" ry="4" fill="#120d1a"/></svg><p class="transition-titre" data-transition-titre>Le prochain masque vous invite…</p><p class="transition-nom" data-transition-nom></p></div></div>
+  <div class="transition" data-transition hidden aria-live="polite"><div><svg viewBox="0 0 64 32" width="120" height="60" aria-hidden="true"><path d="M2 8c10-6 20-4 30 4C42 4 52 2 62 8c0 12-8 20-18 20-6 0-9-4-12-8-3 4-6 8-12 8C10 28 2 20 2 8Z" fill="#E9DFFA" stroke="#fff6dc" stroke-width="1.2"/><ellipse cx="19" cy="15" rx="6" ry="4" fill="#120d1a"/><ellipse cx="45" cy="15" rx="6" ry="4" fill="#120d1a"/></svg><p class="transition-titre" data-transition-titre>Le prochain masque vous invite…</p><p class="transition-nom" data-transition-nom></p></div></div>
   <header class="salle-haut">
     <div><p class="bal-kicker"><span data-salle-salon></span> <span data-salle-tour></span></p><h1 data-salle-titre>Le grand salon</h1><p class="salon-phrase" data-salon-phrase hidden></p></div>
     <p class="salle-temps" data-salle-temps aria-live="off"></p>
@@ -977,14 +977,14 @@ page(
   <p class="salle-msg" role="status" data-salle-msg></p>
   <p class="salle-demasque" data-demasque hidden>Dernier tête-à-tête : le moment du démasquage. Retire ton masque si tu le souhaites.</p>
   <div class="salle-reciproque" data-reciproque hidden>
-    <p class="salle-reciproque-titre">💞 Vous vous êtes choisis tous les deux</p>
+    <p class="salle-reciproque-titre"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Vous vous êtes choisis tous les deux</p>
     <p>Après ce tête-à-tête sans masque, veux-tu te démasquer pour de bon, et que Lamia vous mette en relation ? Ta réponse reste privée.</p>
     <p class="bal-actions" data-reciproque-boutons><button class="btn btn-gold" type="button" data-reciproque-rep="oui">Oui, je me démasque</button><button class="btn bal-btn-line" type="button" data-reciproque-rep="non">Pas cette fois</button></p>
     <p class="salle-reciproque-ok" data-reciproque-ok hidden></p>
   </div>
   <p class="salle-compte" data-salle-compte></p>
   <div class="tchat" data-tchat hidden>
-    <button class="tchat-bulle" type="button" data-tchat-ouvrir aria-expanded="false">💬 Écrire à Lamia <b data-tchat-nouveau hidden>•</b></button>
+    <button class="tchat-bulle" type="button" data-tchat-ouvrir aria-expanded="false"><svg class="ico" aria-hidden="true"><use href="/icones.svg#message-circle"/></svg> Écrire à Lamia <b data-tchat-nouveau hidden>•</b></button>
     <div class="tchat-panneau" data-tchat-panneau hidden>
       <ol class="tchat-fil" data-tchat-fil aria-live="polite"><li class="tchat-vide">Lamia peut t’écrire ici. Ta réponse n’est lue que par elle.</li></ol>
       <form class="tchat-form" data-tchat-form><input name="t" maxlength="300" autocomplete="off" placeholder="Ta réponse à Lamia…" aria-label="Message à Lamia"><button class="btn btn-gold" type="submit">Envoyer</button></form>
@@ -1172,9 +1172,9 @@ page(
 
 <section class="conf-choix" aria-label="Comment veux-tu te confier ?">
   <button type="button" class="conf-carte" data-choix="ecrire" aria-expanded="false"><span class="conf-icone" aria-hidden="true">✎</span><strong>Je préfère écrire</strong><small>Un message, et si tu veux des photos ou des documents.</small></button>
-  <button type="button" class="conf-carte" data-choix="parler" aria-expanded="false"><span class="conf-icone" aria-hidden="true">🎙</span><strong>Je préfère parler</strong><small>Un message vocal, enregistré ici même.</small></button>
+  <button type="button" class="conf-carte" data-choix="parler" aria-expanded="false"><span class="conf-icone" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#mic"/></svg></span><strong>Je préfère parler</strong><small>Un message vocal, enregistré ici même.</small></button>
   <button type="button" class="conf-carte" data-choix="conversation" aria-expanded="false"><span class="conf-icone" aria-hidden="true">❦</span><strong>Échanger avec Lamia</strong><small>Une conversation privée, que tu retrouves quand tu veux.</small></button>
-  <button type="button" class="conf-carte" data-choix="annonce" aria-expanded="false"><span class="conf-icone" aria-hidden="true">💌</span><strong>Trouver mon âme sœur</strong><small>Ton profil, confié à Lamia et à son outil de matching.</small></button>
+  <button type="button" class="conf-carte" data-choix="annonce" aria-expanded="false"><span class="conf-icone" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg></span><strong>Trouver mon âme sœur</strong><small>Ton profil, confié à Lamia et à son outil de matching.</small></button>
 </section>
 
 <section class="conf-panneau" data-panneau="annonce" id="annonce" hidden>
@@ -1235,8 +1235,8 @@ page(
       <label class="conf-visuel-cache" for="conv-texte">Ton message</label>
       <textarea id="conv-texte" name="body" rows="3" maxlength="8000" placeholder="Écris à Lamia…"></textarea>
       <div class="conf-composer-outils">
-        <label class="conf-btn conf-petit">🖼 Image<input type="file" accept="image/*" multiple data-conv-images hidden></label>
-        <button class="conf-btn conf-petit" type="button" data-conv-vocal-ouvrir>🎙 Vocal</button>
+        <label class="conf-btn conf-petit"><svg class="ico" aria-hidden="true"><use href="/icones.svg#image"/></svg> Image<input type="file" accept="image/*" multiple data-conv-images hidden></label>
+        <button class="conf-btn conf-petit" type="button" data-conv-vocal-ouvrir><svg class="ico" aria-hidden="true"><use href="/icones.svg#mic"/></svg> Vocal</button>
         <button class="conf-btn conf-btn-plein" type="submit">Envoyer</button>
       </div>
       <ul class="conf-liste" data-conv-liste></ul>
@@ -1301,7 +1301,7 @@ page(
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Confidences · Lamia</title>
 <meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="#252B78">
+<meta name="theme-color" content="#2F2B3D">
 <link rel="manifest" href="/confidences-lamia.webmanifest">
 <link rel="icon" href="/images/marque/confidences-icone-192.png" type="image/png">
 <link rel="apple-touch-icon" href="/images/marque/confidences-icone-180.png">
@@ -1316,13 +1316,13 @@ page(
   <button class="cl-retour" type="button" data-retour hidden aria-label="Retour à la liste">‹</button>
   <a class="cl-logo" href="/" aria-label="Retour à l’accueil du site"><img src="/images/marque/lamia-logo-net-160.webp" width="36" height="36" alt=""></a>
   <h1>Confidences <span data-total></span></h1>
-  <button class="cl-icone" type="button" data-ouvrir-reglages aria-label="Réglages des alertes">⚙︎</button>
+  <button class="cl-icone" type="button" data-ouvrir-reglages aria-label="Réglages des alertes"><svg class="ico" aria-hidden="true"><use href="/icones.svg#settings"/></svg>︎</button>
 </header>
 <nav class="cl-nav" aria-label="Navigation">
-  <a href="/">🏠 Accueil du site</a>
-  <a href="/tableau-de-bord">📊 Tableau de bord</a>
-  <a href="/rencontres/">💞 Rencontres</a>
-  <a href="/mon-espace/">👤 Mon espace</a>
+  <a href="/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#house"/></svg> Accueil du site</a>
+  <a href="/tableau-de-bord"><svg class="ico" aria-hidden="true"><use href="/icones.svg#chart-column"/></svg> Tableau de bord</a>
+  <a href="/rencontres/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Rencontres</a>
+  <a href="/mon-espace/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#user"/></svg> Mon espace</a>
 </nav>
 
 <main class="cl-main">
@@ -1341,7 +1341,7 @@ page(
       <button type="button" data-filtre="en_cours" aria-pressed="false">En cours <b data-n="en_cours"></b></button>
       <button type="button" data-filtre="termine" aria-pressed="false">Terminé <b data-n="termine"></b></button>
       <button type="button" data-filtre="tous" aria-pressed="false">Tout</button>
-      <button type="button" data-ouvrir-annonces>💌 Annonces <b data-n-annonces></b></button>
+      <button type="button" data-ouvrir-annonces><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> Annonces <b data-n-annonces></b></button>
     </nav>
     <div class="cl-alerte" data-alerte-notif hidden></div>
     <ul class="cl-liste" data-liste></ul>
@@ -1372,8 +1372,8 @@ page(
         </div>
       </div>
       <div class="cl-outils">
-        <label class="cl-btn cl-petit">🖼 Image<input type="file" accept="image/*" multiple data-images hidden></label>
-        <button class="cl-btn cl-petit" type="button" data-ouvrir-vocal>🎙 Vocal</button>
+        <label class="cl-btn cl-petit"><svg class="ico" aria-hidden="true"><use href="/icones.svg#image"/></svg> Image<input type="file" accept="image/*" multiple data-images hidden></label>
+        <button class="cl-btn cl-petit" type="button" data-ouvrir-vocal><svg class="ico" aria-hidden="true"><use href="/icones.svg#mic"/></svg> Vocal</button>
         <button class="cl-btn cl-plein" type="submit">Envoyer</button>
       </div>
       <p class="cl-statut" data-rep-statut role="status"></p>
@@ -1385,19 +1385,19 @@ page(
     <h2>Annonces de rencontre</h2>
     <p class="cl-aide">Les profils ne sont jamais publiés. 1) Vérifie le profil (et la pièce d’identité si la personne l’a donnée : elle est facultative), puis « Valider » : la pièce est supprimée, et le profil garde le badge « vérifié avec pièce d’identité ». 2) Exporte vers ton outil et fais le matching. 3) Indique le nombre de profils compatibles et « Envoyer le résultat » : la personne reçoit ce nombre par email (sans savoir qui), avec l’invitation à t’écrire (première mise en relation offerte, ensuite abonnement).</p>
         <div class="cl-carte cl-export">
-      <h3>📷 Profils sans leurs photos <span data-n-sans-photos></span></h3>
+      <h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#camera"/></svg> Profils sans leurs photos <span data-n-sans-photos></span></h3>
       <p class="cl-aide">Tant qu’il manque 2 photos, la personne voit une demande dans l’application et ne peut ni swiper ni répondre. Le bouton lui envoie aussi une notification sur son téléphone, une seule fois, si elle les a activées.</p>
       <button class="cl-btn cl-plein" type="button" data-relance-medias>Envoyer la notification</button>
       <p class="cl-statut" data-relance-statut></p>
     </div>
         <div class="cl-carte cl-export">
-      <h3>💳 Abonnés et achats à l’unité <span data-n-abonnes></span></h3>
+      <h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#credit-card"/></svg> Abonnés et achats à l’unité <span data-n-abonnes></span></h3>
       <p class="cl-aide">Les formules payées sur la page Abonnement. Quand tu fais une mise en relation ou inscris quelqu’un à un speed dating payé à l’unité, clique « Utiliser 1 » pour le décompter. Les résiliations se font par la personne depuis son espace.</p>
       <div data-abonnes></div>
     </div>
     <div class="cl-carte cl-export">
-      <h3>💌 Matchs demandés <span data-n-demandes></span></h3>
-      <p class="cl-aide">Quand quelqu’un clique sur « Ce profil m’intéresse » ou swipe un profil à droite, la demande arrive ici. Quand deux personnes se choisissent l’une l’autre, la demande passe en tête avec « 💞 INTÉRÊT RÉCIPROQUE » et tu reçois une alerte (notification et email). Les demandes sont regroupées par personne et notées sur 100 selon leur potentiel (âge, religion, pratique, origine, enfants, situation, tabac, pays, dans les deux sens) : fais la mise en relation avec le ⭐ meilleur potentiel, puis confirme dans ton outil. Personne d’autre ne la voit. Elle est aussi notée dans la fiche exportée vers ton outil.</p>
+      <h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> Matchs demandés <span data-n-demandes></span></h3>
+      <p class="cl-aide">Quand quelqu’un clique sur « Ce profil m’intéresse » ou swipe un profil à droite, la demande arrive ici. Quand deux personnes se choisissent l’une l’autre, la demande passe en tête avec « INTÉRÊT RÉCIPROQUE » et tu reçois une alerte (notification et email). Les demandes sont regroupées par personne et notées sur 100 selon leur potentiel (âge, religion, pratique, origine, enfants, situation, tabac, pays, dans les deux sens) : fais la mise en relation avec le meilleur potentiel, puis confirme dans ton outil. Personne d’autre ne la voit. Elle est aussi notée dans la fiche exportée vers ton outil.</p>
       <div data-demandes></div>
     </div>
     <div class="cl-carte cl-export">
@@ -1408,10 +1408,10 @@ page(
       <p class="cl-statut" role="status" data-export-statut></p>
     </div>
     <details class="cl-carte cl-export cl-nouveautes cl-replie">
-      <summary><h3>📣 Annoncer aux membres (actu, live…) <span data-n-nouv></span></h3></summary>
+      <summary><h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#megaphone"/></svg> Annoncer aux membres (actu, live…) <span data-n-nouv></span></h3></summary>
       <p class="cl-aide">Les produits mis en vente s’ajoutent tout seuls et partent en notification chaque soir à 18 h (regroupés). Pour un article, une actu ou un live, écris-le ici : il part tout de suite, avec sa couleur, chez les membres qui ont activé les notifications.</p>
       <form class="cl-nouv-form" data-nouv-form>
-        <label>Type<select name="type"><option value="actu">📣 Actu (vert)</option><option value="article">📰 Article (bleu)</option><option value="live">🎥 Live (rouge)</option><option value="boutique">🛍️ Boutique (doré)</option></select></label>
+        <label>Type<select name="type"><option value="actu">Actu (vert)</option><option value="article">Article (bleu)</option><option value="live">Live (rouge)</option><option value="boutique">Boutique (doré)</option></select></label>
         <label>Titre<input name="titre" maxlength="140" required placeholder="Ce soir à 21 h : live spécial mariage"></label>
         <label>Texte <small>(facultatif)</small><textarea name="texte" maxlength="600" rows="2"></textarea></label>
         <label>Lien <small>(facultatif, ex. /salon/ ou /produit/…)</small><input name="lien" maxlength="300" placeholder="/salon/"></label>
@@ -1422,7 +1422,7 @@ page(
       <div data-nouv-liste></div>
     </details>
     <details class="cl-carte cl-export cl-replie">
-      <summary><h3>🔗 Clé de liaison avec mon outil</h3></summary>
+      <summary><h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#link"/></svg> Clé de liaison avec mon outil</h3></summary>
       <p class="cl-aide">Ton outil récupère tout seul les profils validés et les matchs demandés grâce à une clé secrète. Crée la clé une fois, colle-la dans l’écran « Le site » de ton outil. Si tu crées une nouvelle clé, l’ancienne ne marche plus.</p>
       <div class="cl-outils"><button class="cl-btn cl-plein" type="button" data-outil-cle>Créer une clé de liaison</button></div>
       <div data-outil-zone hidden><input data-outil-valeur readonly style="width:100%;font-family:monospace"> <button class="cl-btn" type="button" data-outil-copier>Copier</button></div>
@@ -1474,11 +1474,6 @@ page(
     body: `<div class="po-app">
 <section class="po-hero" aria-labelledby="po-titre">
   <div class="po-fond" aria-hidden="true"></div>
-  <div class="po-garland" aria-hidden="true">
-    <svg viewBox="0 0 1000 40" preserveAspectRatio="none"><path d="M0,3 Q500,23 1000,3" fill="none" stroke="#cdb372" stroke-width="2.2" vector-effect="non-scaling-stroke"/><path d="M0,3 Q500,23 1000,3" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="1" stroke-dasharray="1 7" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>
-    ${['j6','j3','j5','j7','j3','j5','j6','j7','j3'].map((k, i, a) => { const t = (i + 1) / (a.length + 1); return `<span class="po-gj" style="left:${(t * 100).toFixed(1)}%;top:${(7 + 40 * t * (1 - t)).toFixed(1)}px;--d:${(2.6 + ((i * 37) % 17) / 10).toFixed(1)}s;--l:-${(((i * 53) % 30) / 10).toFixed(1)}s"><img src="/images/outil/${k}.webp" alt=""></span>`; }).join('')}
-    <span class="po-gcorner"><img src="/images/outil/j0.webp" alt=""></span>
-  </div>
   <div class="po-hero-grid">
     <div class="po-hero-texte">
       <p class="po-eyebrow">Les Rencontres de Lamia</p>
@@ -1520,7 +1515,7 @@ page(
   </div>
   <h2 class="annonces-titre" id="profils-anonymes">Les profils vérifiés</h2>
   <p class="annonces-sous">Ni prénom, ni photo, ni contact. Un profil te touche ? Clique sur « Ce profil m’intéresse » : Lamia regarde si vous pouvez correspondre. Ton identité reste secrète : on ne voit que des numéros de profil.</p>
-  <p class="po-actions btn-swipe"><a class="po-btn" href="/rencontres/swipe/">💘 Swiper les profils, un par un</a></p>
+  <p class="po-actions btn-swipe"><a class="po-btn" href="/rencontres/swipe/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Swiper les profils, un par un</a></p>
   <div class="annonces-liste" data-annonces-liste><p class="annonce-vide">Les profils arrivent…</p></div>
   <div class="accueil-duo">
     <a class="abo-carte accueil-carte" href="/speed-dating/"><h3>Speed dating en ligne</h3><p>Des soirées en visio par tranche d’âge, caméra allumée, avec Lamia qui veille.</p><span class="po-btn-verre">Voir les prochaines soirées</span></a>
@@ -1638,7 +1633,7 @@ page(
     room: roomBySlug.patio,
     scripts: ['/assets/nouveautes.js'],
     body: `<div class="po-app"><section class="po-hero"><div class="po-fond" aria-hidden="true"></div>
-  <p class="po-eyebrow">🔔 Les nouveautés</p><h1>Quoi de neuf chez Lamia ?</h1>
+  <p class="po-eyebrow"><svg class="ico" aria-hidden="true"><use href="/icones.svg#bell"/></svg> Les nouveautés</p><h1>Quoi de neuf chez Lamia ?</h1>
   <p class="po-lead">Les nouvelles trouvailles de la boutique, les bijoux kabyles, les articles, les actus et les lives de Lamia. Active les notifications dans <a href="/mon-espace/">Mon espace</a> pour ne rien manquer.</p>
 </section>
 <div class="nouveautes-app"><div class="nouveautes-filtres" data-nouveautes-filtres></div><div class="nouveautes-liste" data-nouveautes><p class="annonce-vide">Un instant…</p></div></div></div>`,
@@ -1655,16 +1650,16 @@ page(
     room: roomBySlug.patio,
     scripts: ['/assets/swipe.js'],
     body: `<div class="po-app swipe-page"><header class="swipe-tete">
-  <h1>💘 Swipe</h1>
+  <h1><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Swipe</h1>
   <details class="swipe-explique"><summary>Comment ça marche ?</summary><p>À droite (cœur) s’il t’intéresse, à gauche (croix) sinon, sans limite. Ton identité reste secrète : on ne voit que des numéros de profil. Si vous vous choisissez tous les deux, Lamia est prévenue et vous met en relation.</p></details>
 </header>
 <div class="swipe-app">
-  <p class="swipe-antighost">🤝 <strong>Appli anti-ghosting</strong> : ici, on ne disparaît pas. Pour dématcher, on se dit au revoir.</p>
+  <p class="swipe-antighost"><svg class="ico" aria-hidden="true"><use href="/icones.svg#handshake"/></svg> <strong>Appli anti-ghosting</strong> : ici, on ne disparaît pas. Pour dématcher, on se dit au revoir.</p>
   <div class="swipe-infos" data-swipe-infos></div>
   <div class="swipe-filtres-zone" data-swipe-filtres></div>
   <p class="swipe-compteur" data-swipe-compteur></p>
   <p class="swipe-adresse" data-swipe-adresse hidden></p>
-  <svg class="swipe-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs><radialGradient id="corail-b" cx="38%" cy="32%" r="70%"><stop offset="0" stop-color="#F08A68"/><stop offset=".6" stop-color="#D2482C"/><stop offset="1" stop-color="#A5301C"/></radialGradient><linearGradient id="or-b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF4B8"/><stop offset=".45" stop-color="#C9992B"/><stop offset=".62" stop-color="#FFE98A"/><stop offset="1" stop-color="#8A6414"/></linearGradient><clipPath id="clip-rond"><circle cx="90" cy="92" r="72"/></clipPath><clipPath id="clip-triangle"><path d="M14 44Q90 30 166 44 174 56 168 68L100 190Q90 204 80 190L12 68Q6 56 14 44Z"/></clipPath><g id="pampille"><circle cy="-5" r="3.6" fill="none" stroke="url(#or-b)" stroke-width="1.8"/><circle cy="1" r="3.6" fill="none" stroke="url(#or-b)" stroke-width="1.8"/><path d="M0 4 9 24Q9 36 0 46-9 36-9 24Z" fill="#16289A" stroke="url(#or-b)" stroke-width="2.2" stroke-linejoin="round"/><path d="M0 7 6.5 22Q0 27-6.5 22Z" fill="#3FA535" stroke="#E9CE7A" stroke-width=".7"/><path d="M0 22Q6 28 4.6 33 0 40-4.6 33-6 28 0 22Z" fill="#F2BE2C" stroke="#E9CE7A" stroke-width=".7"/><circle cy="48" r="4.6" fill="url(#or-b)"/><circle cy="48" r="3" fill="#3FA535"/></g><g id="bijou-femme"><circle cx="90" cy="0" r="17" fill="none" stroke="url(#or-b)" stroke-width="4.5"/><path d="M46 10L126 -9L136 -13L126 -5.5L47 13Q42 13 46 10Z" fill="url(#or-b)" stroke="#8A6414" stroke-width=".5"/><use href="#pampille" x="48" y="158"/><use href="#pampille" x="90" y="178"/><use href="#pampille" x="132" y="158"/><circle cx="90" cy="92" r="76" fill="none" stroke="url(#or-b)" stroke-width="8"/><circle cx="90" cy="92" r="72" fill="#252B78"/><image href="/images/outil/avatar-femme.webp" x="17" y="19" width="146" height="146" clip-path="url(#clip-rond)" preserveAspectRatio="xMidYMid slice"/><circle cx="90" cy="168" r="11.1" fill="url(#or-b)"/><circle cx="90" cy="168" r="8.5" fill="url(#corail-b)"/><ellipse cx="87.3" cy="164.9" rx="2.2" ry="1.4" fill="#FBC4AE" opacity=".8"/></g><g id="bijou-homme"><circle cx="90" cy="16" r="17" fill="none" stroke="url(#or-b)" stroke-width="4.5"/><path d="M46 26L126 7L136 3L126 10.5L47 29Q42 29 46 26Z" fill="url(#or-b)" stroke="#8A6414" stroke-width=".5"/><use href="#pampille" x="56" y="150"/><use href="#pampille" x="90" y="198"/><use href="#pampille" x="124" y="150"/><path d="M14 44Q90 30 166 44 174 56 168 68L100 190Q90 204 80 190L12 68Q6 56 14 44Z" fill="#252B78"/><image href="/images/outil/avatar-homme.webp" x="-6" y="30" width="190" height="190" clip-path="url(#clip-triangle)" preserveAspectRatio="xMidYMid slice"/><path d="M14 44Q90 30 166 44 174 56 168 68L100 190Q90 204 80 190L12 68Q6 56 14 44Z" fill="none" stroke="url(#or-b)" stroke-width="8" stroke-linejoin="round"/><circle cx="90" cy="192" r="11.1" fill="url(#or-b)"/><circle cx="90" cy="192" r="8.5" fill="url(#corail-b)"/><ellipse cx="87.3" cy="188.9" rx="2.2" ry="1.4" fill="#FBC4AE" opacity=".8"/></g></defs></svg>
+  <svg class="swipe-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs><radialGradient id="corail-b" cx="38%" cy="32%" r="70%"><stop offset="0" stop-color="#F08A68"/><stop offset=".6" stop-color="#D2482C"/><stop offset="1" stop-color="#A5301C"/></radialGradient><linearGradient id="or-b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF4B8"/><stop offset=".45" stop-color="#D4B56E"/><stop offset=".62" stop-color="#F3E0B9"/><stop offset="1" stop-color="#8A6414"/></linearGradient><clipPath id="clip-rond"><circle cx="90" cy="92" r="72"/></clipPath><clipPath id="clip-triangle"><path d="M14 44Q90 30 166 44 174 56 168 68L100 190Q90 204 80 190L12 68Q6 56 14 44Z"/></clipPath><g id="pampille"><circle cy="-5" r="3.6" fill="none" stroke="url(#or-b)" stroke-width="1.8"/><circle cy="1" r="3.6" fill="none" stroke="url(#or-b)" stroke-width="1.8"/><path d="M0 4 9 24Q9 36 0 46-9 36-9 24Z" fill="#2F2B3D" stroke="url(#or-b)" stroke-width="2.2" stroke-linejoin="round"/><path d="M0 7 6.5 22Q0 27-6.5 22Z" fill="#D4B56E" stroke="#F3E0B9" stroke-width=".7"/><path d="M0 22Q6 28 4.6 33 0 40-4.6 33-6 28 0 22Z" fill="#F3E0B9" stroke="#F3E0B9" stroke-width=".7"/><circle cy="48" r="4.6" fill="url(#or-b)"/><circle cy="48" r="3" fill="#D4B56E"/></g><g id="bijou-femme"><circle cx="90" cy="0" r="17" fill="none" stroke="url(#or-b)" stroke-width="4.5"/><path d="M46 10L126 -9L136 -13L126 -5.5L47 13Q42 13 46 10Z" fill="url(#or-b)" stroke="#8A6414" stroke-width=".5"/><use href="#pampille" x="48" y="158"/><use href="#pampille" x="90" y="178"/><use href="#pampille" x="132" y="158"/><circle cx="90" cy="92" r="76" fill="none" stroke="url(#or-b)" stroke-width="8"/><circle cx="90" cy="92" r="72" fill="#2F2B3D"/><image href="/images/outil/avatar-femme.webp" x="17" y="19" width="146" height="146" clip-path="url(#clip-rond)" preserveAspectRatio="xMidYMid slice"/><circle cx="90" cy="168" r="11.1" fill="url(#or-b)"/><circle cx="90" cy="168" r="8.5" fill="url(#corail-b)"/><ellipse cx="87.3" cy="164.9" rx="2.2" ry="1.4" fill="#FBC4AE" opacity=".8"/></g><g id="bijou-homme"><circle cx="90" cy="16" r="17" fill="none" stroke="url(#or-b)" stroke-width="4.5"/><path d="M46 26L126 7L136 3L126 10.5L47 29Q42 29 46 26Z" fill="url(#or-b)" stroke="#8A6414" stroke-width=".5"/><use href="#pampille" x="56" y="150"/><use href="#pampille" x="90" y="198"/><use href="#pampille" x="124" y="150"/><path d="M14 44Q90 30 166 44 174 56 168 68L100 190Q90 204 80 190L12 68Q6 56 14 44Z" fill="#2F2B3D"/><image href="/images/outil/avatar-homme.webp" x="-6" y="30" width="190" height="190" clip-path="url(#clip-triangle)" preserveAspectRatio="xMidYMid slice"/><path d="M14 44Q90 30 166 44 174 56 168 68L100 190Q90 204 80 190L12 68Q6 56 14 44Z" fill="none" stroke="url(#or-b)" stroke-width="8" stroke-linejoin="round"/><circle cx="90" cy="192" r="11.1" fill="url(#or-b)"/><circle cx="90" cy="192" r="8.5" fill="url(#corail-b)"/><ellipse cx="87.3" cy="188.9" rx="2.2" ry="1.4" fill="#FBC4AE" opacity=".8"/></g></defs></svg>
   <div class="swipe-pile" data-swipe><p class="annonce-vide">Les profils arrivent…</p></div>
   <div class="swipe-boutons" data-swipe-boutons hidden><button type="button" data-swipe-non aria-label="Pas pour moi"><svg class="ico" aria-hidden="true"><use href="/icones.svg#croix"/></svg></button><button type="button" class="swipe-annuler" data-swipe-annuler aria-label="Revenir au profil précédent" disabled><svg class="ico" aria-hidden="true"><use href="/icones.svg#retour"/></svg></button><button type="button" data-swipe-oui aria-label="Ce profil m’intéresse"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur-plein"/></svg></button></div>
   <p class="swipe-aide">La flèche ronde te fait revenir sur ton dernier choix. Sur ordinateur : flèches ← et → du clavier. Ajoute le site à ton écran d’accueil pour l’avoir comme une application.</p>
@@ -1683,7 +1678,7 @@ page(
   <p class="po-eyebrow">Merci</p><h1>Bienvenue, ton cœur est entre de bonnes mains</h1>
   <p class="abo-alerte" data-abo-confirmation>Vérification du paiement…</p>
   <p class="po-lead">Ton paiement est bien reçu. Tu reçois un reçu par email, et Lamia est prévenue. Si ce n’est pas encore fait, crée ton profil pour que Lamia puisse chercher la bonne personne.</p>
-  <p class="po-actions"><a class="po-btn" href="/rencontres/#confier">💌 Créer mon profil</a><a class="po-btn-verre" href="/mon-espace/">Mon espace</a></p>
+  <p class="po-actions"><a class="po-btn" href="/rencontres/#confier"><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> Créer mon profil</a><a class="po-btn-verre" href="/mon-espace/">Mon espace</a></p>
 </section></div>`,
   })
 );
@@ -1957,7 +1952,7 @@ page(
     path: '/application/',
     room: roomBySlug.boutique,
     body: `<section class="room-head"><p class="room-name"><span class="pip" aria-hidden="true"></span>L’application</p><h1>L’application de rencontre kabyle de Lamia</h1><p class="lead">Installe l’application de Lamia sur ton téléphone : une icône sur ton écran d’accueil, les profils vérifiés, le swipe, ton espace et le live en plein écran, sans passer par un magasin d’applications de lourd.</p>
-<p class="bal-actions"><button type="button" class="btn btn-ink btn-installer" data-installer-bouton>📲 Installer l’application</button><span data-installee hidden>✓ L’application est déjà installée sur cet appareil.</span></p></section>
+<p class="bal-actions"><button type="button" class="btn btn-ink btn-installer" data-installer-bouton><svg class="ico" aria-hidden="true"><use href="/icones.svg#smartphone"/></svg> Installer l’application</button><span data-installee hidden>✓ L’application est déjà installée sur cet appareil.</span></p></section>
 <section class="article"><h2>Sur Android</h2><ol><li>Ouvre lamia-femme-berbere.com dans Chrome.</li><li>Touche le bouton « Installer l’application » ci-dessus, ou le menu ⋮ puis « Installer l’application ».</li><li>Confirme : l’icône de la Maison apparaît sur ton écran d’accueil.</li></ol>
 <h2>Sur iPhone</h2><ol><li>Ouvre lamia-femme-berbere.com dans Safari.</li><li>Touche le bouton Partager (le carré avec une flèche vers le haut).</li><li>Choisis « Sur l’écran d’accueil », puis « Ajouter ».</li></ol>
 <p>L’application se met à jour toute seule, en même temps que le site. Tes paiements restent sécurisés de la même façon.</p></section>`,

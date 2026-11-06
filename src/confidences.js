@@ -25,7 +25,7 @@ document.querySelectorAll('[data-choix]').forEach((b) => b.addEventListener('cli
 function listeFichiers(input, ul, filtre = () => true) {
   let files = [];
   const rendre = () => {
-    ul.innerHTML = files.map((f, i) => `<li><span>${f.type.startsWith('image/') ? '🖼' : '📄'} ${esc(f.name)} <small>${taille(f.size)}</small></span><button type="button" class="conf-lien" data-retirer="${i}" aria-label="Retirer ${esc(f.name)}">Retirer</button></li>`).join('');
+    ul.innerHTML = files.map((f, i) => `<li><span>${f.type.startsWith('image/') ? '' : ''} ${esc(f.name)} <small>${taille(f.size)}</small></span><button type="button" class="conf-lien" data-retirer="${i}" aria-label="Retirer ${esc(f.name)}">Retirer</button></li>`).join('');
   };
   input.addEventListener('change', () => {
     for (const f of input.files) if (filtre(f) && files.length < 6 && !files.some((x) => x.name === f.name && x.size === f.size)) files.push(f);

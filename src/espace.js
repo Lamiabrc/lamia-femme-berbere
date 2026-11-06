@@ -84,10 +84,10 @@ async function monCoaching(session) {
     if (!d.inclus) { box.innerHTML = offre ? '<ul><li>Visio de 15 minutes · 15 € (incluse chaque mois avec Prestige)</li><li>Coaching de 30 minutes · 39 €</li><li>Sauver mon couple, 1 heure · 89 €</li></ul><p><a class="btn btn-ink" href="/abonnement/#unites">Choisir</a> <a class="text-link" href="/abonnement/?formule=prestige">Voir Prestige</a></p>' : ''; return; }
     const parJour = new Map();
     for (const c of d.creneaux || []) { const k = jour(c.debut); if (!parJour.has(k)) parJour.set(k, []); parJour.get(k).push(c); }
-    box.innerHTML = `${d.prochaine ? `<h3>🎥 Ta prochaine visio</h3><p><strong>${esc(jour(d.prochaine.debut))} à ${esc(heure(d.prochaine.debut))}</strong>, ${esc(d.prochaine.nom)} (${esc(d.prochaine.duree)} minutes).</p><p class="po-actions"><button class="btn btn-ink" type="button" data-coaching-entrer="${esc(d.prochaine.id)}">Entrer dans la visio</button>${d.prochaine.annulable ? `<button class="btn btn-line" type="button" data-coaching-annuler="${esc(d.prochaine.id)}">Annuler</button>` : ''}</p><p><small>La visio s’ouvre 10 minutes avant l’heure.${d.prochaine.annulable ? ' Tu peux annuler jusqu’à 24 heures avant.' : ''}</small></p>` : ''}
+    box.innerHTML = `${d.prochaine ? `<h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg> Ta prochaine visio</h3><p><strong>${esc(jour(d.prochaine.debut))} à ${esc(heure(d.prochaine.debut))}</strong>, ${esc(d.prochaine.nom)} (${esc(d.prochaine.duree)} minutes).</p><p class="po-actions"><button class="btn btn-ink" type="button" data-coaching-entrer="${esc(d.prochaine.id)}">Entrer dans la visio</button>${d.prochaine.annulable ? `<button class="btn btn-line" type="button" data-coaching-annuler="${esc(d.prochaine.id)}">Annuler</button>` : ''}</p><p><small>La visio s’ouvre 10 minutes avant l’heure.${d.prochaine.annulable ? ' Tu peux annuler jusqu’à 24 heures avant.' : ''}</small></p>` : ''}
       ${d.prochaine?.invitation ? `<p>Vous venez à deux ? Envoie ce lien à ton conjoint ou ta conjointe : pas besoin de compte.</p><p><button class="btn btn-line" type="button" data-coaching-inviter="${esc(d.prochaine.invitation)}">Copier le lien pour mon couple</button></p>` : ''}
       ${d.impaye ? '<p>Ton paiement est à régulariser pour réserver ta visio du mois : va dans « Gérer mon abonnement ».</p>' : ''}
-      ${d.credits ? `<p>🎟 À réserver : <strong>${[['15', 'visio de 15 minutes'], ['30', 'coaching de 30 minutes'], ['60', 'Sauver mon couple']].filter(([n]) => d.restant?.[n]).map(([n, nom]) => `${esc(d.restant[n])} × ${nom}`).join(', ')}</strong>.</p>${d.creneaux?.length ? '' : '<p>Lamia n’a pas de créneau ouvert pour l’instant : reviens bientôt, ou écris-lui.</p>'}` : ''}
+      ${d.credits ? `<p><svg class="ico" aria-hidden="true"><use href="/icones.svg#ticket"/></svg> À réserver : <strong>${[['15', 'visio de 15 minutes'], ['30', 'coaching de 30 minutes'], ['60', 'Sauver mon couple']].filter(([n]) => d.restant?.[n]).map(([n, nom]) => `${esc(d.restant[n])} × ${nom}`).join(', ')}</strong>.</p>${d.creneaux?.length ? '' : '<p>Lamia n’a pas de créneau ouvert pour l’instant : reviens bientôt, ou écris-lui.</p>'}` : ''}
       ${parJour.size ? `<h3>${d.prochaine ? 'Réserver une autre visio' : 'Choisir mon créneau'}</h3><p><small>Horaires à l’heure de ton téléphone.</small></p>${[...parJour].map(([k, l]) => `<p class="espace-coaching-jour"><strong>${esc(k)}</strong></p><p class="espace-coaching-heures">${l.map((c) => `<button class="btn btn-line" type="button" data-coaching-reserver="${esc(c.id)}" data-quand="${esc(`${k} à ${heure(c.debut)}, ${c.nom}`)}">${esc(heure(c.debut))}${c.duree === 15 ? '' : ` · ${c.duree === 60 ? 'Couple, 1 h' : '30 min'}`}</button>`).join('')}</p>`).join('')}` : (!d.prochaine && !d.impaye ? '<p>Lamia n’a pas encore ouvert de créneaux. Tu seras prévenu·e dès que c’est le cas.</p>' : '')}
       ${window.LFB_PLAY ? '' : '<p><small>Besoin de plus de temps ? <a class="text-link" href="/abonnement/#unites">Coaching de 30 minutes ou Sauver mon couple</a>.</small></p>'}
       <p class="form-status" role="status" data-coaching-statut>${esc(note)}</p>`;
@@ -119,11 +119,11 @@ async function monCoaching(session) {
 const ETAT_DEMASQUE = {
   a_repondre: null,
   attente: 'Tu as dit oui. On attend la réponse de l’autre personne.',
-  confirme: '💞 Confirmé des deux côtés : Lamia va vous mettre en relation.',
+  confirme: 'Confirmé des deux côtés : Lamia va vous mettre en relation.',
   pas_cette_fois: 'Pas de démasquage cette fois.',
 };
 // Bloquer ou signaler un profil depuis Mon espace (demandes reçues, propositions, discussions).
-const moderation = (ref) => (ref ? `<p class="profil-moderer"><button type="button" class="link-button" data-moderer-bloquer="${esc(ref)}">🚩 Bloquer et signaler</button></p>` : '');
+const moderation = (ref) => (ref ? `<p class="profil-moderer"><button type="button" class="link-button" data-moderer-bloquer="${esc(ref)}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#flag"/></svg> Bloquer et signaler</button></p>` : '');
 document.addEventListener('click', async (e) => {
   const bouton = e.target.closest('[data-moderer-bloquer]');
   if (!bouton) return;
@@ -152,14 +152,14 @@ async function invitationModerateur(session) {
   box.hidden = false;
   try { await appelProfil({ action: 'annonce_moderateur_voir', t }, session); }
   catch { box.innerHTML = '<p>Ce lien n’est plus valable. Écris à Lamia sur TikTok.</p>'; try { sessionStorage.removeItem(JETON_MOD); } catch { /* */ } return; }
-  box.innerHTML = `<h3>🛡️ Lamia te propose un compte modérateur</h3><p>Tu as accès aux annonces et la formule Passion incluse, sans rien payer. Confirme-le si tu es d’accord.</p>
+  box.innerHTML = `<h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#shield"/></svg> Lamia te propose un compte modérateur</h3><p>Tu as accès aux annonces et la formule Passion incluse, sans rien payer. Confirme-le si tu es d’accord.</p>
     <p><button class="btn btn-ink" type="button" data-mod-oui>Je confirme</button> <button class="link-button" type="button" data-mod-non>Non merci</button></p><p class="form-status" data-mod-statut role="status"></p>`;
   const repondre = async (oui) => {
     const st = box.querySelector('[data-mod-statut]');
     try {
       await appelProfil({ action: 'annonce_moderateur_accepter', t, oui }, session);
       try { sessionStorage.removeItem(JETON_MOD); } catch { /* */ }
-      box.innerHTML = oui ? '<h3>🛡️ C’est confirmé, merci !</h3><p>Ta formule Passion est active.</p><p><a class="btn btn-ink" href="/rencontres/">Voir les annonces</a> <a class="btn btn-line" href="/rencontres/#confier">Créer une annonce</a></p>' : '<p>C’est noté, merci d’avoir répondu.</p>';
+      box.innerHTML = oui ? '<h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#shield"/></svg> C’est confirmé, merci !</h3><p>Ta formule Passion est active.</p><p><a class="btn btn-ink" href="/rencontres/">Voir les annonces</a> <a class="btn btn-line" href="/rencontres/#confier">Créer une annonce</a></p>' : '<p>C’est noté, merci d’avoir répondu.</p>';
     } catch { if (st) st.textContent = 'Ça n’a pas fonctionné. Réessaie, ou écris à Lamia.'; }
   };
   ecouter(box, 'click', (e) => { if (e.target.closest('[data-mod-oui]')) repondre(true); if (e.target.closest('[data-mod-non]')) repondre(false); });
@@ -174,10 +174,10 @@ async function invitationBeta(session) {
   if (!d.beta) return;
   box.hidden = false;
   const montrer = (statut, adresse) => {
-    if (statut === 'accepte') { box.innerHTML = `<h3>📱 Bêta-test de l’appli</h3><p>Merci ! Lamia t’enverra le lien d’installation à ${esc(adresse || 'ton adresse')}.</p>`; return; }
-    if (statut === 'refuse') { box.innerHTML = '<h3>📱 Bêta-test de l’appli</h3><p>C’est noté, merci d’avoir répondu.</p>'; return; }
+    if (statut === 'accepte') { box.innerHTML = `<h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#smartphone"/></svg> Bêta-test de l’appli</h3><p>Merci ! Lamia t’enverra le lien d’installation à ${esc(adresse || 'ton adresse')}.</p>`; return; }
+    if (statut === 'refuse') { box.innerHTML = '<h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#smartphone"/></svg> Bêta-test de l’appli</h3><p>C’est noté, merci d’avoir répondu.</p>'; return; }
     const gmail = /@gmail\.com$/i.test(d.email || '') ? d.email : '';
-    box.innerHTML = `<h3>📱 L’appli arrive sur Google Play</h3><p>Lamia cherche des testeurs : il faut un téléphone Android, installer l’appli depuis un lien et rester inscrit·e 14 jours. Tu gardes ton compte et tes discussions.</p>
+    box.innerHTML = `<h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#smartphone"/></svg> L’appli arrive sur Google Play</h3><p>Lamia cherche des testeurs : il faut un téléphone Android, installer l’appli depuis un lien et rester inscrit·e 14 jours. Tu gardes ton compte et tes discussions.</p>
       <form data-beta-form><label>L’adresse Gmail de ton téléphone <input name="adresse" type="email" required value="${esc(gmail)}" autocomplete="email"></label>
       <p class="aide">Elle sert uniquement à t’inscrire au test.</p>
       <button class="btn btn-ink" type="submit">Oui, je veux bien tester</button> <button class="link-button" type="button" data-beta-non>Non merci</button></form><p class="form-status" data-beta-statut role="status"></p>`;
@@ -249,7 +249,7 @@ async function achats(session) {
       ? orders.map((o) => `<article class="espace-achat">
           <div><p class="event-date">${esc(new Date(o.created_at).toLocaleDateString((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { day: 'numeric', month: 'long', year: 'numeric' }))} · n° ${esc(o.order_number)}</p>
           <h3>${(o.order_items || []).map((i) => `${esc(i.product_name)}${i.quantity > 1 ? ` × ${i.quantity}` : ''}`).join(', ') || 'Commande'}</h3>
-          ${(o.order_items || []).filter((i) => i.telechargement).map((i) => `<a class="btn btn-ink btn-telecharger" href="${esc(i.telechargement)}">⬇ Télécharger mon livre numérique</a>`).join('')}</div>
+          ${(o.order_items || []).filter((i) => i.telechargement).map((i) => `<a class="btn btn-ink btn-telecharger" href="${esc(i.telechargement)}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#download"/></svg> Télécharger mon livre numérique</a>`).join('')}</div>
           <div class="espace-achat-droite"><strong>${money(o.amount_total_cents, o.currency)}</strong><span class="statut is-${esc(o.status)}">${esc(STATUTS[o.status] || o.status)}</span></div>
         </article>`).join('')
       : '<p>Pas encore d’achat. Tes commandes apparaîtront ici. <a class="text-link" href="/boutique/">Voir la Boutique</a></p>';
@@ -257,7 +257,7 @@ async function achats(session) {
 }
 
 // Profil confié à Lamia : état, avantages, modification, fin d'un match en cours.
-const ETAT_PROFIL = { a_verifier: '⏳ En cours de vérification par Lamia', publiee: '✓ Vérifié par Lamia', refusee: 'Non retenu pour le moment' };
+const ETAT_PROFIL = { a_verifier: 'En cours de vérification par Lamia', publiee: '✓ Vérifié par Lamia', refusee: 'Non retenu pour le moment' };
 async function appelProfil(body, session) {
   const r = await fetch('/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` }, body: JSON.stringify(body) });
   const d = await r.json().catch(() => ({}));
@@ -317,17 +317,17 @@ async function monProfil(session) {
   try {
     const { profil: p } = await appelProfil({ action: 'annonce_mon_profil' }, session);
     if (!p) { box.innerHTML = '<p data-sans-profil>Tu n’as pas encore d’annonce chez Lamia. <a class="btn btn-ink" href="/rencontres/#confier">Créer une annonce</a> (la première mise en relation est offerte).</p>'; return; }
-    box.innerHTML = `${p.test ? '<p class="espace-test">🧪 <strong>Compte de test.</strong> Il sert uniquement à essayer l’application : il ne voit que les profils de test et ne contacte aucun vrai membre.</p>' : ''}<article class="espace-achat"><div><p class="event-date">Profil n° ${esc(p.ref)}</p><h3>${esc(ETAT_PROFIL[p.status] || p.status)}${p.status === 'publiee' && p.piece_identite ? ' · 🛡 avec pièce d’identité' : ''}</h3>
-      ${p.live ? `<p>🎥 Profil créé en live avec Lamia${p.live_retrouve ? '' : ' (Lamia vérifie ta fiche)'} : <strong>tes 3 premières mises en relation sont offertes</strong>.</p>` : '<p>Ta première mise en relation est offerte.</p>'}
+    box.innerHTML = `${p.test ? '<p class="espace-test"><svg class="ico" aria-hidden="true"><use href="/icones.svg#flask-conical"/></svg> <strong>Compte de test.</strong> Il sert uniquement à essayer l’application : il ne voit que les profils de test et ne contacte aucun vrai membre.</p>' : ''}<article class="espace-achat"><div><p class="event-date">Profil n° ${esc(p.ref)}</p><h3>${esc(ETAT_PROFIL[p.status] || p.status)}${p.status === 'publiee' && p.piece_identite ? ' · avec pièce d’identité' : ''}</h3>
+      ${p.live ? `<p><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg> Profil créé en live avec Lamia${p.live_retrouve ? '' : ' (Lamia vérifie ta fiche)'} : <strong>tes 3 premières mises en relation sont offertes</strong>.</p>` : '<p>Ta première mise en relation est offerte.</p>'}
       ${p.nb_compatibles !== null && p.nb_compatibles !== undefined ? `<p>D’après l’outil de Lamia, tu pourrais correspondre à ${esc(p.nb_compatibles)} personne(s).</p>` : ''}
-      ${p.matchs ? `<p class="espace-match">💞 Matchs en cours : <strong>${esc(p.matchs.actifs)} / ${esc(p.matchs.limite)}</strong>${p.matchs.actifs >= p.matchs.limite ? (p.matchs.formule === 'prestige' ? ' · mets fin à un match pour en choisir un autre.' : ' · mets fin à un match pour en choisir un autre, ou <a class="text-link" href="/abonnement/">passe à une formule supérieure</a>.') : ''}</p>` : ''}</div>
+      ${p.matchs ? `<p class="espace-match"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Matchs en cours : <strong>${esc(p.matchs.actifs)} / ${esc(p.matchs.limite)}</strong>${p.matchs.actifs >= p.matchs.limite ? (p.matchs.formule === 'prestige' ? ' · mets fin à un match pour en choisir un autre.' : ' · mets fin à un match pour en choisir un autre, ou <a class="text-link" href="/abonnement/">passe à une formule supérieure</a>.') : ''}</p>` : ''}</div>
       <div class="espace-achat-droite">${p.fiche_live ? '<a class="btn btn-ink" href="#mes-fiches">Modifier mon annonce</a>' : '<button class="btn btn-ink" type="button" data-profil-modifier>Modifier mon annonce</button>'}</div></article>
-      ${(p.matchs_lies || []).length ? `<ul class="espace-matchs-liste">${p.matchs_lies.map((m) => `<li><span>💞 Match avec le profil n° ${esc(m.ref)}</span><button class="btn btn-line" type="button" data-profil-dematcher="${esc(m.ref)}">Mettre fin à ce match</button></li>`).join('')}</ul>` : ''}
-      ${p.medias_ok === false ? `<section class="espace-photos" id="photos"><h3>📷 Il manque tes photos</h3><p>Ajoute <strong>2 photos de toi, visage visible,</strong> pour swiper et répondre aux personnes intéressées. Elles restent privées : elles ne sont pas affichées dans les profils.</p><div data-profil-medias></div></section>` : ''}
-      ${p.demander_affichage ? `<section class="espace-photos" id="affichage" data-affichage><h3>💌 Veux-tu que ton annonce soit visible ?</h3><p>Ton annonce n° ${esc(p.ref)} est validée. Si tu es d’accord, elle apparaît sur le site de façon anonyme : sans prénom, photo, ville ni contact.</p><p><button class="btn btn-ink" type="button" data-affichage-oui>Oui, je veux qu’elle soit visible</button> <button class="link-button" type="button" data-affichage-non>Non merci</button></p></section>` : ''}
+      ${(p.matchs_lies || []).length ? `<ul class="espace-matchs-liste">${p.matchs_lies.map((m) => `<li><span><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Match avec le profil n° ${esc(m.ref)}</span><button class="btn btn-line" type="button" data-profil-dematcher="${esc(m.ref)}">Mettre fin à ce match</button></li>`).join('')}</ul>` : ''}
+      ${p.medias_ok === false ? `<section class="espace-photos" id="photos"><h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#camera"/></svg> Il manque tes photos</h3><p>Ajoute <strong>2 photos de toi, visage visible,</strong> pour swiper et répondre aux personnes intéressées. Elles restent privées : elles ne sont pas affichées dans les profils.</p><div data-profil-medias></div></section>` : ''}
+      ${p.demander_affichage ? `<section class="espace-photos" id="affichage" data-affichage><h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> Veux-tu que ton annonce soit visible ?</h3><p>Ton annonce n° ${esc(p.ref)} est validée. Si tu es d’accord, elle apparaît sur le site de façon anonyme : sans prénom, photo, ville ni contact.</p><p><button class="btn btn-ink" type="button" data-affichage-oui>Oui, je veux qu’elle soit visible</button> <button class="link-button" type="button" data-affichage-non>Non merci</button></p></section>` : ''}
       ${p.en_pause
-        ? '<section class="espace-photos espace-pause"><h3>⏸️ Ton annonce est en pause</h3><p>Personne ne la voit et tu ne reçois plus de nouveau match. Tes discussions en cours continuent.</p><p><button class="btn btn-ink" type="button" data-annonce-pause="non">▶️ Reprendre mon annonce</button></p></section>'
-        : '<p class="espace-pause"><button class="btn btn-line" type="button" data-annonce-pause="oui">⏸️ Mettre mon annonce en pause</button><br><small>Elle devient invisible, sans rien effacer. Tes discussions continuent et tu la reprends quand tu veux.</small></p>'}
+        ? '<section class="espace-photos espace-pause"><h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#pause"/></svg> Ton annonce est en pause</h3><p>Personne ne la voit et tu ne reçois plus de nouveau match. Tes discussions en cours continuent.</p><p><button class="btn btn-ink" type="button" data-annonce-pause="non"><svg class="ico" aria-hidden="true"><use href="/icones.svg#play"/></svg> Reprendre mon annonce</button></p></section>'
+        : '<p class="espace-pause"><button class="btn btn-line" type="button" data-annonce-pause="oui"><svg class="ico" aria-hidden="true"><use href="/icones.svg#pause"/></svg> Mettre mon annonce en pause</button><br><small>Elle devient invisible, sans rien effacer. Tes discussions continuent et tu la reprends quand tu veux.</small></p>'}
       <div class="espace-suivi" data-profil-suivi></div>
       <label class="annonce-case espace-photo"><input type="checkbox" data-profil-photo${p.photo_partage ? ' checked' : ''}> <span>Si un match me convient, Lamia peut transmettre <strong>ma photo</strong> à la personne avec qui elle me met en relation (et à elle seule).</span></label>
       <p class="form-status" data-profil-statut></p><div data-profil-edition hidden></div>`;
@@ -345,7 +345,7 @@ async function monProfil(session) {
       const zone = box.querySelector('[data-affichage]');
       try {
         const r = await appelProfil({ action: 'annonce_affichage_accord', oui: Boolean(oui) }, session);
-        zone.innerHTML = oui ? `<h3>✅ C’est noté</h3><p>${r.visible ? `Ton annonce n° ${esc(r.ref)} est maintenant publiée, de façon anonyme.` : 'Ton accord est bien enregistré.'}</p>` : '<p>C’est noté : ton annonce reste masquée.</p>';
+        zone.innerHTML = oui ? `<h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#circle-check"/></svg> C’est noté</h3><p>${r.visible ? `Ton annonce n° ${esc(r.ref)} est maintenant publiée, de façon anonyme.` : 'Ton accord est bien enregistré.'}</p>` : '<p>C’est noté : ton annonce reste masquée.</p>';
       } catch { zone.insertAdjacentHTML('beforeend', '<p class="form-status">Ta réponse n’est pas passée. Réessaie.</p>'); }
     });
     suivi(box.querySelector('[data-profil-suivi]'), p);
@@ -374,7 +374,7 @@ async function monProfil(session) {
 // Suivi : mises en relation offertes et du mois, speed datings inclus, demandes envoyées.
 // « coeur » : ancienne formule (supprimée le 31/10/2026), gardée pour un éventuel ancien abonnement.
 const QUOTAS = { coeur: { nom: 'Cœur', mises: 3, sd: 1 }, passion: { nom: 'Passion', mises: 10, sd: 1 }, prestige: { nom: 'Prestige', mises: null, sd: 2 } };
-const ETAT_DEMANDE = { a_traiter: '⏳ Lamia étudie la compatibilité', mis_en_relation: '💞 Mise en relation faite', en_reserve: '🗂 Gardé en réserve : Lamia te le reproposera si ton match se termine', pas_compatible: 'Pas compatible, désolée', dematche: 'Match terminé' };
+const ETAT_DEMANDE = { a_traiter: 'Lamia étudie la compatibilité', mis_en_relation: 'Mise en relation faite', en_reserve: 'Gardé en réserve : Lamia te le reproposera si ton match se termine', pas_compatible: 'Pas compatible, désolée', dematche: 'Match terminé' };
 async function suivi(el, p) {
   const etat = await etatAbo;
   const a = etat?.abonnement, q = a ? QUOTAS[a.formule] : null, u = etat?.unites || {};
@@ -384,7 +384,7 @@ async function suivi(el, p) {
     `<li><strong>Mises en relation offertes</strong> : ${offertesRestantes} sur ${p.offertes || 1} restante(s)</li>`,
     q ? `<li><strong>Formule ${esc(q.nom)}</strong> : ${s.mises_mois} mise(s) en relation ce mois-ci${q.mises ? ` sur ${q.mises}` : ' (sans limite)'} · ${q.sd} speed dating inclus par mois</li>`
       : (p.algerie ? '<li><strong>Formule Découverte</strong> (gratuite) · pour d’autres matchs, <a class="text-link" href="/salon/">viens au live de Lamia</a> (1 match offert toutes les 2 semaines)</li>' : '<li><strong>Formule Découverte</strong> (gratuite) · d’autres matchs en <a class="text-link" href="/salon/">venant au live</a> (1 toutes les 2 semaines), à l’unité ou avec <a class="text-link" href="/abonnement/">une formule</a></li>'),
-    q && q.nom !== 'Cœur' ? '<li><strong>📷 Photo de ton match</strong> : incluse dans ta formule, si ton match l’accepte</li>' : '<li><strong>📷 Photo de ton match</strong> : incluse à partir de la formule Passion, ou 3 € pour la voir 1 heure · <a class="text-link" href="/abonnement/?formule=passion">en savoir plus</a></li>',
+    q && q.nom !== 'Cœur' ? '<li><strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#camera"/></svg> Photo de ton match</strong> : incluse dans ta formule, si ton match l’accepte</li>' : '<li><strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#camera"/></svg> Photo de ton match</strong> : incluse à partir de la formule Passion, ou 3 € pour la voir 1 heure · <a class="text-link" href="/abonnement/?formule=passion">en savoir plus</a></li>',
     u.mise_en_relation || u.speed_dating ? `<li><strong>Achetés à l’unité</strong> : ${u.mise_en_relation || 0} match(s) supplémentaire(s) · ${u.speed_dating || 0} place(s) de speed dating</li>` : '',
   ].filter(Boolean).join('');
   const demandes = (p.interets || []).map((i) => `<li>Profil n° ${esc(i.cible_ref)} · ${esc(ETAT_DEMANDE[i.statut] || i.statut)}${i.date ? ` <small>(${esc(new Date(i.date).toLocaleDateString((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { day: 'numeric', month: 'long' }))})</small>` : ''}</li>`).join('');
@@ -392,7 +392,7 @@ async function suivi(el, p) {
   // Une photo par match en cours. Pas d'achat dans l'appli Play, ni depuis l'Algérie (paiement en ligne impossible).
   const peutPayer = !window.LFB_PLAY && !p.algerie;
   const unePhoto = (pm) => {
-    const titre = `<h3>📷 La photo de ton match (profil n° ${esc(pm.ref)})</h3>`;
+    const titre = `<h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#camera"/></svg> La photo de ton match (profil n° ${esc(pm.ref)})</h3>`;
     if (pm.url) return `${titre}<img class="espace-photo-match" src="${esc(pm.url)}" alt="Photo de ton match" loading="lazy"><p><small>${pm.jusqu_a ? `Visible jusqu’à ${esc(heure(pm.jusqu_a))}. ` : ''}Rien que pour toi : merci de ne pas la partager.</small></p>`;
     if (pm.accepte === false) return `${titre}<p>Ton match n’a pas (encore) accepté de transmettre sa photo.</p>`;
     if (pm.achetable && peutPayer) return `${titre}<p>Vois sa photo pendant 1 heure pour 3 €, ou tant que dure le match avec la formule <a class="text-link" href="/abonnement/?formule=passion">Passion</a>.</p><label class="annonce-case"><input type="checkbox" data-photo-cgv="${esc(pm.ref)}"> <span>J’accepte les <a href="/cgv/#abonnement" target="_blank">conditions de vente</a> et je demande que l’heure commence dès le paiement.</span></label><p><button class="btn btn-ink" type="button" data-photo-acheter="${esc(pm.ref)}">Voir la photo · 3 €</button></p><p class="form-status" data-photo-statut="${esc(pm.ref)}"></p>`;
@@ -402,12 +402,12 @@ async function suivi(el, p) {
   const blocPhoto = (p.matchs_lies || []).map(unePhoto).join('');
   const cp = p.choisi_par || { nombre: 0, refs: [] };
   const blocChoisi = !cp.nombre ? '' : cp.inclus
-    ? `<h3>💞 Qui t’a choisi·e</h3><p>${cp.refs.map((r) => `<strong>n° ${esc(r)}</strong>`).join(', ')} : ${cp.nombre > 1 ? 'ces profils sont' : 'ce profil est'} en tête de ton <a class="text-link" href="/rencontres/swipe/">swipe</a>. Choisis-${cp.nombre > 1 ? 'les' : 'le'} à ton tour pour un intérêt réciproque.</p>`
-    : `<h3>💞 ${cp.nombre} personne${cp.nombre > 1 ? 's t’ont' : ' t’a'} choisi·e</h3><p>Découvre qui avec la formule <a class="text-link" href="/abonnement/?formule=passion">Passion</a>${peutPayer ? ', ou pour 2 € pendant 24 heures' : ''}.</p>${peutPayer ? boutonService('qui_choisi', 'Voir qui t’a choisi·e pendant 24 heures', '2 €', 'Voir qui · 2 €') : ''}`;
+    ? `<h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Qui t’a choisi·e</h3><p>${cp.refs.map((r) => `<strong>n° ${esc(r)}</strong>`).join(', ')} : ${cp.nombre > 1 ? 'ces profils sont' : 'ce profil est'} en tête de ton <a class="text-link" href="/rencontres/swipe/">swipe</a>. Choisis-${cp.nombre > 1 ? 'les' : 'le'} à ton tour pour un intérêt réciproque.</p>`
+    : `<h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> ${cp.nombre} personne${cp.nombre > 1 ? 's t’ont' : ' t’a'} choisi·e</h3><p>Découvre qui avec la formule <a class="text-link" href="/abonnement/?formule=passion">Passion</a>${peutPayer ? ', ou pour 2 € pendant 24 heures' : ''}.</p>${peutPayer ? boutonService('qui_choisi', 'Voir qui t’a choisi·e pendant 24 heures', '2 €', 'Voir qui · 2 €') : ''}`;
   const finAvant = p.en_avant_jusqu_a ? new Date(p.en_avant_jusqu_a).toLocaleDateString((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { day: 'numeric', month: 'long' }) : '';
-  const blocAvant = finAvant ? `<h3>🌟 Ton profil est mis en avant</h3><p>En tête du swipe jusqu’au ${esc(finAvant)}.</p>` : peutPayer ? `<h3>🌟 Mets ton profil en avant</h3><p>En tête du swipe pendant 7 jours, auprès des personnes qui correspondent à ses critères. Lamia ne promet pas de match, mais tu seras vu·e plus tôt.</p>${boutonService('profil_avant', 'Profil mis en avant pendant 7 jours', '5 €', 'Mettre en avant · 5 €')}` : '';
+  const blocAvant = finAvant ? `<h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#star"/></svg> Ton profil est mis en avant</h3><p>En tête du swipe jusqu’au ${esc(finAvant)}.</p>` : peutPayer ? `<h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#star"/></svg> Mets ton profil en avant</h3><p>En tête du swipe pendant 7 jours, auprès des personnes qui correspondent à ses critères. Lamia ne promet pas de match, mais tu seras vu·e plus tôt.</p>${boutonService('profil_avant', 'Profil mis en avant pendant 7 jours', '5 €', 'Mettre en avant · 5 €')}` : '';
   el.innerHTML = `<h3>Mon suivi</h3><ul>${lignes}</ul>${blocChoisi}${blocAvant}${blocPhoto}
-    <p><a class="po-btn" href="/rencontres/swipe/">💘 Swiper les profils</a></p>
+    <p><a class="po-btn" href="/rencontres/swipe/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Swiper les profils</a></p>
     <h3>Mes demandes de match</h3>${demandes ? `<ul>${demandes}</ul>` : '<p>Aucune pour l’instant. <a class="text-link" href="/rencontres/#profils-anonymes">Voir les profils</a></p>'}`;
   el.querySelectorAll('[data-photo-acheter]').forEach((b) => b.addEventListener('click', async () => {
     const ref = b.dataset.photoAcheter, st = el.querySelector(`[data-photo-statut="${ref}"]`);
@@ -433,7 +433,7 @@ function monAbonnement(etat, session) {
   const a = etat?.abonnement, u = etat?.unites || {};
   const date = (d) => new Date(d).toLocaleDateString((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { day: 'numeric', month: 'long', year: 'numeric' });
   const unites = [u.mise_en_relation ? `${u.mise_en_relation} mise(s) en relation` : '', u.speed_dating ? `${u.speed_dating} place(s) de speed dating` : ''].filter(Boolean).join(' · ');
-  if (a?.offert) { box.innerHTML = `<article class="espace-achat"><div><p class="event-date">Offerte par Lamia</p><h3>Formule ${esc(NOMS_FORMULES[a.formule] || a.formule)}</h3><p>${a.raison === 'moderateur' ? 'Merci pour ta modération 🛡️ ' : ''}Rien à payer.</p>${unites ? `<p>À l’unité : ${esc(unites)}</p>` : ''}</div></article>`; return; }
+  if (a?.offert) { box.innerHTML = `<article class="espace-achat"><div><p class="event-date">Offerte par Lamia</p><h3>Formule ${esc(NOMS_FORMULES[a.formule] || a.formule)}</h3><p>${a.raison === 'moderateur' ? 'Merci pour ta modération ' : ''}Rien à payer.</p>${unites ? `<p>À l’unité : ${esc(unites)}</p>` : ''}</div></article>`; return; }
   box.innerHTML = a
     ? `<article class="espace-achat"><div><p class="event-date">Abonnement ${a.periode === 'an' ? 'annuel' : 'mensuel'}</p><h3>Formule ${esc(NOMS_FORMULES[a.formule] || a.formule)}</h3>
         <p>${esc(ETATS_ABO[a.statut] || a.statut)}${a.fin_periode ? ` · ${a.resiliation_prevue ? 'se termine le' : 'prochaine échéance le'} ${esc(date(a.fin_periode))}` : ''}</p>${unites ? `<p>À l’unité : ${esc(unites)}</p>` : ''}</div>
@@ -470,7 +470,7 @@ $('[data-espace-reset]').addEventListener('submit', async (e) => {
   try { rep = await api({ action: 'annonce_lien_connexion', email: String(f.get('email')).trim(), retour: 'espace', en: document.documentElement.lang === 'en' }); }
   catch (err) { return say(st, err.code === 'trop_de_demandes' ? 'Plusieurs liens sont déjà partis pour cette adresse. Regarde dans tes emails (et les courriers indésirables), ou réessaie dans une heure.' : err.code === 'email_invalide' ? 'Vérifie ton adresse email.' : 'L’envoi n’a pas fonctionné. Réessaie dans un instant.', true); }
   if (rep && rep.existe === false) return say(st, 'Aucun espace n’existe avec cet email. Crée-le juste en dessous, c’est rapide.', true);
-  say(st, '📩 C’est parti ! Ouvre l’email que tu viens de recevoir et clique sur le lien (pense aux courriers indésirables).');
+  say(st, 'C’est parti ! Ouvre l’email que tu viens de recevoir et clique sur le lien (pense aux courriers indésirables).');
 });
 
 $('[data-espace-newpass]').addEventListener('submit', async (e) => {
@@ -519,7 +519,7 @@ supabase.auth.onAuthStateChange((event) => { if (event === 'PASSWORD_RECOVERY') 
 render();
 
 // Fiche créée en live avec Lamia, reliée à ce compte depuis le lien personnel.
-const ETAT_FICHE = { confirmee: '✅ Confirmée : visible sur le site, anonyme', en_attente: '⏳ Visible sur le site, en attente de ta confirmation', a_modifier: '✏️ Lamia corrige ta fiche', retiree: 'Retirée du site' };
+const ETAT_FICHE = { confirmee: 'Confirmée : visible sur le site, anonyme', en_attente: 'Visible sur le site, en attente de ta confirmation', a_modifier: 'Lamia corrige ta fiche', retiree: 'Retirée du site' };
 async function mesFiches(session) {
   const box = document.querySelector('[data-espace-fiches]');
   if (!box) return;
@@ -529,7 +529,7 @@ async function mesFiches(session) {
     if (fiches.length) { const sans = document.querySelector('[data-sans-profil]'); if (sans) sans.remove(); else setTimeout(() => document.querySelector('[data-sans-profil]')?.remove(), 1500); }
     box.innerHTML = fiches.map((f) => `<article class="espace-achat"><div><p class="event-date">Fiche n° ${esc(f.ref)} · créée en live avec Lamia</p><h3>${esc(ETAT_FICHE[f.etat] || f.etat)}</h3>
       <p>${esc([f.age && `${f.age} ans`, f.ville, f.pays].filter(Boolean).join(' · '))}</p>
-      <p>💌 <strong>${esc(f.interets.total)}</strong> personne(s) intéressée(s)${f.interets.mis_en_relation ? ` · 💞 ${esc(f.interets.mis_en_relation)} mise(s) en relation` : ''}${f.interets.dernier ? ` · dernier intérêt le ${esc(new Date(f.interets.dernier).toLocaleDateString((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { day: 'numeric', month: 'long' }))}` : ''}</p></div>
+      <p><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> <strong>${esc(f.interets.total)}</strong> personne(s) intéressée(s)${f.interets.mis_en_relation ? ` · ${esc(f.interets.mis_en_relation)} mise(s) en relation` : ''}${f.interets.dernier ? ` · dernier intérêt le ${esc(new Date(f.interets.dernier).toLocaleDateString((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { day: 'numeric', month: 'long' }))}` : ''}</p></div>
       <div class="espace-achat-droite"><a class="btn btn-ink" href="${esc(f.lien)}">Voir ma fiche</a> <a class="btn btn-line" href="${esc(f.lien)}#modifier">Modifier mon annonce</a></div></article>`).join('');
   } catch { box.innerHTML = ''; }
 }
@@ -572,9 +572,9 @@ function direErreurReponse(boutons, err) {
   const p = document.createElement('p');
   p.className = 'interet-erreur'; p.setAttribute('role', 'alert');
   p.innerHTML = err?.code === 'annonce_en_pause'
-    ? '⏸️ <strong>Ton annonce est en pause.</strong> Reprends-la pour dire oui : le bouton est dans ton profil, plus haut.'
+    ? '<strong>Ton annonce est en pause.</strong> Reprends-la pour dire oui : le bouton est dans ton profil, plus haut.'
     : err?.code === 'photos_requises'
-    ? '📷 <strong>Il te manque tes 2 photos</strong> pour dire oui. Elles restent privées. <a class="text-link" href="#photos">Ajouter mes photos</a>'
+    ? '<strong>Il te manque tes 2 photos</strong> pour dire oui. Elles restent privées. <a class="text-link" href="#photos">Ajouter mes photos</a>'
     : 'Ta réponse n’est pas passée. Vérifie ta connexion et réessaie.';
   boutons.after(p);
 }
@@ -593,10 +593,10 @@ async function avisLamia(session) {
     const f = x.fiche;
     const infos = [f.genre === 'femme' ? 'Une femme' : 'Un homme', f.age && `${f.age} ans`, f.ville, f.pays, f.situation].filter(Boolean);
     const ages = f.age_min || f.age_max ? ` · ${f.age_min || 18} à ${f.age_max || 99} ans` : '';
-    const rep = x.reponse === 'oui' ? '<p class="espace-match">👍 Tu acceptes la différence : c’est noté, la suite se fait toute seule.</p><p>Pense à mettre à jour ce que tu recherches pour recevoir aussi ce genre de profils : <a class="text-link" href="#mon-profil">Modifier mon annonce</a>.</p>'
+    const rep = x.reponse === 'oui' ? '<p class="espace-match"><svg class="ico" aria-hidden="true"><use href="/icones.svg#thumbs-up"/></svg> Tu acceptes la différence : c’est noté, la suite se fait toute seule.</p><p>Pense à mettre à jour ce que tu recherches pour recevoir aussi ce genre de profils : <a class="text-link" href="#mon-profil">Modifier mon annonce</a>.</p>'
       : x.reponse === 'non' ? '<p>Tu as répondu non : c’est noté, merci.</p>'
       : `<p class="interet-boutons"><button type="button" class="btn btn-ink" data-avis="oui" data-id="${esc(x.id)}">Oui, j’accepte la différence</button><button type="button" class="btn btn-line" data-avis="non" data-id="${esc(x.id)}">Non merci</button></p>`;
-    return `<article class="espace-achat interet-recu proposition"><div><p class="event-date">💬 Lamia te demande ton avis · profil n° ${esc(f.ref)}</p>
+    return `<article class="espace-achat interet-recu proposition"><div><p class="event-date"><svg class="ico" aria-hidden="true"><use href="/icones.svg#message-circle"/></svg> Lamia te demande ton avis · profil n° ${esc(f.ref)}</p>
       <p class="proposition-mot">« ${esc(x.question)} Est-ce que tu acceptes cette différence ? » <small>Lamia</small></p>
       <h3>${esc(infos.join(' · '))}</h3>
       ${f.profil ? `<p><strong>Qui je suis :</strong> <span data-membre>${esc(f.profil)}</span></p>` : ''}
@@ -624,9 +624,9 @@ async function interetsRecus(session) {
     const f = i.fiche;
     const infos = [f.genre === 'femme' ? 'Une femme' : 'Un homme', f.age && `${f.age} ans`, f.ville, f.pays, f.situation].filter(Boolean);
     const ages = f.age_min || f.age_max ? ` · ${f.age_min || 18} à ${f.age_max || 99} ans` : '';
-    const rep = i.reponse === 'oui' ? '<p class="espace-match">💞 Tu as dit oui : c’est réciproque, Lamia est prévenue.</p>'
+    const rep = i.reponse === 'oui' ? '<p class="espace-match"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Tu as dit oui : c’est réciproque, Lamia est prévenue.</p>'
       : i.reponse === 'non' ? '<p>Tu as répondu : pas pour moi.</p>'
-      : `<p class="interet-boutons"><button type="button" class="btn btn-ink" data-repondre="oui" data-id="${esc(i.id)}">💞 Ça m’intéresse aussi</button><button type="button" class="btn btn-line" data-repondre="non" data-id="${esc(i.id)}">Pas pour moi</button></p>`;
+      : `<p class="interet-boutons"><button type="button" class="btn btn-ink" data-repondre="oui" data-id="${esc(i.id)}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Ça m’intéresse aussi</button><button type="button" class="btn btn-line" data-repondre="non" data-id="${esc(i.id)}">Pas pour moi</button></p>`;
     return `<article class="espace-achat interet-recu"><div><p class="event-date">Profil n° ${esc(f.ref)} · intéressé·e par ta fiche n° ${esc(i.pour)} · le ${esc(new Date(i.le).toLocaleDateString((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { day: 'numeric', month: 'long' }))}</p>
       <h3>${esc(infos.join(' · '))}</h3>
       ${f.profil ? `<p><strong>Qui je suis :</strong> <span data-membre>${esc(f.profil)}</span></p>` : ''}
@@ -656,13 +656,13 @@ async function interetsRecus(session) {
   const octets = (b64) => { const s = atob(b64.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - (b64.length % 4)) % 4)); return Uint8Array.from(s, (c) => c.charCodeAt(0)); };
   const dire = (html) => { box.innerHTML = html; };
   async function etat() {
-    if (!possible) return dire(ios && !installee ? '<p>🔔 Sur iPhone, les notifications marchent avec l’application installée : <a class="text-link" href="/application/">installe-la</a>, puis reviens ici depuis l’icône.</p><p class="espace-aide">En attendant, tu es prévenu·e par email.</p>' : '<p>🔔 Ce navigateur ne permet pas les notifications. Tu es prévenu·e par email.</p>');
+    if (!possible) return dire(ios && !installee ? '<p><svg class="ico" aria-hidden="true"><use href="/icones.svg#bell"/></svg> Sur iPhone, les notifications marchent avec l’application installée : <a class="text-link" href="/application/">installe-la</a>, puis reviens ici depuis l’icône.</p><p class="espace-aide">En attendant, tu es prévenu·e par email.</p>' : '<p><svg class="ico" aria-hidden="true"><use href="/icones.svg#bell"/></svg> Ce navigateur ne permet pas les notifications. Tu es prévenu·e par email.</p>');
     const reg = await navigator.serviceWorker.getRegistration('/');
     const sub = reg ? await reg.pushManager.getSubscription() : null;
     if (sub && Notification.permission === 'granted') {
       let prefs = {}; try { prefs = JSON.parse(localStorage.getItem('lfb-notif-prefs') || '{}'); } catch { /* */ }
-      const T = [['boutique', '🛍️ Boutique', '#c8901a'], ['article', '📰 Articles', '#2f6fb5'], ['actu', '📣 Actus', '#2e9d5b'], ['live', '🎥 Lives', '#c8213f']];
-      dire(`<p>🔔 <strong>Notifications activées sur ce téléphone.</strong> Tu es toujours prévenu·e pour tes rencontres (intérêt, réciproque, match). En plus, je veux être prévenu·e des nouveautés :</p><div class="notif-prefs">${T.map(([k, n, c]) => `<label style="--c:${c}"><input type="checkbox" data-pref="${k}"${prefs[k] === false ? '' : ' checked'}> ${n}</label>`).join('')}</div><p><button type="button" class="btn btn-line" data-notif-off>Désactiver sur ce téléphone</button></p>`);
+      const T = [['boutique', 'Boutique', '#C9BCE8'], ['article', 'Articles', '#6C5BA7'], ['actu', 'Actus', '#2e9d5b'], ['live', 'Lives', '#c8213f']];
+      dire(`<p><svg class="ico" aria-hidden="true"><use href="/icones.svg#bell"/></svg> <strong>Notifications activées sur ce téléphone.</strong> Tu es toujours prévenu·e pour tes rencontres (intérêt, réciproque, match). En plus, je veux être prévenu·e des nouveautés :</p><div class="notif-prefs">${T.map(([k, n, c]) => `<label style="--c:${c}"><input type="checkbox" data-pref="${k}"${prefs[k] === false ? '' : ' checked'}> ${n}</label>`).join('')}</div><p><button type="button" class="btn btn-line" data-notif-off>Désactiver sur ce téléphone</button></p>`);
       box.querySelectorAll('[data-pref]').forEach((c) => c.addEventListener('change', async () => {
         const p = Object.fromEntries([...box.querySelectorAll('[data-pref]')].map((x) => [x.dataset.pref, x.checked]));
         try { localStorage.setItem('lfb-notif-prefs', JSON.stringify(p)); } catch { /* */ }
@@ -671,8 +671,8 @@ async function interetsRecus(session) {
       }));
       return;
     }
-    if (Notification.permission === 'denied') return dire('<p>🔕 Les notifications sont bloquées pour ce site dans les réglages de ton téléphone. Autorise-les dans les réglages du navigateur, puis recharge la page.</p>');
-    dire('<p>🔔 Sois prévenu·e tout de suite quand quelqu’un s’intéresse à toi, quand c’est réciproque, quand Lamia te trouve un match… et des nouveautés de la boutique, des articles et des lives.</p><p><button type="button" class="btn btn-ink" data-notif-on>Activer les notifications</button></p>');
+    if (Notification.permission === 'denied') return dire('<p><svg class="ico" aria-hidden="true"><use href="/icones.svg#bell-off"/></svg> Les notifications sont bloquées pour ce site dans les réglages de ton téléphone. Autorise-les dans les réglages du navigateur, puis recharge la page.</p>');
+    dire('<p><svg class="ico" aria-hidden="true"><use href="/icones.svg#bell"/></svg> Sois prévenu·e tout de suite quand quelqu’un s’intéresse à toi, quand c’est réciproque, quand Lamia te trouve un match… et des nouveautés de la boutique, des articles et des lives.</p><p><button type="button" class="btn btn-ink" data-notif-on>Activer les notifications</button></p>');
   }
   ecouter(box, 'click', async (e) => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -721,43 +721,43 @@ async function discussions(session) {
       ? `<p class="parcours-attente">✓ Tu as validé. On attend ${esc(d.avec)}.</p>`
       : `<p class="parcours-valider">${x.lui ? `<span>${esc(d.avec)} a déjà validé.</span> ` : ''}<button type="button" class="btn btn-ink" data-parcours-valider="${esc(x.id)}">Nous avons vécu cette étape</button></p>`;
     const detail = x ? `<div class="parcours-detail"><strong>${esc(x.titre)}</strong><p>${esc(x.texte)}</p>${questions}${etat}</div>` : '';
-    return `<details class="parcours" ${p.fini ? '' : 'open'}><summary>💍 Votre parcours vers le mariage <span>${p.fini ? 'Terminé, félicitations !' : `Étape ${esc(p.courante + 1)} sur ${esc(p.total)} : ${esc(x.mot)}`}</span></summary><p class="parcours-livre">Le parcours de mariage de Lamia, détaillé dans l’ebook <a class="text-link" href="/werdi-ouvre-les-yeux/"><em>Werdi, ouvre les yeux !</em></a></p><ol class="parcours-frise">${frise}</ol>${detail}</details>`;
+    return `<details class="parcours" ${p.fini ? '' : 'open'}><summary><svg class="ico" aria-hidden="true"><use href="/icones.svg#gem"/></svg> Votre parcours vers le mariage <span>${p.fini ? 'Terminé, félicitations !' : `Étape ${esc(p.courante + 1)} sur ${esc(p.total)} : ${esc(x.mot)}`}</span></summary><p class="parcours-livre">Le parcours de mariage de Lamia, détaillé dans l’ebook <a class="text-link" href="/werdi-ouvre-les-yeux/"><em>Werdi, ouvre les yeux !</em></a></p><ol class="parcours-frise">${frise}</ol>${detail}</details>`;
   };
   const raisonsDematch = [['physique', 'Physique'], ['enfants', 'Enfants'], ['localisation', 'Localisation'], ['caractere', 'Caractère'], ['valeurs', 'Valeurs'], ['parcours', 'Une étape du parcours'], ['autre', 'Autre raison']]
     .map(([v, t]) => `<label><input type="radio" name="raison" value="${v}" required> ${t}</label>`).join('');
   let dematchOuvert = null;
   const vue = (d) => {
-    const msgs = d.messages.map((m) => `<p class="disc-msg ${m.moi ? 'is-moi' : ''}${m.lamia ? ' is-systeme' : ''}"><span>${esc(m.texte)}</span><small>${esc(heure(m.le))}</small></p>`).join('') || `<p class="disc-vide">${salut ? `${esc(salut)}, dis` : 'Dis'} bonjour à ${esc(d.avec)} 👋</p>`;
+    const msgs = d.messages.map((m) => `<p class="disc-msg ${m.moi ? 'is-moi' : ''}${m.lamia ? ' is-systeme' : ''}"><span>${esc(m.texte)}</span><small>${esc(heure(m.le))}</small></p>`).join('') || `<p class="disc-vide">${salut ? `${esc(salut)}, dis` : 'Dis'} bonjour à ${esc(d.avec)}</p>`;
     const numeros = d.echange
-      ? `<div class="disc-numeros is-ok">📞 Vous avez échangé vos numéros. Celui de ${esc(d.avec)} : <a href="tel:${esc(d.son_numero)}"><strong>${esc(d.son_numero)}</strong></a></div>`
+      ? `<div class="disc-numeros is-ok"><svg class="ico" aria-hidden="true"><use href="/icones.svg#phone"/></svg> Vous avez échangé vos numéros. Celui de ${esc(d.avec)} : <a href="tel:${esc(d.son_numero)}"><strong>${esc(d.son_numero)}</strong></a></div>`
       : d.mon_numero
-        ? `<div class="disc-numeros">📞 Tu as donné ton numéro. ${esc(d.avec)} le verra dès qu’il ou elle aura donné le sien${d.il_a_partage ? '' : ' (on l’a prévenu·e)'}.</div>`
-        : d.ouverte ? `<form class="disc-numeros" data-disc-numero><label>📞 ${d.il_a_partage ? `<strong>${esc(d.avec)} a donné son numéro</strong> : donne le tien pour le voir` : `${salut ? `${esc(salut)}, prêt${e}` : `Prêt${e}`} à passer au téléphone ? Donne ton numéro`} <input name="telephone" type="tel" autocomplete="tel" placeholder="06 12 34 56 78" required></label><button class="btn btn-ink" type="submit">Échanger nos numéros</button><small>Ton numéro n’est montré que quand vous l’avez donné tous les deux.</small></form>` : '';
+        ? `<div class="disc-numeros"><svg class="ico" aria-hidden="true"><use href="/icones.svg#phone"/></svg> Tu as donné ton numéro. ${esc(d.avec)} le verra dès qu’il ou elle aura donné le sien${d.il_a_partage ? '' : ' (on l’a prévenu·e)'}.</div>`
+        : d.ouverte ? `<form class="disc-numeros" data-disc-numero><label><svg class="ico" aria-hidden="true"><use href="/icones.svg#phone"/></svg> ${d.il_a_partage ? `<strong>${esc(d.avec)} a donné son numéro</strong> : donne le tien pour le voir` : `${salut ? `${esc(salut)}, prêt${e}` : `Prêt${e}`} à passer au téléphone ? Donne ton numéro`} <input name="telephone" type="tel" autocomplete="tel" placeholder="06 12 34 56 78" required></label><button class="btn btn-ink" type="submit">Échanger nos numéros</button><small>Ton numéro n’est montré que quand vous l’avez donné tous les deux.</small></form>` : '';
     return `<article class="disc" data-disc="${esc(d.id)}">
-      <header class="disc-tete"><strong>Avec ${esc(d.avec)}</strong><span>${d.ouverte ? `⏳ ${esc(reste(d))}` : d.close_raison === 'signalee' ? 'fermée (signalée)' : d.close_raison ? 'fermée' : 'terminée'}</span></header>
+      <header class="disc-tete"><strong>Avec ${esc(d.avec)}</strong><span>${d.ouverte ? `${esc(reste(d))}` : d.close_raison === 'signalee' ? 'fermée (signalée)' : d.close_raison ? 'fermée' : 'terminée'}</span></header>
       ${d.ses_autres_matchs > 0 ? `<p class="disc-honnete">Par honnêteté : ${esc(d.avec)} a aussi ${d.ses_autres_matchs} autre${d.ses_autres_matchs > 1 ? 's' : ''} match${d.ses_autres_matchs > 1 ? 's' : ''} en cours.</p>` : ''}
       ${d.mes_autres_matchs > 0 ? `<p class="disc-honnete">De ton côté, tu as ${d.mes_autres_matchs} autre${d.mes_autres_matchs > 1 ? 's' : ''} match${d.mes_autres_matchs > 1 ? 's' : ''} en cours : ${esc(d.avec)} le voit aussi.</p>` : ''}
       ${vueParcours(d)}
       <div class="disc-fil" data-disc-fil>${msgs}</div>
       ${d.dematch ? `<div class="disc-dematch-etat">${d.dematch.par_moi
-        ? `<strong>🤝 Tu as mis fin à ce match.</strong> ${d.dematch.restants ? `Il te reste <strong>${esc(d.dematch.restants)} message${d.dematch.restants > 1 ? 's' : ''}</strong> pour dire au revoir.` : `Merci d’être resté${e} courtois${e === 'e' ? 'e' : e ? '·e' : ''}.`}`
-        : `<strong>💌 ${esc(d.avec)} a mis fin à ce match.</strong> Raison : ${esc(d.dematch.raison)}. ${d.dematch.restants ? `Tu peux répondre, il te reste ${esc(d.dematch.restants)} message${d.dematch.restants > 1 ? 's' : ''}.` : ''}`}
+        ? `<strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#handshake"/></svg> Tu as mis fin à ce match.</strong> ${d.dematch.restants ? `Il te reste <strong>${esc(d.dematch.restants)} message${d.dematch.restants > 1 ? 's' : ''}</strong> pour dire au revoir.` : `Merci d’être resté${e} courtois${e === 'e' ? 'e' : e ? '·e' : ''}.`}`
+        : `<strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> ${esc(d.avec)} a mis fin à ce match.</strong> Raison : ${esc(d.dematch.raison)}. ${d.dematch.restants ? `Tu peux répondre, il te reste ${esc(d.dematch.restants)} message${d.dematch.restants > 1 ? 's' : ''}.` : ''}`}
         ${d.ouverte ? `<small>La discussion se ferme le ${esc(new Date(d.dematch.fin).toLocaleString((document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR'), { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }))}.</small>` : ''}</div>` : ''}
       ${d.ouverte && (!d.dematch || d.dematch.restants) ? `<form class="disc-saisie" data-disc-envoi><textarea name="texte" rows="2" maxlength="1000" placeholder="Ton message…" required></textarea><button class="btn btn-ink" type="submit">Envoyer</button></form>
       <p class="disc-aide">Pour ta sécurité, les numéros, liens et emails écrits dans les messages sont masqués : utilise le bouton ci-dessous pour échanger vos numéros.</p>` : ''}
       ${d.ouverte && !d.dematch && !d.prenom?.partage ? (d.prenom?.demander
-        ? `<div class="disc-prenom"><p>👋 <strong>Veux-tu partager ton prénom${d.prenom.mien ? ` (${esc(d.prenom.mien)})` : ''} avec ton match ?</strong> Rien ne presse : tu peux aussi le faire plus tard, après vos premiers échanges.</p><p><button type="button" class="btn btn-ink" data-disc-prenom="partager">Oui, partager</button> <button type="button" class="btn btn-line" data-disc-prenom="plus_tard">Plus tard</button></p></div>`
-        : '<p class="disc-prenom-lien"><button type="button" class="link-button" data-disc-prenom="partager">👋 Partager mon prénom</button></p>') : ''}
+        ? `<div class="disc-prenom"><p><svg class="ico" aria-hidden="true"><use href="/icones.svg#hand"/></svg> <strong>Veux-tu partager ton prénom${d.prenom.mien ? ` (${esc(d.prenom.mien)})` : ''} avec ton match ?</strong> Rien ne presse : tu peux aussi le faire plus tard, après vos premiers échanges.</p><p><button type="button" class="btn btn-ink" data-disc-prenom="partager">Oui, partager</button> <button type="button" class="btn btn-line" data-disc-prenom="plus_tard">Plus tard</button></p></div>`
+        : '<p class="disc-prenom-lien"><button type="button" class="link-button" data-disc-prenom="partager"><svg class="ico" aria-hidden="true"><use href="/icones.svg#hand"/></svg> Partager mon prénom</button></p>') : ''}
       ${d.dematch ? '' : numeros}
-      ${d.prolongeable && !window.LFB_PLAY && new Date(d.ferme_at) - Date.now() < 72 * 3600e3 ? `<div class="disc-prolonger">${d.ouverte ? '' : '<p>Votre discussion est terminée, mais vous pouvez la rouvrir.</p>'}${boutonService('prolonger_discussion', 'Prolonger la discussion de 7 jours', '3 €', '⏳ 7 jours de plus · 3 €', d.id)}</div>` : ''}
+      ${d.prolongeable && !window.LFB_PLAY && new Date(d.ferme_at) - Date.now() < 72 * 3600e3 ? `<div class="disc-prolonger">${d.ouverte ? '' : '<p>Votre discussion est terminée, mais vous pouvez la rouvrir.</p>'}${boutonService('prolonger_discussion', 'Prolonger la discussion de 7 jours', '3 €', '7 jours de plus · 3 €', d.id)}</div>` : ''}
       ${d.ouverte && !d.dematch ? (dematchOuvert === d.id ? `<form class="disc-dematch" data-disc-dematch-form>
-        <h4>🤝 Tu peux dématcher, avec élégance</h4>
+        <h4><svg class="ico" aria-hidden="true"><use href="/icones.svg#handshake"/></svg> Tu peux dématcher, avec élégance</h4>
         <p>Tu as encore <strong>deux messages</strong> à écrire pour rester ${e === '' ? 'courtois et gentleman' : e === 'e' ? 'courtoise et élégante' : 'courtois·e et élégant·e'}. Si tu confirmes, ton match sera informé de ton dématch et attendra un au revoir, voire une raison.</p>
         <fieldset><legend>Pourquoi tu dématches ?</legend>${raisonsDematch}</fieldset>
         <label class="disc-dematch-etape" data-dematch-etape hidden>Quelle étape ? <select name="etape">${(d.parcours?.etapes || []).map((x) => `<option value="${esc(x.id)}">${esc(x.mot)}</option>`).join('')}</select></label>
         <p class="disc-dematch-actions"><button class="btn btn-ink" type="submit">Confirmer le dématch</button> <button type="button" class="link-button" data-disc-dematch-annuler>Je reste</button></p></form>`
         : `<p class="disc-dematch-lien"><button type="button" class="btn btn-line" data-disc-dematch>Dématcher</button></p>`) : ''}
-      ${d.ouverte ? `<p><button type="button" class="link-button" data-disc-signaler>🚩 Bloquer et signaler</button></p>` : ''}
+      ${d.ouverte ? `<p><button type="button" class="link-button" data-disc-signaler><svg class="ico" aria-hidden="true"><use href="/icones.svg#flag"/></svg> Bloquer et signaler</button></p>` : ''}
     </article>`;
   };
   const afficher = () => {
@@ -793,7 +793,7 @@ async function discussions(session) {
       }
       await charger();
     } catch (err) {
-      alert(err.code === 'telephone_invalide' ? 'Ce numéro ne semble pas valide. Exemple : 06 12 34 56 78 ou +213 5 12 34 56 78.' : err.code === 'au_revoir_fini' ? 'Tu as écrit tes deux messages d’au revoir.' : err.code === 'raison_requise' ? 'Choisis une raison.' : err.code === 'discussion_fermee' ? 'Cette discussion est terminée.' : err.code === 'rate_limited' ? 'Doucement 🙂 Réessaie dans quelques minutes.' : 'Le message n’est pas parti. Réessaie.');
+      alert(err.code === 'telephone_invalide' ? 'Ce numéro ne semble pas valide. Exemple : 06 12 34 56 78 ou +213 5 12 34 56 78.' : err.code === 'au_revoir_fini' ? 'Tu as écrit tes deux messages d’au revoir.' : err.code === 'raison_requise' ? 'Choisis une raison.' : err.code === 'discussion_fermee' ? 'Cette discussion est terminée.' : err.code === 'rate_limited' ? 'Doucement Réessaie dans quelques minutes.' : 'Le message n’est pas parti. Réessaie.');
     }
     bouton.disabled = false;
   });

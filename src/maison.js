@@ -201,7 +201,7 @@ async function renderProductPage() {
       <p class="product-price">${p.compare_at_price_cents ? `<del>${money(p.compare_at_price_cents, p.currency)}</del>` : ''}${money(p.price_cents, p.currency)}</p>
       ${p.description ? `<div class="product-desc">${String(p.description).split(/\n\s*\n/).map((b) => `<p>${b.split('\n').map(esc).join('<br>')}</p>`).join('')}</div>` : ''}
       ${specs ? `<div class="specs">${specs}</div>` : ''}
-      ${Array.isArray(m.extrait) && m.extrait.length ? `<details class="extrait-livre" data-extrait><summary>📖 Lire gratuitement les premières pages <small>(${m.extrait.length} pages)</small></summary>
+      ${Array.isArray(m.extrait) && m.extrait.length ? `<details class="extrait-livre" data-extrait><summary>Lire gratuitement les premières pages <small>(${m.extrait.length} pages)</small></summary>
         <div class="extrait-pages">${m.extrait.filter((u) => /^\/images\//.test(u)).map((u, i) => `<img src="${esc(u)}" alt="Extrait, page ${i + 1}" loading="lazy">`).join('')}</div>
         <p class="fine">La suite t’attend dans le livre complet.</p></details>` : ''}
       ${sold ? '<button class="btn btn-ink" type="button" disabled>Déjà partie</button>' : window.LFB_PLAY && p.product_type === 'digital' ? '<p>Ce livre numérique ne s’achète pas dans cette version de l’appli.</p>' : preorderForm(p)}
@@ -286,7 +286,7 @@ function preorderForm(p) {
     <input name="zz_hp" class="hp" tabindex="-1" autocomplete="new-password" aria-hidden="true">
     <div class="preorder-total"><span>Total</span><strong data-total></strong></div>
     <label class="check"><input type="checkbox" name="cgv"><span>J’accepte les <a href="/cgv/" target="_blank" rel="noopener">conditions de vente</a>${digital ? ' et je demande l’accès immédiat au livre numérique : je renonce ainsi à mon droit de rétractation une fois le téléchargement possible' : ''}.</span></label>
-    <button class="btn btn-ink btn-payer" type="submit">🔒 Payer en toute sécurité</button>
+    <button class="btn btn-ink btn-payer" type="submit"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lock"/></svg> Payer en toute sécurité</button>
     <div class="paiement-sur">
       <p><strong>Paiement 100 % sécurisé</strong> par Stripe : carte bancaire, Apple Pay ou Google Pay, avec validation 3D Secure de ta banque.</p>
       <p>Tes coordonnées bancaires sont saisies chez Stripe, sur une page chiffrée : Lamia ne les voit jamais.</p>
@@ -342,7 +342,7 @@ function wirePreorder(p, box) {
     };
     let r = {}, res;
     try { res = await fetch('/api/preorder', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); r = await res.json().catch(() => ({})); } catch { /* réseau */ }
-    btn.disabled = false; btn.textContent = '🔒 Payer en toute sécurité';
+    btn.disabled = false; btn.textContent = 'Payer en toute sécurité';
     if (res?.ok && r.ok && r.url) {
       window.lfbEvent?.('paiement_ouvert');
       btn.disabled = true; btn.textContent = 'Redirection vers le paiement…';
@@ -750,7 +750,7 @@ renderSocials();
       try { window.gtag?.('event', 'purchase', { transaction_id: id }); } catch { /* */ }
       if (r.telechargements?.length) {
         dire('Merci, ton livre est à toi !', `Commande n° ${r.order_number}. Tu reçois le reçu de paiement par email. Télécharge ton livre maintenant : tu le retrouveras aussi à tout moment dans « Mon espace », connectée avec la même adresse email.`);
-        texte.insertAdjacentHTML('afterend', r.telechargements.map((t) => `<p><a class="btn btn-ink btn-telecharger" href="${esc(t.url)}">⬇ Télécharger « ${esc(t.nom)} »</a></p>`).join(''));
+        texte.insertAdjacentHTML('afterend', r.telechargements.map((t) => `<p><a class="btn btn-ink btn-telecharger" href="${esc(t.url)}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#download"/></svg> Télécharger « ${esc(t.nom)} »</a></p>`).join(''));
         return;
       }
       return dire('Merci, ton achat est confirmé !', `Commande n° ${r.order_number}. Tu reçois le reçu de paiement par email. Lamia prépare ton colis et te tient au courant de l’expédition.`);

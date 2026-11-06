@@ -9,7 +9,7 @@ import { versOutil, lib } from './matching-options.mjs';
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', PUBLIC_KEY);
 const $ = (s) => document.querySelector(s);
 const say = (el, msg, err = false) => { if (!el) return; el.textContent = msg; el.classList.toggle('is-error', err); };
-const CANAL = { ecrit: '✎', vocal: '🎙', conversation: '❦' };
+const CANAL = { ecrit: '✎', vocal: '', conversation: '❦' };
 let session = null, threads = [], filtre = 'a_lire', courant = null, minuteur = 0;
 
 async function jetonFrais() { ({ data: { session } } = await supabase.auth.getSession()); return session?.access_token; }
@@ -73,7 +73,7 @@ document.querySelectorAll('[data-filtre]').forEach((b) => b.addEventListener('cl
 // ---------------------------------------------------------------- une conversation
 const rec = monterEnregistreur($('[data-vocal] [data-rec]'));
 let images = [];
-const rendrePj = () => { $('[data-pj]').innerHTML = images.map((f, i) => `<li>🖼 ${esc(f.name)} <small>${taille(f.size)}</small> <button type="button" class="cl-lien" data-retirer="${i}">Retirer</button></li>`).join(''); };
+const rendrePj = () => { $('[data-pj]').innerHTML = images.map((f, i) => `<li><svg class="ico" aria-hidden="true"><use href="/icones.svg#image"/></svg> ${esc(f.name)} <small>${taille(f.size)}</small> <button type="button" class="cl-lien" data-retirer="${i}">Retirer</button></li>`).join(''); };
 $('[data-images]').addEventListener('change', (e) => { for (const f of e.target.files) if (f.type.startsWith('image/') && images.length < 6) images.push(f); e.target.value = ''; rendrePj(); });
 $('[data-pj]').addEventListener('click', (e) => { const i = e.target.closest('[data-retirer]')?.dataset.retirer; if (i != null) { images.splice(Number(i), 1); rendrePj(); } });
 $('[data-ouvrir-vocal]').addEventListener('click', () => { const v = $('[data-vocal]'); v.hidden = !v.hidden; });
@@ -85,7 +85,7 @@ function rendreFil(t) {
   { // Ouvrir le profil de la personne, dans un nouvel onglet pour garder la conversation.
     const cible = t.profil?.ref ? `#profil-${t.profil.ref}` : t.profil?.user_id ? `#compte-${t.profil.user_id}` : '';
     $('[data-fil-coord]').insertAdjacentHTML('beforeend', cible
-      ? ` <a class="cl-btn cl-fil-profil" href="/tableau-de-bord${cible}" target="_blank" rel="noopener">👤 Ouvrir son profil${t.profil.ref ? ` n° ${t.profil.ref}` : ''}</a>`
+      ? ` <a class="cl-btn cl-fil-profil" href="/tableau-de-bord${cible}" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="/icones.svg#user"/></svg> Ouvrir son profil${t.profil.ref ? ` n° ${t.profil.ref}` : ''}</a>`
       : ' <small class="cl-fil-profil">Aucun profil avec cet email.</small>');
   }
   $('[data-fil-statut]').value = t.status;
@@ -220,7 +220,7 @@ demarrer();
 
 // ---------------------------------------------------------------- annonces de rencontre à vérifier
 // ---------------------------------------------------------------- écrire à quelqu'un : message préparé, puis l'application du réseau
-const boutonEcrire = (ref, role = '') => (ref ? `<div class="cl-ecrire"><button class="cl-btn" type="button" data-ecrire="${ref}" data-role="${role}">💬 Envoyer un message au n° ${ref}</button></div>` : '');
+const boutonEcrire = (ref, role = '') => (ref ? `<div class="cl-ecrire"><button class="cl-btn" type="button" data-ecrire="${ref}" data-role="${role}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#message-circle"/></svg> Envoyer un message au n° ${ref}</button></div>` : '');
 document.addEventListener('click', async (e) => {
   const b = e.target.closest('[data-ecrire]');
   if (!b) return;
@@ -232,7 +232,7 @@ document.addEventListener('click', async (e) => {
   panneau.className = 'cl-ecrire-zone'; panneau.dataset.ecrireZone = '';
   try {
     const r = await api({ action: 'annonce_contact_preparer', ref: b.dataset.ecrire, role: b.dataset.role }, await jetonFrais());
-    panneau.innerHTML = `${r.dernier_at ? `<p class="cl-aide">✉️ Déjà ouvert le ${quand(r.dernier_at)}</p>` : ''}
+    panneau.innerHTML = `${r.dernier_at ? `<p class="cl-aide"><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> Déjà ouvert le ${quand(r.dernier_at)}</p>` : ''}
       <label>Message préparé <small>(tu peux le changer)</small><textarea data-ecrire-texte rows="6">${esc(r.message)}</textarea></label>
       <div class="cl-outils">${r.lien ? `<a class="cl-btn cl-plein" href="${esc(r.lien)}" target="_blank" rel="noopener" data-ecrire-ouvrir="${r.ref}">Copier et ouvrir ${esc(r.reseau)}</a>` : `<button class="cl-btn cl-plein" type="button" data-ecrire-ouvrir="${r.ref}">Copier le message</button>`}</div>
       <p class="cl-statut" role="status" data-ecrire-statut>${r.lien ? (r.reseau === 'WhatsApp' ? '' : `Dans ${esc(r.reseau)} : touche Message, colle, envoie.`) : 'Je n’ai pas encore son réseau sur le site.'}</p>`;
@@ -253,6 +253,9 @@ document.addEventListener('click', (e) => {
   jetonFrais().then((j) => api({ action: 'annonce_contact_note', ref: o.dataset.ecrireOuvrir }, j)).catch(() => {});
 });
 
+// Pastels : une couleur douce par sens, pour distinguer d'un coup d'œil.
+const pastelBadge = (t) => (/PAUSE/.test(t) ? 'is-sable' : /TEST/.test(t) ? 'is-ciel' : /live/i.test(t) ? 'is-lilas' : /Match/.test(t) ? 'is-rose' : /Recommand|Mod[ée]rat/i.test(t) ? 'is-champagne' : /identit|V[ée]rifi/i.test(t) ? 'is-menthe' : /ne pas/.test(t) ? 'is-peche' : 'is-sable');
+document.addEventListener('change', (e) => { const s = e.target.closest?.('[data-demande-statut]'); if (s) s.className = `cl-etat-choix is-${s.value}`; });
 const STATUT_ANNONCE = { a_verifier: 'À vérifier', publiee: 'Validé', refusee: 'Refusé' };
 let dernieresAnnonces = [];
 async function chargerAnnonces() {
@@ -267,17 +270,17 @@ async function chargerAnnonces() {
     const aExporter = annonces.filter((a) => a.status === 'publiee' && !a.exportee_at).length;
     $('[data-export-info]').textContent = aExporter ? `${aExporter} annonce(s) publiée(s) pas encore dans l’outil.` : 'Toutes les annonces publiées sont déjà dans l’outil.';
     box.innerHTML = annonces.map((a) => `<article class="cl-carte cl-annonce" data-id="${a.id}" id="annonce-${a.ref}">
-      <p class="cl-coord"><b>N° ${a.ref}</b> · ${STATUT_ANNONCE[a.status] || a.status}${a.submitted_at ? ` · reçue le ${quand(a.submitted_at)}` : ''}</p>
+      <p class="cl-coord"><b>N° ${a.ref}</b> <span class="cl-etat is-${esc(a.status)}">${STATUT_ANNONCE[a.status] || esc(a.status)}</span>${a.submitted_at ? ` · reçue le ${quand(a.submitted_at)}` : ''}</p>
       ${boutonEcrire(a.ref)}
       <h3>${a.genre === 'femme' ? 'Femme' : 'Homme'}, ${a.age} ans</h3>
-      <p class="cl-badges">${[a.en_pause ? '⏸️ EN PAUSE (invisible, à sa demande)' : '',a.test ? '🧪 PROFIL DE TEST (invisible du public)' : '',a.live_declare ? (a.outil_lie ? '🎥 Créé en live · fiche retrouvée dans l’outil · 3 offertes' : '🎥 Dit avoir été en live · fiche à retrouver · 3 offertes') : a.outil_lie ? '🔗 Déjà dans ton outil (même lien)' : '', a.compte ? '👤 Compte lié' : '', a.photo_partage ? '📷 Photo transmissible au match' : '🚫📷 Photo à ne pas transmettre', a.en_match ? '💞 Match en cours' : '', a.modifiee_at ? `✏️ Modifié le ${quand(a.modifiee_at)}` : ''].filter(Boolean).map((t) => `<span>${esc(t)}</span>`).join('')}</p>
+      <p class="cl-badges">${[a.en_pause ? 'EN PAUSE (invisible, à sa demande)' : '',a.test ? 'PROFIL DE TEST (invisible du public)' : '',a.live_declare ? (a.outil_lie ? 'Créé en live · fiche retrouvée dans l’outil · 3 offertes' : 'Dit avoir été en live · fiche à retrouver · 3 offertes') : a.outil_lie ? 'Déjà dans ton outil (même lien)' : '', a.compte ? 'Compte lié' : '', a.photo_partage ? 'Photo transmissible au match' : 'Photo à ne pas transmettre', a.en_match ? 'Match en cours' : '', a.modifiee_at ? `Modifié le ${quand(a.modifiee_at)}` : ''].filter(Boolean).map((t) => `<span class="${pastelBadge(t)}">${esc(t)}</span>`).join('')}</p>
       <p class="cl-coord">Prénom : ${esc(a.prenom)} · ${esc(a.ville)}, ${esc(a.pays)}${a.situation ? ` · ${esc(a.situation)}` : ''} · né(e) le ${esc(a.birth_date)}<br>${esc(a.email)}${a.phone ? ` · ${esc(a.phone)}` : ''}</p>
       <div class="cl-annonce-medias">${a.medias.map((m) => !m.url ? '' : m.kind === 'video' ? `<video src="${esc(m.url)}" controls playsinline preload="metadata"></video>` : `<a href="${esc(m.url)}" target="_blank" rel="noopener"><img src="${esc(m.url)}" alt="Photo"></a>`).join('')}</div>
       ${a.identite?.url ? `<div class="cl-annonce-id"><p><b>Pièce d’identité</b> (vérifie le prénom, l’âge et que le numéro est caché) :</p>${a.identite.mime === 'application/pdf' ? `<a class="cl-btn" href="${esc(a.identite.url)}" target="_blank" rel="noopener">Ouvrir le PDF</a>` : `<a href="${esc(a.identite.url)}" target="_blank" rel="noopener"><img src="${esc(a.identite.url)}" alt="Pièce d’identité"></a>`}</div>` : a.identite_verifiee_at ? `<p class="cl-aide">✓ Identité vérifiée le ${quand(a.identite_verifiee_at)} (pièce supprimée).</p>` : ''}
       ${a.matching && Object.keys(a.matching).length ? `<p class="cl-coord">${[a.matching.situation, a.matching.enfants === 'Oui' ? `${a.matching.nbEnfants || ''} enfant(s)` : a.matching.enfants === 'Non' ? 'sans enfant' : '', a.matching.niveauEtudeDetail || a.matching.niveauEtudeCategorie, a.matching.profession, a.matching.religion, a.matching.pratique, ...(a.matching.origineTags || [])].filter(Boolean).map(lib).map(esc).join(' · ')}${a.matching.contactReseau ? `<br>Réseau : ${esc(a.matching.contactReseau)}` : ''}</p>` : ''}
       ${a.exportee_at ? `<p class="cl-aide">↪ Exportée vers l’outil de matching le ${quand(a.exportee_at)}</p>` : ''}
-      ${(a.interets || []).length ? `<p class="cl-match-demande">💌 Match demandé : intéressé(e) par le profil n° ${a.interets.join(', ')}</p>` : ''}
-      <p class="cl-aide">${a.anonyme_ok ? (a.visible_anonyme ? '👁 Affiché anonymement dans les Rencontres' : 'Accepte d’être affiché(e) anonymement') : 'N’a pas accepté l’affichage anonyme'}</p>
+      ${(a.interets || []).length ? `<p class="cl-match-demande"><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> Match demandé : intéressé(e) par le profil n° ${a.interets.join(', ')}</p>` : ''}
+      <p class="cl-aide">${a.anonyme_ok ? (a.visible_anonyme ? 'Affiché anonymement dans les Rencontres' : 'Accepte d’être affiché(e) anonymement') : 'N’a pas accepté l’affichage anonyme'}</p>
       <p><b>Qui je suis</b><br>${esc(a.profil)}</p>
       <p><b>Qui je cherche</b>${a.age_min || a.age_max ? ` (${a.age_min || 18}-${a.age_max || 99} ans)` : ''}<br>${esc(a.recherche)}</p>
       ${a.status === 'publiee' ? `<div class="cl-resultat"><label>Profils compatibles trouvés dans ton outil<input data-nb type="number" min="0" max="9999" inputmode="numeric" value="${a.nb_compatibles ?? ''}"></label><button class="cl-btn cl-plein" type="button" data-decision="resultat">Envoyer le résultat</button>${a.resultat_envoye_at ? `<small>Envoyé le ${quand(a.resultat_envoye_at)} (${a.nb_compatibles} profil(s))</small>` : ''}</div>` : ''}
@@ -286,8 +289,8 @@ async function chargerAnnonces() {
         ${a.status !== 'publiee' ? '<button class="cl-btn cl-plein" type="button" data-decision="publier">✓ Valider le profil</button>' : ''}
         ${a.status !== 'refusee' ? `<button class="cl-btn" type="button" data-decision="refuser">${a.status === 'publiee' ? 'Retirer le profil' : 'Refuser'}</button>` : ''}
         ${a.status === 'publiee' ? '<button class="cl-btn" type="button" data-exporter-une>↪ Fiche pour l’outil de matching</button>' : ''}
-        ${a.status === 'publiee' ? `<span class="cl-aide">${a.visible_anonyme ? '👁 Affiché anonymement dans les Rencontres' : a.anonyme_ok ? 'Pour l’afficher dans les Rencontres : ton outil, écran « Le site » → Publier' : 'La personne n’a pas accepté l’affichage anonyme'}</span>${a.visible_anonyme ? ' <button class="cl-btn" type="button" data-decision="masquer">Retirer du Patio</button>' : ''}` : ''}
-        ${a.medias.length ? '<button class="cl-btn" type="button" data-decision="photos_refuser">📷 Photos non conformes : en redemander</button>' : ''}
+        ${a.status === 'publiee' ? `<span class="cl-aide">${a.visible_anonyme ? 'Affiché anonymement dans les Rencontres' : a.anonyme_ok ? 'Pour l’afficher dans les Rencontres : ton outil, écran « Le site » → Publier' : 'La personne n’a pas accepté l’affichage anonyme'}</span>${a.visible_anonyme ? ' <button class="cl-btn" type="button" data-decision="masquer">Retirer du Patio</button>' : ''}` : ''}
+        ${a.medias.length ? '<button class="cl-btn" type="button" data-decision="photos_refuser"><svg class="ico" aria-hidden="true"><use href="/icones.svg#camera"/></svg> Photos non conformes : en redemander</button>' : ''}
         <button class="cl-btn" type="button" data-decision="supprimer">Supprimer définitivement</button>
       </div>
       <p class="cl-statut" role="status" data-annonce-statut></p>
@@ -377,7 +380,7 @@ async function chargerAbonnes() {
     const d = (x) => x ? new Date(x).toLocaleDateString('fr-FR') : '';
     box.innerHTML = (abonnes.length || unites.length ? '' : '<p class="cl-vide">Pas encore d’abonné.</p>')
       + abonnes.map((a) => `<p class="cl-coord"><b>${esc(FORMULES_NOMS[a.formule] || a.formule)}</b>${a.periode === 'an' ? ' (annuel)' : ''} · ${esc(a.nom || '')} · ${esc(a.email)} · ${esc(ETATS[a.statut] || a.statut)}${a.resiliation_prevue ? ' · se termine' : ''}${a.fin_periode ? ` le ${d(a.fin_periode)}` : ''}</p>`).join('')
-      + unites.map((u) => `<p class="cl-coord">${({ speed_dating: '🎟 Speed dating', photo_match: '📷 Photo du match (1 h)', mise_en_relation: '🤝 Match supplémentaire', coaching: '🎥 Visio de 15 minutes', coaching_30: '🎥 Coaching de 30 minutes', sauver_couple: '💞 Sauver mon couple', live_priorite: '📣 Priorité en live', prolonger_discussion: '⏳ Discussion prolongée', profil_avant: '🌟 Profil mis en avant', qui_choisi: '💞 Qui m’a choisi·e (24 h)' })[u.type] || u.type} · ${esc(u.nom || '')} · ${esc(u.email)} · ${u.quantite - u.utilisees}/${u.quantite} restant(es) · ${d(u.created_at)} ${u.utilisees < u.quantite ? `<button type="button" class="cl-btn cl-petit" data-unite-utiliser="${u.id}">Utiliser 1</button>` : ''}</p>`).join('');
+      + unites.map((u) => `<p class="cl-coord">${({ speed_dating: 'Speed dating', photo_match: 'Photo du match (1 h)', mise_en_relation: 'Match supplémentaire', coaching: 'Visio de 15 minutes', coaching_30: 'Coaching de 30 minutes', sauver_couple: 'Sauver mon couple', live_priorite: 'Priorité en live', prolonger_discussion: 'Discussion prolongée', profil_avant: 'Profil mis en avant', qui_choisi: 'Qui m’a choisi·e (24 h)' })[u.type] || u.type} · ${esc(u.nom || '')} · ${esc(u.email)} · ${u.quantite - u.utilisees}/${u.quantite} restant(es) · ${d(u.created_at)} ${u.utilisees < u.quantite ? `<button type="button" class="cl-btn cl-petit" data-unite-utiliser="${u.id}">Utiliser 1</button>` : ''}</p>`).join('');
     box.querySelectorAll('[data-unite-utiliser]').forEach((b) => b.addEventListener('click', async () => {
       b.disabled = true;
       try { await api({ action: 'annonce_unite_utiliser', id: b.dataset.uniteUtiliser }, await jetonFrais()); } catch { /* */ }
@@ -387,7 +390,7 @@ async function chargerAbonnes() {
 }
 
 // ---------------------------------------------------------------- matchs demandés (« ce profil m'intéresse »)
-const STATUT_DEMANDE = { a_traiter: 'À traiter', mis_en_relation: 'Mis en relation (match actif)', en_reserve: '🗂 Gardé en réserve', pas_compatible: 'Pas compatible', dematche: 'Dématché' };
+const STATUT_DEMANDE = { a_traiter: 'À traiter', mis_en_relation: 'Mis en relation (match actif)', en_reserve: 'Gardé en réserve', pas_compatible: 'Pas compatible', dematche: 'Dématché' };
 async function chargerDemandes() {
   const box = $('[data-demandes]');
   if (!box) return;
@@ -412,21 +415,21 @@ async function chargerDemandes() {
     box.innerHTML = ordre.map((g) => `<section class="cl-carte cl-groupe">
       <h4>${qui(g.qui)}</h4>
       ${g.qui?.ref ? boutonEcrire(g.qui.ref, 'demandeur') : ''}
-      <p class="cl-coord">${g.liste.length} match(s) demandé(s)${g.aTraiter ? ` · <b>${g.aTraiter} à traiter</b>` : ''}${g.reserve ? ` · 🗂 ${g.reserve} en réserve` : ''}${(personnes[g.qui?.ref]?.matchs_en_cours || 0) > 1 ? ` · <b>💞 ${personnes[g.qui.ref].matchs_en_cours} matchs en cours</b>` : g.enRelation ? ' · <b>💞 déjà mis(e) en relation</b>' : g.aTraiter ? ' · 🤖 le site s’en occupe : rien à faire' : ''}${g.qui?.status && g.qui.status !== 'publiee' ? ' · <b class="cl-a-verifier">⏳ profil pas encore vérifié</b>' : ''}</p>
+      <p class="cl-coord">${g.liste.length} match(s) demandé(s)${g.aTraiter ? ` · <b>${g.aTraiter} à traiter</b>` : ''}${g.reserve ? ` · ${g.reserve} en réserve` : ''}${(personnes[g.qui?.ref]?.matchs_en_cours || 0) > 1 ? ` · <b><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> ${personnes[g.qui.ref].matchs_en_cours} matchs en cours</b>` : g.enRelation ? ' · <b><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> déjà mis(e) en relation</b>' : g.aTraiter ? ' · le site s’en occupe : rien à faire' : ''}${g.qui?.status && g.qui.status !== 'publiee' ? ' · <b class="cl-a-verifier"><svg class="ico" aria-hidden="true"><use href="/icones.svg#hourglass"/></svg> profil pas encore vérifié</b>' : ''}</p>
       ${g.liste.map((d) => { const [sc, cl, txt] = niveau(d.potentiel?.score); return `<article class="cl-demande${d === g.meilleur ? ' is-meilleur' : ''}" data-demande="${d.id}">
         <div class="cl-pot ${cl}" title="${txt}"><b>${sc}</b><small>/100</small></div>
         <div class="cl-demande-corps">
-          <p class="cl-coord">${d.potentiel?.outil ? '<b class="cl-source">algorithme de ton outil</b> · ' : d.potentiel?.provisoire ? '<b class="cl-provisoire">note provisoire : synchronise ton outil</b> · ' : ''}${d === g.meilleur ? '<b class="cl-meilleur">⭐ Meilleur potentiel</b> · ' : ''}${d.reciproque ? '<b class="cl-reciproque">💞 RÉCIPROQUE</b> · ' : ''}${d.via === 'swipe' ? '💘 swipe · ' : ''}${quand(d.created_at)} · ${txt}</p>
-          <p>💌 → ${qui(d.cible)}</p>
-          ${d.statut === 'a_traiter' ? `<p class="cl-coord">${d.reciproque || d.reponse === 'oui' ? '🤖 Les deux ont dit oui : la mise en relation se fera toute seule dès que les différences éventuelles sont acceptées.' : d.cible_compte === false ? '📭 Cette personne n’a pas de compte : elle ne peut pas répondre tant qu’elle n’a pas confirmé sa fiche.' : '⏳ En attente de la réponse de l’autre personne. Si elle dit oui, la mise en relation est automatique.'}</p>` : ''}
-          ${d.potentiel && (d.potentiel.forts.length || d.potentiel.vigilance.length) ? `<details><summary>Pourquoi ce score</summary>${d.potentiel.forts.length ? `<p class="cl-forts">✓ ${d.potentiel.forts.map(esc).join('<br>✓ ')}</p>` : ''}${d.potentiel.vigilance.length ? `<p class="cl-vigilance">⚠ ${d.potentiel.vigilance.map(esc).join('<br>⚠ ')}</p>` : ''}</details>` : ''}
-          <label>Statut<select data-demande-statut>${Object.entries(STATUT_DEMANDE).map(([k, v]) => `<option value="${k}"${k === d.statut ? ' selected' : ''}>${v}</option>`).join('')}</select></label>
+          <p class="cl-coord">${d.potentiel?.outil ? '<b class="cl-source">algorithme de ton outil</b> · ' : d.potentiel?.provisoire ? '<b class="cl-provisoire">note provisoire : synchronise ton outil</b> · ' : ''}${d === g.meilleur ? '<b class="cl-meilleur"><svg class="ico" aria-hidden="true"><use href="/icones.svg#star"/></svg> Meilleur potentiel</b> · ' : ''}${d.reciproque ? '<b class="cl-reciproque"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> RÉCIPROQUE</b> · ' : ''}${d.via === 'swipe' ? 'swipe · ' : ''}${quand(d.created_at)} · ${txt}</p>
+          <p><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> → ${qui(d.cible)}</p>
+          ${d.statut === 'a_traiter' ? `<p class="cl-coord">${d.reciproque || d.reponse === 'oui' ? 'Les deux ont dit oui : la mise en relation se fera toute seule dès que les différences éventuelles sont acceptées.' : d.cible_compte === false ? 'Cette personne n’a pas de compte : elle ne peut pas répondre tant qu’elle n’a pas confirmé sa fiche.' : 'En attente de la réponse de l’autre personne. Si elle dit oui, la mise en relation est automatique.'}</p>` : ''}
+          ${d.potentiel && (d.potentiel.forts.length || d.potentiel.vigilance.length) ? `<details><summary>Pourquoi ce score</summary>${d.potentiel.forts.length ? `<p class="cl-forts">✓ ${d.potentiel.forts.map(esc).join('<br>✓ ')}</p>` : ''}${d.potentiel.vigilance.length ? `<p class="cl-vigilance"><svg class="ico" aria-hidden="true"><use href="/icones.svg#triangle-alert"/></svg> ${d.potentiel.vigilance.map(esc).join('<br><svg class="ico" aria-hidden="true"><use href="/icones.svg#triangle-alert"/></svg> ')}</p>` : ''}</details>` : ''}
+          <label>Statut<select data-demande-statut class="cl-etat-choix is-${esc(d.statut)}">${Object.entries(STATUT_DEMANDE).map(([k, v]) => `<option value="${k}"${k === d.statut ? ' selected' : ''}>${v}</option>`).join('')}</select></label>
           ${boutonEcrire(d.cible_ref ?? d.cible?.ref, 'cible')}
         </div>
       </article>`; }).join('')}
       ${(() => { const pp = personnes[g.qui?.ref] || {}; const prop = pp.proposes || [], sug = pp.suggestions || [];
-        return `${prop.length ? `<div class="cl-jauge"><h5>💌 Proposés par toi</h5>${prop.map((x) => { const [sc, cl] = niveau(x.score); return `<p><span class="cl-pot ${cl} is-petit"><b>${sc}</b></span> n° ${x.cible_ref} · ${x.reponse === 'oui' ? '✅ ça l’intéresse' : x.reponse === 'non' ? '✖ pas pour elle / lui' : '⏳ en attente de réponse'}</p>`; }).join('')}</div>` : ''}
-        ${sug.length ? `<div class="cl-jauge"><h5>🧭 Meilleurs scores de ton outil, pas encore demandés ni proposés</h5>${sug.map((x) => { const [sc, cl] = niveau(x.score); return `<p><span class="cl-pot ${cl} is-petit"><b>${sc}</b></span> n° ${x.ref}${x.niveau ? ` · ${esc(x.niveau)}` : ''} <button class="cl-btn" type="button" data-proposer="${g.qui.ref}" data-cible="${x.ref}" data-score="${x.score}">💌 Lui proposer</button></p>`; }).join('')}</div>` : ''}`; })()}
+        return `${prop.length ? `<div class="cl-jauge"><h5><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> Proposés par toi</h5>${prop.map((x) => { const [sc, cl] = niveau(x.score); return `<p><span class="cl-pot ${cl} is-petit"><b>${sc}</b></span> n° ${x.cible_ref} · ${x.reponse === 'oui' ? 'ça l’intéresse' : x.reponse === 'non' ? '✖ pas pour elle / lui' : 'en attente de réponse'}</p>`; }).join('')}</div>` : ''}
+        ${sug.length ? `<div class="cl-jauge"><h5><svg class="ico" aria-hidden="true"><use href="/icones.svg#compass"/></svg> Meilleurs scores de ton outil, pas encore demandés ni proposés</h5>${sug.map((x) => { const [sc, cl] = niveau(x.score); return `<p><span class="cl-pot ${cl} is-petit"><b>${sc}</b></span> n° ${x.ref}${x.niveau ? ` · ${esc(x.niveau)}` : ''} <button class="cl-btn" type="button" data-proposer="${g.qui.ref}" data-cible="${x.ref}" data-score="${x.score}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> Lui proposer</button></p>`; }).join('')}</div>` : ''}`; })()}
     </section>`).join('');
   } catch (err) { box.innerHTML = `<p class="cl-vide">${esc(erreur(err.code))}</p>`; }
 }
@@ -467,7 +470,7 @@ async function chargerNouveautes() {
     const { nouveautes = [], abonnes = 0, types = {} } = await api({ action: 'annonce_nouveautes_admin' }, await jetonFrais());
     const attente = nouveautes.filter((n) => !n.envoyee_at).length;
     $('[data-n-nouv]').textContent = attente ? `(${attente} en attente)` : '';
-    box.innerHTML = `<p class="cl-aide">🔔 ${abonnes} téléphone(s) de membres abonnés aux notifications.${attente ? ` <button class="cl-btn" type="button" data-nouv-envoyer>Envoyer les ${attente} en attente maintenant</button>` : ''}</p>`
+    box.innerHTML = `<p class="cl-aide"><svg class="ico" aria-hidden="true"><use href="/icones.svg#bell"/></svg> ${abonnes} téléphone(s) de membres abonnés aux notifications.${attente ? ` <button class="cl-btn" type="button" data-nouv-envoyer>Envoyer les ${attente} en attente maintenant</button>` : ''}</p>`
       + nouveautes.slice(0, 15).map((n) => { const t = types[n.type] || {}; return `<p class="cl-nouv" style="border-left:5px solid ${t.couleur || '#999'}">${t.emoji || ''} <b>${esc(n.titre)}</b> <small>· ${quand(n.created_at)} · ${n.envoyee_at ? `envoyée (${n.nb_envoyes})` : 'en attente'}</small> <button class="cl-btn" type="button" data-nouv-suppr="${n.id}" aria-label="Supprimer">✕</button></p>`; }).join('');
   } catch (err) { box.innerHTML = `<p class="cl-vide">${esc(erreur(err.code))}</p>`; }
 }
@@ -493,6 +496,6 @@ document.addEventListener('click', async (e) => {
   if (!b) return;
   if (!confirm(`Proposer le profil n° ${b.dataset.cible} à la personne n° ${b.dataset.proposer} ? Elle le verra dans son espace LFB (fiche anonyme) et recevra une notification.`)) return;
   b.disabled = true;
-  try { await api({ action: 'annonce_proposer', pour: b.dataset.proposer, cible: b.dataset.cible, score: b.dataset.score }, await jetonFrais()); b.textContent = '✅ Proposé'; }
+  try { await api({ action: 'annonce_proposer', pour: b.dataset.proposer, cible: b.dataset.cible, score: b.dataset.score }, await jetonFrais()); b.textContent = 'Proposé'; }
   catch (err) { b.disabled = false; alert(err.code === 'pas_de_compte' ? 'Cette personne n’a pas encore de compte LFB.' : 'La proposition n’est pas partie. Réessaie.'); }
 });

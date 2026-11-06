@@ -8,13 +8,13 @@ test('« A gma Rachid » pour un homme, « A weltma Werda » pour une femme, ave
   assert.equal(adresse('femme', 'Werda'), 'A weltma Werda');
   assert.equal(adresse('homme'), 'A gma');
   assert.equal(accord('homme'), ''); assert.equal(accord('femme'), 'e');
-  assert.equal(adresser('💌 {A}, quelqu’un t’a choisi{e}', { genre: 'homme', prenom: 'Rachid' }), '💌 A gma Rachid, quelqu’un t’a choisi');
-  assert.equal(adresser('💌 {A}, quelqu’un t’a choisi{e}', { genre: 'femme', prenom: 'Werda' }), '💌 A weltma Werda, quelqu’un t’a choisie');
+  assert.equal(adresser('{A}, quelqu’un t’a choisi{e}', { genre: 'homme', prenom: 'Rachid' }), 'A gma Rachid, quelqu’un t’a choisi');
+  assert.equal(adresser('{A}, quelqu’un t’a choisi{e}', { genre: 'femme', prenom: 'Werda' }), 'A weltma Werda, quelqu’un t’a choisie');
 });
 
 test('genre inconnu : le prénom, sinon une phrase propre, jamais de {A} visible', () => {
-  assert.equal(adresser('⏳ {A}, ta discussion se termine demain', { prenom: 'Sam' }), '⏳ Sam, ta discussion se termine demain');
-  assert.equal(adresser('⏳ {A}, ta discussion se termine demain'), '⏳ Ta discussion se termine demain');
+  assert.equal(adresser('{A}, ta discussion se termine demain', { prenom: 'Sam' }), 'Sam, ta discussion se termine demain');
+  assert.equal(adresser('{A}, ta discussion se termine demain'), 'Ta discussion se termine demain');
   assert.equal(adresser('Tu seras prévenu{e}'), 'Tu seras prévenu·e');
 });
 
@@ -27,5 +27,5 @@ test('la discussion transmet l’adresse à l’écran et aux notifications', as
   assert.equal(j.adresse, 'A gma Rachid'); assert.equal(j.accord, '');
   const pushes = [];
   await rappelsDiscussions({ read, patch: async () => {}, now: () => new Date('2026-11-02T10:00:00Z'), pousserMembre: async (u, m) => { pushes.push(m.titre); } });
-  assert.deepEqual(pushes, ['⏳ {A}, ta discussion se termine demain', '⏳ {A}, ta discussion se termine demain']);
+  assert.deepEqual(pushes, ['{A}, ta discussion se termine demain', '{A}, ta discussion se termine demain']);
 });

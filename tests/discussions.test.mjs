@@ -29,7 +29,7 @@ test('discussion : ouverte 7 jours, contacts masqués, numéros montrés quand l
   const [s1, r1] = await json(await actionDiscussion('annonce_discussion_envoyer', { id: D, texte: 'Salam ! mon 06 12 34 56 78' }, { ...ctx, user: { id: A } }));
   assert.equal(s1, 200); assert.equal(r1.masque, true);
   assert.ok(!db.discussion_messages[0].texte.includes('06 12'));
-  assert.deepEqual(pushes[0], [B, '💬 Ton match t’a écrit']);
+  assert.deepEqual(pushes[0], [B, 'Ton match t’a écrit']);
 
   const [, v] = await json(await actionDiscussion('annonce_discussion_numero', { id: D, telephone: '06 12 34 56 78' }, { ...ctx, user: { id: A } }));
   assert.equal(v.echange, false);
@@ -177,6 +177,6 @@ test('prénom : caché par défaut, demandé, partagé par choix, ou plus tard a
   assert.equal(vu.avec, 'Melina');
   assert.equal(vu.prenom.partage, false, 'le choix de l’un n’engage pas l’autre');
   assert.equal((await liste(A)).avec, 'Profil n° 27');
-  assert.deepEqual(pushes.at(-1), [B, '👋 Melina t’a donné son prénom']);
+  assert.deepEqual(pushes.at(-1), [B, 'Melina t’a donné son prénom']);
   assert.ok(db.discussion_messages.some((m) => m.texte.includes('Melina')));
 });

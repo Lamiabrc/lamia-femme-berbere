@@ -9,17 +9,17 @@
   body { background: #120d1a; color: #efe4cf; }
   .wrap { max-width: 1100px; margin: 0 auto; padding: 32px var(--gouttiere) 64px; }
   h1, h2 { color: #fff; } h2 { font-size: 26px; margin: 28px 0 10px; }
-  .kicker { color: #e3bd6e; font-size: 12px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; margin: 0; }
-  .box { background: rgba(255,255,255,.05); border: 1px solid rgba(227,189,110,.3); border-radius: 16px; padding: 18px; margin-top: 14px; }
+  .kicker { color: #E9DFFA; font-size: 12px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; margin: 0; }
+  .box { background: rgba(255,255,255,.05); border: 1px solid rgba(233, 223, 250,.3); border-radius: 16px; padding: 18px; margin-top: 14px; }
   .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }
   label { display: grid; gap: 6px; font-weight: 600; }
-  input, select { min-height: 44px; padding: 8px 12px; border-radius: 10px; border: 1px solid rgba(227,189,110,.5); font: 16px var(--sans); }
-  .btn-gold { background: #f3e0b9; color: #151515; border-color: #f3e0b9; }
-  .btn-out { background: transparent; color: #fff1c9; border-color: rgba(227,189,110,.7); }
+  input, select { min-height: 44px; padding: 8px 12px; border-radius: 10px; border: 1px solid rgba(233, 223, 250,.5); font: 16px var(--sans); }
+  .btn-gold { background: #E9DFFA; color: #272433; border-color: #E9DFFA; }
+  .btn-out { background: transparent; color: #fff1c9; border-color: rgba(233, 223, 250,.7); }
   .btn-stop { background: #5c1424; color: #fff; border-color: #5c1424; }
   table { width: 100%; border-collapse: collapse; font-size: 15px; display: block; overflow-x: auto; }
-  th, td { text-align: left; padding: 8px; border-bottom: 1px solid rgba(227,189,110,.2); }
-  th { color: #e3bd6e; font-size: 13px; }
+  th, td { text-align: left; padding: 8px; border-bottom: 1px solid rgba(233, 223, 250,.2); }
+  th { color: #E9DFFA; font-size: 13px; }
   .big { font-family: var(--serif); font-size: 40px; color: #fff1c9; margin: 0; }
   .status { color: #fff1c9; min-height: 1.4em; }
   .status.err { color: #ff9aa8; }
@@ -27,18 +27,18 @@
   .tat { display: flex; flex-wrap: wrap; gap: 8px; }
   /* Régie : la caméra et les commandes du bal sur le même écran. */
   .regie { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 14px; margin-top: 14px; }
-  .regie-video { position: relative; min-height: 420px; height: 62vh; border-radius: 16px; overflow: hidden; background: #000; border: 1px solid rgba(227,189,110,.4); }
+  .regie-video { position: relative; min-height: 420px; height: 62vh; border-radius: 16px; overflow: hidden; background: #000; border: 1px solid rgba(233, 223, 250,.4); }
   .regie-video iframe { width: 100%; height: 100%; border: 0; }
-  .regie-ou { position: absolute; top: 10px; left: 10px; z-index: 2; padding: 4px 12px; border-radius: 999px; background: rgba(18,13,26,.85); color: #f3e0b9; font-size: 13px; font-weight: 700; }
+  .regie-ou { position: absolute; top: 10px; left: 10px; z-index: 2; padding: 4px 12px; border-radius: 999px; background: rgba(18,13,26,.85); color: #E9DFFA; font-size: 13px; font-weight: 700; }
   .regie-cmd { display: grid; gap: 10px; align-content: start; }
   .regie-cmd .btn { width: 100%; justify-content: center; }
   .regie-chrono { font-family: var(--serif); font-size: 44px; color: #fff1c9; margin: 0; text-align: center; }
   .regie-cmd .tat { flex-direction: column; }
-  .tchat-admin { border: 1px solid rgba(227,189,110,.35); border-radius: 12px; padding: 10px; background: rgba(0,0,0,.25); }
+  .tchat-admin { border: 1px solid rgba(233, 223, 250,.35); border-radius: 12px; padding: 10px; background: rgba(0,0,0,.25); }
   .tchat-fil { list-style: none; margin: 0; padding: 0; max-height: 220px; overflow-y: auto; display: grid; gap: 6px; font-size: 14px; }
   .tchat-fil li { padding: 6px 9px; border-radius: 10px; background: rgba(255,255,255,.06); }
-  .tchat-fil li.is-moi { background: rgba(243,224,185,.18); }
-  .tchat-fil b { color: #e3bd6e; margin-right: 4px; }
+  .tchat-fil li.is-moi { background: rgba(233,223,250,.18); }
+  .tchat-fil b { color: #E9DFFA; margin-right: 4px; }
   @media (max-width: 860px) { .regie { grid-template-columns: 1fr; } .regie-video { height: 55vh; } }
 </style>
 </head>
@@ -72,7 +72,7 @@
         <p class="kicker" id="phase"></p>
         <p class="big" id="presents"></p>
         <div class="row" style="margin-top:12px">
-          <button class="btn btn-gold" id="btn-salon" type="button">📹 Ouvrir la caméra ici (salon d’attente)</button>
+          <button class="btn btn-gold" id="btn-salon" type="button">Ouvrir la caméra ici (salon d’attente)</button>
         </div>
         <div class="regie" id="regie" hidden>
           <div class="regie-video"><span class="regie-ou" id="regie-ou">Salon d’attente</span><div id="cadre" style="height:100%"></div></div>
@@ -80,14 +80,14 @@
             <p class="regie-chrono" id="chrono"></p>
             <label>Durée d’un tour (minutes)<input id="minutes2" type="number" min="2" max="15" value="6"></label>
             <label style="display:flex;gap:8px;align-items:center;font-weight:600"><input id="melanger" type="checkbox" checked style="width:20px;min-height:0;height:20px"> Mélanger les salons s’il manque quelqu’un en face</label>
-            <button class="btn btn-gold" id="r-round" type="button">▶ Lancer un tour</button>
+            <button class="btn btn-gold" id="r-round" type="button"><svg class="ico" aria-hidden="true"><use href="/icones.svg#play"/></svg> Lancer un tour</button>
             <p id="r-last" style="margin:0;font-size:14px;color:#fff1c9"></p>
             <button class="btn btn-out" id="r-grand" type="button">↩ Rappeler tout le monde</button>
             <div class="tat" id="r-tat"></div>
             <button class="btn btn-out" id="r-salon" type="button" hidden>Revenir au salon d’attente</button>
             <button class="btn btn-out" id="r-fin" type="button">Fin du bal (souhaits)</button>
             <div class="tchat-admin">
-              <p class="kicker" style="margin:0 0 6px">💬 Chat du salon</p>
+              <p class="kicker" style="margin:0 0 6px"><svg class="ico" aria-hidden="true"><use href="/icones.svg#message-circle"/></svg> Chat du salon</p>
               <ol id="tchat-fil" class="tchat-fil"><li style="color:#b8a98f">Écris à tout le salon d’attente. Leurs réponses n’arrivent qu’à toi.</li></ol>
               <form id="tchat-form" class="row" style="gap:6px;margin-top:6px"><input name="t" maxlength="300" autocomplete="off" placeholder="Vous m’entendez ?" style="flex:1;min-width:0"><button class="btn btn-gold" type="submit">Envoyer</button></form>
             </div>
@@ -135,7 +135,7 @@
         <p style="font-size:14px;color:#b8a98f">Réunit seulement les couples qui se sont choisis et sont encore connectés, pour un dernier tête-à-tête sans masque. Chacun confirme à l’écran s’il veut être mis en relation. Ceux déjà partis reçoivent la question dans « Mon espace ».</p>
         <table><thead><tr><th>Souhait réciproque</th><th>Démasquage</th><th>Emails</th></tr></thead><tbody id="mutual"></tbody></table>
         <h2>Tous les souhaits</h2>
-        <p style="font-size:14px;color:#b8a98f">Ce que chaque participant a coché, même si ce n’est pas réciproque. 💞 = réciproque. Personne d’autre ne voit cette liste.</p>
+        <p style="font-size:14px;color:#b8a98f">Ce que chaque participant a coché, même si ce n’est pas réciproque. = réciproque. Personne d’autre ne voit cette liste.</p>
         <table><thead><tr><th>Participant</th><th>Aimerait revoir</th><th>Son mot</th><th>Avis sur le bal</th></tr></thead><tbody id="souhaits"></tbody></table>
       </div>
     </div>
@@ -179,7 +179,7 @@ function paint(d) {
   $('#presents').textContent = `${d.present} masque${d.present > 1 ? 's' : ''} au bal`;
   $('#salons').innerHTML = d.salons.map((x) => `<tr><td>${esc(x.label)}</td><td>${x.inscrits}</td><td>${x.presents}</td><td>${x.femmes}</td><td>${x.hommes}</td></tr>`).join('');
   const lr = s.last_round;
-  const texteTour = lr ? (lr.pairs ? `Tour ${s.round} : ${lr.pairs} tête-à-tête lancé${lr.pairs > 1 ? 's' : ''}${lr.waiting.length ? ` · en attente : ${lr.waiting.join(', ')}` : ''}` : `⚠️ Tour ${s.round} : aucun tête-à-tête. ${lr.raison || ''}${lr.waiting.length ? ` En attente : ${lr.waiting.join(', ')}.` : ''}`) : '';
+  const texteTour = lr ? (lr.pairs ? `Tour ${s.round} : ${lr.pairs} tête-à-tête lancé${lr.pairs > 1 ? 's' : ''}${lr.waiting.length ? ` · en attente : ${lr.waiting.join(', ')}` : ''}` : `Tour ${s.round} : aucun tête-à-tête. ${lr.raison || ''}${lr.waiting.length ? ` En attente : ${lr.waiting.join(', ')}.` : ''}`) : '';
   $('#last').textContent = texteTour;
   $('#r-last').textContent = texteTour;
   const boutonsTat = s.phase === 'tour' ? d.tat.map((t, i) => { const n = t.noms?.length ? t.noms.join(' et ') : `tête-à-tête ${i + 1}`; return `<button class="btn btn-out" type="button" data-room="${esc(t.room)}" data-noms="${esc(n)}">Rendre visite : ${esc(n)}</button>`; }).join('') : '';
@@ -190,9 +190,9 @@ function paint(d) {
   if (salleActuelle && s.phase !== 'tour' && cadre) openRoom();
   $('#wishes').textContent = `${d.wishes_count} personne${d.wishes_count > 1 ? 's ont' : ' a'} envoyé ses souhaits.`;
   const AV = { oui: 'oui', moyen: 'moyen', non: 'non', 'peut-etre': 'peut-être' };
-  $('#souhaits').innerHTML = (d.souhaits || []).map((w) => `<tr><td><b>${esc(w.nom)}</b><br><small style="color:#b8a98f">${esc(w.salon)} · ${w.rencontres} tête-à-tête</small></td><td>${w.choix.length ? w.choix.map((c) => `${esc(c.nom)}${c.reciproque ? ' 💞' : ''}`).join(', ') : '<span style="color:#b8a98f">personne</span>'}</td><td>${esc(w.message)}</td><td><small>${[w.avis.aime && `a aimé : ${AV[w.avis.aime]}`, w.avis.reviendrait && `reviendrait : ${AV[w.avis.reviendrait]}`, w.avis.paierait && `paierait : ${AV[w.avis.paierait]}`].filter(Boolean).join('<br>')}</small></td></tr>`).join('') || '<tr><td colspan="4">Personne n’a encore envoyé ses souhaits.</td></tr>';
+  $('#souhaits').innerHTML = (d.souhaits || []).map((w) => `<tr><td><b>${esc(w.nom)}</b><br><small style="color:#b8a98f">${esc(w.salon)} · ${w.rencontres} tête-à-tête</small></td><td>${w.choix.length ? w.choix.map((c) => `${esc(c.nom)}${c.reciproque ? '' : ''}`).join(', ') : '<span style="color:#b8a98f">personne</span>'}</td><td>${esc(w.message)}</td><td><small>${[w.avis.aime && `a aimé : ${AV[w.avis.aime]}`, w.avis.reviendrait && `reviendrait : ${AV[w.avis.reviendrait]}`, w.avis.paierait && `paierait : ${AV[w.avis.paierait]}`].filter(Boolean).join('<br>')}</small></td></tr>`).join('') || '<tr><td colspan="4">Personne n’a encore envoyé ses souhaits.</td></tr>';
   const REP = (x) => (x === true ? 'oui' : x === false ? 'non' : 'pas encore répondu');
-  const ETAT = { confirme: '💞 Confirmé : mets-les en relation', pas_cette_fois: 'Pas cette fois', en_cours: 'En attente' };
+  const ETAT = { confirme: 'Confirmé : mets-les en relation', pas_cette_fois: 'Pas cette fois', en_cours: 'En attente' };
   $('#mutual').innerHTML = d.mutual.map(([a, b]) => `<tr><td>${esc(a.name)} et ${esc(b.name)}</td><td><strong>${esc(ETAT[a.demasque?.etat] || 'En attente')}</strong><br><small>${esc(a.name)} : ${REP(a.demasque?.reponse)} · ${esc(b.name)} : ${REP(b.demasque?.reponse)}</small></td><td>${esc(a.email || '')} · ${esc(b.email || '')}</td></tr>`).join('') || '<tr><td colspan="3">Pas encore de souhait réciproque.</td></tr>';
 }
 

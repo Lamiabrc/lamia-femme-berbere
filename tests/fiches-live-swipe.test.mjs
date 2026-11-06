@@ -212,7 +212,7 @@ test('le swipe ne s’arrête jamais : les profils passés reviennent, jamais ce
 test('recommandation : posée sur la fiche, visible dans la liste, retirable', async () => {
   const { badgesProfil } = await import('../content/matching-options.mjs');
   assert.match(badgesProfil({ recommande: true }), /Recommandé par Lamia/);
-  assert.match(badgesProfil({ piece_identite: true }), /🪪/);
+  assert.match(badgesProfil({ piece_identite: true }), /pièce d’identité/);
   assert.equal(badgesProfil({}), '');
   const { db, ctx } = base({ profils_outil: [FICHE(100001, 'u-rachid', 'homme'), FICHE(100002, null, 'femme', { recommande_at: '2026-11-03' })] });
   const r = await lire(await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID)));

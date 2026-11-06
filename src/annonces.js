@@ -63,7 +63,7 @@ export function formulaireHtml() {
     </fieldset>
     <div data-si-live hidden>
       <label>Ton pseudo ou ton lien TikTok de l’époque<input name="tiktok_live" maxlength="200" placeholder="@tonpseudo"></label>
-      <p class="annonce-aide">🎥 Lamia retrouve ta fiche : ton profil est déjà chez elle, tu n’as que l’essentiel à remplir ci-dessous. <strong>Tes 3 premières mises en relation sont offertes.</strong></p>
+      <p class="annonce-aide"><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg> Lamia retrouve ta fiche : ton profil est déjà chez elle, tu n’as que l’essentiel à remplir ci-dessous. <strong>Tes 3 premières mises en relation sont offertes.</strong></p>
     </div>
   </div>
   <div class="annonce-etape">
@@ -138,7 +138,7 @@ export function formulaireHtml() {
   <div class="annonce-etape annonce-id">
     <h3><span>5</span> Facultatif : ta pièce d’identité, pour un profil encore plus sûr</h3>
     <p class="annonce-aide">Ce n’est pas obligatoire. Mais un profil vérifié <strong>avec pièce d’identité</strong> porte un badge renforcé dans les annonces et inspire davantage confiance. Prends en photo ta carte d’identité, ton passeport ou ton titre de séjour, <strong>en posant ta main (ou un doigt) sur le numéro du document</strong> pour le cacher. Lamia vérifie seulement que la personne de l’annonce existe vraiment et qu’elle est majeure.</p>
-    <p class="annonce-aide">🔒 Cette photo n’est <strong>jamais publiée</strong>. Seule Lamia la voit, et elle est <strong>supprimée dès la vérification faite</strong>.</p>
+    <p class="annonce-aide"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lock"/></svg> Cette photo n’est <strong>jamais publiée</strong>. Seule Lamia la voit, et elle est <strong>supprimée dès la vérification faite</strong>.</p>
     <label class="annonce-depot">＋ Ajouter la photo de ma pièce d’identité<input type="file" accept="image/*,.pdf,application/pdf" data-identite></label>
     <ul class="annonce-apercu" data-identite-liste></ul>
   </div>
@@ -162,7 +162,7 @@ export function formulaireHtml() {
   <input type="hidden" name="interet_ref" value="">
   <p class="annonce-interet" data-interet-info hidden></p>
   <input class="hp" name="zz_site" tabindex="-1" autocomplete="off" aria-hidden="true">
-  <button class="btn btn-ink annonce-envoyer" type="submit">💌 Envoyer mon profil à Lamia</button>
+  <button class="btn btn-ink annonce-envoyer" type="submit"><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> Envoyer mon profil à Lamia</button>
   <p class="form-status" role="status" data-annonce-statut></p>
 </form>`;
 }
@@ -194,7 +194,7 @@ async function copier(liste, max) {
 }
 
 function apercu(ul, fichiers, retirer) {
-  ul.innerHTML = fichiers.map((f, i) => `<li>${f.type.startsWith('image/') && !/heic|heif/.test(f.type) ? `<img src="${URL.createObjectURL(f)}" alt="">` : f.type.startsWith('video/') ? '<span class="annonce-ico">🎬</span>' : '<span class="annonce-ico">📄</span>'}<small>${esc(f.name || 'fichier')}</small><button type="button" data-i="${i}" aria-label="Retirer ce fichier">✕</button></li>`).join('');
+  ul.innerHTML = fichiers.map((f, i) => `<li>${f.type.startsWith('image/') && !/heic|heif/.test(f.type) ? `<img src="${URL.createObjectURL(f)}" alt="">` : f.type.startsWith('video/') ? '<span class="annonce-ico"><svg class="ico" aria-hidden="true"><use href="/icones.svg#clapperboard"/></svg></span>' : '<span class="annonce-ico"><svg class="ico" aria-hidden="true"><use href="/icones.svg#file-text"/></svg></span>'}<small>${esc(f.name || 'fichier')}</small><button type="button" data-i="${i}" aria-label="Retirer ce fichier">✕</button></li>`).join('');
   $$('button', ul).forEach((b) => b.addEventListener('click', () => retirer(Number(b.dataset.i))));
 }
 
@@ -210,7 +210,7 @@ function porteCompte(box) {
   const ref = box.dataset.interet;
   box.innerHTML = `<div class="annonce-porte">
     <h3>Connecte-toi ou crée ton profil</h3>
-    ${ref ? `<p class="annonce-interet">💌 Le profil n° ${esc(ref)} t’intéresse : crée d’abord ton compte, puis ton profil. Lamia regardera si vous pouvez correspondre.</p>` : ''}
+    ${ref ? `<p class="annonce-interet"><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> Le profil n° ${esc(ref)} t’intéresse : crée d’abord ton compte, puis ton profil. Lamia regardera si vous pouvez correspondre.</p>` : ''}
     <p class="annonce-aide">Déjà un compte ? Connecte-toi. Sinon, commence ici : ton email et un mot de passe, puis ton profil. Tu pourras le modifier et suivre tes mises en relation.</p>
     <div class="annonce-onglets" role="tablist"><button type="button" role="tab" data-mode="creer" aria-selected="true">Créer mon profil</button><button type="button" role="tab" data-mode="connexion" aria-selected="false">Me connecter</button></div>
     <form class="annonce-grille" data-porte novalidate>
@@ -259,13 +259,13 @@ function porteCompte(box) {
       // Compte existant ou mot de passe oublié : un lien de connexion par email, en un clic.
       if (['compte_existant', 'connexion'].includes(err.code)) {
         const lien = document.createElement('button');
-        lien.type = 'button'; lien.className = 'btn btn-line'; lien.textContent = '📩 Recevoir un lien de connexion par email';
+        lien.type = 'button'; lien.className = 'btn btn-line'; lien.textContent = 'Recevoir un lien de connexion par email';
         st.append(document.createElement('br'), lien);
         lien.addEventListener('click', async () => {
           lien.disabled = true;
           try {
             const r = await api({ action: 'annonce_lien_connexion', email, retour: 'rencontres' });
-            say(st, r.existe === false ? 'Aucun compte n’existe avec cet email : choisis « Créer mon compte ».' : '📩 C’est parti ! Ouvre l’email que tu viens de recevoir et clique sur « Me connecter » (regarde aussi les courriers indésirables).', r.existe === false);
+            say(st, r.existe === false ? 'Aucun compte n’existe avec cet email : choisis « Créer mon compte ».' : 'C’est parti ! Ouvre l’email que tu viens de recevoir et clique sur « Me connecter » (regarde aussi les courriers indésirables).', r.existe === false);
           } catch (e2) { say(st, e2.code === 'trop_de_demandes' ? 'Plusieurs liens sont déjà partis : regarde dans tes emails, ou réessaie dans une heure.' : 'L’envoi n’a pas fonctionné. Réessaie dans un instant.', true); lien.disabled = false; }
         });
       }
@@ -280,7 +280,7 @@ function appliquerInteret(box) {
   const info = form.querySelector('[data-interet-info]');
   form.prepend(info);
   info.hidden = false;
-  info.textContent = `💌 Le profil n° ${ref} t’intéresse : crée ton profil ci-dessous. Lamia est prévenue et regarde si vous pouvez correspondre. Ton identité reste secrète.`;
+  info.textContent = `Le profil n° ${ref} t’intéresse : crée ton profil ci-dessous. Lamia est prévenue et regarde si vous pouvez correspondre. Ton identité reste secrète.`;
 }
 
 function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
@@ -428,7 +428,7 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
       envoi = null;
       window.lfbEvent?.('annonce_deposee');
       try { localStorage.removeItem(BROUILLON); } catch { /* */ }
-      box.innerHTML = `<div class="annonce-merci"><p class="annonce-coeur" aria-hidden="true">💌</p><h3>Merci ${esc(f.prenom.value.trim())}, ton profil est bien arrivé chez Lamia${fin.ref ? ` (n° ${fin.ref})` : ''} !</h3><p>Il n’est publié nulle part. Lamia le vérifie, puis le passe dans son outil de matching. Tu recevras par email le nombre de personnes avec qui tu pourrais correspondre. ${live ? 'Tes 3 premières mises en relation sont offertes.' : 'Ta première mise en relation est offerte.'}</p><p>Ton profil est lié à ton compte : tu peux le modifier quand tu veux dans <a href="/mon-espace/">Mon espace</a>.</p><p>En attendant, tu peux <a href="/speed-dating/">t’inscrire à la prochaine soirée</a> ou <a href="/confidences/">écrire à Lamia</a>.</p></div>`;
+      box.innerHTML = `<div class="annonce-merci"><p class="annonce-coeur" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg></p><p class="lfb-azul" lang="ber">ⵜⴰⵏⴻⵎⵎⵉⵔⵜ</p><h3>Merci ${esc(f.prenom.value.trim())}, ton profil est bien arrivé chez Lamia${fin.ref ? ` (n° ${fin.ref})` : ''} !</h3><p>Il n’est publié nulle part. Lamia le vérifie, puis le passe dans son outil de matching. Tu recevras par email le nombre de personnes avec qui tu pourrais correspondre. ${live ? 'Tes 3 premières mises en relation sont offertes.' : 'Ta première mise en relation est offerte.'}</p><p>Ton profil est lié à ton compte : tu peux le modifier quand tu veux dans <a href="/mon-espace/">Mon espace</a>.</p><p>En attendant, tu peux <a href="/speed-dating/">t’inscrire à la prochaine soirée</a> ou <a href="/confidences/">écrire à Lamia</a>.</p></div>`;
     } catch (err) {
       btn.disabled = false;
       say(st, ERR[err.code] || (err.code && !/^http_/.test(err.code) ? `L’envoi n’a pas abouti (${err.code}). Réessaie, ou écris à Lamia en lui donnant ce code.` : 'L’envoi n’a pas abouti : la connexion a coupé ou le serveur n’a pas répondu. Réessaie dans un instant ; si ça recommence, écris à Lamia.'), true);
@@ -486,7 +486,7 @@ async function interesse(ref) {
   if (s) {
     try {
       await api({ action: 'annonce_interet', ref }, s.access_token);
-      montrerMessage(`💌 C’est noté : Lamia sait que le profil n° ${ref} t’intéresse. Elle regarde si vous pouvez correspondre. Ton identité reste secrète : seul ton numéro de profil peut apparaître.`);
+      montrerMessage(`C’est noté : Lamia sait que le profil n° ${ref} t’intéresse. Elle regarde si vous pouvez correspondre. Ton identité reste secrète : seul ton numéro de profil peut apparaître.`);
       window.lfbEvent?.('interet_profil');
       return;
     } catch (err) {
@@ -512,7 +512,7 @@ function carte(a) {
   return `<article class="annonce-carte annonce-anonyme">
     <div class="annonce-sceau" aria-hidden="true"><img src="/images/outil/${a.genre === 'femme' ? 'avatar-femme' : 'avatar-homme'}.webp" alt="" width="80" height="80"></div>
     <div class="annonce-texte">
-      <p class="annonce-ref${a.piece_identite ? ' is-piece' : ''}">Profil n° ${a.ref} · ${a.piece_identite ? '✓ vérifié par Lamia' : a.outil ? (a.confirme ? '✓ vérifié par Lamia · ✅ confirmé' : '✓ vérifié par Lamia · ⏳ en attente de confirmation') : '✓ profil vérifié'}</p>
+      <p class="annonce-ref${a.piece_identite ? ' is-piece' : ''}">Profil n° ${a.ref} · ${a.piece_identite ? '✓ vérifié par Lamia' : a.outil ? (a.confirme ? '✓ vérifié par Lamia · confirmé' : '✓ vérifié par Lamia · en attente de confirmation') : '✓ profil vérifié'}</p>
       ${badgesProfil(a)}
       <h3>${esc(infos.slice(0, 2).join(', '))}</h3>
       <p class="annonce-lieu"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lieu"/></svg>${esc([a.ville, ...infos.slice(2)].filter(Boolean).join(' · '))}</p>
@@ -523,7 +523,7 @@ function carte(a) {
       <h4>Qui je suis</h4><p data-membre>${esc(a.profil)}</p>
       <h4>Qui je cherche${ages}</h4><p data-membre>${esc(a.recherche)}</p>
       ${foiEtVie(a)}
-      <button type="button" class="btn btn-ink" data-interet="${a.ref}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur"/></svg> Ce profil m’intéresse</button><span class="profil-moderer"><button type="button" class="link-button" data-liste-bloquer="${a.ref}">🚩 Bloquer et signaler</button></span>
+      <button type="button" class="btn btn-ink" data-interet="${a.ref}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur"/></svg> Ce profil m’intéresse</button><span class="profil-moderer"><button type="button" class="link-button" data-liste-bloquer="${a.ref}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#flag"/></svg> Bloquer et signaler</button></span>
     </div>
   </article>`;
 }
@@ -538,7 +538,7 @@ export async function monterListe(box) {
     const groupes = { femme: annonces.filter((a) => a.genre === 'femme'), homme: annonces.filter((a) => a.genre === 'homme') };
     const onglets = document.createElement('div');
     onglets.className = 'annonce-onglets'; onglets.setAttribute('role', 'tablist'); onglets.setAttribute('aria-label', 'Catégories de profils');
-    onglets.innerHTML = [['femme', '👩 Les femmes'], ['homme', '👨 Les hommes']].map(([g, t]) => `<button type="button" role="tab" data-genre="${g}">${t} <b>${groupes[g].length}</b></button>`).join('');
+    onglets.innerHTML = [['femme', 'Les femmes'], ['homme', 'Les hommes']].map(([g, t]) => `<button type="button" role="tab" data-genre="${g}">${t} <b>${groupes[g].length}</b></button>`).join('');
     box.before(onglets);
     // 20 profils par page.
     const limite = Number(box.dataset.limite) || 0;
@@ -575,7 +575,7 @@ export async function retraitDepuisLien() {
   zone.hidden = false;
   zone.innerHTML = '<p>Tu veux retirer ton profil ? Tes textes, tes photos et ta vidéo seront effacés.</p><p><button type="button" class="btn btn-ink" data-retirer-ok>Oui, retirer mon profil</button></p><p class="form-status" data-retrait-statut></p>';
   zone.querySelector('[data-retirer-ok]').addEventListener('click', async () => {
-    try { await api({ action: 'annonce_retirer', annonce_id: id, token }); zone.innerHTML = '<p>C’est fait : ton profil est retiré et tes photos sont effacées. Lamia te souhaite le meilleur 💛</p>'; }
+    try { await api({ action: 'annonce_retirer', annonce_id: id, token }); zone.innerHTML = '<p>C’est fait : ton profil est retiré et tes photos sont effacées. Lamia te souhaite le meilleur</p>'; }
     catch { say(zone.querySelector('[data-retrait-statut]'), 'Ce lien ne fonctionne pas. Écris à Lamia dans les Confidences, elle retirera ton annonce.', true); }
   });
 }
@@ -687,7 +687,7 @@ function monterEtapes(form, { calculerManques, afficherManques }) {
     remplir(); // les listes qui dépendent d'une autre réponse (diplôme, vision du couple) sont remplies maintenant
     const note = document.createElement('p');
     note.className = 'annonce-aide annonce-reprise';
-    note.innerHTML = '📝 On a gardé ce que tu avais commencé. <button type="button" class="link-button">Tout effacer</button>';
+    note.innerHTML = 'On a gardé ce que tu avais commencé. <button type="button" class="link-button">Tout effacer</button>';
     $('button', note).addEventListener('click', () => { try { localStorage.removeItem(BROUILLON); } catch { /* */ } location.reload(); });
     progres.after(note);
   }

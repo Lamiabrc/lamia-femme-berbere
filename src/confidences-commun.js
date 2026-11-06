@@ -58,6 +58,6 @@ export function piecesHtml(files = []) {
     if (!f.url) return '<p class="conf-piece">Fichier indisponible</p>';
     if (f.kind === 'audio') return `<audio class="conf-audio" controls preload="none" src="${esc(f.url)}"></audio>`;
     if (f.kind === 'image') return `<a class="conf-image" href="${esc(f.url)}" target="_blank" rel="noopener"><img src="${esc(f.url)}" alt="${esc(f.original_name || 'Image')}" loading="lazy"></a>`;
-    return `<a class="conf-doc" href="${esc(f.url)}" target="_blank" rel="noopener">📄 ${esc(f.original_name || 'Document')} <small>${taille(f.size_bytes)}</small></a>`;
+    return `<a class="conf-doc" href="${esc(f.url)}" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="/icones.svg#file-text"/></svg> ${esc(f.original_name || 'Document')} <small>${taille(f.size_bytes)}</small></a>`;
   }).join('');
 }
