@@ -146,3 +146,5 @@ legend { font-size: 14px; font-weight: 600; padding: 0 4px; }
 .cl-ecrire-zone label { display: grid; gap: 6px; font-size: 14px; font-weight: 600; }
 .cl-ecrire-zone textarea { width: 100%; box-sizing: border-box; font: 16px/1.4 inherit; padding: 8px; border: 1px solid #d9c19a; border-radius: 10px; margin-bottom: 8px; }
 .cl-ecrire-zone a.cl-btn { text-decoration: none; }
+
+.cl-fil-profil { display: block; width: fit-content; margin-top: 8px; text-decoration: none; }
