@@ -3953,3 +3953,10 @@ html[dir="rtl"], html[dir="rtl"] body { overflow-x: clip; }
 .conf-conv-reserve { padding: 16px 18px; margin-top: 14px; background: #E9DFFA; border-radius: 16px; }
 .conf-conv-reserve h3 { margin: 0 0 8px; }
 .conf .conf-form a.conf-btn.conf-btn-plein { color: #fff; -webkit-text-fill-color: #fff; text-decoration: none; }
+
+/* Mon espace : plus court sur téléphone */
+.espace-nb { display: inline-block; min-width: 1.6em; padding: 0 7px; border-radius: 999px; background: #E9DFFA; color: #4A3B75; font-weight: 600; font-size: .9em; text-align: center; }
+.espace-deja, .espace-demandes-finies { margin: 10px 0 4px; padding: 10px 14px; border-radius: 14px; background: rgba(233, 223, 250, .45); }
+.espace-deja summary, .espace-demandes-finies summary { cursor: pointer; font-weight: 600; }
+.espace-deja ul, .espace-demandes-finies ul { margin: 8px 0 0; padding-left: 18px; }
+.espace-demandes-attente small { color: #6B6680; }

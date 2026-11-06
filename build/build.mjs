@@ -838,12 +838,23 @@ page(
 
     <section id="discussion" data-espace-discussion-bloc hidden>
       <h2>Mes matchs en cours</h2>
-      <p>Vos matchs réciproques : vous avez 7 jours pour faire connaissance ici, en privé. Quand vous êtes prêts, échangez vos numéros pour passer au téléphone. Lamia ne lit pas vos messages, sauf si l’un de vous la signale.</p>
+      <p>7 jours pour faire connaissance ici, en privé. Ensuite, échangez vos numéros.</p>
       <div class="espace-profil" id="moderateur" data-espace-moderateur hidden></div>
       <div class="espace-profil" id="beta" data-espace-beta hidden></div>
       <div class="espace-profil" data-espace-blocages hidden><h3>Profils bloqués</h3><ul data-blocages-liste></ul></div>
       <p class="parcours-livre"><svg class="ico" aria-hidden="true"><use href="/icones.svg#gem"/></svg> Vous suivez le parcours de mariage de Lamia, détaillé dans l’ebook <a class="text-link" href="/werdi-ouvre-les-yeux/"><em>Werdi, ouvre les yeux !</em></a></p>
       <div data-espace-discussion></div>
+    </section>
+
+    <section id="propositions">
+      <h2>Profils proposés par Lamia</h2>
+      <p>Dis oui ou non. <strong>Si vous dites oui tous les deux, c’est un match.</strong></p>
+            <div class="espace-interets" data-espace-propositions><p class="loading">Un instant…</p></div>
+    </section>
+    <section id="interets">
+      <h2>Intérêts reçus</h2>
+      <p>Ces personnes ont choisi ton profil. Dis oui si elles te plaisent aussi.</p>
+      <div class="espace-interets" data-espace-interets><p class="loading">Un instant…</p></div>
     </section>
 
     <section id="coaching" data-espace-coaching-bloc hidden>
@@ -870,17 +881,6 @@ page(
       </div>
     </section>
 
-    <section id="propositions">
-      <h2>Profils proposés par Lamia</h2>
-      <p>Lamia a choisi pour toi des profils qui te correspondent, selon son algorithme. Leur fiche est anonyme. Dis oui ou non : <strong>si l’autre personne dit oui aussi, vous êtes mis en relation tout de suite</strong>, avec une discussion privée de 7 jours.</p>
-      <p><a class="btn btn-line" href="/confidences/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> Contacter Lamia</a></p>
-      <div class="espace-interets" data-espace-propositions><p class="loading">Un instant…</p></div>
-    </section>
-    <section id="interets">
-      <h2>Intérêts reçus</h2>
-      <p>Les personnes qui ont dit que ton profil les intéresse. Leur fiche est anonyme, comme sur le site. Si l’une t’intéresse aussi, c’est réciproque : Lamia vous met en relation.</p>
-      <div class="espace-interets" data-espace-interets><p class="loading">Un instant…</p></div>
-    </section>
 
     <section>
       <h2>Mon abonnement âme sœur</h2>
