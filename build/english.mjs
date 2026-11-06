@@ -1,6 +1,7 @@
 // Version anglaise de la Maison (/en/…).
 // Les pages françaises sont générées comme d'habitude, puis chaque page publique est
-// traduite ici à partir d'un dictionnaire français → anglais (content/en/strings.json).
+// traduite ici à partir d'un dictionnaire français → anglais (content/en/strings.json,
+// et content/en/app-strings.json pour les textes écrits par les scripts de l'appli).
 // Un texte absent du dictionnaire (par exemple un texte modifié depuis le tableau de bord)
 // reste en français : la construction affiche la liste de ces textes à traduire.
 // Les fiches produits ont leur propre traduction (content/en/products.json), appliquée
@@ -14,7 +15,7 @@ import { PAIRES_GUIDES } from '../content/guides.mjs';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const lire = (f) => (existsSync(join(ROOT, f)) ? JSON.parse(readFileSync(join(ROOT, f), 'utf8')) : {});
 
-export const STRINGS = { ...lire('content/en/strings.json'), ...PAIRES_GUIDES };
+export const STRINGS = { ...lire('content/en/app-strings.json'), ...lire('content/en/strings.json'), ...PAIRES_GUIDES };
 export const PRODUCTS = lire('content/en/products.json');
 
 // Pages qui restent uniquement en français (outils privés de Lamia).

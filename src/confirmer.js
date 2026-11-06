@@ -22,7 +22,7 @@ function fiche(f) {
     <p class="confirmer-num">Fiche n° ${esc(f.ref)} · ${f.genre === 'femme' ? 'une femme' : 'un homme'}</p>
     <p class="confirmer-infos">${esc(infos.join(' · '))}</p>
     ${f.ville || f.village ? `<p class="confirmer-infos">${esc([f.ville, f.village && `village : ${f.village}`].filter(Boolean).join(' · '))}</p>` : ''}
-    ${f.profil ? `<h3>Qui je suis</h3><p>${esc(f.profil)}</p>` : ''}
+    ${f.profil ? `<h3>Qui je suis</h3><p data-membre>${esc(f.profil)}</p>` : ''}
     <h3>Qui je cherche${esc(ages)}</h3><p>${esc(f.recherche || 'À préciser avec Lamia.')}</p>
   </article>`;
 }
