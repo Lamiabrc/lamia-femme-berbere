@@ -1,6 +1,6 @@
 // Annonces de rencontre : dépôt (Patio et Confidences) et affichage des annonces vérifiées par Lamia.
 import { api, esc, PUBLIC_KEY, creerCompte } from './confidences-commun.js';
-import { O, lib, secteurLisible, telephoneNormal, foiEtVie, badgesProfil } from './matching-options.mjs';
+import { O, lib, secteurLisible, telephoneNormal, foiEtVie, badgesProfil, origineLisible } from './matching-options.mjs';
 import { createClient } from '/vendor/supabase.mjs';
 
 // Compte (le même que « Mon espace ») : chaque profil y est lié pour pouvoir être modifié.
@@ -18,6 +18,7 @@ const ERR = {
   invalid_birth_date: 'Vérifie ta date de naissance.',
   mineur: 'Les annonces sont réservées aux personnes majeures (18 ans et plus).',
   missing_lieu: 'Indique ta ville et ton pays.',
+  origine_requise: 'Indique ton origine : kabyle, chaouie, touarègue, amazighe ou autre.',
   invalid_email: 'Vérifie ton adresse email : Lamia en a besoin pour te répondre.',
   textes_courts: 'Raconte-toi un peu plus : au moins quelques phrases pour ton profil et pour la personne que tu cherches.',
   medias_requis: 'Ajoute 2 photos de toi, visage visible.',
@@ -76,9 +77,9 @@ export function formulaireHtml() {
       <label>Ta ville<input name="ville" maxlength="80" autocomplete="address-level2" required></label>
       <label>Ton pays de résidence<select name="pays">${opts(O.pays)}</select></label>
       <label>Ton village ou ta région d’origine <small>(facultatif)</small><input name="villageOrigine" maxlength="80"></label>
-      <label>Les langues que tu parles<input name="langue" maxlength="80" placeholder="Kabyle, français…"></label>
+      <label>Les langues que tu parles<input name="langue" maxlength="80" placeholder="Kabyle, tamazight, français…"></label>
     </div>
-    <p class="annonce-sous">Tes origines</p>${puces('origineTags', O.origine)}
+    <p class="annonce-sous" id="ton-origine">Ton origine <small>(affichée sur ton profil, 3 au maximum)</small></p>${puces('origineTags', O.origine)}
   </div>
   <div class="annonce-etape" data-optionnel-live>
     <h3><span>2</span> Ta vie aujourd’hui</h3>
@@ -347,6 +348,7 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
     if (!form.querySelector('[name=genre]:checked')) manque('Femme ou homme', form.querySelector('[name=genre]')?.closest('label'));
     if (!f.birth_date.value) manque('Ta date de naissance', f.birth_date);
     else if (f.birth_date.value > maxNaissance()) manque('Ta date de naissance : il faut avoir 18 ans ou plus', f.birth_date);
+    if (!form.querySelector('[name=origineTags]:checked')) manque('Ton origine', form.querySelector('[name=origineTags]')?.closest('.annonce-puces'));
     if (live && !f.tiktok_live.value.trim()) manque('Ton pseudo ou lien TikTok du live', f.tiktok_live);
     if (!live) {
       if (!f.ville.value.trim()) manque('Ta ville', f.ville);
@@ -466,6 +468,7 @@ function monterEdition(form, st, p, token) {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (F.profil.value.trim().length < 20 || F.recherche.value.trim().length < 20) return say(st, ERR.textes_courts, true);
+    if (!form.querySelector('[name=origineTags]:checked')) { form.querySelector('#ton-origine')?.scrollIntoView({ block: 'center' }); return say(st, ERR.origine_requise, true); }
     if (F.sans_reseau.checked ? !telephoneNormal(F.telephone.value) : !F.contactReseau.value.trim()) return say(st, F.sans_reseau.checked ? ERR.telephone_invalide : ERR.contact_requis, true);
     btn.disabled = true; say(st, 'Enregistrement…');
     try {
@@ -503,7 +506,7 @@ function montrerMessage(texte, erreurMsg = false) {
 
 function carte(a) {
   const ages = a.age_min || a.age_max ? ` · ${a.age_min || 18} à ${a.age_max || 99} ans` : '';
-  const tags = [...(a.origine || []), ...(a.caracteristiques || [])];
+  const tags = a.caracteristiques || [];
   const infos = [a.genre === 'femme' ? 'Une femme' : 'Un homme', `${a.age} ans`, lib(a.pays), a.situation && lib(a.situation), a.enfants === 'Oui' ? 'avec enfant(s)' : a.enfants === 'Non' ? 'sans enfant' : '', a.etudes && `études : ${lib(a.etudes).toLowerCase()}`].filter(Boolean);
   return `<article class="annonce-carte annonce-anonyme">
     <div class="annonce-sceau" aria-hidden="true"><img src="/images/outil/${a.genre === 'femme' ? 'avatar-femme' : 'avatar-homme'}.webp" alt="" width="80" height="80"></div>
@@ -512,6 +515,7 @@ function carte(a) {
       ${badgesProfil(a)}
       <h3>${esc(infos.slice(0, 2).join(', '))}</h3>
       <p class="annonce-lieu"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lieu"/></svg>${esc([a.ville, ...infos.slice(2)].filter(Boolean).join(' · '))}</p>
+      ${origineLisible(a.origine) ? `<p class="annonce-origine">Origine : <b>${esc(origineLisible(a.origine))}</b></p>` : ''}
       ${a.village ? `<p class="annonce-lieu"><svg class="ico" aria-hidden="true"><use href="/icones.svg#maison"/></svg> Originaire de ${esc(a.village)}</p>` : ''}
       ${secteurLisible(a.secteur) ? `<p class="annonce-lieu annonce-secteur"><svg class="ico" aria-hidden="true"><use href="/icones.svg#boussole"/></svg> Cherche en : <b>${esc(secteurLisible(a.secteur))}</b></p>` : ''}
       ${tags.length ? `<p class="annonce-tags">${tags.map((t) => `<span>${esc(lib(t))}</span>`).join('')}</p>` : ''}
