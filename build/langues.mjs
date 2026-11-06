@@ -1,7 +1,7 @@
 // Versions arabe (/ar/…) et kabyle (/kab/…) du parcours des rencontres.
 // Même principe que la version anglaise : les pages françaises sont traduites à partir d'un
 // dictionnaire français → langue (content/<langue>/strings.json). Un texte absent reste en français.
-// Le kabyle reste hors menu et hors Google tant que Lamia ne l'a pas relu (publie: false).
+// Le kabyle est dans le menu mais reste hors Google tant que Lamia ne l'a pas relu (publie: false).
 
 import { readFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -14,7 +14,7 @@ export const PAGES_RENCONTRES = ['/', '/rencontres/', '/rencontres/swipe/', '/re
 
 export const LANGUES = {
   ar: { dir: 'rtl', etiquette: 'العربية', court: 'ع', titre: 'النسخة العربية', og: 'ar_DZ', publie: true },
-  kab: { dir: 'ltr', etiquette: 'Taqbaylit', court: 'ⵣ', titre: 'Taqbaylit', og: 'fr_FR', publie: false },
+  kab: { dir: 'ltr', etiquette: 'Taqbaylit', court: 'ⵣ', titre: 'Taqbaylit', og: 'fr_FR', publie: false, menu: true },
 };
 export const LANGUES_PUBLIEES = Object.keys(LANGUES).filter((l) => LANGUES[l].publie);
 export const dictionnaire = (l) => lire(`content/${l}/strings.json`);
@@ -77,7 +77,7 @@ export function pageTraduite(html, frPath, siteUrl, langue, D, manquants) {
 // Lien vers l'arabe (et le kabyle une fois relu) sur les pages françaises du parcours.
 export function liensLangues(html, frPath, siteUrl) {
   if (!PAGES_RENCONTRES.includes(frPath)) return html;
-  const liens = LANGUES_PUBLIEES.map((l) => `<a class="lang-link" href="/${l}${frPath}" hreflang="${l}" lang="${l}" title="${LANGUES[l].titre}">${LANGUES[l].court}</a>`).join('\n    ');
+  const liens = Object.keys(LANGUES).filter((l) => LANGUES[l].publie || LANGUES[l].menu).map((l) => `<a class="lang-link" href="/${l}${frPath}" hreflang="${l}" lang="${l}" title="${LANGUES[l].titre}">${LANGUES[l].court}</a>`).join('\n    ');
   const alternates = LANGUES_PUBLIEES.map((l) => `<link rel="alternate" hreflang="${l === 'ar' ? 'ar' : l}" href="${siteUrl}/${l}${frPath}">`).join('\n');
   return html.replace('</head>', `${alternates}\n</head>`).replace('<div class="header-actions">', `<div class="header-actions">\n    ${liens}`);
 }

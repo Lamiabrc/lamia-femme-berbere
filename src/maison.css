@@ -3944,3 +3944,5 @@ html[dir="rtl"], html[dir="rtl"] body { overflow-x: clip; }
 }
 
 .maison-menu-langues a[aria-current="true"] strong { color: #6C5BA7; text-decoration: underline; text-underline-offset: 3px; }
+
+.lang-link[hreflang="kab"] { font-family: 'Tifinagh', var(--sans); }
