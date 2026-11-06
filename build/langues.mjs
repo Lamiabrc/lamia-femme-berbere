@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const lire = (f) => (existsSync(join(ROOT, f)) ? JSON.parse(readFileSync(join(ROOT, f), 'utf8')) : {});
 
-export const PAGES_RENCONTRES = ['/', '/rencontres/', '/rencontres/swipe/', '/rencontres/confirmer/', '/rencontres/visio/', '/mon-espace/', '/abonnement/', '/abonnement/merci/', '/application/', '/hors-ligne/'];
+export const PAGES_RENCONTRES = ['/', '/rencontres/', '/rencontres/swipe/', '/rencontres/confirmer/', '/rencontres/visio/', '/mon-espace/', '/abonnement/', '/abonnement/merci/', '/application/', '/hors-ligne/', '/speed-dating/', '/speed-dating/inscription/', '/speed-dating/merci/', '/speed-dating/bal/', '/speed-dating/salle/', '/speed-dating/souhaits/', '/salon/', '/confidences/', '/nouveautes/', '/rencontre-kabyle-algerie/', '/rencontre-kabyle-canada/', '/rencontre-kabyle-europe/', '/lamia-brechet/', '/guides/mariage-kabyle/', '/guides/france-algerie/'];
 
 export const LANGUES = {
   ar: { dir: 'rtl', etiquette: 'العربية', court: 'ع', titre: 'النسخة العربية', og: 'ar_DZ', publie: true },
