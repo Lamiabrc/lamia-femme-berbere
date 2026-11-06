@@ -707,7 +707,7 @@ page(
     <li><strong>Caméra allumée</strong>, dans un endroit calme, et aucun propos déplacé.</li>
     <li><strong>Lamia veille</strong> : l’accueil, l’animation et le suivi de chaque soirée. Elle peut passer saluer un tête-à-tête pendant le bal : son nom s’affiche quand elle entre.</li>
     <li><strong>Une ambiance</strong> : chaque soirée est un bal masqué virtuel kabyle : masque, robe kabyle ou tenue élégante.</li>
-    <li><strong>Un souci ?</strong> <a href="/confidences/">Les Confidences avec Lamia</a> permettent de lui écrire ou de lui signaler un souci en toute discrétion.</li>
+    <li><strong>Un souci ?</strong> <a href="/confidences/#signaler">Le signalement à Lamia</a> permet de lui signaler un souci en toute discrétion.</li>
   </ul>
 </section>
 
@@ -909,7 +909,7 @@ page(
     </section>
 
     <div class="espace-liens is-light">
-      <a href="/confidences/"><strong>Me confier à Lamia</strong><span>Écrire, laisser un vocal, échanger</span></a>
+      <a href="/confidences/"><strong>Me confier à Lamia</strong><span>Écrire, laisser un vocal, échanger · réservé aux abonnés</span></a>
     </div>
   </div>
 </section>`,
@@ -1169,7 +1169,7 @@ page(
   <p class="conf-sur">Le petit salon</p>
   <h1>Les Confidences avec Lamia</h1>
   <p class="conf-sous">« Un mot, un doute, une histoire… je t’écoute. »</p>
-  <p class="conf-promesse">Lamia te répond personnellement dès qu’elle est disponible.</p>
+  <p class="conf-promesse">Réservées aux abonnés : Lamia leur répond personnellement.</p>
 </section>
 
 <section class="conf-choix" aria-label="Comment veux-tu te confier ?">
@@ -1177,6 +1177,18 @@ page(
   <button type="button" class="conf-carte" data-choix="parler" aria-expanded="false"><span class="conf-icone" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#mic"/></svg></span><strong>Je préfère parler</strong><small>Un message vocal, enregistré ici même.</small></button>
   <button type="button" class="conf-carte" data-choix="conversation" aria-expanded="false"><span class="conf-icone" aria-hidden="true">❦</span><strong>Échanger avec Lamia</strong><small>Une conversation privée, que tu retrouves quand tu veux.</small></button>
   <button type="button" class="conf-carte" data-choix="annonce" aria-expanded="false"><span class="conf-icone" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg></span><strong>Trouver mon âme sœur</strong><small>Ton profil, confié à Lamia et à son outil de matching.</small></button>
+</section>
+
+<section class="conf-panneau" data-panneau="reserve" id="reserve" hidden>
+  <div class="conf-form">
+    <h2>Les Confidences sont réservées aux abonnés</h2>
+    <p>Pour écrire à Lamia ici, par message ou par vocal, il faut une formule Passion ou Prestige.</p>
+    <p>Tu peux toujours la contacter sur ses réseaux sociaux. Mais là-bas, elle ne saura pas de quel profil tu parles.</p>
+    <ul class="conf-reseaux"><li><a href="https://www.tiktok.com/@lamiafemmeberbere" rel="noopener" target="_blank">TikTok</a></li><li data-social="instagram" hidden><a rel="noopener" target="_blank">Instagram</a></li><li><a href="https://www.facebook.com/femmeberberes/" rel="noopener" target="_blank">Facebook</a></li></ul>
+    <p data-hors-play><a class="conf-btn conf-btn-plein" href="/abonnement/">Voir les formules</a></p>
+    <p data-si-deconnecte><strong>Déjà abonné·e ?</strong> <button type="button" class="conf-lien" data-choix="conversation">Me connecter</button></p>
+    <p><strong>Un faux profil ou un comportement inquiétant ?</strong> <a class="text-link" href="#signaler">Le signalement reste ouvert à tous les membres.</a></p>
+  </div>
 </section>
 
 <section class="conf-panneau" data-panneau="annonce" id="annonce" hidden>
@@ -1219,6 +1231,7 @@ page(
   <div class="conf-form" data-conv-connexion>
     <h2>Échanger avec Lamia</h2>
     <p>Une conversation privée, rien qu’entre toi et Lamia : textes, vocaux et images. C’est Lamia elle-même qui te répond, jamais un robot.</p>
+    <p><strong>Réservée aux abonnés.</strong> Si tu as déjà écrit à Lamia ici, tu peux toujours relire tes anciens messages.</p>
     <p>Pour retrouver ta conversation, pas de mot de passe : tu reçois un lien de connexion par email.</p>
     <form class="conf-ligne" data-conv-lien>
       <label>Ton email<input name="email" type="email" autocomplete="email" required></label>
@@ -1229,6 +1242,12 @@ page(
   <div class="conf-form conf-conv" data-conv hidden>
     <div class="conf-conv-tete"><h2>Ma conversation avec Lamia</h2><p><small data-conv-email></small> · <button type="button" class="conf-lien" data-conv-sortir>Me déconnecter</button></p></div>
     <div class="conf-fil" data-conv-fil aria-live="polite"></div>
+    <div class="conf-conv-reserve" data-conv-reserve hidden>
+      <h3>Les Confidences sont réservées aux abonnés</h3>
+      <p>Tu peux toujours la contacter sur ses réseaux sociaux. Mais là-bas, elle ne saura pas de quel profil tu parles.</p>
+    <ul class="conf-reseaux"><li><a href="https://www.tiktok.com/@lamiafemmeberbere" rel="noopener" target="_blank">TikTok</a></li><li data-social="instagram" hidden><a rel="noopener" target="_blank">Instagram</a></li><li><a href="https://www.facebook.com/femmeberberes/" rel="noopener" target="_blank">Facebook</a></li></ul>
+    <p data-hors-play><a class="conf-btn conf-btn-plein" href="/abonnement/">Voir les formules</a></p>
+    </div>
     <form class="conf-composer" data-conv-form novalidate>
       <div data-conv-premier hidden>
         <label>Prénom ou pseudonyme<input name="name" maxlength="80"></label>
@@ -1545,6 +1564,7 @@ const tableauFormules = () => {
     ['Le profil de qui t’a choisi·e', 'Le nombre seulement', v(pa.quiMaChoisi), v(pr.quiMaChoisi)],
     ['La photo de ton match, s’il ou elle l’accepte', `${eurosAbo(UNITES.find((u) => u.id === 'photo_match').prix)} pour 1 heure`, 'Incluse', 'Incluse'],
     ['Tes questions à Lamia sur ton profil', non, oui, oui],
+    ['Les Confidences avec Lamia (messages et vocaux)', non, oui, oui],
     ['Profil prioritaire dans le matching', non, non, oui],
     ['Annonce présentée en priorité en live', non, non, oui],
     ['Coaching avec Lamia', non, non, '1 visio de 15 minutes par mois'],

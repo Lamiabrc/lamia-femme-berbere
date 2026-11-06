@@ -3946,3 +3946,10 @@ html[dir="rtl"], html[dir="rtl"] body { overflow-x: clip; }
 .maison-menu-langues a[aria-current="true"] strong { color: #6C5BA7; text-decoration: underline; text-underline-offset: 3px; }
 
 .lang-link[hreflang="kab"] { font-family: 'Tifinagh', var(--sans); }
+
+/* Confidences réservées aux abonnés */
+.conf-reseaux { list-style: none; display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0 18px; padding: 0; }
+.conf-reseaux a { display: inline-block; padding: 7px 14px; border: 1px solid var(--or-3, #D9B96E); border-radius: 999px; color: #2F2B3D; text-decoration: none; }
+.conf-conv-reserve { padding: 16px 18px; margin-top: 14px; background: #E9DFFA; border-radius: 16px; }
+.conf-conv-reserve h3 { margin: 0 0 8px; }
+.conf .conf-form a.conf-btn.conf-btn-plein { color: #fff; -webkit-text-fill-color: #fff; text-decoration: none; }

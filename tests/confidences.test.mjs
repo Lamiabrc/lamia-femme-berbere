@@ -8,8 +8,10 @@ import { b64u } from '../lib/webpush.mjs';
 const env = { SUPABASE_SERVICE_ROLE_KEY: 'sb_secret_fixture', RESEND_API_KEY: 're_test' };
 
 const req = (b, token, ip = '1.2.3.4') => new Request('https://x/api/confidences', { method: 'POST', headers: { 'content-type': 'application/json', 'x-forwarded-for': ip, ...(token ? { authorization: `Bearer ${token}` } : {}) }, body: JSON.stringify(b) });
-const call = async (be, b, token, ip) => { const r = await handleConfidences(req(b, token, ip), { env, fetcher: be.fetcher }); return { status: r.status, body: await r.json() }; };
+const call = async (be, b, token, ip) => { const r = await handleConfidences(req(b, token, ip), { env, fetcher: be.fetcher, etat: async (m) => ({ abonnement: m.startsWith('gratuit') ? null : { formule: 'passion' } }) }); return { status: r.status, body: await r.json() }; };
 const lamia = { id: 'lamia', email: 'lamia@exemple.fr', email_confirmed_at: '2026', app_metadata: { role: 'admin' } };
+const nadia = { id: 'nadia', email: 'nadia@exemple.fr', email_confirmed_at: '2026', app_metadata: {} };
+const gratuit = { id: 'g', email: 'gratuit@exemple.fr', email_confirmed_at: '2026', app_metadata: {} };
 const sara = { id: 'sara', email: 'sara@exemple.fr', email_confirmed_at: '2026', app_metadata: {} };
 
 test('fichiers : types, tailles et nombre contrôlés', () => {
@@ -35,14 +37,14 @@ test('heures de silence (heure de Paris) et réglages nettoyés', () => {
   assert.equal(reglagesPropres({ silence_debut: 30 }).silence_debut, null);
 });
 
-test('confidence vocale sans compte : envoi signé, alerte push sans contenu et email avec lien', async () => {
-  const be = backend({ users: { L: lamia } });
+test('confidence vocale d’un abonné : envoi signé, alerte push sans contenu et email avec lien', async () => {
+  const be = backend({ users: { L: lamia, N: nadia } });
   const ua = createECDH('prime256v1'); ua.generateKeys();
   be.db.push_subscriptions.push({ id: 'p1', user_id: 'lamia', pour: 'lamia', endpoint: 'https://push.example/abc', p256dh: b64u(ua.getPublicKey()), auth: b64u(randomBytes(16)) });
   be.db.platform_settings.push({ key: 'confidences_reglages', value: { email_alerte: 'alerte@exemple.fr' } });
 
-  assert.equal((await call(be, { action: 'envoyer', name: 'Nadia', email: 'nadia@exemple.fr', body: 'Bonjour' })).body.error, 'consent_required');
-  const r = await call(be, { action: 'envoyer', channel: 'vocal', consent: true, name: 'Nadia', email: 'Nadia@Exemple.fr', files: [{ type: 'audio/webm', size: 30000, duration: 61 }, { type: 'image/jpeg', size: 2000, name: 'photo.jpg' }] });
+  assert.equal((await call(be, { action: 'envoyer', name: 'Nadia', email: 'nadia@exemple.fr', body: 'Bonjour' }, 'N')).body.error, 'consent_required');
+  const r = await call(be, { action: 'envoyer', channel: 'vocal', consent: true, name: 'Nadia', email: 'Nadia@Exemple.fr', files: [{ type: 'audio/webm', size: 30000, duration: 61 }, { type: 'image/jpeg', size: 2000, name: 'photo.jpg' }] }, 'N');
   assert.equal(r.status, 200);
   assert.equal(r.body.uploads.length, 2);
   assert.match(r.body.uploads[0].url, /\/storage\/v1\/object\/upload\/sign\/confidences\/.+token=/);
@@ -68,13 +70,13 @@ test('confidence vocale sans compte : envoi signé, alerte push sans contenu et 
 });
 
 test('protection contre les envois abusifs et les robots', async () => {
-  const be = backend();
+  const be = backend({ users: { N: nadia } });
   const base = { action: 'envoyer', consent: true, name: 'X', email: 'x@exemple.fr', body: 'coucou' };
   assert.equal((await call(be, { ...base, website: 'spam' })).body.thread_id, null);
   assert.equal(be.db.confidence_threads.length, 0);
-  for (let i = 0; i < 6; i++) assert.equal((await call(be, base, null, '9.9.9.9')).status, 200);
-  assert.equal((await call(be, base, null, '9.9.9.9')).status, 429);
-  assert.equal((await call(be, base, null, '8.8.8.8')).status, 200);
+  for (let i = 0; i < 6; i++) assert.equal((await call(be, base, 'N', '9.9.9.9')).status, 200);
+  assert.equal((await call(be, base, 'N', '9.9.9.9')).status, 429);
+  assert.equal((await call(be, base, 'N', '8.8.8.8')).status, 200);
 });
 
 test('conversation privée : la personne connectée par lien email retrouve ses échanges, Lamia répond', async () => {
@@ -82,8 +84,8 @@ test('conversation privée : la personne connectée par lien email retrouve ses 
   assert.equal((await call(be, { action: 'mes_conversations' })).status, 401);
   const w = await call(be, { action: 'ecrire', consent: true, name: 'Sara', body: 'Je voudrais te parler' }, 'S');
   await call(be, { action: 'finaliser', message_id: w.body.message_id, token: w.body.token });
-  // Une confidence envoyée plus tôt sans compte avec la même adresse apparaît aussi.
-  const old = await call(be, { action: 'envoyer', consent: true, name: 'Sara', email: 'sara@exemple.fr', body: 'Première confidence' });
+  // Une confidence écrite ou vocale du même compte apparaît aussi.
+  const old = await call(be, { action: 'envoyer', consent: true, name: 'Sara', email: 'sara@exemple.fr', body: 'Première confidence' }, 'S');
   await call(be, { action: 'finaliser', message_id: old.body.message_id, token: old.body.token });
 
   assert.equal((await call(be, { action: 'lamia_liste' }, 'S')).status, 403);
@@ -124,4 +126,25 @@ test('alertes groupées : pas plus d’une notification par conversation toutes 
   const r = await call(be, { action: 'finaliser', message_id: b.body.message_id, token: b.body.token });
   assert.equal(r.body.alerte.groupee, true);
   assert.equal(be.mails.length, 1);
+});
+
+test('réservé aux abonnés : sans formule on ne peut plus écrire, seulement relire et supprimer', async () => {
+  const be = backend({ users: { G: gratuit, N: nadia, L: lamia } });
+  const base = { action: 'envoyer', consent: true, name: 'X', email: 'nadia@exemple.fr', body: 'coucou' };
+  assert.equal((await call(be, base)).body.error, 'reserve_abonnes'); // sans compte, même avec l'email d'une abonnée
+  assert.equal((await call(be, base, 'G')).body.error, 'reserve_abonnes');
+  assert.equal((await call(be, { action: 'ecrire', consent: true, body: 'coucou' }, 'G')).body.error, 'reserve_abonnes');
+  assert.equal(be.db.confidence_threads.length, 0);
+  // Un ancien fil reste lisible et supprimable.
+  be.db.confidence_threads.push({ id: 't-g', email: 'gratuit@exemple.fr', name: 'G', channel: 'ecrit', unread_visitor: 0, unread_lamia: 0, status: 'en_cours' });
+  const lu = await call(be, { action: 'mes_conversations' }, 'G');
+  assert.equal(lu.status, 200); assert.equal(lu.body.abonne, false);
+  assert.equal((await call(be, { action: 'ecrire', thread_id: 't-g', body: 'encore' }, 'G')).body.error, 'reserve_abonnes');
+  assert.equal((await call(be, { action: 'supprimer_ma_conversation', thread_id: 't-g' }, 'G')).status, 200);
+  // L'accès dit la vérité, et le fil d'une abonnée porte l'adresse de son compte.
+  assert.deepEqual((await call(be, { action: 'confidences_acces' })).body, { ok: true, connecte: false, abonne: false });
+  assert.equal((await call(be, { action: 'confidences_acces' }, 'N')).body.abonne, true);
+  const ok = await call(be, { ...base, email: 'quelquun@exemple.fr' }, 'N');
+  assert.equal(ok.status, 200);
+  assert.equal(be.db.confidence_threads.at(-1).email, 'nadia@exemple.fr');
 });
