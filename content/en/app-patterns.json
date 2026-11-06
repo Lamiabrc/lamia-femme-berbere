@@ -1,172 +1,748 @@
 {
  "_doc": "Textes de l'appli avec une partie variable. Chaque motif : [regex sur tout le nœud, remplacement, groupes à repasser par le dictionnaire (facultatif)]. Le premier qui correspond gagne. « segments » : éléments dont le texte est une liste « a · b · c », traduite morceau par morceau. « membre » : textes écrits par les membres, jamais traduits.",
  "membre": "[data-membre], .disc-msg, .proposition-mot",
- "segments": ".annonce-lieu, .interet-recu h3, .espace-achat p",
+ "segments": ".annonce-lieu, .interet-recu h3, .espace-achat p, .confirmer-infos",
  "motifs": [
-  ["^(Une femme|Un homme), (\\d+) ans$", "$1, $2", [1]],
-  ["^(\\d+) ans$", "$1 years old"],
-  ["^Originaire de (.+)$", "From $1"],
-  ["^originaire de (.+)$", "from $1"],
-  ["^études : (.+)$", "education: $1", [1]],
-  ["^(Islam|Chrétienne|Agnostique|Athée|Autre), (pratiquant\\(e\\)|pratique modérée|non pratiquant\\(e\\))$", "$1, $2", [1, 2]],
-  ["^Qui je cherche \\((\\d+) à (\\d+) ans\\)$", "Who I’m looking for (ages $1 to $2)"],
-  ["^Qui je cherche · (\\d+) à (\\d+) ans$", "Who I’m looking for · ages $1 to $2"],
-  ["^Qui je cherche · (\\d+) à (\\d+) ans :$", "Who I’m looking for · ages $1 to $2:"],
-  ["^· (\\d+) à (\\d+) ans$", "· ages $1 to $2"],
-
-  ["^Profil n° (\\d+)$", "Profile no. $1"],
-  ["^Profil n° (\\d+) · intéressé·e par ta fiche n° (\\d+) · le (.+)$", "Profile no. $1 · interested in your profile no. $2 · on $3"],
-  ["^Profil n° (\\d+) · (.+)$", "Profile no. $1 · $2", [2]],
-  ["^Fiche n° (\\d+) · créée en live avec Lamia$", "Profile no. $1 · created live with Lamia"],
-  ["^Proposé par Lamia · profil n° (\\d+) · le (.+)$", "Suggested by Lamia · profile no. $1 · on $2"],
-  ["^💞 Match avec le profil n° (\\d+)$", "💞 Match with profile no. $1"],
-  ["^n° (\\d+)$", "no. $1"],
-
-  ["^1 profil correspond$", "1 profile matches"],
-  ["^(\\d+) profils correspondent$", "$1 profiles match"],
-  ["^0 profil correspond$", "0 profiles match"],
-  ["^1 personne t’a choisi·e$", "1 person chose you"],
-  ["^(\\d+) personnes t’ont choisi·e$", "$1 people chose you"],
-  ["^💞 1 personne t’a choisi·e$", "💞 1 person chose you"],
-  ["^💞 (\\d+) personnes t’ont choisi·e$", "💞 $1 people chose you"],
-  ["^profil à swiper aujourd’hui \\((\\d+) par jour avec ta formule\\)\\.$", "profile left to swipe today ($1 a day on your plan)."],
-  ["^profils à swiper aujourd’hui \\((\\d+) par jour avec ta formule\\)\\.$", "profiles left to swipe today ($1 a day on your plan)."],
-  ["^Tu as swipé tes (\\d+) profils du jour\\. Reviens demain : ton compteur repart à zéro à minuit\\.$", "You’ve swiped your $1 profiles for today. Come back tomorrow: your counter resets at midnight."],
-  ["^🔄 Tour (\\d+) ! Tu as tout vu : voici une seconde chance$", "🔄 Round $1! You’ve seen everything: here’s a second chance"],
-  ["^1 profil à découvrir$", "1 profile to discover"],
-  ["^(\\d+) profils à découvrir$", "$1 profiles to discover"],
-  ["^🔄 Tour (\\d+) · encore 1 profil$", "🔄 Round $1 · 1 profile left"],
-  ["^🔄 Tour (\\d+) · encore (\\d+) profils$", "🔄 Round $1 · $2 profiles left"],
-  ["^1 profil reste à découvrir si tu élargis ta recherche : ouvre les filtres et enlève un critère\\.$", "1 profile is left to discover if you widen your search: open the filters and remove a criterion."],
-  ["^(\\d+) profils restent à découvrir si tu élargis ta recherche : ouvre les filtres et enlève un critère\\.$", "$1 profiles are left to discover if you widen your search: open the filters and remove a criterion."],
-  ["^1 coup de cœur$", "1 heart"],
-  ["^(\\d+) coups de cœur$", "$1 hearts"],
-  ["^envoyés? aujourd’hui 💘$", "sent today 💘"],
-
-  ["^💌 Le profil n° (\\d+) t’intéresse : crée d’abord ton compte, puis ton profil\\. Lamia regardera si vous pouvez correspondre\\.$", "💌 You’re interested in profile no. $1: first create your account, then your profile. Lamia will see whether you could be a match."],
-  ["^💌 Le profil n° (\\d+) t’intéresse : crée ton profil ci-dessous\\. Lamia est prévenue et regarde si vous pouvez correspondre\\. Ton identité reste secrète\\.$", "💌 You’re interested in profile no. $1: create your profile below. Lamia has been told and will see whether you could be a match. Your identity stays secret."],
-  ["^Tu es connecté\\(e\\) : ton profil sera lié à ton compte (.+)\\.$", "You’re signed in: your profile will be linked to your account $1."],
-  ["^« Parle-nous de toi » : encore (\\d+) caractères? au moins$", "“Tell us about yourself”: at least $1 more character(s)"],
-  ["^« La personne que tu cherches » : encore (\\d+) caractères? au moins$", "“The person you’re looking for”: at least $1 more character(s)"],
-  ["^Il manque une information pour envoyer ton profil :$", "One detail is missing before you can send your profile:"],
-  ["^Il manque (\\d+) informations pour envoyer ton profil :$", "$1 details are missing before you can send your profile:"],
-  ["^Envoi de tes fichiers \\((\\d+)/(\\d+)\\)…$", "Sending your files ($1/$2)…"],
-  ["^Envoi de tes fichiers \\((\\d+)/(\\d+)\\), nouvel essai…$", "Sending your files ($1/$2), trying again…"],
-  ["^Merci (.+), ton profil est bien arrivé chez Lamia \\(n° (\\d+)\\) !$", "Thank you $1, your profile has reached Lamia (no. $2)!"],
-  ["^Merci (.+), ton profil est bien arrivé chez Lamia !$", "Thank you $1, your profile has reached Lamia!"],
-  ["^L’envoi n’a pas abouti \\((.+)\\)\\. Réessaie, ou écris à Lamia en lui donnant ce code\\.$", "Sending didn’t go through ($1). Try again, or write to Lamia and give her this code."],
-  ["^💌 C’est noté : Lamia sait que le profil n° (\\d+) t’intéresse\\. Elle regarde si vous pouvez correspondre\\. Ton identité reste secrète : seul ton numéro de profil peut apparaître\\.$", "💌 Noted: Lamia knows you’re interested in profile no. $1. She’ll see whether you could be a match. Your identity stays secret: only your profile number can appear."],
-  ["^Bloquer et signaler le profil n° (\\d+) \\? Vous ne vous verrez plus et Lamia est prévenue\\. La personne n’est pas avertie\\.$", "Block and report profile no. $1? You won’t see each other any more and Lamia will be told. The person won’t be notified."],
-  ["^Étape (\\d+) sur (\\d+)$", "Step $1 of $2"],
-
-  ["^(.{3,80}) : (\\d+) €\\.$", "$1: €$2.", [1]],
-  ["^En continuant, tu acceptes les conditions de vente \\(lamia-femme-berbere\\.com/cgv\\) et tu demandes que le service commence dès le paiement\\.$", "By continuing, you accept the terms of sale (lamia-femme-berbere.com/cgv) and ask for the service to start as soon as you pay."],
-  ["^, (.+) \\((\\d+) minutes\\)\\.$", ", $1 ($2 minutes).", [1]],
-  ["^Réserver ta visio du (.+) à (\\d\\d:\\d\\d), (.+) \\?$", "Book your video call on $1 at $2, $3?", [3]],
-  ["^(.+) à (\\d\\d:\\d\\d)$", "$1 at $2"],
-  ["^(\\d+) × (visio de 15 minutes|coaching de 30 minutes|Sauver mon couple)$", "$1 × $2", [2]],
-  ["^(\\d\\d:\\d\\d) · (Couple, 1 h|30 min)$", "$1 · $2", [2]],
-  ["^Merci ! Lamia t’enverra le lien d’installation à ton adresse\\.$", "Thank you! Lamia will send the install link to your address."],
-  ["^Merci ! Lamia t’enverra le lien d’installation à (.+)\\.$", "Thank you! Lamia will send the install link to $1."],
-  ["^(.+) souhaite aussi te revoir$", "$1 would like to see you again too"],
-  ["^Secteurs : (.+)\\.$", "Areas: $1."],
-  ["^Tu acceptes de rencontrer des personnes de moins de 40 ans\\.$", "You’re open to meeting people under 40."],
-  ["^Tu acceptes de rencontrer des personnes de 40 ans et plus\\.$", "You’re open to meeting people aged 40 and over."],
-  ["^Tu rencontres seulement des personnes de moins de 40 ans\\.$", "You only meet people under 40."],
-  ["^Tu rencontres seulement des personnes de 40 ans et plus\\.$", "You only meet people aged 40 and over."],
-  ["^(Salon \\d+-\\d+ ans|Salon 40 ans et plus) · (.+)$", "$1 · $2", [1, 2]],
-  ["^Valide ta place avant le (.+)\\.$", "Validate your place before $1."],
-  ["^, chaque soir à 21 h : elle peut t’offrir ta place\\. Sans validation avant le (.+), ta place passera à la personne suivante\\.$", ", every evening at 9 pm: she can give you your place. Without validation before $1, your place will go to the next person."],
-  ["^Règle ta place avant le (.+), sinon elle passera à la personne suivante\\.$", "Pay for your place before $1, or it will go to the next person."],
-  ["^D’après l’outil de Lamia, tu pourrais correspondre à (\\d+) personne\\(s\\)\\.$", "According to Lamia’s tool, you could match with $1 person/people."],
-  ["^Ton annonce n° (\\d+) est validée\\. Si tu es d’accord, elle apparaît sur le site de façon anonyme : sans prénom, photo, ville ni contact\\.$", "Your listing no. $1 is approved. If you agree, it appears on the site anonymously: with no first name, photo, city or contact details."],
-  ["^Ton annonce n° (\\d+) est maintenant publiée, de façon anonyme\\.$", "Your listing no. $1 is now published, anonymously."],
-  ["^Mettre fin à ton match avec le profil n° (\\d+) \\? Lamia sera prévenue, et une place se libère\\.$", "End your match with profile no. $1? Lamia will be told, and a slot opens up."],
-  ["^: (\\d+) sur (\\d+) restante\\(s\\)$", ": $1 of $2 left"],
-  ["^Formule (Découverte|Cœur|Passion|Prestige)$", "$1 plan", [1]],
-  ["^: (\\d+) mise\\(s\\) en relation ce mois-ci sur (\\d+) · (\\d+) speed dating inclus par mois$", ": $1 introduction(s) this month out of $2 · $3 speed dating included a month"],
-  ["^: (\\d+) mise\\(s\\) en relation ce mois-ci \\(sans limite\\) · (\\d+) speed dating inclus par mois$", ": $1 introduction(s) this month (no limit) · $2 speed dating included a month"],
-  ["^: (\\d+) match\\(s\\) supplémentaire\\(s\\) · (\\d+) place\\(s\\) de speed dating$", ": $1 extra match(es) · $2 speed dating place(s)"],
-  ["^📷 La photo de ton match \\(profil n° (\\d+)\\)$", "📷 Your match’s photo (profile no. $1)"],
-  ["^Visible jusqu’à (.+)\\. Rien que pour toi : merci de ne pas la partager\\.$", "Visible until $1. Just for you: please don’t share it."],
-  ["^: ces profils sont en tête de ton$", ": these profiles are at the top of your"],
-  ["^: ce profil est en tête de ton$", ": this profile is at the top of your"],
-  ["^\\. Choisis-les à ton tour pour un intérêt réciproque\\.$", ". Choose them in turn for mutual interest."],
-  ["^\\. Choisis-le à ton tour pour un intérêt réciproque\\.$", ". Choose them in turn for mutual interest."],
-  ["^En tête du swipe jusqu’au (.+)\\.$", "At the top of the swipe until $1."],
-  ["^(\\d+) mise\\(s\\) en relation$", "$1 introduction(s)"],
-  ["^(\\d+) place\\(s\\) de speed dating$", "$1 speed dating place(s)"],
-  ["^À l’unité : (\\d+) mise\\(s\\) en relation · (\\d+) place\\(s\\) de speed dating(\\.?)$", "Individually: $1 introduction(s) · $2 speed dating place(s)$3"],
-  ["^À l’unité : (\\d+) mise\\(s\\) en relation(\\.?)$", "Individually: $1 introduction(s)$2"],
-  ["^À l’unité : (\\d+) place\\(s\\) de speed dating(\\.?)$", "Individually: $1 speed dating place(s)$2"],
-  ["^À l’unité : (.+)\\. Pas d’abonnement en cours\\.$", "Individually: $1. No current subscription."],
-  ["^se termine le (.+)$", "ends on $1"],
-  ["^prochaine échéance le (.+)$", "next payment on $1"],
-  ["^💞 (\\d+) mise\\(s\\) en relation$", "💞 $1 introduction(s)"],
-  ["^dernier intérêt le (.+)$", "latest interest on $1"],
-  ["^💬 Lamia te demande ton avis · profil n° (\\d+)$", "💬 Lamia is asking your opinion · profile no. $1"],
-  ["^« (.+) Est-ce que tu acceptes cette différence \\? »$", "“$1 Do you accept this difference?”"],
-
-  ["^⏳ encore 1 jour$", "⏳ 1 day left"],
-  ["^⏳ encore (\\d+) jours$", "⏳ $1 days left"],
-  ["^⏳ encore 1 jour et (\\d+) h$", "⏳ 1 day $1 hr left"],
-  ["^⏳ encore (\\d+) jours et (\\d+) h$", "⏳ $1 days $2 hr left"],
-  ["^⏳ encore (\\d+) h$", "⏳ $1 hr left"],
-  ["^✓ Tu as validé\\. On attend (.+)\\.$", "✓ You’ve validated. We’re waiting for $1."],
-  ["^(.+) a déjà validé\\.$", "$1 has already validated."],
-  ["^Étape (\\d+) sur (\\d+) : (.+)$", "Step $1 of $2: $3", [3]],
-  ["^(.+), dis bonjour à (.+) 👋$", "$1, say hello to $2 👋"],
-  ["^Dis bonjour à (.+) 👋$", "Say hello to $1 👋"],
-  ["^📞 Vous avez échangé vos numéros\\. Celui de (.+) :$", "📞 You’ve exchanged numbers. $1’s number:"],
-  ["^📞 Tu as donné ton numéro\\. (.+) le verra dès qu’il ou elle aura donné le sien \\(on l’a prévenu·e\\)\\.$", "📞 You’ve given your number. $1 will see it as soon as they’ve given theirs (we’ve let them know)."],
-  ["^📞 Tu as donné ton numéro\\. (.+) le verra dès qu’il ou elle aura donné le sien\\.$", "📞 You’ve given your number. $1 will see it as soon as they’ve given theirs."],
-  ["^(.+) a donné son numéro$", "$1 has given their number"],
-  ["^📞 (.+), prêt(?:e|·e)? à passer au téléphone \\? Donne ton numéro$", "📞 $1, ready to move to the phone? Give your number"],
-  ["^📞 Prêt(?:e|·e)? à passer au téléphone \\? Donne ton numéro$", "📞 Ready to move to the phone? Give your number"],
-  ["^Avec (.+)$", "With $1"],
-  ["^Par honnêteté : (.+) a aussi 1 autre match en cours\\.$", "In all honesty: $1 also has 1 other current match."],
-  ["^Par honnêteté : (.+) a aussi (\\d+) autres matchs en cours\\.$", "In all honesty: $1 also has $2 other current matches."],
-  ["^De ton côté, tu as 1 autre match en cours : (.+) le voit aussi\\.$", "On your side, you have 1 other current match: $1 can see this too."],
-  ["^De ton côté, tu as (\\d+) autres matchs en cours : (.+) le voit aussi\\.$", "On your side, you have $1 other current matches: $2 can see this too."],
-  ["^1 message$", "1 message"],
-  ["^(\\d+) messages$", "$1 messages"],
-  ["^Merci d’être resté(?:e|·e)? courtois(?:e|·e)?\\.$", "Thanks for staying courteous."],
-  ["^💌 (.+) a mis fin à ce match\\.$", "💌 $1 ended this match."],
-  ["^Raison : (.+)\\. Tu peux répondre, il te reste 1 message\\.$", "Reason: $1. You can reply, you have 1 message left.", [1]],
-  ["^Raison : (.+)\\. Tu peux répondre, il te reste (\\d+) messages\\.$", "Reason: $1. You can reply, you have $2 messages left.", [1]],
-  ["^Raison : (.+)\\.$", "Reason: $1.", [1]],
-  ["^La discussion se ferme le (.+)\\.$", "The conversation closes on $1."],
-  ["^Veux-tu partager ton prénom \\((.+)\\) avec ton match \\?$", "Would you like to share your first name ($1) with your match?"],
-  ["^Veux-tu partager ton prénom avec ton match \\?$", "Would you like to share your first name with your match?"],
-
-  ["^Ta place est réservée, (.+) : salon (.+)\\.$", "Your place is booked, $1: $2 lounge."],
-  ["^Ta place est réservée, (.+)\\.$", "Your place is booked, $1."],
-  ["^Voir l’image (\\d+)$", "See image $1"],
-  ["^Lamia t’envoie par email le lien de paiement sécurisé\\. Total : (.+?)\\.(.*)$", "Lamia is sending you the secure payment link by email. Total: $1.$2"],
-  ["^Tu es dans le navigateur de$", "You’re in the browser of"],
-  ["^\\. Si le paiement ne s’ouvre pas, ouvre cette page dans (Chrome|Safari) : (.+)\\.$", ". If the payment doesn’t open, open this page in $1: $2.", [2]],
-  ["^Plus que 1 place à ([\\d,]+) €, puis ([\\d,]+) € par mois$", "Only 1 place left at €$1, then €$2 a month"],
-  ["^Plus que (\\d+) places à ([\\d,]+) €, puis ([\\d,]+) € par mois$", "Only $1 places left at €$2, then €$3 a month"],
-  ["^⬇ Télécharger « (.+) »$", "⬇ Download “$1”"],
-  ["^Lien copié : colle-le dans (Safari|Chrome)\\.?$", "Link copied: paste it into $1."],
-  ["^Ce soir (\\d+) h · (.+)$", "Tonight at $1:00 · $2"],
-  ["^Ce soir (\\d+) h (\\d+) · (.+)$", "Tonight at $1:$2 · $3"],
-  ["^En ce moment · (.+)$", "Right now · $1"],
-  ["^(lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche) (\\d+) h · (.+)$", "$1 at $2:00 · $3", [1]],
-  ["^(lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche) (\\d+) h (\\d+) · (.+)$", "$1 at $2:$3 · $4", [1]],
-  ["^plus que 1 place$", "1 place left"],
-  ["^plus que (\\d+) places$", "$1 places left"],
-  ["^(\\d+)-(\\d+) ans :$", "Ages $1-$2:"],
-  ["^40 ans et plus :$", "40 and over:"],
-  ["^Salon (\\d+)-(\\d+) ans$", "$1-$2 lounge"],
-  ["^Tour (\\d+)$", "Round $1"],
-
-  ["^✓ Ta formule (.+) est active pour un an\\. Tu la retrouves dans ton espace, où tu peux réserver ta visio avec Lamia\\.$", "✓ Your $1 plan is active for a year. You’ll find it in your space, where you can book your video call with Lamia.", [1]],
-  ["^✓ Ta formule (.+) est active\\. Tu la retrouves dans ton espace, où tu peux réserver ta visio avec Lamia\\.$", "✓ Your $1 plan is active. You’ll find it in your space, where you can book your video call with Lamia.", [1]],
-  ["^✓ Ta formule (.+) est active pour un an\\. Tu la retrouves dans ton espace\\.$", "✓ Your $1 plan is active for a year. You’ll find it in your space.", [1]],
-  ["^✓ Ta formule (.+) est active\\. Tu la retrouves dans ton espace\\.$", "✓ Your $1 plan is active. You’ll find it in your space.", [1]],
-  ["^✓ Achat confirmé : (\\d+) × (.+)\\.$", "✓ Purchase confirmed: $1 × $2.", [2]],
-  ["^([\\d,]+) Mo$", "$1 MB"],
-  ["^(\\d+) Ko$", "$1 KB"]
+  [
+   "^(Une femme|Un homme), (\\d+) ans$",
+   "$1, $2",
+   [
+    1
+   ]
+  ],
+  [
+   "^(\\d+) ans$",
+   "$1 years old"
+  ],
+  [
+   "^Originaire de (.+)$",
+   "From $1"
+  ],
+  [
+   "^originaire de (.+)$",
+   "from $1"
+  ],
+  [
+   "^études : (.+)$",
+   "education: $1",
+   [
+    1
+   ]
+  ],
+  [
+   "^(Islam|Chrétienne|Agnostique|Athée|Autre), (pratiquant\\(e\\)|pratique modérée|non pratiquant\\(e\\))$",
+   "$1, $2",
+   [
+    1,
+    2
+   ]
+  ],
+  [
+   "^Qui je cherche \\((\\d+) à (\\d+) ans\\)$",
+   "Who I’m looking for (ages $1 to $2)"
+  ],
+  [
+   "^Qui je cherche · (\\d+) à (\\d+) ans$",
+   "Who I’m looking for · ages $1 to $2"
+  ],
+  [
+   "^Qui je cherche · (\\d+) à (\\d+) ans :$",
+   "Who I’m looking for · ages $1 to $2:"
+  ],
+  [
+   "^· (\\d+) à (\\d+) ans$",
+   "· ages $1 to $2"
+  ],
+  [
+   "^Profil n° (\\d+)$",
+   "Profile no. $1"
+  ],
+  [
+   "^Profil n° (\\d+) · intéressé·e par ta fiche n° (\\d+) · le (.+)$",
+   "Profile no. $1 · interested in your profile no. $2 · on $3"
+  ],
+  [
+   "^Profil n° (\\d+) · (.+)$",
+   "Profile no. $1 · $2",
+   [
+    2
+   ]
+  ],
+  [
+   "^Fiche n° (\\d+) · créée en live avec Lamia$",
+   "Profile no. $1 · created live with Lamia"
+  ],
+  [
+   "^Proposé par Lamia · profil n° (\\d+) · le (.+)$",
+   "Suggested by Lamia · profile no. $1 · on $2"
+  ],
+  [
+   "^💞 Match avec le profil n° (\\d+)$",
+   "💞 Match with profile no. $1"
+  ],
+  [
+   "^n° (\\d+)$",
+   "no. $1"
+  ],
+  [
+   "^1 profil correspond$",
+   "1 profile matches"
+  ],
+  [
+   "^(\\d+) profils correspondent$",
+   "$1 profiles match"
+  ],
+  [
+   "^0 profil correspond$",
+   "0 profiles match"
+  ],
+  [
+   "^1 personne t’a choisi·e$",
+   "1 person chose you"
+  ],
+  [
+   "^(\\d+) personnes t’ont choisi·e$",
+   "$1 people chose you"
+  ],
+  [
+   "^💞 1 personne t’a choisi·e$",
+   "💞 1 person chose you"
+  ],
+  [
+   "^💞 (\\d+) personnes t’ont choisi·e$",
+   "💞 $1 people chose you"
+  ],
+  [
+   "^profil à swiper aujourd’hui \\((\\d+) par jour avec ta formule\\)\\.$",
+   "profile left to swipe today ($1 a day on your plan)."
+  ],
+  [
+   "^profils à swiper aujourd’hui \\((\\d+) par jour avec ta formule\\)\\.$",
+   "profiles left to swipe today ($1 a day on your plan)."
+  ],
+  [
+   "^Tu as swipé tes (\\d+) profils du jour\\. Reviens demain : ton compteur repart à zéro à minuit\\.$",
+   "You’ve swiped your $1 profiles for today. Come back tomorrow: your counter resets at midnight."
+  ],
+  [
+   "^🔄 Tour (\\d+) ! Tu as tout vu : voici une seconde chance$",
+   "🔄 Round $1! You’ve seen everything: here’s a second chance"
+  ],
+  [
+   "^1 profil à découvrir$",
+   "1 profile to discover"
+  ],
+  [
+   "^(\\d+) profils à découvrir$",
+   "$1 profiles to discover"
+  ],
+  [
+   "^🔄 Tour (\\d+) · encore 1 profil$",
+   "🔄 Round $1 · 1 profile left"
+  ],
+  [
+   "^🔄 Tour (\\d+) · encore (\\d+) profils$",
+   "🔄 Round $1 · $2 profiles left"
+  ],
+  [
+   "^1 profil reste à découvrir si tu élargis ta recherche : ouvre les filtres et enlève un critère\\.$",
+   "1 profile is left to discover if you widen your search: open the filters and remove a criterion."
+  ],
+  [
+   "^(\\d+) profils restent à découvrir si tu élargis ta recherche : ouvre les filtres et enlève un critère\\.$",
+   "$1 profiles are left to discover if you widen your search: open the filters and remove a criterion."
+  ],
+  [
+   "^1 coup de cœur$",
+   "1 heart"
+  ],
+  [
+   "^(\\d+) coups de cœur$",
+   "$1 hearts"
+  ],
+  [
+   "^envoyés? aujourd’hui 💘$",
+   "sent today 💘"
+  ],
+  [
+   "^💌 Le profil n° (\\d+) t’intéresse : crée d’abord ton compte, puis ton profil\\. Lamia regardera si vous pouvez correspondre\\.$",
+   "💌 You’re interested in profile no. $1: first create your account, then your profile. Lamia will see whether you could be a match."
+  ],
+  [
+   "^💌 Le profil n° (\\d+) t’intéresse : crée ton profil ci-dessous\\. Lamia est prévenue et regarde si vous pouvez correspondre\\. Ton identité reste secrète\\.$",
+   "💌 You’re interested in profile no. $1: create your profile below. Lamia has been told and will see whether you could be a match. Your identity stays secret."
+  ],
+  [
+   "^Tu es connecté\\(e\\) : ton profil sera lié à ton compte (.+)\\.$",
+   "You’re signed in: your profile will be linked to your account $1."
+  ],
+  [
+   "^« Parle-nous de toi » : encore (\\d+) caractères? au moins$",
+   "“Tell us about yourself”: at least $1 more character(s)"
+  ],
+  [
+   "^« La personne que tu cherches » : encore (\\d+) caractères? au moins$",
+   "“The person you’re looking for”: at least $1 more character(s)"
+  ],
+  [
+   "^Il manque une information pour envoyer ton profil :$",
+   "One detail is missing before you can send your profile:"
+  ],
+  [
+   "^Il manque (\\d+) informations pour envoyer ton profil :$",
+   "$1 details are missing before you can send your profile:"
+  ],
+  [
+   "^Envoi de tes fichiers \\((\\d+)/(\\d+)\\)…$",
+   "Sending your files ($1/$2)…"
+  ],
+  [
+   "^Envoi de tes fichiers \\((\\d+)/(\\d+)\\), nouvel essai…$",
+   "Sending your files ($1/$2), trying again…"
+  ],
+  [
+   "^Merci (.+), ton profil est bien arrivé chez Lamia \\(n° (\\d+)\\) !$",
+   "Thank you $1, your profile has reached Lamia (no. $2)!"
+  ],
+  [
+   "^Merci (.+), ton profil est bien arrivé chez Lamia !$",
+   "Thank you $1, your profile has reached Lamia!"
+  ],
+  [
+   "^L’envoi n’a pas abouti \\((.+)\\)\\. Réessaie, ou écris à Lamia en lui donnant ce code\\.$",
+   "Sending didn’t go through ($1). Try again, or write to Lamia and give her this code."
+  ],
+  [
+   "^💌 C’est noté : Lamia sait que le profil n° (\\d+) t’intéresse\\. Elle regarde si vous pouvez correspondre\\. Ton identité reste secrète : seul ton numéro de profil peut apparaître\\.$",
+   "💌 Noted: Lamia knows you’re interested in profile no. $1. She’ll see whether you could be a match. Your identity stays secret: only your profile number can appear."
+  ],
+  [
+   "^Bloquer et signaler le profil n° (\\d+) \\? Vous ne vous verrez plus et Lamia est prévenue\\. La personne n’est pas avertie\\.$",
+   "Block and report profile no. $1? You won’t see each other any more and Lamia will be told. The person won’t be notified."
+  ],
+  [
+   "^Étape (\\d+) sur (\\d+)$",
+   "Step $1 of $2"
+  ],
+  [
+   "^(.{3,80}) : (\\d+) €\\.$",
+   "$1: €$2.",
+   [
+    1
+   ]
+  ],
+  [
+   "^En continuant, tu acceptes les conditions de vente \\(lamia-femme-berbere\\.com/cgv\\) et tu demandes que le service commence dès le paiement\\.$",
+   "By continuing, you accept the terms of sale (lamia-femme-berbere.com/cgv) and ask for the service to start as soon as you pay."
+  ],
+  [
+   "^, (.+) \\((\\d+) minutes\\)\\.$",
+   ", $1 ($2 minutes).",
+   [
+    1
+   ]
+  ],
+  [
+   "^Réserver ta visio du (.+) à (\\d\\d:\\d\\d), (.+) \\?$",
+   "Book your video call on $1 at $2, $3?",
+   [
+    3
+   ]
+  ],
+  [
+   "^(.+) à (\\d\\d:\\d\\d)$",
+   "$1 at $2"
+  ],
+  [
+   "^(\\d+) × (visio de 15 minutes|coaching de 30 minutes|Sauver mon couple)$",
+   "$1 × $2",
+   [
+    2
+   ]
+  ],
+  [
+   "^(\\d\\d:\\d\\d) · (Couple, 1 h|30 min)$",
+   "$1 · $2",
+   [
+    2
+   ]
+  ],
+  [
+   "^Merci ! Lamia t’enverra le lien d’installation à ton adresse\\.$",
+   "Thank you! Lamia will send the install link to your address."
+  ],
+  [
+   "^Merci ! Lamia t’enverra le lien d’installation à (.+)\\.$",
+   "Thank you! Lamia will send the install link to $1."
+  ],
+  [
+   "^(.+) souhaite aussi te revoir$",
+   "$1 would like to see you again too"
+  ],
+  [
+   "^Secteurs : (.+)\\.$",
+   "Areas: $1."
+  ],
+  [
+   "^Tu acceptes de rencontrer des personnes de moins de 40 ans\\.$",
+   "You’re open to meeting people under 40."
+  ],
+  [
+   "^Tu acceptes de rencontrer des personnes de 40 ans et plus\\.$",
+   "You’re open to meeting people aged 40 and over."
+  ],
+  [
+   "^Tu rencontres seulement des personnes de moins de 40 ans\\.$",
+   "You only meet people under 40."
+  ],
+  [
+   "^Tu rencontres seulement des personnes de 40 ans et plus\\.$",
+   "You only meet people aged 40 and over."
+  ],
+  [
+   "^(Salon \\d+-\\d+ ans|Salon 40 ans et plus) · (.+)$",
+   "$1 · $2",
+   [
+    1,
+    2
+   ]
+  ],
+  [
+   "^Valide ta place avant le (.+)\\.$",
+   "Validate your place before $1."
+  ],
+  [
+   "^, chaque soir à 21 h : elle peut t’offrir ta place\\. Sans validation avant le (.+), ta place passera à la personne suivante\\.$",
+   ", every evening at 9 pm: she can give you your place. Without validation before $1, your place will go to the next person."
+  ],
+  [
+   "^Règle ta place avant le (.+), sinon elle passera à la personne suivante\\.$",
+   "Pay for your place before $1, or it will go to the next person."
+  ],
+  [
+   "^D’après l’outil de Lamia, tu pourrais correspondre à (\\d+) personne\\(s\\)\\.$",
+   "According to Lamia’s tool, you could match with $1 person/people."
+  ],
+  [
+   "^Ton annonce n° (\\d+) est validée\\. Si tu es d’accord, elle apparaît sur le site de façon anonyme : sans prénom, photo, ville ni contact\\.$",
+   "Your listing no. $1 is approved. If you agree, it appears on the site anonymously: with no first name, photo, city or contact details."
+  ],
+  [
+   "^Ton annonce n° (\\d+) est maintenant publiée, de façon anonyme\\.$",
+   "Your listing no. $1 is now published, anonymously."
+  ],
+  [
+   "^Mettre fin à ton match avec le profil n° (\\d+) \\? Lamia sera prévenue, et une place se libère\\.$",
+   "End your match with profile no. $1? Lamia will be told, and a slot opens up."
+  ],
+  [
+   "^: (\\d+) sur (\\d+) restante\\(s\\)$",
+   ": $1 of $2 left"
+  ],
+  [
+   "^Formule (Découverte|Cœur|Passion|Prestige)$",
+   "$1 plan",
+   [
+    1
+   ]
+  ],
+  [
+   "^: (\\d+) mise\\(s\\) en relation ce mois-ci sur (\\d+) · (\\d+) speed dating inclus par mois$",
+   ": $1 introduction(s) this month out of $2 · $3 speed dating included a month"
+  ],
+  [
+   "^: (\\d+) mise\\(s\\) en relation ce mois-ci \\(sans limite\\) · (\\d+) speed dating inclus par mois$",
+   ": $1 introduction(s) this month (no limit) · $2 speed dating included a month"
+  ],
+  [
+   "^: (\\d+) match\\(s\\) supplémentaire\\(s\\) · (\\d+) place\\(s\\) de speed dating$",
+   ": $1 extra match(es) · $2 speed dating place(s)"
+  ],
+  [
+   "^📷 La photo de ton match \\(profil n° (\\d+)\\)$",
+   "📷 Your match’s photo (profile no. $1)"
+  ],
+  [
+   "^Visible jusqu’à (.+)\\. Rien que pour toi : merci de ne pas la partager\\.$",
+   "Visible until $1. Just for you: please don’t share it."
+  ],
+  [
+   "^: ces profils sont en tête de ton$",
+   ": these profiles are at the top of your"
+  ],
+  [
+   "^: ce profil est en tête de ton$",
+   ": this profile is at the top of your"
+  ],
+  [
+   "^\\. Choisis-les à ton tour pour un intérêt réciproque\\.$",
+   ". Choose them in turn for mutual interest."
+  ],
+  [
+   "^\\. Choisis-le à ton tour pour un intérêt réciproque\\.$",
+   ". Choose them in turn for mutual interest."
+  ],
+  [
+   "^En tête du swipe jusqu’au (.+)\\.$",
+   "At the top of the swipe until $1."
+  ],
+  [
+   "^(\\d+) mise\\(s\\) en relation$",
+   "$1 introduction(s)"
+  ],
+  [
+   "^(\\d+) place\\(s\\) de speed dating$",
+   "$1 speed dating place(s)"
+  ],
+  [
+   "^À l’unité : (\\d+) mise\\(s\\) en relation · (\\d+) place\\(s\\) de speed dating(\\.?)$",
+   "Individually: $1 introduction(s) · $2 speed dating place(s)$3"
+  ],
+  [
+   "^À l’unité : (\\d+) mise\\(s\\) en relation(\\.?)$",
+   "Individually: $1 introduction(s)$2"
+  ],
+  [
+   "^À l’unité : (\\d+) place\\(s\\) de speed dating(\\.?)$",
+   "Individually: $1 speed dating place(s)$2"
+  ],
+  [
+   "^À l’unité : (.+)\\. Pas d’abonnement en cours\\.$",
+   "Individually: $1. No current subscription."
+  ],
+  [
+   "^se termine le (.+)$",
+   "ends on $1"
+  ],
+  [
+   "^prochaine échéance le (.+)$",
+   "next payment on $1"
+  ],
+  [
+   "^💞 (\\d+) mise\\(s\\) en relation$",
+   "💞 $1 introduction(s)"
+  ],
+  [
+   "^dernier intérêt le (.+)$",
+   "latest interest on $1"
+  ],
+  [
+   "^💬 Lamia te demande ton avis · profil n° (\\d+)$",
+   "💬 Lamia is asking your opinion · profile no. $1"
+  ],
+  [
+   "^« (.+) Est-ce que tu acceptes cette différence \\? »$",
+   "“$1 Do you accept this difference?”"
+  ],
+  [
+   "^⏳ encore 1 jour$",
+   "⏳ 1 day left"
+  ],
+  [
+   "^⏳ encore (\\d+) jours$",
+   "⏳ $1 days left"
+  ],
+  [
+   "^⏳ encore 1 jour et (\\d+) h$",
+   "⏳ 1 day $1 hr left"
+  ],
+  [
+   "^⏳ encore (\\d+) jours et (\\d+) h$",
+   "⏳ $1 days $2 hr left"
+  ],
+  [
+   "^⏳ encore (\\d+) h$",
+   "⏳ $1 hr left"
+  ],
+  [
+   "^✓ Tu as validé\\. On attend (.+)\\.$",
+   "✓ You’ve validated. We’re waiting for $1."
+  ],
+  [
+   "^(.+) a déjà validé\\.$",
+   "$1 has already validated."
+  ],
+  [
+   "^Étape (\\d+) sur (\\d+) : (.+)$",
+   "Step $1 of $2: $3",
+   [
+    3
+   ]
+  ],
+  [
+   "^(.+), dis bonjour à (.+) 👋$",
+   "$1, say hello to $2 👋"
+  ],
+  [
+   "^Dis bonjour à (.+) 👋$",
+   "Say hello to $1 👋"
+  ],
+  [
+   "^📞 Vous avez échangé vos numéros\\. Celui de (.+) :$",
+   "📞 You’ve exchanged numbers. $1’s number:"
+  ],
+  [
+   "^📞 Tu as donné ton numéro\\. (.+) le verra dès qu’il ou elle aura donné le sien \\(on l’a prévenu·e\\)\\.$",
+   "📞 You’ve given your number. $1 will see it as soon as they’ve given theirs (we’ve let them know)."
+  ],
+  [
+   "^📞 Tu as donné ton numéro\\. (.+) le verra dès qu’il ou elle aura donné le sien\\.$",
+   "📞 You’ve given your number. $1 will see it as soon as they’ve given theirs."
+  ],
+  [
+   "^(.+) a donné son numéro$",
+   "$1 has given their number"
+  ],
+  [
+   "^📞 (.+), prêt(?:e|·e)? à passer au téléphone \\? Donne ton numéro$",
+   "📞 $1, ready to move to the phone? Give your number"
+  ],
+  [
+   "^📞 Prêt(?:e|·e)? à passer au téléphone \\? Donne ton numéro$",
+   "📞 Ready to move to the phone? Give your number"
+  ],
+  [
+   "^Avec (.+)$",
+   "With $1"
+  ],
+  [
+   "^Par honnêteté : (.+) a aussi 1 autre match en cours\\.$",
+   "In all honesty: $1 also has 1 other current match."
+  ],
+  [
+   "^Par honnêteté : (.+) a aussi (\\d+) autres matchs en cours\\.$",
+   "In all honesty: $1 also has $2 other current matches."
+  ],
+  [
+   "^De ton côté, tu as 1 autre match en cours : (.+) le voit aussi\\.$",
+   "On your side, you have 1 other current match: $1 can see this too."
+  ],
+  [
+   "^De ton côté, tu as (\\d+) autres matchs en cours : (.+) le voit aussi\\.$",
+   "On your side, you have $1 other current matches: $2 can see this too."
+  ],
+  [
+   "^1 message$",
+   "1 message"
+  ],
+  [
+   "^(\\d+) messages$",
+   "$1 messages"
+  ],
+  [
+   "^Merci d’être resté(?:e|·e)? courtois(?:e|·e)?\\.$",
+   "Thanks for staying courteous."
+  ],
+  [
+   "^💌 (.+) a mis fin à ce match\\.$",
+   "💌 $1 ended this match."
+  ],
+  [
+   "^Raison : (.+)\\. Tu peux répondre, il te reste 1 message\\.$",
+   "Reason: $1. You can reply, you have 1 message left.",
+   [
+    1
+   ]
+  ],
+  [
+   "^Raison : (.+)\\. Tu peux répondre, il te reste (\\d+) messages\\.$",
+   "Reason: $1. You can reply, you have $2 messages left.",
+   [
+    1
+   ]
+  ],
+  [
+   "^Raison : (.+)\\.$",
+   "Reason: $1.",
+   [
+    1
+   ]
+  ],
+  [
+   "^La discussion se ferme le (.+)\\.$",
+   "The conversation closes on $1."
+  ],
+  [
+   "^Veux-tu partager ton prénom \\((.+)\\) avec ton match \\?$",
+   "Would you like to share your first name ($1) with your match?"
+  ],
+  [
+   "^Veux-tu partager ton prénom avec ton match \\?$",
+   "Would you like to share your first name with your match?"
+  ],
+  [
+   "^Ta place est réservée, (.+) : salon (.+)\\.$",
+   "Your place is booked, $1: $2 lounge."
+  ],
+  [
+   "^Ta place est réservée, (.+)\\.$",
+   "Your place is booked, $1."
+  ],
+  [
+   "^Voir l’image (\\d+)$",
+   "See image $1"
+  ],
+  [
+   "^Lamia t’envoie par email le lien de paiement sécurisé\\. Total : (.+?)\\.(.*)$",
+   "Lamia is sending you the secure payment link by email. Total: $1.$2"
+  ],
+  [
+   "^Tu es dans le navigateur de$",
+   "You’re in the browser of"
+  ],
+  [
+   "^\\. Si le paiement ne s’ouvre pas, ouvre cette page dans (Chrome|Safari) : (.+)\\.$",
+   ". If the payment doesn’t open, open this page in $1: $2.",
+   [
+    2
+   ]
+  ],
+  [
+   "^Plus que 1 place à ([\\d,]+) €, puis ([\\d,]+) € par mois$",
+   "Only 1 place left at €$1, then €$2 a month"
+  ],
+  [
+   "^Plus que (\\d+) places à ([\\d,]+) €, puis ([\\d,]+) € par mois$",
+   "Only $1 places left at €$2, then €$3 a month"
+  ],
+  [
+   "^⬇ Télécharger « (.+) »$",
+   "⬇ Download “$1”"
+  ],
+  [
+   "^Lien copié : colle-le dans (Safari|Chrome)\\.?$",
+   "Link copied: paste it into $1."
+  ],
+  [
+   "^Ce soir (\\d+) h · (.+)$",
+   "Tonight at $1:00 · $2"
+  ],
+  [
+   "^Ce soir (\\d+) h (\\d+) · (.+)$",
+   "Tonight at $1:$2 · $3"
+  ],
+  [
+   "^En ce moment · (.+)$",
+   "Right now · $1"
+  ],
+  [
+   "^(lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche) (\\d+) h · (.+)$",
+   "$1 at $2:00 · $3",
+   [
+    1
+   ]
+  ],
+  [
+   "^(lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche) (\\d+) h (\\d+) · (.+)$",
+   "$1 at $2:$3 · $4",
+   [
+    1
+   ]
+  ],
+  [
+   "^plus que 1 place$",
+   "1 place left"
+  ],
+  [
+   "^plus que (\\d+) places$",
+   "$1 places left"
+  ],
+  [
+   "^(\\d+)-(\\d+) ans :$",
+   "Ages $1-$2:"
+  ],
+  [
+   "^40 ans et plus :$",
+   "40 and over:"
+  ],
+  [
+   "^Salon (\\d+)-(\\d+) ans$",
+   "$1-$2 lounge"
+  ],
+  [
+   "^Tour (\\d+)$",
+   "Round $1"
+  ],
+  [
+   "^✓ Ta formule (.+) est active pour un an\\. Tu la retrouves dans ton espace, où tu peux réserver ta visio avec Lamia\\.$",
+   "✓ Your $1 plan is active for a year. You’ll find it in your space, where you can book your video call with Lamia.",
+   [
+    1
+   ]
+  ],
+  [
+   "^✓ Ta formule (.+) est active\\. Tu la retrouves dans ton espace, où tu peux réserver ta visio avec Lamia\\.$",
+   "✓ Your $1 plan is active. You’ll find it in your space, where you can book your video call with Lamia.",
+   [
+    1
+   ]
+  ],
+  [
+   "^✓ Ta formule (.+) est active pour un an\\. Tu la retrouves dans ton espace\\.$",
+   "✓ Your $1 plan is active for a year. You’ll find it in your space.",
+   [
+    1
+   ]
+  ],
+  [
+   "^✓ Ta formule (.+) est active\\. Tu la retrouves dans ton espace\\.$",
+   "✓ Your $1 plan is active. You’ll find it in your space.",
+   [
+    1
+   ]
+  ],
+  [
+   "^✓ Achat confirmé : (\\d+) × (.+)\\.$",
+   "✓ Purchase confirmed: $1 × $2.",
+   [
+    2
+   ]
+  ],
+  [
+   "^([\\d,]+) Mo$",
+   "$1 MB"
+  ],
+  [
+   "^(\\d+) Ko$",
+   "$1 KB"
+  ],
+  [
+   "^Fiche n° (\\d+) · (une femme|un homme)$",
+   "Profile no. $1 · $2",
+   [
+    2
+   ]
+  ],
+  [
+   "^village : (.+)$",
+   "village: $1"
+  ],
+  [
+   "^études : (.+)$",
+   "education: $1",
+   [
+    1
+   ]
+  ],
+  [
+   "^✓ Ta fiche est reliée à ton compte \\((.+)\\)\\.$",
+   "✓ Your profile is linked to your account ($1)."
+  ],
+  [
+   "^(\\d+) femmes? et (\\d+) hommes? inscrits · (\\d+) \\+ (\\d+) pour confirmer$",
+   "$1 women and $2 men signed up · $3 + $4 to confirm"
+  ],
+  [
+   "^, pour (\\d+) minutes\\.$",
+   ", for $1 minutes."
+  ],
+  [
+   "^(.+) · gratuite$",
+   "$1 · free"
+  ],
+  [
+   "^(.+ €.*) l’unité\\.$",
+   "$1 each."
+  ]
  ]
 }
