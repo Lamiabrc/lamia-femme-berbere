@@ -3580,3 +3580,6 @@ body.espace-est-admin .espace-admin-note { color: #E8D6B5; }
 .annonce-origine { margin: 4px 0; }
 .annonce-origine b { font-weight: 700; }
 .swipe-origine { margin: 2px 0 0; font-weight: 700; color: #252B78; }
+
+.espace-pause { margin: 12px 0; }
+.espace-pause small { color: inherit; opacity: .75; }
