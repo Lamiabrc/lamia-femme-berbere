@@ -555,6 +555,10 @@ renderSocials();
     const raw = localStorage.getItem('sb-tybwvxinigahhntfeeur-auth-token');
     if (raw && JSON.parse(raw)?.access_token) {
       const t = a.querySelector('[data-account-texte]'); if (t) t.textContent = 'Mon espace'; else a.textContent = 'Mon espace';
+      // Déjà connecté·e : plus question de créer un profil ou de se connecter.
+      const en = document.documentElement.lang === 'en', mienne = en ? 'My profile' : 'Mon profil';
+      document.documentElement.classList.add('a-compte');
+      document.querySelectorAll('.cta-profil span, [data-cta-profil] span').forEach((x) => { x.textContent = mienne; });
     }
   } catch { /* stockage indisponible */ }
   // Compte administratrice : l'application s'ouvre sur son tableau de bord, et l'onglet « Moi » devient « Gérer ».

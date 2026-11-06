@@ -192,14 +192,14 @@ function header(room) {
     <details class="maison-menu" data-maison-menu>
       <summary>Menu <span aria-hidden="true">▾</span></summary>
       <div class="maison-menu-panneau">
-        <div class="maison-menu-etage"><p>Rencontres</p><ul><li><a href="/rencontres/#profils-anonymes"><strong>Les profils</strong></a></li><li><a href="/rencontres/swipe/"><strong>Swiper les profils</strong></a></li><li><a href="/rencontres/#confier"><strong>Confier mon profil</strong></a></li><li><a href="/speed-dating/"><strong>Speed dating</strong></a></li><li><a href="/abonnement/"><strong>Les formules</strong></a></li><li><a href="/salon/"><strong>Le live</strong></a></li><li><a href="/confidences/"><strong>Écrire à Lamia</strong></a></li></ul></div>
+        <div class="maison-menu-etage"><p>Rencontres</p><ul><li><a href="/rencontres/#profils-anonymes"><strong>Les profils</strong></a></li><li><a href="/rencontres/swipe/"><strong>Swiper les profils</strong></a></li><li><a href="/rencontres/#confier"><strong>Créer mon profil</strong></a></li><li><a href="/speed-dating/"><strong>Speed dating</strong></a></li><li><a href="/abonnement/"><strong>Les formules</strong></a></li><li><a href="/salon/"><strong>Le live</strong></a></li><li><a href="/confidences/"><strong>Écrire à Lamia</strong></a></li></ul></div>
         <div class="maison-menu-etage"><p>L’univers de Lamia</p><ul><li><a href="/lamia-brechet/"><strong>Qui est Lamia</strong></a></li><li><a href="/ecrin/"><strong>Bijoux kabyles</strong></a></li><li><a href="/werdi-ouvre-les-yeux/"><strong>Le livre Werdi</strong></a></li><li><a href="/boutique/"><strong>La boutique</strong></a></li><li><a href="/galerie/"><strong>La galerie</strong></a></li></ul></div>
         <div class="maison-menu-etage"><p>Mon compte</p><ul><li><a href="/mon-espace/"><strong>Mon espace</strong></a></li><li><a href="/application/"><strong>L’application</strong></a></li></ul></div>
       </div>
     </details>
     <a class="cloche" href="/nouveautes/" aria-label="Les nouveautés"><svg class="ico" aria-hidden="true"><use href="/icones.svg#cloche"/></svg><b data-cloche-point hidden></b></a>
     <a class="account-link" href="/mon-espace/" data-account-link aria-label="Se connecter ou ouvrir mon espace"><span class="account-icone" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#compte"/></svg></span><span data-account-texte>Se connecter</span></a>
-    <a class="cta-profil" href="/rencontres/#confier"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg><span>Confier mon profil</span></a>
+    <a class="cta-profil" href="/rencontres/#confier"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg><span>Créer mon profil</span></a>
   </div>
 </header>
 <nav class="barre-app" aria-label="Raccourcis">
@@ -220,7 +220,7 @@ function footer() {
   </div>
   <nav aria-label="Rencontres">
     <p class="footer-title">Rencontres</p>
-    <ul><li><a href="/rencontres/">Rencontres kabyles sérieuses</a></li><li><a href="/rencontres/#confier">Confier mon profil</a></li><li><a href="/speed-dating/">Speed dating</a></li><li><a href="/abonnement/">Les formules</a></li><li><a href="/salon/">Le live chaque soir</a></li><li><a href="/confidences/">Écrire à Lamia</a></li></ul>
+    <ul><li><a href="/rencontres/">Rencontres kabyles sérieuses</a></li><li><a href="/rencontres/#confier">Créer mon profil</a></li><li><a href="/speed-dating/">Speed dating</a></li><li><a href="/abonnement/">Les formules</a></li><li><a href="/salon/">Le live chaque soir</a></li><li><a href="/confidences/">Écrire à Lamia</a></li></ul>
     <p class="footer-title">Guides</p>
     <ul>${GUIDES.map((g) => `<li><a href="${g.path}">${esc(g.lien[0])}</a></li>`).join('')}</ul>
     <p class="footer-title">Boutique</p>
@@ -326,7 +326,7 @@ page(
       <p class="po-eyebrow">${esc(T('accueil.surtitre', 'Accueil', 'Petite ligne au-dessus du titre', 'La marieuse kabyle · rencontres sérieuses'))}</p>
       <h1 id="accueil-titre">${esc(T('accueil.titre', 'Accueil', 'Grand titre', 'Trouve ton âme sœur kabyle, avec Lamia'))}</h1>
       <p class="po-sub">${esc(T('accueil.sous-titre', 'Accueil', 'Phrase sous le titre', 'Profils vérifiés. Lamia vous présente. En vue du mariage.'))}</p>
-      <p class="po-actions"><a class="po-btn" href="/rencontres/#confier"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> Je confie mon profil</a><a class="po-btn-verre" href="/rencontres/#profils-anonymes">Voir les profils</a></p>
+      <p class="po-actions"><a class="po-btn" data-cta-profil href="/rencontres/#confier"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> <span>Créer mon profil ou connexion</span></a><a class="po-btn-verre" href="/rencontres/#profils-anonymes">Voir les profils</a></p>
       <p class="accueil-couple"><a href="/abonnement/#unite-sauver_couple"><strong>${esc(T('accueil.couple-titre', 'Accueil', 'Encadré couple : la question', 'T’es en couple et tu veux tenter une dernière chose avant de rompre ?'))}</strong><span>${esc(T('accueil.couple-action', 'Accueil', 'Encadré couple : le bouton', 'Réserve une séance de love coaching en ligne'))}</span><small><b>1 heure en visio avec Lamia</b><i> · ${UNITES.find((u) => u.id === 'sauver_couple').prix / 100} €</i></small></a></p>
       <ul class="accueil-preuves">
         <li>✓ Chaque profil vérifié par Lamia</li>
@@ -346,12 +346,12 @@ page(
   <div class="patio-etapes">
     <h2>Comment ça marche</h2>
     <ol>
-      <li><strong>Tu confies ton profil</strong><span>En 5 minutes : qui tu es, qui tu cherches, 2 photos. Rien n’est publié avec ton nom.</span></li>
+      <li><strong>Tu crées ton profil</strong><span>En 5 minutes : qui tu es, qui tu cherches, 2 photos. Rien n’est publié avec ton nom.</span></li>
       <li><strong>Lamia vérifie</strong><span>Les faux profils n’entrent pas. Avec ta pièce d’identité (facultative), ton profil gagne le badge « vérifié avec pièce d’identité ».</span></li>
       <li><strong>Elle cherche pour toi</strong><span>Son outil de matching compare les profils, et Lamia choisit avec son regard.</span></li>
       <li><strong>Elle vous présente</strong><span>Si vous êtes d’accord tous les deux, elle vous met en contact. La première fois, c’est offert.</span></li>
     </ol>
-    <p class="po-actions"><a class="po-btn" href="/rencontres/#confier"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> Je confie mon profil</a></p>
+    <p class="po-actions"><a class="po-btn" data-cta-profil href="/rencontres/#confier"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> <span>Créer mon profil ou connexion</span></a></p>
   </div>
 
   <div class="accueil-bloc">
@@ -486,7 +486,7 @@ page(
       <li><strong>La mise en relation</strong><span>Si vous êtes d’accord tous les deux, je vous mets en contact. Ton numéro reste chez moi jusque-là. La première mise en relation est offerte, les suivantes avec une <a href="/abonnement/">formule</a>.</span></li>
       <li><strong>Je vous suis</strong><span>Je prends des nouvelles après la rencontre. Si ça ne colle pas, on clôt le match avec respect et ton profil revient en attente pour une nouvelle chance.</span></li>
     </ol>
-    <p class="po-actions"><a class="po-btn" href="/rencontres/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> Je confie mon profil à Lamia</a><a class="po-btn-verre" href="/rencontres/#profils-anonymes">Voir les profils anonymes</a></p>
+    <p class="po-actions"><a class="po-btn" href="/rencontres/#confier"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> Créer mon profil</a><a class="po-btn-verre" href="/rencontres/#profils-anonymes">Voir les profils anonymes</a></p>
   </div>
 </section>
 <section class="salon-replays" id="replays" aria-labelledby="replays-titre">
@@ -1483,8 +1483,8 @@ page(
     <div class="po-hero-texte">
       <p class="po-eyebrow">Les Rencontres de Lamia</p>
       <h1 id="po-titre">Profils kabyles vérifiés : comment ça marche</h1>
-      <p class="po-sub">Tu confies ton profil, Lamia vérifie, cherche et vous présente.</p>
-      <p class="po-actions"><button type="button" class="po-btn" data-annonce-ouvrir aria-expanded="false"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> Je confie mon profil</button><a class="po-btn-verre" href="#profils-anonymes">Voir les profils</a></p>
+      <p class="po-sub">Tu crées ton profil, Lamia vérifie, cherche et vous présente.</p>
+      <p class="po-actions"><button type="button" class="po-btn" data-annonce-ouvrir data-cta-profil aria-expanded="false"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> <span>Créer mon profil ou connexion</span></button><a class="po-btn-verre" href="#profils-anonymes">Voir les profils</a></p>
     </div>
     <figure class="po-lamia">
       <img src="/images/lamia/lamia-portrait-tatouages-rond-480.webp" alt="Lamia Femme Berbère, marieuse kabyle" width="240" height="240">
@@ -1498,12 +1498,12 @@ page(
   <div class="patio-etapes po-panel" id="annonces">
     <h2>Comment ça marche</h2>
     <ol>
-      <li><strong>Tu confies ton profil</strong><span>En 5 minutes : qui tu es, qui tu cherches, 2 photos. Ton identité n’est jamais publiée.</span></li>
+      <li><strong>Tu crées ton profil</strong><span>En 5 minutes : qui tu es, qui tu cherches, 2 photos. Ton identité n’est jamais publiée.</span></li>
       <li><strong>Lamia vérifie</strong><span>Elle vérifie ton profil. Son outil compare les profils, et c’est elle qui choisit. Ta pièce d’identité est facultative : si tu la donnes, ton profil porte le badge renforcé.</span></li>
       <li><strong>Tu sais combien te correspondent</strong><span>Lamia te dit avec combien de personnes tu pourrais correspondre. Personne ne sait qui matche avec qui.</span></li>
       <li><strong>Lamia vous présente</strong><span>Si vous êtes d’accord tous les deux, elle vous met en contact. Ton numéro reste chez elle jusque-là. La première fois, c’est offert.</span></li>
     </ol>
-    <p class="po-actions"><button type="button" class="po-btn" data-annonce-ouvrir aria-expanded="false"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> Je confie mon profil</button></p>
+    <p class="po-actions"><button type="button" class="po-btn" data-annonce-ouvrir data-cta-profil aria-expanded="false"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> <span>Créer mon profil ou connexion</span></button></p>
   </div>
   <div class="patio-etapes po-panel" id="questions">
     <h2>Tes questions</h2>
@@ -1567,7 +1567,7 @@ const carteFormule = (f) => `<article class="abo-carte${f.vedette ? ' is-vedette
   <p class="abo-prix">${f.mois ? `<span data-prix-mois${f.lancement ? ' data-prestige-prix="mois"' : ''}>${eurosAbo(prixMensuel(f, 0))}<small> / mois</small></span><span data-prix-an hidden${f.lancement ? ' data-prestige-prix="an"' : ''}>${eurosAbo(prixAnnuel(f, 0))}<small> / an</small><em>soit 2 mois offerts</em></span>` : 'Gratuit'}</p>
   ${placesLancement(f)}
   <ul>${f.avantages.map((a) => `<li>${esc(a)}</li>`).join('')}</ul>
-  ${f.mois ? `<button type="button" class="po-btn" data-choisir="${f.id}">Choisir ${esc(f.nom)}</button>` : '<a class="po-btn-verre" href="/rencontres/#confier">Confier mon profil</a>'}
+  ${f.mois ? `<button type="button" class="po-btn" data-choisir="${f.id}">Choisir ${esc(f.nom)}</button>` : '<a class="po-btn-verre" href="/rencontres/#confier">Créer mon profil</a>'}
 </article>`;
 page(
   '/abonnement/',
@@ -1682,8 +1682,8 @@ page(
     body: `<div class="po-app"><section class="po-hero abo-hero"><div class="po-fond" aria-hidden="true"></div>
   <p class="po-eyebrow">Merci</p><h1>Bienvenue, ton cœur est entre de bonnes mains</h1>
   <p class="abo-alerte" data-abo-confirmation>Vérification du paiement…</p>
-  <p class="po-lead">Ton paiement est bien reçu. Tu reçois un reçu par email, et Lamia est prévenue. Si ce n’est pas encore fait, confie ton profil à Lamia pour qu’elle puisse chercher la bonne personne.</p>
-  <p class="po-actions"><a class="po-btn" href="/rencontres/#confier">💌 Confier mon profil</a><a class="po-btn-verre" href="/mon-espace/">Mon espace</a></p>
+  <p class="po-lead">Ton paiement est bien reçu. Tu reçois un reçu par email, et Lamia est prévenue. Si ce n’est pas encore fait, crée ton profil pour que Lamia puisse chercher la bonne personne.</p>
+  <p class="po-actions"><a class="po-btn" href="/rencontres/#confier">💌 Créer mon profil</a><a class="po-btn-verre" href="/mon-espace/">Mon espace</a></p>
 </section></div>`,
   })
 );

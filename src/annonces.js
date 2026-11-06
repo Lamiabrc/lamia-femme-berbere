@@ -31,7 +31,7 @@ const ERR = {
   rate_limited: 'Tu as déjà déposé plusieurs annonces aujourd’hui : réessaie demain.',
   upload_failed: 'Tes photos ne sont pas arrivées. Vérifie ta connexion, puis appuie à nouveau sur « Envoyer » : ton profil reprend là où il s’est arrêté.',
   contact_requis: 'Indique le lien de ton TikTok, Instagram ou Facebook : Lamia en a besoin pour la mise en relation.',
-  compte_requis: 'Crée d’abord ton compte (ou connecte-toi) : il faut un compte pour confier ton profil ou dire qu’un profil t’intéresse.',
+  compte_requis: 'Crée d’abord ton compte (ou connecte-toi) : il faut un compte pour créer ton profil ou dire qu’un profil t’intéresse.',
   connexion: 'Email ou mot de passe incorrect.',
   trop_de_demandes: 'Trop de demandes en ce moment. Réessaie dans une heure.',
   compte_impossible: 'La création du compte n’a pas fonctionné. Réessaie dans un instant.',
@@ -162,7 +162,7 @@ export function formulaireHtml() {
   <input type="hidden" name="interet_ref" value="">
   <p class="annonce-interet" data-interet-info hidden></p>
   <input class="hp" name="zz_site" tabindex="-1" autocomplete="off" aria-hidden="true">
-  <button class="btn btn-ink annonce-envoyer" type="submit">💌 Confier mon profil à Lamia</button>
+  <button class="btn btn-ink annonce-envoyer" type="submit">💌 Envoyer mon profil à Lamia</button>
   <p class="form-status" role="status" data-annonce-statut></p>
 </form>`;
 }
@@ -209,15 +209,15 @@ export async function monterFormulaire(box, { existant = null, token = null } = 
 function porteCompte(box) {
   const ref = box.dataset.interet;
   box.innerHTML = `<div class="annonce-porte">
-    <h3>Étape 1 : ton compte</h3>
+    <h3>Connecte-toi ou crée ton profil</h3>
     ${ref ? `<p class="annonce-interet">💌 Le profil n° ${esc(ref)} t’intéresse : crée d’abord ton compte, puis ton profil. Lamia regardera si vous pouvez correspondre.</p>` : ''}
-    <p class="annonce-aide">Il faut un compte pour confier ton profil à Lamia ou dire qu’un profil t’intéresse. C’est avec lui que tu modifies ton profil et suis tes mises en relation.</p>
-    <div class="annonce-onglets" role="tablist"><button type="button" role="tab" data-mode="creer" aria-selected="true">Créer mon compte</button><button type="button" role="tab" data-mode="connexion" aria-selected="false">J’ai déjà un compte</button></div>
+    <p class="annonce-aide">Déjà un compte ? Connecte-toi. Sinon, commence ici : ton email et un mot de passe, puis ton profil. Tu pourras le modifier et suivre tes mises en relation.</p>
+    <div class="annonce-onglets" role="tablist"><button type="button" role="tab" data-mode="creer" aria-selected="true">Créer mon profil</button><button type="button" role="tab" data-mode="connexion" aria-selected="false">Me connecter</button></div>
     <form class="annonce-grille" data-porte novalidate>
       <label data-seulement-creer>Ton prénom<input name="prenom" maxlength="60" autocomplete="given-name"></label>
       <label>Ton email<input name="email" type="email" autocomplete="email" required></label>
       <label>Mot de passe <small>(8 caractères minimum)</small><input name="mdp" type="password" minlength="8" autocomplete="new-password" required></label>
-      <button class="btn btn-ink" type="submit">Créer mon compte</button>
+      <button class="btn btn-ink" type="submit">Continuer</button>
       <p class="form-status" role="status" data-porte-statut></p>
       <p class="annonce-aide" data-seulement-connexion hidden><a class="text-link" href="/mon-espace/">Mot de passe oublié ?</a></p>
     </form>
@@ -229,7 +229,7 @@ function porteCompte(box) {
     $$('[data-mode]', box).forEach((x) => x.setAttribute('aria-selected', String(x === b)));
     $('[data-seulement-creer]', f).hidden = mode !== 'creer'; $('[data-seulement-connexion]', f).hidden = mode === 'creer';
     f.mdp.autocomplete = mode === 'creer' ? 'new-password' : 'current-password';
-    $('button[type=submit]', f).textContent = mode === 'creer' ? 'Créer mon compte' : 'Me connecter';
+    $('button[type=submit]', f).textContent = mode === 'creer' ? 'Continuer' : 'Me connecter';
     say(st, '');
   }));
   f.addEventListener('submit', async (e) => {
@@ -611,7 +611,7 @@ document.addEventListener('click', async (e) => {
 });
 const liste = document.querySelector('[data-annonces-liste]');
 if (liste) monterListe(liste);
-// « Confier mon profil » (bouton du haut, liens #confier) : le formulaire s'ouvre directement.
+// « Créer mon profil » (bouton du haut, liens #confier) : le formulaire s'ouvre directement.
 const viaAncre = () => { if (location.hash === '#confier' && document.querySelector('[data-annonce-box]')) ouvrirFormulaire(); };
 viaAncre();
 addEventListener('hashchange', viaAncre);

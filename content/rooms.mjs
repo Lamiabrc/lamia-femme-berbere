@@ -27,7 +27,7 @@ export const rooms = [
     summary: 'Le rouge à lèvres signature de Lamia et le maquillage. En préparation.', status: 'soon', accent: 'rouge' },
 
   { slug: 'patio', path: '/rencontres/', floor: 0, name: 'Les Rencontres', welcome: 'Trouver l’âme sœur, en confiance.', headline: 'Profils kabyles vérifiés : comment ça marche',
-    summary: 'Confie ton profil à Lamia, découvre des profils vérifiés et anonymes, et laisse-la faire le lien, en toute discrétion.', status: 'open', accent: 'vert' },
+    summary: 'Crée ton profil, découvre des profils vérifiés et anonymes, et laisse-la faire le lien, en toute discrétion.', status: 'open', accent: 'vert' },
 
   // ---------- premier étage : rencontres, parole, lecture
   { slug: 'salon', path: '/salon/', floor: 1, name: 'Le Salon de Lamia', welcome: 'Installe-toi, on parle vrai.', headline: 'Les lives de Lamia : couple, mariage et culture kabyle',
