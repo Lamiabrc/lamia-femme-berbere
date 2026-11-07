@@ -4,8 +4,8 @@
 
 export const O = {
   sexe: ['Femme', 'Homme'],
-  pays: ['France', 'Algerie', 'Europe', 'Canada', 'USA', 'Amerique', 'Autre'],
-  origine: ['Kabyle (Algerie)', 'Chaoui (Algerie)', 'Touareg (Algerie / Mali / Niger / Libye / Burkina Faso)', 'Autre Amazigh / Berbere', 'Arabophone', 'Europeen', 'Autre origine'],
+  pays: ['France', 'Algerie', 'Maroc', 'Tunisie', 'Libye', 'Mauritanie', 'Mali', 'Niger', 'Egypte', 'Belgique', 'Suisse', 'Luxembourg', 'Allemagne', 'Pays-Bas', 'Royaume-Uni', 'Irlande', 'Espagne', 'Portugal', 'Italie', 'Autriche', 'Suede', 'Norvege', 'Danemark', 'Finlande', 'Pologne', 'Europe', 'Canada', 'USA', 'Mexique', 'Bresil', 'Amerique', 'Emirats arabes unis', 'Qatar', 'Arabie saoudite', 'Turquie', 'Australie', 'Autre'],
+  origine: ['Kabyle (Algerie)', 'Chaoui (Algerie)', 'Touareg (Algerie / Mali / Niger / Libye / Burkina Faso)', 'Mozabite (Algerie)', 'Chenoui (Algerie)', 'Zenete (Algerie)', 'Chleuh / Soussi (Maroc)', 'Rifain (Maroc)', 'Amazigh du Moyen Atlas (Maroc)', 'Amazigh de Tunisie', 'Nefoussi (Libye)', 'Siwi (Egypte)', 'Autre Amazigh / Berbere', 'Arabophone', 'Europeen', 'Autre origine'],
   situation: ['Jamais marie(e)', 'Marie(e) sur papier uniquement', 'Divorce(e)', 'Separe(e)', 'Veuf/Veuve'],
   enfants: ['Non', 'Oui'],
   desirEnfants: ['Oui, important', 'Oui, mais a discuter', 'Peut-etre', 'Non', 'Pas important'],
@@ -28,7 +28,7 @@ export const O = {
   alcool: ['Alcool: non', 'Alcool: occasionnel', 'Alcool: oui'],
   chemma: ['Chemma: non', 'Chemma: oui'],
   // Recherche
-  zoneGeo: ['France', 'Algerie', 'Autre que Algerie', 'Europe', 'Canada', 'USA', 'Amerique', 'Autre', "N'importe ou"],
+  zoneGeo: ['France', 'Algerie', 'Autre que Algerie', 'Maghreb', 'Maroc', 'Tunisie', 'Europe', 'Canada', 'USA', 'Amerique', 'Golfe', 'Autre', "N'importe ou"],
   religionRecherche: ['Pas important', 'Islam', 'Chretienne', 'Agnostique', 'Athee', 'Autre'],
   pratiqueRecherche: ['Pas important', 'Pratiquant(e)', 'Pratique moderee', 'Non pratiquant(e)'],
   etudesRecherche: ['Pas important', 'Bac', 'Bac+', 'Bac+5', 'Plus de Bac+5'],
@@ -37,8 +37,9 @@ export const O = {
 
 // Libellés affichés sur le site (avec accents), la valeur envoyée reste celle de l'outil.
 export const LIBELLE = {
+  'Egypte': 'Égypte', 'Suede': 'Suède', 'Norvege': 'Norvège', 'Bresil': 'Brésil', 'Emirats arabes unis': 'Émirats arabes unis', 'Europe': 'Europe (autre pays)', 'USA': 'États-Unis', 'Golfe': 'Pays du Golfe', 'Mozabite (Algerie)': 'Mozabite (Algérie)', 'Chenoui (Algerie)': 'Chenoui (Algérie)', 'Zenete (Algerie)': 'Zénète (Algérie)', 'Chleuh / Soussi (Maroc)': 'Chleuh / Soussi (Maroc)', 'Rifain (Maroc)': 'Rifain (Maroc)', 'Amazigh du Moyen Atlas (Maroc)': 'Amazigh du Moyen Atlas (Maroc)', 'Amazigh de Tunisie': 'Amazigh de Tunisie', 'Nefoussi (Libye)': 'Nefoussi (Libye)', 'Siwi (Egypte)': 'Siwi (Égypte)', 'Autre Amazigh / Berbere': 'Amazigh (autre)',
   'Algerie': 'Algérie', 'Amerique': 'Amérique', 'Autre que Algerie': 'Ailleurs qu’en Algérie', "N'importe ou": 'Peu importe',
-  'Kabyle (Algerie)': 'Kabyle (Algérie)', 'Chaoui (Algerie)': 'Chaoui (Algérie)', 'Touareg (Algerie / Mali / Niger / Libye / Burkina Faso)': 'Touareg', 'Autre Amazigh / Berbere': 'Amazigh (autre : chleuh, rifain, mozabite…)', 'Kabyle': 'Kabyle', 'Chaoui': 'Chaoui', 'Algerien(ne)': 'Algérien(ne)', 'Europeen': 'Européen(ne)', 'Autre origine': 'Autre origine',
+  'Kabyle (Algerie)': 'Kabyle (Algérie)', 'Chaoui (Algerie)': 'Chaoui (Algérie)', 'Touareg (Algerie / Mali / Niger / Libye / Burkina Faso)': 'Touareg', 'Kabyle': 'Kabyle', 'Chaoui': 'Chaoui', 'Algerien(ne)': 'Algérien(ne)', 'Europeen': 'Européen(ne)', 'Autre origine': 'Autre origine',
   'Jamais marie(e)': 'Jamais marié(e)', 'Marie(e) sur papier uniquement': 'Marié(e) sur papier uniquement', 'Divorce(e)': 'Divorcé(e)', 'Separe(e)': 'Séparé(e)', 'Veuf/Veuve': 'Veuf / veuve',
   'Oui, mais a discuter': 'Oui, mais à discuter', 'Peut-etre': 'Peut-être',
   'College': 'Collège', 'Lycee': 'Lycée', 'Primaire non termine': 'Primaire non terminé', 'Primaire termine': 'Primaire terminé', 'College non termine': 'Collège non terminé', 'College termine': 'Collège terminé', 'Lycee non termine': 'Lycée non terminé', 'Bac general': 'Bac général',
@@ -99,7 +100,7 @@ export function choixPropres(m = {}) {
     visionFinanciere: un(m.visionFinanciere, [...O.visionHomme, ...O.visionFemme]),
     hygieneVie: [un(m.fumeur, O.fumeur), un(m.sport, O.sport), un(m.alcool, O.alcool), un(m.chemma, O.chemma)].filter(Boolean),
     zoneGeo: un(m.zoneGeo, O.zoneGeo),
-    origineRechercheTags: plusieurs(m.origineRechercheTags, O.origine, 7),
+    origineRechercheTags: plusieurs(m.origineRechercheTags, O.origine, 16),
     religionRecherche: un(m.religionRecherche, O.religionRecherche),
     pratiqueRecherche: un(m.pratiqueRecherche, O.pratiqueRecherche),
     etudesRecherche: un(m.etudesRecherche, O.etudesRecherche),
@@ -236,7 +237,7 @@ function sens(A, B, forts, vigilance, quiA, quiB) {
   if (A.prefs.fumeur === 'Fumeur: non' && fB && fB !== 'Fumeur: non') { vigilance.push(`${quiB} fume, ${quiA} non`); ajoute(1, 5); } else ajoute(fB ? 5 : 4, 5);
   // Géographie (5)
   const zone = A.prefs.zone;
-  if (zone && zone !== "N'importe ou" && B.pays) { if (zone === B.pays || (zone === 'Europe' && ['France', 'Europe'].includes(B.pays))) ajoute(5, 5); else if (/^Oui/.test(A.prefs.mobilite || '')) ajoute(3, 5); else { vigilance.push(`${quiB} vit hors de la zone voulue par ${quiA}`); ajoute(1, 5); } }
+  if (zone && zone !== "N'importe ou" && B.pays) { if (zone === B.pays || (zone !== 'Autre' && zoneAccepte(zone, B.pays))) ajoute(5, 5); else if (/^Oui/.test(A.prefs.mobilite || '')) ajoute(3, 5); else { vigilance.push(`${quiB} vit hors de la zone voulue par ${quiA}`); ajoute(1, 5); } }
   else ajoute(B.pays && B.pays === A.pays ? 5 : 3.5, 5);
   return pts / max;
 }
@@ -257,13 +258,16 @@ const plat = (v) => String(v ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g,
 // « France · Marseille » → « france » : seule la grande zone sert au filtre, la précision reste à lire sur la fiche.
 const zoneDe = (secteur) => plat(String(secteur ?? '').split('·')[0]);
 // La personne qui cherche dans cette zone accepte-t-elle quelqu'un qui vit dans ce pays ? En cas de doute : oui.
+const EUROPE = ['europe', 'france', 'belgique', 'suisse', 'luxembourg', 'allemagne', 'pays-bas', 'royaume-uni', 'irlande', 'espagne', 'portugal', 'italie', 'autriche', 'suede', 'norvege', 'danemark', 'finlande', 'pologne'];
 export function zoneAccepte(secteur, pays) {
   const z = zoneDe(secteur), p = plat(pays);
   if (!z || !p || ['pas important', "n'importe ou", '…'].includes(z) || p === 'pas important') return true;
   if (p === 'autre que algerie') return z !== 'algerie';
   if (z === 'autre que algerie') return p !== 'algerie';
-  if (z === 'europe') return p === 'europe' || p === 'france';
-  if (z === 'amerique') return ['amerique', 'canada', 'usa'].includes(p);
+  if (z === 'europe') return EUROPE.includes(p);
+  if (z === 'amerique') return ['amerique', 'canada', 'usa', 'mexique', 'bresil'].includes(p);
+  if (z === 'maghreb') return ['algerie', 'maroc', 'tunisie', 'libye', 'mauritanie'].includes(p);
+  if (z === 'golfe') return ['emirats arabes unis', 'qatar', 'arabie saoudite'].includes(p);
   if (z === 'autre') return !['france', 'algerie'].includes(p);
   return z === p;
 }
