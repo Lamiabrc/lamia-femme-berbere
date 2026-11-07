@@ -289,3 +289,33 @@ export const origineLisible = (origines) => [...new Set((origines || []).map((o)
   const t = String(lib(o) || o);
   return /^Amazigh/.test(t) ? 'Amazigh' : t.replace(/\s*\(.*\)$/, '');
 }))].join(' · ');
+
+// ---------------------------------------------------------------- « Un profil avec une différence », en mots simples
+// Critères non respectés → phrases courtes, accordées au genre de l'autre personne (« Il est divorcé. »).
+const SITUATION_DIFF = {
+  'Divorce(e)': ['Il est divorcé.', 'Elle est divorcée.'], 'Separe(e)': ['Il est séparé.', 'Elle est séparée.'],
+  'Veuf/Veuve': ['Il est veuf.', 'Elle est veuve.'], 'Marie(e) sur papier uniquement': ['Il est marié sur papier.', 'Elle est mariée sur papier.'],
+  'Jamais marie(e)': ['Il n’a jamais été marié.', 'Elle n’a jamais été mariée.'],
+};
+export function phrasesDifference(criteres = [], fiche = {}) {
+  const f = fiche?.genre === 'femme' ? 1 : 0;
+  const t = [];
+  if (criteres.includes('situation')) t.push(SITUATION_DIFF[fiche?.situation]?.[f] || 'Sa situation n’est pas celle que tu cherches.');
+  if (criteres.includes('age')) t.push('Son âge n’est pas dans la tranche que tu cherches.');
+  if (criteres.includes('secteur')) t.push(['Il ne vit pas là où tu cherches.', 'Elle ne vit pas là où tu cherches.'][f]);
+  if (criteres.includes('religion')) t.push('Sa religion ou sa pratique n’est pas celle que tu cherches.');
+  if (criteres.includes('enfants')) t.push('Pour les enfants, ce n’est pas ce que tu as demandé.');
+  if (criteres.some((c) => !['secteur', 'age', 'situation', 'religion', 'enfants'].includes(c))) t.push('Un autre de tes critères n’est pas respecté.');
+  return t;
+}
+// Les anciennes questions sont enregistrées en texte : on retrouve les critères pour les redire simplement.
+export function criteresDeQuestion(q = '') {
+  const c = [];
+  if (/Tu cherches en/.test(q)) c.push('secteur');
+  if (/Son âge/.test(q)) c.push('age');
+  if (/Sa situation/.test(q)) c.push('situation');
+  if (/religion/.test(q)) c.push('religion');
+  if (/enfants/.test(q)) c.push('enfants');
+  if (/Un (de tes|autre de tes) critères/.test(q)) c.push('autre');
+  return c;
+}

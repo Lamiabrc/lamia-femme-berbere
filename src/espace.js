@@ -1,7 +1,7 @@
 // Mon espace : connexion, mot de passe, soirées réservées, liens d'administration.
 import { createClient } from '/vendor/supabase.mjs';
 import { creerCompte, api } from './confidences-commun.js';
-import { secteurLisible, origineLisible } from './matching-options.mjs';
+import { secteurLisible, origineLisible, phrasesDifference, criteresDeQuestion } from './matching-options.mjs';
 
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc');
 const $ = (s, r = document) => r.querySelector(s);
@@ -611,11 +611,11 @@ async function avisLamia(session) {
     const f = x.fiche;
     const infos = [f.genre === 'femme' ? 'Une femme' : 'Un homme', f.age && `${f.age} ans`, f.ville, f.pays, f.situation].filter(Boolean);
     const ages = f.age_min || f.age_max ? ` · ${f.age_min || 18} à ${f.age_max || 99} ans` : '';
-    const rep = x.reponse === 'oui' ? '<p class="espace-match"><svg class="ico" aria-hidden="true"><use href="/icones.svg#thumbs-up"/></svg> Tu acceptes la différence : c’est noté, la suite se fait toute seule.</p><p>Pense à mettre à jour ce que tu recherches pour recevoir aussi ce genre de profils : <a class="text-link" href="#mon-profil">Modifier mon annonce</a>.</p>'
+    const rep = x.reponse === 'oui' ? '<p class="espace-match"><svg class="ico" aria-hidden="true"><use href="/icones.svg#thumbs-up"/></svg> Tu as dit oui : c’est noté.</p><p>Pense à mettre à jour ce que tu recherches pour recevoir aussi ce genre de profils : <a class="text-link" href="#mon-profil">Modifier mon annonce</a>.</p>'
       : x.reponse === 'non' ? '<p>Tu as répondu non : c’est noté, merci.</p>'
-      : `<p class="interet-boutons"><button type="button" class="btn btn-ink" data-avis="oui" data-id="${esc(x.id)}">Oui</button><button type="button" class="btn btn-line" data-avis="non" data-id="${esc(x.id)}">Non</button></p>`;
+      : `<p><strong>Tu acceptes quand même ?</strong></p><p class="interet-boutons"><button type="button" class="btn btn-ink" data-avis="oui" data-id="${esc(x.id)}">Oui</button><button type="button" class="btn btn-line" data-avis="non" data-id="${esc(x.id)}">Non</button></p>`;
     return `<article class="espace-achat interet-recu proposition"><div><p class="event-date"><svg class="ico" aria-hidden="true"><use href="/icones.svg#message-circle"/></svg> Lamia te demande ton avis · profil n° ${esc(f.ref)}</p>
-      <p class="proposition-mot">${esc(x.question)}</p><p><strong>Tu acceptes quand même ?</strong></p>
+      ${(() => { const d = phrasesDifference(criteresDeQuestion(x.question), f); return d.length ? `<p class="espace-diff-intro">Ce profil ne correspond pas à ce que tu as demandé :</p><ul class="espace-diff">${d.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>` : `<p class="proposition-mot">${esc(x.question)}</p>`; })()}
       <h3>${esc(infos.join(' · '))}</h3>
       ${f.profil ? `<p><strong>Qui je suis :</strong> <span data-membre>${esc(f.profil)}</span></p>` : ''}
       ${f.recherche ? `<p><strong>Qui je cherche${esc(ages)} :</strong> <span data-membre>${esc(f.recherche)}</span></p>` : ''}
