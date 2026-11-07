@@ -563,6 +563,15 @@ export async function monterListe(box) {
     pages.addEventListener('click', (e) => { const x = e.target.closest('[data-page]'); if (x && !x.disabled) montrer(genre, Number(x.dataset.page), true); });
     onglets.addEventListener('click', (e) => { const x = e.target.closest('[data-genre]'); if (x) montrer(x.dataset.genre); });
     montrer(groupes.femme.length || !groupes.homme.length ? 'femme' : 'homme');
+    // Membre connecté : on ouvre sur l'autre genre (une femme voit d'abord les hommes, et inversement).
+    let memo = null; try { memo = localStorage.getItem('lfb_mon_genre'); } catch { /* */ }
+    const ouvrirAutre = (g) => { const autre = g === 'femme' ? 'homme' : g === 'homme' ? 'femme' : ''; if (autre && groupes[autre].length) montrer(autre); };
+    if (memo) ouvrirAutre(memo);
+    sessionActive().then(async (s) => {
+      if (!s) return;
+      const r = await api({ action: 'mon_genre' }, s.access_token).catch(() => null);
+      if (r?.genre) { try { localStorage.setItem('lfb_mon_genre', r.genre); } catch { /* */ } if (r.genre !== memo) ouvrirAutre(r.genre); }
+    });
   } catch { box.innerHTML = '<p class="annonce-vide">Les annonces n’ont pas pu s’afficher. Recharge la page dans un instant.</p>'; }
 }
 
