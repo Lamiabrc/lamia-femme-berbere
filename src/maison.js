@@ -569,6 +569,10 @@ renderSocials();
       const moi = document.querySelector('[data-barre-compte]');
       if (moi) { moi.href = '/tableau-de-bord'; moi.querySelector('b').textContent = 'Gérer'; }
       document.querySelector('.cta-profil')?.setAttribute('hidden', '');
+    } else if (role !== 'admin' && JSON.parse(localStorage.getItem('sb-tybwvxinigahhntfeeur-auth-token') || 'null')?.access_token) {
+      // Membre connecté : l'appli s'ouvre directement sur les profils.
+      const src = new URLSearchParams(location.search).get('source');
+      if (location.pathname === '/' && (src === 'app' || src === 'play')) location.replace(`/rencontres/swipe/${src === 'play' ? '?source=play' : ''}`);
     }
   } catch { /* stockage indisponible */ }
   // Barre du bas (téléphone) : l'onglet de la page en cours.
