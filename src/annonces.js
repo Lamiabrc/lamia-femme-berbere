@@ -428,7 +428,8 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
       envoi = null;
       window.lfbEvent?.('annonce_deposee');
       try { localStorage.removeItem(BROUILLON); } catch { /* */ }
-      box.innerHTML = `<div class="annonce-merci"><p class="annonce-coeur" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg></p><p class="lfb-azul" lang="ber">ⵜⴰⵏⴻⵎⵎⵉⵔⵜ</p><h3>Merci ${esc(f.prenom.value.trim())}, ton profil est bien arrivé chez Lamia${fin.ref ? ` (n° ${fin.ref})` : ''} !</h3><p>Il n’est publié nulle part. Lamia le vérifie, puis le passe dans son outil de matching. Tu recevras par email le nombre de personnes avec qui tu pourrais correspondre. ${live ? 'Tes 3 premières mises en relation sont offertes.' : 'Ta première mise en relation est offerte.'}</p><p>Ton profil est lié à ton compte : tu peux le modifier quand tu veux dans <a href="/mon-espace/">Mon espace</a>.</p><p>En attendant, tu peux <a href="/speed-dating/">t’inscrire à la prochaine soirée</a> ou <a href="/rencontres/swipe/">swiper les profils</a>.</p></div>`;
+      box.innerHTML = `<div class="annonce-merci"><p class="lfb-azul" lang="ber">ⵜⴰⵏⴻⵎⵎⵉⵔⵜ</p><h3>Merci ${esc(f.prenom.value.trim())}, c’est enregistré !</h3><p><a class="btn btn-ink" href="/rencontres/swipe/?bienvenue=1">Découvrir les profils</a></p></div>`;
+      setTimeout(() => location.assign('/rencontres/swipe/?bienvenue=1'), 1800);
     } catch (err) {
       btn.disabled = false;
       say(st, ERR[err.code] || (err.code && !/^http_/.test(err.code) ? `L’envoi n’a pas abouti (${err.code}). Réessaie, ou écris à Lamia en lui donnant ce code.` : 'L’envoi n’a pas abouti : la connexion a coupé ou le serveur n’a pas répondu. Réessaie dans un instant ; si ça recommence, écris à Lamia.'), true);

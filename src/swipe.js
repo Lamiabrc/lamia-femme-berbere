@@ -159,6 +159,20 @@ function fenetre(html, classe = '') {
   d.addEventListener('click', (e) => { if (e.target === d || e.target.closest('[data-fermer]')) d.remove(); });
   return d;
 }
+// Première visite (ou juste après l'inscription) : ce qu'il faut faire, en trois gestes.
+function bienvenue() {
+  let deja = false;
+  try { deja = localStorage.getItem('lfb_swipe_bienvenue') === '1'; } catch { /* */ }
+  if (deja && !new URLSearchParams(location.search).has('bienvenue')) return;
+  try { localStorage.setItem('lfb_swipe_bienvenue', '1'); } catch { /* */ }
+  const d = fenetre(`<h2>Bienvenue !</h2>
+    <ul class="swipe-bienvenue">
+      <li><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Il te plaît</li>
+      <li><svg class="ico" aria-hidden="true"><use href="/icones.svg#croix"/></svg> Pas pour toi</li>
+      <li>Les deux d’accord : <strong>match</strong></li>
+    </ul>`, 'swipe-fenetre-bienvenue');
+  const b = d.querySelector('[data-fermer]'); if (b) b.textContent = 'C’est parti';
+}
 function celebrerMatch(ref) {
   vibrer([40, 60, 40, 60, 120]);
   const d = fenetre(`<p class="swipe-match-coeurs" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg></p><h2>C’est réciproque !</h2><p>Le profil <strong>n° ${esc(ref)}</strong> t’a choisi·e aussi. Lamia est prévenue à l’instant : elle regarde votre compatibilité et revient vers toi pour la mise en relation.</p>`, 'is-match');
@@ -282,9 +296,10 @@ addEventListener('keydown', (e) => { if (document.querySelector('.swipe-fenetre'
     if (gardes) filtres = { ...filtres, ...gardes };
     monterFiltres();
     appliquer();
+    bienvenue();
   } catch (err) {
     if (err.code === 'annonce_en_pause') return message('<h2>Ton annonce est en pause</h2><p>Reprends-la dans ton espace pour découvrir les profils.</p><p><a class="po-btn" href="/mon-espace/">Aller à mon espace</a></p>');
-    if (err.code === 'photos_requises') return message('<h2>Il manque tes photos</h2><p>Pour découvrir les profils, ajoute <strong>2 photos de toi</strong> dans ton espace. Elles restent privées.</p><p><a class="po-btn" href="/mon-espace/#photos">Ajouter mes photos</a></p>');
+    if (err.code === 'photos_requises') return message('<h2>Ajoute 2 photos</h2><p>Puis les profils s’affichent ici.</p><p><a class="po-btn" href="/mon-espace/#photos">Ajouter mes photos</a></p>');
     if (err.code === 'fiche_a_confirmer') return message('<h2>Plus qu’une étape</h2><p>Ta fiche du live n’est pas encore confirmée. Confirme-la depuis ton espace, puis reviens swiper. Inutile de refaire un profil.</p><p><a class="po-btn" href="/mon-espace/">Confirmer ma fiche</a></p>');
     if (err.code === 'fiche_live') return message('<h2>Ta fiche du live est bien là</h2><p>Il lui manque ton âge ou ton genre pour que tu puisses swiper. Écris à Lamia pour qu’elle la complète : inutile de refaire un profil.</p><p><a class="po-btn" href="/mon-espace/">Aller dans mon espace</a></p>');
     if (err.code === 'moderateur_sans_annonce') return message('<h2><svg class="ico" aria-hidden="true"><use href="/icones.svg#shield"/></svg> Ton compte modérateur</h2><p>Tu peux lire toutes les annonces anonymes. Sans annonce à toi, tu ne swipes pas et tu ne matches pas. Tu peux en créer une quand tu veux.</p><p><a class="po-btn" href="/rencontres/#confier">Créer une annonce</a> <a class="po-btn" href="/rencontres/">Voir les annonces</a></p>');

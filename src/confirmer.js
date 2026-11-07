@@ -94,8 +94,8 @@ async function monterSimple() {
     try { await api({ action: 'annonce_lier_fiche_outil', n, t }, s.access_token); }
     catch (e) { dire(e.code === 'deja_liee' ? 'Cette fiche est déjà reliée à un autre compte. Écris à Lamia pour qu’elle t’aide.' : 'Ça n’a pas fonctionné. Réessaie dans un instant.'); return; }
     await agir('annonce_confirmer_outil');
-    // La fiche est confirmée : direction l'espace pour ajouter les photos, obligatoires pour swiper et répondre.
-    location.assign('/mon-espace/#photos');
+    // La fiche est confirmée : direction le swipe, qui guide vers les photos s'il en manque.
+    location.assign('/rencontres/swipe/?bienvenue=1');
   };
   if (session) {
     z.innerHTML = `<p>Tu es connecté·e avec <strong>${esc(session.user.email)}</strong>.</p><p class="confirmer-actions"><button type="button" class="po-btn" data-tout><svg class="ico" aria-hidden="true"><use href="/icones.svg#circle-check"/></svg> Je confirme ma fiche</button></p><p class="confirmer-note" data-simple-msg></p>`;

@@ -520,7 +520,7 @@ $('[data-espace-signup]').addEventListener('submit', async (e) => {
   }
   const { error } = await supabase.auth.signInWithPassword({ email: String(f.get('email')).trim(), password: String(f.get('password')) });
   if (error) return say(st, 'Ton espace est créé : connecte-toi avec ton email et ton mot de passe.');
-  say(st, ''); e.target.reset(); render();
+  say(st, ''); e.target.reset(); location.assign('/rencontres/swipe/?bienvenue=1');
 });
 
 supabase.auth.onAuthStateChange((event) => { if (event === 'PASSWORD_RECOVERY') recovering = true; render(); });

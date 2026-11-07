@@ -3969,3 +3969,11 @@ html[dir="rtl"], html[dir="rtl"] body { overflow-x: clip; }
 .po-app .confirmer-app .confirmer-fiche h3, .confirmer-app .confirmer-fiche h3 { color: #2F2B3D; }
 .espace-diff-intro { margin: 8px 0 2px; font-weight: 600; color: #2F2B3D; }
 .espace-diff { margin: 4px 0 8px; padding-left: 20px; color: #D1173A; font-weight: 600; }
+
+/* Bienvenue sur le swipe */
+.swipe-bienvenue { text-align: left; margin: 12px auto; padding-left: 22px; max-width: 320px; line-height: 1.5; }
+.swipe-bienvenue li { margin: 6px 0; }
+.swipe-fenetre-bienvenue h2 { margin: 4px 0 6px; }
+.swipe-bienvenue { list-style: none; padding: 0; font-size: 1.1em; }
+.swipe-bienvenue li { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 10px 0; }
+.swipe-bienvenue .ico { width: 1.4em; height: 1.4em; color: #D1173A; }
