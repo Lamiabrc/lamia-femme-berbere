@@ -153,7 +153,7 @@ ${noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" hr
 <link rel="icon" href="/images/marque/lamia-logo-net-160.webp" type="image/webp">
 <link rel="manifest" href="/maison.webmanifest">
 <script src="/assets/version-play.js"></script>
-<link rel="apple-touch-icon" href="/images/marque/maison-icone-180.png">
+<link rel="apple-touch-icon" href="/images/marque/lfb-icone-180.png">
 <meta name="apple-mobile-web-app-title" content="LFB">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">

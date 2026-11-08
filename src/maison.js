@@ -801,7 +801,7 @@ renderSocials();
     const { titre, liste, copier } = etapes();
     const d = document.createElement('div');
     d.className = 'install-aide'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-label', titre);
-    d.innerHTML = `<div class="install-boite"><button type="button" class="install-fermer" aria-label="Fermer">×</button><p class="install-icone"><img src="/images/marque/maison-icone-192.png" width="64" height="64" alt=""></p><h2>${titre}</h2><ol>${liste.map((x) => `<li>${x}</li>`).join('')}</ol>${copier ? '<button type="button" class="btn btn-ink" data-copier-lien>Copier le lien du site</button><p class="install-copie" data-copie hidden>Lien copié : colle-le dans ' + (ios ? 'Safari' : 'Chrome') + '.</p>' : ''}</div>`;
+    d.innerHTML = `<div class="install-boite"><button type="button" class="install-fermer" aria-label="Fermer">×</button><p class="install-icone"><img src="/images/marque/lfb-icone-192.png" width="64" height="64" alt=""></p><h2>${titre}</h2><ol>${liste.map((x) => `<li>${x}</li>`).join('')}</ol>${copier ? '<button type="button" class="btn btn-ink" data-copier-lien>Copier le lien du site</button><p class="install-copie" data-copie hidden>Lien copié : colle-le dans ' + (ios ? 'Safari' : 'Chrome') + '.</p>' : ''}</div>`;
     document.body.appendChild(d);
     const fermer = () => d.remove();
     d.addEventListener('click', (e) => { if (e.target === d || e.target.closest('.install-fermer')) fermer(); });
