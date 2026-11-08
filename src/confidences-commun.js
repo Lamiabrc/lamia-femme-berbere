@@ -30,7 +30,7 @@ export async function api(body, token) {
   const r = await fetch('/api/confidences', { method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }, body: JSON.stringify(body) });
   let data = {};
   try { data = await r.json(); } catch { /* */ }
-  if (!r.ok || data.error) { const e = new Error(data.error || `http_${r.status}`); e.code = data.error; throw e; }
+  if (!r.ok || data.error) { const e = new Error(data.error || `http_${r.status}`); e.code = data.error; e.data = data; throw e; }
   return data;
 }
 
