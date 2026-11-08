@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.lamiafemmeberbere.lfb",
+      "sha256_cert_fingerprints": [
+        "1A:DA:AD:AF:AA:63:CD:95:D8:B7:14:4A:18:C6:1A:2C:EF:3F:C5:83:64:16:47:F4:18:73:1D:9D:3C:59:9D:38",
+        "FF:12:BC:1B:2E:EB:0D:66:A3:67:BF:E1:BB:68:3B:0A:A2:E2:CE:6C:76:C7:65:2D:22:C0:8C:B6:75:08:6C:DA"
+      ]
+    }
+  }
+]
