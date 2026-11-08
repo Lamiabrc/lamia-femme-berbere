@@ -3982,3 +3982,5 @@ html[dir="rtl"], html[dir="rtl"] body { overflow-x: clip; }
 .lfb-testeur-play { position: fixed; left: 12px; right: 12px; bottom: 84px; z-index: 60; background: #fff; border: 1.5px solid #C9BCE8; border-radius: 18px; padding: 14px 16px; box-shadow: 0 10px 30px rgba(47, 43, 61, .18); color: #2F2B3D; max-width: 480px; margin: 0 auto; }
 .lfb-testeur-play p { margin: 0 0 8px; }
 .lfb-testeur-play p:last-child { margin: 0; }
+
+.lfb-testeur-play .btn { margin: 4px 4px 0 0; }
