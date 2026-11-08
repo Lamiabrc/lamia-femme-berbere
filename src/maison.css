@@ -3984,3 +3984,13 @@ html[dir="rtl"], html[dir="rtl"] body { overflow-x: clip; }
 .lfb-testeur-play p:last-child { margin: 0; }
 
 .lfb-testeur-play .btn { margin: 4px 4px 0 0; }
+
+/* Confirmation de fiche : la page est sur fond clair, tout le texte passe en indigo foncé */
+.po-app .confirmer-app, .confirmer-app { color: #1C2059; }
+.confirmer-app p, .confirmer-app label, .confirmer-app .confirmer-note, .confirmer-app .confirmer-infos { color: #1C2059; opacity: 1; }
+.confirmer-app label { font-weight: 600; }
+.confirmer-app .confirmer-acces h2, .confirmer-app h2, .confirmer-app h3 { color: #1C2059; }
+.confirmer-app a, .confirmer-app .confirmer-lien, .confirmer-app .confirmer-note a { color: #252B78; font-weight: 600; }
+.confirmer-app input, .confirmer-app textarea, .confirmer-modif input, .confirmer-modif textarea { background: #FFFFFF; color: #1C2059; border: 1.5px solid #8A8FC4; }
+.confirmer-app input::placeholder, .confirmer-app textarea::placeholder { color: #5A5F8F; opacity: 1; }
+.confirmer-app .confirmer-acces, .confirmer-app .confirmer-erreur { background: #FFFFFF; border: 1.5px solid #C9C3E4; }
