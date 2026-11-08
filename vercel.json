@@ -191,6 +191,15 @@
           "value": "noindex, nofollow"
         }
       ]
+    },
+    {
+      "source": "/images/play/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "https://play.google.com"
+        }
+      ]
     }
   ],
   "rewrites": [
