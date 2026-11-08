@@ -17,19 +17,19 @@
   ],
   "icons": [
     {
-      "src": "/images/marque/maison-icone-192.png",
+      "src": "/images/marque/lfb-icone-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/images/marque/maison-icone-512.png",
+      "src": "/images/marque/lfb-icone-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/images/marque/maison-icone-maskable-512.png",
+      "src": "/images/marque/lfb-icone-maskable-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -41,7 +41,7 @@
       "url": "/rencontres/swipe/?source=app",
       "icons": [
         {
-          "src": "/images/marque/maison-icone-192.png",
+          "src": "/images/marque/lfb-icone-192.png",
           "sizes": "192x192"
         }
       ]
@@ -51,7 +51,7 @@
       "url": "/mon-espace/?source=app",
       "icons": [
         {
-          "src": "/images/marque/maison-icone-192.png",
+          "src": "/images/marque/lfb-icone-192.png",
           "sizes": "192x192"
         }
       ]
@@ -61,7 +61,7 @@
       "url": "/speed-dating/?source=app",
       "icons": [
         {
-          "src": "/images/marque/maison-icone-192.png",
+          "src": "/images/marque/lfb-icone-192.png",
           "sizes": "192x192"
         }
       ]
@@ -71,7 +71,7 @@
       "url": "/salon/?source=app",
       "icons": [
         {
-          "src": "/images/marque/maison-icone-192.png",
+          "src": "/images/marque/lfb-icone-192.png",
           "sizes": "192x192"
         }
       ]
