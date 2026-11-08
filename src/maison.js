@@ -874,23 +874,24 @@ renderSocials();
     }).catch(() => {});
 })();
 
-// Test Google Play : proposé une fois aux membres connectés sur Android (pas dans la version Play elle-même).
+// Test Google Play : proposé une fois à tous les membres connectés (pas dans la version Play elle-même).
 (function testeurPlay() {
   try {
-    if (!/Android/i.test(navigator.userAgent) || window.LFB_PLAY) return;
+    if (window.LFB_PLAY) return;
     if (localStorage.getItem('lfb_testeur_play')) return;
     const jeton = JSON.parse(localStorage.getItem('sb-tybwvxinigahhntfeeur-auth-token') || 'null')?.access_token;
     if (!jeton || location.pathname.startsWith('/tableau-de-bord')) return;
     const installee = matchMedia('(display-mode: standalone)').matches;
     const d = document.createElement('div');
     d.className = 'lfb-testeur-play';
-    d.innerHTML = '<p><strong>LFB arrive sur Google Play.</strong> Tu veux la tester en avant-première ?</p><p><button type="button" class="btn btn-ink" data-oui>Oui</button> <button type="button" class="btn btn-line" data-non>Non merci</button></p>';
+    d.innerHTML = '<p><strong>LFB arrive sur Google Play.</strong> Tu veux la tester en avant-première ?</p><p><button type="button" class="btn btn-ink" data-oui>Oui</button> <button type="button" class="btn btn-line" data-non>Non</button> <button type="button" class="btn btn-line" data-iphone>Non, je suis sur iPhone</button></p>';
     const fin = (v) => { try { localStorage.setItem('lfb_testeur_play', v); } catch { /* */ } };
     d.querySelector('[data-non]').onclick = () => { fin('non'); d.remove(); };
+    d.querySelector('[data-iphone]').onclick = () => { fin('iphone'); d.remove(); };
     d.querySelector('[data-oui]').onclick = async () => {
       fin('oui');
-      try { await fetch('/api/confidences', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jeton}` }, body: JSON.stringify({ action: 'testeur_play', installee }) }); } catch { /* */ }
-      d.innerHTML = '<p><strong>Merci !</strong> Tu recevras le lien de Google Play sur ton adresse email.</p>';
+      try { await fetch('/api/confidences', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jeton}` }, body: JSON.stringify({ action: 'testeur_play', installee, android: /Android/i.test(navigator.userAgent) }) }); } catch { /* */ }
+      d.innerHTML = '<p><strong>Merci !</strong> Tu recevras le lien de Google Play sur ton adresse email. Il faut un téléphone Android avec cette adresse Gmail.</p>';
       setTimeout(() => d.remove(), 4000);
     };
     setTimeout(() => document.body.append(d), 4000);
