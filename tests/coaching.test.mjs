@@ -119,14 +119,19 @@ test('entrer dans la visio : 10 minutes avant, seulement pour les deux personnes
   assert.equal((await go(w, 'annonce_coaching_rejoindre', { id: a.id })).error, 'trop_tot');
   w.t.now = new Date(new Date(a.debut).getTime() - 5 * 60e3);
   assert.equal((await go(w, 'annonce_coaching_rejoindre', { id: a.id }, KARIM)).status, 404);
+  // Le membre frappe à la porte : pas de jeton, seulement son prénom.
   const r = await go(w, 'annonce_coaching_rejoindre', { id: a.id });
-  assert.equal(r.url, 'https://lfb.daily.co/coaching-x?t=jeton');
+  assert.equal(r.url, 'https://lfb.daily.co/coaching-x?n=Nina');
   const salle = JSON.parse(w.daily[0][1].body);
-  assert.equal(salle.privacy, 'private'); assert.equal(salle.properties.max_participants, 2);
-  const jeton = JSON.parse(w.daily[1][1].body).properties;
-  assert.equal(jeton.is_owner, false); assert.equal(jeton.user_name, 'Nina');
-  assert.equal((await go(w, 'annonce_coaching_rejoindre', { id: a.id }, LAMIA, true)).status, 200);
-  assert.equal(JSON.parse(w.daily[3][1].body).properties.is_owner, true);
+  assert.equal(salle.privacy, 'private');
+  const porte = JSON.parse(w.daily[1][1].body).properties;
+  assert.equal(porte.enable_knocking, true); assert.equal(porte.max_participants, 2);
+  assert.equal(w.daily.some(([u]) => u.includes('meeting-tokens')), false);
+  // Lamia dirige la salle : jeton de propriétaire.
+  const l = await go(w, 'annonce_coaching_rejoindre', { id: a.id }, LAMIA, true);
+  assert.equal(l.url, 'https://lfb.daily.co/coaching-x?t=jeton');
+  const jeton = JSON.parse(w.daily.find(([u]) => u.includes('meeting-tokens'))[1].body).properties;
+  assert.equal(jeton.is_owner, true); assert.equal(jeton.user_name, 'Lamia');
   w.t.now = new Date(new Date(a.debut).getTime() + 3600e3);
   assert.equal((await go(w, 'annonce_coaching_rejoindre', { id: a.id })).error, 'terminee');
 });
@@ -235,8 +240,9 @@ test('Sauver mon couple : le conjoint entre sans compte, 3 personnes, avec le bo
   const r = await inv({ entrer: true, nom: 'Rachid' });
   assert.match(r.url, /daily/);
   assert.equal(JSON.parse(w.daily[0][1].body).properties.max_participants, 3);
-  const j = JSON.parse(w.daily[1][1].body).properties;
-  assert.equal(j.is_owner, false); assert.equal(j.user_name, 'Rachid');
+  // Le conjoint frappe à la porte avec son prénom, sans jeton : c'est Lamia qui le fait entrer.
+  assert.equal(new URL(r.url).searchParams.get('n'), 'Rachid'); assert.equal(new URL(r.url).searchParams.get('t'), null);
+  assert.equal(JSON.parse(w.daily[1][1].body).properties.enable_knocking, true);
   // Une heure et quart après le début, c'est encore bon ; après, c'est fini.
   w.t.now = new Date(new Date(c.debut).getTime() + 80 * 60e3);
   assert.equal((await inv({ entrer: true })).error, 'terminee');
@@ -252,4 +258,17 @@ test('une visio de 15 minutes n’a pas de lien d’invitation', async () => {
   const r = await go(w, 'annonce_coaching_reserver', { id: c.id });
   assert.equal(r.prochaine.invitation, undefined);
   assert.equal((await go(w, 'annonce_coaching_invite', { c: c.id, t: `signe-${c.id}.${c.reserve_at}` }, null)).status, 403);
+});
+
+test('Lamia ouvre sa salle quand elle veut, même avant l’heure ; elle seule a un jeton', async () => {
+  const w = monde();
+  await ouvrir(w);
+  const a = w.lignes[0];
+  await go(w, 'annonce_coaching_reserver', { id: a.id });
+  assert.equal((await go(w, 'annonce_coaching_rejoindre', { id: a.id })).error, 'trop_tot');
+  assert.equal((await go(w, 'annonce_coaching_rejoindre', { id: a.id }, LAMIA, true)).url, 'https://lfb.daily.co/coaching-x?t=jeton');
+  assert.equal((await go(w, 'annonce_coaching_ma_salle', {})).status, 403);
+  const m = await go(w, 'annonce_coaching_ma_salle', {}, LAMIA, true);
+  assert.equal(m.url, 'https://lfb.daily.co/coaching-x?t=jeton'); assert.equal(m.invitation, 'https://lfb.daily.co/coaching-x');
+  assert.ok(w.daily.some(([u, o]) => u.endsWith('/rooms') && JSON.parse(o.body).name === 'lamia-salle'));
 });

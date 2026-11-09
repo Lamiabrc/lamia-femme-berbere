@@ -28,6 +28,15 @@
   .salle-moi video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
   .salle-attente { grid-column: 1/-1; text-align: center; padding: 40px 16px; font-family: var(--serif, Georgia, serif); font-size: 22px; color: #fff; }
   .salle-barre { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: rgba(0,0,0,.35); }
+  .salle-porte { position: absolute; left: 16px; top: 16px; z-index: 3; width: min(320px, calc(100% - 32px)); padding: 14px; border-radius: 16px; background: rgba(29,26,23,.92); box-shadow: 0 6px 24px rgba(0,0,0,.5); }
+  .salle-porte h2 { margin: 0 0 8px; font: 600 15px var(--sans, system-ui, sans-serif); color: var(--qvt-champagne, #d9c19a); }
+  .salle-porte ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .salle-porte li { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; color: #fff; }
+  .salle-porte li strong { flex: 1 1 120px; }
+  .salle-porte .salle-btn { min-height: 40px; padding: 0 14px; font-size: 14px; }
+  .salle-sortir { position: absolute; right: 8px; top: 8px; min-height: 34px !important; padding: 0 12px !important; font-size: 13px !important; }
+  .salle-entree label { display: block; text-align: left; margin: 0 auto 12px; }
+  .salle-entree input { width: 100%; min-height: 46px; box-sizing: border-box; padding: 8px 12px; border-radius: 10px; border: 0; font: 16px var(--sans, system-ui, sans-serif); }
   .salle-fin { max-width: 460px; margin: 0 auto; padding: 18vh 16px; text-align: center; }
   .salle-fin h1 { font-family: var(--serif, Georgia, serif); font-weight: 400; color: #fff; }
 </style>
@@ -35,24 +44,38 @@
 <body class="salle">
 
 <section class="salle-entree" data-etape="entree">
-  <h1>Ta visio avec Lamia</h1>
-  <p>Ton arrière-plan est remplacé automatiquement : on ne voit pas chez toi. Tu peux le changer à tout moment.</p>
+  <h1 data-titre>Ta visio avec Lamia</h1>
+  <p data-intro>Ton arrière-plan est remplacé automatiquement : on ne voit pas chez toi. Tu peux le changer à tout moment.</p>
   <video data-apercu autoplay muted playsinline></video>
+  <label data-champ-nom hidden>Ton prénom<input type="text" maxlength="60" autocomplete="given-name" data-nom></label>
   <p class="salle-statut" role="status" data-statut-entree></p>
   <p><button class="salle-btn" type="button" data-entrer>Entrer dans la visio</button></p>
   <p><small>Cette visio n’est jamais enregistrée.</small></p>
   <p><small><a href="#" data-classique style="color:inherit">La visio ne s’ouvre pas ? Ouvrir la visio simple (sans fond automatique)</a></small></p>
 </section>
 
+<section class="salle-entree" data-etape="porte" hidden>
+  <h1>Tu frappes à la porte</h1>
+  <p data-porte-texte>Lamia va te faire entrer. Reste sur cette page.</p>
+  <p class="salle-statut">Tu es dans la salle d’attente…</p>
+  <p><button class="salle-btn is-line" type="button" data-partir>Partir</button></p>
+</section>
+
 <section class="salle-appel" data-etape="appel" hidden>
   <div class="salle-videos" data-videos>
     <p class="salle-attente" data-attente>En attente de l’autre personne…</p>
+    <div class="salle-porte" data-porte hidden>
+      <h2>À la porte</h2>
+      <ul data-porte-liste></ul>
+      <p data-porte-tous hidden style="margin:10px 0 0"><button class="salle-btn" type="button" data-entrer-tous>Faire entrer tout le monde</button></p>
+    </div>
     <div class="salle-moi"><video data-video-moi autoplay muted playsinline></video></div>
   </div>
   <div class="salle-barre">
     <button class="salle-btn" type="button" data-micro aria-pressed="true">Micro</button>
     <button class="salle-btn" type="button" data-camera aria-pressed="true">Caméra</button>
     <button class="salle-btn is-line" type="button" data-fond>Fond : Maison</button>
+    <button class="salle-btn is-line" type="button" data-copier hidden>Copier le lien d’invitation</button>
     <button class="salle-btn is-rouge" type="button" data-quitter>Quitter</button>
   </div>
   <div data-audios hidden></div>
@@ -61,7 +84,7 @@
 <section class="salle-fin" data-etape="fin" hidden>
   <h1 data-fin-titre>À bientôt</h1>
   <p data-fin-texte>Merci pour ce moment. Tu retrouves tout dans ton espace.</p>
-  <p><a class="salle-btn" href="/mon-espace/">Mon espace</a></p>
+  <p><a class="salle-btn" href="/mon-espace/" data-fin-lien>Mon espace</a></p>
 </section>
 
 <script type="module">
@@ -83,16 +106,27 @@ const montrer = (etape) => document.querySelectorAll('[data-etape]').forEach((s)
 const fin = (titre, texte) => { if (titre) $('[data-fin-titre]').textContent = titre; if (texte) $('[data-fin-texte]').textContent = texte; montrer('fin'); };
 
 // Le lien de la salle arrive dans le #, jamais envoyé au serveur du site.
-let salle = null, jeton = '';
+// Avec un jeton, c'est Lamia : elle dirige la salle. Sans jeton, on frappe à la porte et on attend qu'elle fasse entrer.
+let salle = null, jeton = '', nom = '';
 try {
   const u = new URL(decodeURIComponent(location.hash.slice(1)));
-  if (u.protocol === 'https:' && /\.daily\.co$/.test(u.hostname)) { jeton = u.searchParams.get('t') || ''; u.search = ''; salle = u.href; }
+  if (u.protocol === 'https:' && /\.daily\.co$/.test(u.hostname)) { jeton = u.searchParams.get('t') || ''; nom = (u.searchParams.get('n') || '').slice(0, 60); u.search = ''; salle = u.href; }
 } catch {}
+const hote = Boolean(jeton);
+const nomSalle = salle ? new URL(salle).pathname.slice(1) : '';
+if (hote) {
+  $('[data-titre]').textContent = nomSalle === 'lamia-salle' ? 'Ma salle' : 'Ta salle de coaching';
+  $('[data-intro]').textContent = 'Teste ta caméra et ton fond. Une fois dans la salle, les personnes frappent à la porte : c’est toi qui les fais entrer.';
+  $('[data-entrer]').textContent = 'Ouvrir ma salle';
+  $('[data-fin-lien]').href = '/tableau-de-bord/#coaching'; $('[data-fin-lien]').textContent = 'Tableau de bord';
+  $('[data-attente]').textContent = 'Ta salle est ouverte. Quand quelqu’un frappe, il apparaît en haut à gauche.';
+  if (nomSalle === 'lamia-salle') $('[data-copier]').hidden = false;
+} else if (!nom) $('[data-champ-nom]').hidden = false;
 if (salle) $('[data-classique]').href = jeton ? `${salle}?t=${encodeURIComponent(jeton)}` : salle;
 if (!salle) fin('Lien de visio invalide', 'Repasse par ton espace pour entrer dans la visio.');
 
 const traitementOk = (() => { try { return Daily.supportedBrowser().supportsVideoProcessing; } catch { return false; } })();
-if (!traitementOk) { $('[data-fond]').hidden = true; $('.salle-entree p').textContent = 'Sur cet appareil, l’arrière-plan ne peut pas être remplacé. Place-toi devant un mur simple.'; }
+if (!traitementOk) { $('[data-fond]').hidden = true; $('[data-intro]').textContent = 'Sur cet appareil, l’arrière-plan ne peut pas être remplacé. Place-toi devant un mur simple.'; }
 
 const call = Daily.createCallObject({ subscribeToTracksAutomatically: true, dailyConfig: { useDevicePreferenceCookies: true } });
 const reglerFond = async () => {
@@ -129,7 +163,7 @@ function afficher() {
     let t = zone.querySelector(`[data-tuile="${p.session_id}"]`);
     if (!t) {
       t = document.createElement('div'); t.className = 'salle-tuile'; t.dataset.tuile = p.session_id;
-      t.innerHTML = '<video autoplay playsinline></video><span></span>';
+      t.innerHTML = `<video autoplay playsinline></video><span></span>${hote ? `<button class="salle-btn is-line salle-sortir" type="button" data-sortir="${p.session_id}">Faire sortir</button>` : ''}`;
       zone.insertBefore(t, zone.querySelector('.salle-moi'));
     }
     t.querySelector('span').textContent = p.user_name || '';
@@ -143,12 +177,64 @@ function afficher() {
 }
 for (const ev of ['participant-joined', 'participant-updated', 'participant-left', 'track-started', 'track-stopped', 'joined-meeting', 'started-camera']) call.on(ev, afficher);
 call.on('left-meeting', () => fin());
-call.on('error', (e) => fin('La visio s’est arrêtée', /exp|eject/i.test(String(e?.errorMsg || '')) ? 'Le temps de la séance est terminé.' : 'Repasse par ton espace pour entrer à nouveau.'));
+call.on('error', (e) => {
+  const m = String(e?.errorMsg || e?.error?.type || '');
+  if (/exp/i.test(m)) return fin('La visio s’est arrêtée', 'Le temps de la séance est terminé.');
+  if (/eject|denied|reject/i.test(m)) return fin('La visio est terminée pour toi', 'Lamia t’a fait sortir de la salle ou n’a pas pu te recevoir.');
+  fin('La visio s’est arrêtée', 'Repasse par ton espace pour entrer à nouveau.');
+});
+
+let dedans = false;
+const entrerDansAppel = async () => { if (dedans) return; dedans = true; montrer('appel'); await reglerFond(); afficher(); };
+call.on('access-state-updated', (e) => { if (e?.access?.level === 'full' && call.meetingState() === 'joined-meeting') entrerDansAppel(); });
 
 $('[data-entrer]').addEventListener('click', async (e) => {
+  if (!hote && !nom) { nom = $('[data-nom]').value.trim().slice(0, 60); if (!nom) { $('[data-statut-entree]').textContent = 'Écris ton prénom pour que Lamia sache qui frappe.'; return; } }
   e.target.disabled = true; $('[data-statut-entree]').textContent = 'Ouverture de la visio…';
-  try { await call.join({ url: salle, token: jeton }); montrer('appel'); await reglerFond(); afficher(); }
-  catch { $('[data-statut-entree]').textContent = 'La visio ne s’ouvre pas. Repasse par ton espace et réessaie.'; e.target.disabled = false; }
+  try {
+    if (hote) { await call.join({ url: salle, token: jeton }); await entrerDansAppel(); return; }
+    await call.join({ url: salle, userName: nom });
+    if (call.accessState()?.access?.level === 'full') { await entrerDansAppel(); return; }
+    // Salle d'attente : on frappe, Lamia fait entrer ou non.
+    montrer('porte');
+    const { granted } = await call.requestAccess({ access: { level: 'full' }, name: nom });
+    if (granted) await entrerDansAppel();
+    else fin('Lamia ne peut pas te recevoir maintenant', 'Repasse par ton espace un peu plus tard, ou écris-lui.');
+  } catch { if (!dedans) { montrer('entree'); $('[data-statut-entree]').textContent = 'La visio ne s’ouvre pas. Repasse par ton espace et réessaie.'; e.target.disabled = false; } }
+});
+$('[data-partir]').addEventListener('click', () => call.leave());
+
+// Côté Lamia : qui frappe à la porte, et faire entrer, refuser ou faire sortir.
+const esc = (x) => String(x ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+let dejaSonne = new Set();
+const sonner = () => { try { const a = new AudioContext(), o = a.createOscillator(), g = a.createGain(); o.frequency.value = 660; g.gain.setValueAtTime(0.15, a.currentTime); g.gain.exponentialRampToValueAtTime(0.001, a.currentTime + 0.6); o.connect(g).connect(a.destination); o.start(); o.stop(a.currentTime + 0.6); } catch {} };
+function afficherPorte() {
+  if (!hote) return;
+  const attente = Object.values(call.waitingParticipants?.() || {});
+  $('[data-porte]').hidden = attente.length === 0;
+  $('[data-porte-tous]').hidden = attente.length < 2;
+  $('[data-porte-liste]').innerHTML = attente.map((w) => `<li><strong>${esc(w.name || 'Quelqu’un')}</strong><button class="salle-btn" type="button" data-admettre="${esc(w.id)}">Faire entrer</button><button class="salle-btn is-line" type="button" data-refuser="${esc(w.id)}">Refuser</button></li>`).join('');
+  document.title = attente.length ? `(${attente.length}) à la porte · Ma salle` : 'Visio avec Lamia · Lamia Femme Berbère';
+  if (attente.some((w) => !dejaSonne.has(w.id))) sonner();
+  dejaSonne = new Set(attente.map((w) => w.id));
+}
+for (const ev of ['waiting-participant-added', 'waiting-participant-updated', 'waiting-participant-removed']) call.on(ev, afficherPorte);
+$('[data-porte-liste]').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-admettre],[data-refuser]');
+  if (!b) return;
+  b.disabled = true;
+  call.updateWaitingParticipant(b.dataset.admettre || b.dataset.refuser, { grantRequestedAccess: Boolean(b.dataset.admettre) }).catch(() => {}).finally(afficherPorte);
+});
+$('[data-entrer-tous]').addEventListener('click', () => call.updateWaitingParticipants({ '*': { grantRequestedAccess: true } }).catch(() => {}).finally(afficherPorte));
+$('[data-videos]').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-sortir]');
+  if (!b || !confirm('Faire sortir cette personne de la salle ?')) return;
+  call.updateParticipant(b.dataset.sortir, { eject: true });
+});
+$('[data-copier]').addEventListener('click', async (e) => {
+  const lien = `${location.origin}/salle-coaching/#${encodeURIComponent(salle)}`;
+  try { await navigator.clipboard.writeText(lien); e.target.textContent = 'Lien copié'; } catch { prompt('Copie ce lien :', lien); }
+  setTimeout(() => { e.target.textContent = 'Copier le lien d’invitation'; }, 2500);
 });
 $('[data-micro]').addEventListener('click', () => { call.setLocalAudio(!call.localAudio()); afficher(); });
 $('[data-camera]').addEventListener('click', () => { call.setLocalVideo(!call.localVideo()); afficher(); });
