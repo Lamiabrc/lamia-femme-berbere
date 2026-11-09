@@ -4,8 +4,10 @@ Copyright © 2026 Lamia Bréchet Ighil. Tous droits réservés.
 
 Ce dépôt contient le code source de l'écosystème Lamia Femme Berbère :
 - le site lamia-femme-berbere.com (« La Maison Lamia Femme Berbère ») ;
-- l'application LFB · Lamia Femme Berbère (application installable depuis le site
-  et version Google Play, identifiant com.lamiafemmeberbere.lfb) ;
+- l'application LFB · Lamia Femme Berbère, sur toutes les plateformes présentes
+  et futures : application installable depuis le site, version Android / Google Play
+  (identifiant com.lamiafemmeberbere.lfb), future version iOS / App Store (iPhone,
+  iPad) et toute autre version (ordinateur, tablette, montre, télévision, métavers) ;
 - l'algorithme de matching, le Swipe, les mises en relation, les speed datings
   (« Bal masqué Virtuel Kabyle »), les Confidences, le coaching, la boutique ;
 - le tableau de bord, le pilotage et les outils d'administration ;
@@ -46,6 +48,12 @@ Les bibliothèques de tiers incluses (par exemple public/vendor/supabase.mjs,
 public/vendor/daily.mjs, le module stripe), les polices et les photographies
 sous licence libre restent soumises à leurs propres licences. Elles ne sont pas
 couvertes par la présente licence.
+
+6. Versions futures
+La présente licence s'applique automatiquement à toutes les versions, mises à jour,
+adaptations et portages futurs de ce logiciel, quel que soit le langage ou la
+plateforme (dont iOS, iPadOS, Android et le web), qu'ils soient développés dans ce
+dépôt ou dans un autre.
 
 Toute utilisation non autorisée constitue une contrefaçon (articles L335-2 et
 suivants du Code de la propriété intellectuelle).
