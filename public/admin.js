@@ -1,3 +1,8 @@
+/*!
+ * LFB · Lamia Femme Berbère
+ * © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+ * Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
+ */
 import { createClient } from '/vendor/supabase.mjs';
 const supabase=createClient('https://tybwvxinigahhntfeeur.supabase.co','sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc');
 const $=s=>document.querySelector(s);const esc=s=>String(s??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));

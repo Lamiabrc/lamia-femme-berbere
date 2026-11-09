@@ -1,3 +1,8 @@
+/*!
+ * LFB · Lamia Femme Berbère
+ * © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+ * Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
+ */
 // Les textes et images que Lamia peut modifier depuis son tableau de bord.
 // Chaque clé pointe vers un texte de content/pages.mjs (« pages.<objet>.<champ> »)
 // ou de content/rooms.mjs (« rooms.<slug>.<champ> »), ou vers une image (« images.<nom> »).

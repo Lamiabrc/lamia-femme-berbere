@@ -1,3 +1,6 @@
+-- LFB · Lamia Femme Berbère
+-- © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+-- Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
 -- Résumé des visites sur 30 jours (appelé par le tableau de bord avec la clé de service).
 create or replace function public.visit_stats(p_today date)
 returns json language sql stable security invoker set search_path = public as $$

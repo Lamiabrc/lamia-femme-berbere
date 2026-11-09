@@ -1,3 +1,6 @@
+-- LFB · Lamia Femme Berbère
+-- © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+-- Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
 -- Profils de l'outil de matching de Lamia affichés anonymement dans le Patio.
 -- Aucune donnée identifiante : ni prénom, ni contact, ni photo, ni ville. Lecture et écriture côté serveur uniquement.
 create sequence if not exists public.profils_outil_ref_seq start 5001;

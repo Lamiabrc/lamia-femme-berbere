@@ -1,3 +1,6 @@
+-- LFB · Lamia Femme Berbère
+-- © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+-- Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
 -- Comptes créés par le site lui-même (déjà confirmés, sans email de confirmation, donc sans la limite d'envoi d'emails).
 -- On garde seulement une empreinte de l'adresse IP, pour limiter les créations en rafale.
 create table if not exists public.creations_compte (

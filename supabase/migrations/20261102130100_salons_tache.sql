@@ -1,3 +1,6 @@
+-- LFB · Lamia Femme Berbère
+-- © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+-- Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
 -- Rappels des soirées : toutes les 5 minutes (Vercel ne lance sa tâche qu'une fois par jour).
 create extension if not exists pg_cron;
 create extension if not exists pg_net;

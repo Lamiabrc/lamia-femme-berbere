@@ -1,3 +1,6 @@
+-- LFB · Lamia Femme Berbère
+-- © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+-- Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
 -- Soirées : deux salons permanents (20-39 ans, 40 ans et plus), options de secteur, autant de femmes que d'hommes.
 -- Écrit et lu uniquement par le serveur (clé de service) : aucune règle d'accès public.
 alter table public.speed_dating_events add column if not exists sur_invitation boolean not null default false;

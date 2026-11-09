@@ -1,3 +1,8 @@
+/*!
+ * LFB · Lamia Femme Berbère
+ * © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+ * Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
+ */
 // Pages légales : BROUILLONS. Les champs [À COMPLÉTER] dépendent de la situation de Lamia
 // et doivent être remplis avant l'ouverture du paiement. À faire relire par un professionnel.
 
@@ -18,6 +23,7 @@ Email : <a href="mailto:lamia.brechet@outlook.fr">lamia.brechet@outlook.fr</a></
 Données stockées par Supabase, centre de données de Paris (Union européenne).</p>
 <h2>Propriété intellectuelle</h2>
 <p>Les textes, illustrations, photographies, logos et la marque Lamia Femme Berbère sont la propriété de leur autrice. Toute reproduction sans autorisation écrite est interdite.</p>
+<p>Le code source du site et de l’application LFB (web, Android, et ses futures versions dont iOS), l’algorithme de matching, le tableau de bord et les outils de la Maison ont été conçus par Lamia Bréchet Ighil et lui appartiennent. Toute copie, adaptation ou réutilisation, même partielle, sans son autorisation écrite est interdite.</p>
 <p>Crédits : photographies de paysages de Kabylie et de silhouettes issues de Pexels (licence Pexels, usage libre) ; icônes inspirées de Lucide (licence ISC).</p>`,
   },
   {
@@ -238,6 +244,7 @@ Signature (si envoi papier) : …</p>
 
 <h2>6. Propriété intellectuelle</h2>
 <p>Les textes, photographies, illustrations, vidéos, logos et la marque Lamia Femme Berbère appartiennent à leur autrice. Toute reproduction, même partielle, sans autorisation écrite est interdite. Tu peux partager les liens des pages librement.</p>
+<p>Le code source du site et de l’application LFB (web, Android, et ses futures versions dont iOS), l’algorithme de matching, le tableau de bord et les outils de la Maison ont été conçus par Lamia Bréchet Ighil et lui appartiennent. Toute copie, adaptation ou réutilisation, même partielle, sans son autorisation écrite est interdite.</p>
 
 <h2>7. Liens vers d’autres sites</h2>
 <p>Le site contient des liens vers TikTok, Facebook et d’autres services. La Maison n’est pas responsable de leur contenu ni de leurs pratiques ; leurs propres conditions s’appliquent.</p>

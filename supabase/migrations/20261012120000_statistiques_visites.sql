@@ -1,3 +1,6 @@
+-- LFB · Lamia Femme Berbère
+-- © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+-- Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
 -- Visites anonymes (sans cookie) : écrites et lues uniquement par le serveur (clé de service).
 create table if not exists public.page_views (
   id bigint generated always as identity primary key,

@@ -1,3 +1,6 @@
+-- LFB · Lamia Femme Berbère
+-- © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+-- Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
 -- Journal des alertes envoyées aux membres (notification et email), pour que Lamia voie qui a été prévenu et qui l'a vu.
 create table if not exists public.alertes_membres (
   id uuid primary key default gen_random_uuid(),

@@ -2,6 +2,9 @@
   "name": "lamia-femme-berbere",
   "version": "2.0.0",
   "private": true,
+  "author": "Lamia Bréchet Ighil <lamia.brechet@outlook.fr>",
+  "license": "UNLICENSED",
+  "description": "LFB · Lamia Femme Berbère — site et application. © 2026 Lamia Bréchet Ighil, tous droits réservés.",
   "type": "commonjs",
   "scripts": {
     "build": "node build/build.mjs",

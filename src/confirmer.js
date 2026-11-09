@@ -1,3 +1,8 @@
+/*!
+ * LFB · Lamia Femme Berbère
+ * © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+ * Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
+ */
 // Confirmation d'une fiche créée en live avec Lamia : la personne ouvre son lien personnel,
 // voit sa fiche anonyme et choisit : « je confirme » (elle apparaît dans les profils) ou « je ne veux plus apparaître ».
 import { api, esc, PUBLIC_KEY, creerCompte } from './confidences-commun.js';

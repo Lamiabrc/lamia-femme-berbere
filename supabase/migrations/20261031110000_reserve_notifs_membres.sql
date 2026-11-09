@@ -1,3 +1,6 @@
+-- LFB · Lamia Femme Berbère
+-- © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+-- Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
 -- Demandes « gardées en réserve » : reproposées quand le match en cours se termine.
 alter table public.annonce_interets drop constraint if exists annonce_interets_statut_check;
 alter table public.annonce_interets add constraint annonce_interets_statut_check check (statut in ('a_traiter','mis_en_relation','pas_compatible','dematche','en_reserve'));

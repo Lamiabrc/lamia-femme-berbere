@@ -1,3 +1,8 @@
+/*!
+ * LFB · Lamia Femme Berbère
+ * © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+ * Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
+ */
 // Générateur de la Maison Lamia Femme Berbère.
 // Aucune dépendance : node build/build.mjs → dossier dist/ (servi par Vercel).
 // Les pages sont pré-rendues ; les données vivantes (produits, soirées) sont chargées
@@ -242,6 +247,7 @@ function footer() {
       <li data-social="youtube" hidden><a rel="noopener" target="_blank">YouTube</a></li>
     </ul>
     <p class="footer-legal"><a href="/mentions-legales/">Mentions légales</a> · <a href="/cgv/">Conditions de vente</a> · <a href="/retours/">Livraison et retours</a> · <a href="/conditions-utilisation/">Conditions d’utilisation</a> · <a href="/confidentialite/">Confidentialité et cookies</a> · <a href="#" data-gerer-cookies>Gérer les cookies</a></p>
+    <p class="footer-legal footer-copyright">© 2026 Lamia Bréchet Ighil · Site et application LFB, algorithme de matching : tous droits réservés.</p>
   </div>
 </footer>`;
 }

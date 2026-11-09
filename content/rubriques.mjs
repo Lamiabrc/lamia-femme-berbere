@@ -1,3 +1,8 @@
+/*!
+ * LFB · Lamia Femme Berbère
+ * © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+ * Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
+ */
 // Rubriques du Grenier. Chaque trouvaille porte une « famille » (metadata.famille) ;
 // la rubrique affichée sur le site se déduit de cette famille.
 // Ce fichier est partagé : site (copié dans /assets), tableau de bord et tests.

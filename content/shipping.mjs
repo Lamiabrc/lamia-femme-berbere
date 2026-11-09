@@ -1,3 +1,8 @@
+/*!
+ * LFB · Lamia Femme Berbère
+ * © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+ * Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
+ */
 // Frais d'envoi de la Maison (France métropolitaine), en centimes.
 // Base : grille Colissimo 2026 de La Poste, livraison à domicile sans signature
 // (250 g 5,49 € ; 500 g 7,59 € ; 750 g 9,29 € ; 1 kg 9,59 € ; 2 kg 11,19 € ; 5 kg 17,39 €).

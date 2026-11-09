@@ -1,3 +1,8 @@
+/*!
+ * LFB · Lamia Femme Berbère
+ * © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+ * Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
+ */
 // Listes de choix des annonces, identiques à celles de l'outil local de matching de Lamia
 // (F:\quick-pair-pro, src/lib/store.ts) : les annonces s'importent ensuite dans l'outil sans rien retaper.
 // Partagé : serveur (validation), formulaire du site (copié dans /assets) et export vers l'outil.

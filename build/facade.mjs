@@ -1,3 +1,8 @@
+/*!
+ * LFB · Lamia Femme Berbère
+ * © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+ * Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
+ */
 // La façade de la Maison : photographie de nuit fournie par Lamia, rendue interactive.
 // Chaque fenêtre est une pièce : la lumière s'avive au survol, le nom et la phrase
 // d'accueil apparaissent. Les volets clos sont les pièces à venir. La porte rouge est l'entrée.
