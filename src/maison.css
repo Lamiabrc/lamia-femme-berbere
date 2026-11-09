@@ -4008,3 +4008,7 @@ html[dir="rtl"], html[dir="rtl"] body { overflow-x: clip; }
   html:not(.a-compte) .header-actions .account-link [data-account-texte] { display: inline; }
   html:not(.a-compte) .header-actions .account-link .account-icone { display: none; }
 }
+
+/* Visuels des prestations de coaching */
+.abo-coaching-img { display: block; width: 100%; max-width: 360px; height: auto; aspect-ratio: 1; margin: 0 auto 14px; border-radius: 14px; object-fit: cover; }
+.espace-coaching-img { display: block; width: 100%; max-width: 320px; height: auto; aspect-ratio: 1; margin: 0 0 12px; border-radius: 14px; }

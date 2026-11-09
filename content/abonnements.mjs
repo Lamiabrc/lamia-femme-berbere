@@ -29,6 +29,8 @@ export const UNITES = [
   { id: 'qui_choisi', nom: 'Voir qui t’a choisi·e', prix: 200, heures: 24, depuisEspace: true, texte: 'Les numéros anonymes des profils qui t’ont choisi·e, en tête de ton swipe, pendant 24 heures.' },
   { id: 'photo_match', nom: 'La photo de ton match', prix: 300, heures: 1, depuisEspace: true, texte: 'Visible pendant 1 heure, si ton match accepte de la transmettre. Depuis Mon espace, pendant le match.' },
 ];
+// Visuel de chaque prestation de coaching.
+export const FONDS_COACHING = { coaching: ['prestige', 'Salle de coaching, formule Prestige'], coaching_30: ['match-manuel', 'Coaching et match manuel'], sauver_couple: ['couple', 'Coaching couple'] };
 export const formule = (id) => FORMULES.find((f) => f.id === id) || null;
 export const unite = (id) => UNITES.find((u) => u.id === id) || null;
 export const euros = (c) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', minimumFractionDigits: c % 100 ? 2 : 0 }).format(c / 100);

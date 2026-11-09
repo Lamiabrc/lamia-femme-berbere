@@ -16,7 +16,7 @@ import { GUIDES } from '../content/guides.mjs';
 import { pageAnglaise, pageFrancaise, produitAnglais, enPath, FR_ONLY, STRINGS, MANQUANTS } from './english.mjs';
 import { LANGUES, PAGES_RENCONTRES, dictionnaire, motifs, pageTraduite, liensLangues } from './langues.mjs';
 import { EDITABLE, defaults, applyOverrides } from '../content/editable.mjs';
-import { FORMULES, UNITES, prixAnnuel, prixMensuel, euros as eurosAbo } from '../content/abonnements.mjs';
+import { FORMULES, UNITES, FONDS_COACHING, prixAnnuel, prixMensuel, euros as eurosAbo } from '../content/abonnements.mjs';
 
 const placesLancement = (f) => (f.lancement ? `<p class="abo-places" data-prestige-places>${eurosAbo(f.lancement.prix)} pour les ${f.lancement.places} premiers abonnés, qui gardent ce prix. Ensuite, ${eurosAbo(f.mois)} par mois pour les nouvelles inscriptions.</p>` : '');
 
@@ -1617,7 +1617,7 @@ page(
   <div class="abo-grille">${FORMULES.map(carteFormule).join('')}</div>
   ${tableauFormules()}
   <h2 class="annonces-titre" id="unites">Sans abonnement, à l’unité</h2>
-  <div class="abo-unites">${UNITES.map((u) => `<article class="abo-carte abo-unite" id="unite-${u.id}"><h3>${esc(u.nom)}</h3><p class="abo-prix">${eurosAbo(u.prix)}</p><p>${esc(u.texte)}</p>${u.depuisEspace ? '<a class="po-btn-verre" href="/mon-espace/">Mon espace</a>' : `<button type="button" class="po-btn-verre" data-unite="${u.id}">Acheter</button>`}</article>`).join('')}</div>
+  <div class="abo-unites">${UNITES.map((u) => `<article class="abo-carte abo-unite${FONDS_COACHING[u.id] ? ' abo-coaching' : ''}" id="unite-${u.id}">${FONDS_COACHING[u.id] ? `<img class="abo-coaching-img" src="/images/coaching/${FONDS_COACHING[u.id][0]}.webp" alt="${esc(FONDS_COACHING[u.id][1])}" width="720" height="720" loading="lazy">` : ''}<h3>${esc(u.nom)}</h3><p class="abo-prix">${eurosAbo(u.prix)}</p><p>${esc(u.texte)}</p>${u.depuisEspace ? '<a class="po-btn-verre" href="/mon-espace/">Mon espace</a>' : `<button type="button" class="po-btn-verre" data-unite="${u.id}">Acheter</button>`}</article>`).join('')}</div>
   <form class="abo-form annonce-form" data-abo-form hidden>
     <h2 data-abo-titre>Ta formule</h2>
     <p class="annonce-aide" data-abo-resume></p>
@@ -1943,7 +1943,7 @@ page(
   <p class="po-eyebrow">Les Rencontres de Lamia</p><h1>Votre visio avec Lamia</h1>
   <p class="po-lead">Un moment à deux avec Lamia. Rien n’est enregistré.</p>
 </section>
-<section class="confirmer-app" data-visio-invite><p class="annonce-vide">Un instant…</p></section></div>`,
+<img class="espace-coaching-img" style="margin:0 auto 16px" src="/images/coaching/couple.webp" alt="Coaching couple" width="720" height="720"><section class="confirmer-app" data-visio-invite><p class="annonce-vide">Un instant…</p></section></div>`,
   })
 );
 
