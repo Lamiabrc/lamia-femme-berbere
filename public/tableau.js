@@ -1079,7 +1079,7 @@ document.addEventListener('click', async (e) => {
   if (x) { if (x.dataset.reserve && !confirm('Annuler cette visio ? La personne est prévenue et pourra choisir un autre créneau.')) return; chargerCoaching({ action: 'annonce_coaching_fermer', id: x.dataset.coachingFermer }); }
   if (v) {
     const fen = window.open('', '_blank');
-    try { const d = await conf({ action: 'annonce_coaching_rejoindre', id: v.dataset.coachingEntrer }); if (fen) fen.location.href = d.url; else location.href = d.url; }
+    try { const d = await conf({ action: 'annonce_coaching_rejoindre', id: v.dataset.coachingEntrer }); const salle = `/salle-coaching/#${encodeURIComponent(d.url)}`; if (fen) fen.location.href = salle; else location.href = salle; }
     catch (err) { fen?.close(); $('[data-coaching-statut]').textContent = ERR_COACHING[err.message] || 'La visio ne s’ouvre pas pour le moment.'; }
   }
 });

@@ -23,7 +23,7 @@ try {
   zone.querySelector('[data-visio-entrer]').addEventListener('click', async (ev) => {
     const st = zone.querySelector('[data-visio-statut]');
     ev.target.disabled = true; st.textContent = 'Ouverture de la visio…';
-    try { const r = await api({ action: 'annonce_coaching_invite', c, t, entrer: true, nom: zone.querySelector('[data-visio-nom]').value }); location.href = r.url; }
+    try { const r = await api({ action: 'annonce_coaching_invite', c, t, entrer: true, nom: zone.querySelector('[data-visio-nom]').value }); location.href = `/salle-coaching/#${encodeURIComponent(r.url)}`; }
     catch (e) { st.textContent = erreur(e); ev.target.disabled = false; }
   });
 } catch (e) { zone.innerHTML = `<p>${esc(erreur(e))}</p>`; }

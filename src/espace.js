@@ -107,7 +107,7 @@ async function monCoaching(session) {
       if (v) {
         const st = box.querySelector('[data-coaching-statut]'), fen = window.open('', '_blank');
         v.disabled = true; st.textContent = 'Ouverture de la visio…';
-        try { const d = await appelProfil({ action: 'annonce_coaching_rejoindre', id: v.dataset.coachingEntrer }, session); if (fen) fen.location.href = d.url; else location.href = d.url; st.textContent = ''; }
+        try { const d = await appelProfil({ action: 'annonce_coaching_rejoindre', id: v.dataset.coachingEntrer }, session); const salle = `/salle-coaching/#${encodeURIComponent(d.url)}`; if (fen) fen.location.href = salle; else location.href = salle; st.textContent = ''; }
         catch (err) { fen?.close(); st.textContent = ERR_COACHING[err.code] || 'La visio ne s’ouvre pas pour le moment. Réessaie dans un instant.'; }
         v.disabled = false;
       }

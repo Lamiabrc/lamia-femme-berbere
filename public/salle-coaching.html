@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Visio avec Lamia · Lamia Femme Berbère</title>
+<link rel="icon" href="/images/marque/lamia-logo-net-160.webp">
+<link rel="stylesheet" href="/assets/maison.css">
+<style>
+  /* Salle de coaching : la vidéo de la Maison, avec un arrière-plan posé automatiquement. */
+  body.salle { margin: 0; min-height: 100vh; background: var(--qvt-nuit, #1d1a17); color: var(--qvt-sable-fonce, #efe6d6); font-family: var(--sans, system-ui, sans-serif); }
+  .salle [hidden] { display: none !important; }
+  .salle-entree { max-width: 460px; margin: 0 auto; padding: 12vh 16px 40px; text-align: center; }
+  .salle-entree h1 { font-family: var(--serif, Georgia, serif); font-weight: 400; color: #fff; font-size: 30px; margin: 0 0 10px; }
+  .salle-entree p { line-height: 1.5; }
+  .salle-entree video { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 18px; background: #000; transform: scaleX(-1); margin: 18px 0; }
+  .salle-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 22px; border: 0; border-radius: 999px; font: 600 16px var(--sans, system-ui, sans-serif); cursor: pointer; background: var(--qvt-champagne, #d9c19a); color: var(--qvt-nuit, #1d1a17); }
+  .salle-btn.is-line { background: transparent; color: var(--qvt-sable-fonce, #efe6d6); border: 1px solid rgba(255,255,255,.35); }
+  .salle-btn.is-rouge { background: #b3261e; color: #fff; }
+  .salle-btn[aria-pressed="false"] { background: rgba(255,255,255,.12); color: #fff; }
+  .salle-statut { min-height: 1.5em; color: var(--qvt-champagne, #d9c19a); }
+  .salle-appel { display: grid; grid-template-rows: 1fr auto; height: 100vh; height: 100dvh; }
+  .salle-videos { position: relative; display: grid; gap: 10px; padding: 10px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); align-content: center; overflow: hidden; }
+  .salle-tuile { position: relative; background: #000; border-radius: 16px; overflow: hidden; aspect-ratio: 16/9; }
+  .salle-tuile video { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .salle-tuile span { position: absolute; left: 10px; bottom: 8px; padding: 2px 10px; border-radius: 999px; background: rgba(0,0,0,.55); color: #fff; font-size: 14px; }
+  .salle-moi { position: absolute; right: 16px; bottom: 16px; width: min(220px, 34vw); aspect-ratio: 16/9; border-radius: 12px; overflow: hidden; box-shadow: 0 6px 24px rgba(0,0,0,.5); background: #000; z-index: 2; }
+  .salle-moi video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+  .salle-attente { grid-column: 1/-1; text-align: center; padding: 40px 16px; font-family: var(--serif, Georgia, serif); font-size: 22px; color: #fff; }
+  .salle-barre { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: rgba(0,0,0,.35); }
+  .salle-fin { max-width: 460px; margin: 0 auto; padding: 18vh 16px; text-align: center; }
+  .salle-fin h1 { font-family: var(--serif, Georgia, serif); font-weight: 400; color: #fff; }
+</style>
+</head>
+<body class="salle">
+
+<section class="salle-entree" data-etape="entree">
+  <h1>Ta visio avec Lamia</h1>
+  <p>Ton arrière-plan est remplacé automatiquement : on ne voit pas chez toi. Tu peux le changer à tout moment.</p>
+  <video data-apercu autoplay muted playsinline></video>
+  <p class="salle-statut" role="status" data-statut-entree></p>
+  <p><button class="salle-btn" type="button" data-entrer>Entrer dans la visio</button></p>
+  <p><small>Cette visio n’est jamais enregistrée.</small></p>
+  <p><small><a href="#" data-classique style="color:inherit">La visio ne s’ouvre pas ? Ouvrir la visio simple (sans fond automatique)</a></small></p>
+</section>
+
+<section class="salle-appel" data-etape="appel" hidden>
+  <div class="salle-videos" data-videos>
+    <p class="salle-attente" data-attente>En attente de l’autre personne…</p>
+    <div class="salle-moi"><video data-video-moi autoplay muted playsinline></video></div>
+  </div>
+  <div class="salle-barre">
+    <button class="salle-btn" type="button" data-micro aria-pressed="true">Micro</button>
+    <button class="salle-btn" type="button" data-camera aria-pressed="true">Caméra</button>
+    <button class="salle-btn is-line" type="button" data-fond>Fond : Maison</button>
+    <button class="salle-btn is-rouge" type="button" data-quitter>Quitter</button>
+  </div>
+  <div data-audios hidden></div>
+</section>
+
+<section class="salle-fin" data-etape="fin" hidden>
+  <h1 data-fin-titre>À bientôt</h1>
+  <p data-fin-texte>Merci pour ce moment. Tu retrouves tout dans ton espace.</p>
+  <p><a class="salle-btn" href="/mon-espace/">Mon espace</a></p>
+</section>
+
+<script type="module">
+import Daily from '/vendor/daily.mjs';
+
+const $ = (s, r = document) => r.querySelector(s);
+const FOND_IMAGE = new URL('/images/maison/fond-visio.jpg', location.origin).href;
+// Les arrière-plans proposés, dans l'ordre du bouton. Le premier est posé automatiquement.
+const FONDS = [
+  { id: 'maison', nom: 'Maison', processor: { type: 'background-image', config: { source: FOND_IMAGE } } },
+  { id: 'flou', nom: 'Flou', processor: { type: 'background-blur', config: { strength: 0.8 } } },
+  { id: 'aucun', nom: 'Aucun', processor: { type: 'none' } },
+];
+const lire = (k) => { try { return localStorage.getItem(k); } catch { return null; } };
+const ecrire = (k, v) => { try { localStorage.setItem(k, v); } catch {} };
+let fond = Math.max(0, FONDS.findIndex((f) => f.id === lire('salle-fond')));
+
+const montrer = (etape) => document.querySelectorAll('[data-etape]').forEach((s) => { s.hidden = s.dataset.etape !== etape; });
+const fin = (titre, texte) => { if (titre) $('[data-fin-titre]').textContent = titre; if (texte) $('[data-fin-texte]').textContent = texte; montrer('fin'); };
+
+// Le lien de la salle arrive dans le #, jamais envoyé au serveur du site.
+let salle = null, jeton = '';
+try {
+  const u = new URL(decodeURIComponent(location.hash.slice(1)));
+  if (u.protocol === 'https:' && /\.daily\.co$/.test(u.hostname)) { jeton = u.searchParams.get('t') || ''; u.search = ''; salle = u.href; }
+} catch {}
+if (salle) $('[data-classique]').href = jeton ? `${salle}?t=${encodeURIComponent(jeton)}` : salle;
+if (!salle) fin('Lien de visio invalide', 'Repasse par ton espace pour entrer dans la visio.');
+
+const traitementOk = (() => { try { return Daily.supportedBrowser().supportsVideoProcessing; } catch { return false; } })();
+if (!traitementOk) { $('[data-fond]').hidden = true; $('.salle-entree p').textContent = 'Sur cet appareil, l’arrière-plan ne peut pas être remplacé. Place-toi devant un mur simple.'; }
+
+const call = Daily.createCallObject({ subscribeToTracksAutomatically: true, dailyConfig: { useDevicePreferenceCookies: true } });
+const reglerFond = async () => {
+  $('[data-fond]').textContent = `Fond : ${FONDS[fond].nom}`;
+  if (!traitementOk) return;
+  try { await call.updateInputSettings({ video: { processor: FONDS[fond].processor } }); }
+  catch { if (FONDS[fond].id === 'maison') { fond = 1; reglerFond(); } }
+};
+
+// Aperçu avant d'entrer, avec le fond déjà posé.
+if (salle) {
+  $('[data-statut-entree]').textContent = 'Préparation de ta caméra…';
+  call.startCamera({ url: salle, token: jeton, inputSettings: traitementOk ? { video: { processor: FONDS[fond].processor } } : undefined })
+    .then(() => { $('[data-statut-entree]').textContent = ''; $('[data-fond]').textContent = `Fond : ${FONDS[fond].nom}`; })
+    .catch(() => { $('[data-statut-entree]').textContent = 'Autorise la caméra et le micro pour cette page, puis recharge-la.'; });
+}
+
+const attacher = (el, track) => {
+  const cur = el.srcObject?.getTracks?.()[0];
+  if (track && cur?.id === track.id) return;
+  el.srcObject = track ? new MediaStream([track]) : null;
+};
+function afficher() {
+  const ps = call.participants();
+  const moi = ps.local;
+  attacher($('[data-apercu]'), moi?.tracks?.video?.persistentTrack);
+  attacher($('[data-video-moi]'), moi?.tracks?.video?.persistentTrack);
+  const autres = Object.values(ps).filter((p) => !p.local);
+  const zone = $('[data-videos]'), audios = $('[data-audios]');
+  $('[data-attente]').hidden = autres.length > 0;
+  for (const t of zone.querySelectorAll('[data-tuile]')) if (!autres.some((p) => p.session_id === t.dataset.tuile)) t.remove();
+  for (const a of audios.querySelectorAll('audio')) if (!autres.some((p) => p.session_id === a.dataset.son)) a.remove();
+  for (const p of autres) {
+    let t = zone.querySelector(`[data-tuile="${p.session_id}"]`);
+    if (!t) {
+      t = document.createElement('div'); t.className = 'salle-tuile'; t.dataset.tuile = p.session_id;
+      t.innerHTML = '<video autoplay playsinline></video><span></span>';
+      zone.insertBefore(t, zone.querySelector('.salle-moi'));
+    }
+    t.querySelector('span').textContent = p.user_name || '';
+    attacher(t.querySelector('video'), p.tracks?.video?.state === 'playable' ? p.tracks.video.persistentTrack : null);
+    let a = audios.querySelector(`[data-son="${p.session_id}"]`);
+    if (!a) { a = document.createElement('audio'); a.autoplay = true; a.dataset.son = p.session_id; audios.append(a); }
+    attacher(a, p.tracks?.audio?.state === 'playable' ? p.tracks.audio.persistentTrack : null);
+  }
+  $('[data-micro]').setAttribute('aria-pressed', String(call.localAudio()));
+  $('[data-camera]').setAttribute('aria-pressed', String(call.localVideo()));
+}
+for (const ev of ['participant-joined', 'participant-updated', 'participant-left', 'track-started', 'track-stopped', 'joined-meeting', 'started-camera']) call.on(ev, afficher);
+call.on('left-meeting', () => fin());
+call.on('error', (e) => fin('La visio s’est arrêtée', /exp|eject/i.test(String(e?.errorMsg || '')) ? 'Le temps de la séance est terminé.' : 'Repasse par ton espace pour entrer à nouveau.'));
+
+$('[data-entrer]').addEventListener('click', async (e) => {
+  e.target.disabled = true; $('[data-statut-entree]').textContent = 'Ouverture de la visio…';
+  try { await call.join({ url: salle, token: jeton }); montrer('appel'); await reglerFond(); afficher(); }
+  catch { $('[data-statut-entree]').textContent = 'La visio ne s’ouvre pas. Repasse par ton espace et réessaie.'; e.target.disabled = false; }
+});
+$('[data-micro]').addEventListener('click', () => { call.setLocalAudio(!call.localAudio()); afficher(); });
+$('[data-camera]').addEventListener('click', () => { call.setLocalVideo(!call.localVideo()); afficher(); });
+$('[data-fond]').addEventListener('click', () => { fond = (fond + 1) % FONDS.length; ecrire('salle-fond', FONDS[fond].id); reglerFond(); });
+$('[data-quitter]').addEventListener('click', () => call.leave());
+</script>
+</body>
+</html>
