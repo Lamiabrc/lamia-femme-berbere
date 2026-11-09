@@ -551,6 +551,14 @@ renderSocials();
 (function compte() {
   const a = document.querySelector('[data-account-link]');
   if (!a) return;
+  // Pas connecté·e : « Connexion » en haut et dans la barre du bas.
+  try {
+    if (!JSON.parse(localStorage.getItem('sb-tybwvxinigahhntfeeur-auth-token') || 'null')?.access_token) {
+      const en = document.documentElement.lang === 'en';
+      const t = a.querySelector('[data-account-texte]'); if (t) t.textContent = en ? 'Sign in' : 'Connexion';
+      const moi = document.querySelector('[data-barre-compte] b'); if (moi) moi.textContent = en ? 'Sign in' : 'Connexion';
+    }
+  } catch { /* */ }
   try {
     const raw = localStorage.getItem('sb-tybwvxinigahhntfeeur-auth-token');
     if (raw && JSON.parse(raw)?.access_token) {

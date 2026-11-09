@@ -3994,3 +3994,17 @@ html[dir="rtl"], html[dir="rtl"] body { overflow-x: clip; }
 .confirmer-app input, .confirmer-app textarea, .confirmer-modif input, .confirmer-modif textarea { background: #FFFFFF; color: #1C2059; border: 1.5px solid #8A8FC4; }
 .confirmer-app input::placeholder, .confirmer-app textarea::placeholder { color: #5A5F8F; opacity: 1; }
 .confirmer-app .confirmer-acces, .confirmer-app .confirmer-erreur { background: #FFFFFF; border: 1.5px solid #C9C3E4; }
+
+/* Onglets Les femmes / Les hommes : lisibles sur fond clair, sans rose */
+.annonce-onglets { display: flex; flex-wrap: wrap; gap: 10px; }
+.po-app .annonce-onglets button, .annonce-onglets button { background: #FFFFFF; color: #1C2059; border: 1.5px solid #252B78; font-weight: 700; opacity: 1; }
+.annonce-onglets button b { background: #E8D6B5; color: #1C2059; border-radius: 999px; padding: 1px 8px; }
+.po-app .annonce-onglets button[aria-selected="true"], .annonce-onglets button[aria-selected="true"] { background: #252B78; border-color: #252B78; color: #FFFFFF; }
+.annonce-onglets button[aria-selected="true"] b { background: #E8D6B5; color: #1C2059; }
+
+/* Pas encore connecté·e : le bouton « Connexion » reste visible en haut sur téléphone */
+@media (max-width: 600px) {
+  html:not(.a-compte) .header-actions .account-link { display: inline-flex !important; width: auto; height: auto; padding: 7px 11px !important; border-radius: 999px; font-size: 13px; font-weight: 700; color: #1C2059; border: 1.5px solid #1C2059; background: #FFFFFF; }
+  html:not(.a-compte) .header-actions .account-link [data-account-texte] { display: inline; }
+  html:not(.a-compte) .header-actions .account-link .account-icone { display: none; }
+}
