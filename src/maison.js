@@ -882,6 +882,24 @@ renderSocials();
     }).catch(() => {});
 })();
 
+// Message de Lamia pas encore lu : bandeau dans l'appli et le site, qui ouvre la conversation privée.
+(function messageLamia() {
+  try {
+    if (location.pathname.startsWith('/confidences') || location.pathname.startsWith('/tableau-de-bord')) return;
+    const jeton = JSON.parse(localStorage.getItem('sb-tybwvxinigahhntfeeur-auth-token') || 'null')?.access_token;
+    if (!jeton) return;
+    fetch('/api/confidences', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jeton}` }, body: JSON.stringify({ action: 'mes_non_lus' }) })
+      .then((r) => (r.ok ? r.json() : null)).then((r) => {
+        if (!r?.non_lus) return;
+        const d = document.createElement('div');
+        d.className = 'lfb-testeur-play';
+        d.innerHTML = `<p><strong>Lamia t’a écrit.</strong> ${r.non_lus > 1 ? `${r.non_lus} messages t’attendent` : 'Un message t’attend'} dans ta conversation privée.</p><p><a class="btn btn-ink" href="/confidences/#conversation">Lire</a> <button type="button" class="btn btn-line" data-plus-tard>Plus tard</button></p>`;
+        d.querySelector('[data-plus-tard]').onclick = () => d.remove();
+        setTimeout(() => document.body.append(d), 1500);
+      }).catch(() => {});
+  } catch { /* */ }
+})();
+
 // Test Google Play : proposé une fois à tous les membres connectés (pas dans la version Play elle-même).
 (function testeurPlay() {
   try {

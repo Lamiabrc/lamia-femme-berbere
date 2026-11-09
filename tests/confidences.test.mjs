@@ -195,3 +195,12 @@ test('Lamia retrouve les testeurs Google Play, avec leur état et leur conversat
   assert.equal(b.lien_envoye, true);
   assert.ok(b.thread_id);
 });
+
+test('le membre voit dans l’appli qu’il a un message de Lamia non lu', async () => {
+  const be = backend({ users: { L: lamia, G: gratuit } });
+  assert.equal((await call(be, { action: 'mes_non_lus' }, 'G')).body.non_lus, 0);
+  await call(be, { action: 'lamia_ecrire_a', email: 'gratuit@exemple.fr', body: 'Le lien du test' }, 'L');
+  assert.equal((await call(be, { action: 'mes_non_lus' }, 'G')).body.non_lus, 1);
+  await call(be, { action: 'mes_conversations' }, 'G');
+  assert.equal((await call(be, { action: 'mes_non_lus' }, 'G')).body.non_lus, 0);
+});
