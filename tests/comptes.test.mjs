@@ -87,3 +87,9 @@ test('comptes : assemblage sans profil', () => {
   assert.equal(l[0].profil, null);
   assert.deepEqual(l[0].inscriptions, []);
 });
+
+test('comptes : les testeurs Google Play sont signalés', () => {
+  const l = assembler({ users: [{ id: 'u1', email: 'a@b.fr', created_at: '2026-01-01' }, { id: 'u2', email: 'c@d.fr', created_at: '2026-01-02' }], profils: [], inscriptions: [], soirees: [], annonces: [], fiches: [], testeurs: [{ user_id: 'u1', demande_at: '2026-11-09', ajoute_at: null }] });
+  assert.deepEqual(l.find((c) => c.id === 'u1').testeur_play, { demande_at: '2026-11-09', ajoute_at: null });
+  assert.equal(l.find((c) => c.id === 'u2').testeur_play, null);
+});

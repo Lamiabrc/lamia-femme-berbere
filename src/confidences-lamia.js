@@ -15,8 +15,8 @@ let session = null, threads = [], filtre = 'a_lire', courant = null, minuteur = 
 async function jetonFrais() { ({ data: { session } } = await supabase.auth.getSession()); return session?.access_token; }
 
 function vue(nom) {
-  for (const [k, sel] of [['login', '[data-login]'], ['liste', '[data-liste-vue]'], ['fil', '[data-fil-vue]'], ['reglages', '[data-reglages-vue]'], ['annonces', '[data-annonces-vue]']]) $(sel).hidden = k !== nom;
-  $('[data-retour]').hidden = !['fil', 'reglages', 'annonces'].includes(nom);
+  for (const [k, sel] of [['login', '[data-login]'], ['liste', '[data-liste-vue]'], ['fil', '[data-fil-vue]'], ['reglages', '[data-reglages-vue]'], ['annonces', '[data-annonces-vue]'], ['testeurs', '[data-testeurs-vue]']]) $(sel).hidden = k !== nom;
+  $('[data-retour]').hidden = !['fil', 'reglages', 'annonces', 'testeurs'].includes(nom);
   $('[data-ouvrir-reglages]').hidden = nom === 'login';
   window.scrollTo(0, 0);
 }
@@ -26,6 +26,7 @@ async function demarrer() {
   ({ data: { session } } = await supabase.auth.getSession());
   if (session?.user?.app_metadata?.role !== 'admin') { vue('login'); if (session) say($('[data-login-statut]'), 'Ce compte n’a pas le rôle administratrice.', true); return; }
   await chargerListe();
+  compterTesteurs();
   api({ action: 'annonces_admin' }, await jetonFrais()).then(({ annonces }) => { const n = annonces.filter((a) => a.status === 'a_verifier').length; $('[data-n-annonces]').textContent = n || ''; }).catch(() => {});
   router();
   clearInterval(minuteur);
@@ -69,6 +70,33 @@ function rendreListe() {
     : `<li class="cl-vide">${filtre === 'a_lire' ? 'Rien à lire pour le moment.' : 'Aucune conversation ici.'}</li>`;
 }
 document.querySelectorAll('[data-filtre]').forEach((b) => b.addEventListener('click', () => { filtre = b.dataset.filtre; rendreListe(); }));
+
+// ---------------------------------------------------------------- testeurs Google Play (les « Oui » du site)
+const jourCourt = (x) => (x ? new Date(x).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : '');
+async function compterTesteurs() {
+  try { const { testeurs } = await api({ action: 'lamia_testeurs' }, await jetonFrais()); const n = testeurs.filter((t) => !t.ajoute_at).length; $('[data-n-testeurs]').textContent = n ? `(${n} nouveau${n > 1 ? 'x' : ''})` : `(${testeurs.length})`; } catch { /* */ }
+}
+async function chargerTesteurs() {
+  const box = $('[data-testeurs]');
+  box.innerHTML = '<p class="cl-vide">Un instant…</p>';
+  try {
+    const { testeurs, lien } = await api({ action: 'lamia_testeurs' }, await jetonFrais());
+    const surListe = testeurs.filter((t) => t.ajoute_at).length;
+    $('[data-testeurs-resume]').innerHTML = `${testeurs.length} testeur${testeurs.length > 1 ? 's' : ''} · ${surListe} sur la liste Google Play · ${testeurs.filter((t) => t.lien_envoye).length} ont reçu le lien · il en faut au moins 12. Lien du test : <a href="${esc(lien)}" target="_blank" rel="noopener">${esc(lien)}</a>`;
+    box.innerHTML = testeurs.length ? testeurs.map((t) => {
+      const etat = t.lien_envoye ? 'lien envoyé' : t.ajoute_at ? `sur la liste depuis le ${jourCourt(t.ajoute_at)}` : 'à ajouter à la liste (demain matin)';
+      const profil = t.ref ? `/tableau-de-bord#profil-${t.ref}` : `/tableau-de-bord#compte-${t.user_id}`;
+      return `<p class="cl-coord"><b>${esc(t.prenom || t.email.split('@')[0])}</b>${t.ref ? ` · n° ${esc(t.ref)}` : ''} · ${esc(t.email)} · « Oui » le ${esc(jourCourt(t.demande_at))} · <b>${esc(etat)}</b>
+        ${t.thread_id ? `<a class="cl-btn cl-petit" href="#${esc(t.thread_id)}">Conversation</a>` : `<button type="button" class="cl-btn cl-petit" data-testeur-ecrire="${esc(t.email)}">Écrire</button>`}
+        <a class="cl-btn cl-petit" href="${profil}" target="_blank" rel="noopener">Profil</a></p>`;
+    }).join('') : '<p class="cl-vide">Personne n’a encore dit « Oui ».</p>';
+    box.querySelectorAll('[data-testeur-ecrire]').forEach((b) => b.addEventListener('click', () => {
+      location.hash = '';
+      const f = $('[data-ecrire-a]'); f.hidden = false; f.email.value = b.dataset.testeurEcrire; f.body.focus();
+    }));
+  } catch (err) { box.innerHTML = `<p class="cl-vide">${esc(erreur(err.code))}</p>`; }
+}
+$('[data-ouvrir-testeurs]').addEventListener('click', () => { location.hash = 'testeurs'; });
 
 // ---------------------------------------------------------------- écrire la première à un membre (par son adresse email)
 $('[data-ouvrir-ecrire-a]').addEventListener('click', () => { const f = $('[data-ecrire-a]'); f.hidden = !f.hidden; if (!f.hidden) f.email.focus(); });
@@ -144,6 +172,7 @@ function router() {
   if (!session) return;
   const h = location.hash.slice(1);
   if (h === 'reglages') { courant = null; vue('reglages'); chargerReglages(); return; }
+  if (h === 'testeurs') { courant = null; vue('testeurs'); chargerTesteurs(); return; }
   if (h === 'annonces' || /^annonce-\d+$/.test(h)) { courant = null; vue('annonces'); chargerAnnonces(); chargerSansPhotos(); chargerDemandes(); chargerAbonnes(); chargerNouveautes(); return; }
   if (/^[0-9a-f-]{36}$/i.test(h)) return ouvrirFil(h);
   courant = null; vue('liste'); rendreListe();
