@@ -310,3 +310,23 @@ test('tableau de bord : profil complet avec photos, jamais la pièce d’identit
   assert.doesNotMatch(JSON.stringify(a), /id1/);
 });
 
+
+// Cas du 9 nov. 2026 (n° 30 ↔ fiche n° 11556) : oui réciproque sur une fiche sortie de l'export, la personne ayant son annonce sur le site.
+const casFicheMasquee = (extraRachid = {}) => base({
+  annonces: [annonceNina(), { id: 'a-rachid', ref: 12, user_id: 'u-rachid', email: 'rachid@example.com', status: 'publiee', prenom: 'Rachid', genre: 'homme', en_match: false, test: false, fiche_ref: 100001, pays: 'France', matching: {}, ...extraRachid }],
+  profils_outil: [FICHE(100001, 'u-rachid', 'homme', { visible: false })],
+  annonce_interets: [{ id: 'i-1', demandeur_id: 'a-nina', cible_ref: 100001, statut: 'a_traiter', reciproque: true, reponse: 'oui', via: 'swipe', created_at: '2026-11-02T00:00:00Z' }],
+});
+const lancerPilote = (ctx) => handleAnnonces('annonce_pilote', { op: 'lancer' }, { ...ctx({ id: 'adm', email: 'a@x.fr' }), admin: true });
+
+test('fiche masquée mais reliée à une annonce publiée : le oui réciproque est mis en relation', async () => {
+  const { db, ctx } = casFicheMasquee();
+  await lancerPilote(ctx);
+  assert.equal(db.annonce_interets.find((i) => i.id === 'i-1').statut, 'mis_en_relation');
+});
+
+test('fiche masquée dont l’annonce est en pause : pas de mise en relation', async () => {
+  const { db, ctx } = casFicheMasquee({ pause_at: '2026-11-03T10:00:00Z' });
+  await lancerPilote(ctx);
+  assert.equal(db.annonce_interets.find((i) => i.id === 'i-1').statut, 'a_traiter');
+});
