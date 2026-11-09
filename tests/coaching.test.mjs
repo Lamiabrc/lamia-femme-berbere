@@ -129,7 +129,7 @@ test('entrer dans la visio : 10 minutes avant, seulement pour les deux personnes
   assert.equal(w.daily.some(([u]) => u.includes('meeting-tokens')), false);
   // Lamia dirige la salle : jeton de propriétaire.
   const l = await go(w, 'annonce_coaching_rejoindre', { id: a.id }, LAMIA, true);
-  assert.equal(l.url, 'https://lfb.daily.co/coaching-x?t=jeton&f=prestige');
+  assert.equal(l.url, `https://lfb.daily.co/coaching-x?t=jeton&f=prestige&d=15&s=${a.id}`);
   const jeton = JSON.parse(w.daily.find(([u]) => u.includes('meeting-tokens'))[1].body).properties;
   assert.equal(jeton.is_owner, true); assert.equal(jeton.user_name, 'Lamia');
   w.t.now = new Date(new Date(a.debut).getTime() + 3600e3);
@@ -266,9 +266,21 @@ test('Lamia ouvre sa salle quand elle veut, même avant l’heure ; elle seule a
   const a = w.lignes[0];
   await go(w, 'annonce_coaching_reserver', { id: a.id });
   assert.equal((await go(w, 'annonce_coaching_rejoindre', { id: a.id })).error, 'trop_tot');
-  assert.equal((await go(w, 'annonce_coaching_rejoindre', { id: a.id }, LAMIA, true)).url, 'https://lfb.daily.co/coaching-x?t=jeton&f=prestige');
+  assert.equal((await go(w, 'annonce_coaching_rejoindre', { id: a.id }, LAMIA, true)).url, `https://lfb.daily.co/coaching-x?t=jeton&f=prestige&d=15&s=${a.id}`);
   assert.equal((await go(w, 'annonce_coaching_ma_salle', {})).status, 403);
   const m = await go(w, 'annonce_coaching_ma_salle', {}, LAMIA, true);
   assert.equal(m.url, 'https://lfb.daily.co/coaching-x?t=jeton'); assert.equal(m.invitation, 'https://lfb.daily.co/coaching-x');
   assert.ok(w.daily.some(([u, o]) => u.endsWith('/rooms') && JSON.parse(o.body).name === 'lamia-salle'));
+});
+
+test('dans sa salle, Lamia a la fiche de la séance et garde ses notes privées', async () => {
+  const w = monde();
+  await ouvrir(w);
+  const a = w.lignes[0];
+  await go(w, 'annonce_coaching_reserver', { id: a.id });
+  assert.equal((await go(w, 'annonce_coaching_seance', { id: a.id })).status, 403);
+  assert.equal((await go(w, 'annonce_coaching_notes', { id: a.id, notes: 'x' })).status, 403);
+  assert.equal((await go(w, 'annonce_coaching_notes', { id: a.id, notes: 'Veut se marier dans l’année.' }, LAMIA, true)).ok, true);
+  const d = await go(w, 'annonce_coaching_seance', { id: a.id }, LAMIA, true);
+  assert.equal(d.seance.duree, 15); assert.equal(d.seance.prenom, 'Nina'); assert.equal(d.seance.service, 'Visio de 15 minutes');
 });

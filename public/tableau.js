@@ -1061,7 +1061,27 @@ function peindreCoaching(d) {
   $('[data-coaching-planning]').innerHTML = [...parJour].map(([k, l]) => `<h3>${esc(k)}</h3><ul class="tdb-retraits">${l.map((c) => `<li><span><b>${esc(date(c.debut, { hour: '2-digit', minute: '2-digit' }))}${typeDe(c)}</b> · ${c.user_id ? `${esc(c.prenom || '')} <small>${esc(c.email || '')}</small>` : '<small>Libre</small>'}</span>${passe(c) ? '' : `<span>${c.user_id ? `<button class="btn btn-ink" type="button" data-coaching-entrer="${esc(c.id)}">Entrer</button> ` : ''}<button class="link-button" type="button" data-coaching-fermer="${esc(c.id)}" data-reserve="${c.user_id ? '1' : ''}">${c.user_id ? 'Annuler' : 'Retirer'}</button></span>`}</li>`).join('')}</ul>`).join('') || '<p>Aucun créneau ouvert pour l’instant.</p>';
   $('[data-coaching-abonnes]').innerHTML = (d.abonnes || []).map((a) => `<li><span><b>${esc(a.nom || a.email)}</b> <small>${a.reserve ? `Visio du mois : ${esc(date(a.reserve))}` : 'Pas encore de visio ce mois-ci'}</small></span></li>`).join('') || '<li>Pas encore d’abonné Prestige actif.</li>';
 }
+async function chargerAlertes() {
+  const z = $('[data-alertes-membres]');
+  if (!z) return;
+  try {
+    const d = await conf({ action: 'annonce_alertes' });
+    const dons = (d.cadeaux || []).length ? `<h3>Cadeaux pas encore utilisés</h3><ul class="tdb-retraits">${d.cadeaux.map((c) => `<li><span><b>${esc(c.prenom || c.email)}</b> · ${esc(c.quoi)}<br><small>offert ${esc(date(c.le))}</small></span><span><button class="btn btn-line" type="button" data-cadeau-relancer="${esc(c.id)}">Relancer</button></span></li>`).join('')}</ul>` : '';
+    if (!d.actif) { z.innerHTML = `${dons}<p class="aide">Le journal des alertes n’est pas encore activé.</p>`; return; }
+    if (!d.alertes.length) { z.innerHTML = `${dons}<p class="aide">Aucune alerte envoyée pour l’instant.</p>`; return; }
+    const canal = (a) => [a.notifications ? 'notification' : '', a.email_envoye ? 'email' : ''].filter(Boolean).join(' + ') || 'non reçue (ni notification ni email)';
+    z.innerHTML = `${dons}<h3>Dernières alertes</h3><ul class="tdb-retraits">${d.alertes.map((a) => `<li><span><b>${esc(a.prenom || a.email || 'Membre')}</b> · ${esc(date(a.created_at))}<br><small>${esc(a.titre)}</small><br><small>Envoyée par ${esc(canal(a))}</small></span><span>${a.vu_at ? `<b>Vue</b><br><small>${esc(date(a.vu_at))}</small>` : '<small>Pas encore vue</small>'}</span></li>`).join('')}</ul>`;
+  } catch { z.innerHTML = '<p class="aide">Les alertes ne se chargent pas pour le moment.</p>'; }
+}
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-cadeau-relancer]');
+  if (!b || !confirm('Renvoyer à cette personne un rappel de son cadeau (notification et email) ?')) return;
+  b.disabled = true;
+  try { await conf({ action: 'annonce_cadeau_relancer', id: b.dataset.cadeauRelancer }); b.textContent = 'Relancé'; chargerAlertes(); }
+  catch { b.disabled = false; b.textContent = 'Réessayer'; }
+});
 async function chargerCoaching(corps = { action: 'annonce_coaching_planning' }) {
+  if (corps.action === 'annonce_coaching_planning') chargerAlertes();
   const st = $('[data-coaching-statut]');
   try { peindreCoaching(await conf(corps)); st.textContent = ''; }
   catch (e) { st.textContent = ERR_COACHING[e.message] || 'Ça n’a pas fonctionné. Réessaie dans un instant.'; }
