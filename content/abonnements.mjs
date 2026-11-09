@@ -20,7 +20,7 @@ export const UNITES = [
   { id: 'mise_en_relation', nom: 'Un match supplémentaire', prix: 500, texte: 'Un match de plus, sans abonnement. Il n’expire pas.' },
   { id: 'speed_dating', nom: 'Une soirée de speed dating', prix: 1200, texte: 'Une place pour une soirée de speed dating en ligne, à utiliser quand tu veux.' },
   { id: 'coaching', nom: 'Une visio de coaching avec Lamia', prix: 1500, texte: '15 minutes en visio avec Lamia, sans enregistrement. Tu choisis ton créneau dans Mon espace après l’achat.' },
-  { id: 'coaching_30', nom: 'Un coaching de 30 minutes avec Lamia', prix: 3900, texte: '30 minutes en visio avec Lamia, sans enregistrement, pour faire le point en profondeur. Tu choisis ton créneau dans Mon espace après l’achat.' },
+  { id: 'coaching_30', nom: 'Coaching de 30 minutes et match manuel', prix: 3900, texte: '30 minutes en visio avec Lamia, sans enregistrement. Vous faites le point sur ta recherche, puis elle cherche avec toi, en direct, les profils qui te correspondent et lance la mise en relation tout de suite. Tu choisis ton créneau dans Mon espace après l’achat.' },
   { id: 'sauver_couple', nom: 'Sauver mon couple', prix: 8900, texte: 'Une séance de love coaching : 1 heure en visio avec Lamia, à deux ou seul·e, sans enregistrement. Un accompagnement, sans garantie de résultat et sans remplacer une thérapie. Tu choisis ton créneau dans Mon espace après l’achat.' },
   { id: 'live_priorite', nom: 'Passage en priorité en live', prix: 500, texte: 'Lamia présente ton annonce en priorité à son prochain live.' },
   // S'achètent seulement depuis Mon espace : ils concernent un compte, un match ou une discussion.
