@@ -312,7 +312,7 @@ document.addEventListener('click', async (e) => {
   const f = e.target.closest('[data-filtre-journal]');
   if (f) { filtreJournal = f.dataset.filtreJournal; chargerJournal(); return; }
   const o = e.target.closest('[data-journal-ouvrir]');
-  if (o) { const l = o.dataset.journalOuvrir; if (l.startsWith('/confidences-lamia/#annonces')) { aller = 'annonces'; const fr = $('[data-rencontres]'); if (fr) fr.removeAttribute('src'); ouvrir('rencontres'); } else window.open(l, '_blank', 'noopener'); return; }
+  if (o) { const l = o.dataset.journalOuvrir; if (/^\/confidences-lamia\/#(annonces|testeurs)/.test(l)) { aller = l.split('#')[1].startsWith('testeurs') ? 'testeurs' : 'annonces'; const fr = $('[data-rencontres]'); if (fr) fr.removeAttribute('src'); ouvrir('rencontres'); } else window.open(l, '_blank', 'noopener'); return; }
   const ef = e.target.closest('[data-effacement-fait]');
   if (ef) {
     if (!confirm(`Tu as bien supprimé la fiche n° ${ef.dataset.effacementFait} de ton outil ? Son contenu sera aussi effacé du site.`)) return;
@@ -736,6 +736,7 @@ async function chargerComptes() {
     kpi('Comptes', l.length, `${l.filter((c) => c.profil?.gender === 'femme').length} femmes · ${l.filter((c) => c.profil?.gender === 'homme').length} hommes`),
     kpi('Inscrits à une soirée', l.filter((c) => c.inscriptions.some((i) => i.statut !== 'cancelled')).length),
     kpi('Avec annonce', l.filter((c) => c.annonces.length).length),
+    kpi('Testeurs Google Play', l.filter((c) => c.testeur_play).length, `${l.filter((c) => c.testeur_play && !c.testeur_play.ajoute_at).length} à ajouter à la liste`),
     kpi('Profil incomplet', l.filter(incomplet).length, 'genre, date de naissance ou prénom manquant'),
   ].join('');
   listeComptes();
@@ -750,6 +751,7 @@ function listeComptes() {
     soiree: (c) => c.inscriptions.some((i) => i.statut !== 'cancelled'),
     annonce: (c) => c.annonces.length,
     fiche: (c) => c.fiches.length,
+    testeur: (c) => c.testeur_play,
     incomplet,
   }[filtreComptes];
   const l = comptes.comptes.filter(garde).filter((c) => !q || [nomDe(c), c.email, c.profil?.city, c.profil?.display_name, ...c.annonces.map((a) => a.ref), ...c.fiches.map((f) => f.ref)].join(' ').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes(q));
@@ -758,7 +760,7 @@ function listeComptes() {
     const soirees = c.inscriptions.slice(0, 3).map((i) => `<span class="compte-badge ${i.statut === 'cancelled' ? 'is-annule' : 'is-bal'}">${esc(salonCourt(i.salon) || i.titre)}</span>`).join('');
     const liens = [...c.annonces.map((a) => `<span class="compte-badge">Annonce n° ${esc(a.ref)}</span>`), ...c.fiches.map((f) => `<span class="compte-badge">Fiche n° ${esc(f.ref)}</span>`)].join('');
     return `<tr class="compte-ligne" data-compte="${esc(c.id)}" tabindex="0">
-      <td><strong>${esc(nomDe(c))}${c.admin ? ' <span class="compte-badge">toi (admin)</span>' : ''}</strong><small>${esc(c.email || '')}</small></td>
+      <td><strong>${esc(nomDe(c))}${c.admin ? ' <span class="compte-badge">toi (admin)</span>' : ''}${c.testeur_play ? ` <span class="compte-badge is-bal" title="${c.testeur_play.ajoute_at ? 'Sur la liste Google Play' : 'En attente d’ajout à la liste Google Play'}">Testeur Play${c.testeur_play.ajoute_at ? '' : ' (à ajouter)'}</span>` : ''}</strong><small>${esc(c.email || '')}</small></td>
       <td>${c.profil?.gender ? esc(GENRE[c.profil.gender]) : '<span class="compte-badge is-alerte">genre ?</span>'} ${age != null ? `· ${age} ans` : '<span class="compte-badge is-alerte">âge ?</span>'}</td>
       <td>${esc(c.profil?.city || '')}</td>
       <td>${soirees || '—'}</td>
@@ -778,6 +780,7 @@ function ouvrirCompte(id) {
     `Compte créé le ${date(c.cree_le, { day: 'numeric', month: 'long', year: 'numeric' })}`,
     c.vu_le ? `dernière connexion le ${date(c.vu_le, { day: 'numeric', month: 'long' })}` : 'jamais reconnecté·e',
     c.email_confirme ? 'email confirmé' : 'email non confirmé',
+    c.testeur_play ? `testeur Google Play depuis le ${date(c.testeur_play.demande_at, { day: 'numeric', month: 'long' })}${c.testeur_play.ajoute_at ? ' (sur la liste)' : ' (pas encore sur la liste)'}` : '',
     c.source ? `venu·e de ${c.source}` : '',
   ].filter(Boolean).join(' · ');
   const f = $('[data-compte-form]');

@@ -1363,6 +1363,7 @@ page(
       <button type="button" data-filtre="termine" aria-pressed="false">Terminé <b data-n="termine"></b></button>
       <button type="button" data-filtre="tous" aria-pressed="false">Tout</button>
       <button type="button" data-ouvrir-annonces><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> Annonces <b data-n-annonces></b></button>
+      <button type="button" data-ouvrir-testeurs><svg class="ico" aria-hidden="true"><use href="/icones.svg#smartphone"/></svg> Testeurs Play <b data-n-testeurs></b></button>
       <button type="button" data-ouvrir-ecrire-a><svg class="ico" aria-hidden="true"><use href="/icones.svg#pencil"/></svg> Écrire à un membre</button>
     </nav>
     <form class="cl-carte cl-ecrire-a" data-ecrire-a hidden>
@@ -1457,6 +1458,13 @@ page(
       <p class="cl-statut" role="status" data-outil-statut></p>
     </details>
     <div data-annonces></div>
+  </section>
+
+  <section class="cl-reglages" data-testeurs-vue hidden>
+    <h2>Testeurs Google Play</h2>
+    <p class="cl-aide">Chaque membre qui répond « Oui » sur le site arrive ici (et tu reçois une alerte). Le matin, la tâche programmée l’ajoute à la liste « Testeurs LFB » de la Play Console ; le soir, il reçoit le lien du test dans sa conversation avec toi. Tu peux lui écrire ou ouvrir son profil.</p>
+    <p class="cl-aide" data-testeurs-resume></p>
+    <div class="cl-carte" data-testeurs></div>
   </section>
 
   <section class="cl-reglages" data-reglages-vue hidden>

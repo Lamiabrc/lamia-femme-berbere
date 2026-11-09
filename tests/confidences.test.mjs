@@ -182,3 +182,16 @@ test('chaque soir, les testeurs ajoutés à Google Play reçoivent le lien une s
   assert.match(be.db.confidence_messages[0].body, /play\.google\.com\/apps\/testing\/com\.lamiafemmeberbere\.lfb/);
   assert.deepEqual(be.db.platform_settings.find((x) => x.key === 'testeurs_play_lien_envoye').value, ['u1']);
 });
+
+test('Lamia retrouve les testeurs Google Play, avec leur état et leur conversation', async () => {
+  const be = backend({ users: { L: lamia, N: nadia } });
+  be.db.testeurs_play.push({ user_id: 'u1', email: 'a@gmail.com', demande_at: '2026-11-09', ajoute_at: null }, { user_id: 'u2', email: 'b@gmail.com', demande_at: '2026-11-08', ajoute_at: '2026-11-09' });
+  be.db.annonces.push({ user_id: 'u1', ref: 42, prenom: 'Amel' });
+  assert.equal((await call(be, { action: 'lamia_testeurs' }, 'N')).status, 403);
+  await handleConfidences(req({ action: 'testeurs_play_cron' }), { env, fetcher: be.fetcher, cron: true });
+  const { body } = await call(be, { action: 'lamia_testeurs' }, 'L');
+  const [a, b] = body.testeurs;
+  assert.deepEqual([a.prenom, a.ref, a.lien_envoye, a.thread_id], ['Amel', 42, false, null]);
+  assert.equal(b.lien_envoye, true);
+  assert.ok(b.thread_id);
+});
