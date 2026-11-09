@@ -1,3 +1,8 @@
+/*!
+ * LFB · Lamia Femme Berbère
+ * © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+ * Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
+ */
 // Le conjoint rejoint « Sauver mon couple » : lien transmis par la personne qui a réservé, sans compte.
 import { api, esc } from './confidences-commun.js';
 

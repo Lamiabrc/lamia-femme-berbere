@@ -1,3 +1,6 @@
+-- LFB · Lamia Femme Berbère
+-- © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+-- Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
 -- Profils affichés anonymement dans le Patio (si la personne l'accepte et si Lamia le décide)
 -- et « matchs demandés » : un nouveau profil peut dire qu'un profil anonyme l'intéresse.
 alter table public.annonces add column if not exists anonyme_ok boolean not null default false;

@@ -1,0 +1,51 @@
+LICENCE PROPRIÉTAIRE — TOUS DROITS RÉSERVÉS
+
+Copyright © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+
+Ce dépôt contient le code source de l'écosystème Lamia Femme Berbère :
+- le site lamia-femme-berbere.com (« La Maison Lamia Femme Berbère ») ;
+- l'application LFB · Lamia Femme Berbère (application installable depuis le site
+  et version Google Play, identifiant com.lamiafemmeberbere.lfb) ;
+- l'algorithme de matching, le Swipe, les mises en relation, les speed datings
+  (« Bal masqué Virtuel Kabyle »), les Confidences, le coaching, la boutique ;
+- le tableau de bord, le pilotage et les outils d'administration ;
+- les fonctions serveur (dossiers api/ et lib/), le schéma et les migrations
+  de base de données (dossier supabase/), les scripts de construction et les tests.
+
+Autrice et titulaire des droits : Lamia Bréchet Ighil, Rennes, France.
+Contact : lamia.brechet@outlook.fr
+
+1. Propriété
+Ce logiciel, son code source et son code objet, sa conception, son architecture,
+ses règles de fonctionnement, ses écrans, ses textes et sa documentation sont la
+propriété exclusive de Lamia Bréchet Ighil et sont protégés par le Code de la
+propriété intellectuelle (livre I, droit d'auteur, dont les articles L112-2 et
+L122-6) et par les conventions internationales.
+
+2. Interdictions
+Sauf autorisation écrite et préalable de Lamia Bréchet Ighil, il est interdit de :
+- copier, reproduire ou télécharger tout ou partie de ce logiciel ;
+- le modifier, l'adapter, le traduire ou créer une œuvre dérivée ;
+- le diffuser, le publier, le vendre, le louer, le prêter ou le céder ;
+- le décompiler ou en extraire le fonctionnement, hors des cas permis par la loi ;
+- réutiliser l'algorithme de matching ou les règles de l'application dans un
+  autre produit.
+
+3. Accès
+L'accès à ce dépôt est accordé uniquement aux personnes que Lamia Bréchet Ighil
+autorise, pour travailler sur ce projet et pour son compte. Cet accès ne transfère
+aucun droit et peut être retiré à tout moment.
+
+4. Marques
+« Lamia Femme Berbère », « LFB », « La Maison Lamia Femme Berbère »,
+« Bal masqué Virtuel Kabyle », le logo et l'icône de l'application appartiennent
+à Lamia Bréchet Ighil. Ce fichier ne donne aucun droit sur ces noms et signes.
+
+5. Composants de tiers
+Les bibliothèques de tiers incluses (par exemple public/vendor/supabase.mjs,
+public/vendor/daily.mjs, le module stripe), les polices et les photographies
+sous licence libre restent soumises à leurs propres licences. Elles ne sont pas
+couvertes par la présente licence.
+
+Toute utilisation non autorisée constitue une contrefaçon (articles L335-2 et
+suivants du Code de la propriété intellectuelle).

@@ -1,3 +1,6 @@
+-- LFB · Lamia Femme Berbère
+-- © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+-- Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
 -- Scores de compatibilité calculés par l'outil de Lamia (son algorithme et ses poids), envoyés au site à chaque synchronisation.
 -- Le site s'en sert partout : matchs demandés, propositions, réserve, ordre du swipe. Ainsi le live et le site disent la même chose.
 create table if not exists public.scores_outil (

@@ -1,3 +1,6 @@
+-- LFB · Lamia Femme Berbère
+-- © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+-- Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
 -- Espace coaching Prestige : créneaux ouverts par Lamia, 1 visio de 15 minutes par mois et par personne.
 create table if not exists public.coaching_creneaux (
   id uuid primary key default gen_random_uuid(),

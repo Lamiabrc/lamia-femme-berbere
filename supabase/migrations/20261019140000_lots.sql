@@ -1,3 +1,6 @@
+-- LFB · Lamia Femme Berbère
+-- © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+-- Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
 -- Lots : un produit dont metadata.lot liste les slugs des pièces qui le composent.
 -- Quand le lot est vendu, ses pièces ne sont plus disponibles à l'unité ;
 -- quand une pièce est vendue seule, le lot qui la contient n'est plus disponible.

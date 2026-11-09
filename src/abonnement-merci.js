@@ -1,3 +1,8 @@
+/*!
+ * LFB · Lamia Femme Berbère
+ * © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+ * Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
+ */
 // Retour de paiement : confirme l'abonnement ou l'achat auprès du serveur (qui relit Stripe).
 const box = document.querySelector('[data-abo-confirmation]');
 const id = new URLSearchParams(location.search).get('session_id');

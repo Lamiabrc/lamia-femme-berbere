@@ -1,3 +1,8 @@
+/*!
+ * LFB · Lamia Femme Berbère
+ * © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+ * Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
+ */
 // Swipe des profils vérifiés : à droite « ça m'intéresse », à gauche « pas pour moi ».
 // Anonyme : on ne voit que des numéros de profil. Quand deux personnes se choisissent, Lamia est alertée et fait la mise en relation.
 // Swipe sans limite. Matchs en même temps : 1 en Découverte (Lamia en débloque d'autres en live), 3 avec une formule.

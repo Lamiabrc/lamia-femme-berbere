@@ -1,3 +1,8 @@
+/*!
+ * LFB · Lamia Femme Berbère
+ * © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+ * Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
+ */
 // Formules d'abonnement « Trouve ton âme sœur » (choisies par Lamia le 29/10/2026, ramenées à 3 le 31/10/2026 : prix de lancement).
 // Prix en centimes, TTC. Partagé par le site (affichage) et le serveur (paiement) :
 // le prix payé est toujours relu ici côté serveur, jamais repris du navigateur.

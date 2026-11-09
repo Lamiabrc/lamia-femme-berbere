@@ -1,3 +1,8 @@
+/*!
+ * LFB · Lamia Femme Berbère
+ * © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+ * Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
+ */
 // Version anglaise de la Maison (/en/…).
 // Les pages françaises sont générées comme d'habitude, puis chaque page publique est
 // traduite ici à partir d'un dictionnaire français → anglais (content/en/strings.json,

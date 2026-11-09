@@ -1,3 +1,8 @@
+/*!
+ * LFB · Lamia Femme Berbère
+ * © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+ * Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
+ */
 /* Espace de Lamia pour les confidences : pensé d'abord pour le téléphone. */
 :root { --ivoire: #fbf6f1; --poudre: #efe7d8; --poudre-fonce: #e5d8be; --vieux-rose: #6C5BA7; --vieux-rose-fonce: #6C5BA7; --champagne: #d8bd91; --encre: #3d3034; --gris: #7d6a6e;
   --serif: 'Cormorant Garamond', Georgia, serif; --sans: 'DM Sans', system-ui, sans-serif; color-scheme: light; }

@@ -1,3 +1,6 @@
+-- LFB · Lamia Femme Berbère
+-- © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+-- Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
 -- Consentement : la photo peut être transmise à la personne avec qui on est mis en relation (et seulement elle).
 alter table public.annonces add column if not exists photo_partage boolean not null default false;
 alter table public.annonces add column if not exists photo_partage_at timestamptz;

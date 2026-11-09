@@ -1,3 +1,8 @@
+/*!
+ * LFB · Lamia Femme Berbère
+ * © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+ * Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
+ */
 // L'antichambre du bal : test de la caméra, du micro et de la connexion.
 // Tout reste dans le navigateur : aucune image ni aucun son n'est envoyé.
 

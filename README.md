@@ -1,5 +1,7 @@
 # La Maison Lamia Femme Berbère — version 2 (branche `maison-v2`)
 
+> **© 2026 Lamia Bréchet Ighil — tous droits réservés.** Site lamia-femme-berbere.com, application LFB (installable et Google Play), algorithme de matching, tableau de bord et outils : code propriétaire conçu par Lamia Bréchet Ighil. Aucune copie, modification ou diffusion sans son autorisation écrite. Voir [LICENSE](LICENSE).
+
 La Maison numérique de Lamia : chaque activité est une pièce (le Hall, le Salon, la
 Bibliothèque de Yemma, l'Écrin, le Grenier des Trouvailles, le Salon du Speed Dating,
 le Cabinet des Confidences, le Patio, la Galerie, et trois pièces prévues : l'Atelier,

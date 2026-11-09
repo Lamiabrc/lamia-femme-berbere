@@ -1,3 +1,6 @@
+-- LFB · Lamia Femme Berbère
+-- © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+-- Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
 -- Confirmation des fiches de l'outil par les personnes elles-mêmes (lien personnel envoyé par Lamia).
 -- Une fiche n'apparaît dans les profils anonymes qu'une fois confirmée ; « ne plus apparaître » la masque définitivement.
 alter table public.profils_outil

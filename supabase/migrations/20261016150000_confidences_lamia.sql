@@ -1,3 +1,6 @@
+-- LFB · Lamia Femme Berbère
+-- © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+-- Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
 -- Les Confidences avec Lamia : conversations privées, messages, pièces jointes, abonnements aux notifications.
 -- Tout passe par l'API serveur (clé de service) : aucune politique d'accès public, RLS activé sans règle = accès refusé
 -- au navigateur. Les signalements existants (safety_reports, report_evidence) ne sont pas touchés.

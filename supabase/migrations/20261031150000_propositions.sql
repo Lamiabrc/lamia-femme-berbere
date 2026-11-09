@@ -1,3 +1,6 @@
+-- LFB · Lamia Femme Berbère
+-- © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+-- Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
 -- Matchs proposés par Lamia depuis son outil à un compte LFB : « Lamia te propose ce profil » (oui / non).
 create table if not exists public.propositions (
   id uuid primary key default gen_random_uuid(),

@@ -1,3 +1,8 @@
+/*!
+ * LFB · Lamia Femme Berbère
+ * © 2026 Lamia Bréchet Ighil. Tous droits réservés.
+ * Code propriétaire : copie, modification ou diffusion interdites sans autorisation écrite. Voir LICENSE.
+ */
 /* Tableau de bord de Lamia — palette de la Maison (crème, champagne, encre) */
 .tdb { background: var(--qvt-creme); color: var(--qvt-encre); }
 .tdb [hidden] { display: none !important; }
