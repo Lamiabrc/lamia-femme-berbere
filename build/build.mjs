@@ -1692,6 +1692,7 @@ page(
 </header>
 <div class="swipe-app">
   <p class="swipe-antighost"><svg class="ico" aria-hidden="true"><use href="/icones.svg#handshake"/></svg> <strong>Appli anti-ghosting</strong> : ici, on ne disparaît pas. Pour dématcher, on se dit au revoir.</p>
+  <p class="swipe-abo" data-swipe-abo hidden></p>
   <div class="swipe-infos" data-swipe-infos></div>
   <div class="swipe-filtres-zone" data-swipe-filtres></div>
   <p class="swipe-compteur" data-swipe-compteur></p>

@@ -183,6 +183,18 @@ function limiteAtteinte() {
   vibrer(80);
   return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg></p><h2>Tes matchs en cours sont au complet</h2><p>Tu peux continuer à découvrir les profils. Pour choisir quelqu’un d’autre, mets fin à un match depuis ton espace, ou passe à une formule qui en permet plus : <strong>2 en cours avec Passion, 5 avec Prestige</strong>.</p><p class="po-actions"><a class="po-btn-verre" href="/mon-espace/">Mon espace</a><a class="po-btn-verre" href="/abonnement/">Voir les formules</a></p>`);
 }
+// Toujours à portée de main pendant le swipe : s'abonner, ou monter en Prestige.
+function boutonAbo(formule, algerie) {
+  const z = document.querySelector('[data-swipe-abo]');
+  if (!z || formule === 'prestige' || window.LFB_PLAY) return;
+  z.innerHTML = algerie
+    ? '<a class="swipe-abo-btn" href="/salon/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg> Plus de matchs : viens au live</a>'
+    : formule === 'passion'
+      ? '<a class="swipe-abo-btn" href="/abonnement/?formule=prestige"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Passer à Prestige · matchs illimités</a>'
+      : '<a class="swipe-abo-btn" href="/abonnement/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> S’abonner · plus de matchs dès 9 €</a>';
+  z.hidden = false;
+}
+
 // Plus de match disponible : le live, et les formules pour celles et ceux qui peuvent payer en ligne.
 function quotaAtteint({ algerie, formule } = {}) {
   vibrer(80);
@@ -286,7 +298,9 @@ addEventListener('keydown', (e) => { if (document.querySelector('.swipe-fenetre'
   token = session.access_token;
   try {
     let adresse;
-    ({ profils: tous, quota, choisi, matchs = matchs, adresse } = await api({ action: 'annonce_swipe_liste' }, token));
+    let formule, algerie;
+    ({ profils: tous, quota, choisi, matchs = matchs, adresse, formule, algerie } = await api({ action: 'annonce_swipe_liste' }, token));
+    boutonAbo(formule, algerie);
     dejaCharge = true;
     const salut = document.querySelector('[data-swipe-adresse]');
     if (salut && adresse) { salut.textContent = adresse; salut.hidden = false; }
