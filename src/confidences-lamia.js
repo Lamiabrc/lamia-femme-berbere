@@ -2,7 +2,7 @@
 if (new URLSearchParams(location.search).has('integre')) document.documentElement.classList.add('cl-integre');
 // Espace de Lamia : conversations, lecture des confidences, réponses (texte, vocal, images), alertes.
 import { createClient } from '/vendor/supabase.mjs';
-import { api, envoyer, erreur, esc, taille, quand, piecesHtml, PUBLIC_KEY } from './confidences-commun.js';
+import { api, envoyer, erreur, esc, texteAvecLiens, taille, quand, piecesHtml, PUBLIC_KEY } from './confidences-commun.js';
 import { monterEnregistreur } from './enregistreur.js';
 import { versOutil, lib } from './matching-options.mjs';
 
@@ -70,6 +70,20 @@ function rendreListe() {
 }
 document.querySelectorAll('[data-filtre]').forEach((b) => b.addEventListener('click', () => { filtre = b.dataset.filtre; rendreListe(); }));
 
+// ---------------------------------------------------------------- écrire la première à un membre (par son adresse email)
+$('[data-ouvrir-ecrire-a]').addEventListener('click', () => { const f = $('[data-ecrire-a]'); f.hidden = !f.hidden; if (!f.hidden) f.email.focus(); });
+$('[data-ecrire-a]').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target, st = $('[data-ecrire-a-statut]'), btn = form.querySelector('[type=submit]');
+  btn.disabled = true; say(st, 'Envoi…');
+  try {
+    const r = await api({ action: 'lamia_ecrire_a', email: form.email.value, body: form.body.value }, await jetonFrais());
+    form.reset(); form.hidden = true; say(st, '');
+    location.hash = r.thread_id;
+  } catch (err) { say(st, err.code === 'bad_email' ? 'Cette adresse email n’est pas valide.' : erreur(err.code), true); }
+  btn.disabled = false;
+});
+
 // ---------------------------------------------------------------- une conversation
 const rec = monterEnregistreur($('[data-vocal] [data-rec]'));
 let images = [];
@@ -90,7 +104,7 @@ function rendreFil(t) {
   }
   $('[data-fil-statut]').value = t.status;
   const box = $('[data-messages]');
-  box.innerHTML = t.messages.map((m) => `<article class="cl-bulle is-${m.author}"><p class="cl-qui">${m.author === 'lamia' ? 'Toi' : esc(t.name)} · <time>${esc(quand(m.created_at))}</time></p>${m.body ? `<p class="cl-texte">${esc(m.body)}</p>` : ''}${piecesHtml(m.files)}</article>`).join('');
+  box.innerHTML = t.messages.map((m) => `<article class="cl-bulle is-${m.author}"><p class="cl-qui">${m.author === 'lamia' ? 'Toi' : esc(t.name)} · <time>${esc(quand(m.created_at))}</time></p>${m.body ? `<p class="cl-texte">${texteAvecLiens(m.body)}</p>` : ''}${piecesHtml(m.files)}</article>`).join('');
   box.lastElementChild?.scrollIntoView({ block: 'end' });
 }
 async function ouvrirFil(id) {

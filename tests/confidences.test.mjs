@@ -148,3 +148,37 @@ test('réservé aux abonnés : sans formule on ne peut plus écrire, seulement r
   assert.equal(ok.status, 200);
   assert.equal(be.db.confidence_threads.at(-1).email, 'nadia@exemple.fr');
 });
+
+test('Lamia écrit la première à un membre non abonné, qui peut lui répondre', async () => {
+  const be = backend({ users: { L: lamia, G: gratuit } });
+  be.db.annonces.push({ email: 'gratuit@exemple.fr', prenom: 'Amel', created_at: '2026' });
+  assert.equal((await call(be, { action: 'lamia_ecrire_a', email: 'gratuit@exemple.fr', body: 'Bonjour' }, 'G')).status, 403);
+  assert.equal((await call(be, { action: 'lamia_ecrire_a', email: 'pas-un-email', body: 'x' }, 'L')).body.error, 'bad_email');
+  const r = await call(be, { action: 'lamia_ecrire_a', email: 'Gratuit@exemple.fr', body: 'Salam, une question ?' }, 'L');
+  assert.equal(r.status, 200);
+  const [t] = be.db.confidence_threads;
+  assert.deepEqual([t.email, t.name, t.channel, t.unread_visitor], ['gratuit@exemple.fr', 'Amel', 'conversation', 1]);
+  assert.equal(be.db.confidence_messages[0].ready, true);
+  assert.match(be.mails.at(-1).subject, /Lamia t’a écrit/);
+  const mes = await call(be, { action: 'mes_conversations' }, 'G');
+  assert.equal(mes.body.abonne, false);
+  assert.equal(mes.body.threads[0].lamia_a_ecrit, true);
+  const rep = await call(be, { action: 'ecrire', thread_id: t.id, body: 'Oui ?' }, 'G');
+  assert.equal(rep.status, 200);
+  assert.equal((await call(be, { action: 'ecrire', body: 'nouveau fil', consent: true }, 'G')).body.error, 'reserve_abonnes');
+  // Un second message de Lamia reprend la même conversation.
+  await call(be, { action: 'lamia_ecrire_a', email: 'gratuit@exemple.fr', body: 'Encore moi' }, 'L');
+  assert.equal(be.db.confidence_threads.length, 1);
+});
+
+test('chaque soir, les testeurs ajoutés à Google Play reçoivent le lien une seule fois', async () => {
+  const be = backend();
+  be.db.testeurs_play.push({ user_id: 'u1', email: 'a@gmail.com', ajoute_at: '2026-11-09' }, { user_id: 'u2', email: 'b@gmail.com', ajoute_at: null });
+  const cron = async () => { const r = await handleConfidences(req({ action: 'testeurs_play_cron' }), { env, fetcher: be.fetcher, cron: true }); return r.json(); };
+  assert.equal((await call(be, { action: 'testeurs_play_cron' })).status, 403);
+  assert.equal((await cron()).envoyes, 1);
+  assert.equal((await cron()).envoyes, 0);
+  assert.equal(be.db.confidence_threads.length, 1);
+  assert.match(be.db.confidence_messages[0].body, /play\.google\.com\/apps\/testing\/com\.lamiafemmeberbere\.lfb/);
+  assert.deepEqual(be.db.platform_settings.find((x) => x.key === 'testeurs_play_lien_envoye').value, ['u1']);
+});

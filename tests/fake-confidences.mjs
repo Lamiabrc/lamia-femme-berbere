@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 
 // Faux Supabase en mémoire : tables PostgREST, stockage, connexion, emails et services de notification.
 export function backend({ users = {} } = {}) {
-  const db = { confidence_threads: [], confidence_messages: [], confidence_files: [], push_subscriptions: [], platform_settings: [] };
+  const db = { confidence_threads: [], confidence_messages: [], confidence_files: [], push_subscriptions: [], platform_settings: [], testeurs_play: [], annonces: [] };
   const storage = new Set();
   const mails = [], pushes = [];
   const match = (row, url) => {
@@ -11,6 +11,8 @@ export function backend({ users = {} } = {}) {
       const [op, ...rest] = v.split('.'); const val = rest.join('.');
       const cell = row[k];
       if (op === 'eq' && String(cell) !== val) return false;
+      if (op === 'is' && val === 'null' && cell != null) return false;
+      if (op === 'not' && val === 'is.null' && cell == null) return false;
       if (op === 'neq' && String(cell) === val) return false;
       if (op === 'gte' && !(String(cell) >= val)) return false;
       if (op === 'in' && !val.slice(1, -1).split(',').includes(String(cell))) return false;

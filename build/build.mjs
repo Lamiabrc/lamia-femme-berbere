@@ -1363,7 +1363,14 @@ page(
       <button type="button" data-filtre="termine" aria-pressed="false">Terminé <b data-n="termine"></b></button>
       <button type="button" data-filtre="tous" aria-pressed="false">Tout</button>
       <button type="button" data-ouvrir-annonces><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> Annonces <b data-n-annonces></b></button>
+      <button type="button" data-ouvrir-ecrire-a><svg class="ico" aria-hidden="true"><use href="/icones.svg#pencil"/></svg> Écrire à un membre</button>
     </nav>
+    <form class="cl-carte cl-ecrire-a" data-ecrire-a hidden>
+      <label>Adresse email du membre <input type="email" name="email" required autocomplete="off"></label>
+      <label>Message <textarea name="body" rows="4" required maxlength="8000"></textarea></label>
+      <p><button type="submit" class="cl-btn">Envoyer</button> <small>Il arrive dans sa conversation privée et le membre est prévenu par email. Il peut te répondre, même sans abonnement.</small></p>
+    </form>
+    <p class="cl-statut" data-ecrire-a-statut role="status"></p>
     <div class="cl-alerte" data-alerte-notif hidden></div>
     <ul class="cl-liste" data-liste></ul>
   </section>
