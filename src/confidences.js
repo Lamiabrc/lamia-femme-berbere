@@ -112,7 +112,9 @@ $('[data-conv-lien]')?.addEventListener('submit', async (e) => {
   say(st, 'C’est parti : ouvre l’email reçu et clique sur le lien (pense à regarder les courriers indésirables). Tu reviendras directement ici.');
 });
 
-function rendreFil(threads, abonne = true) {
+function rendreFil(threads, abonneCompte = true) {
+  // Un membre peut toujours répondre à Lamia quand c'est elle qui lui a écrit.
+  const abonne = abonneCompte || threads.some((t) => t.channel === 'conversation' && t.lamia_a_ecrit);
   $('[data-conv-form]').hidden = !abonne;
   $('[data-conv-reserve]').hidden = abonne;
   const box = $('[data-conv-fil]');
@@ -120,7 +122,7 @@ function rendreFil(threads, abonne = true) {
   fil = threads.find((t) => t.channel === 'conversation') || threads[0] || null;
   $('[data-conv-premier]').hidden = Boolean(fil);
   box.innerHTML = msgs.length
-    ? msgs.map((m) => `<article class="conf-bulle is-${m.author}"><p class="conf-bulle-qui">${m.author === 'lamia' ? 'Lamia' : 'Toi'} · <time>${esc(quand(m.created_at))}</time></p>${m.body ? `<p class="conf-bulle-texte">${esc(m.body)}</p>` : ''}${piecesHtml(m.files)}</article>`).join('')
+    ? msgs.map((m) => `<article class="conf-bulle is-${m.author}"><p class="conf-bulle-qui">${m.author === 'lamia' ? 'Lamia' : 'Toi'} · <time>${esc(quand(m.created_at))}</time></p>${m.body ? `<p class="conf-bulle-texte">${texteAvecLiens(m.body)}</p>` : ''}${piecesHtml(m.files)}</article>`).join('')
     : abonne ? '<p class="conf-vide">Ta conversation commence ici. Écris à Lamia, ou laisse-lui un vocal.</p>' : '';
   box.scrollTop = box.scrollHeight;
 }

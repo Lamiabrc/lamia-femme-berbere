@@ -33,6 +33,8 @@ export async function GET(request) {
     const r = await handleConfidences(new Request('https://lamia-femme-berbere.com/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'annonce_rappels_cron' }) }), { cron: true }).catch(() => null);
     // Filet de sécurité : les rappels des salons tournent aussi une fois par jour d'ici.
     await handleConfidences(new Request('https://lamia-femme-berbere.com/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'salon_cron' }) }), { cron: true }).catch(() => null);
+    // Les testeurs ajoutés à la liste Google Play reçoivent le lien du test dans leur conversation avec Lamia.
+    await handleConfidences(new Request('https://lamia-femme-berbere.com/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'testeurs_play_cron' }) }), { cron: true }).catch(() => null);
     return json({ ok: true, ...nouveautes, rappels: r ? (await r.json().catch(() => ({}))).rappels ?? null : null });
   }
   catch (e) { console.error('nouveautes failed', e?.message); return json({ error: 'temporary_failure' }, 502); }
