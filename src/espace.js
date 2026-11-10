@@ -527,7 +527,7 @@ supabase.auth.onAuthStateChange((event) => { if (event === 'PASSWORD_RECOVERY') 
 render();
 
 // Fiche créée en live avec Lamia, reliée à ce compte depuis le lien personnel.
-const ETAT_FICHE = { confirmee: 'Confirmée : visible sur le site, anonyme', en_attente: 'Visible sur le site, en attente de ta confirmation', a_modifier: 'Lamia corrige ta fiche', retiree: 'Retirée du site' };
+const ETAT_FICHE = { confirmee: 'Confirmée : visible sur le site, anonyme', en_attente: 'Visible sur le site, en attente de ta confirmation', a_modifier: 'À corriger par toi : clique sur « Modifier mon annonce »', retiree: 'Retirée du site' };
 async function mesFiches(session) {
   const box = document.querySelector('[data-espace-fiches]');
   if (!box) return;

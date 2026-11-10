@@ -4,7 +4,7 @@ import { api, esc, PUBLIC_KEY, creerCompte } from './confidences-commun.js';
 import { createClient } from '/vendor/supabase.mjs';
 
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', PUBLIC_KEY);
-import { lib } from './matching-options.mjs';
+import { lib, O } from './matching-options.mjs';
 
 const zone = document.querySelector('[data-confirmer]');
 const q = new URLSearchParams(location.search);
@@ -12,7 +12,8 @@ const n = q.get('n'), t = q.get('t');
 
 const ERREURS = {
   lien_invalide: 'Ce lien ne fonctionne pas. Vérifie que tu l’as copié en entier, ou écris à Lamia pour qu’elle te le renvoie.',
-  texte_requis: 'Écris en quelques mots ce que tu veux changer.',
+  age_invalide: 'Indique ton âge (18 ans minimum).',
+  fiche_retiree: 'Cette fiche n’est plus sur le site. Écris à Lamia si tu veux revenir.',
 };
 
 function fiche(f) {
@@ -27,7 +28,28 @@ function fiche(f) {
   </article>`;
 }
 
-const formulaire = `<form class="confirmer-modif" data-form-modif hidden><label>Qu’est-ce que tu veux changer dans ta fiche ?<textarea name="texte" rows="4" maxlength="1000" placeholder="Ex. : je n’habite plus à Lyon mais à Paris ; je cherche plutôt un homme de 35 à 42 ans…" required></textarea></label><button type="submit" class="po-btn">Envoyer ma demande à Lamia</button></form>`;
+// « Modifier ma fiche » : tout est déjà rempli avec ce que Lamia a noté ; la personne corrige et enregistre elle-même.
+const ETUDES = [...O.etudeCategorie, ...Object.values(O.etudeDetail).flat()];
+const choix = (nom, titre, liste, v) => `<label>${titre}<select name="${nom}"><option value="">—</option>${[...new Set([...(v && !liste.includes(v) ? [v] : []), ...liste])].map((x) => `<option value="${esc(x)}"${x === v ? ' selected' : ''}>${esc(lib(x))}</option>`).join('')}</select></label>`;
+const champ = (nom, titre, v, max) => `<label>${titre}<input name="${nom}" maxlength="${max}" value="${esc(v || '')}"></label>`;
+const formulaire = (f) => `<form class="confirmer-modif" data-form-modif hidden>
+  <p><strong>Corrige ce qui ne va pas, puis enregistre.</strong> C’est pris en compte tout de suite.</p>
+  <label>Ton âge<input name="age" type="number" min="18" max="99" value="${esc(f.age || '')}" required></label>
+  ${choix('pays', 'Le pays où tu vis', O.pays, f.pays)}
+  ${champ('ville', 'Ta ville', f.ville, 60)}
+  ${champ('village', 'Ton village ou ta ville d’origine', f.village, 60)}
+  ${choix('situation', 'Ta situation', O.situation, f.situation)}
+  ${choix('enfants', 'Tu as des enfants ?', O.enfants, f.enfants)}
+  ${choix('etudes', 'Tes études', ETUDES, f.etudes)}
+  ${choix('religion', 'Ta religion', O.religion, f.religion)}
+  ${choix('pratique', 'Ta pratique', O.pratique, f.pratique)}
+  <label>Qui je suis<textarea name="profil" rows="4" maxlength="700">${esc(f.profil || '')}</textarea></label>
+  <label>Qui je cherche<textarea name="recherche" rows="4" maxlength="700">${esc(f.recherche || '')}</textarea></label>
+  <label>Âge recherché, de<input name="age_min" type="number" min="18" max="99" value="${esc(f.age_min || '')}"></label>
+  <label>à<input name="age_max" type="number" min="18" max="99" value="${esc(f.age_max || '')}"></label>
+  ${champ('secteur', 'Où tu cherches (pays, région)', f.secteur, 120)}
+  <button type="submit" class="po-btn">Enregistrer ma fiche</button>
+  <p class="confirmer-note">Ne mets ni numéro, ni TikTok, ni email : ils sont retirés automatiquement.</p></form>`;
 const effacer = `<p class="confirmer-note"><button type="button" class="confirmer-lien" data-effacer>Je ne veux plus du tout être dans l’outil de Lamia</button></p>`;
 
 // Quelqu'un a choisi cette fiche : son annonce anonyme, et ce qu'il reste à faire pour répondre.
@@ -49,6 +71,7 @@ function choisie(d) {
 
 function afficher(d) {
   afficherFiche(d);
+  if (d.corrige && !d.retire && !d.efface) zone.insertAdjacentHTML('afterbegin', '<p class="confirmer-etat" role="status"><strong>✓ Ta fiche est à jour.</strong></p>');
   if (!d.retire && !d.efface) zone.insertAdjacentHTML('afterbegin', choisie(d));
   // Arrivée depuis « Modifier mon annonce » : le formulaire s'ouvre directement.
   if (location.hash === '#modifier') zone.querySelector('[data-modifier]')?.click();
@@ -66,13 +89,7 @@ function afficherFiche(d) {
   if (d.confirme) {
     zone.innerHTML = `${fiche(f)}<div class="confirmer-etat"><p><strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#circle-check"/></svg> Merci, ta fiche est confirmée.</strong> Elle porte maintenant la mention « confirmé » dans les profils de Lamia, toujours anonyme : personne ne voit ton prénom, ton TikTok ni ton numéro.</p>
       <p>C’est fait ! Tes <strong>3 premières mises en relation sont offertes</strong>.</p>
-      <p class="confirmer-actions"><button type="button" class="po-btn-verre" data-retirer>Je ne veux plus apparaître</button></p>${effacer}</div>${acces(d)}`;
-    monterAcces(d);
-    return;
-  }
-  if (d.modif) {
-    zone.innerHTML = `${fiche(f)}<div class="confirmer-etat"><p><strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#pencil"/></svg> Ta demande de modification est envoyée à Lamia.</strong> Ta fiche reste affichée « en attente de confirmation » le temps que Lamia la corrige, puis elle te renvoie ce même lien pour que tu la valides.</p>
-      <p class="confirmer-actions"><button type="button" class="po-btn" data-confirmer-oui>Finalement, je la confirme telle quelle</button><button type="button" class="po-btn-verre" data-modifier>Préciser ma demande</button></p>${formulaire}${effacer}</div>${acces(d)}`;
+      <p class="confirmer-actions"><button type="button" class="po-btn-verre" data-modifier>Modifier ma fiche</button><button type="button" class="po-btn-verre" data-retirer>Je ne veux plus apparaître</button></p>${formulaire(f)}${effacer}</div>${acces(d)}`;
     monterAcces(d);
     return;
   }
@@ -81,7 +98,7 @@ function afficherFiche(d) {
     ${fiche(f)}
     <div class="confirmer-etat" data-simple><p class="annonce-vide">Un instant…</p></div>
     <p class="confirmer-note">Pas tout à fait ça ? <button type="button" class="confirmer-lien" data-modifier>Modifier ma fiche</button> · <button type="button" class="confirmer-lien" data-retirer>Ne pas apparaître</button></p>
-    ${formulaire}${effacer}`;
+    ${formulaire(f)}${effacer}`;
   monterSimple();
 }
 
@@ -174,13 +191,13 @@ zone.addEventListener('click', (e) => {
   if (e.target.closest('[data-aller-confirmer]')) { const c = zone.querySelector('[data-simple]'); c?.scrollIntoView({ behavior: 'smooth', block: 'center' }); c?.querySelector('input, [data-tout]')?.focus({ preventScroll: true }); }
   else if (e.target.closest('[data-confirmer-oui]')) agir('annonce_confirmer_outil');
   else if (e.target.closest('[data-retirer]') && confirm('Ta fiche ne sera plus visible sur le site. Tu confirmes ?')) agir('annonce_retirer_outil');
-  else if (e.target.closest('[data-modifier]')) { const fm = zone.querySelector('[data-form-modif]'); fm.hidden = false; fm.querySelector('textarea').focus(); }
+  else if (e.target.closest('[data-modifier]')) { const fm = zone.querySelector('[data-form-modif]'); fm.hidden = false; fm.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
   else if (e.target.closest('[data-effacer]') && confirm('Ta fiche sera retirée du site et Lamia l’effacera de son outil de matching. Tu confirmes ?')) agir('annonce_effacer_outil');
 });
 zone.addEventListener('submit', (e) => {
   if (!e.target.closest('[data-form-modif]')) return;
   e.preventDefault();
-  agir('annonce_modifier_outil', { texte: e.target.texte.value.trim() });
+  agir('annonce_modifier_outil', { fiche: Object.fromEntries(new FormData(e.target)) });
 });
 
 if (!n || !t) zone.innerHTML = `<p class="confirmer-erreur">${esc(ERREURS.lien_invalide)}</p>`;

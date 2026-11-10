@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { handleAnnonces, jetonAnnonce } from '../lib/annonces.mjs';
 
 // Une fiche de l'outil (n° 5020) et une petite base en mémoire.
@@ -53,15 +54,47 @@ test('« je ne veux plus apparaître » masque la fiche, même confirmée', asyn
   const r = await (await handleAnnonces('annonces_publiques', {}, ctx)).json();
   assert.equal(r.annonces.filter((a) => a.ref === 5020).length, 0);
 });
-test('« je veux la modifier avant » : la fiche reste cachée et Lamia reçoit la demande', async () => {
+test('la personne corrige sa fiche elle-même : enregistré tout de suite, sans alerte ni travail pour Lamia', async () => {
   const { ctx, jeton, alertes, fiches } = monde();
-  let r = await handleAnnonces('annonce_modifier_outil', { n: '5020', t: jeton, texte: '' }, ctx);
-  assert.equal(r.status, 400);
-  const d = await (await handleAnnonces('annonce_modifier_outil', { n: '5020', t: jeton, texte: 'Je vis maintenant à Paris.' }, ctx)).json();
-  assert.equal(d.modif, true);
-  assert.equal(fiches[0].modif_demandee, 'Je vis maintenant à Paris.');
-  assert.equal(fiches[0].confirme_at, null);
-  assert.match(alertes[0], /modification demandée/);
+  assert.equal((await handleAnnonces('annonce_modifier_outil', { n: '5020', t: jeton }, ctx)).status, 400);
+  assert.equal((await handleAnnonces('annonce_modifier_outil', { n: '5020', t: 'faux', fiche: { village: 'Tigzirt' } }, ctx)).status, 403);
+  await handleAnnonces('annonce_confirmer_outil', { n: '5020', t: jeton }, ctx);
+  alertes.length = 0;
+  const d = await (await handleAnnonces('annonce_modifier_outil', { n: '5020', t: jeton, fiche: { village: 'Tigzirt', age: '46', pays: 'France', profil: 'Sérieuse, appelle-moi au 06 12 34 56 78.', genre: 'homme', age_min: '50', age_max: '40' } }, ctx)).json();
+  assert.equal(d.corrige, true);
+  assert.equal(d.confirme, true); // corriger ne retire pas la confirmation
+  assert.equal(d.fiche.village, 'Tigzirt');
+  assert.equal(fiches[0].age, 46);
+  assert.equal(fiches[0].pays, 'France');
+  assert.equal(fiches[0].genre, 'femme'); // le genre ne se change pas
+  assert.doesNotMatch(fiches[0].profil, /06 12/);
+  assert.deepEqual([fiches[0].age_min, fiches[0].age_max], [40, 50]);
+  assert.equal(fiches[0].corrections.village, 'Tigzirt');
+  assert.equal('corrections' in d.fiche, false);
+  assert.equal(alertes.length, 0);
+});
+test('une ancienne demande en attente disparaît dès que la personne enregistre sa fiche', async () => {
+  const { ctx, jeton, fiches } = monde();
+  Object.assign(fiches[0], { modif_at: '2026-11-10T14:17:00Z', modif_demandee: 'Ville d’origine : Tigzirt' });
+  const d = await (await handleAnnonces('annonce_modifier_outil', { n: '5020', t: jeton, fiche: { village: 'Tigzirt' } }, ctx)).json();
+  assert.equal(d.modif, false);
+  assert.equal(fiches[0].modif_at, null);
+  assert.equal(fiches[0].modif_demandee, null);
+});
+test('l’outil republie la fiche : les corrections de la personne restent, et l’outil les reçoit', async () => {
+  const { ctx, jeton, fiches } = monde();
+  await handleAnnonces('annonce_modifier_outil', { n: '5020', t: jeton, fiche: { village: 'Tigzirt' } }, ctx);
+  fiches[0].village = null; // l'outil a réécrit la fiche avec son ancienne version
+  const lire = ctx.read, CLE = 'cle-de-liaison-de-test-0123456789abcdef';
+  const c = { ...ctx, read: async (u) => {
+    if (u.startsWith('/rest/v1/platform_settings')) return [{ value: { hash: createHash('sha256').update(CLE).digest('hex') } }];
+    if (u.startsWith('/rest/v1/profils_outil?corrige_at=not.is.null')) return fiches.filter((f) => f.corrige_at);
+    if (u.startsWith('/rest/v1/profils_outil?select=')) return fiches;
+    return lire(u);
+  } };
+  const r = await handleAnnonces('outil_publier', { cle: CLE, profils: [{ outil_id: 'p-1', genre: 'femme', age: 45 }] }, c);
+  if (r.status === 200) { const j = await r.json(); assert.equal(j.corrections['p-1'].village, 'Tigzirt'); assert.equal(fiches[0].village, 'Tigzirt'); }
+  else assert.fail(`outil_publier a répondu ${r.status}`);
 });
 test('« je ne veux plus être dans l’outil » : retirée du site et Lamia doit l’effacer', async () => {
   const { ctx, jeton, alertes, fiches } = monde();

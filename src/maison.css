@@ -3213,6 +3213,7 @@ label.is-manquant { outline: 2px solid #6C5BA7; outline-offset: 3px; border-radi
 .confirmer-lien { background: none; border: 0; padding: 0; color: #E9DFFA; text-decoration: underline; cursor: pointer; font: inherit; }
 .confirmer-acces { margin-top: 26px; padding: 18px 20px; border-radius: 18px; border: 1px solid rgba(233, 223, 250,.45); background: rgba(255,255,255,.05); }
 .confirmer-acces h2 { margin: 0 0 6px; font-size: 20px; color: #E9DFFA; }
+.confirmer-modif select { width: 100%; border-radius: 12px; border: 1px solid rgba(233, 223, 250,.45); background: #2b2838; color: #fff4ec; padding: 10px 12px; font: inherit; }
 .confirmer-modif input { width: 100%; border-radius: 12px; border: 1px solid rgba(233, 223, 250,.45); background: rgba(255,255,255,.06); color: #fff4ec; padding: 10px 12px; font: inherit; }
 .po-btn-verre.is-on { background: linear-gradient(90deg, rgba(255,90,74,.34), rgba(233, 223, 250,.14)); }
 .interet-boutons { display: flex; flex-wrap: wrap; gap: 10px; }
