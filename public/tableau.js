@@ -144,12 +144,14 @@ async function aFaire() {
     const { a_faire: f } = await r.json();
     const heure = (d) => new Date(d).toLocaleString('fr-FR', { weekday: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
     const MOTIF = (m) => esc(m || 'sans motif donné');
+    // Chaque numéro ouvre le profil : qui c'est, son activité, ses blocages et signalements.
+    const VOIR = (r) => (r ? `<a class="fiche-ref" href="#profil-${esc(r)}">n° ${esc(r)}</a>` : 'n° ?');
     const PRESTA = { 15: 'Visio de 15 min', 30: 'Coaching 30 min et match manuel', 60: 'Sauver mon couple' };
     // Ce qui te concerne : tes coachings, tes soirées, les blocages et signalements.
     const miens = [
       ...(f.coachings || []).map((c) => [`🎥 <b>${esc(PRESTA[c.duree] || 'Coaching')}</b> avec <b>${esc(c.prenom || c.email || '?')}</b>, ${esc(heure(c.debut))}`, '<button class="btn btn-line" type="button" data-tab-aller="coaching">Coaching</button>']),
-      (f.signalements || []).length && [`🚩 <b>${f.signalements.length} signalement(s) à traiter</b> :<br>${f.signalements.map((s) => `n° ${esc(s.cible_ref)} signalé par n° ${esc(s.auteur_ref)} · « ${MOTIF(s.motif)} »`).join('<br>')}`, ''],
-      (f.blocages || []).length && [`🚫 <b>${f.blocages.length} blocage(s) cette semaine</b> :<br>${f.blocages.map((x) => `n° ${esc(x.auteur_ref)} a bloqué n° ${esc(x.cible_ref)} · « ${MOTIF(x.motif)} »`).join('<br>')}`, ''],
+      (f.signalements || []).length && [`🚩 <b>${f.signalements.length} signalement(s) à traiter</b> :<br>${f.signalements.map((s) => `${VOIR(s.cible_ref)} signalé par ${VOIR(s.auteur_ref)} · « ${MOTIF(s.motif)} »`).join('<br>')}`, ''],
+      (f.blocages || []).length && [`🚫 <b>${f.blocages.length} blocage(s) cette semaine</b> (clique sur un numéro pour ouvrir le profil) :<br>${f.blocages.map((x) => `${VOIR(x.auteur_ref)} a bloqué ${VOIR(x.cible_ref)} · « ${MOTIF(x.motif)} »`).join('<br>')}`, ''],
     ];
     const lignes = [
       ...miens,
@@ -1128,3 +1130,6 @@ document.addEventListener('click', async (e) => {
 
 // Un bouton de la liste « À faire » qui ouvre directement un onglet.
 document.addEventListener('click', (e) => { const b = e.target.closest('[data-tab-aller]'); if (b) ouvrir(b.dataset.tabAller); });
+
+// Un numéro de profil déjà ouvert une fois se rouvre au clic (l'adresse ne change pas, donc pas de « hashchange »).
+document.addEventListener('click', (e) => { const a = e.target.closest('a[href^="#profil-"]'); if (a && token && location.hash === a.getAttribute('href')) { e.preventDefault(); suivreHashProfil(); } });

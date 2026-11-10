@@ -4032,3 +4032,16 @@ html[dir="rtl"], html[dir="rtl"] body { overflow-x: clip; }
 /* Inscription aux salons : places restantes et sondage du jour */
 .salons-carte small.salons-places { color: var(--or-clair); font-weight: 600; opacity: 1; }
 .salons-jours { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+
+/* Accueil : le swipe d'abord, même sans compte. */
+.accueil-swipe { padding: 84px 0 8px; }
+.accueil-swipe + .accueil-hero { padding-top: 28px; }
+.accueil-swipe-titre { text-align: center; color: #E9DFFA; font-weight: 600; margin: 0 0 12px; }
+.accueil-swipe .swipe-pile { height: clamp(400px, calc(100svh - 300px), 540px); }
+.accueil-swipe .confirmer-lien { color: #E9DFFA; }
+.swipe-choix { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+.swipe-choix button { padding: 18px 8px; border-radius: 18px; border: 2px solid #C9BCE8; background: #EFE9F7; color: #2F2B3D; font: inherit; font-size: 1.15rem; font-weight: 700; cursor: pointer; }
+.swipe-choix button:hover { background: #E9DFFA; }
+.swipe-fenetre .swipe-invite-liens { display: grid; gap: 10px; margin-top: 14px; }
+@media (max-width: 760px) { .accueil-swipe { padding-top: 64px; } }
+.swipe-fenetre .confirmer-lien { color: #2F2B3D; }
