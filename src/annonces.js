@@ -1,6 +1,6 @@
 // Annonces de rencontre : dépôt (Patio et Confidences) et affichage des annonces vérifiées par Lamia.
 import { api, esc, PUBLIC_KEY, creerCompte, matchsOuverts, SECURITE_APPLI } from './confidences-commun.js';
-import { O, lib, secteurLisible, telephoneNormal, foiEtVie, badgesProfil, origineLisible } from './matching-options.mjs';
+import { O, lib, secteurLisible, telephoneNormal, foiEtVie, badgesProfil, origineLisible, religionsAccepteesDe } from './matching-options.mjs';
 import { createClient } from '/vendor/supabase.mjs';
 
 // Compte (le même que « Mon espace ») : chaque profil y est lié pour pouvoir être modifié.
@@ -95,9 +95,14 @@ export function formulaireHtml() {
       <label>Diplôme obtenu en<select name="etudesPaysObtention">${opts(O.etudesPaysObtention)}</select></label>
       <label>Ta profession<input name="profession" maxlength="80"></label>
       <label>Ta taille <small>(en cm, facultatif)</small><input name="tailleCm" type="number" min="120" max="230" inputmode="numeric" placeholder="170"></label>
-      <label>Ta religion <small>(facultatif)</small><select name="religion">${opts(O.religion, 'Je préfère ne pas dire')}</select></label>
-      <label>Ta pratique <small>(facultatif)</small><select name="pratique">${opts(O.pratique, 'Je préfère ne pas dire')}</select></label>
-      <label class="annonce-large">Ta foi et ta pratique en quelques mots <small>(facultatif : prière, ramadan, ce qui compte pour toi…)</small><textarea name="religionTexte" rows="2" maxlength="300"></textarea></label>
+      <fieldset class="annonce-encart annonce-large"><legend>Ta religion</legend>
+        <div class="annonce-grille">
+          <label>Ta religion <small>(facultatif)</small><select name="religion">${opts(O.religion, 'Je préfère ne pas dire')}</select></label>
+          <label data-si-religion-autre hidden>Précise ta religion<input name="religionAutre" maxlength="60"></label>
+          <label>Ta pratique <small>(facultatif)</small><select name="pratique">${opts(O.pratique, 'Je préfère ne pas dire')}</select></label>
+          <label class="annonce-large">Ta foi et ta pratique en quelques mots <small>(facultatif : prière, ramadan, ce qui compte pour toi…)</small><textarea name="religionTexte" rows="2" maxlength="300"></textarea></label>
+        </div>
+      </fieldset>
       <label>Bouger pour l’amour ?<select name="mobiliteGeographique">${opts(O.mobilite)}</select></label>
       <label data-vision>Le travail dans le couple<select name="visionFinanciere"><option value="">Choisis d’abord femme ou homme</option></select></label>
       <label>Tabac<select name="fumeur">${opts(O.fumeur)}</select></label>
@@ -114,11 +119,17 @@ export function formulaireHtml() {
     <div class="annonce-grille">
       <div class="annonce-ages"><label>Âge de</label><input name="age_min" type="number" min="18" max="99" inputmode="numeric" aria-label="Âge minimum" placeholder="25"><label>à</label><input name="age_max" type="number" min="18" max="99" inputmode="numeric" aria-label="Âge maximum" placeholder="40"><span>ans</span></div>
       <label>Où doit-elle vivre ?<select name="zoneGeo">${opts(O.zoneGeo)}</select></label>
-      <label>Sa religion<select name="religionRecherche">${opts(O.religionRecherche)}</select></label>
-      <label>Sa pratique<select name="pratiqueRecherche">${opts(O.pratiqueRecherche)}</select></label>
       <label>Son niveau d’études<select name="etudesRecherche">${opts(O.etudesRecherche)}</select></label>
       <label data-hidjab hidden>Qu’elle porte le hijab ?<select name="rechercheFemmeHidjabiste">${opts(O.hidjab)}</select></label>
     </div>
+    <fieldset class="annonce-encart"><legend>Sa religion</legend>
+      <p class="annonce-sous">Les religions que tu acceptes <small>(plusieurs choix possibles ; laisse vide si peu importe)</small></p>${puces('religionsAcceptees', O.religion)}
+      <div class="annonce-grille">
+        <label data-si-religion-acceptee-autre hidden>Précise la religion acceptée<input name="religionRechercheAutre" maxlength="60"></label>
+        <label>Sa pratique<select name="pratiqueRecherche">${opts(O.pratiqueRecherche)}</select></label>
+        <label>Une pratique différente de celle que tu cherches, c’est non ?<select name="fermeDifferencePratique">${opts(O.fermeDifferencePratique)}</select></label>
+      </div>
+    </fieldset>
     <p class="annonce-sous">Ses origines <small>(laisse vide si peu importe)</small></p>${puces('origineRechercheTags', O.origine)}
     <div class="annonce-puces annonce-accepte">
       <label><input type="checkbox" name="kabyleUniquement"><span>Uniquement kabyle</span></label>
@@ -326,6 +337,9 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
   // Champs qui dépendent d'autres réponses (comme dans l'outil de matching).
   const F = form.elements;
   F.enfants.addEventListener('change', () => $$('[data-si-enfants]', form).forEach((l) => { l.hidden = F.enfants.value !== 'Oui'; }));
+  // « Autre » religion : un champ pour l'écrire.
+  F.religion.addEventListener('change', () => { $('[data-si-religion-autre]', form).hidden = F.religion.value !== 'Autre'; });
+  form.addEventListener('change', (e) => { if (e.target.name === 'religionsAcceptees') $('[data-si-religion-acceptee-autre]', form).hidden = !$('[name=religionsAcceptees][value="Autre"]', form).checked; });
   F.niveauEtudeCategorie.addEventListener('change', () => { const d = O.etudeDetail[F.niveauEtudeCategorie.value] || []; F.niveauEtudeDetail.innerHTML = d.length ? opts(d) : '<option value="">Choisis d’abord ton niveau</option>'; });
   form.addEventListener('change', (e) => {
     if (e.target.name === 'genre') {
@@ -437,8 +451,8 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
   });
 }
 
-const CHAMPS = ['villageOrigine', 'langue', 'situation', 'enfants', 'nbEnfants', 'ageEnfants', 'desirEnfants', 'niveauEtudeCategorie', 'niveauEtudeDetail', 'etudesPaysObtention', 'profession', 'tailleCm', 'religion', 'pratique', 'mobiliteGeographique', 'visionFinanciere', 'fumeur', 'sport', 'alcool', 'chemma', 'religionTexte', 'autresModeVie', 'zoneGeo', 'religionRecherche', 'pratiqueRecherche', 'etudesRecherche', 'rechercheFemmeHidjabiste', 'contactReseau'];
-const LISTES = ['origineTags', 'caracteristiques', 'origineRechercheTags', 'caracteristiquesRecherche'];
+const CHAMPS = ['villageOrigine', 'langue', 'situation', 'enfants', 'nbEnfants', 'ageEnfants', 'desirEnfants', 'niveauEtudeCategorie', 'niveauEtudeDetail', 'etudesPaysObtention', 'profession', 'tailleCm', 'religion', 'religionAutre', 'pratique', 'mobiliteGeographique', 'visionFinanciere', 'fumeur', 'sport', 'alcool', 'chemma', 'religionTexte', 'autresModeVie', 'zoneGeo', 'religionRechercheAutre', 'fermeDifferencePratique', 'pratiqueRecherche', 'etudesRecherche', 'rechercheFemmeHidjabiste', 'contactReseau'];
+const LISTES = ['origineTags', 'caracteristiques', 'origineRechercheTags', 'caracteristiquesRecherche', 'religionsAcceptees'];
 const CASES = ['kabyleUniquement', 'accepteDivorce', 'accepteVeuf', 'accepteEnfants'];
 function lireMatching(form) {
   const f = form.elements, m = {};
@@ -461,7 +475,11 @@ function monterEdition(form, st, p, token) {
   const m = p.matching || {};
   poser('niveauEtudeCategorie', m.niveauEtudeCategorie);
   for (const n of CHAMPS) if (n !== 'niveauEtudeCategorie') poser(n, m[n]);
-  for (const n of LISTES) for (const v of m[n] || []) { const c = form.querySelector(`[name=${n}][value="${CSS.escape(v)}"]`); if (c) c.checked = true; }
+  // Anciennes fiches : la religion recherchée unique devient la liste des religions acceptées.
+  const listes = { ...m, religionsAcceptees: religionsAccepteesDe(m) };
+  for (const n of LISTES) for (const v of listes[n] || []) { const c = form.querySelector(`[name=${n}][value="${CSS.escape(v)}"]`); if (c) c.checked = true; }
+  $('[data-si-religion-autre]', form).hidden = F.religion.value !== 'Autre';
+  $('[data-si-religion-acceptee-autre]', form).hidden = !listes.religionsAcceptees.includes('Autre');
   for (const n of CASES) F[n].checked = Boolean(m[n]);
   F.anonyme_ok.checked = Boolean(p.anonyme_ok);
   if (p.sans_reseau) { F.sans_reseau.checked = true; F.telephone.value = p.telephone || ''; F.sans_reseau.dispatchEvent(new Event('change')); }
