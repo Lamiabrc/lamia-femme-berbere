@@ -1,7 +1,7 @@
 // Accueil : le swipe tout de suite, même sans compte. Une fenêtre demande « un homme ou une femme ? »,
 // puis les profils anonymes défilent un par un. Le cœur demande un profil : sans profil, pas de match.
 import { api, esc, PUBLIC_KEY } from './confidences-commun.js';
-import { lib, secteurLisible, origineLisible } from './matching-options.mjs';
+import { lib, secteurLisible, origineLisible, metierEtReligion } from './matching-options.mjs';
 import { createClient } from '/vendor/supabase.mjs';
 
 const bloc = document.querySelector('[data-swipe-accueil]');
@@ -36,6 +36,7 @@ function demander() {
 
 function carte(a) {
   const femme = a.genre === 'femme';
+  const mr = metierEtReligion(a);
   const infos = [a.pays && lib(a.pays), a.situation && lib(a.situation), a.enfants === 'Oui' ? 'avec enfant(s)' : a.enfants === 'Non' ? 'sans enfant' : '', a.etudes && `études : ${lib(a.etudes).toLowerCase()}`].filter(Boolean);
   const ages = a.age_min || a.age_max ? ` (${a.age_min || 18} à ${a.age_max || 99} ans)` : '';
   const lieu = a.ville || (a.pays && lib(a.pays)) || '';
@@ -48,6 +49,8 @@ function carte(a) {
       ${lieu ? `<p class="swipe-lieu">${esc(lieu)}</p>` : ''}
       ${origineLisible(a.origine) ? `<p class="swipe-origine">${esc(origineLisible(a.origine))}</p>` : ''}
       ${a.village ? `<p class="swipe-village">Originaire de ${esc(a.village)}</p>` : ''}
+      ${mr.metier ? `<p class="swipe-metier">${esc(mr.metier)}</p>` : ''}
+      ${mr.religion ? `<p class="swipe-religion">${esc(mr.religion)}</p>` : ''}
       <p class="swipe-statut"><span aria-hidden="true">✓</span> ${a.piece_identite ? 'Vérifié avec pièce d’identité' : 'Profil vérifié'}</p>
       <button type="button" class="swipe-voir" data-voir aria-expanded="false">Voir le profil</button>
     </div>
@@ -88,7 +91,7 @@ function montrer(genre) {
 function inviter(el) {
   if (el) { el.style.transition = 'transform .25s ease'; el.style.transform = ''; el.classList.remove('vers-oui', 'vers-non'); }
   window.lfbEvent?.('swipe_invite_coeur');
-  const d = fenetre(`<h2>Ce profil te plaît ?</h2><p>Pour lui envoyer ton cœur, il te faut un profil : c’est lui que l’autre personne verra. C’est gratuit, anonyme, et ton premier match est offert.</p>
+  const d = fenetre(`<h2>Ce profil te plaît ?</h2><p>Pour lui envoyer ton cœur, il te faut un profil : c’est lui que l’autre personne verra. C’est gratuit et anonyme, et les matchs sont gratuits aussi.</p>
     <div class="swipe-invite-liens"><a class="po-btn" href="/rencontres/#confier">Créer mon profil gratuit</a><a class="po-btn-verre" href="/mon-espace/">J’ai déjà un compte</a><button type="button" class="confirmer-lien" data-fermer>Continuer à regarder</button></div>`);
   d.addEventListener('click', (e) => { if (e.target === d || e.target.closest('[data-fermer]')) d.remove(); });
 }
@@ -139,6 +142,7 @@ if (bloc && pile) {
       const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', PUBLIC_KEY);
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
+        bloc.classList.add('is-membre');
         titre.textContent = 'Tes profils t’attendent';
         pile.innerHTML = '<div class="swipe-message"><h2>Reprends ton swipe</h2><p>Les profils qui te correspondent, tes cœurs et tes matchs.</p><p class="po-actions"><a class="po-btn" href="/rencontres/swipe/">Swiper</a><a class="po-btn-verre" href="/mon-espace/">Mon espace</a></p></div>';
         return;
@@ -149,3 +153,7 @@ if (bloc && pile) {
     if (v) montrer(v); else if (tous.length) demander(); else afficher();
   })();
 }
+
+// Une explication ou la liste repliée s'ouvre quand un lien y mène.
+const deplier = () => { try { const el = location.hash.length > 1 && document.querySelector(location.hash); const d = el?.closest('details'); if (d) d.open = true; } catch { /* */ } };
+deplier(); addEventListener('hashchange', deplier);

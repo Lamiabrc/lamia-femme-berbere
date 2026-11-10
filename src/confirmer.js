@@ -38,6 +38,7 @@ const formulaire = (f) => `<form class="confirmer-modif" data-form-modif hidden>
   ${choix('pays', 'Le pays où tu vis', O.pays, f.pays)}
   ${champ('ville', 'Ta ville', f.ville, 60)}
   ${champ('village', 'Ton village ou ta ville d’origine', f.village, 60)}
+  ${champ('metier', 'Ton métier ou ton secteur d’activité', f.metier, 80)}
   ${choix('situation', 'Ta situation', O.situation, f.situation)}
   ${choix('enfants', 'Tu as des enfants ?', O.enfants, f.enfants)}
   ${choix('etudes', 'Tes études', ETUDES, f.etudes)}

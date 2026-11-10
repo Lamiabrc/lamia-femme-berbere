@@ -3,7 +3,7 @@
 // Swipe sans limite. Matchs en même temps : 1 en Découverte (Lamia en débloque d'autres en live), 3 avec une formule.
 // « Qui m'a choisi·e » (Passion, Prestige) : ces profils passent en tête.
 import { api, esc, PUBLIC_KEY, matchsOuverts, matchPleinHtml } from './confidences-commun.js';
-import { O, lib, secteurLisible, foiEtVie, badgesProfil, origineLisible } from './matching-options.mjs';
+import { O, lib, secteurLisible, foiEtVie, badgesProfil, origineLisible, metierEtReligion } from './matching-options.mjs';
 import { createClient } from '/vendor/supabase.mjs';
 
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', PUBLIC_KEY);
@@ -19,6 +19,7 @@ const message = (html) => { zone.innerHTML = `<div class="swipe-message">${html}
 const statut = (a) => (a.piece_identite ? 'Vérifié avec pièce d’identité' : a.outil && !a.confirme ? 'En attente de confirmation' : 'Profil vérifié');
 function carte(a) {
   const femme = a.genre === 'femme';
+  const mr = metierEtReligion(a);
   const tags = (a.caracteristiques || []).slice(0, 8);
   const infos = [a.pays && lib(a.pays), a.situation && lib(a.situation), a.enfants === 'Oui' ? 'avec enfant(s)' : a.enfants === 'Non' ? 'sans enfant' : '', a.etudes && `études : ${lib(a.etudes).toLowerCase()}`].filter(Boolean);
   const ages = a.age_min || a.age_max ? ` (${a.age_min || 18} à ${a.age_max || 99} ans)` : '';
@@ -34,6 +35,8 @@ function carte(a) {
       ${lieu ? `<p class="swipe-lieu">${esc(lieu)}</p>` : ''}
       ${origineLisible(a.origine) ? `<p class="swipe-origine">${esc(origineLisible(a.origine))}</p>` : ''}
       ${a.village ? `<p class="swipe-village">Originaire de ${esc(a.village)}</p>` : ''}
+      ${mr.metier ? `<p class="swipe-metier">${esc(mr.metier)}</p>` : ''}
+      ${mr.religion ? `<p class="swipe-religion">${esc(mr.religion)}</p>` : ''}
       <p class="swipe-statut"><span aria-hidden="true">✓</span> ${statut(a)}</p>
       <button type="button" class="swipe-voir" data-voir aria-expanded="false">Voir le profil</button>
     </div>
@@ -204,7 +207,7 @@ function quotaAtteint({ algerie, formule } = {}) {
   vibrer(80);
   if (algerie || window.LFB_PLAY) return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg></p><h2>Viens me voir en live</h2><p>Tu as utilisé ton match. Pour en avoir d’autres, <strong>viens soutenir le live de Lamia</strong>, chaque soir à 21 h : elle peut t’offrir un match, une fois toutes les 2 semaines.</p><p class="po-actions"><a class="po-btn-verre" href="/salon/">Voir le live</a></p>`);
   if (formule === 'passion') return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg></p><h2>Tes 10 matchs du mois sont utilisés</h2><p>Ils reviennent le mois prochain. Avec <strong>Prestige</strong>, les matchs sont illimités. Tu peux aussi prendre un match supplémentaire à 5 €, ou venir au live de Lamia (1 match offert toutes les 2 semaines).</p><p class="po-actions"><a class="po-btn-verre" href="/abonnement/">Voir les formules</a><a class="po-btn-verre" href="/salon/">Voir le live</a></p>`);
-  return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg></p><h2>Tu as utilisé ton match offert</h2><p>Prends un <strong>match supplémentaire à 5 €</strong>, viens au <strong>live de Lamia</strong>, chaque soir à 21 h (1 match offert toutes les 2 semaines), ou choisis une formule : 10 matchs par mois avec Passion, illimités avec Prestige.</p><p class="po-actions"><a class="po-btn-verre" href="/salon/">Voir le live</a><a class="po-btn-verre" href="/abonnement/">Voir les formules</a></p>`);
+  return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg></p><h2>Tes matchs disponibles sont utilisés</h2><p>Prends un <strong>match supplémentaire à 5 €</strong>, viens au <strong>live de Lamia</strong>, chaque soir à 21 h (1 match offert toutes les 2 semaines), ou choisis une formule : 10 matchs par mois avec Passion, illimités avec Prestige.</p><p class="po-actions"><a class="po-btn-verre" href="/salon/">Voir le live</a><a class="po-btn-verre" href="/abonnement/">Voir les formules</a></p>`);
 }
 // Bloquer ou signaler le profil affiché. Bloquer le retire tout de suite, et la personne n'en sait rien.
 function moderer(ref) {

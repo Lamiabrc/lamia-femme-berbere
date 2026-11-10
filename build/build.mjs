@@ -311,17 +311,8 @@ globalThis.__pageFr = page;
 // Le Hall
 // Les bijoux des cartes du swipe (page Swipe et accueil).
 const SWIPE_DEFS = `<svg class="swipe-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs><radialGradient id="corail-b" cx="38%" cy="32%" r="70%"><stop offset="0" stop-color="#F08A68"/><stop offset=".6" stop-color="#D2482C"/><stop offset="1" stop-color="#A5301C"/></radialGradient><linearGradient id="or-b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF4B8"/><stop offset=".45" stop-color="#D4B56E"/><stop offset=".62" stop-color="#F3E0B9"/><stop offset="1" stop-color="#8A6414"/></linearGradient><clipPath id="clip-rond"><circle cx="90" cy="92" r="72"/></clipPath><clipPath id="clip-triangle"><path d="M14 44Q90 30 166 44 174 56 168 68L100 190Q90 204 80 190L12 68Q6 56 14 44Z"/></clipPath><g id="pampille"><circle cy="-5" r="3.6" fill="none" stroke="url(#or-b)" stroke-width="1.8"/><circle cy="1" r="3.6" fill="none" stroke="url(#or-b)" stroke-width="1.8"/><path d="M0 4 9 24Q9 36 0 46-9 36-9 24Z" fill="#2F2B3D" stroke="url(#or-b)" stroke-width="2.2" stroke-linejoin="round"/><path d="M0 7 6.5 22Q0 27-6.5 22Z" fill="#D4B56E" stroke="#F3E0B9" stroke-width=".7"/><path d="M0 22Q6 28 4.6 33 0 40-4.6 33-6 28 0 22Z" fill="#F3E0B9" stroke="#F3E0B9" stroke-width=".7"/><circle cy="48" r="4.6" fill="url(#or-b)"/><circle cy="48" r="3" fill="#D4B56E"/></g><g id="bijou-femme"><circle cx="90" cy="0" r="17" fill="none" stroke="url(#or-b)" stroke-width="4.5"/><path d="M46 10L126 -9L136 -13L126 -5.5L47 13Q42 13 46 10Z" fill="url(#or-b)" stroke="#8A6414" stroke-width=".5"/><use href="#pampille" x="48" y="158"/><use href="#pampille" x="90" y="178"/><use href="#pampille" x="132" y="158"/><circle cx="90" cy="92" r="76" fill="none" stroke="url(#or-b)" stroke-width="8"/><circle cx="90" cy="92" r="72" fill="#2F2B3D"/><image href="/images/outil/avatar-femme.webp" x="17" y="19" width="146" height="146" clip-path="url(#clip-rond)" preserveAspectRatio="xMidYMid slice"/><circle cx="90" cy="168" r="11.1" fill="url(#or-b)"/><circle cx="90" cy="168" r="8.5" fill="url(#corail-b)"/><ellipse cx="87.3" cy="164.9" rx="2.2" ry="1.4" fill="#FBC4AE" opacity=".8"/></g><g id="bijou-homme"><circle cx="90" cy="16" r="17" fill="none" stroke="url(#or-b)" stroke-width="4.5"/><path d="M46 26L126 7L136 3L126 10.5L47 29Q42 29 46 26Z" fill="url(#or-b)" stroke="#8A6414" stroke-width=".5"/><use href="#pampille" x="56" y="150"/><use href="#pampille" x="90" y="198"/><use href="#pampille" x="124" y="150"/><path d="M14 44Q90 30 166 44 174 56 168 68L100 190Q90 204 80 190L12 68Q6 56 14 44Z" fill="#2F2B3D"/><image href="/images/outil/avatar-homme.webp" x="-6" y="30" width="190" height="190" clip-path="url(#clip-triangle)" preserveAspectRatio="xMidYMid slice"/><path d="M14 44Q90 30 166 44 174 56 168 68L100 190Q90 204 80 190L12 68Q6 56 14 44Z" fill="none" stroke="url(#or-b)" stroke-width="8" stroke-linejoin="round"/><circle cx="90" cy="192" r="11.1" fill="url(#or-b)"/><circle cx="90" cy="192" r="8.5" fill="url(#corail-b)"/><ellipse cx="87.3" cy="188.9" rx="2.2" ry="1.4" fill="#FBC4AE" opacity=".8"/></g></defs></svg>`;
-page(
-  '/',
-  layout({
-    title: 'Rencontre kabyle sérieuse pour le mariage · Lamia',
-    description: 'Rencontre kabyle en vue du mariage : profils vérifiés, présentations faites par Lamia, marieuse kabyle. Ton premier match est offert.',
-    path: '/',
-    room: roomBySlug.hall,
-    scripts: ['/assets/annonces.js', '/assets/swipe-accueil.js'],
-    body: `<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@graph': [{ '@type': 'Organization', '@id': SITE_URL + '/#organisation', name: 'Lamia Femme Berbère', url: SITE_URL + '/', logo: SITE_URL + '/images/lamia/lamia-portrait-tatouages-rond-480.webp', founder: { '@type': 'Person', name: 'Lamia Bréchet Ighil', url: SITE_URL + '/lamia-brechet/' }, sameAs: ['https://www.tiktok.com/@lamiafemmeberbere', 'https://www.facebook.com/femmeberberes/'] }, { '@type': 'WebSite', '@id': SITE_URL + '/#site', name: 'Lamia Femme Berbère', url: SITE_URL + '/', publisher: { '@id': SITE_URL + '/#organisation' }, inLanguage: ['fr', 'en'] }] })}</script>
-<div class="po-app accueil">
-<section class="swipe-page accueil-swipe" data-swipe-accueil aria-label="Les profils">
+// Le swipe ouvert à tous (accueil et page Profils) : src/swipe-accueil.js le fait vivre.
+const SWIPE_INVITE = `<section class="swipe-page accueil-swipe" id="profils-anonymes" data-swipe-accueil aria-label="Les profils">
   <div class="swipe-app">
     ${SWIPE_DEFS}
     <p class="accueil-swipe-titre" data-inv-titre>Les profils vérifiés, un par un</p>
@@ -330,6 +321,22 @@ page(
     <p class="swipe-aide"><button type="button" class="confirmer-lien" data-inv-changer hidden>Changer : je cherche un homme / une femme</button></p>
   </div>
 </section>
+<aside class="lfb-valeurs" aria-label="Nos valeurs">
+  <p class="lfb-valeurs-titre">Un parcours qui suit l’éducation et les valeurs kabyles</p>
+  <p class="lfb-valeurs-mots"><span>Pudeur</span><span>Discrétion</span><span>Respect</span></p>
+  <p class="lfb-valeurs-texte">On n’affiche pas les femmes, et on ne les cache pas non plus : on les respecte. On valorise thirougza et irgazen, avec le même respect. Chaque religion et chaque valeur a sa place, sans renier les nôtres.</p>
+</aside>`;
+page(
+  '/',
+  layout({
+    title: 'Rencontre kabyle sérieuse pour le mariage · Lamia',
+    description: 'Rencontre kabyle en vue du mariage : profils vérifiés, présentations faites par Lamia, marieuse kabyle. Les matchs sont gratuits.',
+    path: '/',
+    room: roomBySlug.hall,
+    scripts: ['/assets/annonces.js', '/assets/swipe-accueil.js'],
+    body: `<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@graph': [{ '@type': 'Organization', '@id': SITE_URL + '/#organisation', name: 'Lamia Femme Berbère', url: SITE_URL + '/', logo: SITE_URL + '/images/lamia/lamia-portrait-tatouages-rond-480.webp', founder: { '@type': 'Person', name: 'Lamia Bréchet Ighil', url: SITE_URL + '/lamia-brechet/' }, sameAs: ['https://www.tiktok.com/@lamiafemmeberbere', 'https://www.facebook.com/femmeberberes/'] }, { '@type': 'WebSite', '@id': SITE_URL + '/#site', name: 'Lamia Femme Berbère', url: SITE_URL + '/', publisher: { '@id': SITE_URL + '/#organisation' }, inLanguage: ['fr', 'en'] }] })}</script>
+<div class="po-app accueil">
+${SWIPE_INVITE}
 <section class="po-hero accueil-hero" aria-labelledby="accueil-titre">
   <div class="po-fond" aria-hidden="true"></div>
   <div class="po-hero-grid">
@@ -361,7 +368,7 @@ page(
       <li><strong>Tu crées ton profil</strong><span>En 5 minutes : qui tu es, qui tu cherches, 2 photos. Rien n’est publié avec ton nom.</span></li>
       <li><strong>Lamia vérifie</strong><span>Les faux profils n’entrent pas. Avec ta pièce d’identité (facultative), ton profil gagne le badge « vérifié avec pièce d’identité ».</span></li>
       <li><strong>Elle cherche pour toi</strong><span>Son outil de matching compare les profils, et Lamia choisit avec son regard.</span></li>
-      <li><strong>Elle vous présente</strong><span>Si vous êtes d’accord tous les deux, elle vous met en contact. La première fois, c’est offert.</span></li>
+      <li><strong>Elle vous présente</strong><span>Si vous êtes d’accord tous les deux, elle vous met en contact. C’est gratuit.</span></li>
     </ol>
     <p class="po-actions"><a class="po-btn" data-cta-profil href="/rencontres/#confier"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> <span>Créer mon profil ou connexion</span></a></p>
   </div>
@@ -488,7 +495,7 @@ page(
       <li><strong>Trois niveaux</strong><span><b>Prioritaire</b> : score élevé, âge et secteur cohérents, rien à négocier. <b>Prometteur</b> : bon score, aucune condition enfreinte. <b>À explorer</b> : possible, sans blocage, à discuter.</span></li>
       <li><strong>Les blocages sont respectés</strong><span>Ce qui est rédhibitoire pour toi (un divorce, des enfants, une distance…) écarte le profil d’office, même avec un bon score.</span></li>
       <li><strong>Moi, je décide</strong><span>L’outil propose, c’est moi qui valide. Je relis les deux fiches, je vous parle, et je ne propose un match que si j’y crois vraiment.</span></li>
-      <li><strong>La mise en relation</strong><span>Si vous êtes d’accord tous les deux, je vous mets en contact. Ton numéro reste chez moi jusque-là. La première mise en relation est offerte, les suivantes avec une <a href="/abonnement/">formule</a>.</span></li>
+      <li><strong>La mise en relation</strong><span>Si vous êtes d’accord tous les deux, je vous mets en contact. Ton numéro reste chez moi jusque-là. Les matchs sont gratuits. Pour aller plus vite et soutenir le live, il y a les <a href="/abonnement/">formules</a>.</span></li>
       <li><strong>Je vous suis</strong><span>Je prends des nouvelles après la rencontre. Si ça ne colle pas, on clôt le match avec respect et ton profil revient en attente pour une nouvelle chance.</span></li>
     </ol>
     <p class="po-actions"><a class="po-btn" href="/rencontres/#confier"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> Créer mon profil</a><a class="po-btn-verre" href="/rencontres/#profils-anonymes">Voir les profils anonymes</a></p>
@@ -1205,7 +1212,7 @@ page(
 <section class="conf-panneau" data-panneau="annonce" id="annonce" hidden>
   <div class="conf-form">
     <h2>Trouver mon âme sœur avec Lamia</h2>
-    <p>Tu cherches quelqu’un de sérieux pour construire ta vie ? Présente-toi avec ton cœur et dis qui tu aimerais rencontrer. Ton profil n’est jamais publié : Lamia le vérifie, le passe dans son outil de matching et te dit avec combien de personnes tu pourrais correspondre. Pour les découvrir, tu lui écris. La première mise en relation est offerte.</p>
+    <p>Tu cherches quelqu’un de sérieux pour construire ta vie ? Présente-toi avec ton cœur et dis qui tu aimerais rencontrer. Ton profil n’est jamais publié : Lamia le vérifie, le passe dans son outil de matching et te dit avec combien de personnes tu pourrais correspondre. Pour les découvrir, tu lui écris. Les matchs sont gratuits.</p>
     <div data-annonce-box></div>
   </div>
 </section>
@@ -1423,7 +1430,7 @@ page(
 
   <section class="cl-reglages" data-annonces-vue hidden>
     <h2>Annonces de rencontre</h2>
-    <p class="cl-aide">Les profils ne sont jamais publiés. 1) Vérifie le profil (et la pièce d’identité si la personne l’a donnée : elle est facultative), puis « Valider » : la pièce est supprimée, et le profil garde le badge « vérifié avec pièce d’identité ». 2) Exporte vers ton outil et fais le matching. 3) Indique le nombre de profils compatibles et « Envoyer le résultat » : la personne reçoit ce nombre par email (sans savoir qui), avec l’invitation à t’écrire (première mise en relation offerte, ensuite abonnement).</p>
+    <p class="cl-aide">Les profils ne sont jamais publiés. 1) Vérifie le profil (et la pièce d’identité si la personne l’a donnée : elle est facultative), puis « Valider » : la pièce est supprimée, et le profil garde le badge « vérifié avec pièce d’identité ». 2) Exporte vers ton outil et fais le matching. 3) Indique le nombre de profils compatibles et « Envoyer le résultat » : la personne reçoit ce nombre par email (sans savoir qui), avec l’invitation à t’écrire (matchs gratuits, formules pour aller plus vite).</p>
         <div class="cl-carte cl-export">
       <h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#camera"/></svg> Profils sans leurs photos <span data-n-sans-photos></span></h3>
       <p class="cl-aide">Tant qu’il manque 2 photos, la personne voit une demande dans l’application et ne peut ni swiper ni répondre. Le bouton lui envoie aussi une notification sur son téléphone, une seule fois, si elle les a activées.</p>
@@ -1517,8 +1524,9 @@ page(
     description: 'Parcours les profils kabyles vérifiés par Lamia, de façon anonyme. France, Algérie, Maghreb, Canada, Europe. Tu choisis, elle vous présente.',
     path: '/rencontres/',
     room: roomBySlug.patio,
-    scripts: ['/assets/annonces.js'],
+    scripts: ['/assets/annonces.js', '/assets/swipe-accueil.js'],
     body: `<div class="po-app">
+${SWIPE_INVITE}
 <section class="po-hero" aria-labelledby="po-titre">
   <div class="po-fond" aria-hidden="true"></div>
   <div class="po-hero-grid">
@@ -1537,18 +1545,18 @@ page(
 <section class="room-body patio-body po-corps">
   <div class="annonce-retrait" data-annonce-retrait hidden></div>
   <div class="annonce-box" id="confier" data-annonce-box hidden></div>
-  <div class="patio-etapes po-panel" id="annonces">
-    <h2>Comment ça marche</h2>
+  <details class="patio-etapes po-panel po-replie" id="annonces">
+    <summary><h2>Comment ça marche</h2></summary>
     <ol>
       <li><strong>Tu crées ton profil</strong><span>En 5 minutes : qui tu es, qui tu cherches, 2 photos. Ton identité n’est jamais publiée.</span></li>
       <li><strong>Lamia vérifie</strong><span>Elle vérifie ton profil. Son outil compare les profils, et c’est elle qui choisit. Ta pièce d’identité est facultative : si tu la donnes, ton profil porte le badge renforcé.</span></li>
       <li><strong>Tu sais combien te correspondent</strong><span>Lamia te dit avec combien de personnes tu pourrais correspondre. Personne ne sait qui matche avec qui.</span></li>
-      <li><strong>Lamia vous présente</strong><span>Si vous êtes d’accord tous les deux, elle vous met en contact. Ton numéro reste chez elle jusque-là. La première fois, c’est offert.</span></li>
+      <li><strong>Lamia vous présente</strong><span>Si vous êtes d’accord tous les deux, elle vous met en contact. Ton numéro reste chez elle jusque-là. C’est gratuit.</span></li>
     </ol>
     <p class="po-actions"><button type="button" class="po-btn" data-annonce-ouvrir data-cta-profil aria-expanded="false"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> <span>Créer mon profil ou connexion</span></button></p>
-  </div>
-  <div class="patio-etapes po-panel" id="questions">
-    <h2>Tes questions</h2>
+  </details>
+  <details class="patio-etapes po-panel po-replie" id="questions">
+    <summary><h2>Tes questions</h2></summary>
     <ol>
       <li><strong>Mon nom est-il visible ?</strong><span>Non. Sur les profils, on ne voit ni prénom, ni photo, ni contact : seulement un numéro de profil.</span></li>
       <li><strong>Pourquoi 2 photos ?</strong><span>Lamia en a besoin pour vérifier ton profil et écarter les faux profils. Tes photos ne s’affichent pas sur les profils publics.</span></li>
@@ -1556,14 +1564,16 @@ page(
       <li><strong>Que se passe-t-il quand nous sommes d’accord tous les deux ?</strong><span>Lamia vous présente, et une discussion privée de 7 jours s’ouvre dans votre espace. Vous échangez vos numéros ensuite.</span></li>
       <li><strong>Le site est-il réservé aux Kabyles ?</strong><span>Non. Lamia est marieuse kabyle, et les rencontres sont aussi ouvertes aux Chaouis, aux Touaregs, aux autres Amazighs et aux personnes d’autres origines. Chacun indique son origine sur son profil.</span></li>
       <li><strong>D’où viennent les profils ?</strong><span>De France, d’Algérie, du Canada, d’Europe et d’ailleurs. <a class="text-link" href="/rencontre-kabyle-canada/">Canada</a> · <a class="text-link" href="/rencontre-kabyle-algerie/">Algérie</a> · <a class="text-link" href="/rencontre-kabyle-europe/">Belgique et Europe</a></span></li>
-      <li><strong>Je vis en Algérie, comment faire ?</strong><span>Ton profil et ton premier match sont gratuits. Le paiement en ligne n’y est pas possible : <a class="text-link" href="/salon/">viens au live</a>, chaque soir à 21 h, pour d’autres matchs.</span></li>
-      <li><strong>Combien ça coûte ?</strong><span>Découverte est gratuite et ton premier match est offert. <a class="text-link" href="/abonnement/">Voir toutes les formules</a>.</span></li>
+      <li><strong>Combien ça coûte ?</strong><span>Rien : ton profil et tes matchs sont gratuits, 1 match à la fois. Pour aller plus vite, <a class="text-link" href="/abonnement/">prends une formule</a>.</span></li>
+      <li><strong>Comment soutenir Lamia ?</strong><span><a class="text-link" href="/salon/">Viens au live</a>, partage-le, et abonne-toi si tu peux. Depuis l’Algérie, le paiement en ligne n’est pas possible : ta présence au live compte autant.</span></li>
     </ol>
-  </div>
-  <h2 class="annonces-titre" id="profils-anonymes">Les profils vérifiés</h2>
+  </details>
+  <details class="po-replie po-replie-liste" id="profils-liste">
+  <summary><h2 class="annonces-titre">Les profils vérifiés, en liste</h2></summary>
   <p class="annonces-sous">Ni prénom, ni photo, ni contact. Un profil te touche ? Clique sur « Ce profil m’intéresse » : Lamia regarde si vous pouvez correspondre. Ton identité reste secrète : on ne voit que des numéros de profil.</p>
   <p class="po-actions btn-swipe"><a class="po-btn" href="/rencontres/swipe/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Swiper les profils, un par un</a></p>
   <div class="annonces-liste" data-annonces-liste><p class="annonce-vide">Les profils arrivent…</p></div>
+  </details>
   <div class="accueil-duo">
     <a class="abo-carte accueil-carte" href="/speed-dating/"><h3>Speed dating en ligne</h3><p>Des soirées en visio par tranche d’âge, caméra allumée, avec Lamia qui veille.</p><span class="po-btn-verre">Voir les prochaines soirées</span></a>
     <a class="abo-carte accueil-carte" href="/salon/"><h3>Le live, chaque soir à 21 h</h3><p>Les annonces de mariage présentées en direct, sur toutes les plateformes.</p><span class="po-btn-verre">Le live et mes outils</span></a>
@@ -1629,7 +1639,7 @@ page(
       <h1 id="abo-titre">Les formules de rencontre kabyle</h1>
       <p class="po-sub">En gratuit, un match à la fois : dès qu’il se termine, un autre peut commencer.</p>
       <p class="po-lead">Ou choisis le rythme qui te ressemble : 10 matchs par mois et 2 en cours, ou illimités et 5 en cours, avec le coaching et l’option mariage de Lamia. Sans engagement, résiliable en un clic depuis ton espace.</p>
-      <p class="po-lead">Tu vis en Algérie ? Le paiement en ligne n’y est pas possible : <a class="text-link" href="/salon/">viens au live</a>, chaque soir à 21 h, pour d’autres matchs.</p>
+      <p class="po-lead">Les matchs sont gratuits pour tout le monde. Pour soutenir Lamia, <a class="text-link" href="/salon/">viens au live</a> : depuis l’Algérie, où le paiement en ligne n’est pas possible, ta présence compte autant.</p>
     </div>
     <figure class="po-lamia"><img src="/images/lamia/lamia-portrait-tatouages-rond-480.webp" alt="Lamia Femme Berbère" width="200" height="200"><figcaption>Lamia · ta marieuse</figcaption></figure>
   </div>

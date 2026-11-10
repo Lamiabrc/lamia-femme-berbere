@@ -4036,12 +4036,58 @@ html[dir="rtl"], html[dir="rtl"] body { overflow-x: clip; }
 /* Accueil : le swipe d'abord, même sans compte. */
 .accueil-swipe { padding: 84px 0 8px; }
 .accueil-swipe + .accueil-hero { padding-top: 28px; }
-.accueil-swipe-titre { text-align: center; color: #E9DFFA; font-weight: 600; margin: 0 0 12px; }
-.accueil-swipe .swipe-pile { height: clamp(400px, calc(100svh - 300px), 540px); }
-.accueil-swipe .confirmer-lien { color: #E9DFFA; }
+.accueil-swipe-titre { text-align: center; color: #2F2B3D; font-weight: 600; margin: 0 0 12px; }
+.accueil-swipe .swipe-pile { height: clamp(330px, calc(100svh - 390px), 540px); }
+.accueil-swipe .confirmer-lien { color: #6B5B95; }
 .swipe-choix { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
 .swipe-choix button { padding: 18px 8px; border-radius: 18px; border: 2px solid #C9BCE8; background: #EFE9F7; color: #2F2B3D; font: inherit; font-size: 1.15rem; font-weight: 700; cursor: pointer; }
 .swipe-choix button:hover { background: #E9DFFA; }
 .swipe-fenetre .swipe-invite-liens { display: grid; gap: 10px; margin-top: 14px; }
 @media (max-width: 760px) { .accueil-swipe { padding-top: 64px; } }
 .swipe-fenetre .confirmer-lien { color: #2F2B3D; }
+
+/* Page Profils : le swipe d'abord ; les explications et la liste sont repliées. */
+.po-replie > summary { cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.po-replie > summary::-webkit-details-marker { display: none; }
+.po-replie > summary::after { content: "+"; flex: none; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; border: 1px solid currentColor; font-size: 22px; line-height: 1; color: #6B5B95; }
+.po-replie[open] > summary::after { content: "–"; }
+.po-replie > summary h2 { margin: 0; }
+.po-replie[open] > summary { margin-bottom: 16px; }
+.po-replie-liste { margin: 0 0 34px; }
+.accueil-swipe.is-membre .swipe-pile { height: auto; min-height: 0; }
+
+/* Plus de bordeaux (demande de Lamia, 10 nov. 2026) : un bordeaux velours, pas trop sombre, sur les boutons principaux, les liens, les repères et le bandeau des valeurs. */
+:root { --bordeaux-lfb: #7A1F35; --bordeaux-lfb-clair: #9A2F48; --bordeaux-velours: linear-gradient(135deg, #8A2640, #6B1A2E 60%, #7A1F35); }
+.po-btn, .abo-carte .po-btn, .ame-soeur-btn, .po-corps .po-btn, .po-app .patio-etapes .ame-soeur-btn, .po-app .ame-soeur-btn:not(.po-hero *) { background: var(--bordeaux-velours) !important; color: #FFF6E6 !important; -webkit-text-fill-color: #FFF6E6; box-shadow: 0 8px 20px rgba(122, 31, 53, .22); }
+.po-btn:hover { background: var(--bordeaux-velours) !important; opacity: .92; }
+.po-btn .ico { color: #F3E0B9; }
+.btn-gold { background: var(--bordeaux-velours); border-color: var(--bordeaux-lfb); color: #FFF6E6; }
+.btn-gold:hover { background: var(--bordeaux-velours); border-color: var(--bordeaux-lfb); color: #FFF6E6; opacity: .92; }
+.po-app .text-link, .po-app a.text-link, .po-corps li a, .po-corps p a { color: var(--bordeaux-lfb); }
+.po-app .po-hero .text-link { color: #fff; }
+.po-corps h2::after, .room-body > h2::after, .annonces-titre::after { background: linear-gradient(90deg, var(--bordeaux-lfb) 0 28px, var(--or) 28px); width: 56px; }
+html[dir="rtl"] .po-corps h2::after, html[dir="rtl"] .room-body > h2::after, html[dir="rtl"] .annonces-titre::after { background: linear-gradient(270deg, var(--bordeaux-lfb) 0 28px, var(--or) 28px); }
+.po-app.po-app .patio-etapes li::before { background: var(--bordeaux-velours) !important; color: #F3E0B9 !important; }
+.po-replie > summary::after { color: var(--bordeaux-lfb); }
+.abo-ruban { background: var(--bordeaux-velours); color: #FFF6E6; }
+.abo-carte.is-vedette { border-color: var(--bordeaux-lfb); }
+.po-eyebrow { color: var(--bordeaux-lfb); }
+.po-hero .po-eyebrow { color: #F3E0B9; }
+.accueil-swipe-titre { color: var(--bordeaux-lfb); }
+.swipe-choix button { border-color: var(--bordeaux-lfb); background: #FBF1F3; color: var(--bordeaux-lfb); }
+.swipe-choix button:hover { background: var(--bordeaux-velours); color: #FFF6E6; }
+@media (max-width: 760px) { .barre-app a[aria-current="page"], body:has(.swipe-page) .barre-app a[aria-current="page"] { color: var(--bordeaux-lfb); } .barre-app a[aria-current="page"] .ico { color: var(--bordeaux-lfb); fill: rgba(122, 31, 53, .12); } .barre-app a[aria-current="page"]::after { background: var(--bordeaux-lfb); } }
+.lfb-valeurs { margin: 0 auto; padding: 22px clamp(16px, 5vw, 40px) 24px; text-align: center; background: var(--bordeaux-velours); color: #FFF6E6; }
+.lfb-valeurs p { margin: 0 auto; max-width: 620px; }
+.lfb-valeurs-titre { font-family: var(--serif); font-size: clamp(21px, 3.4vw, 28px); font-weight: 600; line-height: 1.2; color: #F3E0B9; }
+.lfb-valeurs-mots { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 12px auto !important; }
+.lfb-valeurs-mots span { padding: 5px 14px; border-radius: 999px; border: 1px solid rgba(243, 224, 185, .7); color: #F3E0B9; font-weight: 600; font-size: 14px; letter-spacing: .04em; text-transform: uppercase; }
+.lfb-valeurs-texte { font-size: 15.5px; line-height: 1.5; }
+.po-app .lfb-valeurs p.lfb-valeurs-texte, .lfb-valeurs p.lfb-valeurs-texte { color: #FFF6E6 !important; -webkit-text-fill-color: #FFF6E6; }
+.po-app .lfb-valeurs p.lfb-valeurs-titre, .lfb-valeurs p.lfb-valeurs-titre { color: #F3E0B9 !important; -webkit-text-fill-color: #F3E0B9; }
+.accueil-swipe [hidden] { display: none !important; }
+
+/* Métier et religion sur le devant des cartes. */
+.swipe-page .swipe-metier { margin: 4px 0 0; font-weight: 600; color: #2F2B3D; }
+.swipe-page .swipe-religion { margin: 2px 0 0; font-size: 14.5px; color: #625D72; }
+.annonce-metier { font-weight: 600; }
