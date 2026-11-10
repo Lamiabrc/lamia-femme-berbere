@@ -1,7 +1,7 @@
 // Accueil : le swipe tout de suite, même sans compte. Une fenêtre demande « un homme ou une femme ? »,
 // puis les profils anonymes défilent un par un. Le cœur demande un profil : sans profil, pas de match.
 import { api, esc, PUBLIC_KEY } from './confidences-commun.js';
-import { lib, secteurLisible, origineLisible } from './matching-options.mjs';
+import { lib, secteurLisible, origineLisible, metierEtReligion } from './matching-options.mjs';
 import { createClient } from '/vendor/supabase.mjs';
 
 const bloc = document.querySelector('[data-swipe-accueil]');
@@ -36,6 +36,7 @@ function demander() {
 
 function carte(a) {
   const femme = a.genre === 'femme';
+  const mr = metierEtReligion(a);
   const infos = [a.pays && lib(a.pays), a.situation && lib(a.situation), a.enfants === 'Oui' ? 'avec enfant(s)' : a.enfants === 'Non' ? 'sans enfant' : '', a.etudes && `études : ${lib(a.etudes).toLowerCase()}`].filter(Boolean);
   const ages = a.age_min || a.age_max ? ` (${a.age_min || 18} à ${a.age_max || 99} ans)` : '';
   const lieu = a.ville || (a.pays && lib(a.pays)) || '';
@@ -48,6 +49,8 @@ function carte(a) {
       ${lieu ? `<p class="swipe-lieu">${esc(lieu)}</p>` : ''}
       ${origineLisible(a.origine) ? `<p class="swipe-origine">${esc(origineLisible(a.origine))}</p>` : ''}
       ${a.village ? `<p class="swipe-village">Originaire de ${esc(a.village)}</p>` : ''}
+      ${mr.metier ? `<p class="swipe-metier">${esc(mr.metier)}</p>` : ''}
+      ${mr.religion ? `<p class="swipe-religion">${esc(mr.religion)}</p>` : ''}
       <p class="swipe-statut"><span aria-hidden="true">✓</span> ${a.piece_identite ? 'Vérifié avec pièce d’identité' : 'Profil vérifié'}</p>
       <button type="button" class="swipe-voir" data-voir aria-expanded="false">Voir le profil</button>
     </div>

@@ -184,6 +184,12 @@ export function versOutil(a, { photoDataUrl = '', aujourdHui = new Date() } = {}
   };
 }
 
+// Sur le devant d'une carte : le métier (ou secteur d'activité) et la religion, quand la personne les a donnés.
+export function metierEtReligion(a) {
+  const religion = a?.religion === 'Autre' ? (a.religion_texte || '') : a?.religion ? lib(a.religion) : '';
+  return { metier: String(a?.metier || '').trim(), religion: String(religion || '').trim() };
+}
+
 // Religion, pratique et mode de vie (tabac, alcool, chique, sport, le reste en quelques mots).
 export function foiEtVie(a) {
   const esc = (x) => String(x ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
