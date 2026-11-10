@@ -64,3 +64,24 @@ export function piecesHtml(files = []) {
     return `<a class="conf-doc" href="${esc(f.url)}" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="/icones.svg#file-text"/></svg> ${esc(f.original_name || 'Document')} <small>${taille(f.size_bytes)}</small></a>`;
   }).join('');
 }
+
+// Matchs en cours au complet : avec qui (prénom s'il est partagé, sinon numéro de profil), pour proposer de dématcher ou de s'abonner.
+export async function matchsOuverts(token) {
+  try { const r = await api({ action: 'annonce_discussions' }, token); return (r.discussions || []).filter((d) => d.ouverte && !d.dematch); } catch { return []; }
+}
+export const SECURITE_APPLI = 'Reste sur l’application tant que tu n’es pas sûr·e : ton numéro et tes réseaux restent protégés.';
+export function matchPleinHtml(ouverts, { formule = '', algerie = false } = {}) {
+  const noms = ouverts.map((d) => `<strong>${esc(d.avec)}</strong>`);
+  const avec = noms.length ? noms.join(noms.length > 2 ? ', ' : ' et ') : '';
+  const dematch = ouverts.length === 1
+    ? `<a class="po-btn" href="/mon-espace/#dematcher-${encodeURIComponent(ouverts[0].id)}">Dématcher avec ${esc(ouverts[0].avec)}</a>`
+    : '<a class="po-btn" href="/mon-espace/#discussion">Choisir le match à terminer</a>';
+  const abo = algerie
+    ? '<p>Tu vis en Algérie : pour un match de plus, <a class="text-link" href="/salon/">viens au live de Lamia</a>.</p>'
+    : formule === 'prestige' ? ''
+      : `<p>Tu veux garder ${ouverts.length > 1 ? 'tes matchs' : 'ce match'} <em>et</em> dire oui à ce profil ? <a class="text-link" href="/abonnement/${formule === 'passion' ? '?formule=prestige' : ''}">${formule === 'passion' ? 'Prestige : 5 matchs en même temps' : 'Avec une formule, plusieurs matchs en même temps (2 avec Passion, 5 avec Prestige)'}</a>.</p>`;
+  return `<h2>Tu es déjà en match${avec ? ` avec ${avec}` : ''}</h2>
+    ${ouverts.length ? `<p>${ouverts.length > 1 ? 'Ces matchs n’étaient pas assez bien pour toi ?' : 'Ce match n’était pas assez bien pour toi ?'} Pour dire oui à ce profil, dématche d’abord, avec élégance : tu choisis la raison et vous avez chacun deux messages pour vous dire au revoir.</p><p class="po-actions">${dematch}</p>` : '<p>Mets fin à un match depuis ton espace pour dire oui à ce profil.</p><p class="po-actions"><a class="po-btn" href="/mon-espace/">Mon espace</a></p>'}
+    ${abo}
+    <p class="swipe-securite">${SECURITE_APPLI}</p>`;
+}

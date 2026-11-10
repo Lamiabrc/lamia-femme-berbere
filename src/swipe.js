@@ -2,13 +2,14 @@
 // Anonyme : on ne voit que des numéros de profil. Quand deux personnes se choisissent, Lamia est alertée et fait la mise en relation.
 // Swipe sans limite. Matchs en même temps : 1 en Découverte (Lamia en débloque d'autres en live), 3 avec une formule.
 // « Qui m'a choisi·e » (Passion, Prestige) : ces profils passent en tête.
-import { api, esc, PUBLIC_KEY } from './confidences-commun.js';
+import { api, esc, PUBLIC_KEY, matchsOuverts, matchPleinHtml } from './confidences-commun.js';
 import { O, lib, secteurLisible, foiEtVie, badgesProfil, origineLisible } from './matching-options.mjs';
 import { createClient } from '/vendor/supabase.mjs';
 
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', PUBLIC_KEY);
 const zone = document.querySelector('[data-swipe]');
 const compteur = document.querySelector('[data-swipe-compteur]');
+let infosAbo = {};
 let tour = 1, tourAnnonce = false, dejaCharge = false, enRecharge = false, envoi = Promise.resolve(), tous = [], profils = [], token = null, occupe = false, quota = { limite: null, restants: null }, choisi = { nombre: 0, refs: [] }, matchs = { actifs: 0, limite: 1, formule: 'decouverte' }, dernier = null, coeurs = 0;
 const bandeau = document.querySelector('[data-swipe-infos]');
 
@@ -179,9 +180,11 @@ function celebrerMatch(ref) {
   const r = d.querySelector('.swipe-fenetre-boite').getBoundingClientRect();
   for (let k = 0; k < 3; k += 1) setTimeout(() => eclat(r.left + r.width / 2, r.top + 60, ['', '', '', '', ''], 22), k * 280);
 }
-function limiteAtteinte() {
+// Matchs au complet : avec qui, l'invitation à dématcher (raisons ouvertes dans l'espace) et l'abonnement pour plusieurs matchs.
+async function limiteAtteinte() {
   vibrer(80);
-  return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg></p><h2>Tes matchs en cours sont au complet</h2><p>Tu peux continuer à découvrir les profils. Pour choisir quelqu’un d’autre, mets fin à un match depuis ton espace, ou passe à une formule qui en permet plus : <strong>2 en cours avec Passion, 5 avec Prestige</strong>.</p><p class="po-actions"><a class="po-btn-verre" href="/mon-espace/">Mon espace</a><a class="po-btn-verre" href="/abonnement/">Voir les formules</a></p>`);
+  const ouverts = token ? await matchsOuverts(token) : [];
+  return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg></p>${matchPleinHtml(ouverts, infosAbo)}`);
 }
 // Toujours à portée de main pendant le swipe : s'abonner, ou monter en Prestige.
 function boutonAbo(formule, algerie) {
@@ -301,6 +304,7 @@ addEventListener('keydown', (e) => { if (document.querySelector('.swipe-fenetre'
     let formule, algerie;
     ({ profils: tous, quota, choisi, matchs = matchs, adresse, formule, algerie } = await api({ action: 'annonce_swipe_liste' }, token));
     boutonAbo(formule, algerie);
+    infosAbo = { formule, algerie };
     dejaCharge = true;
     const salut = document.querySelector('[data-swipe-adresse]');
     if (salut && adresse) { salut.textContent = adresse; salut.hidden = false; }

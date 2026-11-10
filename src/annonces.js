@@ -1,5 +1,5 @@
 // Annonces de rencontre : dépôt (Patio et Confidences) et affichage des annonces vérifiées par Lamia.
-import { api, esc, PUBLIC_KEY, creerCompte } from './confidences-commun.js';
+import { api, esc, PUBLIC_KEY, creerCompte, matchsOuverts, SECURITE_APPLI } from './confidences-commun.js';
 import { O, lib, secteurLisible, telephoneNormal, foiEtVie, badgesProfil, origineLisible } from './matching-options.mjs';
 import { createClient } from '/vendor/supabase.mjs';
 
@@ -492,7 +492,11 @@ async function interesse(ref) {
       return;
     } catch (err) {
       if (err.code === 'en_match') return montrerMessage(ERR.en_match, true);
-      if (err.code === 'limite_matchs') return montrerMessage(ERR.limite_matchs, true);
+      if (err.code === 'limite_matchs') {
+        const o = await matchsOuverts(s.access_token);
+        if (o.length === 1) { montrerMessage(`Tu es déjà en match avec ${o[0].avec}. Ce match n’était pas assez bien pour toi ? Tu vas pouvoir dématcher, ou prendre une formule pour plusieurs matchs en même temps. ${SECURITE_APPLI}`, true); setTimeout(() => { location.href = `/mon-espace/#dematcher-${encodeURIComponent(o[0].id)}`; }, 4500); return; }
+        return montrerMessage(ERR.limite_matchs, true);
+      }
       if (err.code === 'quota_matchs') return montrerMessage(ERR.quota_matchs, true);
       if (err.code !== 'pas_de_profil') return montrerMessage('La demande n’a pas pu partir. Réessaie dans un instant.', true);
     }

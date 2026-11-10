@@ -4018,3 +4018,6 @@ html[dir="rtl"], html[dir="rtl"] body { overflow-x: clip; }
 .swipe-abo + .swipe-infos, .swipe-abo ~ .swipe-adresse { scroll-margin-top: 130px; }
 .po-app .swipe-abo-btn, .swipe-abo-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 999px; background: #252B78; color: #FFFFFF !important; font-weight: 700; font-size: 15px; text-decoration: none !important; box-shadow: 0 6px 18px rgba(28, 32, 89, .25); border: 1.5px solid #C9A24A; }
 .swipe-abo-btn .ico { width: 18px; height: 18px; color: #E8D6B5; }
+
+.swipe-securite{font-size:.85em;opacity:.8;margin-top:.6em}
+.swipe-securite::before{content:"🔒 "}
