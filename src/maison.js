@@ -823,9 +823,9 @@ renderSocials();
       'Touche le bouton Partager : le carré avec une flèche vers le haut (en bas de l’écran, ou en haut à droite sur iPad).',
       'Fais défiler et choisis « Sur l’écran d’accueil », puis touche « Ajouter » en haut à droite.',
       'L’icône « LFB » apparaît sur ton écran d’accueil : ouvre-la depuis là.'], copier: iosAutre };
-    if (samsung) return { titre: 'Sur Samsung Internet', liste: ['Touche le menu ≡ en bas à droite.', 'Choisis « Ajouter page à », puis « Écran d’accueil ».', 'Confirme : l’icône « Maison Lamia » apparaît sur ton écran d’accueil.'] };
-    if (android) return { titre: 'Sur Android (Chrome)', liste: ['Touche les « ⋮ » en haut à droite de Chrome.', 'Choisis « Installer l’application » (ou « Ajouter à l’écran d’accueil »).', 'Confirme : l’icône « Maison Lamia » apparaît avec tes autres applications.', 'Si rien de tout ça n’apparaît, mets Chrome à jour dans le Play Store, puis réessaie.'] };
-    return { titre: 'Sur ordinateur', liste: ['Dans Chrome ou Edge : clique sur l’icône d’installation (un écran avec une flèche) à droite de la barre d’adresse.', 'Ou ouvre le menu ⋮ puis « Installer La Maison Lamia Femme Berbère… ».', 'Sur téléphone, c’est encore mieux : ouvre lamia-femme-berbere.com/application/ depuis ton téléphone.'] };
+    if (samsung) return { titre: 'Sur Samsung Internet', liste: ['Touche le menu ≡ en bas à droite.', 'Choisis « Ajouter page à », puis « Écran d’accueil ».', 'Confirme : l’icône « LFB » apparaît sur ton écran d’accueil.'] };
+    if (android) return { titre: 'Sur Android (Chrome)', liste: ['Touche les « ⋮ » en haut à droite de Chrome.', 'Choisis « Installer l’application » (ou « Ajouter à l’écran d’accueil »).', 'Confirme : l’icône « LFB » apparaît avec tes autres applications.', 'Si rien de tout ça n’apparaît, mets Chrome à jour dans le Play Store, puis réessaie.', 'Tu viens de désinstaller l’appli ? Ferme Chrome complètement, rouvre cette page, puis recommence : Chrome met parfois quelques minutes à proposer de nouveau l’installation.'] };
+    return { titre: 'Sur ordinateur', liste: ['Dans Chrome ou Edge : clique sur l’icône d’installation (un écran avec une flèche) à droite de la barre d’adresse.', 'Ou ouvre le menu ⋮ puis « Installer LFB… ».', 'Sur téléphone, c’est encore mieux : ouvre lamia-femme-berbere.com/application/ depuis ton téléphone.'] };
   }
   function aide() {
     document.querySelector('.install-aide')?.remove();
