@@ -85,3 +85,13 @@ test('bloquer et signaler : au-delà de 20 signalements par jour, le blocage pas
   assert.ok(h.appels.some((x) => x.u.includes('blocages')));
 });
 
+
+test('un signalement regardé par Lamia sort de la liste : l’action existe et ne touche que les non traités', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const code = await readFile(new URL('../lib/annonces.mjs', import.meta.url), 'utf8');
+  assert.match(code, /action === 'annonce_signalement_traite'/);
+  assert.match(code, /patch\('signalements', `id=eq\.\$\{id\}&traite_at=is\.null`/);
+  const tdb = await readFile(new URL('../public/tableau.js', import.meta.url), 'utf8');
+  assert.match(tdb, /data-signalement-traite/);
+  assert.match(tdb, /href=\\"#profil-\$\{esc\(s\.cible_ref\)\}\\"|href="#profil-\$\{esc\(s\.cible_ref\)\}"/);
+});

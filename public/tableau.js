@@ -144,12 +144,14 @@ async function aFaire() {
     const { a_faire: f } = await r.json();
     const heure = (d) => new Date(d).toLocaleString('fr-FR', { weekday: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
     const MOTIF = (m) => esc(m || 'sans motif donné');
+    // Chaque numéro ouvre le profil : qui c'est, son activité, ses blocages et signalements.
+    const VOIR = (r) => (r ? `<a class="fiche-ref" href="#profil-${esc(r)}">n° ${esc(r)}</a>` : 'n° ?');
     const PRESTA = { 15: 'Visio de 15 min', 30: 'Coaching 30 min et match manuel', 60: 'Sauver mon couple' };
     // Ce qui te concerne : tes coachings, tes soirées, les blocages et signalements.
     const miens = [
       ...(f.coachings || []).map((c) => [`🎥 <b>${esc(PRESTA[c.duree] || 'Coaching')}</b> avec <b>${esc(c.prenom || c.email || '?')}</b>, ${esc(heure(c.debut))}`, '<button class="btn btn-line" type="button" data-tab-aller="coaching">Coaching</button>']),
-      (f.signalements || []).length && [`🚩 <b>${f.signalements.length} signalement(s) à traiter</b> :<br>${f.signalements.map((s) => `n° ${esc(s.cible_ref)} signalé par n° ${esc(s.auteur_ref)} · « ${MOTIF(s.motif)} »`).join('<br>')}`, ''],
-      (f.blocages || []).length && [`🚫 <b>${f.blocages.length} blocage(s) cette semaine</b> :<br>${f.blocages.map((x) => `n° ${esc(x.auteur_ref)} a bloqué n° ${esc(x.cible_ref)} · « ${MOTIF(x.motif)} »`).join('<br>')}`, ''],
+      (f.signalements || []).length && [`🚩 <b>${f.signalements.length} signalement(s) à traiter</b> :<br>${f.signalements.map((s) => `${VOIR(s.cible_ref)} signalé par ${VOIR(s.auteur_ref)} · « ${MOTIF(s.motif)} » <a class="btn btn-line" href="#profil-${esc(s.cible_ref)}">Ouvrir</a> <button type="button" class="btn btn-line" data-signalement-traite="${esc(s.id)}">C’est traité</button>`).join('<br>')}`, ''],
+      (f.blocages || []).length && [`🚫 <b>${f.blocages.length} blocage(s) cette semaine</b> (clique sur un numéro pour ouvrir le profil) :<br>${f.blocages.map((x) => `${VOIR(x.auteur_ref)} a bloqué ${VOIR(x.cible_ref)} · « ${MOTIF(x.motif)} »`).join('<br>')}`, ''],
     ];
     const lignes = [
       ...miens,
@@ -326,7 +328,9 @@ document.addEventListener('click', async (e) => {
   const f = e.target.closest('[data-filtre-journal]');
   if (f) { filtreJournal = f.dataset.filtreJournal; chargerJournal(); return; }
   const o = e.target.closest('[data-journal-ouvrir]');
-  if (o) { const l = o.dataset.journalOuvrir; if (/^\/confidences-lamia\/#(annonces|testeurs)/.test(l)) { aller = l.split('#')[1].startsWith('testeurs') ? 'testeurs' : 'annonces'; const fr = $('[data-rencontres]'); if (fr) fr.removeAttribute('src'); ouvrir('rencontres'); } else window.open(l, '_blank', 'noopener'); return; }
+  if (o) { const l = o.dataset.journalOuvrir; if (/^\/confidences-lamia\/#(annonces|testeurs)/.test(l)) { aller = l.split('#')[1].startsWith('testeurs') ? 'testeurs' : 'annonces'; const fr = $('[data-rencontres]'); if (fr) fr.removeAttribute('src'); ouvrir('rencontres'); } else if (/^\/tableau-de-bord\/?#/.test(l)) { const h = l.slice(l.indexOf('#')); if (location.hash === h) suivreHashProfil(); else location.hash = h; } else window.open(l, '_blank', 'noopener'); return; }
+  const st = e.target.closest('[data-signalement-traite]');
+  if (st) { try { await conf({ action: 'annonce_signalement_traite', id: st.dataset.signalementTraite }); message('Signalement noté comme traité.'); aFaire(); } catch { message('Le signalement n’a pas pu être noté.', true); } return; }
   const ef = e.target.closest('[data-effacement-fait]');
   if (ef) {
     if (!confirm(`Tu as bien supprimé la fiche n° ${ef.dataset.effacementFait} de ton outil ? Son contenu sera aussi effacé du site.`)) return;
@@ -1128,3 +1132,6 @@ document.addEventListener('click', async (e) => {
 
 // Un bouton de la liste « À faire » qui ouvre directement un onglet.
 document.addEventListener('click', (e) => { const b = e.target.closest('[data-tab-aller]'); if (b) ouvrir(b.dataset.tabAller); });
+
+// Un numéro de profil déjà ouvert une fois se rouvre au clic (l'adresse ne change pas, donc pas de « hashchange »).
+document.addEventListener('click', (e) => { const a = e.target.closest('a[href^="#profil-"]'); if (a && token && location.hash === a.getAttribute('href')) { e.preventDefault(); suivreHashProfil(); } });
