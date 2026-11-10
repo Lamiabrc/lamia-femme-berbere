@@ -271,3 +271,13 @@ test('pause : sans annonce ni fiche, rien à mettre en pause', async () => {
   const r = await handleAnnonces('annonce_pause', { pause: true }, ctx(NINA));
   assert.equal(r.status, 404);
 });
+test('cœur avec message : sans crédit, rien ne part (402) ; message vide refusé', async () => {
+  const { ctx, db } = monde();
+  db.annonces.push({ id: 'a1', ref: 21, user_id: 'u1', email: 'nina@example.com', status: 'publiee', prenom: 'Nina', genre: 'femme', en_match: false, matchs_bonus: 0 });
+  const nina = { id: 'u1', email: 'nina@example.com' };
+  let r = await handleAnnonces('annonce_swipe', { ref: 31, choix: 'oui', message: ' ' }, ctx(nina, 'decouverte'));
+  assert.equal(r.status, 400);
+  r = await handleAnnonces('annonce_swipe', { ref: 31, choix: 'oui', message: 'Ta fiche m’a touchée' }, ctx(nina, 'decouverte'));
+  assert.equal(r.status, 402);
+  assert.equal((await r.json()).error, 'coeur_requis');
+});

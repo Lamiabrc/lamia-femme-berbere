@@ -4021,3 +4021,9 @@ html[dir="rtl"], html[dir="rtl"] body { overflow-x: clip; }
 
 .swipe-securite{font-size:.85em;opacity:.8;margin-top:.6em}
 .swipe-securite::before{content:"🔒 "}
+
+.swipe-coeur-mot{margin:2.8em .8em 0;padding:.6em .9em;border-radius:14px;background:#fff4e0;color:#2b2540;font-style:italic;font-size:.95em;line-height:1.35;text-align:left}
+.swipe-boutons .swipe-mot{font-size:1.5rem}
+.swipe-mot-champ{display:block;text-align:left;margin:.6em 0}
+.swipe-mot-champ textarea{display:block;width:100%;margin-top:.4em;padding:.6em;border-radius:12px;border:1px solid #d9cfe8;font:inherit}
+.swipe-mot-credits{font-size:.85em;opacity:.75}

@@ -80,7 +80,7 @@ test('notification Stripe : abonnement enregistré une seule fois, puis mis à j
 test('état : crédits à l’unité restants', async () => {
   const fetcher = async (u) => ({ ok: true, json: async () => (u.includes('achats_unite') ? [{ type: 'mise_en_relation', quantite: 3, utilisees: 1 }, { type: 'speed_dating', quantite: 1, utilisees: 1 }] : []) });
   const e = await etatAbonnement('a@b.fr', { env, fetcher });
-  assert.deepEqual(e.unites, { mise_en_relation: 2, speed_dating: 0, coaching: 0, coaching_30: 0, sauver_couple: 0, live_priorite: 0 });
+  assert.deepEqual(e.unites, { mise_en_relation: 2, speed_dating: 0, coaching: 0, coaching_30: 0, sauver_couple: 0, live_priorite: 0, coeur_message: 0 });
   assert.equal(e.abonnement, null);
 });
 test('retour de paiement : la session est relue chez Stripe puis enregistrée', async () => {

@@ -9,7 +9,7 @@ import { createClient } from '/vendor/supabase.mjs';
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', PUBLIC_KEY);
 const zone = document.querySelector('[data-swipe]');
 const compteur = document.querySelector('[data-swipe-compteur]');
-let infosAbo = {};
+let infosAbo = {}, creditsCoeur = 0;
 let tour = 1, tourAnnonce = false, dejaCharge = false, enRecharge = false, envoi = Promise.resolve(), tous = [], profils = [], token = null, occupe = false, quota = { limite: null, restants: null }, choisi = { nombre: 0, refs: [] }, matchs = { actifs: 0, limite: 1, formule: 'decouverte' }, dernier = null, coeurs = 0;
 const bandeau = document.querySelector('[data-swipe-infos]');
 
@@ -25,6 +25,7 @@ function carte(a) {
   const lieu = a.ville || (a.pays && lib(a.pays)) || '';
   return `<article class="swipe-carte" data-ref="${a.ref}">
     <span class="swipe-tampon is-oui" aria-hidden="true">Intéressé·e</span><span class="swipe-tampon is-non" aria-hidden="true">Pas pour moi</span>
+    ${a.coeur_message ? `<p class="swipe-coeur-mot"><span aria-hidden="true">💌</span> « ${esc(a.coeur_message)} »</p>` : ''}
     ${a.ta_choisi ? '<span class="swipe-ta-choisi"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Ce profil t’a choisi·e</span>' : ''}
     ${a.revu ? '<span class="swipe-ta-choisi">Tu l’as déjà passé : une seconde chance ?</span>' : a.hors_criteres ? '<span class="swipe-ta-choisi"><svg class="ico" aria-hidden="true"><use href="/icones.svg#globe"/></svg> Un peu hors de tes critères</span>' : ''}
     <div class="swipe-resume">
@@ -240,7 +241,7 @@ function restaurerDernier() {
 }
 const majAnnuler = () => { const b = document.querySelector('[data-swipe-annuler]'); if (b) b.disabled = !dernier; };
 
-async function choisir(choix) {
+async function choisir(choix, message) {
   if (occupe || !profils.length) return;
   occupe = true;
   const el = zone.querySelector(`.swipe-carte[data-ref="${profils[0].ref}"]`);
@@ -254,10 +255,11 @@ async function choisir(choix) {
     window.lfbEvent?.('swipe_interesse');
   } else vibrer(8);
   dernier = { profil, choix }; garderDernier(); majAnnuler();
-  envoi = api({ action: 'annonce_swipe', ref, choix }, token).then((r) => {
+  envoi = api({ action: 'annonce_swipe', ref, choix, ...(message ? { message } : {}) }, token).then((r) => {
+    if (message) { creditsCoeur = Math.max(0, creditsCoeur - 1); try { localStorage.removeItem(`lfb-coeur-${ref}`); } catch { /* */ } toast('💌 Ton cœur et ton message sont partis'); }
     if (r?.matchs) { matchs = { ...matchs, ...r.matchs }; infos(); }
     if (r?.match) { dernier = null; majAnnuler(); celebrerMatch(r.ref); }
-  }).catch((err) => { if (err.code === 'quota_matchs') return quotaAtteint(err); if (err.code === 'limite_matchs') { matchs = { ...matchs, actifs: err.actifs ?? matchs.limite }; infos(); limiteAtteinte(); } });
+  }).catch((err) => { if (err.code === 'coeur_requis') { creditsCoeur = 0; return toast('Ton cœur avec message n’est pas parti : il te faut un crédit. Ton choix n’a pas été enregistré.'); } if (err.code === 'quota_matchs') return quotaAtteint(err); if (err.code === 'limite_matchs') { matchs = { ...matchs, actifs: err.actifs ?? matchs.limite }; infos(); limiteAtteinte(); } });
   await new Promise((r) => setTimeout(r, 300));
   profils.shift();
   tous = tous.filter((p) => p.ref !== ref);
@@ -292,6 +294,39 @@ function glisser(el) {
 
 document.querySelector('[data-swipe-non]').addEventListener('click', () => choisir('non'));
 document.querySelector('[data-swipe-oui]').addEventListener('click', () => choisir('oui'));
+// Cœur avec message (2 €) : une phrase qui part avec le cœur. Sans crédit, on l'achète ; le brouillon est gardé sur ce téléphone.
+document.querySelector('[data-swipe-mot]')?.addEventListener('click', () => {
+  if (occupe || !profils.length) return;
+  const ref = profils[0].ref;
+  let brouillon = '';
+  try { brouillon = localStorage.getItem(`lfb-coeur-${ref}`) || ''; } catch { /* */ }
+  const algerie = infosAbo.algerie;
+  const d = fenetre(`<h2>💌 Un cœur avec un message</h2>
+    <p>Ta phrase part avec ton cœur. Ton profil passe en tête de sa pile, ta phrase affichée. Ça reste anonyme : numéros, liens et réseaux sont masqués.</p>
+    <label class="swipe-mot-champ">Ton message au profil n° ${esc(ref)}<textarea data-mot rows="3" maxlength="200" placeholder="Ex. : Ta fiche m’a touché·e, surtout ce que tu dis sur la famille.">${esc(brouillon)}</textarea></label>
+    ${creditsCoeur > 0
+      ? `<p class="po-actions"><button type="button" class="po-btn" data-mot-envoyer>Envoyer mon cœur</button></p><p class="swipe-mot-credits">${creditsCoeur} cœur${creditsCoeur > 1 ? 's' : ''} avec message disponible${creditsCoeur > 1 ? 's' : ''}</p>`
+      : algerie ? '<p>Le paiement en ligne n’est pas possible depuis l’Algérie : envoie un cœur simple, ou viens au live de Lamia.</p>'
+        : '<label class="swipe-case"><input type="checkbox" data-mot-cgv> J’accepte les <a class="text-link" href="/cgv/" target="_blank">conditions de vente</a></label><p class="po-actions"><button type="button" class="po-btn" data-mot-acheter>Envoyer pour 2 €</button></p><p class="swipe-mot-credits">Après le paiement, reviens ici : ton message t’attend.</p>'}`);
+  const champ = d.querySelector('[data-mot]');
+  champ.addEventListener('input', () => { try { localStorage.setItem(`lfb-coeur-${ref}`, champ.value); } catch { /* */ } });
+  d.querySelector('[data-mot-envoyer]')?.addEventListener('click', () => {
+    const texte = champ.value.trim();
+    if (texte.length < 2) { champ.focus(); return; }
+    d.remove(); choisir('oui', texte);
+  });
+  d.querySelector('[data-mot-acheter]')?.addEventListener('click', async (e) => {
+    if (!d.querySelector('[data-mot-cgv]').checked) return toast('Coche les conditions de vente pour continuer.');
+    e.target.disabled = true;
+    try {
+      const r = await fetch('/api/preorder', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ action: 'abonnement_payer', unite: 'coeur_message', cgv_accepted: true }) });
+      const j = await r.json().catch(() => ({}));
+      if (j.url) { location.href = j.url; return; }
+      toast(j.error === 'profil_requis' ? 'Il faut un profil publié pour envoyer un cœur avec message.' : 'Le paiement n’a pas pu s’ouvrir. Réessaie dans un instant.');
+    } catch { toast('Le paiement n’a pas pu s’ouvrir. Réessaie dans un instant.'); }
+    e.target.disabled = false;
+  });
+});
 document.querySelector('[data-swipe-annuler]')?.addEventListener('click', annulerDernier);
 addEventListener('keydown', (e) => { if (document.querySelector('.swipe-fenetre')) return; if (e.key === 'ArrowRight') choisir('oui'); if (e.key === 'ArrowLeft') choisir('non'); if (e.key === 'Backspace') annulerDernier(); });
 
@@ -302,7 +337,9 @@ addEventListener('keydown', (e) => { if (document.querySelector('.swipe-fenetre'
   try {
     let adresse;
     let formule, algerie;
-    ({ profils: tous, quota, choisi, matchs = matchs, adresse, formule, algerie } = await api({ action: 'annonce_swipe_liste' }, token));
+    let liste;
+    ({ profils: tous, quota, choisi, matchs = matchs, adresse, formule, algerie } = liste = await api({ action: 'annonce_swipe_liste' }, token));
+    creditsCoeur = liste.coeurs_message || 0;
     boutonAbo(formule, algerie);
     infosAbo = { formule, algerie };
     dejaCharge = true;

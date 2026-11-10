@@ -27,6 +27,7 @@ export const UNITES = [
   { id: 'prolonger_discussion', nom: 'Prolonger la discussion', prix: 300, jours: 7, depuisEspace: true, texte: '7 jours de plus avec ton match, pour vous deux. Depuis ta discussion, dans Mon espace.' },
   { id: 'profil_avant', nom: 'Profil mis en avant', prix: 500, jours: 7, depuisEspace: true, texte: 'Ton profil passe en tête du swipe pendant 7 jours, auprès des personnes qui correspondent à ses critères.' },
   { id: 'qui_choisi', nom: 'Voir qui t’a choisi·e', prix: 200, heures: 24, depuisEspace: true, texte: 'Les numéros anonymes des profils qui t’ont choisi·e, en tête de ton swipe, pendant 24 heures.' },
+  { id: 'coeur_message', nom: 'Cœur avec message', prix: 200, depuisEspace: true, lien: '/rencontres/swipe/', texte: 'Ton cœur arrive avec une phrase de toi : ton profil passe en tête de sa pile, ta phrase affichée. Anonyme, numéros et liens masqués. Depuis le swipe.' },
   { id: 'photo_match', nom: 'La photo de ton match', prix: 300, heures: 1, depuisEspace: true, texte: 'Visible pendant 1 heure, si ton match accepte de la transmettre. Depuis Mon espace, pendant le match.' },
 ];
 // Visuel de chaque prestation de coaching.
