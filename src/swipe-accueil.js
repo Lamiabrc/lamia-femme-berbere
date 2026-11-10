@@ -139,6 +139,7 @@ if (bloc && pile) {
       const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', PUBLIC_KEY);
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
+        bloc.classList.add('is-membre');
         titre.textContent = 'Tes profils t’attendent';
         pile.innerHTML = '<div class="swipe-message"><h2>Reprends ton swipe</h2><p>Les profils qui te correspondent, tes cœurs et tes matchs.</p><p class="po-actions"><a class="po-btn" href="/rencontres/swipe/">Swiper</a><a class="po-btn-verre" href="/mon-espace/">Mon espace</a></p></div>';
         return;
@@ -149,3 +150,7 @@ if (bloc && pile) {
     if (v) montrer(v); else if (tous.length) demander(); else afficher();
   })();
 }
+
+// Une explication ou la liste repliée s'ouvre quand un lien y mène.
+const deplier = () => { try { const el = location.hash.length > 1 && document.querySelector(location.hash); const d = el?.closest('details'); if (d) d.open = true; } catch { /* */ } };
+deplier(); addEventListener('hashchange', deplier);

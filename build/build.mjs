@@ -311,6 +311,16 @@ globalThis.__pageFr = page;
 // Le Hall
 // Les bijoux des cartes du swipe (page Swipe et accueil).
 const SWIPE_DEFS = `<svg class="swipe-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs><radialGradient id="corail-b" cx="38%" cy="32%" r="70%"><stop offset="0" stop-color="#F08A68"/><stop offset=".6" stop-color="#D2482C"/><stop offset="1" stop-color="#A5301C"/></radialGradient><linearGradient id="or-b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF4B8"/><stop offset=".45" stop-color="#D4B56E"/><stop offset=".62" stop-color="#F3E0B9"/><stop offset="1" stop-color="#8A6414"/></linearGradient><clipPath id="clip-rond"><circle cx="90" cy="92" r="72"/></clipPath><clipPath id="clip-triangle"><path d="M14 44Q90 30 166 44 174 56 168 68L100 190Q90 204 80 190L12 68Q6 56 14 44Z"/></clipPath><g id="pampille"><circle cy="-5" r="3.6" fill="none" stroke="url(#or-b)" stroke-width="1.8"/><circle cy="1" r="3.6" fill="none" stroke="url(#or-b)" stroke-width="1.8"/><path d="M0 4 9 24Q9 36 0 46-9 36-9 24Z" fill="#2F2B3D" stroke="url(#or-b)" stroke-width="2.2" stroke-linejoin="round"/><path d="M0 7 6.5 22Q0 27-6.5 22Z" fill="#D4B56E" stroke="#F3E0B9" stroke-width=".7"/><path d="M0 22Q6 28 4.6 33 0 40-4.6 33-6 28 0 22Z" fill="#F3E0B9" stroke="#F3E0B9" stroke-width=".7"/><circle cy="48" r="4.6" fill="url(#or-b)"/><circle cy="48" r="3" fill="#D4B56E"/></g><g id="bijou-femme"><circle cx="90" cy="0" r="17" fill="none" stroke="url(#or-b)" stroke-width="4.5"/><path d="M46 10L126 -9L136 -13L126 -5.5L47 13Q42 13 46 10Z" fill="url(#or-b)" stroke="#8A6414" stroke-width=".5"/><use href="#pampille" x="48" y="158"/><use href="#pampille" x="90" y="178"/><use href="#pampille" x="132" y="158"/><circle cx="90" cy="92" r="76" fill="none" stroke="url(#or-b)" stroke-width="8"/><circle cx="90" cy="92" r="72" fill="#2F2B3D"/><image href="/images/outil/avatar-femme.webp" x="17" y="19" width="146" height="146" clip-path="url(#clip-rond)" preserveAspectRatio="xMidYMid slice"/><circle cx="90" cy="168" r="11.1" fill="url(#or-b)"/><circle cx="90" cy="168" r="8.5" fill="url(#corail-b)"/><ellipse cx="87.3" cy="164.9" rx="2.2" ry="1.4" fill="#FBC4AE" opacity=".8"/></g><g id="bijou-homme"><circle cx="90" cy="16" r="17" fill="none" stroke="url(#or-b)" stroke-width="4.5"/><path d="M46 26L126 7L136 3L126 10.5L47 29Q42 29 46 26Z" fill="url(#or-b)" stroke="#8A6414" stroke-width=".5"/><use href="#pampille" x="56" y="150"/><use href="#pampille" x="90" y="198"/><use href="#pampille" x="124" y="150"/><path d="M14 44Q90 30 166 44 174 56 168 68L100 190Q90 204 80 190L12 68Q6 56 14 44Z" fill="#2F2B3D"/><image href="/images/outil/avatar-homme.webp" x="-6" y="30" width="190" height="190" clip-path="url(#clip-triangle)" preserveAspectRatio="xMidYMid slice"/><path d="M14 44Q90 30 166 44 174 56 168 68L100 190Q90 204 80 190L12 68Q6 56 14 44Z" fill="none" stroke="url(#or-b)" stroke-width="8" stroke-linejoin="round"/><circle cx="90" cy="192" r="11.1" fill="url(#or-b)"/><circle cx="90" cy="192" r="8.5" fill="url(#corail-b)"/><ellipse cx="87.3" cy="188.9" rx="2.2" ry="1.4" fill="#FBC4AE" opacity=".8"/></g></defs></svg>`;
+// Le swipe ouvert à tous (accueil et page Profils) : src/swipe-accueil.js le fait vivre.
+const SWIPE_INVITE = `<section class="swipe-page accueil-swipe" id="profils-anonymes" data-swipe-accueil aria-label="Les profils">
+  <div class="swipe-app">
+    ${SWIPE_DEFS}
+    <p class="accueil-swipe-titre" data-inv-titre>Les profils vérifiés, un par un</p>
+    <div class="swipe-pile" data-inv-pile><p class="annonce-vide">Les profils arrivent…</p></div>
+    <div class="swipe-boutons" data-inv-boutons hidden><button type="button" data-swipe-non aria-label="Pas pour moi"><svg class="ico" aria-hidden="true"><use href="/icones.svg#croix"/></svg></button><button type="button" data-swipe-oui aria-label="Ce profil m’intéresse"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur-plein"/></svg></button></div>
+    <p class="swipe-aide"><button type="button" class="confirmer-lien" data-inv-changer hidden>Changer : je cherche un homme / une femme</button></p>
+  </div>
+</section>`;
 page(
   '/',
   layout({
@@ -321,15 +331,7 @@ page(
     scripts: ['/assets/annonces.js', '/assets/swipe-accueil.js'],
     body: `<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@graph': [{ '@type': 'Organization', '@id': SITE_URL + '/#organisation', name: 'Lamia Femme Berbère', url: SITE_URL + '/', logo: SITE_URL + '/images/lamia/lamia-portrait-tatouages-rond-480.webp', founder: { '@type': 'Person', name: 'Lamia Bréchet Ighil', url: SITE_URL + '/lamia-brechet/' }, sameAs: ['https://www.tiktok.com/@lamiafemmeberbere', 'https://www.facebook.com/femmeberberes/'] }, { '@type': 'WebSite', '@id': SITE_URL + '/#site', name: 'Lamia Femme Berbère', url: SITE_URL + '/', publisher: { '@id': SITE_URL + '/#organisation' }, inLanguage: ['fr', 'en'] }] })}</script>
 <div class="po-app accueil">
-<section class="swipe-page accueil-swipe" data-swipe-accueil aria-label="Les profils">
-  <div class="swipe-app">
-    ${SWIPE_DEFS}
-    <p class="accueil-swipe-titre" data-inv-titre>Les profils vérifiés, un par un</p>
-    <div class="swipe-pile" data-inv-pile><p class="annonce-vide">Les profils arrivent…</p></div>
-    <div class="swipe-boutons" data-inv-boutons hidden><button type="button" data-swipe-non aria-label="Pas pour moi"><svg class="ico" aria-hidden="true"><use href="/icones.svg#croix"/></svg></button><button type="button" data-swipe-oui aria-label="Ce profil m’intéresse"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur-plein"/></svg></button></div>
-    <p class="swipe-aide"><button type="button" class="confirmer-lien" data-inv-changer hidden>Changer : je cherche un homme / une femme</button></p>
-  </div>
-</section>
+${SWIPE_INVITE}
 <section class="po-hero accueil-hero" aria-labelledby="accueil-titre">
   <div class="po-fond" aria-hidden="true"></div>
   <div class="po-hero-grid">
@@ -1517,8 +1519,9 @@ page(
     description: 'Parcours les profils kabyles vérifiés par Lamia, de façon anonyme. France, Algérie, Maghreb, Canada, Europe. Tu choisis, elle vous présente.',
     path: '/rencontres/',
     room: roomBySlug.patio,
-    scripts: ['/assets/annonces.js'],
+    scripts: ['/assets/annonces.js', '/assets/swipe-accueil.js'],
     body: `<div class="po-app">
+${SWIPE_INVITE}
 <section class="po-hero" aria-labelledby="po-titre">
   <div class="po-fond" aria-hidden="true"></div>
   <div class="po-hero-grid">
@@ -1537,8 +1540,8 @@ page(
 <section class="room-body patio-body po-corps">
   <div class="annonce-retrait" data-annonce-retrait hidden></div>
   <div class="annonce-box" id="confier" data-annonce-box hidden></div>
-  <div class="patio-etapes po-panel" id="annonces">
-    <h2>Comment ça marche</h2>
+  <details class="patio-etapes po-panel po-replie" id="annonces">
+    <summary><h2>Comment ça marche</h2></summary>
     <ol>
       <li><strong>Tu crées ton profil</strong><span>En 5 minutes : qui tu es, qui tu cherches, 2 photos. Ton identité n’est jamais publiée.</span></li>
       <li><strong>Lamia vérifie</strong><span>Elle vérifie ton profil. Son outil compare les profils, et c’est elle qui choisit. Ta pièce d’identité est facultative : si tu la donnes, ton profil porte le badge renforcé.</span></li>
@@ -1546,9 +1549,9 @@ page(
       <li><strong>Lamia vous présente</strong><span>Si vous êtes d’accord tous les deux, elle vous met en contact. Ton numéro reste chez elle jusque-là. La première fois, c’est offert.</span></li>
     </ol>
     <p class="po-actions"><button type="button" class="po-btn" data-annonce-ouvrir data-cta-profil aria-expanded="false"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> <span>Créer mon profil ou connexion</span></button></p>
-  </div>
-  <div class="patio-etapes po-panel" id="questions">
-    <h2>Tes questions</h2>
+  </details>
+  <details class="patio-etapes po-panel po-replie" id="questions">
+    <summary><h2>Tes questions</h2></summary>
     <ol>
       <li><strong>Mon nom est-il visible ?</strong><span>Non. Sur les profils, on ne voit ni prénom, ni photo, ni contact : seulement un numéro de profil.</span></li>
       <li><strong>Pourquoi 2 photos ?</strong><span>Lamia en a besoin pour vérifier ton profil et écarter les faux profils. Tes photos ne s’affichent pas sur les profils publics.</span></li>
@@ -1559,11 +1562,13 @@ page(
       <li><strong>Je vis en Algérie, comment faire ?</strong><span>Ton profil et ton premier match sont gratuits. Le paiement en ligne n’y est pas possible : <a class="text-link" href="/salon/">viens au live</a>, chaque soir à 21 h, pour d’autres matchs.</span></li>
       <li><strong>Combien ça coûte ?</strong><span>Découverte est gratuite et ton premier match est offert. <a class="text-link" href="/abonnement/">Voir toutes les formules</a>.</span></li>
     </ol>
-  </div>
-  <h2 class="annonces-titre" id="profils-anonymes">Les profils vérifiés</h2>
+  </details>
+  <details class="po-replie po-replie-liste" id="profils-liste">
+  <summary><h2 class="annonces-titre">Les profils vérifiés, en liste</h2></summary>
   <p class="annonces-sous">Ni prénom, ni photo, ni contact. Un profil te touche ? Clique sur « Ce profil m’intéresse » : Lamia regarde si vous pouvez correspondre. Ton identité reste secrète : on ne voit que des numéros de profil.</p>
   <p class="po-actions btn-swipe"><a class="po-btn" href="/rencontres/swipe/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Swiper les profils, un par un</a></p>
   <div class="annonces-liste" data-annonces-liste><p class="annonce-vide">Les profils arrivent…</p></div>
+  </details>
   <div class="accueil-duo">
     <a class="abo-carte accueil-carte" href="/speed-dating/"><h3>Speed dating en ligne</h3><p>Des soirées en visio par tranche d’âge, caméra allumée, avec Lamia qui veille.</p><span class="po-btn-verre">Voir les prochaines soirées</span></a>
     <a class="abo-carte accueil-carte" href="/salon/"><h3>Le live, chaque soir à 21 h</h3><p>Les annonces de mariage présentées en direct, sur toutes les plateformes.</p><span class="po-btn-verre">Le live et mes outils</span></a>

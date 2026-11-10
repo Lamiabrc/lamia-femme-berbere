@@ -4036,12 +4036,22 @@ html[dir="rtl"], html[dir="rtl"] body { overflow-x: clip; }
 /* Accueil : le swipe d'abord, même sans compte. */
 .accueil-swipe { padding: 84px 0 8px; }
 .accueil-swipe + .accueil-hero { padding-top: 28px; }
-.accueil-swipe-titre { text-align: center; color: #E9DFFA; font-weight: 600; margin: 0 0 12px; }
-.accueil-swipe .swipe-pile { height: clamp(400px, calc(100svh - 300px), 540px); }
-.accueil-swipe .confirmer-lien { color: #E9DFFA; }
+.accueil-swipe-titre { text-align: center; color: #2F2B3D; font-weight: 600; margin: 0 0 12px; }
+.accueil-swipe .swipe-pile { height: clamp(330px, calc(100svh - 390px), 540px); }
+.accueil-swipe .confirmer-lien { color: #6B5B95; }
 .swipe-choix { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
 .swipe-choix button { padding: 18px 8px; border-radius: 18px; border: 2px solid #C9BCE8; background: #EFE9F7; color: #2F2B3D; font: inherit; font-size: 1.15rem; font-weight: 700; cursor: pointer; }
 .swipe-choix button:hover { background: #E9DFFA; }
 .swipe-fenetre .swipe-invite-liens { display: grid; gap: 10px; margin-top: 14px; }
 @media (max-width: 760px) { .accueil-swipe { padding-top: 64px; } }
 .swipe-fenetre .confirmer-lien { color: #2F2B3D; }
+
+/* Page Profils : le swipe d'abord ; les explications et la liste sont repliées. */
+.po-replie > summary { cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.po-replie > summary::-webkit-details-marker { display: none; }
+.po-replie > summary::after { content: "+"; flex: none; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; border: 1px solid currentColor; font-size: 22px; line-height: 1; color: #6B5B95; }
+.po-replie[open] > summary::after { content: "–"; }
+.po-replie > summary h2 { margin: 0; }
+.po-replie[open] > summary { margin-bottom: 16px; }
+.po-replie-liste { margin: 0 0 34px; }
+.accueil-swipe.is-membre .swipe-pile { height: auto; min-height: 0; }
