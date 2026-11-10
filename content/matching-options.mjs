@@ -17,7 +17,9 @@ export const O = {
     Universitaire: ['Bac+1', 'Bac+2', 'Bac+3', 'Bac+4', 'Bac+5', 'Doctorat', 'Autre universitaire'],
   },
   etudesPaysObtention: ['Algerie', 'Pays de residence'],
-  religion: ['Islam', 'Chretienne', 'Agnostique', 'Athee', 'Autre'],
+  religion: ['Islam', 'Chretienne', 'Judaisme', 'Bouddhisme', 'Hindouisme', 'Spirituel(le) sans religion', 'Laique', 'Agnostique', 'Athee', 'Autre'],
+  // Fermé(e) à une différence de pratique : « Oui » = la pratique recherchée devient bloquante dans l'outil.
+  fermeDifferencePratique: ['Oui', 'Non'],
   pratique: ['Pratiquant(e)', 'Pratique moderee', 'Non pratiquant(e)'],
   caracteristiques: ['Traditionnel(le)', 'Moderne', 'Stable', 'Calme', 'Dynamique', 'Ambitieux(se)', 'Sportif(ve)', 'Mature', 'Communicatif(ve)', 'Famille', 'Responsable', 'Simple', 'Elegant(e)', 'Pudique', 'Cultive(e)', 'Drole', 'Patient(e)', 'Hidjabiste'],
   mobilite: ['Non', 'Oui - France', 'Oui - region', 'Oui - international', 'A discuter'],
@@ -29,7 +31,8 @@ export const O = {
   chemma: ['Chemma: non', 'Chemma: oui'],
   // Recherche
   zoneGeo: ['France', 'Algerie', 'Autre que Algerie', 'Maghreb', 'Maroc', 'Tunisie', 'Europe', 'Canada', 'USA', 'Amerique', 'Golfe', 'Autre', "N'importe ou"],
-  religionRecherche: ['Pas important', 'Islam', 'Chretienne', 'Agnostique', 'Athee', 'Autre'],
+  // Ancien choix unique, gardé pour les fiches existantes : remplacé par la liste « religionsAcceptees » (plusieurs choix).
+  religionRecherche: ['Pas important', 'Islam', 'Chretienne', 'Judaisme', 'Bouddhisme', 'Hindouisme', 'Spirituel(le) sans religion', 'Laique', 'Agnostique', 'Athee', 'Autre'],
   pratiqueRecherche: ['Pas important', 'Pratiquant(e)', 'Pratique moderee', 'Non pratiquant(e)'],
   etudesRecherche: ['Pas important', 'Bac', 'Bac+', 'Bac+5', 'Plus de Bac+5'],
   hidjab: ['Pas important', 'Oui', 'Non'],
@@ -43,7 +46,7 @@ export const LIBELLE = {
   'Jamais marie(e)': 'Jamais marié(e)', 'Marie(e) sur papier uniquement': 'Marié(e) sur papier uniquement', 'Divorce(e)': 'Divorcé(e)', 'Separe(e)': 'Séparé(e)', 'Veuf/Veuve': 'Veuf / veuve',
   'Oui, mais a discuter': 'Oui, mais à discuter', 'Peut-etre': 'Peut-être',
   'College': 'Collège', 'Lycee': 'Lycée', 'Primaire non termine': 'Primaire non terminé', 'Primaire termine': 'Primaire terminé', 'College non termine': 'Collège non terminé', 'College termine': 'Collège terminé', 'Lycee non termine': 'Lycée non terminé', 'Bac general': 'Bac général',
-  'Pays de residence': 'Mon pays de résidence', 'Chretienne': 'Chrétienne', 'Athee': 'Athée', 'Pratique moderee': 'Pratique modérée',
+  'Pays de residence': 'Mon pays de résidence', 'Chretienne': 'Chrétienne', 'Athee': 'Athée', 'Judaisme': 'Judaïsme', 'Laique': 'Laïque', 'Pratique moderee': 'Pratique modérée',
   'Traditionnel(le)': 'Traditionnel(le)', 'Ambitieux(se)': 'Ambitieux(se)', 'Sportif(ve)': 'Sportif(ve)', 'Communicatif(ve)': 'Communicatif(ve)', 'Elegant(e)': 'Élégant(e)', 'Cultive(e)': 'Cultivé(e)', 'Drole': 'Drôle', 'Patient(e)': 'Patient(e)',
   'Oui - France': 'Oui, en France', 'Oui - region': 'Oui, dans ma région', 'Oui - international': 'Oui, à l’international', 'A discuter': 'À discuter',
   'Homme: femme ne travaille pas': 'Je préfère que ma femme ne travaille pas', 'Homme: femme travaille pour son epanouissement': 'Ma femme travaille pour son épanouissement', 'Homme: femme travaille pour aider': 'Ma femme travaille pour aider le foyer', 'Homme: femme travaille en 50/50': 'On partage les charges à 50/50',
@@ -51,6 +54,14 @@ export const LIBELLE = {
   'Fumeur: non': 'Non-fumeur', 'Fumeur: occasionnel': 'Fumeur occasionnel', 'Fumeur: oui': 'Fumeur', 'Sport: oui': 'Sport régulier', 'Sport: occasionnel': 'Sport de temps en temps', 'Sport: non': 'Pas de sport', 'Alcool: non': 'Pas d’alcool', 'Alcool: occasionnel': 'Alcool occasionnel', 'Alcool: oui': 'Alcool', 'Chemma: non': 'Sans chique (chemma)', 'Chemma: oui': 'Chique (chemma)',
 };
 export const lib = (v) => LIBELLE[v] || v;
+// Religions acceptées : la nouvelle liste, ou l'ancien choix unique pour les fiches d'avant.
+export function religionsAccepteesDe(m = {}) {
+  const liste = Array.isArray(m.religionsAcceptees) ? m.religionsAcceptees.filter((r) => O.religion.includes(r)) : [];
+  if (liste.length || Array.isArray(m.religionsAcceptees)) return [...new Set(liste)];
+  return O.religion.includes(m.religionRecherche) ? [m.religionRecherche] : [];
+}
+// Résumé pour l'ancien champ unique : la religion s'il n'y en a qu'une, sinon « Pas important » (le détail est dans la liste).
+export const resumeReligions = (liste) => (liste.length === 1 ? liste[0] : liste.length ? '' : 'Pas important');
 // Secteur recherché, lisible : « Algerie · Tizi ouzou » → « Algérie · Tizi Ouzou », doublons et valeurs vides retirés.
 const SECTEURS = { algerie: 'Algérie', 'autre que algerie': 'Hors Algérie', "n'importe ou": 'Partout', 'pas important': 'Partout', usa: 'États-Unis', amerique: 'Amérique', autre: 'Autre' };
 export function secteurLisible(v) {
@@ -91,6 +102,7 @@ export function choixPropres(m = {}) {
     profession: txt(m.profession, 80),
     tailleCm: int(m.tailleCm, 120, 230),
     religion: un(m.religion, O.religion),
+    religionAutre: m.religion === 'Autre' ? txt(m.religionAutre, 60) : '',
     pratique: un(m.pratique, O.pratique),
     religionTexte: txt(m.religionTexte, 300),
     autresModeVie: txt(m.autresModeVie, 300),
@@ -101,7 +113,11 @@ export function choixPropres(m = {}) {
     hygieneVie: [un(m.fumeur, O.fumeur), un(m.sport, O.sport), un(m.alcool, O.alcool), un(m.chemma, O.chemma)].filter(Boolean),
     zoneGeo: un(m.zoneGeo, O.zoneGeo),
     origineRechercheTags: plusieurs(m.origineRechercheTags, O.origine, 16),
-    religionRecherche: un(m.religionRecherche, O.religionRecherche),
+    // Plusieurs religions acceptées (bloquant dans l'outil) ; aucune = pas important.
+    religionsAcceptees: religionsAccepteesDe(m),
+    religionRechercheAutre: religionsAccepteesDe(m).includes('Autre') ? txt(m.religionRechercheAutre, 60) : '',
+    religionRecherche: resumeReligions(religionsAccepteesDe(m)),
+    fermeDifferencePratique: un(m.fermeDifferencePratique, O.fermeDifferencePratique),
     pratiqueRecherche: un(m.pratiqueRecherche, O.pratiqueRecherche),
     etudesRecherche: un(m.etudesRecherche, O.etudesRecherche),
     rechercheFemmeHidjabiste: un(m.rechercheFemmeHidjabiste, O.hidjab),
@@ -151,6 +167,7 @@ export function versOutil(a, { photoDataUrl = '', aujourdHui = new Date() } = {}
     profession: m.profession || '',
     tailleCm: m.tailleCm ?? null,
     religion: m.religion || '',
+    religionAutre: m.religionAutre || '',
     pratique: m.pratique || '',
     caracteristiques: m.caracteristiques || [],
     mobiliteGeographique: m.mobiliteGeographique || '',
@@ -161,6 +178,9 @@ export function versOutil(a, { photoDataUrl = '', aujourdHui = new Date() } = {}
     zoneGeo: m.zoneGeo || '',
     origineRechercheTags: m.origineRechercheTags || [],
     religionRecherche: m.religionRecherche || '',
+    religionsAcceptees: religionsAccepteesDe(m),
+    religionRechercheAutre: m.religionRechercheAutre || '',
+    fermeDifferencePratique: m.fermeDifferencePratique || '',
     pratiqueRecherche: m.pratiqueRecherche || '',
     etudesRecherche: m.etudesRecherche || '',
     rechercheFemmeHidjabiste: m.rechercheFemmeHidjabiste || '',
@@ -200,10 +220,10 @@ export function foiEtVie(a) {
 // Calculé dans les deux sens (ce que A cherche chez B, et ce que B cherche chez A), puis moyenné.
 // Ce n'est pas l'outil de matching complet de Lamia : un premier tri, à confirmer dans l'outil.
 export function fichePotentiel(src, { outil = false, age = null } = {}) {
-  if (outil) return { age: src.age ?? null, age_min: src.age_min, age_max: src.age_max, pays: src.pays || '', religion: src.religion || '', pratique: src.pratique || '', enfants: src.enfants || '', situation: src.situation || '', origine: src.origine || [], hygiene: src.mode_vie || [], etudes: src.etudes || '', prefs: { religion: src.religion_recherche || '', pratique: src.pratique_recherche || '' } };
+  if (outil) return { age: src.age ?? null, age_min: src.age_min, age_max: src.age_max, pays: src.pays || '', religion: src.religion || '', pratique: src.pratique || '', enfants: src.enfants || '', situation: src.situation || '', origine: src.origine || [], hygiene: src.mode_vie || [], etudes: src.etudes || '', prefs: { religion: src.religion_recherche || '', religions: src.religion_recherche && src.religion_recherche !== 'Pas important' ? [src.religion_recherche] : [], pratique: src.pratique_recherche || '' } };
   const m = src.matching || {};
   return { age, age_min: src.age_min, age_max: src.age_max, pays: src.pays || '', religion: m.religion || '', pratique: m.pratique || '', enfants: m.enfants || '', situation: m.situation || '', origine: m.origineTags || [], hygiene: m.hygieneVie || [], etudes: m.niveauEtudeCategorie || '',
-    prefs: { religion: m.religionRecherche || '', pratique: m.pratiqueRecherche || '', origines: m.origineRechercheTags || [], kabyleUniquement: Boolean(m.kabyleUniquement), accepteEnfants: m.accepteEnfants, accepteDivorce: m.accepteDivorce, accepteVeuf: m.accepteVeuf, zone: m.zoneGeo || '', mobilite: m.mobiliteGeographique || '', fumeur: (m.hygieneVie || []).find((x) => /^Fumeur/.test(x)) || '' } };
+    prefs: { religion: m.religionRecherche || '', religions: religionsAccepteesDe(m), pratique: m.pratiqueRecherche || '', origines: m.origineRechercheTags || [], kabyleUniquement: Boolean(m.kabyleUniquement), accepteEnfants: m.accepteEnfants, accepteDivorce: m.accepteDivorce, accepteVeuf: m.accepteVeuf, zone: m.zoneGeo || '', mobilite: m.mobiliteGeographique || '', fumeur: (m.hygieneVie || []).find((x) => /^Fumeur/.test(x)) || '' } };
 }
 function sens(A, B, forts, vigilance, quiA, quiB) {
   let pts = 0, max = 0;
@@ -221,7 +241,13 @@ function sens(A, B, forts, vigilance, quiA, quiB) {
     if (pref === val) { forts.push(`${nom} de ${quiB} : celle recherchée par ${quiA}`); return ajoute(poids, poids); }
     vigilance.push(`${nom} de ${quiB} différente de celle recherchée par ${quiA}`); return ajoute(0, poids);
   };
-  crit(A.prefs.religion, B.religion, 20, 'Religion'); crit(A.prefs.pratique, B.pratique, 15, 'Pratique');
+  // Religion (20) : plusieurs religions acceptées possibles.
+  const acc = A.prefs.religions || [];
+  if (!acc.length) ajoute(20 * 0.7, 20);
+  else if (!B.religion) ajoute(20 * 0.5, 20);
+  else if (acc.includes(B.religion)) { forts.push(`Religion de ${quiB} : acceptée par ${quiA}`); ajoute(20, 20); }
+  else { vigilance.push(`Religion de ${quiB} pas acceptée par ${quiA}`); ajoute(0, 20); }
+  crit(A.prefs.pratique, B.pratique, 15, 'Pratique');
   // Enfants (10)
   if (B.enfants === 'Oui' && A.prefs.accepteEnfants === false) { vigilance.push(`${quiB} a des enfants, ${quiA} ne l’a pas accepté`); ajoute(0, 10); } else ajoute(B.enfants ? 10 : 7, 10);
   // Divorce / veuvage (10)

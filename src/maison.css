@@ -4031,3 +4031,8 @@ html[dir="rtl"], html[dir="rtl"] body { overflow-x: clip; }
 /* Inscription aux salons : places restantes et sondage du jour */
 .salons-carte small.salons-places { color: var(--or-clair); font-weight: 600; opacity: 1; }
 .salons-jours { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+
+/* Encart Religion du formulaire de profil */
+.annonce-encart { border: 1.5px solid #d8c397; border-radius: 16px; padding: 12px 16px 16px; margin: 4px 0 8px; background: rgba(216, 195, 151, .1); min-width: 0; }
+.annonce-encart > legend { padding: 0 8px; font-family: var(--serif, "Playfair Display", Georgia, serif); font-size: 18px; font-weight: 600; color: #2F2B3D; }
+.annonce-encart .annonce-sous { margin-top: 0; }

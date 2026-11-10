@@ -1799,5 +1799,19 @@
  "Sans ton accord, le site ne dépose": "Without your consent, the site sets",
  "aucun cookie de mesure ni de publicité": "no measurement or advertising cookies",
  "Pixel Meta": "Meta pixel",
- ": avec le même accord, le pixel Meta dépose des cookies (_fbp, _fbc) pour 90 jours au maximum. Il indique à Meta les pages visitées et les actions importantes (inscription, dépôt d’annonce, paiement) afin de mesurer et d’améliorer les publicités de la Maison sur Facebook et Instagram. Aucun contenu d’annonce, aucun prénom ni aucune adresse email n’est transmis. Si tu refuses, rien n’est déposé.": ": with the same consent, the Meta pixel sets cookies (_fbp, _fbc) for a maximum of 90 days. It tells Meta which pages are visited and the key actions (sign-up, ad posted, payment) in order to measure and improve the House's ads on Facebook and Instagram. No ad content, first name or email address is sent. If you refuse, nothing is set."
+ ": avec le même accord, le pixel Meta dépose des cookies (_fbp, _fbc) pour 90 jours au maximum. Il indique à Meta les pages visitées et les actions importantes (inscription, dépôt d’annonce, paiement) afin de mesurer et d’améliorer les publicités de la Maison sur Facebook et Instagram. Aucun contenu d’annonce, aucun prénom ni aucune adresse email n’est transmis. Si tu refuses, rien n’est déposé.": ": with the same consent, the Meta pixel sets cookies (_fbp, _fbc) for a maximum of 90 days. It tells Meta which pages are visited and the key actions (sign-up, ad posted, payment) in order to measure and improve the House's ads on Facebook and Instagram. No ad content, first name or email address is sent. If you refuse, nothing is set.",
+ "Judaïsme": "Judaism",
+ "Bouddhisme": "Buddhism",
+ "Hindouisme": "Hinduism",
+ "Spirituel(le) sans religion": "Spiritual, no religion",
+ "Laïque": "Secular",
+ "Précise ta religion": "Specify your religion",
+ "Précise la religion acceptée": "Specify the accepted religion",
+ "Les religions que tu acceptes": "The religions you accept",
+ "(plusieurs choix possibles ; laisse vide si peu importe)": "(you can pick several; leave empty if it doesn’t matter)",
+ "Une pratique différente de celle que tu cherches, c’est non ?": "A different practice from the one you want: is that a no?",
+ "Ta religion": "Your religion",
+ "Sa religion": "Their religion",
+ "Sa pratique": "Their practice",
+ "Ta pratique": "Your practice"
 }
