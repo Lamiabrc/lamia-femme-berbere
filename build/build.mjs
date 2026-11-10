@@ -224,7 +224,7 @@ function footer() {
   </div>
   <nav aria-label="Rencontres">
     <p class="footer-title">Rencontres</p>
-    <ul><li><a href="/rencontres/">Rencontres kabyles sérieuses</a></li><li><a href="/rencontres/#confier">Créer mon profil</a></li><li><a href="/speed-dating/">Speed dating</a></li><li><a href="/abonnement/">Les formules</a></li><li><a href="/salon/">Le live chaque soir</a></li><li><a href="/confidences/">Écrire à Lamia</a></li></ul>
+    <ul><li><a href="/rencontres/">Rencontres kabyles sérieuses</a></li><li><a href="/rencontres/#confier">Créer mon profil</a></li><li><a href="/speed-dating/">Speed dating</a></li><li><a href="/abonnement/">Les formules</a></li><li><a href="/salon/">Le live, du lundi au vendredi</a></li><li><a href="/confidences/">Écrire à Lamia</a></li></ul>
     <p class="footer-title">Guides</p>
     <ul>${GUIDES.map((g) => `<li><a href="${g.path}">${esc(g.lien[0])}</a></li>`).join('')}</ul>
     <p class="footer-title">Boutique</p>
@@ -350,7 +350,7 @@ ${SWIPE_INVITE}
       <ul class="accueil-preuves">
         <li>✓ Chaque profil vérifié par Lamia</li>
         <li>✓ Matchs gratuits, 1 à la fois</li>
-        <li>✓ Live chaque soir, 21 h</li>
+        <li>✓ Live du lundi au vendredi, 20 h</li>
         <li>✓ France, Algérie, Maghreb, Canada, Europe</li>
       </ul>
     </div>
@@ -386,7 +386,7 @@ ${SWIPE_INVITE}
       <span class="po-btn-verre">Voir les prochaines soirées</span>
     </a>
     <a class="abo-carte accueil-carte" href="/salon/">
-      <h3>Le live, chaque soir à 21 h</h3>
+      <h3>Le live, du lundi au vendredi à 20 h</h3>
       <p>Débats, invités et annonces de mariage en direct, sur TikTok, YouTube, Facebook, Instagram et Twitch.</p>
       <span class="po-btn-verre">Le live et mes outils</span>
     </a>
@@ -418,7 +418,7 @@ page(
   '/salon/',
   layout({
     title: 'Le Salon de Lamia · Lives et débats',
-    description: 'Les lives de Lamia Femme Berbère : couple, célibat, engagement, humour et culture kabyle, tous les soirs de 21 h à 23 h.',
+    description: 'Les lives de Lamia Femme Berbère : couple, célibat, engagement, humour et culture kabyle, du lundi au vendredi de 20 h à 22 h 30.',
     path: '/salon/',
     room: roomBySlug.salon,
     body: `${roomHead(roomBySlug.salon, '<p class="patio-actions"><a class="ame-soeur-btn" href="#ce-soir">Ce soir en live</a><a class="salon-ancre" href="#coeur-direct">Les débats</a><a class="salon-ancre" href="#outil-live">Le matching en live</a><a class="salon-ancre" href="#replays">Les replays</a></p>')}
@@ -445,7 +445,7 @@ page(
   <div class="outil-live-tete">
     <img src="/images/lamia/lamia-portrait-tatouages-rond-480.webp" alt="" width="120" height="120" loading="lazy">
     <div>
-      <p class="po-eyebrow">Ma salle de rédaction · chaque soir</p>
+      <p class="po-eyebrow">Ma salle de rédaction · du lundi au vendredi</p>
       <h2 id="coeur-direct-titre">Le Cœur en Direct, mon outil pour préparer le live</h2>
       <p>Avant chaque live, je passe par ma salle de rédaction, Le Cœur en Direct. C’est là que je prépare l’émission du soir : le thème, les débats, les questions et les animations. L’amour, le couple, le mariage, la famille, et nos cultures kabyle, algérienne, française et maghrébine.</p>
     </div>
@@ -454,7 +454,7 @@ page(
     <h2>Comment je choisis les débats</h2>
     <ol>
       <li><strong>Un thème par soir</strong><span>L’outil me propose une thématique principale. C’est moi qui la valide ou la refuse, et je prépare les animations qui vont avec.</span></li>
-      <li><strong>Des questions neuves</strong><span>Chaque soir, de nouvelles questions dans le même esprit, jamais celles de la veille. On ne tourne pas en rond.</span></li>
+      <li><strong>Des questions neuves</strong><span>À chaque live, de nouvelles questions dans le même esprit, jamais celles de la veille. On ne tourne pas en rond.</span></li>
       <li><strong>Du concret qui fait réagir</strong><span>L’argent dans le couple, le 50/50, les exigences des hommes et des femmes, le bled ou la France, le contrôle, la belle-famille, le mariage gris : des situations vraies, posées sans détour.</span></li>
       <li><strong>Vos réactions comptent</strong><span>L’outil retient les sujets qui vous ont fait le plus réagir, pour que les prochains lives vous ressemblent encore plus.</span></li>
     </ol>
@@ -474,7 +474,7 @@ page(
   <div class="outil-live-tete">
     <img src="/images/lamia/lamia-portrait-tatouages-rond-480.webp" alt="Lamia Femme Berbère" width="120" height="120" loading="lazy">
     <div>
-      <p class="po-eyebrow">En direct chaque soir · par Lamia, marieuse kabyle</p>
+      <p class="po-eyebrow">En direct du lundi au vendredi · par Lamia, marieuse kabyle</p>
       <h2 id="outil-live-titre">Mon outil de matching, en live</h2>
       <p>Pendant le live, mon outil de matching est affiché à l’écran, sur toutes les plateformes à la fois. C’est lui qui me sert à présenter les annonces de mariage, à chercher les profils compatibles et à suivre chaque rencontre. Voici comment il marche, et surtout comment naît un match.</p>
     </div>
@@ -1459,7 +1459,7 @@ page(
       <p class="cl-aide">Les produits mis en vente s’ajoutent tout seuls et partent en notification chaque soir à 18 h (regroupés). Pour un article, une actu ou un live, écris-le ici : il part tout de suite, avec sa couleur, chez les membres qui ont activé les notifications.</p>
       <form class="cl-nouv-form" data-nouv-form>
         <label>Type<select name="type"><option value="actu">Actu (vert)</option><option value="article">Article (bleu)</option><option value="live">Live (rouge)</option><option value="boutique">Boutique (doré)</option></select></label>
-        <label>Titre<input name="titre" maxlength="140" required placeholder="Ce soir à 21 h : live spécial mariage"></label>
+        <label>Titre<input name="titre" maxlength="140" required placeholder="Ce soir à 20 h : live spécial mariage"></label>
         <label>Texte <small>(facultatif)</small><textarea name="texte" maxlength="600" rows="2"></textarea></label>
         <label>Lien <small>(facultatif, ex. /salon/ ou /produit/…)</small><input name="lien" maxlength="300" placeholder="/salon/"></label>
         <label class="cl-case"><input type="checkbox" name="envoyer" checked> Envoyer la notification maintenant</label>
@@ -1576,7 +1576,7 @@ ${SWIPE_INVITE}
   </details>
   <div class="accueil-duo">
     <a class="abo-carte accueil-carte" href="/speed-dating/"><h3>Speed dating en ligne</h3><p>Des soirées en visio par tranche d’âge, caméra allumée, avec Lamia qui veille.</p><span class="po-btn-verre">Voir les prochaines soirées</span></a>
-    <a class="abo-carte accueil-carte" href="/salon/"><h3>Le live, chaque soir à 21 h</h3><p>Les annonces de mariage présentées en direct, sur toutes les plateformes.</p><span class="po-btn-verre">Le live et mes outils</span></a>
+    <a class="abo-carte accueil-carte" href="/salon/"><h3>Le live, du lundi au vendredi à 20 h</h3><p>Les annonces de mariage présentées en direct, sur toutes les plateformes.</p><span class="po-btn-verre">Le live et mes outils</span></a>
   </div>
 </section>
 </div>`,
@@ -1867,7 +1867,7 @@ page(
     <div>
       <h2>Et oui… c’est aussi moi en live</h2>
       <p>Pas de studio, pas de personnage figé : c’est aussi comme ça que beaucoup d’entre vous me connaissent. En direct, avec mes lunettes, mes idées, mes coups de gueule, mes fous rires… et parfois quelques thichrad supplémentaires.</p>
-      <p><a class="text-link" href="/salon/">Tous les soirs au Salon, de 21 h à 23 h</a></p>
+      <p><a class="text-link" href="/salon/">Du lundi au vendredi au Salon, de 20 h à 22 h 30</a></p>
     </div>
   </section>
 
