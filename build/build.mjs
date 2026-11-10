@@ -674,8 +674,8 @@ page(
   <p class="salons-gratuit" data-salons-gratuit hidden>La prochaine soirée est gratuite</p>
   <p>Deux salons, plusieurs secteurs de recherche. Quand assez de femmes et d’hommes sont inscrits dans un même secteur, le salon est confirmé et tu es prévenu·e.</p>
   <div class="salons-deux">
-    <a class="salons-carte" href="/speed-dating/inscription/?salon=20-39"><span><strong>Salon 20-39 ans</strong><small>Je m’inscris</small></span></a>
-    <a class="salons-carte" href="/speed-dating/inscription/?salon=40%2B"><span><strong>Salon 40 ans et plus</strong><small>Je m’inscris</small></span></a>
+    <a class="salons-carte" href="/speed-dating/inscription/?salon=20-39"><span><strong>Salon 20-39 ans</strong><small data-places="20-39"></small><small>Je m’inscris</small></span></a>
+    <a class="salons-carte" href="/speed-dating/inscription/?salon=40%2B"><span><strong>Salon 40 ans et plus</strong><small data-places="40+"></small><small>Je m’inscris</small></span></a>
   </div>
   <div class="salons-confirmes" data-salons-confirmes hidden></div>
 </section>
@@ -1110,13 +1110,20 @@ page(
   <form data-salon-form novalidate hidden>
     <fieldset class="salons-etape"><legend>1. Ton salon</legend>
       <div class="salons-deux">
-        <label class="salons-carte"><input type="radio" name="salon" value="20-39"><span><strong>Salon 20-39 ans</strong><small>Pour celles et ceux qui préfèrent ce salon</small></span></label>
-        <label class="salons-carte"><input type="radio" name="salon" value="40+"><span><strong>Salon 40 ans et plus</strong><small>Pour celles et ceux qui préfèrent ce salon</small></span></label>
+        <label class="salons-carte"><input type="radio" name="salon" value="20-39"><span><strong>Salon 20-39 ans</strong><small data-places="20-39">Pour celles et ceux qui préfèrent ce salon</small></span></label>
+        <label class="salons-carte"><input type="radio" name="salon" value="40+"><span><strong>Salon 40 ans et plus</strong><small data-places="40+">Pour celles et ceux qui préfèrent ce salon</small></span></label>
       </div>
     </fieldset>
     <fieldset class="salons-etape"><legend>2. Les secteurs où tu cherches</legend>
       <p class="salons-aide">Plusieurs choix possibles : plus tu en coches, plus vite tu trouves un salon.</p>
       <div class="salons-options" data-salon-options><p class="salons-aide">Choisis d’abord ton salon.</p></div>
+    </fieldset>
+    <fieldset class="salons-etape"><legend>Sondage : quand préfères-tu la soirée ?</legend>
+      <div class="salons-deux salons-jours">
+        <label class="salons-option"><input type="radio" name="prefere_jour" value="weekend"><span><strong>Le week-end</strong><small>Vendredi, samedi ou dimanche soir</small></span></label>
+        <label class="salons-option"><input type="radio" name="prefere_jour" value="semaine"><span><strong>En semaine</strong><small>Du lundi au jeudi soir</small></span></label>
+        <label class="salons-option"><input type="radio" name="prefere_jour" value="indifferent"><span><strong>Peu importe</strong><small>Je m’adapte</small></span></label>
+      </div>
     </fieldset>
     <fieldset class="salons-etape" data-salon-autre hidden><legend>3. L’autre tranche d’âge</legend>
       <label class="salons-option"><input type="checkbox" name="accepte_autre"><span><strong data-salon-autre-titre></strong><small data-salon-autre-aide></small></span></label>

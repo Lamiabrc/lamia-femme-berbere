@@ -150,7 +150,7 @@ test('soirée suivante : payante, et place incluse pour une formule qui la compr
 
 test('s’inscrire à une soirée exige un compte et un profil', async () => {
   const b = base([], new Date('2026-11-02T12:00:00Z'));
-  const ok = { salon: '40+', secteurs: ['europe'], rules_accepted: true };
+  const ok = { salon: '40+', secteurs: ['europe'], rules_accepted: true, prefere_jour: 'weekend' };
   assert.equal((await actionSalons('salon_inscrire', ok, b.ctx())).status, 401);
   const u = { id: 'u1', email: 'R@x.fr', user_metadata: { first_name: 'Rachid' } };
   // Sans profil, ou profil pas terminé : refusé.

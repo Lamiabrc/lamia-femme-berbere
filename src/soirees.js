@@ -13,7 +13,7 @@ const api = async (body) => {
   return d;
 };
 const ERREURS = {
-  missing_salon: 'Choisis un salon.', missing_secteur: 'Choisis au moins un secteur.', rules_required: 'Merci d’accepter le cadre de la soirée.',
+  missing_salon: 'Choisis un salon.', missing_jour: 'Réponds au sondage : week-end, semaine ou peu importe.', missing_secteur: 'Choisis au moins un secteur.', rules_required: 'Merci d’accepter le cadre de la soirée.',
   age_invalide: 'Ces soirées sont réservées aux personnes de 20 ans et plus.', profil_requis: 'Il te faut d’abord un profil validé pour t’inscrire.', login_required: 'Connecte-toi pour t’inscrire.',
 };
 
@@ -30,6 +30,12 @@ function afficherOptions() {
 async function charger() {
   try { etat = await api({ action: 'salon_etat' }); } catch { etat = null; }
   $$('[data-salons-gratuit]').forEach((x) => { x.hidden = !etat?.prochaine_gratuite; });
+  // Places restantes par salon : autant de femmes que d'hommes (10 + 10 au plus).
+  for (const s of etat?.salons || []) {
+    const p = s.places; if (!p) continue;
+    const txt = (n, g) => (n ? `${n} place${n > 1 ? 's' : ''} ${g}` : `complet côté ${g}`);
+    $$(`[data-places="${s.id}"]`).forEach((x) => { x.textContent = `Il reste ${txt(p.femmes, 'femmes')} · ${txt(p.hommes, 'hommes')}`; x.classList.add('salons-places'); });
+  }
   if (form) afficherOptions();
   const c = $('[data-salons-confirmes]');
   if (c) {
@@ -75,6 +81,7 @@ async function preparer() {
   if (choix) choix.checked = true;
   afficherOptions();
   afficherAutre();
+  if (moi.inscription?.prefere_jour) { const j = form.querySelector(`[name=prefere_jour][value="${CSS.escape(moi.inscription.prefere_jour)}"]`); if (j) j.checked = true; }
   for (const v of moi.inscription?.secteurs || []) { const x = form.querySelector(`[name=secteurs][value="${CSS.escape(v)}"]`); if (x) x.checked = true; }
 }
 
@@ -85,7 +92,7 @@ if (form) {
     const st = $('[data-salon-status]'), btn = form.querySelector('button[type=submit]'), f = form.elements;
     st.classList.remove('is-error'); st.textContent = ''; btn.disabled = true;
     try {
-      await api({ action: 'salon_inscrire', salon: f.salon.value, secteurs: $$('[name=secteurs]:checked', form).map((x) => x.value), accepte_autre: f.accepte_autre.checked, rules_accepted: f.rules.checked });
+      await api({ action: 'salon_inscrire', salon: f.salon.value, secteurs: $$('[name=secteurs]:checked', form).map((x) => x.value), accepte_autre: f.accepte_autre.checked, prefere_jour: f.prefere_jour.value, rules_accepted: f.rules.checked });
       form.hidden = true;
       $('[data-salon-merci]').hidden = false;
       $('[data-salon-merci]').scrollIntoView({ behavior: 'smooth', block: 'center' });
