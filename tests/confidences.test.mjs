@@ -183,6 +183,15 @@ test('chaque soir, les testeurs ajoutés à Google Play reçoivent le lien une s
   assert.deepEqual(be.db.platform_settings.find((x) => x.key === 'testeurs_play_lien_envoye').value, ['u1']);
 });
 
+test('Lamia peut envoyer le lien aux testeurs juste après les avoir ajoutés, une seule fois', async () => {
+  const be = backend({ users: { L: lamia, N: nadia } });
+  be.db.testeurs_play.push({ user_id: 'u1', email: 'a@gmail.com', ajoute_at: '2026-11-10' });
+  assert.equal((await call(be, { action: 'testeurs_play_cron' }, 'N')).status, 403);
+  assert.equal((await call(be, { action: 'testeurs_play_cron' }, 'L')).body.envoyes, 1);
+  assert.equal((await call(be, { action: 'testeurs_play_cron' }, 'L')).body.envoyes, 0);
+  assert.equal(be.db.confidence_threads.length, 1);
+});
+
 test('Lamia retrouve les testeurs Google Play, avec leur état et leur conversation', async () => {
   const be = backend({ users: { L: lamia, N: nadia } });
   be.db.testeurs_play.push({ user_id: 'u1', email: 'a@gmail.com', demande_at: '2026-11-09', ajoute_at: null }, { user_id: 'u2', email: 'b@gmail.com', demande_at: '2026-11-08', ajoute_at: '2026-11-09' });
