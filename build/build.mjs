@@ -324,7 +324,7 @@ const SWIPE_INVITE = `<section class="swipe-page accueil-swipe" id="profils-anon
 <aside class="lfb-valeurs" aria-label="Nos valeurs">
   <p class="lfb-valeurs-titre">Un parcours qui suit l’éducation et les valeurs kabyles</p>
   <p class="lfb-valeurs-mots"><span>Pudeur</span><span>Discrétion</span><span>Respect</span></p>
-  <p class="lfb-valeurs-texte">On n’affiche pas les femmes : ni photo, ni prénom en public. Chacun est respecté dans sa religion et ses valeurs, sans renier les nôtres.</p>
+  <p class="lfb-valeurs-texte">On n’affiche pas les femmes, et on ne les cache pas non plus : on les respecte. Chacun est respecté dans sa religion et ses valeurs, sans renier les nôtres.</p>
 </aside>`;
 page(
   '/',
