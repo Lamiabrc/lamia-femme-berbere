@@ -143,7 +143,16 @@ async function aFaire() {
     const r = await fetch('/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ action: 'annonce_a_faire' }) });
     const { a_faire: f } = await r.json();
     const heure = (d) => new Date(d).toLocaleString('fr-FR', { weekday: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
+    const MOTIF = (m) => esc(m || 'sans motif donné');
+    const PRESTA = { 15: 'Visio de 15 min', 30: 'Coaching 30 min et match manuel', 60: 'Sauver mon couple' };
+    // Ce qui te concerne : tes coachings, tes soirées, les blocages et signalements.
+    const miens = [
+      ...(f.coachings || []).map((c) => [`🎥 <b>${esc(PRESTA[c.duree] || 'Coaching')}</b> avec <b>${esc(c.prenom || c.email || '?')}</b>, ${esc(heure(c.debut))}`, '<button class="btn btn-line" type="button" data-tab-aller="coaching">Coaching</button>']),
+      (f.signalements || []).length && [`🚩 <b>${f.signalements.length} signalement(s) à traiter</b> :<br>${f.signalements.map((s) => `n° ${esc(s.cible_ref)} signalé par n° ${esc(s.auteur_ref)} · « ${MOTIF(s.motif)} »`).join('<br>')}`, ''],
+      (f.blocages || []).length && [`🚫 <b>${f.blocages.length} blocage(s) cette semaine</b> :<br>${f.blocages.map((x) => `n° ${esc(x.auteur_ref)} a bloqué n° ${esc(x.cible_ref)} · « ${MOTIF(x.motif)} »`).join('<br>')}`, ''],
+    ];
     const lignes = [
+      ...miens,
       ...f.soirees.map((s) => [`<b>${esc(s.titre)}</b>, ${esc(heure(s.debut))} · ${esc(s.salon)} : <b>${s.inscrits} inscrit(s)</b>, ${Math.max(0, s.places - s.inscrits)} place(s) libre(s). À 20 h 45, ouvre le bal.`, '<a class="btn btn-ink" href="/admin-bal.html">Poste du bal</a>']),
       f.a_verifier.length && [`<b>${f.a_verifier.length} profil(s) incomplet(s)</b>, pas validé(s) automatiquement : ${f.a_verifier.map((r) => `n° ${r}${f.manques?.[r]?.length ? ` (manque : ${f.manques[r].join(', ')})` : ''}`).join(' · ')}. Valide-les toi-même si ça te va, ou demande-leur ce qui manque.`, '<button class="btn btn-ink" type="button" data-rencontres-aller="annonces">Vérifier</button>'],
       f.reciproques && [`<b>${f.reciproques} intérêt(s) réciproque(s)</b> : les deux se sont choisis. Le site les met en relation tout seul dès que les différences éventuelles sont acceptées.`, '<button class="btn btn-ink" type="button" data-rencontres-aller="demandes">Voir</button>'],
@@ -153,7 +162,11 @@ async function aFaire() {
       f.fiches_en_attente && [`<b>${f.fiches_en_attente} fiche(s) pas encore confirmée(s)</b> (${f.fiches_confirmees} confirmée(s)) : envoie les liens de confirmation.`, '<span class="aide">Outil › Site › Publipostage › « À prévenir »</span>'],
       f.nouveautes_en_attente && [`<b>${f.nouveautes_en_attente} nouveauté(s)</b> partiront au prochain envoi de 18 h en notification.`, '<button class="btn btn-line" type="button" data-rencontres-aller="nouveautes">Voir</button>'],
     ].filter(Boolean);
-    box.innerHTML = lignes.length ? lignes.map(([t, b]) => `<li><span>${t}</span>${b}</li>`).join('') : '<li>Rien en attente.</li>';
+    const li = ([t, b]) => `<li><span>${t}</span>${b}</li>`;
+    const nMiens = miens.filter(Boolean).length + f.soirees.length;
+    const mien = lignes.slice(0, nMiens), auto = lignes.slice(nMiens);
+    box.innerHTML = (mien.length ? mien.map(li).join('') : '<li>Rien pour toi aujourd’hui : pas de coaching, de soirée, de blocage ni de signalement en attente.</li>')
+      + (auto.length ? `<li class="afaire-auto"><details><summary>Le site s’en occupe tout seul (${auto.length})</summary><ol>${auto.map(li).join('')}</ol></details></li>` : '');
   } catch { box.innerHTML = '<li>La liste ne s’affiche pas pour le moment.</li>'; }
 }
 document.addEventListener('click', (e) => {
@@ -1111,3 +1124,6 @@ document.addEventListener('click', async (e) => {
     catch (err) { fen?.close(); $('[data-coaching-statut]').textContent = ERR_COACHING[err.message] || 'La visio ne s’ouvre pas pour le moment.'; }
   }
 });
+
+// Un bouton de la liste « À faire » qui ouvre directement un onglet.
+document.addEventListener('click', (e) => { const b = e.target.closest('[data-tab-aller]'); if (b) ouvrir(b.dataset.tabAller); });
