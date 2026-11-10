@@ -3,7 +3,7 @@
 // le prix payé est toujours relu ici côté serveur, jamais repris du navigateur.
 export const FORMULES = [
   { id: 'decouverte', nom: 'Découverte', mois: 0, accroche: 'Pour commencer, sans rien payer',
-    avantages: ['Ton profil confié à Lamia, vérifié et affiché anonymement', 'Swipe sans limite', '1 match offert, 1 match en cours', 'En live : 1 match supplémentaire toutes les 2 semaines', '7 jours de discussion avec ton match, puis vous échangez vos numéros', 'Le nombre de personnes qui t’ont choisi·e'],
+    avantages: ['Ton profil confié à Lamia, vérifié et affiché anonymement', 'Swipe sans limite', 'Matchs gratuits, 1 à la fois : dès qu’il se termine, un autre peut commencer', 'En live : 1 match supplémentaire toutes les 2 semaines', '7 jours de discussion avec ton match, puis vous échangez vos numéros', 'Le nombre de personnes qui t’ont choisi·e'],
     mises: 1, speedDatings: 0, swipesJour: null, matchs: 1 },
   { id: 'passion', nom: 'Passion', mois: 900, accroche: 'Le choix des cœurs sérieux', vedette: true,
     avantages: ['10 matchs par mois, 2 en cours en même temps', 'Qui t’a choisi·e : les profils qui t’ont swipé·e, en tête de ta pile', 'La photo de ton match, s’il ou elle l’accepte', '1 speed dating par mois inclus', 'Tes questions à Lamia pour améliorer ton profil', 'Tout ce que contient Découverte'],

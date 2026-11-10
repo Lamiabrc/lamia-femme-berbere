@@ -331,7 +331,7 @@ page(
       <p class="accueil-couple"><a href="/abonnement/#unite-sauver_couple"><strong>${esc(T('accueil.couple-titre', 'Accueil', 'Encadré couple : la question', 'T’es en couple et tu veux tenter une dernière chose avant de rompre ?'))}</strong><span>${esc(T('accueil.couple-action', 'Accueil', 'Encadré couple : le bouton', 'Réserve une séance de love coaching en ligne'))}</span><small><b>1 heure en visio avec Lamia</b><i> · ${UNITES.find((u) => u.id === 'sauver_couple').prix / 100} €</i></small></a></p>
       <ul class="accueil-preuves">
         <li>✓ Chaque profil vérifié par Lamia</li>
-        <li>✓ 1er match offert</li>
+        <li>✓ Matchs gratuits, 1 à la fois</li>
         <li>✓ Live chaque soir, 21 h</li>
         <li>✓ France, Algérie, Maghreb, Canada, Europe</li>
       </ul>
@@ -357,7 +357,7 @@ page(
 
   <div class="accueil-bloc">
     <h2 class="annonces-titre">Les formules</h2>
-    <p class="annonces-sous">Sans engagement. Le premier match est toujours offert.</p>
+    <p class="annonces-sous">Sans engagement. En gratuit, un match à la fois, renouvelé dès qu’il se termine.</p>
     <div class="abo-grille">${FORMULES.map((f) => `<a class="abo-carte abo-mini${f.vedette ? ' is-vedette' : ''}" href="${f.mois ? `/abonnement/?formule=${f.id}` : '/rencontres/#confier'}">${f.vedette ? '<span class="abo-ruban">Le plus choisi</span>' : ''}<h3>${esc(f.nom)}</h3><p class="abo-prix">${f.mois ? `<span${f.lancement ? ' data-prestige-prix="mois"' : ''}>${eurosAbo(prixMensuel(f, 0))}<small> / mois</small></span>` : 'Gratuit'}</p>${placesLancement(f)}<ul>${f.avantages.slice(0, 2).map((a) => `<li>${esc(a)}</li>`).join('')}</ul><span class="po-btn">${f.mois ? `Choisir ${esc(f.nom)}` : 'Commencer'}</span></a>`).join('')}</div>
   </div>
 
@@ -1616,7 +1616,7 @@ page(
     <div class="po-hero-texte">
       <p class="po-eyebrow">Par Lamia, marieuse kabyle</p>
       <h1 id="abo-titre">Les formules de rencontre kabyle</h1>
-      <p class="po-sub">Un match est toujours offert. En live, 1 match supplémentaire toutes les 2 semaines.</p>
+      <p class="po-sub">En gratuit, un match à la fois : dès qu’il se termine, un autre peut commencer.</p>
       <p class="po-lead">Ou choisis le rythme qui te ressemble : 10 matchs par mois et 2 en cours, ou illimités et 5 en cours, avec le coaching et l’option mariage de Lamia. Sans engagement, résiliable en un clic depuis ton espace.</p>
       <p class="po-lead">Tu vis en Algérie ? Le paiement en ligne n’y est pas possible : <a class="text-link" href="/salon/">viens au live</a>, chaque soir à 21 h, pour d’autres matchs.</p>
     </div>

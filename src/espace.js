@@ -382,9 +382,9 @@ async function suivi(el, p) {
   const s = p.suivi || { mises_total: 0, mises_mois: 0 };
   const offertesRestantes = Math.max(0, (p.offertes || 1) - s.mises_total);
   const lignes = [
-    `<li><strong>Mises en relation offertes</strong> : ${offertesRestantes} sur ${p.offertes || 1} restante(s)</li>`,
+    q ? `<li><strong>Mises en relation offertes</strong> : ${offertesRestantes} sur ${p.offertes || 1} restante(s)</li>` : '<li><strong>Matchs gratuits</strong> : 1 à la fois, un nouveau dès que le précédent se termine</li>',
     q ? `<li><strong>Formule ${esc(q.nom)}</strong> : ${s.mises_mois} mise(s) en relation ce mois-ci${q.mises ? ` sur ${q.mises}` : ' (sans limite)'} · ${q.sd} speed dating inclus par mois</li>`
-      : (p.algerie ? '<li><strong>Formule Découverte</strong> (gratuite) · pour d’autres matchs, <a class="text-link" href="/salon/">viens au live de Lamia</a> (1 match offert toutes les 2 semaines)</li>' : '<li><strong>Formule Découverte</strong> (gratuite) · d’autres matchs en <a class="text-link" href="/salon/">venant au live</a> (1 toutes les 2 semaines), à l’unité ou avec <a class="text-link" href="/abonnement/">une formule</a></li>'),
+      : (p.algerie ? '<li><strong>Formule Découverte</strong> (gratuite)</li>' : '<li><strong>Formule Découverte</strong> (gratuite) · plusieurs matchs en même temps avec <a class="text-link" href="/abonnement/">une formule</a></li>'),
     q && q.nom !== 'Cœur' ? '<li><strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#camera"/></svg> Photo de ton match</strong> : incluse dans ta formule, si ton match l’accepte</li>' : '<li><strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#camera"/></svg> Photo de ton match</strong> : incluse à partir de la formule Passion, ou 3 € pour la voir 1 heure · <a class="text-link" href="/abonnement/?formule=passion">en savoir plus</a></li>',
     u.mise_en_relation || u.speed_dating ? `<li><strong>Achetés à l’unité</strong> : ${u.mise_en_relation || 0} match(s) supplémentaire(s) · ${u.speed_dating || 0} place(s) de speed dating</li>` : '',
   ].filter(Boolean).join('');
