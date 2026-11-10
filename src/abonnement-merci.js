@@ -11,6 +11,7 @@ const id = new URLSearchParams(location.search).get('session_id');
       if (r.ok && d.statut === 'paye') {
         window.lfbEvent?.('abonnement');
         try { window.gtag?.('event', 'purchase', { transaction_id: id }); } catch { /* */ }
+        try { window.fbq?.('track', d.kind === 'abonnement' ? 'Subscribe' : 'Purchase', {}, { eventID: id }); } catch { /* */ }
         box.textContent = d.type === 'prolonger_discussion' ? '✓ Votre discussion est prolongée de 7 jours.' : d.type === 'profil_avant' ? '✓ Ton profil passe en tête du swipe pendant 7 jours.' : d.type === 'qui_choisi' ? '✓ Pendant 24 heures, les profils qui t’ont choisi·e sont visibles dans ton espace.' : ['coaching', 'coaching_30', 'sauver_couple'].includes(d.type) ? '✓ C’est acheté : choisis ton créneau dans Mon espace, section Coaching.' : d.type === 'live_priorite' ? '✓ C’est noté : Lamia présentera ton annonce en priorité à son prochain live.' : d.type === 'photo_match' ? '✓ La photo de ton match est visible pendant 1 heure dans ton espace.' : d.kind === 'abonnement' ? `✓ Ta formule ${d.nom} est active${d.periode === 'an' ? ' pour un an' : ''}. Tu la retrouves dans ton espace${d.nom === 'Prestige' ? ', où tu peux réserver ta visio avec Lamia' : ''}.` : `✓ Achat confirmé : ${d.quantite || 1} × ${d.nom.toLowerCase()}.`;
         return;
       }

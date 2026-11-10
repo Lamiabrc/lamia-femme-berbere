@@ -614,7 +614,15 @@ renderSocials();
   };
   envoyer();
   // Actions importantes (réservation, précommande…), comptées sans identifier personne.
-  window.lfbEvent = (event) => { envoyer({ event }); try { window.gtag?.('event', event); } catch { /* */ } };
+  window.lfbEvent = (event) => {
+    envoyer({ event });
+    try { window.gtag?.('event', event); } catch { /* */ }
+    // Pixel Meta (chargé seulement après accord) : événements standard quand ils existent, sinon personnalisés.
+    try {
+      const std = { inscription_bal: 'CompleteRegistration', annonce_deposee: 'Lead', paiement_ouvert: 'InitiateCheckout', clic_produit: 'ViewContent' }[event];
+      if (window.fbq) std ? window.fbq('track', std) : window.fbq('trackCustom', event);
+    } catch { /* */ }
+  };
   // Temps passé sur la page, envoyé une seule fois quand on la quitte.
   const debut = Date.now();
   let tempsEnvoye = false;
@@ -688,9 +696,10 @@ renderSocials();
   });
 })();
 
-// ---------------------------------------------------------------- Google Analytics, seulement avec l'accord du visiteur (RGPD)
+// ---------------------------------------------------------------- Google Analytics et pixel Meta, seulement avec l'accord du visiteur (RGPD)
 (function analytics() {
   const GA = 'G-YZ486LN6LV';
+  const PIXEL = '1472644064811166'; // pixel Meta « LFB – site lamia-femme-berbere.com » (compte publicitaire Femme berbère)
   const KEY = 'lfb-cookies';
   if (!/lamia-femme-berbere\.com$/.test(location.hostname)) return;
   const lire = () => { try { return localStorage.getItem(KEY); } catch { return null; } };
@@ -705,12 +714,25 @@ renderSocials();
     s.async = true;
     s.src = `https://www.googletagmanager.com/gtag/js?id=${GA}`;
     document.head.appendChild(s);
+    pixel();
+  }
+  function pixel() {
+    if (window.fbq) return;
+    const f = window.fbq = function fbq() { f.callMethod ? f.callMethod.apply(f, arguments) : f.queue.push(arguments); };
+    if (!window._fbq) window._fbq = f;
+    f.push = f; f.loaded = true; f.version = '2.0'; f.queue = [];
+    const s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://connect.facebook.net/en_US/fbevents.js';
+    document.head.appendChild(s);
+    window.fbq('init', PIXEL);
+    window.fbq('track', 'PageView');
   }
   function effacer() {
-    // Retire les cookies Google Analytics déjà posés.
+    // Retire les cookies Google Analytics et Meta déjà posés.
     for (const c of document.cookie.split(';')) {
       const nom = c.split('=')[0].trim();
-      if (/^_ga/.test(nom)) for (const d of ['', location.hostname, '.' + location.hostname.replace(/^www\./, '')]) document.cookie = `${nom}=; Max-Age=0; path=/${d ? `; domain=${d}` : ''}`;
+      if (/^_ga|^_fb[pc]$/.test(nom)) for (const d of ['', location.hostname, '.' + location.hostname.replace(/^www\./, '')]) document.cookie = `${nom}=; Max-Age=0; path=/${d ? `; domain=${d}` : ''}`;
     }
   }
   function bandeau() {
@@ -720,7 +742,7 @@ renderSocials();
     b.setAttribute('data-cookies', '');
     b.setAttribute('role', 'dialog');
     b.setAttribute('aria-label', 'Mesure d’audience');
-    b.innerHTML = `<p>Avec ton accord, la Maison utilise Google Analytics pour savoir comment le site est visité et l’améliorer. Aucune publicité. <a href="/confidentialite/">En savoir plus</a></p>
+    b.innerHTML = `<p>Avec ton accord, la Maison utilise Google Analytics et le pixel Meta pour savoir comment le site est visité, l’améliorer et mesurer ses publicités sur Facebook et Instagram. <a href="/confidentialite/">En savoir plus</a></p>
       <div><button type="button" class="btn btn-line" data-refuser>Refuser</button><button type="button" class="btn btn-ink" data-accepter>Accepter</button></div>`;
     b.querySelector('[data-accepter]').addEventListener('click', () => { ecrire('oui'); b.remove(); charger(); });
     b.querySelector('[data-refuser]').addEventListener('click', () => { ecrire('non'); b.remove(); effacer(); });
@@ -760,6 +782,7 @@ renderSocials();
     if (r.status === 'paid') {
       window.lfbEvent?.('achat');
       try { window.gtag?.('event', 'purchase', { transaction_id: id }); } catch { /* */ }
+      try { window.fbq?.('track', 'Purchase', {}, { eventID: id }); } catch { /* */ }
       if (r.telechargements?.length) {
         dire('Merci, ton livre est à toi !', `Commande n° ${r.order_number}. Tu reçois le reçu de paiement par email. Télécharge ton livre maintenant : tu le retrouveras aussi à tout moment dans « Mon espace », connectée avec la même adresse email.`);
         texte.insertAdjacentHTML('afterend', r.telechargements.map((t) => `<p><a class="btn btn-ink btn-telecharger" href="${esc(t.url)}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#download"/></svg> Télécharger « ${esc(t.nom)} »</a></p>`).join(''));

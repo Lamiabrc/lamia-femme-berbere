@@ -97,6 +97,7 @@ Données stockées par Supabase, centre de données de Paris (Union européenne)
 <li>Stripe : paiement sécurisé et gestion des abonnements.</li>
 <li>Resend : envoi des emails du site (confirmations, résultats, alertes).</li>
 <li>Google Analytics (Google Ireland) : mesure d’audience, <strong>uniquement si tu l’acceptes</strong>.</li>
+<li>Meta (Meta Platforms Ireland) : pixel de mesure des publicités Facebook et Instagram, <strong>uniquement si tu l’acceptes</strong>.</li>
 </ul>
 <p>Les polices de caractères et les bibliothèques techniques sont hébergées sur le site lui-même : ta visite n’envoie aucune donnée à Google Fonts ni à un autre service tiers tant que tu n’as rien accepté.</p>
 <h2>Durée de conservation</h2>
@@ -110,8 +111,9 @@ Données stockées par Supabase, centre de données de Paris (Union européenne)
 <li>Mesure d’audience : 13 mois.</li>
 </ul>
 <h2>Cookies et stockage dans ton navigateur</h2>
-<p>Le site n’utilise <strong>aucun cookie publicitaire</strong>. Ton navigateur garde ce qui est nécessaire au fonctionnement, sans demande d’accord : ta connexion à ton espace, ton panier, ton passage au bal (le temps de la soirée), tes réglages de musique et de flou, et ton choix concernant les cookies.</p>
+<p>Sans ton accord, le site ne dépose <strong>aucun cookie de mesure ni de publicité</strong>. Ton navigateur garde ce qui est nécessaire au fonctionnement, sans demande d’accord : ta connexion à ton espace, ton panier, ton passage au bal (le temps de la soirée), tes réglages de musique et de flou, et ton choix concernant les cookies.</p>
 <p><strong>Google Analytics</strong> : si tu cliques sur « Accepter » dans le bandeau, des cookies de mesure d’audience Google (_ga) sont déposés pour 13 mois au maximum, avec une adresse IP anonymisée, afin de savoir quelles pages sont consultées. Si tu refuses, rien n’est déposé. Tu peux changer d’avis à tout moment avec le lien « Gérer les cookies » en bas de chaque page.</p>
+<p><strong>Pixel Meta</strong> : avec le même accord, le pixel Meta dépose des cookies (_fbp, _fbc) pour 90 jours au maximum. Il indique à Meta les pages visitées et les actions importantes (inscription, dépôt d’annonce, paiement) afin de mesurer et d’améliorer les publicités de la Maison sur Facebook et Instagram. Aucun contenu d’annonce, aucun prénom ni aucune adresse email n’est transmis. Si tu refuses, rien n’est déposé.</p>
 <p>Mesure d’audience interne, sans cookie : pour savoir quelles pages sont lues et d’où viennent les visites, le site compte les pages vues sans cookie. Il enregistre la page, la provenance (réseau social, lien direct…), le type d’appareil, l’heure, ainsi que le pays, la région et la ville approximatifs déduits du réseau internet. L’adresse IP n’est jamais enregistrée, et l’empreinte technique utilisée pour compter les visiteurs change chaque jour : elle ne permet pas de suivre une personne dans le temps.</p>
 <h2>Tes droits</h2>
 <p><strong>Discussion avec ton match.</strong> Après une mise en relation par Lamia, une discussion privée de 7 jours s’ouvre entre vous deux dans ton espace. Ton prénom reste caché : c’est toi qui choisis de le partager, quand tu veux. Tant que vous n’avez pas échangé vos numéros, les numéros, liens et emails écrits dans les messages sont masqués. Chacun donne son numéro s’il le veut : il n’est montré à l’autre que quand vous l’avez donné tous les deux. Lamia ne lit pas vos messages, sauf si l’un de vous signale la discussion. Tes messages sont effacés si tu supprimes ton compte.</p>
