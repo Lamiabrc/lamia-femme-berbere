@@ -150,7 +150,7 @@ async function aFaire() {
     // Ce qui te concerne : tes coachings, tes soirées, les blocages et signalements.
     const miens = [
       ...(f.coachings || []).map((c) => [`🎥 <b>${esc(PRESTA[c.duree] || 'Coaching')}</b> avec <b>${esc(c.prenom || c.email || '?')}</b>, ${esc(heure(c.debut))}`, '<button class="btn btn-line" type="button" data-tab-aller="coaching">Coaching</button>']),
-      (f.signalements || []).length && [`🚩 <b>${f.signalements.length} signalement(s) à traiter</b> :<br>${f.signalements.map((s) => `${VOIR(s.cible_ref)} signalé par ${VOIR(s.auteur_ref)} · « ${MOTIF(s.motif)} »`).join('<br>')}`, ''],
+      (f.signalements || []).length && [`🚩 <b>${f.signalements.length} signalement(s) à traiter</b> :<br>${f.signalements.map((s) => `${VOIR(s.cible_ref)} signalé par ${VOIR(s.auteur_ref)} · « ${MOTIF(s.motif)} » <a class="btn btn-line" href="#profil-${esc(s.cible_ref)}">Ouvrir</a> <button type="button" class="btn btn-line" data-signalement-traite="${esc(s.id)}">C’est traité</button>`).join('<br>')}`, ''],
       (f.blocages || []).length && [`🚫 <b>${f.blocages.length} blocage(s) cette semaine</b> (clique sur un numéro pour ouvrir le profil) :<br>${f.blocages.map((x) => `${VOIR(x.auteur_ref)} a bloqué ${VOIR(x.cible_ref)} · « ${MOTIF(x.motif)} »`).join('<br>')}`, ''],
     ];
     const lignes = [
@@ -328,7 +328,9 @@ document.addEventListener('click', async (e) => {
   const f = e.target.closest('[data-filtre-journal]');
   if (f) { filtreJournal = f.dataset.filtreJournal; chargerJournal(); return; }
   const o = e.target.closest('[data-journal-ouvrir]');
-  if (o) { const l = o.dataset.journalOuvrir; if (/^\/confidences-lamia\/#(annonces|testeurs)/.test(l)) { aller = l.split('#')[1].startsWith('testeurs') ? 'testeurs' : 'annonces'; const fr = $('[data-rencontres]'); if (fr) fr.removeAttribute('src'); ouvrir('rencontres'); } else window.open(l, '_blank', 'noopener'); return; }
+  if (o) { const l = o.dataset.journalOuvrir; if (/^\/confidences-lamia\/#(annonces|testeurs)/.test(l)) { aller = l.split('#')[1].startsWith('testeurs') ? 'testeurs' : 'annonces'; const fr = $('[data-rencontres]'); if (fr) fr.removeAttribute('src'); ouvrir('rencontres'); } else if (/^\/tableau-de-bord\/?#/.test(l)) { const h = l.slice(l.indexOf('#')); if (location.hash === h) suivreHashProfil(); else location.hash = h; } else window.open(l, '_blank', 'noopener'); return; }
+  const st = e.target.closest('[data-signalement-traite]');
+  if (st) { try { await conf({ action: 'annonce_signalement_traite', id: st.dataset.signalementTraite }); message('Signalement noté comme traité.'); aFaire(); } catch { message('Le signalement n’a pas pu être noté.', true); } return; }
   const ef = e.target.closest('[data-effacement-fait]');
   if (ef) {
     if (!confirm(`Tu as bien supprimé la fiche n° ${ef.dataset.effacementFait} de ton outil ? Son contenu sera aussi effacé du site.`)) return;
