@@ -127,12 +127,16 @@ test('dématch courtois : raison obligatoire, deux messages, l’autre prévenu,
   const insert0 = ctx.insert;
   ctx.insert = async (t, r) => insert0(t, { created_at: '2026-11-01T10:00:00.000Z', ...r });
   const termines = [];
-  const moi = { ...ctx, user: { id: A }, terminerDematch: async (d) => { termines.push(d.id); } };
+  const liberes = [];
+  const moi = { ...ctx, user: { id: A }, terminerDematch: async (d) => { termines.push(d.id); }, libererMatch: async (d) => { liberes.push(d.id); } };
   const lui = { ...moi, user: { id: B } };
   const [s0] = await json(await actionDiscussion('annonce_discussion_dematcher', { id: D }, moi));
   assert.equal(s0, 400);
   const [s1, r1] = await json(await actionDiscussion('annonce_discussion_dematcher', { id: D, raison: 'parcours', etape: 'valeurs' }, moi));
   assert.equal(s1, 200); assert.equal(r1.restants, 2);
+  // Règle de Lamia (10 nov. 2026) : dès le dématch annoncé, les deux retrouvent une place, sans attendre la fin de l'au revoir.
+  assert.deepEqual(liberes, [D]);
+  assert.match(db.discussion_messages.at(-1).texte, /matcher à nouveau dès maintenant/);
   assert.match(pushes.at(-1)[1], /La personne met fin/);
   assert.equal(pushes.at(-1)[0], B);
   assert.equal(db.discussions[0].ferme_at, '2026-11-03T10:00:00.000Z');
@@ -179,4 +183,14 @@ test('prénom : caché par défaut, demandé, partagé par choix, ou plus tard a
   assert.equal((await liste(A)).avec, 'Profil n° 27');
   assert.deepEqual(pushes.at(-1), [B, 'Melina t’a donné son prénom']);
   assert.ok(db.discussion_messages.some((m) => m.texte.includes('Melina')));
+});
+
+test('chaque jour, un au revoir encore ouvert rend les places (dématchs d’avant la règle compris)', async () => {
+  const d = { id: D, dematch_par: 'a', a_user: A, b_user: B, dematch_at: '2026-11-01T09:00:00Z', ferme_at: '2026-11-03T09:00:00Z', dematch_rappel_at: '2026-11-01T17:00:00Z' };
+  const liberes = [], termines = [];
+  const base = { read: async () => [d], patch: async () => [], pousserMembre: async () => {}, terminerDematch: async (x) => termines.push(x.id), libererMatch: async (x) => liberes.push(x.id) };
+  await suiviDematchs({ ...base, now: () => new Date('2026-11-02T10:00:00Z') });
+  assert.deepEqual(liberes, [D]); assert.deepEqual(termines, []);
+  await suiviDematchs({ ...base, now: () => new Date('2026-11-03T10:00:00Z') });
+  assert.deepEqual(termines, [D]);
 });

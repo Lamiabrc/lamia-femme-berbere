@@ -77,15 +77,11 @@ test('hors live, textes et photos restent obligatoires', async () => {
   const r = await handleAnnonces('annonce_deposer', { ...base, ville: 'Lyon', pays: 'France' }, ctx(NINA));
   assert.equal((await r.json()).error, 'textes_courts');
 });
-test('match actif : plus de nouvel intérêt jusqu’au dématch', async () => {
+test('« en match » resté à vrai sans aucun match en cours : il se corrige tout seul au lieu de bloquer la personne', async () => {
   const { ctx, db } = monde();
   const user = { id: 'u1', email: 'nina@example.com' };
   db.annonces.push({ id: 'a1', ref: 7, user_id: 'u1', email: 'nina@example.com', status: 'publiee', prenom: 'Nina', en_match: true });
-  let r = await handleAnnonces('annonce_interet', { ref: 9 }, ctx(user));
-  assert.equal((await r.json()).error, 'limite_matchs');
-  r = await handleAnnonces('annonce_dematcher', {}, ctx(user));
-  assert.equal(db.annonces[0].en_match, false);
-  r = await handleAnnonces('annonce_interet', { ref: 9 }, ctx(user));
+  const r = await handleAnnonces('annonce_interet', { ref: 9 }, ctx(user));
   assert.equal(r.status, 200);
   assert.equal(db.annonce_interets[0].cible_ref, 9);
 });
