@@ -320,12 +320,17 @@ const SWIPE_INVITE = `<section class="swipe-page accueil-swipe" id="profils-anon
     <div class="swipe-boutons" data-inv-boutons hidden><button type="button" data-swipe-non aria-label="Pas pour moi"><svg class="ico" aria-hidden="true"><use href="/icones.svg#croix"/></svg></button><button type="button" data-swipe-oui aria-label="Ce profil m’intéresse"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur-plein"/></svg></button></div>
     <p class="swipe-aide"><button type="button" class="confirmer-lien" data-inv-changer hidden>Changer : je cherche un homme / une femme</button></p>
   </div>
-</section>`;
+</section>
+<aside class="lfb-valeurs" aria-label="Nos valeurs">
+  <p class="lfb-valeurs-titre">Un parcours qui suit l’éducation et les valeurs kabyles</p>
+  <p class="lfb-valeurs-mots"><span>Pudeur</span><span>Discrétion</span><span>Respect</span></p>
+  <p class="lfb-valeurs-texte">On n’affiche pas les femmes : ni photo, ni prénom en public. Chacun est respecté dans sa religion et ses valeurs, sans renier les nôtres.</p>
+</aside>`;
 page(
   '/',
   layout({
     title: 'Rencontre kabyle sérieuse pour le mariage · Lamia',
-    description: 'Rencontre kabyle en vue du mariage : profils vérifiés, présentations faites par Lamia, marieuse kabyle. Ton premier match est offert.',
+    description: 'Rencontre kabyle en vue du mariage : profils vérifiés, présentations faites par Lamia, marieuse kabyle. Les matchs sont gratuits.',
     path: '/',
     room: roomBySlug.hall,
     scripts: ['/assets/annonces.js', '/assets/swipe-accueil.js'],
@@ -363,7 +368,7 @@ ${SWIPE_INVITE}
       <li><strong>Tu crées ton profil</strong><span>En 5 minutes : qui tu es, qui tu cherches, 2 photos. Rien n’est publié avec ton nom.</span></li>
       <li><strong>Lamia vérifie</strong><span>Les faux profils n’entrent pas. Avec ta pièce d’identité (facultative), ton profil gagne le badge « vérifié avec pièce d’identité ».</span></li>
       <li><strong>Elle cherche pour toi</strong><span>Son outil de matching compare les profils, et Lamia choisit avec son regard.</span></li>
-      <li><strong>Elle vous présente</strong><span>Si vous êtes d’accord tous les deux, elle vous met en contact. La première fois, c’est offert.</span></li>
+      <li><strong>Elle vous présente</strong><span>Si vous êtes d’accord tous les deux, elle vous met en contact. C’est gratuit.</span></li>
     </ol>
     <p class="po-actions"><a class="po-btn" data-cta-profil href="/rencontres/#confier"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> <span>Créer mon profil ou connexion</span></a></p>
   </div>
@@ -490,7 +495,7 @@ page(
       <li><strong>Trois niveaux</strong><span><b>Prioritaire</b> : score élevé, âge et secteur cohérents, rien à négocier. <b>Prometteur</b> : bon score, aucune condition enfreinte. <b>À explorer</b> : possible, sans blocage, à discuter.</span></li>
       <li><strong>Les blocages sont respectés</strong><span>Ce qui est rédhibitoire pour toi (un divorce, des enfants, une distance…) écarte le profil d’office, même avec un bon score.</span></li>
       <li><strong>Moi, je décide</strong><span>L’outil propose, c’est moi qui valide. Je relis les deux fiches, je vous parle, et je ne propose un match que si j’y crois vraiment.</span></li>
-      <li><strong>La mise en relation</strong><span>Si vous êtes d’accord tous les deux, je vous mets en contact. Ton numéro reste chez moi jusque-là. La première mise en relation est offerte, les suivantes avec une <a href="/abonnement/">formule</a>.</span></li>
+      <li><strong>La mise en relation</strong><span>Si vous êtes d’accord tous les deux, je vous mets en contact. Ton numéro reste chez moi jusque-là. Les matchs sont gratuits. Pour aller plus vite et soutenir le live, il y a les <a href="/abonnement/">formules</a>.</span></li>
       <li><strong>Je vous suis</strong><span>Je prends des nouvelles après la rencontre. Si ça ne colle pas, on clôt le match avec respect et ton profil revient en attente pour une nouvelle chance.</span></li>
     </ol>
     <p class="po-actions"><a class="po-btn" href="/rencontres/#confier"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> Créer mon profil</a><a class="po-btn-verre" href="/rencontres/#profils-anonymes">Voir les profils anonymes</a></p>
@@ -1207,7 +1212,7 @@ page(
 <section class="conf-panneau" data-panneau="annonce" id="annonce" hidden>
   <div class="conf-form">
     <h2>Trouver mon âme sœur avec Lamia</h2>
-    <p>Tu cherches quelqu’un de sérieux pour construire ta vie ? Présente-toi avec ton cœur et dis qui tu aimerais rencontrer. Ton profil n’est jamais publié : Lamia le vérifie, le passe dans son outil de matching et te dit avec combien de personnes tu pourrais correspondre. Pour les découvrir, tu lui écris. La première mise en relation est offerte.</p>
+    <p>Tu cherches quelqu’un de sérieux pour construire ta vie ? Présente-toi avec ton cœur et dis qui tu aimerais rencontrer. Ton profil n’est jamais publié : Lamia le vérifie, le passe dans son outil de matching et te dit avec combien de personnes tu pourrais correspondre. Pour les découvrir, tu lui écris. Les matchs sont gratuits.</p>
     <div data-annonce-box></div>
   </div>
 </section>
@@ -1425,7 +1430,7 @@ page(
 
   <section class="cl-reglages" data-annonces-vue hidden>
     <h2>Annonces de rencontre</h2>
-    <p class="cl-aide">Les profils ne sont jamais publiés. 1) Vérifie le profil (et la pièce d’identité si la personne l’a donnée : elle est facultative), puis « Valider » : la pièce est supprimée, et le profil garde le badge « vérifié avec pièce d’identité ». 2) Exporte vers ton outil et fais le matching. 3) Indique le nombre de profils compatibles et « Envoyer le résultat » : la personne reçoit ce nombre par email (sans savoir qui), avec l’invitation à t’écrire (première mise en relation offerte, ensuite abonnement).</p>
+    <p class="cl-aide">Les profils ne sont jamais publiés. 1) Vérifie le profil (et la pièce d’identité si la personne l’a donnée : elle est facultative), puis « Valider » : la pièce est supprimée, et le profil garde le badge « vérifié avec pièce d’identité ». 2) Exporte vers ton outil et fais le matching. 3) Indique le nombre de profils compatibles et « Envoyer le résultat » : la personne reçoit ce nombre par email (sans savoir qui), avec l’invitation à t’écrire (matchs gratuits, formules pour aller plus vite).</p>
         <div class="cl-carte cl-export">
       <h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#camera"/></svg> Profils sans leurs photos <span data-n-sans-photos></span></h3>
       <p class="cl-aide">Tant qu’il manque 2 photos, la personne voit une demande dans l’application et ne peut ni swiper ni répondre. Le bouton lui envoie aussi une notification sur son téléphone, une seule fois, si elle les a activées.</p>
@@ -1546,7 +1551,7 @@ ${SWIPE_INVITE}
       <li><strong>Tu crées ton profil</strong><span>En 5 minutes : qui tu es, qui tu cherches, 2 photos. Ton identité n’est jamais publiée.</span></li>
       <li><strong>Lamia vérifie</strong><span>Elle vérifie ton profil. Son outil compare les profils, et c’est elle qui choisit. Ta pièce d’identité est facultative : si tu la donnes, ton profil porte le badge renforcé.</span></li>
       <li><strong>Tu sais combien te correspondent</strong><span>Lamia te dit avec combien de personnes tu pourrais correspondre. Personne ne sait qui matche avec qui.</span></li>
-      <li><strong>Lamia vous présente</strong><span>Si vous êtes d’accord tous les deux, elle vous met en contact. Ton numéro reste chez elle jusque-là. La première fois, c’est offert.</span></li>
+      <li><strong>Lamia vous présente</strong><span>Si vous êtes d’accord tous les deux, elle vous met en contact. Ton numéro reste chez elle jusque-là. C’est gratuit.</span></li>
     </ol>
     <p class="po-actions"><button type="button" class="po-btn" data-annonce-ouvrir data-cta-profil aria-expanded="false"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> <span>Créer mon profil ou connexion</span></button></p>
   </details>
@@ -1559,8 +1564,8 @@ ${SWIPE_INVITE}
       <li><strong>Que se passe-t-il quand nous sommes d’accord tous les deux ?</strong><span>Lamia vous présente, et une discussion privée de 7 jours s’ouvre dans votre espace. Vous échangez vos numéros ensuite.</span></li>
       <li><strong>Le site est-il réservé aux Kabyles ?</strong><span>Non. Lamia est marieuse kabyle, et les rencontres sont aussi ouvertes aux Chaouis, aux Touaregs, aux autres Amazighs et aux personnes d’autres origines. Chacun indique son origine sur son profil.</span></li>
       <li><strong>D’où viennent les profils ?</strong><span>De France, d’Algérie, du Canada, d’Europe et d’ailleurs. <a class="text-link" href="/rencontre-kabyle-canada/">Canada</a> · <a class="text-link" href="/rencontre-kabyle-algerie/">Algérie</a> · <a class="text-link" href="/rencontre-kabyle-europe/">Belgique et Europe</a></span></li>
-      <li><strong>Je vis en Algérie, comment faire ?</strong><span>Ton profil et ton premier match sont gratuits. Le paiement en ligne n’y est pas possible : <a class="text-link" href="/salon/">viens au live</a>, chaque soir à 21 h, pour d’autres matchs.</span></li>
-      <li><strong>Combien ça coûte ?</strong><span>Découverte est gratuite et ton premier match est offert. <a class="text-link" href="/abonnement/">Voir toutes les formules</a>.</span></li>
+      <li><strong>Combien ça coûte ?</strong><span>Rien : ton profil et tes matchs sont gratuits, 1 match à la fois. Pour aller plus vite, <a class="text-link" href="/abonnement/">prends une formule</a>.</span></li>
+      <li><strong>Comment soutenir Lamia ?</strong><span><a class="text-link" href="/salon/">Viens au live</a>, partage-le, et abonne-toi si tu peux. Depuis l’Algérie, le paiement en ligne n’est pas possible : ta présence au live compte autant.</span></li>
     </ol>
   </details>
   <details class="po-replie po-replie-liste" id="profils-liste">
@@ -1634,7 +1639,7 @@ page(
       <h1 id="abo-titre">Les formules de rencontre kabyle</h1>
       <p class="po-sub">En gratuit, un match à la fois : dès qu’il se termine, un autre peut commencer.</p>
       <p class="po-lead">Ou choisis le rythme qui te ressemble : 10 matchs par mois et 2 en cours, ou illimités et 5 en cours, avec le coaching et l’option mariage de Lamia. Sans engagement, résiliable en un clic depuis ton espace.</p>
-      <p class="po-lead">Tu vis en Algérie ? Le paiement en ligne n’y est pas possible : <a class="text-link" href="/salon/">viens au live</a>, chaque soir à 21 h, pour d’autres matchs.</p>
+      <p class="po-lead">Les matchs sont gratuits pour tout le monde. Pour soutenir Lamia, <a class="text-link" href="/salon/">viens au live</a> : depuis l’Algérie, où le paiement en ligne n’est pas possible, ta présence compte autant.</p>
     </div>
     <figure class="po-lamia"><img src="/images/lamia/lamia-portrait-tatouages-rond-480.webp" alt="Lamia Femme Berbère" width="200" height="200"><figcaption>Lamia · ta marieuse</figcaption></figure>
   </div>

@@ -88,7 +88,7 @@ function montrer(genre) {
 function inviter(el) {
   if (el) { el.style.transition = 'transform .25s ease'; el.style.transform = ''; el.classList.remove('vers-oui', 'vers-non'); }
   window.lfbEvent?.('swipe_invite_coeur');
-  const d = fenetre(`<h2>Ce profil te plaît ?</h2><p>Pour lui envoyer ton cœur, il te faut un profil : c’est lui que l’autre personne verra. C’est gratuit, anonyme, et ton premier match est offert.</p>
+  const d = fenetre(`<h2>Ce profil te plaît ?</h2><p>Pour lui envoyer ton cœur, il te faut un profil : c’est lui que l’autre personne verra. C’est gratuit et anonyme, et les matchs sont gratuits aussi.</p>
     <div class="swipe-invite-liens"><a class="po-btn" href="/rencontres/#confier">Créer mon profil gratuit</a><a class="po-btn-verre" href="/mon-espace/">J’ai déjà un compte</a><button type="button" class="confirmer-lien" data-fermer>Continuer à regarder</button></div>`);
   d.addEventListener('click', (e) => { if (e.target === d || e.target.closest('[data-fermer]')) d.remove(); });
 }
