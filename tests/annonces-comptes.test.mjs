@@ -77,6 +77,19 @@ test('hors live, textes et photos restent obligatoires', async () => {
   const r = await handleAnnonces('annonce_deposer', { ...base, ville: 'Lyon', pays: 'France' }, ctx(NINA));
   assert.equal((await r.json()).error, 'textes_courts');
 });
+test('un profil tapé au hasard est refusé, un vrai texte passe (français, kabyle, arabe)', async () => {
+  const { texteCredible } = await import('../content/matching-options.mjs');
+  assert.equal(texteCredible('walou bdgjfggyfeshkkhfswhfsgjrdhrdgjfdhkkhgfdsdgjkkhgfdgivf'), false);
+  assert.equal(texteCredible('kgcivbhcrdshknfzaagjncvljghmvcxcbvxcxxxcxvi'), false);
+  assert.equal(texteCredible('bbbbbbbbbbbbbbbbbbbbbbbbbb'), false);
+  assert.equal(texteCredible('dfgh jklm qsdf wxcv bnqs dfgh jklm'), false);
+  for (const ok of ['Je suis une femme simple, souriante, attachée à ma famille et à mes racines.',
+    'Nekk d taqbaylit, ḥemmleɣ tamurt-iw d twacult-iw, ttnadiɣ argaz n lɛali.',
+    'أبحث عن رجل جاد ومحترم يحب العائلة ويقدر القيم', 'Sérieux svp', '']) assert.equal(texteCredible(ok), true, ok);
+  const { ctx } = monde();
+  const r = await handleAnnonces('annonce_deposer', { ...complet, profil: 'walou bdgjfggyfeshkkhfswhfsgjrdhrdgjfdhkkhgfdsdgjkkhgfdgivf' }, ctx(NINA));
+  assert.equal((await r.json()).error, 'textes_illisibles');
+});
 test('« en match » resté à vrai sans aucun match en cours : il se corrige tout seul au lieu de bloquer la personne', async () => {
   const { ctx, db } = monde();
   const user = { id: 'u1', email: 'nina@example.com' };
