@@ -597,9 +597,21 @@ export async function retraitDepuisLien() {
 
 // Montage automatique sur les pages qui ont les emplacements (Patio).
 retraitDepuisLien();
-function ouvrirFormulaire(ref) {
+// Un membre qui a déjà son profil ne doit pas remplir le formulaire pour rien (il était refusé à la fin).
+async function aDejaUnProfil() {
+  const s = await sessionActive();
+  if (!s) return false;
+  try { return Boolean((await api({ action: 'annonce_mon_profil', discret: true }, s.access_token)).profil); } catch { return false; }
+}
+async function ouvrirFormulaire(ref) {
   const box = document.querySelector('[data-annonce-box]');
   if (!box) return;
+  if (!ref && !box.dataset.monte && await aDejaUnProfil()) {
+    box.innerHTML = '<div class="annonce-deja"><h3>Tu as déjà ton profil</h3><p>Pas besoin d’en créer un autre. Modifie-le dans ton espace, ou continue à swiper.</p><p class="po-actions"><a class="po-btn" href="/mon-espace/#mon-profil">Modifier mon profil</a><a class="po-btn-verre" href="/rencontres/swipe/">Swiper</a></p></div>';
+    box.hidden = false;
+    box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
   if (ref) { box.dataset.interet = ref; window.lfbEvent?.('interet_profil'); }
   if (!box.dataset.monte || ref) { monterFormulaire(box); box.dataset.monte = '1'; }
   box.hidden = false;

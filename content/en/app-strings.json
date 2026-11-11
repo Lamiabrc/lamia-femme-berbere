@@ -1216,5 +1216,8 @@
  "Ou ouvre le menu ⋮ puis « Installer LFB… ».": "Or open the ⋮ menu, then “Install LFB…”.",
  "La conversation met du temps à s’afficher. Nouvel essai…": "The conversation is taking a while to load. Trying again…",
  "La conversation ne s’affiche pas. Vérifie ta connexion, puis rouvre cette page. Tu peux quand même écrire.": "The conversation isn’t loading. Check your connection, then reopen this page. You can still write.",
- "Ce lien a expiré ou a déjà servi. Écris ton email ici pour en recevoir un nouveau.": "This link has expired or has already been used. Enter your email here to receive a new one."
+ "Ce lien a expiré ou a déjà servi. Écris ton email ici pour en recevoir un nouveau.": "This link has expired or has already been used. Enter your email here to receive a new one.",
+ "Tu as déjà ton profil": "You already have your profile",
+ "Pas besoin d’en créer un autre. Modifie-le dans ton espace, ou continue à swiper.": "No need to create another one. Edit it in your space, or keep swiping.",
+ "Modifier mon profil": "Edit my profile"
 }

@@ -78,7 +78,8 @@ async function monCoaching(session) {
   const peindre = (d, note = '') => {
     // Sans visio incluse ni achetée : l'offre à l'unité, sauf là où le paiement en ligne n'existe pas.
     const offre = d.offre && !window.LFB_PLAY;
-    bloc.hidden = !d.inclus && !offre;
+    // Sans visio incluse ni achetée, la partie reste cachée : l'offre de coaching est dans les rubriques du haut (« Coaching »).
+    bloc.hidden = !d.inclus;
     const intro = bloc.querySelector('[data-coaching-intro]');
     if (intro) intro.textContent = d.prestige ? 'Ta formule Prestige comprend une visio de 15 minutes par mois avec Lamia, pour ton profil et tes rencontres. Elle n’est jamais enregistrée.' : 'Du temps en visio avec Lamia, pour ton profil, tes rencontres ou ton couple. Jamais enregistré.';
     if (!d.inclus) { box.innerHTML = offre ? '<ul><li>Visio de 15 minutes · 15 € (incluse chaque mois avec Prestige)</li><li>Coaching de 30 minutes · 39 €</li><li>Sauver mon couple, 1 heure · 89 €</li></ul><p><a class="btn btn-ink" href="/abonnement/#unites">Choisir</a> <a class="text-link" href="/abonnement/?formule=prestige">Voir Prestige</a></p>' : ''; return; }
@@ -573,7 +574,8 @@ async function propositions(session) {
       ${secteurLisible(f.secteur) ? `<p><strong>Cherche en :</strong> ${esc(secteurLisible(f.secteur))}</p>` : ''}
       ${rep}${moderation(f.ref)}</div></article>`;
   };
-  const afficher = () => { box.innerHTML = liste.length ? enDeuxTemps(liste, carte, 'proposition') : '<p>Pas encore de proposition.</p>'; };
+  // Rien à montrer : la partie entière disparaît, pour ne pas alourdir la page.
+  const afficher = () => { box.innerHTML = liste.length ? enDeuxTemps(liste, carte, 'proposition') : ''; const sec = box.closest('section'); if (sec) { sec.hidden = !liste.length; if (liste.length && !sec.dataset.montre && location.hash === `#${sec.id}`) { sec.dataset.montre = '1'; sec.scrollIntoView({ behavior: 'smooth' }); } } };
   try { ({ propositions: liste = [] } = await appelProfil({ action: 'annonce_propositions' }, session)); afficher(); }
   catch { box.innerHTML = '<p>Les propositions ne s’affichent pas pour le moment.</p>'; return; }
   ecouter(box, 'click', async (e) => {
@@ -663,7 +665,7 @@ async function interetsRecus(session) {
       ${secteurLisible(f.secteur) ? `<p><strong>Cherche en :</strong> ${esc(secteurLisible(f.secteur))}</p>` : ''}
       ${rep}${moderation(f.ref)}</div></article>`;
   };
-  const afficher = () => { box.innerHTML = liste.length ? enDeuxTemps(liste, carte, 'interet') : '<p>Personne pour le moment.</p>'; };
+  const afficher = () => { box.innerHTML = liste.length ? enDeuxTemps(liste, carte, 'interet') : ''; const sec = box.closest('section'); if (sec) { sec.hidden = !liste.length; if (liste.length && !sec.dataset.montre && location.hash === `#${sec.id}`) { sec.dataset.montre = '1'; sec.scrollIntoView({ behavior: 'smooth' }); } } };
   try { ({ interets: liste = [] } = await appelProfil({ action: 'annonce_interets_recus' }, session)); afficher(); }
   catch { box.innerHTML = '<p>Les intérêts reçus ne s’affichent pas pour le moment. Réessaie dans un instant.</p>'; return; }
   ecouter(box, 'click', async (e) => {
