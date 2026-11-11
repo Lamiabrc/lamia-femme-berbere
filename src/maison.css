@@ -4093,3 +4093,21 @@ html[dir="rtl"] .po-corps h2::after, html[dir="rtl"] .room-body > h2::after, htm
 .annonce-metier { font-weight: 600; }
 /* Bouton secondaire sur fond clair (accueil en swipe) : lisible, pas blanc sur blanc. */
 .accueil-swipe .po-btn-verre { background: #fff; color: var(--bordeaux-lfb) !important; border: 1px solid var(--bordeaux-lfb); }
+
+/* Rubriques épinglées : tout ce que Lamia propose, en icônes (accueil, Profils, Mon espace). */
+.lfb-rubriques { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; max-width: 860px; margin: 0 auto; padding: 14px 16px 18px; }
+.lfb-rubriques a { display: grid; justify-items: center; align-content: start; gap: 4px; padding: 12px 6px 10px; border-radius: 16px; border: 1px solid #E6D9DD; background: #fff; color: #2F2B3D; text-decoration: none; text-align: center; transition: transform .15s, border-color .15s, box-shadow .15s; }
+.lfb-rubriques a:hover, .lfb-rubriques a:focus-visible { transform: translateY(-2px); border-color: var(--bordeaux-lfb); box-shadow: 0 8px 18px rgba(122, 31, 53, .12); }
+.lfb-rubriques .ico { width: 26px; height: 26px; color: var(--bordeaux-lfb); }
+.lfb-rubriques strong { font-size: 14.5px; font-weight: 700; line-height: 1.2; }
+.lfb-rubriques small { font-size: 11.5px; color: #6B6478; line-height: 1.2; }
+.espace .lfb-rubriques { padding: 0; margin: 0 0 26px; max-width: none; }
+@media (max-width: 760px) { .lfb-rubriques { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 10px 12px 14px; } .lfb-rubriques a { padding: 10px 4px 8px; } .lfb-rubriques strong { font-size: 13.5px; } }
+/* Mon espace allégé : les parties secondaires sont repliées. */
+.espace-pli { margin-top: 18px; border: 1px solid var(--ligne); border-radius: 16px; background: #fff; padding: 4px 16px; }
+.espace-pli > summary { cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; }
+.espace-pli > summary::-webkit-details-marker { display: none; }
+.espace-pli > summary h2 { margin: 0; font-size: clamp(20px, 3vw, 24px); }
+.espace-pli > summary::after { content: "+"; flex: none; width: 30px; height: 30px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--bordeaux-lfb); color: var(--bordeaux-lfb); font-size: 20px; line-height: 1; }
+.espace-pli[open] > summary::after { content: "–"; }
+.espace-pli[open] { padding-bottom: 16px; }

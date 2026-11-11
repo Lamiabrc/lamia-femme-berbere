@@ -312,6 +312,15 @@ globalThis.__pageFr = page;
 // Le Hall
 // Les bijoux des cartes du swipe (page Swipe et accueil).
 const SWIPE_DEFS = `<svg class="swipe-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs><radialGradient id="corail-b" cx="38%" cy="32%" r="70%"><stop offset="0" stop-color="#F08A68"/><stop offset=".6" stop-color="#D2482C"/><stop offset="1" stop-color="#A5301C"/></radialGradient><linearGradient id="or-b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF4B8"/><stop offset=".45" stop-color="#D4B56E"/><stop offset=".62" stop-color="#F3E0B9"/><stop offset="1" stop-color="#8A6414"/></linearGradient><clipPath id="clip-rond"><circle cx="90" cy="92" r="72"/></clipPath><clipPath id="clip-triangle"><path d="M14 44Q90 30 166 44 174 56 168 68L100 190Q90 204 80 190L12 68Q6 56 14 44Z"/></clipPath><g id="pampille"><circle cy="-5" r="3.6" fill="none" stroke="url(#or-b)" stroke-width="1.8"/><circle cy="1" r="3.6" fill="none" stroke="url(#or-b)" stroke-width="1.8"/><path d="M0 4 9 24Q9 36 0 46-9 36-9 24Z" fill="#2F2B3D" stroke="url(#or-b)" stroke-width="2.2" stroke-linejoin="round"/><path d="M0 7 6.5 22Q0 27-6.5 22Z" fill="#D4B56E" stroke="#F3E0B9" stroke-width=".7"/><path d="M0 22Q6 28 4.6 33 0 40-4.6 33-6 28 0 22Z" fill="#F3E0B9" stroke="#F3E0B9" stroke-width=".7"/><circle cy="48" r="4.6" fill="url(#or-b)"/><circle cy="48" r="3" fill="#D4B56E"/></g><g id="bijou-femme"><circle cx="90" cy="0" r="17" fill="none" stroke="url(#or-b)" stroke-width="4.5"/><path d="M46 10L126 -9L136 -13L126 -5.5L47 13Q42 13 46 10Z" fill="url(#or-b)" stroke="#8A6414" stroke-width=".5"/><use href="#pampille" x="48" y="158"/><use href="#pampille" x="90" y="178"/><use href="#pampille" x="132" y="158"/><circle cx="90" cy="92" r="76" fill="none" stroke="url(#or-b)" stroke-width="8"/><circle cx="90" cy="92" r="72" fill="#2F2B3D"/><image href="/images/outil/avatar-femme.webp" x="17" y="19" width="146" height="146" clip-path="url(#clip-rond)" preserveAspectRatio="xMidYMid slice"/><circle cx="90" cy="168" r="11.1" fill="url(#or-b)"/><circle cx="90" cy="168" r="8.5" fill="url(#corail-b)"/><ellipse cx="87.3" cy="164.9" rx="2.2" ry="1.4" fill="#FBC4AE" opacity=".8"/></g><g id="bijou-homme"><circle cx="90" cy="16" r="17" fill="none" stroke="url(#or-b)" stroke-width="4.5"/><path d="M46 26L126 7L136 3L126 10.5L47 29Q42 29 46 26Z" fill="url(#or-b)" stroke="#8A6414" stroke-width=".5"/><use href="#pampille" x="56" y="150"/><use href="#pampille" x="90" y="198"/><use href="#pampille" x="124" y="150"/><path d="M14 44Q90 30 166 44 174 56 168 68L100 190Q90 204 80 190L12 68Q6 56 14 44Z" fill="#2F2B3D"/><image href="/images/outil/avatar-homme.webp" x="-6" y="30" width="190" height="190" clip-path="url(#clip-triangle)" preserveAspectRatio="xMidYMid slice"/><path d="M14 44Q90 30 166 44 174 56 168 68L100 190Q90 204 80 190L12 68Q6 56 14 44Z" fill="none" stroke="url(#or-b)" stroke-width="8" stroke-linejoin="round"/><circle cx="90" cy="192" r="11.1" fill="url(#or-b)"/><circle cx="90" cy="192" r="8.5" fill="url(#corail-b)"/><ellipse cx="87.3" cy="188.9" rx="2.2" ry="1.4" fill="#FBC4AE" opacity=".8"/></g></defs></svg>`;
+// Les rubriques épinglées : on voit d'un coup d'œil tout ce que Lamia propose (avis d'une abonnée, 11 nov. 2026).
+const RUBRIQUES = `<nav class="lfb-rubriques" aria-label="Tout ce que Lamia propose">
+  <a href="/rencontres/swipe/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur"/></svg><strong>Matchs</strong></a>
+  <a href="/abonnement/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#star"/></svg><strong>Mon offre</strong><small>Tous les tarifs</small></a>
+  <a href="/abonnement/#unites"><svg class="ico" aria-hidden="true"><use href="/icones.svg#handshake"/></svg><strong>Coaching</strong></a>
+  <a href="/speed-dating/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#theater"/></svg><strong>Speed dating</strong></a>
+  <a href="/boutique/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#gem"/></svg><strong>Boutique</strong></a>
+  <a href="/salon/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#live"/></svg><strong>Live</strong></a>
+</nav>`;
 // Le swipe ouvert à tous (accueil et page Profils) : src/swipe-accueil.js le fait vivre.
 const SWIPE_INVITE = `<section class="swipe-page accueil-swipe" id="profils-anonymes" data-swipe-accueil aria-label="Les profils">
   <div class="swipe-app">
@@ -322,6 +331,7 @@ const SWIPE_INVITE = `<section class="swipe-page accueil-swipe" id="profils-anon
     <p class="swipe-aide"><button type="button" class="confirmer-lien" data-inv-changer hidden>Changer : je cherche un homme / une femme</button></p>
   </div>
 </section>
+${RUBRIQUES}
 <aside class="lfb-valeurs" aria-label="Nos valeurs">
   <p class="lfb-valeurs-titre">Un parcours qui suit l’éducation et les valeurs kabyles</p>
   <p class="lfb-valeurs-mots"><span>Pudeur</span><span>Discrétion</span><span>Respect</span></p>
@@ -806,26 +816,7 @@ page(
   <div data-espace-in hidden>
     <p class="lfb-azul" lang="ber">ⴰⵣⵓⵍ</p>
     <h1>Bonjour <span data-espace-nom></span></h1>
-    <p class="espace-email">Connecté·e avec <strong data-espace-email></strong> </p>
-    <p><button class="btn btn-line" type="button" data-espace-logout>Se déconnecter</button></p>
-    <details class="espace-mdp">
-      <summary>Modifier mon mot de passe</summary>
-      <form data-espace-mdp>
-        <label>Nouveau mot de passe (8 caractères minimum)<input name="password" type="password" autocomplete="new-password" minlength="8" required></label>
-        <label>Confirmer le nouveau mot de passe<input name="password2" type="password" autocomplete="new-password" minlength="8" required></label>
-        <button class="btn btn-ink" type="submit">Enregistrer</button>
-        <p class="form-status" role="status" data-mdp-status></p>
-      </form>
-    </details>
-    <details class="espace-mdp espace-supprimer">
-      <summary>Supprimer mon compte</summary>
-      <form data-espace-supprimer>
-        <p>Ton profil, tes photos, tes demandes, tes discussions et tes notifications sont effacés pour de bon, et Lamia est prévenue pour effacer ta fiche de son outil. Tes factures sont gardées, comme la loi l’exige. Si tu as un abonnement, résilie-le d’abord (bloc « Mon abonnement »).</p>
-        <label>Écris SUPPRIMER pour confirmer<input name="confirmation" autocomplete="off" required></label>
-        <button class="btn btn-line" type="submit">Supprimer définitivement mon compte</button>
-        <p class="form-status" role="status" data-supprimer-status></p>
-      </form>
-    </details>
+    ${RUBRIQUES}
 
     <section class="espace-admin" data-espace-admin hidden>
       <h2>Espace administratrice</h2>
@@ -875,9 +866,8 @@ page(
       <div class="espace-profil" data-espace-coaching></div>
     </section>
 
-    <section id="speed-dating">
-      <h2>Mon speed dating</h2>
-      <div id="salons" data-espace-salon><p class="loading">Un instant…</p></div>
+    <details class="espace-pli" id="speed-dating" data-ouvre-si="[data-espace-soirees-bloc]">
+      <summary><h2>Mon speed dating</h2></summary>      <div id="salons" data-espace-salon><p class="loading">Un instant…</p></div>
       <div data-espace-soirees-bloc hidden>
         <h3>Mes soirées réservées</h3>
         <div class="espace-soirees" data-espace-soirees></div>
@@ -891,7 +881,7 @@ page(
         <a href="/speed-dating/bal/"><strong>Entrer dans la salle</strong><span>Le soir de la soirée</span></a>
         <a href="/speed-dating/souhaits/"><strong>Mon carnet de bal</strong><span>Qui aimerais-tu revoir ?</span></a>
       </div>
-    </section>
+    </details>
 
 
     <section>
@@ -899,26 +889,48 @@ page(
       <div class="espace-achats" data-espace-abonnement><p class="loading">Un instant…</p></div>
     </section>
 
-    <section>
-      <h2>Mes achats</h2>
-      <div class="espace-achats" data-espace-achats><p class="loading">Un instant…</p></div>
-    </section>
+    <details class="espace-pli">
+      <summary><h2>Mes achats</h2></summary>      <div class="espace-achats" data-espace-achats><p class="loading">Un instant…</p></div>
+    </details>
 
-    <section>
-      <h2>Les boutiques de la Maison</h2>
-      <div class="espace-liens is-light is-boutiques">
+    <details class="espace-pli">
+      <summary><h2>Les boutiques de la Maison</h2></summary>      <div class="espace-liens is-light is-boutiques">
         <a href="/boutique/"><strong>La Boutique</strong><span>Tout ce que la Maison propose</span></a>
         <a href="/ecrin/"><strong>L’Écrin</strong><span>Les bijoux d’Ath Yenni</span></a>
         <a href="/bibliotheque/"><strong>La Bibliothèque</strong><span>Werdi, broché et ebook</span></a>
         <a href="/grenier/"><strong>Le Grenier</strong><span>Mes trouvailles de brocante</span></a>
       </div>
-    </section>
+    </details>
 
     <section id="demasquage" data-espace-demasquage-section hidden>
       <h2><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Mes démasquages</h2>
       <p class="espace-note">Tu as choisi quelqu’un au bal, et cette personne t’a choisi·e aussi. Veux-tu te démasquer ? Ta réponse reste privée : si vous dites oui tous les deux, Lamia vous met en relation.</p>
       <div class="espace-soirees" data-espace-demasquage></div>
     </section>
+
+    <details class="espace-pli" id="mon-compte">
+      <summary><h2>Mon compte</h2></summary>
+    <p class="espace-email">Connecté·e avec <strong data-espace-email></strong> </p>
+    <p><button class="btn btn-line" type="button" data-espace-logout>Se déconnecter</button></p>
+    <details class="espace-mdp">
+      <summary>Modifier mon mot de passe</summary>
+      <form data-espace-mdp>
+        <label>Nouveau mot de passe (8 caractères minimum)<input name="password" type="password" autocomplete="new-password" minlength="8" required></label>
+        <label>Confirmer le nouveau mot de passe<input name="password2" type="password" autocomplete="new-password" minlength="8" required></label>
+        <button class="btn btn-ink" type="submit">Enregistrer</button>
+        <p class="form-status" role="status" data-mdp-status></p>
+      </form>
+    </details>
+    <details class="espace-mdp espace-supprimer">
+      <summary>Supprimer mon compte</summary>
+      <form data-espace-supprimer>
+        <p>Ton profil, tes photos, tes demandes, tes discussions et tes notifications sont effacés pour de bon, et Lamia est prévenue pour effacer ta fiche de son outil. Tes factures sont gardées, comme la loi l’exige. Si tu as un abonnement, résilie-le d’abord (bloc « Mon abonnement »).</p>
+        <label>Écris SUPPRIMER pour confirmer<input name="confirmation" autocomplete="off" required></label>
+        <button class="btn btn-line" type="submit">Supprimer définitivement mon compte</button>
+        <p class="form-status" role="status" data-supprimer-status></p>
+      </form>
+    </details>
+    </details>
 
     <div class="espace-liens is-light">
       <a href="/confidences/"><strong>Me confier à Lamia</strong><span>Écrire, laisser un vocal, échanger · réservé aux abonnés</span></a>
