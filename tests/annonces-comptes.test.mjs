@@ -159,6 +159,18 @@ test('swipe sans limite ; matchs en cours selon la formule : Découverte 1, Pass
   r = await handleAnnonces('annonce_swipe', { ref: 34, choix: 'oui' }, c('decouverte', 0));
   assert.equal(r.status, 200);
 });
+test('cœurs du jour : 20 en Découverte, sans limite avec une formule, le non reste libre', async () => {
+  const { ctx, db } = monde();
+  db.annonces.push({ id: 'a1', ref: 21, user_id: 'u1', email: 'nina@example.com', status: 'publiee', prenom: 'Nina', genre: 'femme', en_match: false, matchs_bonus: 0, pays: 'France' });
+  const nina = { id: 'u1', email: 'nina@example.com' };
+  const c = (formule, nb) => { const x = ctx(nina, formule), base = x.read; return { ...x, read: async (u) => (u.includes('via=in.(swipe,bouton)') ? Array.from({ length: nb }, (_, i) => ({ id: i })) : base(u)) }; };
+  const swipe = async (formule, nb, choix = 'oui') => { const r = await handleAnnonces('annonce_swipe', { ref: 31, choix }, c(formule, nb)); return [r.status, await r.json()]; };
+  assert.equal((await swipe('decouverte', 19))[0], 200);
+  const [s, r] = await swipe('decouverte', 20);
+  assert.equal(s, 429); assert.equal(r.error, 'coeurs_du_jour'); assert.equal(r.limite, 20);
+  assert.equal((await swipe('decouverte', 20, 'non'))[0], 200);
+  assert.equal((await swipe('passion', 200))[0], 200);
+});
 test('quotas : Découverte sans total (1 match à la fois) ; Passion 10 par mois, Prestige illimité', async () => {
   const { ctx, db } = monde();
   db.annonces.push({ id: 'a1', ref: 21, user_id: 'u1', email: 'nina@example.com', status: 'publiee', prenom: 'Nina', genre: 'femme', en_match: false, matchs_bonus: 0, pays: 'France' });

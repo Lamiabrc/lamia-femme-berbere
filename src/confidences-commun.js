@@ -28,6 +28,12 @@ export async function creerCompte({ email, password, prenom = '', source = 'site
   return api({ action: 'annonce_creer_compte', email, password, prenom, source });
 }
 
+// Listes identiques pour tout le monde : demandées en lecture simple, pour que le réseau de Vercel les garde en cache.
+export async function apiPublique(action) {
+  const r = await fetch(`/api/confidences/?action=${action}`);
+  if (!r.ok) throw new Error('temporary_failure');
+  return r.json();
+}
 export async function api(body, token) {
   const r = await fetch('/api/confidences', { method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }, body: JSON.stringify(body) });
   let data = {};

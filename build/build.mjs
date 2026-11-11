@@ -1609,6 +1609,7 @@ const tableauFormules = () => {
     ['Matchs en cours en même temps', d.matchs, pa.matchs, pr.matchs],
     ['Speed datings inclus par mois', '–', pa.speedDatings, pr.speedDatings],
     ['Swipe sans limite', oui, oui, oui],
+    ['Cœurs par jour', d.coeursJour, 'Illimités', 'Illimités'],
     ['7 jours de discussion avec ton match', oui, oui, oui],
     ['Le profil de qui t’a choisi·e', 'Le nombre seulement', v(pa.quiMaChoisi), v(pr.quiMaChoisi)],
     ['La photo de ton match, s’il ou elle l’accepte', `${eurosAbo(UNITES.find((u) => u.id === 'photo_match').prix)} pour 1 heure`, 'Incluse', 'Incluse'],

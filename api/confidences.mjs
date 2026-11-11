@@ -22,8 +22,20 @@ export async function OPTIONS(request) {
   return cors(request, new Response(null, { status: 204 }));
 }
 
+const PUBLIQUES = { annonces_publiques: { action: 'annonces_publiques', s: 120 }, annonce_places_bal: { action: 'annonce_places_bal', s: 60 }, annonce_nouveautes: { action: 'annonce_nouveautes', s: 300 } };
+
 // Chaque soir (tâche programmée de Vercel) : les nouveautés pas encore annoncées partent en notification, regroupées.
 export async function GET(request) {
+  // Économie : les listes identiques pour tous les visiteurs sont servies par le réseau de Vercel (cache),
+  // sans réveiller le serveur à chaque page.
+  const publique = PUBLIQUES[new URL(request.url).searchParams.get('action') || ''];
+  if (publique) {
+    try {
+      const r = await handleConfidences(new Request('https://lamia-femme-berbere.com/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: publique.action }) }));
+      if (!r.ok) return r;
+      return new Response(await r.text(), { headers: { 'Content-Type': 'application/json', 'Cache-Control': `public, max-age=0, s-maxage=${publique.s}, stale-while-revalidate=${publique.s * 5}` } });
+    } catch (e) { console.error('confidences failed', e?.message); return json({ error: 'temporary_failure' }, 502); }
+  }
   const secret = process.env.CRON_SECRET;
   const ok = secret ? request.headers.get('authorization') === `Bearer ${secret}` : /vercel-cron/i.test(request.headers.get('user-agent') || '');
   if (!ok) return json({ error: 'forbidden' }, 403);

@@ -10,7 +10,7 @@ const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', PUBLIC
 const zone = document.querySelector('[data-swipe]');
 const compteur = document.querySelector('[data-swipe-compteur]');
 let infosAbo = {}, creditsCoeur = 0;
-let tour = 1, tourAnnonce = false, dejaCharge = false, enRecharge = false, envoi = Promise.resolve(), tous = [], profils = [], token = null, occupe = false, quota = { limite: null, restants: null }, choisi = { nombre: 0, refs: [] }, matchs = { actifs: 0, limite: 1, formule: 'decouverte' }, dernier = null, coeurs = 0;
+let tour = 1, tourAnnonce = false, dejaCharge = false, enRecharge = false, envoi = Promise.resolve(), tous = [], profils = [], token = null, occupe = false, quota = { limite: null, restants: null }, coeursJour = { limite: null, restants: null }, choisi = { nombre: 0, refs: [] }, matchs = { actifs: 0, limite: 1, formule: 'decouverte' }, dernier = null, coeurs = 0;
 const bandeau = document.querySelector('[data-swipe-infos]');
 
 const message = (html) => { zone.innerHTML = `<div class="swipe-message">${html}</div>`; document.querySelector('[data-swipe-boutons]').hidden = true; };
@@ -113,6 +113,7 @@ function infos() {
     : `<p class="swipe-info is-choisi"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur-plein"/></svg> <strong>${choisi.nombre} personne${choisi.nombre > 1 ? 's t’ont' : ' t’a'} choisi·e</strong> <span class="swipe-flou" aria-hidden="true">n° ••• · n° •••</span><br><a href="/abonnement/?formule=passion">Découvre qui avec la formule Passion</a></p>`);
   if (matchs.limite) lignes.push(`<p class="swipe-info${matchs.actifs >= matchs.limite ? ' is-plein' : ''}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur-plein"/></svg> Matchs en cours : <strong>${matchs.actifs} / ${matchs.limite}</strong>${matchs.actifs >= matchs.limite ? ' · tu peux continuer à découvrir les profils, mais plus en choisir pour l’instant' : ''}</p>`);
   if (quota.limite) lignes.push(`<p class="swipe-info">Il te reste <strong>${quota.restants}</strong> profil${quota.restants > 1 ? 's' : ''} à swiper aujourd’hui (${quota.limite} par jour avec ta formule). <a href="/abonnement/">Plus de profils</a></p>`);
+  if (coeursJour.limite) lignes.push(`<p class="swipe-info${coeursJour.restants <= 0 ? ' is-plein' : ''}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur-plein"/></svg> Cœurs du jour : <strong>${coeursJour.restants} / ${coeursJour.limite}</strong> · <a href="/abonnement/?formule=passion">Cœurs illimités avec Passion</a></p>`);
   bandeau.innerHTML = lignes.join('');
 }
 function plusDeProfilsAujourdhui() {
@@ -185,6 +186,10 @@ function celebrerMatch(ref) {
   for (let k = 0; k < 3; k += 1) setTimeout(() => eclat(r.left + r.width / 2, r.top + 60, ['', '', '', '', ''], 22), k * 280);
 }
 // Matchs au complet : avec qui, l'invitation à dématcher (raisons ouvertes dans l'espace) et l'abonnement pour plusieurs matchs.
+function coeursFinis() {
+  vibrer(80);
+  return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg></p><h2>Tes cœurs du jour sont partis</h2><p>Tu peux continuer à découvrir les profils. Tes cœurs reviennent demain, à minuit.</p><p>Tu ne veux pas attendre ? Avec <strong>Passion</strong>, tes cœurs sont illimités, et tu soutiens le live.</p><p class="po-actions"><a class="po-btn" href="/abonnement/?formule=passion">Voir la formule Passion</a></p>`);
+}
 async function limiteAtteinte() {
   vibrer(80);
   const ouverts = token ? await matchsOuverts(token) : [];
@@ -251,6 +256,7 @@ async function choisir(choix, message) {
   const ref = profils[0].ref;
   if (el) { el.style.transition = 'transform .35s ease, opacity .35s ease'; el.style.transform = `translateX(${choix === 'oui' ? 130 : -130}%) rotate(${choix === 'oui' ? 18 : -18}deg)`; el.style.opacity = '0'; }
   const profil = profils[0];
+  if (choix === 'oui' && !message && coeursJour.limite && coeursJour.restants <= 0) { if (el) { el.style.transform = ''; el.style.opacity = ''; el.classList.remove('vers-oui', 'vers-non'); el.classList.add('is-refus'); setTimeout(() => el.classList.remove('is-refus'), 500); } occupe = false; return coeursFinis(); }
   if (choix === 'oui' && matchs.limite && matchs.actifs >= matchs.limite) { if (el) { el.style.transform = ''; el.style.opacity = ''; el.classList.remove('vers-oui', 'vers-non'); el.classList.add('is-refus'); setTimeout(() => el.classList.remove('is-refus'), 500); } occupe = false; return limiteAtteinte(); }
   if (choix === 'oui') {
     const btn = document.querySelector('[data-swipe-oui]').getBoundingClientRect(); eclat(btn.left + btn.width / 2, btn.top + btn.height / 2); vibrer(18);
@@ -260,9 +266,10 @@ async function choisir(choix, message) {
   dernier = { profil, choix }; garderDernier(); majAnnuler();
   envoi = api({ action: 'annonce_swipe', ref, choix, ...(message ? { message } : {}) }, token).then((r) => {
     if (message) { creditsCoeur = Math.max(0, creditsCoeur - 1); try { localStorage.removeItem(`lfb-coeur-${ref}`); } catch { /* */ } toast('💌 Ton cœur et ton message sont partis'); }
+    if (choix === 'oui' && !message && coeursJour.limite) coeursJour = { ...coeursJour, restants: Math.max(0, coeursJour.restants - 1) };
     if (r?.matchs) { matchs = { ...matchs, ...r.matchs }; infos(); }
     if (r?.match) { dernier = null; majAnnuler(); celebrerMatch(r.ref); }
-  }).catch((err) => { if (err.code === 'coeur_requis') { creditsCoeur = 0; return toast('Ton cœur avec message n’est pas parti : il te faut un crédit. Ton choix n’a pas été enregistré.'); } if (err.code === 'quota_matchs') return quotaAtteint(err); if (err.code === 'limite_matchs') { matchs = { ...matchs, actifs: err.actifs ?? matchs.limite }; infos(); limiteAtteinte(); } });
+  }).catch((err) => { if (err.code === 'coeur_requis') { creditsCoeur = 0; return toast('Ton cœur avec message n’est pas parti : il te faut un crédit. Ton choix n’a pas été enregistré.'); } if (err.code === 'coeurs_du_jour') { coeursJour = { limite: err.data?.limite ?? coeursJour.limite ?? 20, restants: 0 }; infos(); return coeursFinis(); } if (err.code === 'quota_matchs') return quotaAtteint(err); if (err.code === 'limite_matchs') { matchs = { ...matchs, actifs: err.actifs ?? matchs.limite }; infos(); limiteAtteinte(); } });
   await new Promise((r) => setTimeout(r, 300));
   profils.shift();
   tous = tous.filter((p) => p.ref !== ref);
@@ -341,7 +348,7 @@ addEventListener('keydown', (e) => { if (document.querySelector('.swipe-fenetre'
     let adresse;
     let formule, algerie;
     let liste;
-    ({ profils: tous, quota, choisi, matchs = matchs, adresse, formule, algerie } = liste = await api({ action: 'annonce_swipe_liste' }, token));
+    ({ profils: tous, quota, coeurs: coeursJour = coeursJour, choisi, matchs = matchs, adresse, formule, algerie } = liste = await api({ action: 'annonce_swipe_liste' }, token));
     creditsCoeur = liste.coeurs_message || 0;
     boutonAbo(formule, algerie);
     infosAbo = { formule, algerie };
@@ -375,7 +382,7 @@ async function recharger() {
   try {
     await envoi.catch(() => {});
     tourAnnonce = false;
-    ({ profils: tous, quota, choisi, matchs = matchs } = await api({ action: 'annonce_swipe_liste' }, token));
+    ({ profils: tous, quota, coeurs: coeursJour = coeursJour, choisi, matchs = matchs } = await api({ action: 'annonce_swipe_liste' }, token));
     appliquer();
   } catch { message('<h2>Les profils ne s’affichent pas pour le moment</h2><p>Réessaie dans un instant.</p>'); }
   enRecharge = false;
