@@ -886,3 +886,20 @@ document.querySelector('[data-espace-supprimer]')?.addEventListener('submit', as
     say(st, err.code === 'abonnement_actif' ? 'Tu as un abonnement en cours : résilie-le d’abord dans « Mon abonnement », puis reviens ici.' : 'La suppression n’a pas fonctionné. Réessaie, ou écris à Lamia.', true);
   }
 });
+
+// Les parties repliées de Mon espace s'ouvrent quand un lien y mène, ou quand elles ont quelque chose à montrer (une soirée réservée).
+function deplierEspace() {
+  let cible = null;
+  try { cible = location.hash.length > 1 ? document.querySelector(location.hash) : null; } catch { /* lien de connexion : pas une ancre */ }
+  const pli = cible?.closest('details.espace-pli');
+  if (pli) { pli.open = true; cible.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+}
+addEventListener('hashchange', deplierEspace);
+deplierEspace();
+document.querySelectorAll('details.espace-pli[data-ouvre-si]').forEach((pli) => {
+  const temoin = pli.querySelector(pli.dataset.ouvreSi);
+  if (!temoin) return;
+  const voir = () => { if (!temoin.hidden) pli.open = true; };
+  new MutationObserver(voir).observe(temoin, { attributes: true, attributeFilter: ['hidden'] });
+  voir();
+});
