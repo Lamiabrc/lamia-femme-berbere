@@ -321,8 +321,8 @@
 "أكّد مكانك قبل $1."
 ],
 [
-"^, chaque soir à 21 h : elle peut t’offrir ta place\\. Sans validation avant le (.+), ta place passera à la personne suivante\\.$",
-"، كل مساء في التاسعة: يمكنها أن تمنحك مكانك. وإن لم تؤكده قبل $1، فسينتقل مكانك إلى الشخص التالي."
+"^, du lundi au vendredi à 20 h : elle peut t’offrir ta place\\. Sans validation avant le (.+), ta place passera à la personne suivante\\.$",
+"، من الاثنين إلى الجمعة الساعة 20:00: يمكنها أن تمنحك مكانك. وإن لم تؤكده قبل $1، فسينتقل مكانك إلى الشخص التالي."
 ],
 [
 "^Règle ta place avant le (.+), sinon elle passera à la personne suivante\\.$",
