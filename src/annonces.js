@@ -1,5 +1,5 @@
 // Annonces de rencontre : dépôt (Patio et Confidences) et affichage des annonces vérifiées par Lamia.
-import { api, esc, PUBLIC_KEY, creerCompte, matchsOuverts, SECURITE_APPLI } from './confidences-commun.js';
+import { api, esc, PUBLIC_KEY, creerCompte, matchsOuverts, SECURITE_APPLI, apiPublique } from './confidences-commun.js';
 import { O, lib, secteurLisible, telephoneNormal, foiEtVie, badgesProfil, origineLisible, metierEtReligion, texteCredible } from './matching-options.mjs';
 import { createClient } from '/vendor/supabase.mjs';
 
@@ -540,7 +540,7 @@ export { monterEdition };
 export async function monterListe(box) {
   if (!box) return;
   try {
-    const { annonces } = await api({ action: 'annonces_publiques' });
+    const { annonces } = await apiPublique('annonces_publiques');
     if (!annonces.length) { box.innerHTML = '<p class="annonce-vide">Les premiers profils anonymes arrivent très bientôt. Et si le premier, c’était le tien ?</p>'; return; }
     // Deux catégories séparées, comme dans l'outil : les femmes, les hommes.
     const groupes = { femme: annonces.filter((a) => a.genre === 'femme'), homme: annonces.filter((a) => a.genre === 'homme') };

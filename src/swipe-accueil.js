@@ -1,6 +1,6 @@
 // Accueil : le swipe tout de suite, même sans compte. Une fenêtre demande « un homme ou une femme ? »,
 // puis les profils anonymes défilent un par un. Le cœur demande un profil : sans profil, pas de match.
-import { api, esc, PUBLIC_KEY } from './confidences-commun.js';
+import { api, esc, PUBLIC_KEY, apiPublique } from './confidences-commun.js';
 import { lib, secteurLisible, origineLisible, metierEtReligion } from './matching-options.mjs';
 import { createClient } from '/vendor/supabase.mjs';
 
@@ -148,7 +148,7 @@ if (bloc && pile) {
         return;
       }
     } catch { /* sans session : visiteur */ }
-    try { ({ annonces: tous } = await api({ action: 'annonces_publiques' })); } catch { tous = []; }
+    try { ({ annonces: tous } = await apiPublique('annonces_publiques')); } catch { tous = []; }
     const v = lire();
     if (v) montrer(v); else if (tous.length) demander(); else afficher();
   })();

@@ -803,8 +803,8 @@ async function discussions(session) {
   await charger();
   if (dematchOuvert && liste.length) box.querySelector(`[data-disc="${CSS.escape(dematchOuvert)}"] [data-disc-dematch-form]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   else if (location.hash === '#discussion' && liste.length) bloc.scrollIntoView({ behavior: 'smooth' });
-  // Les nouveaux messages arrivent toutes les 10 secondes tant que la page est ouverte.
-  if (liste.some((d) => d.ouverte)) minuterieDiscussions = setInterval(() => { if (!document.hidden && !dematchOuvert && !box.contains(document.activeElement)) charger(); }, 10000);
+  // Les nouveaux messages arrivent toutes les 20 secondes tant que la page est ouverte.
+  if (liste.some((d) => d.ouverte)) minuterieDiscussions = setInterval(() => { if (!document.hidden && !dematchOuvert && !box.contains(document.activeElement)) charger(); }, 20000);
   ecouter(box, 'submit', async (e) => {
     e.preventDefault();
     const a = e.target.closest('[data-disc]'), id = a?.dataset.disc;
