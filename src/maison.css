@@ -4091,3 +4091,5 @@ html[dir="rtl"] .po-corps h2::after, html[dir="rtl"] .room-body > h2::after, htm
 .swipe-page .swipe-metier { margin: 4px 0 0; font-weight: 600; color: #2F2B3D; }
 .swipe-page .swipe-religion { margin: 2px 0 0; font-size: 14.5px; color: #625D72; }
 .annonce-metier { font-weight: 600; }
+/* Bouton secondaire sur fond clair (accueil en swipe) : lisible, pas blanc sur blanc. */
+.accueil-swipe .po-btn-verre { background: #fff; color: var(--bordeaux-lfb) !important; border: 1px solid var(--bordeaux-lfb); }

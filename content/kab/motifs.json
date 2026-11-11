@@ -309,8 +309,8 @@
 "Ṭṭef amkan-ik/-im qbel $1."
 ],
 [
-"^, chaque soir à 21 h : elle peut t’offrir ta place\\. Sans validation avant le (.+), ta place passera à la personne suivante\\.$",
-", yal iḍ ɣef 21 h: tezmer ad tefk amkan-ik/-im baṭel. Ma ur t-teṭṭifeḍ ara qbel $1, amkan-ik/-im ad iruḥ i wemdan i d-iteddun."
+"^, du lundi au vendredi à 20 h : elle peut t’offrir ta place\\. Sans validation avant le (.+), ta place passera à la personne suivante\\.$",
+", seg letnayen ar lǧemɛa ɣef 20 h: tezmer ad tefk amkan-ik/-im baṭel. Ma ur t-teṭṭifeḍ ara qbel $1, amkan-ik/-im ad iruḥ i wemdan i d-iteddun."
 ],
 [
 "^Règle ta place avant le (.+), sinon elle passera à la personne suivante\\.$",

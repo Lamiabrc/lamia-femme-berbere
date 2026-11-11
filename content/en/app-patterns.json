@@ -312,8 +312,8 @@
 "Validate your place before $1."
 ],
 [
-"^, chaque soir à 21 h : elle peut t’offrir ta place\\. Sans validation avant le (.+), ta place passera à la personne suivante\\.$",
-", every evening at 9 pm: she can give you your place. Without validation before $1, your place will go to the next person."
+"^, du lundi au vendredi à 20 h : elle peut t’offrir ta place\\. Sans validation avant le (.+), ta place passera à la personne suivante\\.$",
+", Monday to Friday at 8 pm: she can give you your place. Without validation before $1, your place will go to the next person."
 ],
 [
 "^Règle ta place avant le (.+), sinon elle passera à la personne suivante\\.$",

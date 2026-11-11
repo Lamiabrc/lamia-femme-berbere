@@ -1,6 +1,6 @@
 // Les Confidences avec Lamia : écrire, parler (vocal), ou échanger en conversation privée.
 import { createClient } from '/vendor/supabase.mjs';
-import { api, envoyer, erreur, esc, taille, quand, piecesHtml, PUBLIC_KEY } from './confidences-commun.js';
+import { api, envoyer, erreur, esc, taille, quand, piecesHtml, texteAvecLiens, PUBLIC_KEY } from './confidences-commun.js';
 import { monterEnregistreur } from './enregistreur.js';
 
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', PUBLIC_KEY);
@@ -127,7 +127,13 @@ function rendreFil(threads, abonneCompte = true) {
   box.scrollTop = box.scrollHeight;
 }
 
-async function chargerConversation() {
+// La conversation est affichée : un message « elle ne s'affiche pas » resté à l'écran n'a plus lieu d'être.
+function conversationAffichee() {
+  charge = true;
+  const st = $('[data-conv-statut]');
+  if (st?.dataset.chargement) { delete st.dataset.chargement; say(st, ''); }
+}
+async function chargerConversation(essai = 0) {
   ({ data: { session } } = await supabase.auth.getSession());
   if (!conv) return;
   connexion.hidden = Boolean(session);
@@ -135,12 +141,21 @@ async function chargerConversation() {
   if (!session) return;
   $('[data-conv-email]').textContent = session.user.email;
   if (!charge) $('[data-conv-fil]').innerHTML = '<p class="conf-vide">Un instant…</p>';
-  try { const r = await api({ action: 'mes_conversations' }, session.access_token); rendreFil(r.threads, r.abonne); charge = true; }
-  catch (err) { say($('[data-conv-statut]'), erreur(err.code), true); }
+  try { const r = await api({ action: 'mes_conversations' }, session.access_token); rendreFil(r.threads, r.abonne); conversationAffichee(); }
+  catch (err) {
+    const st = $('[data-conv-statut]');
+    if (err.code) say(st, erreur(err.code), true);
+    else {
+      // Coupure passagère (réseau, serveur) : ce n'est pas un envoi raté. On réessaie tout seul, sans laisser « Un instant… » à l'écran.
+      st.dataset.chargement = '1';
+      say(st, essai < 3 ? 'La conversation met du temps à s’afficher. Nouvel essai…' : 'La conversation ne s’affiche pas. Vérifie ta connexion, puis rouvre cette page. Tu peux quand même écrire.', true);
+      if (essai < 3) setTimeout(() => { if (!charge) chargerConversation(essai + 1); }, 2000 * (essai + 1));
+    }
+  }
   clearInterval(minuteur);
   minuteur = setInterval(() => { if (document.visibilityState === 'visible' && !$('[data-panneau="conversation"]').hidden) chargerSilencieux(); }, 30000);
 }
-async function chargerSilencieux() { try { const r = await api({ action: 'mes_conversations' }, session.access_token); rendreFil(r.threads, r.abonne); } catch { /* */ } }
+async function chargerSilencieux() { try { const r = await api({ action: 'mes_conversations' }, session.access_token); rendreFil(r.threads, r.abonne); conversationAffichee(); } catch { /* */ } }
 
 $('[data-conv-form]')?.addEventListener('submit', async (e) => {
   e.preventDefault();

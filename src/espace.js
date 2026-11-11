@@ -279,7 +279,7 @@ async function monSpeedDating(session) {
   if (ins.statut === 'attente') contenu = `<h3>${esc(ins.salon)}</h3><p>Secteurs : ${esc(ins.secteurs.join(', '))}.</p><p>${ins.accepte_autre ? `Tu acceptes de rencontrer des personnes de ${ins.tranche === '40+' ? 'moins de 40 ans' : '40 ans et plus'}.` : `Tu rencontres seulement des personnes de ${ins.tranche === '40+' ? '40 ans et plus' : 'moins de 40 ans'}.`} <a class="text-link" href="/speed-dating/inscription/">Modifier mes choix</a></p><p>Tu seras prévenu·e dès que ton salon sera confirmé.</p>${quitter}`;
   else if (ins.statut === 'place') contenu = `<h3>Ta place est confirmée</h3><p><strong>${esc(ins.quand)}</strong><br>${esc(ins.salon)} · ${esc(ins.secteur)}</p><p>Tu recevras un rappel le jour même, une heure avant, puis au démarrage.</p><p><a class="text-link" href="/speed-dating/salle/">Tester ma caméra</a></p>${ins.gratuit || ins.inclus ? quitter : ''}`;
   else if (ins.gratuit) contenu = `<h3>Ton salon est confirmé</h3><p><strong>${esc(ins.quand)}</strong><br>${esc(ins.salon)} · ${esc(ins.secteur)}</p><p class="espace-salon-prix">Gratuit</p><p>Valide ta place avant le ${esc(ins.payer_avant)}.</p><button class="btn btn-ink" type="button" data-salon-valider>Valider ma place</button>${statut}${quitter}`;
-  else if (ins.algerie) contenu = `<h3>Ton salon est confirmé</h3><p><strong>${esc(ins.quand)}</strong><br>${esc(ins.salon)} · ${esc(ins.secteur)}</p><p>Le paiement en ligne n’est pas possible en Algérie. <a class="text-link" href="/salon/">Viens au live de Lamia</a>, chaque soir à 21 h : elle peut t’offrir ta place. Sans validation avant le ${esc(ins.payer_avant)}, ta place passera à la personne suivante.</p>${quitter}`;
+  else if (ins.algerie) contenu = `<h3>Ton salon est confirmé</h3><p><strong>${esc(ins.quand)}</strong><br>${esc(ins.salon)} · ${esc(ins.secteur)}</p><p>Le paiement en ligne n’est pas possible en Algérie. <a class="text-link" href="/salon/">Viens au live de Lamia</a>, du lundi au vendredi à 20 h : elle peut t’offrir ta place. Sans validation avant le ${esc(ins.payer_avant)}, ta place passera à la personne suivante.</p>${quitter}`;
   else if (window.LFB_PLAY) contenu = `<h3>Ton salon est confirmé</h3><p><strong>${esc(ins.quand)}</strong><br>${esc(ins.salon)} · ${esc(ins.secteur)}</p><p>Le règlement de cette place ne se fait pas dans cette version de l’appli.</p>${statut}`;
   else contenu = `<h3>Ton salon est confirmé</h3><p><strong>${esc(ins.quand)}</strong><br>${esc(ins.salon)} · ${esc(ins.secteur)}</p><p class="espace-salon-prix">${esc(money(ins.prix))}</p><p>Règle ta place avant le ${esc(ins.payer_avant)}, sinon elle passera à la personne suivante.</p><label><input type="checkbox" data-salon-cgv> <span>J’accepte les <a class="text-link" href="/cgv/">conditions de vente</a>. Place non remboursable.</span></label><button class="btn btn-ink" type="button" data-salon-payer>Régler ma place</button>${statut}${quitter}`;
   box.innerHTML = `<article class="espace-salon">${contenu}</article>`;
@@ -395,7 +395,8 @@ async function suivi(el, p) {
   const vivantes = toutes.filter((i) => ['mis_en_relation', 'en_reserve'].includes(i.statut));
   const finies = toutes.filter((i) => !['a_traiter', 'mis_en_relation', 'en_reserve'].includes(i.statut));
   const ligne = (i) => `<li>n° ${esc(i.cible_ref)} · <strong>${esc(FIN_DEMANDE[i.fin] || ETAT_DEMANDE[i.statut] || i.statut)}</strong>${i.date ? ` <small>${esc(date(i.date))}</small>` : ''}</li>`;
-  const demandes = !toutes.length ? '' : `${attente.length ? `<p class="espace-demandes-attente"><strong>En attente</strong> <span class="espace-nb">${attente.length}</span><br>Lamia regarde si vous allez ensemble.<br><small>n° ${attente.map((i) => esc(i.cible_ref)).join(', n° ')}</small></p>` : ''}${vivantes.length ? `<ul>${vivantes.map(ligne).join('')}</ul>` : ''}${finies.length ? `<details class="espace-demandes-finies"><summary>Sans suite <span class="espace-nb">${finies.length}</span></summary><p><small>Vous n’étiez pas en relation : ce ne sont pas des dématchs.</small></p><ul>${finies.map(ligne).join('')}</ul></details>` : ''}`;
+  const ici = attente.filter((i) => !i.sans_compte), absents = attente.filter((i) => i.sans_compte);
+  const demandes = !toutes.length ? '' : `${ici.length ? `<p class="espace-demandes-attente"><strong>En attente de sa réponse</strong> <span class="espace-nb">${ici.length}</span><br>La personne a reçu ton cœur. Dès qu’elle répond, tu es prévenu·e.<br><small>n° ${ici.map((i) => esc(i.cible_ref)).join(', n° ')}</small></p>` : ''}${absents.length ? `<p class="espace-demandes-attente"><strong>Pas encore sur l’appli</strong> <span class="espace-nb">${absents.length}</span><br>Ces personnes n’ont pas encore créé leur compte : elles ne peuvent pas te répondre pour l’instant. Continue à swiper.<br><small>n° ${absents.map((i) => esc(i.cible_ref)).join(', n° ')}</small></p>` : ''}${vivantes.length ? `<ul>${vivantes.map(ligne).join('')}</ul>` : ''}${finies.length ? `<details class="espace-demandes-finies"><summary>Sans suite <span class="espace-nb">${finies.length}</span></summary><p><small>Vous n’étiez pas en relation : ce ne sont pas des dématchs.</small></p><ul>${finies.map(ligne).join('')}</ul></details>` : ''}`;
   const heure = (d) => new Date(d).toLocaleTimeString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { hour: '2-digit', minute: '2-digit' });
   // Une photo par match en cours. Pas d'achat dans l'appli Play, ni depuis l'Algérie (paiement en ligne impossible).
   const peutPayer = !window.LFB_PLAY && !p.algerie;
@@ -523,6 +524,16 @@ $('[data-espace-signup]').addEventListener('submit', async (e) => {
   say(st, ''); e.target.reset(); location.assign('/rencontres/swipe/?bienvenue=1');
 });
 
+// Arrivée par un lien « nouveau mot de passe » : le formulaire s'affiche tout de suite, sans attendre la connexion.
+if (/[#&]type=recovery\b/.test(location.hash)) recovering = true;
+// Lien expiré ou déjà utilisé : on le dit, et on propose d'en recevoir un nouveau.
+if (/[#&]error_code=otp_expired\b/.test(location.hash)) {
+  const st = $('[data-reset-status]');
+  say(st, 'Ce lien a expiré ou a déjà servi. Écris ton email ici pour en recevoir un nouveau.', true);
+  st?.closest('details')?.setAttribute('open', '');
+  st?.closest('form')?.scrollIntoView({ block: 'center' });
+  history.replaceState(null, '', location.pathname);
+}
 supabase.auth.onAuthStateChange((event) => { if (event === 'PASSWORD_RECOVERY') recovering = true; render(); });
 render();
 
