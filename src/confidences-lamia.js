@@ -301,6 +301,23 @@ const pastelBadge = (t) => (/PAUSE/.test(t) ? 'is-sable' : /TEST/.test(t) ? 'is-
 document.addEventListener('change', (e) => { const s = e.target.closest?.('[data-demande-statut]'); if (s) s.className = `cl-etat-choix is-${s.value}`; });
 const STATUT_ANNONCE = { a_verifier: 'À vérifier', publiee: 'Validé', refusee: 'Refusé' };
 let dernieresAnnonces = [];
+// Les liens des photos changent à chaque chargement : sans cela, le navigateur retélécharge toutes les photos à chaque fois
+// (80 Mo par ouverture de la liste). On garde le même lien 25 minutes (il est valable 30) pour que la photo déjà vue reste en mémoire.
+const LIENS_MEDIAS = 'cl-liens-medias', DUREE_LIEN = 25 * 60 * 1000;
+function liensStables(annonces) {
+  let vus = {};
+  try { vus = JSON.parse(sessionStorage.getItem(LIENS_MEDIAS) || '{}') || {}; } catch { vus = {}; }
+  const t = Date.now(), garde = {};
+  const stable = (m) => {
+    if (!m?.url) return;
+    const cle = m.url.split('?')[0], v = vus[cle];
+    if (v && v.fin > t) m.url = v.url;
+    garde[cle] = v && v.fin > t ? v : { url: m.url, fin: t + DUREE_LIEN };
+  };
+  for (const a of annonces) { (a.medias || []).forEach(stable); stable(a.identite); }
+  try { sessionStorage.setItem(LIENS_MEDIAS, JSON.stringify(garde)); } catch { /* navigation privée : on s'en passe */ }
+  return annonces;
+}
 async function chargerAnnonces() {
   const box = $('[data-annonces]');
   box.innerHTML = '<p class="cl-vide">Chargement…</p>';
@@ -309,6 +326,7 @@ async function chargerAnnonces() {
     const n = annonces.filter((a) => a.status === 'a_verifier').length;
     $('[data-n-annonces]').textContent = n || '';
     if (!annonces.length) { box.innerHTML = '<p class="cl-vide">Aucune annonce pour le moment.</p>'; return; }
+    liensStables(annonces);
     dernieresAnnonces = annonces;
     const aExporter = annonces.filter((a) => a.status === 'publiee' && !a.exportee_at).length;
     $('[data-export-info]').textContent = aExporter ? `${aExporter} annonce(s) publiée(s) pas encore dans l’outil.` : 'Toutes les annonces publiées sont déjà dans l’outil.';
@@ -318,8 +336,8 @@ async function chargerAnnonces() {
       <h3>${a.genre === 'femme' ? 'Femme' : 'Homme'}, ${a.age} ans</h3>
       <p class="cl-badges">${[a.en_pause ? 'EN PAUSE (invisible, à sa demande)' : '',a.test ? 'PROFIL DE TEST (invisible du public)' : '',a.live_declare ? (a.outil_lie ? 'Créé en live · fiche retrouvée dans l’outil · 3 offertes' : 'Dit avoir été en live · fiche à retrouver · 3 offertes') : a.outil_lie ? 'Déjà dans ton outil (même lien)' : '', a.compte ? 'Compte lié' : '', a.photo_partage ? 'Photo transmissible au match' : 'Photo à ne pas transmettre', a.en_match ? 'Match en cours' : '', a.modifiee_at ? `Modifié le ${quand(a.modifiee_at)}` : ''].filter(Boolean).map((t) => `<span class="${pastelBadge(t)}">${esc(t)}</span>`).join('')}</p>
       <p class="cl-coord">Prénom : ${esc(a.prenom)} · ${esc(a.ville)}, ${esc(a.pays)}${a.situation ? ` · ${esc(a.situation)}` : ''} · né(e) le ${esc(a.birth_date)}<br>${esc(a.email)}${a.phone ? ` · ${esc(a.phone)}` : ''}</p>
-      <div class="cl-annonce-medias">${a.medias.map((m) => !m.url ? '' : m.kind === 'video' ? `<video src="${esc(m.url)}" controls playsinline preload="metadata"></video>` : `<a href="${esc(m.url)}" target="_blank" rel="noopener"><img src="${esc(m.url)}" alt="Photo"></a>`).join('')}</div>
-      ${a.identite?.url ? `<div class="cl-annonce-id"><p><b>Pièce d’identité</b> (vérifie le prénom, l’âge et que le numéro est caché) :</p>${a.identite.mime === 'application/pdf' ? `<a class="cl-btn" href="${esc(a.identite.url)}" target="_blank" rel="noopener">Ouvrir le PDF</a>` : `<a href="${esc(a.identite.url)}" target="_blank" rel="noopener"><img src="${esc(a.identite.url)}" alt="Pièce d’identité"></a>`}</div>` : a.identite_verifiee_at ? `<p class="cl-aide">✓ Identité vérifiée le ${quand(a.identite_verifiee_at)} (pièce supprimée).</p>` : ''}
+      <div class="cl-annonce-medias">${a.medias.map((m) => !m.url ? '' : m.kind === 'video' ? `<video src="${esc(m.url)}" controls playsinline preload="none"></video>` : `<a href="${esc(m.url)}" target="_blank" rel="noopener"><img src="${esc(m.url)}" alt="Photo" loading="lazy" decoding="async" width="150" height="190"></a>`).join('')}</div>
+      ${a.identite?.url ? `<div class="cl-annonce-id"><p><b>Pièce d’identité</b> (vérifie le prénom, l’âge et que le numéro est caché) :</p>${a.identite.mime === 'application/pdf' ? `<a class="cl-btn" href="${esc(a.identite.url)}" target="_blank" rel="noopener">Ouvrir le PDF</a>` : `<a href="${esc(a.identite.url)}" target="_blank" rel="noopener"><img src="${esc(a.identite.url)}" alt="Pièce d’identité" loading="lazy" decoding="async"></a>`}</div>` : a.identite_verifiee_at ? `<p class="cl-aide">✓ Identité vérifiée le ${quand(a.identite_verifiee_at)} (pièce supprimée).</p>` : ''}
       ${a.matching && Object.keys(a.matching).length ? `<p class="cl-coord">${[a.matching.situation, a.matching.enfants === 'Oui' ? `${a.matching.nbEnfants || ''} enfant(s)` : a.matching.enfants === 'Non' ? 'sans enfant' : '', a.matching.niveauEtudeDetail || a.matching.niveauEtudeCategorie, a.matching.profession, a.matching.religion, a.matching.pratique, ...(a.matching.origineTags || [])].filter(Boolean).map(lib).map(esc).join(' · ')}${a.matching.contactReseau ? `<br>Réseau : ${esc(a.matching.contactReseau)}` : ''}</p>` : ''}
       ${a.exportee_at ? `<p class="cl-aide">↪ Exportée vers l’outil de matching le ${quand(a.exportee_at)}</p>` : ''}
       ${(a.interets || []).length ? `<p class="cl-match-demande"><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> Match demandé : intéressé(e) par le profil n° ${a.interets.join(', ')}</p>` : ''}
