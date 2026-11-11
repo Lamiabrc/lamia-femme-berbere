@@ -330,7 +330,7 @@ async function chargerAnnonces() {
     dernieresAnnonces = annonces;
     const aExporter = annonces.filter((a) => a.status === 'publiee' && !a.exportee_at).length;
     $('[data-export-info]').textContent = aExporter ? `${aExporter} annonce(s) publiée(s) pas encore dans l’outil.` : 'Toutes les annonces publiées sont déjà dans l’outil.';
-    box.innerHTML = annonces.map((a) => `<article class="cl-carte cl-annonce" data-id="${a.id}" id="annonce-${a.ref}">
+    const carte = (a) => `<article class="cl-carte cl-annonce" data-id="${a.id}" id="annonce-${a.ref}">
       <p class="cl-coord"><b>N° ${a.ref}</b> <span class="cl-etat is-${esc(a.status)}">${STATUT_ANNONCE[a.status] || esc(a.status)}</span>${a.submitted_at ? ` · reçue le ${quand(a.submitted_at)}` : ''}</p>
       ${boutonEcrire(a.ref)}
       <h3>${a.genre === 'femme' ? 'Femme' : 'Homme'}, ${a.age} ans</h3>
@@ -355,7 +355,12 @@ async function chargerAnnonces() {
         <button class="cl-btn" type="button" data-decision="supprimer">Supprimer définitivement</button>
       </div>
       <p class="cl-statut" role="status" data-annonce-statut></p>
-    </article>`).join('');
+    </article>`;
+    // Les profils à valider sont sortis de la liste et placés tout en haut de la page.
+    const aValider = annonces.filter((a) => a.status === 'a_verifier');
+    const haut = $('[data-annonces-a-valider]'), blocHaut = $('[data-a-valider-bloc]');
+    if (haut && blocHaut) { haut.innerHTML = aValider.map(carte).join(''); blocHaut.hidden = !aValider.length; $('[data-n-a-valider]').textContent = aValider.length ? `(${aValider.length})` : ''; }
+    box.innerHTML = annonces.filter((a) => !(haut && a.status === 'a_verifier')).map(carte).join('');
     // Lien direct vers une annonce (depuis la fiche de l'outil).
     const h = location.hash.slice(1);
     if (/^annonce-\d+$/.test(h)) document.getElementById(h)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
