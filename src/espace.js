@@ -524,6 +524,16 @@ $('[data-espace-signup]').addEventListener('submit', async (e) => {
   say(st, ''); e.target.reset(); location.assign('/rencontres/swipe/?bienvenue=1');
 });
 
+// Arrivée par un lien « nouveau mot de passe » : le formulaire s'affiche tout de suite, sans attendre la connexion.
+if (/[#&]type=recovery\b/.test(location.hash)) recovering = true;
+// Lien expiré ou déjà utilisé : on le dit, et on propose d'en recevoir un nouveau.
+if (/[#&]error_code=otp_expired\b/.test(location.hash)) {
+  const st = $('[data-reset-status]');
+  say(st, 'Ce lien a expiré ou a déjà servi. Écris ton email ici pour en recevoir un nouveau.', true);
+  st?.closest('details')?.setAttribute('open', '');
+  st?.closest('form')?.scrollIntoView({ block: 'center' });
+  history.replaceState(null, '', location.pathname);
+}
 supabase.auth.onAuthStateChange((event) => { if (event === 'PASSWORD_RECOVERY') recovering = true; render(); });
 render();
 

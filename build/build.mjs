@@ -152,6 +152,7 @@ ${noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" hr
 <meta name="theme-color" content="#2F2B3D">
 <link rel="icon" href="/images/marque/lamia-logo-net-160.webp" type="image/webp">
 <link rel="manifest" href="/maison.webmanifest">
+<script src="/assets/lien-mot-de-passe.js"></script>
 <script src="/assets/version-play.js"></script>
 <link rel="apple-touch-icon" href="/images/marque/lfb-icone-180.png">
 <meta name="apple-mobile-web-app-title" content="LFB">
@@ -2148,7 +2149,7 @@ await cp(join(ROOT, 'public'), DIST, { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await writeFile(join(DIST, 'assets', 'editable.json'), JSON.stringify({ fields: [...EDITABLE, ...REGISTRE], defaults: DEFAULTS }));
-for (const f of ['version-play.js', 'abonnement.js', 'abonnement-merci.js', 'swipe.js', 'swipe-accueil.js', 'nouveautes.js', 'confirmer.js', 'visio-invite.js', 'maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'soirees.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'annonces.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
+for (const f of ['lien-mot-de-passe.js', 'version-play.js', 'abonnement.js', 'abonnement-merci.js', 'swipe.js', 'swipe-accueil.js', 'nouveautes.js', 'confirmer.js', 'visio-invite.js', 'maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'soirees.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'annonces.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
 await cp(join(ROOT, 'content', 'shipping.mjs'), join(DIST, 'assets', 'shipping.mjs'));
 await cp(join(ROOT, 'content', 'rubriques.mjs'), join(DIST, 'assets', 'rubriques.mjs'));
 await cp(join(ROOT, 'content', 'matching-options.mjs'), join(DIST, 'assets', 'matching-options.mjs'));
