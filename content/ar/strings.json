@@ -979,6 +979,7 @@
  "Qu’est-ce que tu veux changer dans ta fiche ?": "ما الذي تريد تغييره في بطاقتك؟",
  "Raccourcis": "اختصارات",
  "Raconte-toi un peu plus : au moins quelques phrases pour ton profil et pour la personne que tu cherches.": "حدّثنا عن نفسك أكثر: بضع جمل على الأقل لملفك وللشخص الذي تبحث عنه.",
+ "Écris avec de vrais mots : présente-toi et dis qui tu cherches, sinon personne ne pourra te choisir.": "اكتب بكلمات حقيقية: عرّف بنفسك وقل من تبحث عنه، وإلا فلن يستطيع أحد أن يختارك.",
  "Recevoir mon lien de connexion": "أرسل لي رابط الدخول",
  "Recevoir un lien de connexion par email": "احصل على رابط دخول عبر البريد الإلكتروني",
  "Recevoir un lien pour en choisir un": "احصل على رابط لاختيار واحدة",
@@ -2123,5 +2124,8 @@
  "Tout ce que Lamia propose": "كل ما تقدّمه لمياء",
  "Mon offre": "باقتي",
  "Tous les tarifs": "كل الأسعار",
- "Coaching": "كوتشينغ"
+ "Coaching": "كوتشينغ",
+ "Tu as déjà ton profil": "لديك ملفك بالفعل",
+ "Pas besoin d’en créer un autre. Modifie-le dans ton espace, ou continue à swiper.": "لا حاجة لإنشاء ملف آخر. عدّله في مساحتك أو واصل السوايب.",
+ "Modifier mon profil": "تعديل ملفي"
 }

@@ -329,3 +329,21 @@ export function criteresDeQuestion(q = '') {
   if (/Un (de tes|autre de tes) critères/.test(q)) c.push('autre');
   return c;
 }
+
+// Un texte « tapé au hasard » (walou bdgjfggyfesh…) : des mots interminables, presque pas de voyelles,
+// ou la même lettre répétée. Volontairement prudent : au moindre doute, le texte passe.
+export function texteCredible(texte) {
+  const t = String(texte || '').trim();
+  const lettres = t.replace(/[^\p{L}]/gu, '');
+  if (lettres.length < 15) return true;
+  if (/(\p{L})\1{5,}/u.test(t)) return false;
+  const mots = t.split(/[^\p{L}]+/u).filter(Boolean);
+  const longs = mots.filter((m) => m.length > 20).reduce((n, m) => n + m.length, 0);
+  if (longs >= lettres.length / 3) return false;
+  const latin = lettres.replace(/[^a-zà-öø-ÿɛɣǧḍḥṛṣṭẓčž]/giu, '');
+  if (latin.length >= lettres.length * 0.8) {
+    const voyelles = latin.replace(/[^aeiouyà-æè-ïò-öù-üÿœɛ]/giu, '').length;
+    if (voyelles / latin.length < 0.2) return false;
+  }
+  return true;
+}

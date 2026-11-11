@@ -230,6 +230,7 @@
  "Indique ta ville et ton pays.": "Enter your city and country.",
  "Vérifie ton adresse email : Lamia en a besoin pour te répondre.": "Check your email address: Lamia needs it to reply to you.",
  "Raconte-toi un peu plus : au moins quelques phrases pour ton profil et pour la personne que tu cherches.": "Tell us a bit more: at least a few sentences for your profile and for the person you’re looking for.",
+ "Écris avec de vrais mots : présente-toi et dis qui tu cherches, sinon personne ne pourra te choisir.": "Write with real words: introduce yourself and say who you’re looking for, otherwise no one will be able to choose you.",
  "Ajoute 2 photos de toi, visage visible.": "Add 2 photos of yourself, with your face visible.",
  "Ajoute d’abord 2 photos de toi, dans « Mon espace ».": "First add 2 photos of yourself, in “My space”.",
  "Deux photos au maximum.": "Two photos at most.",
@@ -1216,5 +1217,8 @@
  "Ou ouvre le menu ⋮ puis « Installer LFB… ».": "Or open the ⋮ menu, then “Install LFB…”.",
  "La conversation met du temps à s’afficher. Nouvel essai…": "The conversation is taking a while to load. Trying again…",
  "La conversation ne s’affiche pas. Vérifie ta connexion, puis rouvre cette page. Tu peux quand même écrire.": "The conversation isn’t loading. Check your connection, then reopen this page. You can still write.",
- "Ce lien a expiré ou a déjà servi. Écris ton email ici pour en recevoir un nouveau.": "This link has expired or has already been used. Enter your email here to receive a new one."
+ "Ce lien a expiré ou a déjà servi. Écris ton email ici pour en recevoir un nouveau.": "This link has expired or has already been used. Enter your email here to receive a new one.",
+ "Tu as déjà ton profil": "You already have your profile",
+ "Pas besoin d’en créer un autre. Modifie-le dans ton espace, ou continue à swiper.": "No need to create another one. Edit it in your space, or keep swiping.",
+ "Modifier mon profil": "Edit my profile"
 }

@@ -849,12 +849,12 @@ page(
       <div data-espace-discussion></div>
     </section>
 
-    <section id="propositions">
+    <section id="propositions" hidden>
       <h2>Profils proposés par Lamia</h2>
       <p>Dis oui ou non. <strong>Si vous dites oui tous les deux, c’est un match.</strong></p>
             <div class="espace-interets" data-espace-propositions><p class="loading">Un instant…</p></div>
     </section>
-    <section id="interets">
+    <section id="interets" hidden>
       <h2>Intérêts reçus</h2>
       <p>Ces personnes ont choisi ton profil. Dis oui si elles te plaisent aussi.</p>
       <div class="espace-interets" data-espace-interets><p class="loading">Un instant…</p></div>

@@ -1,6 +1,6 @@
 // Annonces de rencontre : dépôt (Patio et Confidences) et affichage des annonces vérifiées par Lamia.
 import { api, esc, PUBLIC_KEY, creerCompte, matchsOuverts, SECURITE_APPLI } from './confidences-commun.js';
-import { O, lib, secteurLisible, telephoneNormal, foiEtVie, badgesProfil, origineLisible, metierEtReligion } from './matching-options.mjs';
+import { O, lib, secteurLisible, telephoneNormal, foiEtVie, badgesProfil, origineLisible, metierEtReligion, texteCredible } from './matching-options.mjs';
 import { createClient } from '/vendor/supabase.mjs';
 
 // Compte (le même que « Mon espace ») : chaque profil y est lié pour pouvoir être modifié.
@@ -21,6 +21,7 @@ const ERR = {
   origine_requise: 'Indique ton origine : kabyle, chaouie, touarègue, amazighe ou autre.',
   invalid_email: 'Vérifie ton adresse email : Lamia en a besoin pour te répondre.',
   textes_courts: 'Raconte-toi un peu plus : au moins quelques phrases pour ton profil et pour la personne que tu cherches.',
+  textes_illisibles: 'Écris avec de vrais mots : présente-toi et dis qui tu cherches, sinon personne ne pourra te choisir.',
   medias_requis: 'Ajoute 2 photos de toi, visage visible.',
   annonce_en_pause: 'Ton annonce est en pause. Reprends-la dans « Mon espace ».',
   photos_requises: 'Ajoute d’abord 2 photos de toi, dans « Mon espace ».',
@@ -470,6 +471,7 @@ function monterEdition(form, st, p, token) {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (F.profil.value.trim().length < 20 || F.recherche.value.trim().length < 20) return say(st, ERR.textes_courts, true);
+    if (!texteCredible(F.profil.value) || !texteCredible(F.recherche.value)) return say(st, ERR.textes_illisibles, true);
     if (!form.querySelector('[name=origineTags]:checked')) { form.querySelector('#ton-origine')?.scrollIntoView({ block: 'center' }); return say(st, ERR.origine_requise, true); }
     if (F.sans_reseau.checked ? !telephoneNormal(F.telephone.value) : !F.contactReseau.value.trim()) return say(st, F.sans_reseau.checked ? ERR.telephone_invalide : ERR.contact_requis, true);
     btn.disabled = true; say(st, 'Enregistrement…');
@@ -597,9 +599,21 @@ export async function retraitDepuisLien() {
 
 // Montage automatique sur les pages qui ont les emplacements (Patio).
 retraitDepuisLien();
-function ouvrirFormulaire(ref) {
+// Un membre qui a déjà son profil ne doit pas remplir le formulaire pour rien (il était refusé à la fin).
+async function aDejaUnProfil() {
+  const s = await sessionActive();
+  if (!s) return false;
+  try { return Boolean((await api({ action: 'annonce_mon_profil', discret: true }, s.access_token)).profil); } catch { return false; }
+}
+async function ouvrirFormulaire(ref) {
   const box = document.querySelector('[data-annonce-box]');
   if (!box) return;
+  if (!ref && !box.dataset.monte && await aDejaUnProfil()) {
+    box.innerHTML = '<div class="annonce-deja"><h3>Tu as déjà ton profil</h3><p>Pas besoin d’en créer un autre. Modifie-le dans ton espace, ou continue à swiper.</p><p class="po-actions"><a class="po-btn" href="/mon-espace/#mon-profil">Modifier mon profil</a><a class="po-btn-verre" href="/rencontres/swipe/">Swiper</a></p></div>';
+    box.hidden = false;
+    box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
   if (ref) { box.dataset.interet = ref; window.lfbEvent?.('interet_profil'); }
   if (!box.dataset.monte || ref) { monterFormulaire(box); box.dataset.monte = '1'; }
   box.hidden = false;
