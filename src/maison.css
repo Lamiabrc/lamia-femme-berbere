@@ -4117,3 +4117,7 @@ html[dir="rtl"] .po-corps h2::after, html[dir="rtl"] .room-body > h2::after, htm
 .annonce-nav .btn-line[data-etape-prec] { background: #fff; color: #2F2B3D !important; border: 1px solid #2F2B3D; box-shadow: none; }
 .annonce-deja { padding: 22px; border-radius: 18px; background: #fff; border: 1px solid #E6D9DD; text-align: center; }
 .annonce-deja h3 { margin: 0 0 8px; }
+
+/* Cartes de Mon espace : un texte sans espace (ou une longue ligne) ne sort plus de la carte sur téléphone */
+.espace-achat > div { min-width: 0; max-width: 100%; }
+.espace-achat, .espace-achat h3, .espace-achat p, [data-membre] { overflow-wrap: anywhere; }
