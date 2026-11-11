@@ -833,6 +833,7 @@ page(
 
     <section id="mon-profil">
       <h2>Mon profil âme sœur</h2>
+      <p data-profil-modifier-haut hidden><button type="button" class="btn btn-ink"><svg class="ico" aria-hidden="true"><use href="/icones.svg#pencil"/></svg> Modifier mon profil</button></p>
       <p><button type="button" class="btn btn-line btn-installer" data-installer-bouton><svg class="ico" aria-hidden="true"><use href="/icones.svg#smartphone"/></svg> Installer l’application sur mon téléphone</button></p>
       <div class="espace-notifs" data-espace-notifs></div>
       <div class="espace-profil" data-espace-profil><p class="loading">Un instant…</p></div>
@@ -1444,6 +1445,16 @@ page(
   <section class="cl-reglages" data-annonces-vue hidden>
     <h2>Annonces de rencontre</h2>
     <p class="cl-aide">Les profils ne sont jamais publiés. 1) Vérifie le profil (et la pièce d’identité si la personne l’a donnée : elle est facultative), puis « Valider » : la pièce est supprimée, et le profil garde le badge « vérifié avec pièce d’identité ». 2) Exporte vers ton outil et fais le matching. 3) Indique le nombre de profils compatibles et « Envoyer le résultat » : la personne reçoit ce nombre par email (sans savoir qui), avec l’invitation à t’écrire (matchs gratuits, formules pour aller plus vite).</p>
+    <div class="cl-carte cl-export" data-a-valider-bloc hidden>
+      <h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#shield"/></svg> Profils à valider <span data-n-a-valider></span></h3>
+      <p class="cl-aide">Ces profils attendent ta validation : regarde-les, puis « Valider le profil » en bas de chaque carte.</p>
+      <div data-annonces-a-valider></div>
+    </div>
+    <div class="cl-carte cl-export">
+      <h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> Matchs demandés <span data-n-demandes></span></h3>
+      <p class="cl-aide">Quand quelqu’un clique sur « Ce profil m’intéresse » ou swipe un profil à droite, la demande arrive ici. Quand deux personnes se choisissent l’une l’autre, la demande passe en tête avec « INTÉRÊT RÉCIPROQUE » et tu reçois une alerte (notification et email). Les demandes sont regroupées par personne et notées sur 100 selon leur potentiel (âge, religion, pratique, origine, enfants, situation, tabac, pays, dans les deux sens) : fais la mise en relation avec le meilleur potentiel, puis confirme dans ton outil. Personne d’autre ne la voit. Elle est aussi notée dans la fiche exportée vers ton outil.</p>
+      <div data-demandes></div>
+    </div>
         <div class="cl-carte cl-export">
       <h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#camera"/></svg> Profils sans leurs photos <span data-n-sans-photos></span></h3>
       <p class="cl-aide">Tant qu’il manque 2 photos, la personne voit une demande dans l’application et ne peut ni swiper ni répondre. Le bouton lui envoie aussi une notification sur son téléphone, une seule fois, si elle les a activées.</p>
@@ -1454,11 +1465,6 @@ page(
       <h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#credit-card"/></svg> Abonnés et achats à l’unité <span data-n-abonnes></span></h3>
       <p class="cl-aide">Les formules payées sur la page Abonnement. Quand tu fais une mise en relation ou inscris quelqu’un à un speed dating payé à l’unité, clique « Utiliser 1 » pour le décompter. Les résiliations se font par la personne depuis son espace.</p>
       <div data-abonnes></div>
-    </div>
-    <div class="cl-carte cl-export">
-      <h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> Matchs demandés <span data-n-demandes></span></h3>
-      <p class="cl-aide">Quand quelqu’un clique sur « Ce profil m’intéresse » ou swipe un profil à droite, la demande arrive ici. Quand deux personnes se choisissent l’une l’autre, la demande passe en tête avec « INTÉRÊT RÉCIPROQUE » et tu reçois une alerte (notification et email). Les demandes sont regroupées par personne et notées sur 100 selon leur potentiel (âge, religion, pratique, origine, enfants, situation, tabac, pays, dans les deux sens) : fais la mise en relation avec le meilleur potentiel, puis confirme dans ton outil. Personne d’autre ne la voit. Elle est aussi notée dans la fiche exportée vers ton outil.</p>
-      <div data-demandes></div>
     </div>
     <div class="cl-carte cl-export">
       <h3>↪ Vers mon outil de matching</h3>
@@ -1488,6 +1494,7 @@ page(
       <div data-outil-zone hidden><input data-outil-valeur readonly style="width:100%;font-family:monospace"> <button class="cl-btn" type="button" data-outil-copier>Copier</button></div>
       <p class="cl-statut" role="status" data-outil-statut></p>
     </details>
+    <h3 class="cl-titre-liste">Tous les profils</h3>
     <div data-annonces></div>
   </section>
 

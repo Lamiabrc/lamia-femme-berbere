@@ -77,6 +77,18 @@ test('hors live, textes et photos restent obligatoires', async () => {
   const r = await handleAnnonces('annonce_deposer', { ...base, ville: 'Lyon', pays: 'France' }, ctx(NINA));
   assert.equal((await r.json()).error, 'textes_courts');
 });
+test('la personne corrige elle-même sa date de naissance, jamais en dessous de 18 ans', async () => {
+  const { ctx, db } = monde();
+  db.annonces.push({ id: 'a1', ref: 21, user_id: 'u1', email: 'nina@example.com', status: 'publiee', prenom: 'Nina', genre: 'femme', birth_date: '1996-10-01', matching: { contactReseau: 'https://instagram.com/nina' } });
+  const nina = { id: 'u1', email: 'nina@example.com' };
+  const modifier = async (birth_date) => { const r = await handleAnnonces('annonce_modifier', { prenom: 'Nina', birth_date, matching: { contactReseau: 'https://instagram.com/nina' } }, ctx(nina)); return [r.status, await r.json()]; };
+  { const [st, r] = await modifier('1990-05-12'); assert.equal(st, 200, JSON.stringify(r)); }
+  assert.equal(db.annonces[0].birth_date, '1990-05-12');
+  const an = new Date().getUTCFullYear();
+  assert.equal((await modifier(`${an - 10}-01-01`))[1].error, 'mineur');
+  assert.equal((await modifier('pas une date'))[1].error, 'invalid_birth_date');
+  assert.equal(db.annonces[0].birth_date, '1990-05-12');
+});
 test('un profil tapé au hasard est refusé, un vrai texte passe (français, kabyle, arabe)', async () => {
   const { texteCredible } = await import('../content/matching-options.mjs');
   assert.equal(texteCredible('walou bdgjfggyfeshkkhfswhfsgjrdhrdgjfdhkkhgfdsdgjkkhgfdgivf'), false);
