@@ -1220,5 +1220,11 @@
  "Ce lien a expiré ou a déjà servi. Écris ton email ici pour en recevoir un nouveau.": "This link has expired or has already been used. Enter your email here to receive a new one.",
  "Tu as déjà ton profil": "You already have your profile",
  "Pas besoin d’en créer un autre. Modifie-le dans ton espace, ou continue à swiper.": "No need to create another one. Edit it in your space, or keep swiping.",
- "Modifier mon profil": "Edit my profile"
+ "Modifier mon profil": "Edit my profile",
+ "Seconde chance : après un « pas pour moi », tu peux renvoyer ta demande, 2 fois par profil": "Second chance: after a “not for me”, you can send your request again, twice per profile",
+ "Renvoyer ma demande": "Send my request again",
+ "Seconde chance avec Passion": "Second chance with Passion",
+ "✓ Ta demande est repartie": "✓ Your request has been sent again",
+ "Tu as déjà renvoyé 2 fois cette demande.": "You have already re-sent this request twice.",
+ "Réservé aux formules Passion et Prestige.": "Reserved for the Passion and Prestige plans."
 }

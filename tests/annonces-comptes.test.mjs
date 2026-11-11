@@ -89,6 +89,21 @@ test('la personne corrige elle-même sa date de naissance, jamais en dessous de 
   assert.equal((await modifier('pas une date'))[1].error, 'invalid_birth_date');
   assert.equal(db.annonces[0].birth_date, '1990-05-12');
 });
+test('seconde chance : Passion renvoie une demande refusée, 2 fois au plus ; pas en Découverte', async () => {
+  const { ctx, db } = monde();
+  db.annonces.push({ id: 'a1', ref: 21, user_id: 'u1', email: 'nina@example.com', status: 'publiee', prenom: 'Nina', genre: 'femme' });
+  db.annonce_interets = db.annonce_interets || [];
+  db.annonce_interets.push({ id: 'i1', demandeur_id: 'a1', cible_ref: 31, statut: 'pas_compatible', reponse: 'non', relances: 0, via: 'swipe' });
+  const nina = { id: 'u1', email: 'nina@example.com' };
+  const relancer = async (formule) => { const r = await handleAnnonces('annonce_relancer', { ref: 31 }, ctx(nina, formule)); return [r.status, await r.json()]; };
+  assert.equal((await relancer('decouverte'))[1].error, 'formule_requise');
+  const refuser = () => Object.assign(db.annonce_interets[0], { statut: 'pas_compatible', reponse: 'non' });
+  { const [st, r] = await relancer('passion'); assert.equal(st, 200, JSON.stringify(r)); }
+  assert.equal(db.annonce_interets[0].statut, 'a_traiter'); assert.equal(db.annonce_interets[0].reponse, null); assert.equal(db.annonce_interets[0].relances, 1);
+  assert.equal((await relancer('passion'))[1].error, 'not_found'); // déjà repartie : rien à renvoyer
+  refuser(); assert.equal((await relancer('passion'))[0], 200);
+  refuser(); assert.equal((await relancer('passion'))[1].error, 'relances_epuisees');
+});
 test('un profil tapé au hasard est refusé, un vrai texte passe (français, kabyle, arabe)', async () => {
   const { texteCredible } = await import('../content/matching-options.mjs');
   assert.equal(texteCredible('walou bdgjfggyfeshkkhfswhfsgjrdhrdgjfdhkkhgfdsdgjkkhgfdgivf'), false);

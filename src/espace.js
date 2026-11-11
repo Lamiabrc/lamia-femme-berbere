@@ -399,7 +399,11 @@ async function suivi(el, p) {
   const attente = toutes.filter((i) => i.statut === 'a_traiter');
   const vivantes = toutes.filter((i) => ['mis_en_relation', 'en_reserve'].includes(i.statut));
   const finies = toutes.filter((i) => !['a_traiter', 'mis_en_relation', 'en_reserve'].includes(i.statut));
-  const ligne = (i) => `<li>n° ${esc(i.cible_ref)} · <strong>${esc(FIN_DEMANDE[i.fin] || ETAT_DEMANDE[i.statut] || i.statut)}</strong>${i.date ? ` <small>${esc(date(i.date))}</small>` : ''}</li>`;
+  // Seconde chance (formules Passion et Prestige) : après un « pas pour moi », la demande peut repartir, 2 fois par profil.
+  const relance = (i) => (!i.relancable ? '' : i.relancable.inclus
+    ? (i.relancable.restantes > 0 ? ` <button type="button" class="btn btn-line espace-relancer" data-relancer="${esc(i.cible_ref)}">Renvoyer ma demande</button> <small>(encore ${esc(i.relancable.restantes)})</small>` : '')
+    : (window.LFB_PLAY || p.algerie ? '' : ' <a class="text-link" href="/abonnement/?formule=passion">Seconde chance avec Passion</a>'));
+  const ligne = (i) => `<li>n° ${esc(i.cible_ref)} · <strong>${esc(FIN_DEMANDE[i.fin] || ETAT_DEMANDE[i.statut] || i.statut)}</strong>${i.date ? ` <small>${esc(date(i.date))}</small>` : ''}${relance(i)}</li>`;
   const ici = attente.filter((i) => !i.sans_compte), absents = attente.filter((i) => i.sans_compte);
   const demandes = !toutes.length ? '' : `${ici.length ? `<p class="espace-demandes-attente"><strong>En attente de sa réponse</strong> <span class="espace-nb">${ici.length}</span><br>La personne a reçu ton cœur. Dès qu’elle répond, tu es prévenu·e.<br><small>n° ${ici.map((i) => esc(i.cible_ref)).join(', n° ')}</small></p>` : ''}${absents.length ? `<p class="espace-demandes-attente"><strong>Pas encore sur l’appli</strong> <span class="espace-nb">${absents.length}</span><br>Ces personnes n’ont pas encore créé leur compte : elles ne peuvent pas te répondre pour l’instant. Continue à swiper.<br><small>n° ${absents.map((i) => esc(i.cible_ref)).join(', n° ')}</small></p>` : ''}${vivantes.length ? `<ul>${vivantes.map(ligne).join('')}</ul>` : ''}${finies.length ? `<details class="espace-demandes-finies"><summary>Sans suite <span class="espace-nb">${finies.length}</span></summary><p><small>Vous n’étiez pas en relation : ce ne sont pas des dématchs.</small></p><ul>${finies.map(ligne).join('')}</ul></details>` : ''}`;
   const heure = (d) => new Date(d).toLocaleTimeString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { hour: '2-digit', minute: '2-digit' });
@@ -423,6 +427,14 @@ async function suivi(el, p) {
   el.innerHTML = `<h3>Mon suivi</h3><ul>${lignes}</ul>${blocChoisi}${blocAvant}${blocPhoto}
     <p><a class="po-btn" href="/rencontres/swipe/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Swiper les profils</a></p>
     <h3>Mes demandes de match</h3>${demandes ? demandes : '<p>Aucune pour l’instant. <a class="text-link" href="/rencontres/#profils-anonymes">Voir les profils</a></p>'}`;
+  el.querySelectorAll('[data-relancer]').forEach((b) => b.addEventListener('click', async () => {
+    b.disabled = true;
+    try {
+      const { data } = await supabase.auth.getSession();
+      await appelProfil({ action: 'annonce_relancer', ref: Number(b.dataset.relancer) }, data.session);
+      b.outerHTML = '<small>✓ Ta demande est repartie</small>';
+    } catch (err) { b.disabled = false; b.insertAdjacentHTML('afterend', ` <small>${err.code === 'relances_epuisees' ? 'Tu as déjà renvoyé 2 fois cette demande.' : err.code === 'formule_requise' ? 'Réservé aux formules Passion et Prestige.' : 'Ça n’a pas fonctionné. Réessaie dans un instant.'}</small>`); }
+  }));
   el.querySelectorAll('[data-photo-acheter]').forEach((b) => b.addEventListener('click', async () => {
     const ref = b.dataset.photoAcheter, st = el.querySelector(`[data-photo-statut="${ref}"]`);
     if (!el.querySelector(`[data-photo-cgv="${ref}"]`)?.checked) { st.textContent = 'Coche la case des conditions de vente pour continuer.'; return; }
