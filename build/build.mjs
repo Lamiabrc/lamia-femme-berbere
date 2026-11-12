@@ -1525,7 +1525,7 @@ page(
     <form class="cl-carte" data-reglages>
       <h3>Réglages</h3>
       <label class="cl-case"><input type="checkbox" name="alertes_push"> Notifications sur mes appareils</label>
-      <label class="cl-case"><input type="checkbox" name="alertes_email"> Alerte email de secours</label>
+      <label class="cl-case"><input type="checkbox" name="alertes_email"> Email pour les ventes et les encaissements seulement (le reste se lit dans l’appli)</label>
       <label>Adresse qui reçoit les alertes email<input name="email_alerte" type="email" placeholder="ton adresse email"></label>
       <fieldset><legend>Ne pas me déranger (notifications coupées, emails maintenus)</legend>
         <div class="cl-heures"><label>De<select name="silence_debut"></select></label><label>à<select name="silence_fin"></select></label></div>
