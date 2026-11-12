@@ -16,8 +16,8 @@
   <nav class="tdb-onglets" aria-label="Rubriques" data-onglets hidden>
     <button type="button" data-tab="accueil" aria-current="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#house"/></svg> Aujourd’hui</button>
     <button type="button" data-tab="activite"><svg class="ico" aria-hidden="true"><use href="/icones.svg#map"/></svg> Activité</button>
-    <button type="button" data-tab="rencontres"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Rencontres</button>
-    <button type="button" data-tab="comptes"><svg class="ico" aria-hidden="true"><use href="/icones.svg#user"/></svg> Profils</button>
+    <button type="button" data-tab="rencontres"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Profils</button>
+    <button type="button" data-tab="comptes"><svg class="ico" aria-hidden="true"><use href="/icones.svg#user"/></svg> Comptes</button>
     <details class="tdb-plus" data-menu-plus>
       <summary>Plus <span class="tdb-pastille" data-journal-pastille hidden></span></summary>
       <div>
@@ -56,7 +56,7 @@
       <a href="/confidences-lamia/"><strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#message-circle"/></svg> Confidences</strong><span>Lire et répondre</span></a>
       <a href="/confidences-lamia/#annonces"><strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> Profils et matchs</strong><span>Valider, photos, demandes</span></a>
       <button type="button" data-go="activite"><strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#map"/></svg> Activité</strong><span>Mises en relation, pilote</span></button>
-      <button type="button" data-go="comptes"><strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#user"/></svg> Profils</strong><span>Activité, cadeaux, blocages</span></button>
+      <button type="button" data-go="comptes"><strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#user"/></svg> Comptes</strong><span>Activité, cadeaux, blocages</span></button>
     </div>
     <details class="tdb-repli" data-repli="outils"><summary>Autres outils</summary><div class="tdb-outils">
       <a href="/salon/"><strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg> Mon live</strong><span>Le Salon de Lamia</span></a>
@@ -102,8 +102,8 @@
 
   <!-- ===================================================== Ventes -->
   <section data-panel="rencontres" hidden>
-    <div class="tdb-entete"><h1 class="tdb-titre">Rencontres</h1><div class="tdb-raccourcis"><a class="btn btn-line" href="/confidences-lamia/" target="_blank" rel="noopener">Les messages des Confidences</a></div></div>
-    <p class="aide">Ici : valider les profils, traiter les matchs demandés (notés par ton outil), proposer, publier une nouveauté, les abonnés. Ton outil de matching garde ses rôles : publier les fiches, envoyer les liens de confirmation (publipostage), tester les matchs.</p>
+    <div class="tdb-entete"><h1 class="tdb-titre">Profils et matchs</h1><div class="tdb-raccourcis"><a class="btn btn-line" href="/confidences-lamia/" target="_blank" rel="noopener">Les messages des Confidences</a></div></div>
+    <p class="aide">Valider les profils, traiter les matchs demandés, prévenir les membres, voir les abonnés.</p>
     <iframe class="tdb-rencontres" data-rencontres title="Gestion des rencontres" loading="lazy"></iframe>
   </section>
 
@@ -140,7 +140,7 @@
 
   <!-- ===================================================== Comptes -->
   <section data-panel="comptes" hidden>
-    <div class="tdb-entete"><h1 class="tdb-titre">Les profils</h1><button class="btn btn-line" type="button" data-comptes-maj>Actualiser</button></div>
+    <div class="tdb-entete"><h1 class="tdb-titre">Les comptes</h1><button class="btn btn-line" type="button" data-comptes-maj>Actualiser</button></div>
     <p class="aide">Toutes les personnes qui ont un compte. Cherche un prénom, un email ou un n° de profil, puis clique pour voir son activité, lui offrir quelque chose ou la bloquer.</p>
     <div class="tdb-kpis" data-comptes-kpis></div>
     <div class="tdb-filtres">

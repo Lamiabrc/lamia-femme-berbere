@@ -189,3 +189,8 @@ legend { font-size: 14px; font-weight: 600; padding: 0 4px; }
 .ico { color: #B8965A; }
 .cl-btn .ico, button .ico { color: inherit; }
 .cl-plein { background: #2F2B3D; }
+
+/* Sur téléphone, une carte ne dépasse plus de l'écran : sa colonne suit la largeur de la carte, pas celle du plus long texte. */
+.cl-login, .cl-carte { grid-template-columns: minmax(0, 1fr); }
+.cl-carte { overflow-wrap: anywhere; }
+.cl-carte > * { min-width: 0; max-width: 100%; }

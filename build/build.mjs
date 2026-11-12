@@ -1446,7 +1446,7 @@ page(
 
   <section class="cl-reglages" data-annonces-vue hidden>
     <h2>Gestion des profils</h2>
-    <p class="cl-aide">Les profils ne sont jamais publiés. 1) Vérifie le profil (et la pièce d’identité si la personne l’a donnée : elle est facultative), puis « Valider » : la pièce est supprimée, et le profil garde le badge « vérifié avec pièce d’identité ». 2) Exporte vers ton outil et fais le matching. 3) Indique le nombre de profils compatibles et « Envoyer le résultat » : la personne reçoit ce nombre par email (sans savoir qui), avec l’invitation à t’écrire (matchs gratuits, formules pour aller plus vite).</p>
+    <p class="cl-aide">Dans l’ordre : les profils à valider, les matchs demandés, puis le reste.</p>
     <div class="cl-carte cl-export" data-a-valider-bloc hidden>
       <h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#shield"/></svg> Profils à valider <span data-n-a-valider></span></h3>
       <p class="cl-aide">Ces profils attendent ta validation : regarde-les, puis « Valider le profil » en bas de chaque carte.</p>
