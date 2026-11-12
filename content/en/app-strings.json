@@ -245,7 +245,7 @@
  "Ce numéro de téléphone n’est pas valide. Mets-le en entier, avec l’indicatif si tu n’es pas en France (par ex. +213 5 12 34 56 78).": "This phone number isn’t valid. Enter it in full, with the country code if you’re not in France (e.g. +213 5 12 34 56 78).",
  "Tu es connecté(e) avec une autre adresse email : utilise celle de ton compte.": "You’re signed in with a different email address: use the one on your account.",
  "Choisis un mot de passe d’au moins 8 caractères.": "Choose a password of at least 8 characters.",
- "Un compte existe déjà avec cet email, mais le mot de passe ne correspond pas. Mets ton mot de passe, ou réinitialise-le dans « Mon espace ».": "An account already exists with this email, but the password doesn’t match. Enter your password, or reset it in “My space”.",
+ "Tu as déjà un compte avec cet email. Mets ton mot de passe, ou reçois un lien pour entrer sans mot de passe.": "You already have an account with this email. Enter your password, or get a link to sign in without a password.",
  "Tu as déjà un profil chez Lamia : modifie-le dans « Mon espace ».": "You already have a profile with Lamia: edit it in “My space”.",
  "Un profil existe déjà avec ce lien de réseau social. Connecte-toi avec le compte qui l’a créé (« Mon espace »), ou écris à Lamia si ce n’est pas toi.": "A profile already exists with this social media link. Sign in with the account that created it (“My space”), or write to Lamia if it wasn’t you.",
  "Indique le pseudo ou le lien TikTok que tu avais en live, pour que Lamia retrouve ta fiche.": "Enter the TikTok username or link you had on the live, so Lamia can find your profile.",
