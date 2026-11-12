@@ -432,7 +432,17 @@ page(
     description: 'Les lives de Lamia Femme Berbère : couple, célibat, engagement, humour et culture kabyle, du lundi au vendredi de 20 h à 22 h 30.',
     path: '/salon/',
     room: roomBySlug.salon,
+    scripts: ['/assets/live.js'],
     body: `${roomHead(roomBySlug.salon, '<p class="patio-actions"><a class="ame-soeur-btn" href="#ce-soir">Ce soir en live</a><a class="salon-ancre" href="#coeur-direct">Les débats</a><a class="salon-ancre" href="#outil-live">Le matching en live</a><a class="salon-ancre" href="#replays">Les replays</a></p>')}
+<section class="live-direct" id="en-direct" data-live-direct hidden aria-labelledby="live-direct-titre">
+  <p class="live-badge"><span aria-hidden="true"></span> En direct</p>
+  <h2 id="live-direct-titre">Lamia est en live<span data-live-titre></span></h2>
+  <div class="live-grille">
+    <div><div class="live-video" data-live-video></div>
+    <p class="live-note">La vidéo vient de YouTube. Pour commenter et monter en invité : <a data-live-tiktok href="https://www.tiktok.com/@lamiafemmeberbere/live" rel="noopener" target="_blank">le live sur TikTok</a>.</p></div>
+    <div class="live-boite" data-live-question></div>
+  </div>
+</section>
 <section class="room-body salon-ce-soir" id="ce-soir" aria-labelledby="ce-soir-titre">
   <div class="salon-live">
     <p class="prose-lead">${esc(P.salon.intro)}</p>
@@ -2177,7 +2187,7 @@ await cp(join(ROOT, 'public'), DIST, { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await writeFile(join(DIST, 'assets', 'editable.json'), JSON.stringify({ fields: [...EDITABLE, ...REGISTRE], defaults: DEFAULTS }));
-for (const f of ['lien-mot-de-passe.js', 'version-play.js', 'abonnement.js', 'abonnement-merci.js', 'swipe.js', 'swipe-accueil.js', 'sincerite.js', 'signaler.js', 'nouveautes.js', 'confirmer.js', 'visio-invite.js', 'maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'soirees.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'annonces.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
+for (const f of ['lien-mot-de-passe.js', 'version-play.js', 'abonnement.js', 'abonnement-merci.js', 'swipe.js', 'swipe-accueil.js', 'sincerite.js', 'signaler.js', 'nouveautes.js', 'live.js', 'confirmer.js', 'visio-invite.js', 'maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'soirees.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'annonces.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
 await cp(join(ROOT, 'content', 'shipping.mjs'), join(DIST, 'assets', 'shipping.mjs'));
 await cp(join(ROOT, 'content', 'rubriques.mjs'), join(DIST, 'assets', 'rubriques.mjs'));
 await cp(join(ROOT, 'content', 'matching-options.mjs'), join(DIST, 'assets', 'matching-options.mjs'));
