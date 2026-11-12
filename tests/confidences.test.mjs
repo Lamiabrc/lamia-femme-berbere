@@ -37,7 +37,7 @@ test('heures de silence (heure de Paris) et réglages nettoyés', () => {
   assert.equal(reglagesPropres({ silence_debut: 30 }).silence_debut, null);
 });
 
-test('confidence vocale d’un abonné : envoi signé, alerte push sans contenu et email avec lien', async () => {
+test('confidence vocale d’un abonné : envoi signé, alerte push sans contenu, pas d’email', async () => {
   const be = backend({ users: { L: lamia, N: nadia } });
   const ua = createECDH('prime256v1'); ua.generateKeys();
   be.db.push_subscriptions.push({ id: 'p1', user_id: 'lamia', pour: 'lamia', endpoint: 'https://push.example/abc', p256dh: b64u(ua.getPublicKey()), auth: b64u(randomBytes(16)) });
@@ -63,10 +63,8 @@ test('confidence vocale d’un abonné : envoi signé, alerte push sans contenu 
   assert.equal(be.pushes[0].headers['Content-Encoding'], 'aes128gcm');
   assert.match(be.pushes[0].headers.Authorization, /^vapid t=.+, k=.+/);
   assert.ok(be.db.platform_settings.find((s) => s.key === 'vapid').value.privateJwk.d, 'clé privée gardée côté serveur');
-  const mail = be.mails[0];
-  assert.deepEqual(mail.to, ['alerte@exemple.fr']);
-  assert.match(mail.html, /confidences-lamia\/#/);
-  assert.match(mail.text, /un message vocal/);
+  assert.equal(f.body.alerte.email, false);
+  assert.equal(be.mails.length, 0, 'les confidences se lisent dans l’appli : email réservé aux ventes et encaissements');
 });
 
 test('protection contre les envois abusifs et les robots', async () => {
@@ -125,7 +123,7 @@ test('alertes groupées : pas plus d’une notification par conversation toutes 
   const b = await call(be, { action: 'ecrire', thread_id: a.body.thread_id, body: 'deux' }, 'S');
   const r = await call(be, { action: 'finaliser', message_id: b.body.message_id, token: b.body.token });
   assert.equal(r.body.alerte.groupee, true);
-  assert.equal(be.mails.length, 1);
+  assert.equal(be.mails.length, 0);
 });
 
 test('réservé aux abonnés : sans formule on ne peut plus écrire, seulement relire et supprimer', async () => {
