@@ -1374,6 +1374,7 @@ page(
 <nav class="cl-nav" aria-label="Navigation">
   <a href="/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#house"/></svg> Accueil du site</a>
   <a href="/tableau-de-bord"><svg class="ico" aria-hidden="true"><use href="/icones.svg#chart-column"/></svg> Tableau de bord</a>
+  <a href="/confidences-lamia/#annonces" class="cl-nav-profils"><svg class="ico" aria-hidden="true"><use href="/icones.svg#user"/></svg> Gérer les profils <b data-n-annonces-nav></b></a>
   <a href="/rencontres/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Rencontres</a>
   <a href="/mon-espace/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#user"/></svg> Mon espace</a>
 </nav>
@@ -1394,7 +1395,7 @@ page(
       <button type="button" data-filtre="en_cours" aria-pressed="false">En cours <b data-n="en_cours"></b></button>
       <button type="button" data-filtre="termine" aria-pressed="false">Terminé <b data-n="termine"></b></button>
       <button type="button" data-filtre="tous" aria-pressed="false">Tout</button>
-      <button type="button" data-ouvrir-annonces><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> Annonces <b data-n-annonces></b></button>
+      <button type="button" data-ouvrir-annonces><svg class="ico" aria-hidden="true"><use href="/icones.svg#user"/></svg> Profils <b data-n-annonces></b></button>
       <button type="button" data-ouvrir-testeurs><svg class="ico" aria-hidden="true"><use href="/icones.svg#smartphone"/></svg> Testeurs Play <b data-n-testeurs></b></button>
       <button type="button" data-ouvrir-ecrire-a><svg class="ico" aria-hidden="true"><use href="/icones.svg#pencil"/></svg> Écrire à un membre</button>
     </nav>
@@ -1443,7 +1444,7 @@ page(
   </section>
 
   <section class="cl-reglages" data-annonces-vue hidden>
-    <h2>Annonces de rencontre</h2>
+    <h2>Gestion des profils</h2>
     <p class="cl-aide">Les profils ne sont jamais publiés. 1) Vérifie le profil (et la pièce d’identité si la personne l’a donnée : elle est facultative), puis « Valider » : la pièce est supprimée, et le profil garde le badge « vérifié avec pièce d’identité ». 2) Exporte vers ton outil et fais le matching. 3) Indique le nombre de profils compatibles et « Envoyer le résultat » : la personne reçoit ce nombre par email (sans savoir qui), avec l’invitation à t’écrire (matchs gratuits, formules pour aller plus vite).</p>
     <div class="cl-carte cl-export" data-a-valider-bloc hidden>
       <h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#shield"/></svg> Profils à valider <span data-n-a-valider></span></h3>

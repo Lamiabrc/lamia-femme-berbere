@@ -27,7 +27,7 @@ async function demarrer() {
   if (session?.user?.app_metadata?.role !== 'admin') { vue('login'); if (session) say($('[data-login-statut]'), 'Ce compte n’a pas le rôle administratrice.', true); return; }
   await chargerListe();
   compterTesteurs();
-  api({ action: 'annonces_admin' }, await jetonFrais()).then(({ annonces }) => { const n = annonces.filter((a) => a.status === 'a_verifier').length; $('[data-n-annonces]').textContent = n || ''; }).catch(() => {});
+  api({ action: 'annonces_admin' }, await jetonFrais()).then(({ annonces }) => { const n = annonces.filter((a) => a.status === 'a_verifier').length; $('[data-n-annonces]').textContent = n || ''; const nav = $('[data-n-annonces-nav]'); if (nav) nav.textContent = n ? `(${n})` : ''; }).catch(() => {});
   router();
   clearInterval(minuteur);
   minuteur = setInterval(() => { if (document.visibilityState === 'visible') (courant ? rafraichirFil() : chargerListe()); }, 30000);
