@@ -2135,5 +2135,9 @@
  "Tu as déjà renvoyé 2 fois cette demande.": "لقد أعدت إرسال هذا الطلب مرتين.",
  "Réservé aux formules Passion et Prestige.": "خاص بباقتي Passion و Prestige.",
  "Seconde chance après un « pas pour moi »": "فرصة ثانية بعد «ليس لي»",
- "2 fois par profil": "مرتان لكل ملف"
+ "2 fois par profil": "مرتان لكل ملف",
+ "Ce profil cherche quelqu’un d’un autre âge ou d’une autre zone : ton cœur n’est pas parti.": "هذا الملف يبحث عن شخص من عمر آخر أو من منطقة أخرى: لم يُرسل قلبك.",
+ "Ce profil cherche quelqu’un d’un autre âge ou d’une autre zone.": "هذا الملف يبحث عن شخص من عمر آخر أو من منطقة أخرى.",
+ "Qui peut t’envoyer un cœur": "من يستطيع أن يرسل لك قلبًا",
+ ": seulement les personnes qui correspondent à ta tranche d’âge (à 2 ans près) et à la zone que tu as choisie. Vérifie tes critères avec « Modifier mon profil ».": ": فقط الأشخاص الذين يوافقون الفئة العمرية التي حددتها (بفارق سنتين) والمنطقة التي اخترتها. راجع معاييرك عبر «تعديل ملفي»."
 }

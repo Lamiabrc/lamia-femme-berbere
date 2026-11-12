@@ -186,9 +186,11 @@ test('liste : mes critères d’âge et de lieu, ceux qui me cherchent aussi d�
     scores_outil: [{ a_ref: 100001, b_ref: 100002, score: 40 }, { a_ref: 100003, b_ref: 100001, score: 90 }],
   });
   const r = await lire(await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID)));
-  // 100006 cherche au Canada : gardée, mais après. Hors de mes critères (pays, âge) : à la fin, marquées.
-  assert.deepEqual(r.profils.map((p) => p.ref).slice(0, 3), [100003, 100002, 100006]);
-  assert.deepEqual(r.profils.slice(3).map((p) => [p.ref, p.hors_criteres]).sort(), [[100004, true], [100005, true]]);
+  // 100006 cherche au Canada et il vit en France : elle ne lui est plus proposée (barrière des critères).
+  // Hors de mes critères à moi (pays, âge) : à la fin, marquées.
+  assert.deepEqual(r.profils.map((p) => p.ref).slice(0, 2), [100003, 100002]);
+  assert.ok(!r.profils.some((p) => p.ref === 100006));
+  assert.deepEqual(r.profils.slice(2).map((p) => [p.ref, p.hors_criteres]).sort(), [[100004, true], [100005, true]]);
   assert.equal(db.annonces[0].matching.zoneGeo, 'France');
 });
 

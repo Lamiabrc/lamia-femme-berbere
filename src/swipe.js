@@ -262,7 +262,7 @@ async function choisir(choix, message) {
     if (message) { creditsCoeur = Math.max(0, creditsCoeur - 1); try { localStorage.removeItem(`lfb-coeur-${ref}`); } catch { /* */ } toast('💌 Ton cœur et ton message sont partis'); }
     if (r?.matchs) { matchs = { ...matchs, ...r.matchs }; infos(); }
     if (r?.match) { dernier = null; majAnnuler(); celebrerMatch(r.ref); }
-  }).catch((err) => { if (err.code === 'coeur_requis') { creditsCoeur = 0; return toast('Ton cœur avec message n’est pas parti : il te faut un crédit. Ton choix n’a pas été enregistré.'); } if (err.code === 'quota_matchs') return quotaAtteint(err); if (err.code === 'limite_matchs') { matchs = { ...matchs, actifs: err.actifs ?? matchs.limite }; infos(); limiteAtteinte(); } });
+  }).catch((err) => { if (err.code === 'hors_de_ses_criteres') return toast('Ce profil cherche quelqu’un d’un autre âge ou d’une autre zone : ton cœur n’est pas parti.'); if (err.code === 'coeur_requis') { creditsCoeur = 0; return toast('Ton cœur avec message n’est pas parti : il te faut un crédit. Ton choix n’a pas été enregistré.'); } if (err.code === 'quota_matchs') return quotaAtteint(err); if (err.code === 'limite_matchs') { matchs = { ...matchs, actifs: err.actifs ?? matchs.limite }; infos(); limiteAtteinte(); } });
   await new Promise((r) => setTimeout(r, 300));
   profils.shift();
   tous = tous.filter((p) => p.ref !== ref);

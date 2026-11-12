@@ -104,6 +104,24 @@ test('seconde chance : Passion renvoie une demande refusée, 2 fois au plus ; pa
   refuser(); assert.equal((await relancer('passion'))[0], 200);
   refuser(); assert.equal((await relancer('passion'))[1].error, 'relances_epuisees');
 });
+test('barrière des critères : pas de cœur vers quelqu’un qui cherche un autre âge (à 2 ans près) ou une autre zone', async () => {
+  const { accepteParSesCriteres } = await import('../content/matching-options.mjs');
+  const elle = { age_min: 45, age_max: 60, secteur: 'France' };
+  assert.equal(accepteParSesCriteres(elle, { age: 28, pays: 'Algerie' }), false);
+  assert.equal(accepteParSesCriteres(elle, { age: 28, pays: 'France' }), false);
+  assert.equal(accepteParSesCriteres(elle, { age: 50, pays: 'Algerie' }), false);
+  assert.equal(accepteParSesCriteres(elle, { age: 43, pays: 'France' }), true); // 2 ans de marge
+  assert.equal(accepteParSesCriteres(elle, { age: 62, pays: 'France' }), true);
+  assert.equal(accepteParSesCriteres({}, { age: 28, pays: 'Algerie' }), true); // sans critère : tout le monde
+  assert.equal(accepteParSesCriteres({ age_min: 25, age_max: 40, secteur: "N'importe ou" }, { age: 30, pays: 'Algerie' }), true);
+  const { ctx, db } = monde();
+  db.annonces.push({ id: 'a1', ref: 21, user_id: 'u1', email: 'yan@example.com', status: 'publiee', prenom: 'Yan', genre: 'homme', birth_date: '1998-01-01', pays: 'Algerie' });
+  db.annonces.push({ id: 'a2', ref: 31, user_id: 'u2', email: 'f@example.com', status: 'publiee', prenom: 'Fa', genre: 'femme', age_min: 45, age_max: 60, matching: { zoneGeo: 'France' } });
+  const yan = { id: 'u1', email: 'yan@example.com' };
+  const r = await handleAnnonces('annonce_swipe', { ref: 31, choix: 'oui' }, ctx(yan));
+  assert.equal(r.status, 409); assert.equal((await r.json()).error, 'hors_de_ses_criteres');
+  assert.equal((await handleAnnonces('annonce_swipe', { ref: 31, choix: 'non' }, ctx(yan))).status, 200);
+});
 test('un profil tapé au hasard est refusé, un vrai texte passe (français, kabyle, arabe)', async () => {
   const { texteCredible } = await import('../content/matching-options.mjs');
   assert.equal(texteCredible('walou bdgjfggyfeshkkhfswhfsgjrdhrdgjfdhkkhgfdsdgjkkhgfdgivf'), false);
