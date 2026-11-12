@@ -4164,3 +4164,13 @@ html[dir="rtl"] .po-corps h2::after, html[dir="rtl"] .room-body > h2::after, htm
 a.lien-en-direct { position: relative; }
 a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9px; width: 9px; height: 9px; border-radius: 50%; background: #c8213f; box-shadow: 0 0 0 2px #fff; }
 .barre-app a.lien-en-direct::after { top: 4px; right: 24%; }
+/* Signalement : la raison à choisir */
+.signaler-raisons { border: 0; padding: 0; margin: 10px 0; display: grid; gap: 6px; text-align: start; }
+.signaler-raisons legend { font-weight: 600; margin-bottom: 6px; padding: 0; }
+.signaler-raisons label { display: flex; gap: 10px; align-items: flex-start; padding: 9px 10px; border: 1px solid #e0cdb5; border-radius: 12px; background: #fff; color: #3b2f33; cursor: pointer; }
+.signaler-raisons input { margin: 3px 0 0; width: 18px; height: 18px; min-width: 18px; flex: 0 0 18px; padding: 0; accent-color: var(--bordeaux-lfb, #7A1F35); }
+.signaler-raisons label span { flex: 1; min-width: 0; }
+.signaler-raisons label:has(input:checked) { border-color: var(--bordeaux-lfb, #7A1F35); background: #fbf1f3; }
+.signaler-note { text-align: start; color: #5c4a4f; }
+.signaler-fenetre .swipe-fenetre-boite { max-height: 92vh; overflow-y: auto; text-align: start; }
+.signaler-fenetre .po-btn-verre { color: #3b2f33; border-color: #cbb9a4; }

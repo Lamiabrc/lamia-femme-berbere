@@ -1833,5 +1833,18 @@
  "Je m’engage": "I commit",
  "Merci. Tu peux envoyer tes cœurs.": "Thank you. You can send your hearts.",
  "✓ Merci, ton engagement est enregistré.": "✓ Thank you, your commitment is recorded.",
- "Avant d’envoyer un cœur, confirme ta déclaration de bonne foi dans « Mon espace ».": "Before sending a heart, confirm your good-faith declaration in “My space”."
+ "Avant d’envoyer un cœur, confirme ta déclaration de bonne foi dans « Mon espace ».": "Before sending a heart, confirm your good-faith declaration in “My space”.",
+ "Pourquoi signales-tu ce profil ?": "Why are you reporting this profile?",
+ "Je pense que cette personne cherche des papiers": "I think this person is looking for papers",
+ "Comportement de prédateur : insistance, pression, harcèlement": "Predatory behaviour: insistence, pressure, harassment",
+ "Pas sérieux : ne cherche pas le mariage": "Not serious: not looking for marriage",
+ "Contenu ou propos à caractère sexuel": "Sexual content or remarks",
+ "Faux profil ou demande d’argent": "Fake profile or request for money",
+ "Insultes, menaces ou propos haineux": "Insults, threats or hateful remarks",
+ "Je pense que cette personne est mineure": "I think this person is a minor",
+ "Autre raison": "Another reason",
+ "Seule Lamia lit ton signalement. La personne n’est pas prévenue et ne saura jamais qui l’a signalée. Décris des faits, sans insulte : c’est une impression, pas une accusation. Il est effacé au bout d’un an.": "Only Lamia reads your report. The person is not told and will never know who reported them. Describe facts, without insults: it is an impression, not an accusation. It is deleted after one year.",
+ "Choisis une raison pour envoyer ton signalement.": "Choose a reason to send your report.",
+ "Vous ne vous verrez plus et Lamia est prévenue.": "You will no longer see each other and Lamia is informed.",
+ "La discussion sera fermée, vous ne vous reverrez plus, et Lamia la lira.": "The conversation will be closed, you will not see each other again, and Lamia will read it."
 }

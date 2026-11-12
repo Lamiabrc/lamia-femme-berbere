@@ -635,10 +635,11 @@ document.addEventListener('click', async (e) => {
   const s = await sessionActive();
   if (!s) return alert('Connecte-toi pour bloquer et signaler un profil.');
   const ref = bouton.dataset.listeBloquer;
-  const motif = prompt(`Bloquer et signaler le profil n° ${ref} ? Vous ne vous verrez plus et Lamia est prévenue. La personne n’est pas avertie.\n\nQue s’est-il passé ? (facultatif)`);
-  if (motif === null) return;
+  const { demanderSignalement } = await import('/assets/signaler.js');
+  const sig = await demanderSignalement(`Profil n° ${ref}`, 'Vous ne vous verrez plus et Lamia est prévenue.');
+  if (!sig) return;
   try {
-    await api({ action: 'annonce_bloquer_signaler', ref, motif }, s.access_token);
+    await api({ action: 'annonce_bloquer_signaler', ref, ...sig }, s.access_token);
     bouton.closest('.annonce-carte')?.remove();
     alert('C’est fait. Lamia est prévenue.');
   } catch { alert('Ça n’a pas abouti. Réessaie dans un instant.'); }

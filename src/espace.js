@@ -131,10 +131,11 @@ document.addEventListener('click', async (e) => {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) return;
   const ref = bouton.dataset.modererBloquer;
-  const motif = prompt(`Bloquer et signaler le profil n° ${ref} ? Vous ne vous verrez plus et Lamia est prévenue. La personne n’est pas avertie.\n\nQue s’est-il passé ? (facultatif)`);
-  if (motif === null) return;
+  const { demanderSignalement } = await import('/assets/signaler.js');
+  const sig = await demanderSignalement(`Profil n° ${ref}`, 'Vous ne vous verrez plus et Lamia est prévenue.');
+  if (!sig) return;
   try {
-    await appelProfil({ action: 'annonce_bloquer_signaler', ref, motif }, session);
+    await appelProfil({ action: 'annonce_bloquer_signaler', ref, ...sig }, session);
     alert('C’est fait. Lamia est prévenue.');
     render();
   } catch { alert('Ça n’a pas abouti. Réessaie dans un instant.'); }
@@ -367,7 +368,7 @@ async function monProfil(session) {
     }
     { // Le bouton « Modifier mon profil » est aussi tout en haut : plus besoin de descendre pour le trouver.
       const haut = document.querySelector('[data-profil-modifier-haut]');
-      if (haut) { haut.hidden = false; haut.querySelector('button').onclick = () => { const b = box.querySelector('[data-profil-modifier]'); if (b) b.click(); else document.querySelector('#mes-fiches')?.scrollIntoView({ behavior: 'smooth' }); }; }
+      if (haut) { haut.hidden = false; haut.querySelector('button').onclick = () => { const b = box.querySelector('[data-profil-modifier]'); if (b) b.click(); else if (window.lfbModifierFiche) location.href = window.lfbModifierFiche; else document.querySelector('#mes-fiches')?.scrollIntoView({ behavior: 'smooth' }); }; }
     }
     box.querySelector('[data-profil-modifier]')?.addEventListener('click', async () => {
       const zone = box.querySelector('[data-profil-edition]');
@@ -571,12 +572,14 @@ async function mesFiches(session) {
   if (!box) return;
   try {
     const { fiches = [] } = await appelProfil({ action: 'annonce_mes_fiches_outil' }, session);
+    // « Modifier mon profil » mène droit au formulaire de la fiche : un seul geste.
+    if (fiches[0]?.lien) { window.lfbModifierFiche = `${fiches[0].lien}#modifier`; document.querySelectorAll('a[href="#mes-fiches"]').forEach((x) => { x.href = window.lfbModifierFiche; }); }
     // Fiche créée en live reliée à ce compte : pas besoin d'inviter à « confier un profil ».
     if (fiches.length) { const sans = document.querySelector('[data-sans-profil]'); if (sans) sans.remove(); else setTimeout(() => document.querySelector('[data-sans-profil]')?.remove(), 1500); }
     box.innerHTML = fiches.map((f) => `<article class="espace-achat"><div><p class="event-date">Fiche n° ${esc(f.ref)} · créée en live avec Lamia</p><h3>${esc(ETAT_FICHE[f.etat] || f.etat)}</h3>
       <p>${esc([f.age && `${f.age} ans`, f.ville, f.pays].filter(Boolean).join(' · '))}</p>
       <p><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> <strong>${esc(f.interets.total)}</strong> personne(s) intéressée(s)${f.interets.mis_en_relation ? ` · ${esc(f.interets.mis_en_relation)} mise(s) en relation` : ''}${f.interets.dernier ? ` · dernier intérêt le ${esc(new Date(f.interets.dernier).toLocaleDateString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { day: 'numeric', month: 'long' }))}` : ''}</p></div>
-      <div class="espace-achat-droite"><a class="btn btn-ink" href="${esc(f.lien)}">Voir ma fiche</a> <a class="btn btn-line" href="${esc(f.lien)}#modifier">Modifier mon annonce</a></div></article>`).join('');
+      <div class="espace-achat-droite"><a class="btn btn-ink" href="${esc(f.lien)}">Voir ma fiche</a> <a class="btn btn-line" href="${esc(f.lien)}#modifier">Modifier mon profil</a></div></article>`).join('');
   } catch { box.innerHTML = ''; }
 }
 
@@ -882,10 +885,11 @@ async function discussions(session) {
     }
     if (!e.target.closest('[data-disc-signaler]')) return;
     const id = e.target.closest('[data-disc]').dataset.disc;
-    const motif = prompt('Bloquer et signaler ? La discussion sera fermée, vous ne vous reverrez plus, et Lamia la lira.\n\nQue s’est-il passé ? (facultatif)');
-    if (motif === null) return;
+    const { demanderSignalement } = await import('/assets/signaler.js');
+    const sig = await demanderSignalement('Bloquer et signaler', 'La discussion sera fermée, vous ne vous reverrez plus, et Lamia la lira.');
+    if (!sig) return;
     try {
-      await appelProfil({ action: 'annonce_discussion_signaler', id, motif }, session);
+      await appelProfil({ action: 'annonce_discussion_signaler', id, ...sig }, session);
       // Un signalement protège aussi : les deux personnes ne se revoient plus, et le match s'arrête.
       const avec = liste.find((x) => x.id === id)?.avec_ref;
       if (avec) await appelProfil({ action: 'annonce_bloquer', ref: avec, motif: 'Discussion signalée' }, session).catch(() => {});

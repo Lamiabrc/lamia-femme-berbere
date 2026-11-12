@@ -78,6 +78,20 @@ test('un seul bouton : bloquer et signaler enregistre les deux, une seule alerte
   assert.equal(h.alertes.length, 1);
 });
 
+test('signalement : la raison choisie passe en tête du motif, pour Lamia', async () => {
+  const h = harnais();
+  const r = await lire(await actionBlocage('annonce_bloquer_signaler', { ref: 9, raison: 'papiers', motif: 'il me demande où je travaille' }, h.deps));
+  assert.equal(r.status, 200);
+  const s = h.inserts.find((x) => x.t === 'signalements');
+  assert.equal(JSON.stringify(s).includes('Suspicion papiers : il me demande où je travaille'), true);
+  assert.ok(JSON.stringify(h.alertes[0]).includes('Suspicion papiers'));
+  assert.ok(JSON.stringify(h.alertes[0]).includes('pas un fait établi'));
+  // Une raison inconnue ne casse rien : le texte libre est gardé tel quel.
+  const h2 = harnais();
+  await actionBlocage('annonce_bloquer_signaler', { ref: 9, raison: 'nimporte', motif: 'texte libre' }, h2.deps);
+  assert.ok(JSON.stringify(h2.inserts.find((x) => x.t === 'signalements')).includes('texte libre'));
+});
+
 test('bloquer et signaler : au-delà de 20 signalements par jour, le blocage passe quand même', async () => {
   const h = harnais({ 'signalements?auteur_user': Array(21).fill({ id: 1 }) });
   const r = await lire(await actionBlocage('annonce_bloquer_signaler', { ref: 9 }, h.deps));
