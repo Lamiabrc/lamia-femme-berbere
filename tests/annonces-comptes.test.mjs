@@ -56,8 +56,6 @@ test('pas de réseau social : un numéro de téléphone valide est obligatoire',
   const sans = { ...complet, matching: { origineTags: ['Kabyle (Algerie)'] }, sans_reseau: true };
   let r = await handleAnnonces('annonce_deposer', { ...sans, telephone: '12' }, ctx(NINA));
   assert.equal((await r.json()).error, 'telephone_invalide');
-  r = await handleAnnonces('annonce_deposer', { ...complet, matching: {} }, ctx(NINA));
-  assert.equal((await r.json()).error, 'contact_requis');
   r = await handleAnnonces('annonce_deposer', { ...sans, telephone: '06 12 34 56 78' }, ctx(NINA));
   assert.equal(r.status, 200);
   assert.equal(db.annonces[0].phone, '+33612345678');
@@ -75,10 +73,22 @@ test('profil créé en live : formulaire allégé, fiche retrouvée par empreint
   assert.equal(db.annonces[0].live_declare, true);
   assert.equal(db.annonces[0].outil_id, 'outil-42');
 });
-test('hors live, textes et photos restent obligatoires', async () => {
+test('inscription courte : sans textes ni lien de réseau, le profil est accepté ; les 2 photos restent obligatoires', async () => {
+  const { ctx, db } = monde();
+  const court = { ...base, matching: { origineTags: ['Kabyle (Algerie)'] }, ville: 'Lyon', pays: 'France' };
+  let r = await handleAnnonces('annonce_deposer', court, ctx(NINA));
+  assert.equal((await r.json()).error, 'medias_requis');
+  r = await handleAnnonces('annonce_deposer', { ...court, medias: complet.medias }, ctx(NINA));
+  assert.equal(r.status, 200);
+  assert.equal(db.annonces[0].profil, '');
+  assert.ok(!db.annonces[0].matching.contactReseau);
+});
+test('un texte commencé doit faire 20 caractères au moins ; l’origine reste obligatoire', async () => {
   const { ctx } = monde();
-  const r = await handleAnnonces('annonce_deposer', { ...base, ville: 'Lyon', pays: 'France' }, ctx(NINA));
+  let r = await handleAnnonces('annonce_deposer', { ...complet, profil: 'Salut' }, ctx(NINA));
   assert.equal((await r.json()).error, 'textes_courts');
+  r = await handleAnnonces('annonce_deposer', { ...complet, matching: {} }, ctx(NINA));
+  assert.equal((await r.json()).error, 'origine_requise');
 });
 test('la personne corrige elle-même sa date de naissance, jamais en dessous de 18 ans', async () => {
   const { ctx, db } = monde();
