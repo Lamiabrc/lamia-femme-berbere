@@ -5,6 +5,7 @@
 import { api, esc, PUBLIC_KEY, matchsOuverts, matchPleinHtml } from './confidences-commun.js';
 import { O, lib, secteurLisible, foiEtVie, badgesProfil, origineLisible, metierEtReligion } from './matching-options.mjs';
 import { SINCERITE_HTML, brancherSincerite } from './sincerite.js';
+import { SIGNALEMENT_HTML, lireSignalement } from './signaler.js';
 import { createClient } from '/vendor/supabase.mjs';
 
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', PUBLIC_KEY);
@@ -220,10 +221,12 @@ function quotaAtteint({ algerie, formule } = {}) {
 }
 // Bloquer ou signaler le profil affiché. Bloquer le retire tout de suite, et la personne n'en sait rien.
 function moderer(ref) {
-  const d = fenetre(`<h2>Profil n° ${esc(ref)}</h2><p>Vous ne vous verrez plus et vous ne pourrez plus vous écrire. Lamia reçoit une alerte et regarde ce profil. La personne n’est pas prévenue.</p><label class="profil-motif">Que s’est-il passé ? (facultatif)<textarea rows="3" maxlength="500" data-motif></textarea></label><p class="po-actions"><button type="button" class="po-btn" data-bloquer><svg class="ico" aria-hidden="true"><use href="/icones.svg#flag"/></svg> Bloquer et signaler</button></p><p class="form-status" role="status" data-moderer-statut></p>`);
+  const d = fenetre(`<h2>Profil n° ${esc(ref)}</h2><p>Vous ne vous verrez plus et vous ne pourrez plus vous écrire. Lamia reçoit une alerte et regarde ce profil. La personne n’est pas prévenue.</p>${SIGNALEMENT_HTML}<p class="po-actions"><button type="button" class="po-btn" data-bloquer><svg class="ico" aria-hidden="true"><use href="/icones.svg#flag"/></svg> Bloquer et signaler</button></p><p class="form-status" role="status" data-moderer-statut></p>`);
   const envoyer = async (action, fin) => {
+    const sig = lireSignalement(d, d.querySelector('[data-moderer-statut]'));
+    if (!sig) return;
     d.querySelectorAll('button').forEach((x) => { x.disabled = true; });
-    try { await api({ action, ref, motif: d.querySelector('[data-motif]').value }, token); fin(); }
+    try { await api({ action, ref, ...sig }, token); fin(); }
     catch { d.querySelectorAll('button').forEach((x) => { x.disabled = false; }); d.querySelector('[data-moderer-statut]').textContent = 'Ça n’a pas abouti. Réessaie dans un instant.'; }
   };
   d.querySelector('[data-bloquer]').addEventListener('click', () => envoyer('annonce_bloquer_signaler', () => { d.remove(); tous = tous.filter((p) => p.ref !== ref); profils = profils.filter((p) => p.ref !== ref); if (dernier?.profil.ref === ref) { dernier = null; majAnnuler(); } afficher(); toast('C’est fait. Vous ne vous verrez plus, Lamia est prévenue.'); }));
