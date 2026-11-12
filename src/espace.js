@@ -131,10 +131,11 @@ document.addEventListener('click', async (e) => {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) return;
   const ref = bouton.dataset.modererBloquer;
-  const motif = prompt(`Bloquer et signaler le profil n° ${ref} ? Vous ne vous verrez plus et Lamia est prévenue. La personne n’est pas avertie.\n\nQue s’est-il passé ? (facultatif)`);
-  if (motif === null) return;
+  const { demanderSignalement } = await import('/assets/signaler.js');
+  const sig = await demanderSignalement(`Profil n° ${ref}`, 'Vous ne vous verrez plus et Lamia est prévenue.');
+  if (!sig) return;
   try {
-    await appelProfil({ action: 'annonce_bloquer_signaler', ref, motif }, session);
+    await appelProfil({ action: 'annonce_bloquer_signaler', ref, ...sig }, session);
     alert('C’est fait. Lamia est prévenue.');
     render();
   } catch { alert('Ça n’a pas abouti. Réessaie dans un instant.'); }
@@ -884,10 +885,11 @@ async function discussions(session) {
     }
     if (!e.target.closest('[data-disc-signaler]')) return;
     const id = e.target.closest('[data-disc]').dataset.disc;
-    const motif = prompt('Bloquer et signaler ? La discussion sera fermée, vous ne vous reverrez plus, et Lamia la lira.\n\nQue s’est-il passé ? (facultatif)');
-    if (motif === null) return;
+    const { demanderSignalement } = await import('/assets/signaler.js');
+    const sig = await demanderSignalement('Bloquer et signaler', 'La discussion sera fermée, vous ne vous reverrez plus, et Lamia la lira.');
+    if (!sig) return;
     try {
-      await appelProfil({ action: 'annonce_discussion_signaler', id, motif }, session);
+      await appelProfil({ action: 'annonce_discussion_signaler', id, ...sig }, session);
       // Un signalement protège aussi : les deux personnes ne se revoient plus, et le match s'arrête.
       const avec = liste.find((x) => x.id === id)?.avec_ref;
       if (avec) await appelProfil({ action: 'annonce_bloquer', ref: avec, motif: 'Discussion signalée' }, session).catch(() => {});

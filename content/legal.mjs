@@ -105,6 +105,7 @@ Données stockées par Supabase, centre de données de Paris (Union européenne)
 <li>Compte membre : jusqu’à sa suppression, ou 3 ans après ta dernière connexion.</li>
 <li>Inscriptions et souhaits des soirées : 1 an après la soirée.</li>
 <li>Alertes : 3 ans, puis suppression.</li>
+<li>Signalements de profils : 1 an, puis suppression.</li>
 <li>Profils confiés à Lamia : jusqu’à ce que tu les retires, et au plus 2 ans sans nouvelle de ta part. La photo de pièce d’identité est supprimée dès la validation ou le refus du profil.</li>
 <li>Abonnements : pendant l’abonnement, puis 3 ans après sa fin.</li>
 <li>Commandes et factures : 10 ans (obligation comptable).</li>
@@ -234,6 +235,7 @@ Signature (si envoi papier) : …</p>
 <li>tenter de perturber le fonctionnement du site ou d’accéder aux données d’autres personnes.</li>
 </ul>
 <p><strong>Bloquer et signaler.</strong> Tu peux bloquer ou signaler un profil depuis sa fiche, le swipe, ta discussion ou Mon espace. Un blocage vaut dans les deux sens : vous ne vous voyez plus et vous ne pouvez plus vous écrire, et la personne n’en est pas prévenue. Lamia reçoit une alerte à chaque blocage et chaque signalement, et peut retirer un profil qui ne respecte pas ces règles.</p>
+<p><strong>La raison du signalement.</strong> Pour signaler, tu choisis une raison dans une liste (par exemple : comportement insistant, contenu à caractère sexuel, personne pas sérieuse, soupçon de recherche de papiers, faux profil ou demande d’argent, insultes, personne mineure) et tu peux décrire ce qui s’est passé. Ce que tu déclares est une impression, pas un fait établi : seule Lamia le lit, la personne signalée n’en est pas prévenue et ne sait jamais qui l’a signalée, et aucune décision n’est prise automatiquement. Lamia vérifie avant d’agir. Un signalement est effacé au bout d’un an. La personne signalée peut demander à Lamia d’accéder aux informations qui la concernent ou de les corriger, sans que l’auteur du signalement lui soit révélé.</p>
 
 <h2>5. Les Confidences avec Lamia</h2>
 <p>Les alertes sont lues par Lamia seule. L’identité de la personne qui alerte n’est jamais communiquée à la personne signalée. Le Cabinet n’est pas un service d’urgence : <strong>en cas de danger immédiat, appelle le 17 (police) ou le 112</strong>.</p>
