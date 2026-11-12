@@ -27,7 +27,7 @@ async function demarrer() {
   if (session?.user?.app_metadata?.role !== 'admin') { vue('login'); if (session) say($('[data-login-statut]'), 'Ce compte n’a pas le rôle administratrice.', true); return; }
   await chargerListe();
   compterTesteurs();
-  api({ action: 'annonces_admin' }, await jetonFrais()).then(({ annonces }) => { const n = annonces.filter((a) => a.status === 'a_verifier').length; $('[data-n-annonces]').textContent = n || ''; }).catch(() => {});
+  api({ action: 'annonces_admin' }, await jetonFrais()).then(({ annonces }) => { const n = annonces.filter((a) => a.status === 'a_verifier').length; $('[data-n-annonces]').textContent = n || ''; const nav = $('[data-n-annonces-nav]'); if (nav) nav.textContent = n ? `(${n})` : ''; }).catch(() => {});
   router();
   clearInterval(minuteur);
   minuteur = setInterval(() => { if (document.visibilityState === 'visible') (courant ? rafraichirFil() : chargerListe()); }, 30000);
@@ -173,7 +173,7 @@ function router() {
   const h = location.hash.slice(1);
   if (h === 'reglages') { courant = null; vue('reglages'); chargerReglages(); return; }
   if (h === 'testeurs') { courant = null; vue('testeurs'); chargerTesteurs(); return; }
-  if (h === 'annonces' || /^annonce-\d+$/.test(h)) { courant = null; vue('annonces'); chargerAnnonces(); chargerSansPhotos(); chargerDemandes(); chargerAbonnes(); chargerNouveautes(); return; }
+  if (h === 'annonces' || /^annonce-\d+$/.test(h)) { courant = null; vue('annonces'); chargerAnnonces(); chargerSansPhotos(); chargerSincerite(); chargerDemandes(); chargerAbonnes(); chargerNouveautes(); return; }
   if (/^[0-9a-f-]{36}$/i.test(h)) return ouvrirFil(h);
   courant = null; vue('liste'); rendreListe();
 }
@@ -424,6 +424,18 @@ document.addEventListener('click', (e) => {
 // ---------------------------------------------------------------- abonnés et achats à l'unité
 const FORMULES_NOMS = { coeur: 'Cœur (ancienne formule)', passion: 'Passion · 9 €', prestige: 'Prestige' };
 const ETATS = { actif: 'actif', impaye: 'paiement en retard', resilie: 'résilié', en_attente: 'en attente', suspendu: 'suspendu' };
+// Déclaration de bonne foi : combien ne l'ont pas encore acceptée, et la notification envoyée à la demande de Lamia, par lots.
+async function chargerSincerite() {
+  try { const r = await api({ action: 'annonce_relance_sincerite' }, await jetonFrais()); $('[data-n-sincerite]').textContent = `(${r.membres - r.manquent} sur ${r.membres})`; const b = $('[data-relance-sincerite]'); b.disabled = !r.a_prevenir; b.textContent = r.a_prevenir ? `Prévenir les ${r.a_prevenir} membre(s) qui ne se sont pas encore engagés` : (r.manquent ? `${r.manquent} membre(s) déjà prévenu(s), en attente` : 'Tout le monde s’est engagé'); } catch { /* */ }
+}
+$('[data-relance-sincerite]')?.addEventListener('click', async (e) => {
+  if (!confirm('Envoyer la notification « confirme ta bonne foi » à ces membres ? Elle ne part qu’une fois par personne.')) return;
+  const st = $('[data-sincerite-statut-lamia]'); e.target.disabled = true; let total = 0, recus = 0;
+  try { for (let i = 0; i < 100; i += 1) { const r = await api({ action: 'annonce_relance_sincerite', envoyer: true }, await jetonFrais()); total += r.traites; recus += r.notifies; st.textContent = `${total} traité(s)…`; if (!r.a_prevenir) break; }
+    st.textContent = `C’est fait : ${total} membre(s) traité(s), ${recus} notification(s) reçue(s) sur un téléphone. Les autres verront la déclaration en ouvrant l’application.`; }
+  catch { st.textContent = 'L’envoi s’est arrêté. Clique à nouveau : ceux déjà faits ne recevront rien de plus.'; }
+  chargerSincerite();
+});
 // Profils sans photos : le compte, et la notification envoyée à la demande de Lamia, par lots.
 async function chargerSansPhotos() {
   try { const r = await api({ action: 'annonce_relance_medias' }, await jetonFrais()); $('[data-n-sans-photos]').textContent = `(${r.manquent})`; const b = $('[data-relance-medias]'); b.disabled = !r.a_prevenir; b.textContent = r.a_prevenir ? `Envoyer la notification à ${r.a_prevenir} profil${r.a_prevenir > 1 ? 's' : ''}` : 'Tous ont été notifiés'; } catch { /* */ }

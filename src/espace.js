@@ -356,6 +356,15 @@ async function monProfil(session) {
       catch { e.target.checked = !e.target.checked; st.textContent = 'Ça n’a pas été enregistré. Réessaie.'; }
       e.target.disabled = false;
     });
+    { // Déclaration de bonne foi : affichée tant que la personne ne s'est pas engagée.
+      const bloc = document.querySelector('[data-sincerite-bloc]');
+      if (bloc && p.sincerite === false) import('/assets/sincerite.js').then(({ SINCERITE_HTML, brancherSincerite }) => {
+        bloc.innerHTML = SINCERITE_HTML; bloc.hidden = false;
+        brancherSincerite(bloc, async () => (await supabase.auth.getSession()).data.session?.access_token, () => { bloc.innerHTML = '<p><strong>✓ Merci, ton engagement est enregistré.</strong></p>'; });
+        if (location.hash === '#sincerite') bloc.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }).catch(() => {});
+      else if (bloc) bloc.hidden = true;
+    }
     { // Le bouton « Modifier mon profil » est aussi tout en haut : plus besoin de descendre pour le trouver.
       const haut = document.querySelector('[data-profil-modifier-haut]');
       if (haut) { haut.hidden = false; haut.querySelector('button').onclick = () => { const b = box.querySelector('[data-profil-modifier]'); if (b) b.click(); else document.querySelector('#mes-fiches')?.scrollIntoView({ behavior: 'smooth' }); }; }
@@ -391,6 +400,7 @@ async function suivi(el, p) {
     q ? `<li><strong>Formule ${esc(q.nom)}</strong> : ${s.mises_mois} mise(s) en relation ce mois-ci${q.mises ? ` sur ${q.mises}` : ' (sans limite)'} · ${q.sd} speed dating inclus par mois</li>`
       : (p.algerie ? '<li><strong>Formule Découverte</strong> (gratuite)</li>' : '<li><strong>Formule Découverte</strong> (gratuite) · plusieurs matchs en même temps avec <a class="text-link" href="/abonnement/">une formule</a></li>'),
     q && q.nom !== 'Cœur' ? '<li><strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#camera"/></svg> Photo de ton match</strong> : incluse dans ta formule, si ton match l’accepte</li>' : '<li><strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#camera"/></svg> Photo de ton match</strong> : incluse à partir de la formule Passion, ou 3 € pour la voir 1 heure · <a class="text-link" href="/abonnement/?formule=passion">en savoir plus</a></li>',
+    '<li><strong>Qui peut t’envoyer un cœur</strong> : seulement les personnes qui correspondent à ta tranche d’âge (à 2 ans près) et à la zone que tu as choisie. Vérifie tes critères avec « Modifier mon profil ».</li>',
     u.mise_en_relation || u.speed_dating ? `<li><strong>Achetés à l’unité</strong> : ${u.mise_en_relation || 0} match(s) supplémentaire(s) · ${u.speed_dating || 0} place(s) de speed dating</li>` : '',
   ].filter(Boolean).join('');
   // Demandes : les attentes regroupées en une ligne, le reste en court ; les terminées repliées.
@@ -433,7 +443,7 @@ async function suivi(el, p) {
       const { data } = await supabase.auth.getSession();
       await appelProfil({ action: 'annonce_relancer', ref: Number(b.dataset.relancer) }, data.session);
       b.outerHTML = '<small>✓ Ta demande est repartie</small>';
-    } catch (err) { b.disabled = false; b.insertAdjacentHTML('afterend', ` <small>${err.code === 'relances_epuisees' ? 'Tu as déjà renvoyé 2 fois cette demande.' : err.code === 'formule_requise' ? 'Réservé aux formules Passion et Prestige.' : 'Ça n’a pas fonctionné. Réessaie dans un instant.'}</small>`); }
+    } catch (err) { b.disabled = false; b.insertAdjacentHTML('afterend', ` <small>${err.code === 'hors_de_ses_criteres' ? 'Ce profil cherche quelqu’un d’un autre âge ou d’une autre zone.' : err.code === 'relances_epuisees' ? 'Tu as déjà renvoyé 2 fois cette demande.' : err.code === 'formule_requise' ? 'Réservé aux formules Passion et Prestige.' : 'Ça n’a pas fonctionné. Réessaie dans un instant.'}</small>`); }
   }));
   el.querySelectorAll('[data-photo-acheter]').forEach((b) => b.addEventListener('click', async () => {
     const ref = b.dataset.photoAcheter, st = el.querySelector(`[data-photo-statut="${ref}"]`);

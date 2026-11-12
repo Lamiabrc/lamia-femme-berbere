@@ -121,6 +121,7 @@ test('intérêt reçu : la personne voit la fiche anonyme (sans prénom) et rép
   const interet = { id: '22222222-2222-2222-2222-222222222222', cible_ref: 5020, demandeur_id: demandeur.id, created_at: '2026-10-30T20:00:00Z', statut: 'a_traiter', reciproque: false, annonces: demandeur };
   const read0 = ctx.read;
   const c = { ...ctx, user: { id: 'u-1', email: 'moi@example.com' }, read: async (u) => {
+    if (u.includes('declarations_sincerite')) return [{ user_id: 'u-1' }];
     if (u.startsWith('/rest/v1/profils_outil?user_id=eq.u-1')) return [{ ref: 5020 }];
     if (u.startsWith('/rest/v1/annonce_interets?cible_ref=in.(5020)')) return [interet];
     if (u.startsWith(`/rest/v1/annonce_interets?id=eq.${interet.id}`)) return [interet];

@@ -278,6 +278,10 @@ export function zoneAccepte(secteur, pays) {
   return z === p;
 }
 const ageAccepte = (qui, age) => !age || ((!qui.age_min || age >= qui.age_min) && (!qui.age_max || age <= qui.age_max));
+// Barrière : ce que l'autre cherche m'accepte-t-il ? Son âge demandé à 2 ans près, et la zone où il veut que je vive.
+// Sans critère ou en cas de doute : oui. Sert à ne pas montrer un profil (ni lui envoyer de cœur) à quelqu'un qu'il ne cherche pas.
+export const MARGE_AGE = 2;
+export const accepteParSesCriteres = (lui, moi) => (!moi?.age || ((!lui?.age_min || moi.age >= lui.age_min - MARGE_AGE) && (!lui?.age_max || moi.age <= lui.age_max + MARGE_AGE))) && zoneAccepte(lui?.secteur, moi?.pays);
 // moi et lui : { age, age_min, age_max, pays, secteur }.
 // Le profil entre dans ce que je cherche (filtre du swipe).
 export const dansMesCriteres = (moi, lui) => ageAccepte(moi, lui.age) && zoneAccepte(moi.secteur, lui.pays);

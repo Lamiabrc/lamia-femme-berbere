@@ -46,6 +46,8 @@ const ERR = {
   enregistrement: 'Ton profil n’a pas pu être enregistré. Vérifie que tous les champs sont remplis, puis réessaie. Si ça recommence, écris à Lamia.',
   login_required: 'Ta connexion a expiré : reconnecte-toi dans « Mon espace », puis réessaie.',
   limite_matchs: 'Tu as atteint le nombre de matchs en cours de ta formule. Termines-en un depuis ton espace, ou passe à une formule supérieure.',
+  sincerite_requise: 'Avant d’envoyer un cœur, confirme ta déclaration de bonne foi dans « Mon espace ».',
+  hors_de_ses_criteres: 'Ce profil cherche quelqu’un d’un autre âge ou d’une autre zone : ton cœur n’est pas parti.',
   quota_matchs: 'Tu as utilisé tes matchs disponibles. Prends un match supplémentaire à 5 €, ou viens au live de Lamia, du lundi au vendredi à 20 h : 1 match offert toutes les 2 semaines.',
   en_match: 'Tu as atteint le nombre de matchs en cours de ta formule : mets fin à l’un d’eux dans « Mon espace » pour en découvrir d’autres.',
 };
@@ -500,6 +502,8 @@ async function interesse(ref) {
         if (o.length === 1) { montrerMessage(`Tu es déjà en match avec ${o[0].avec}. Ce match n’était pas assez bien pour toi ? Tu vas pouvoir dématcher, ou prendre une formule pour plusieurs matchs en même temps. ${SECURITE_APPLI}`, true); setTimeout(() => { location.href = `/mon-espace/#dematcher-${encodeURIComponent(o[0].id)}`; }, 4500); return; }
         return montrerMessage(ERR.limite_matchs, true);
       }
+      if (err.code === 'sincerite_requise') return montrerMessage(ERR.sincerite_requise, true);
+      if (err.code === 'hors_de_ses_criteres') return montrerMessage(ERR.hors_de_ses_criteres, true);
       if (err.code === 'quota_matchs') return montrerMessage(ERR.quota_matchs, true);
       if (err.code !== 'pas_de_profil') return montrerMessage('La demande n’a pas pu partir. Réessaie dans un instant.', true);
     }
