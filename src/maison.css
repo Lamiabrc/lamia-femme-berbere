@@ -4174,3 +4174,11 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .signaler-note { text-align: start; color: #5c4a4f; }
 .signaler-fenetre .swipe-fenetre-boite { max-height: 92vh; overflow-y: auto; text-align: start; }
 .signaler-fenetre .po-btn-verre { color: #3b2f33; border-color: #cbb9a4; }
+
+/* Profil incomplet : ce qu'il reste à faire */
+.incomplet-bloc { background: #fff8ec; border: 2px solid #d99a2b; border-radius: 18px; padding: 1rem 1.1rem; margin: 0 0 1.2rem; }
+.incomplet-bloc h2 { font-size: 1.35rem; margin: 0 0 .3rem; color: #7a4b00; }
+.incomplet-liste { margin: .7rem 0 0; padding-inline-start: 1.3rem; display: grid; gap: .9rem; }
+.incomplet-liste li > strong, .incomplet-liste li > span { display: block; }
+.incomplet-liste li > span { margin: .15rem 0 .5rem; color: #4d3c2a; }
+[data-profil-medias].is-vise { outline: 3px solid #d99a2b; outline-offset: 6px; border-radius: 12px; }

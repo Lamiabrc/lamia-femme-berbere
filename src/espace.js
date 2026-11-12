@@ -357,6 +357,27 @@ async function monProfil(session) {
       catch { e.target.checked = !e.target.checked; st.textContent = 'Ça n’a pas été enregistré. Réessaie.'; }
       e.target.disabled = false;
     });
+    { // Profil incomplet : ce qui manque, pourquoi ça bloque, et le bouton pour le régler.
+      const bloc = document.querySelector('[data-incomplet-bloc]');
+      const QUOI = {
+        photos: ['Ajoute tes 2 photos', 'Sans tes 2 photos, tu ne peux ni swiper ni répondre. Elles ne sont jamais publiées.', 'Ajouter mes photos', 'photos'],
+        contact: ['Indique un contact valable', 'Mets ton numéro de téléphone, ou le lien de ton profil TikTok, Instagram ou Facebook (un prénom ne suffit pas). Sans lui, ton profil n’est pas validé et personne ne te voit.', 'Corriger mon contact', 'modifier'],
+        email: ['Corrige ton adresse email', 'Ton adresse email n’est pas valable : Lamia ne peut pas te prévenir de tes matchs.', 'Corriger mon profil', 'modifier'],
+        textes: ['Présente-toi en quelques phrases', 'Dis qui tu es et qui tu cherches : un profil sans présentation est beaucoup moins choisi.', 'Écrire ma présentation', 'modifier'],
+      };
+      const manques = (p.a_completer || []).filter((k) => QUOI[k]);
+      if (bloc) {
+        bloc.hidden = !manques.length;
+        if (manques.length) {
+          bloc.innerHTML = `<h2>Ton profil n’est pas terminé</h2><p>${p.invisible ? 'Pour l’instant, personne ne peut te voir. ' : ''}Voici ce qu’il reste à faire :</p><ol class="incomplet-liste">${manques.map((k) => `<li><strong>${QUOI[k][0]}</strong><span>${QUOI[k][1]}</span><button type="button" class="btn btn-ink" data-completer="${QUOI[k][3]}">${QUOI[k][2]}</button></li>`).join('')}</ol>`;
+          bloc.querySelectorAll('[data-completer]').forEach((b) => b.addEventListener('click', () => {
+            if (b.dataset.completer === 'photos') { const z = document.querySelector('[data-profil-medias]'); if (z) { z.scrollIntoView({ behavior: 'smooth', block: 'center' }); z.classList.add('is-vise'); setTimeout(() => z.classList.remove('is-vise'), 2500); return; } }
+            document.querySelector('[data-profil-modifier-haut] button')?.click();
+          }));
+          if (location.hash === '#a-completer') bloc.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    }
     { // Déclaration de bonne foi : affichée tant que la personne ne s'est pas engagée.
       const bloc = document.querySelector('[data-sincerite-bloc]');
       if (bloc && p.sincerite === false) import('/assets/sincerite.js').then(({ SINCERITE_HTML, brancherSincerite }) => {

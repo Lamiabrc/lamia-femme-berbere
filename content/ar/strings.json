@@ -2162,5 +2162,21 @@
  "Seule Lamia lit ton signalement. La personne n’est pas prévenue et ne saura jamais qui l’a signalée. Décris des faits, sans insulte : c’est une impression, pas une accusation. Il est effacé au bout d’un an.": "لمياء وحدها تقرأ بلاغك. لا يُخبَر الشخص ولن يعرف أبدًا من بلّغ عنه. صف وقائع دون شتائم: هو انطباع وليس اتهامًا. يُحذف بعد سنة.",
  "Choisis une raison pour envoyer ton signalement.": "اختر سببًا لإرسال بلاغك.",
  "Vous ne vous verrez plus et Lamia est prévenue.": "لن تريا بعضكما بعد الآن ولمياء على علم.",
- "La discussion sera fermée, vous ne vous reverrez plus, et Lamia la lira.": "ستُغلق المحادثة، لن تلتقيا مجددًا، وستقرؤها لمياء."
+ "La discussion sera fermée, vous ne vous reverrez plus, et Lamia la lira.": "ستُغلق المحادثة، لن تلتقيا مجددًا، وستقرؤها لمياء.",
+ "Ton profil n’est pas terminé": "ملفك غير مكتمل",
+ "Pour l’instant, personne ne peut te voir. ": "حاليًا لا أحد يستطيع رؤيتك. ",
+ "Voici ce qu’il reste à faire :": "هذا ما بقي عليك فعله:",
+ "Ajoute tes 2 photos": "أضف صورتيك",
+ "Sans tes 2 photos, tu ne peux ni swiper ni répondre. Elles ne sont jamais publiées.": "بدون صورتيك لا يمكنك السحب ولا الرد. لا تُنشران أبدًا.",
+ "Indique un contact valable": "ضع وسيلة اتصال صحيحة",
+ "Mets ton numéro de téléphone, ou le lien de ton profil TikTok, Instagram ou Facebook (un prénom ne suffit pas). Sans lui, ton profil n’est pas validé et personne ne te voit.": "ضع رقم هاتفك، أو رابط حسابك على تيك توك أو إنستغرام أو فيسبوك (الاسم وحده لا يكفي). بدونه لا يُعتمد ملفك ولا يراك أحد.",
+ "Corriger mon contact": "تصحيح وسيلة الاتصال",
+ "Corrige ton adresse email": "صحّح بريدك الإلكتروني",
+ "Ton adresse email n’est pas valable : Lamia ne peut pas te prévenir de tes matchs.": "بريدك الإلكتروني غير صالح: لا تستطيع لمياء إخبارك بتطابقاتك.",
+ "Corriger mon profil": "تصحيح ملفي",
+ "Présente-toi en quelques phrases": "عرّف بنفسك في بضع جمل",
+ "Dis qui tu es et qui tu cherches : un profil sans présentation est beaucoup moins choisi.": "قل من أنت ومن تبحث عنه: الملف بلا تعريف يُختار أقل بكثير.",
+ "Écrire ma présentation": "كتابة تعريفي",
+ "Ton profil n’est pas terminé : personne ne peut encore te voir.": "ملفك غير مكتمل: لا أحد يستطيع رؤيتك بعد.",
+ "Voir ce qu’il manque": "انظر ما ينقص"
 }
