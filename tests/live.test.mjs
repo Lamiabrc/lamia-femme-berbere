@@ -84,3 +84,76 @@ test('fermer le live ; un live oublié se ferme seul au bout de 5 heures', async
   assert.equal(etatPublic({ actif: true, debut: t0.toISOString() }, new Date('2026-11-12T21:00:00Z')).actif, true);
   assert.equal(etatPublic({ actif: true, debut: t0.toISOString() }, new Date('2026-11-13T01:00:00Z')).actif, false);
 });
+
+// ---------------------------------------------------------------- l'annonce du soir
+function mondeAnnonces() {
+  const be = monde();
+  const base = { status: 'publiee', test: false, bloque_at: null, pause_at: null, anonyme_ok: true, en_match: false, pays: 'France', situation: 'Divorce(e)', recherche: 'Une femme sérieuse.', avant_jusqu_a: null, user_id: null };
+  const long = 'Je suis une personne qui aime les choses claires et la confiance.';
+  Object.assign(be.db, {
+    annonces: [
+      { ...base, id: 'a1', ref: 10, genre: 'femme', birth_date: '1990-05-01', profil: long, email: 'libre@exemple.fr', published_at: '2026-10-01T10:00:00Z' },
+      { ...base, id: 'a2', ref: 32, genre: 'homme', birth_date: '1993-01-01', profil: long, email: 'Prestige@exemple.fr', published_at: '2026-10-31T10:00:00Z', user_id: 'u32' },
+      { ...base, id: 'a3', ref: 72, genre: 'homme', birth_date: '1978-01-01', profil: `${long} Appelle-moi au 06 12 34 56 78.`, email: 'passion@exemple.fr', published_at: '2026-11-02T10:00:00Z' },
+      { ...base, id: 'a4', ref: 29, genre: 'homme', birth_date: '1969-01-01', profil: 'Sérieux, honnête.', email: 'court@exemple.fr', published_at: '2026-10-31T10:00:00Z' },
+      { ...base, id: 'a5', ref: 50, genre: 'femme', birth_date: '1991-01-01', profil: long, email: 'pause@exemple.fr', published_at: '2026-10-02T10:00:00Z', pause_at: '2026-11-01T00:00:00Z' },
+      { ...base, id: 'a6', ref: 51, genre: 'femme', birth_date: '1991-01-01', profil: long, email: 'refus@exemple.fr', published_at: '2026-10-02T10:00:00Z', anonyme_ok: false },
+      { ...base, id: 'a7', ref: 52, genre: 'femme', birth_date: '1991-01-01', profil: long, email: 'sansphoto@exemple.fr', published_at: '2026-10-02T10:00:00Z' },
+      { ...base, id: 'a8', ref: 53, genre: 'homme', birth_date: '1991-01-01', profil: long, email: 'priorite@exemple.fr', published_at: '2026-11-05T10:00:00Z' },
+    ],
+    annonce_files: ['a1', 'a2', 'a2', 'a3', 'a4', 'a5', 'a6', 'a8'].map((id, k) => ({ id: `f${k}`, annonce_id: id, kind: 'photo' })).concat([{ id: 'fi', annonce_id: 'a7', kind: 'identite' }]),
+    abonnements: [{ email: 'prestige@exemple.fr', formule: 'prestige', statut: 'actif' }, { email: 'passion@exemple.fr', formule: 'passion', statut: 'actif' }, { email: 'court@exemple.fr', formule: 'passion', statut: 'actif' }, { email: 'libre@exemple.fr', formule: 'passion', statut: 'resilie' }],
+    formules_offertes: [],
+    achats_unite: [{ email: 'priorite@exemple.fr', type: 'live_priorite', quantite: 1, utilisees: 0 }],
+    profils_outil: [{ ref: 5000, user_id: 'u32', avant_jusqu_a: null }],
+  });
+  return be;
+}
+
+test('annonce du soir : les formules d’abord, jamais un profil en pause, sans photo ou qui refuse l’anonymat', async () => {
+  const be = mondeAnnonces();
+  assert.equal((await appel(be, { action: 'live_outil_annonces', cle: 'mauvaise-cle-mais-assez-longue-pour-etre-lue-0000' })).status, 403);
+  const r = await appel(be, { action: 'live_outil_annonces', cle: CLE });
+  assert.equal(r.status, 200);
+  assert.deepEqual(r.body.candidats.map((c) => c.ref), [32, 72, 53, 10]);
+  assert.deepEqual(r.body.candidats.map((c) => c.formule), ['prestige', 'passion', 'priorite', '']);
+  assert.deepEqual(r.body.a_completer.map((c) => c.ref), [29], 'une formule mais un texte trop court : à compléter');
+  const p72 = r.body.candidats.find((c) => c.ref === 72);
+  assert.doesNotMatch(p72.profil, /06 12/, 'aucun numéro ne sort du site');
+  assert.equal(r.body.candidats[0].email, undefined, 'jamais d’adresse email dans la console');
+  assert.equal(r.body.annonce, null);
+});
+
+test('annonce du soir : choisir, retravailler le texte, la montrer la fait passer derrière', async () => {
+  const be = mondeAnnonces();
+  assert.equal((await appel(be, { action: 'live_outil_annonce_choisir', cle: CLE, ref: 51 })).status, 409, 'elle a refusé l’affichage anonyme');
+  assert.equal((await appel(be, { action: 'live_outil_annonce_choisir', cle: CLE, ref: 'x' })).status, 400);
+  const c = await appel(be, { action: 'live_outil_annonce_choisir', cle: CLE, ref: 32, titre: 'Clair, droit, il sait ce qu’il veut', texte: 'Un homme de 33 ans   qui aime les choses claires.' });
+  assert.equal(c.body.annonce.ref, 32);
+  assert.equal(c.body.annonce.texte, 'Un homme de 33 ans qui aime les choses claires.');
+  // Un simple « à l'écran » ne perd pas le texte déjà enregistré.
+  await appel(be, { action: 'live_outil_annonce_choisir', cle: CLE, ref: 32, ecran: true });
+  be.db.platform_settings.push({ key: 'live_claude', value: { notes: [{ at: '2026-11-12T19:10:00Z', texte: 'Le public demande son métier.' }] } });
+  const r = await appel(be, { action: 'live_outil_annonces', cle: CLE });
+  assert.equal(r.body.annonce.titre, 'Clair, droit, il sait ce qu’il veut');
+  assert.equal(r.body.annonce.fiche.ref, 32);
+  assert.equal(r.body.annonce.fiche.formule, 'prestige');
+  assert.deepEqual(r.body.candidats.map((c2) => c2.ref), [72, 53, 10, 32], 'déjà passée : elle laisse la place aux suivantes');
+  assert.equal(r.body.notes[0].texte, 'Le public demande son métier.');
+  assert.equal((await appel(be, { action: 'live_outil_annonce_choisir', cle: CLE, ref: null })).body.annonce, null);
+  assert.equal((await appel(be, { action: 'live_outil_annonces', cle: CLE })).body.annonce, null);
+});
+
+test('annonce du soir : mise en avant 7 jours sur le site, sans rallonge au second clic', async () => {
+  const be = mondeAnnonces();
+  const quand = new Date('2026-11-12T19:30:00Z');
+  const r = await appel(be, { action: 'live_outil_annonce_avant', cle: CLE, ref: 32 }, null, quand);
+  assert.equal(r.body.jusqu_a, '2026-11-19T19:30:00.000Z');
+  assert.equal(be.db.annonces.find((a) => a.ref === 32).avant_jusqu_a, '2026-11-19T19:30:00.000Z');
+  assert.equal(be.db.profils_outil[0].avant_jusqu_a, '2026-11-19T19:30:00.000Z', 'sa fiche de l’outil suit');
+  const bis = await appel(be, { action: 'live_outil_annonce_avant', cle: CLE, ref: 32 }, null, new Date('2026-11-12T20:10:00Z'));
+  assert.equal(bis.body.deja, true);
+  assert.equal(bis.body.jusqu_a, '2026-11-19T19:30:00.000Z');
+  assert.equal((await appel(be, { action: 'live_outil_annonce_avant', cle: CLE, ref: 999 })).status, 404);
+  assert.equal((await appel(be, { action: 'live_outil_annonce_avant', cle: 'mauvaise-cle-mais-assez-longue-pour-etre-lue-0000', ref: 32 })).status, 403);
+});
