@@ -18,6 +18,8 @@ function monde({ compte = true, tiktok = {} } = {}) {
     const h = u.match(/outil_tiktok\?h=in\.\(([0-9a-f,]+)\)/); if (h) { const f = h[1].split(',').find((x) => tiktok[x]); return f ? [{ outil_id: tiktok[f] }] : []; }
     if (u.includes('lien_h=eq.')) { const x = u.match(/lien_h=eq\.([0-9a-f]+)/)[1]; return db.annonces.filter((a) => a.lien_h === x && ['a_verifier', 'publiee'].includes(a.status)); }
     if (u.includes('/annonce_interets?id=eq.')) { const id = u.match(/id=eq\.([^&]+)/)[1]; const i = db.annonce_interets.find((x) => x.id === id); return i ? [{ cible_ref: i.cible_ref, annonces: db.annonces.find((a) => a.id === i.demandeur_id) }] : []; }
+    if (u.startsWith('/rest/v1/annonces?id=eq.')) { const id = u.match(/id=eq\.([^&]+)/)[1]; return db.annonces.filter((x) => x.id === id); }
+    if (u.startsWith('/rest/v1/profils_outil?user_id=eq.')) { const id = u.match(/user_id=eq\.([^&]+)/)[1]; return (db.profils_outil || []).filter((x) => x.user_id === id && !x.retire_at); }
     if (u.startsWith('/rest/v1/annonces?ref=eq.')) { const r = Number(u.match(/ref=eq\.(\d+)/)[1]); return db.annonces.filter((a) => a.ref === r); }
     if (u.startsWith('/rest/v1/annonce_interets?demandeur_id=eq.') && u.includes('cible_ref=in.(')) { const d = u.match(/demandeur_id=eq\.([^&]+)/)[1]; const c = u.match(/cible_ref=in\.\(([^)]*)\)/)[1].split(',').map(Number); return db.annonce_interets.filter((i) => i.demandeur_id === d && c.includes(i.cible_ref)); }
     if (u.startsWith('/rest/v1/annonce_interets?demandeur_id=eq.') && u.includes('cible_ref=eq.')) { const [, d, c] = u.match(/demandeur_id=eq\.([^&]+)&cible_ref=eq\.(\d+)/); return db.annonce_interets.filter((i) => i.demandeur_id === d && i.cible_ref === Number(c)); }
@@ -136,6 +138,20 @@ test('bonne foi : sans la déclaration, pas de cœur ; la déclaration s’enreg
   assert.equal((await handleAnnonces('annonce_sincerite', { accepte: true, langue: 'kab' }, sans)).status, 200);
   const [u, corps] = envois.find(([x]) => x.includes('declarations_sincerite'));
   assert.ok(u.includes('on_conflict=user_id')); assert.equal(JSON.parse(corps).langue, 'kab'); assert.equal(JSON.parse(corps).user_id, 'u1');
+});
+test('corriger son profil dans Mon espace corrige aussi sa fiche venue de l’outil (celle que les autres voient)', async () => {
+  const { ctx, db } = monde();
+  db.annonces.push({ id: 'a1', ref: 65, user_id: 'u1', email: 'amel@example.com', status: 'publiee', prenom: 'Amel', genre: 'femme', birth_date: '1981-07-17', ville: 'Alger', pays: 'Algerie', matching: { contactReseau: 'https://instagram.com/amel' } });
+  db.profils_outil = db.profils_outil || [];
+  db.profils_outil.push({ ref: 5410, user_id: 'u1', genre: 'femme', age: 44, ville: 'Alger', pays: 'Algérie', profil: '', recherche: 'Ancien texte', age_min: 45, age_max: 55, corrections: null, modif_at: '2026-11-02T21:23:07Z', modif_demandee: 'j’ai 45 ans', retire_at: null });
+  const amel = { id: 'u1', email: 'amel@example.com' };
+  const r = await handleAnnonces('annonce_modifier', { prenom: 'Amel', ville: 'Alger centre', pays: 'Algerie', profil: 'Je suis diplômée en électronique et je travaille dans la communication.', recherche: 'Un homme sérieux, kabyle, qui respecte la femme.', matching: { contactReseau: 'https://instagram.com/amel' } }, ctx(amel));
+  assert.equal(r.status, 200, JSON.stringify(await r.clone().json()));
+  const f = db.profils_outil[0];
+  assert.equal(f.ville, 'Alger centre'); assert.equal(f.age, 45);
+  assert.equal(f.profil, 'Je suis diplômée en électronique et je travaille dans la communication.');
+  assert.equal(f.modif_demandee, null); assert.ok(f.corrige_at);
+  assert.equal(f.corrections.ville, 'Alger centre'); // gardé à part : remis si l'outil republie
 });
 test('un profil tapé au hasard est refusé, un vrai texte passe (français, kabyle, arabe)', async () => {
   const { texteCredible } = await import('../content/matching-options.mjs');
