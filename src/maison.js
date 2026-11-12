@@ -952,3 +952,38 @@ renderSocials();
     setTimeout(() => document.body.append(d), 4000);
   } catch { /* */ }
 })();
+
+// Lamia en direct (12 nov. 2026) : pastille sur l'onglet Live et fenêtre à l'ouverture de l'appli, une fois par live.
+// L'état vient de /api/live/ (public, gardé 20 s par Vercel) et chaque appareil ne le relit qu'une fois par minute.
+(async function lamiaEnDirect() {
+  try {
+    if (/^\/(confidences-lamia|tableau-de-bord|admin|pilotage)/.test(location.pathname)) return;
+    let etat = null;
+    try { const c = JSON.parse(localStorage.getItem('lfb-live-etat') || 'null'); if (c && Date.now() - c.lu < 60000) etat = c.etat; } catch { /* */ }
+    if (!etat) {
+      const r = await fetch('/api/live/');
+      if (!r.ok) return;
+      etat = await r.json();
+      try { localStorage.setItem('lfb-live-etat', JSON.stringify({ lu: Date.now(), etat })); } catch { /* */ }
+    }
+    if (!etat?.actif) return;
+    document.querySelectorAll('a[href="/salon/"]').forEach((a) => a.classList.add('lien-en-direct'));
+    if (location.pathname.startsWith('/salon')) return;
+    let vu = '';
+    try { vu = localStorage.getItem('lfb-live-vu') || ''; } catch { /* */ }
+    if (vu === etat.debut) return;
+    try { localStorage.setItem('lfb-live-vu', etat.debut); } catch { /* */ }
+    const d = document.createElement('dialog');
+    d.className = 'live-fenetre';
+    d.setAttribute('aria-labelledby', 'live-fenetre-titre');
+    d.innerHTML = `<p class="live-badge"><span aria-hidden="true"></span> En direct</p>
+      <h2 id="live-fenetre-titre">Lamia est en live</h2>
+      ${etat.titre ? `<p class="live-fenetre-theme">${esc(etat.titre)}</p>` : ''}
+      <p>Tu peux lui poser tes questions : elle te répond en direct.</p>
+      <p class="live-fenetre-actions"><a class="po-btn" href="/salon/#en-direct">Poser ma question</a><a class="po-btn-verre" href="/salon/#en-direct">Regarder le live</a></p>
+      <button type="button" class="live-fenetre-fermer" data-fermer>Plus tard</button>`;
+    d.addEventListener('click', (e) => { if (e.target === d || e.target.closest('[data-fermer]')) d.close(); });
+    d.addEventListener('close', () => d.remove());
+    setTimeout(() => { document.body.append(d); if (d.showModal) d.showModal(); else d.setAttribute('open', ''); }, 1200);
+  } catch { /* */ }
+})();

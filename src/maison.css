@@ -4127,3 +4127,40 @@ html[dir="rtl"] .po-corps h2::after, html[dir="rtl"] .room-body > h2::after, htm
 .sincerite-bloc h2 { font-size: 1.35rem; margin: 0 0 .4rem; color: var(--bordeaux-lfb, #7A1F35); }
 .sincerite-liste { margin: .6rem 0; padding-inline-start: 1.2rem; display: grid; gap: .45rem; text-align: start; }
 .swipe-sincerite .swipe-fenetre-boite { text-align: start; }
+
+/* Lamia en direct (12 nov. 2026) : rubrique Live, boîte à questions, fenêtre d'ouverture, pastille de l'onglet. */
+.live-direct { scroll-margin-top: 96px; max-width: var(--largeur, 1180px); margin: 24px auto; padding: 22px clamp(16px, 3vw, 28px); border-radius: 20px; background: #1d1726; color: #f6efe6; }
+.live-direct h2 { margin: 6px 0 16px; font-size: clamp(24px, 3vw, 34px); color: #fff; }
+.live-badge { display: inline-flex; align-items: center; gap: 8px; margin: 0; font: 700 12px/1 var(--po-body, system-ui); letter-spacing: .14em; text-transform: uppercase; color: #fff; background: #c8213f; padding: 7px 12px; border-radius: 999px; }
+.live-badge span { width: 8px; height: 8px; border-radius: 50%; background: #fff; animation: live-pouls 1.4s ease-in-out infinite; }
+@keyframes live-pouls { 50% { opacity: .25; } }
+@media (prefers-reduced-motion: reduce) { .live-badge span { animation: none; } }
+.live-grille { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+@media (max-width: 860px) { .live-grille { grid-template-columns: minmax(0, 1fr); } }
+.live-video { position: relative; aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden; background: #000; }
+.live-video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.live-note { margin: 8px 0 0; font-size: 13px; line-height: 1.45; color: #cbbfd0; }
+.live-note a { color: #E9DFFA; }
+.live-boite { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); border-radius: 14px; padding: 18px; }
+.live-boite h3 { margin: 0 0 8px; font-size: 20px; color: #fff; }
+.live-boite p { color: #e9e1ec; }
+.live-form { display: flex; flex-direction: column; gap: 10px; }
+.live-form label { font-size: 14px; color: #e9e1ec; }
+.live-form textarea { width: 100%; box-sizing: border-box; font: 16px/1.4 var(--po-body, system-ui); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,.25); background: rgba(0,0,0,.25); color: #fff; resize: vertical; }
+.live-form .po-btn { align-self: flex-start; }
+.live-statut { margin: 0; font-size: 14px; color: #E9DFFA; min-height: 1em; }
+.live-mes { margin-top: 16px; border-top: 1px solid rgba(255,255,255,.12); padding-top: 12px; }
+.live-mes-titre { margin: 0 0 8px; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: #cbbfd0; }
+.live-mq { display: flex; justify-content: space-between; gap: 12px; margin: 0 0 8px; font-size: 14px; }
+.live-mq b { flex: none; font-weight: 600; color: #cbbfd0; }
+.live-mq.is-choisie b { color: #fff; background: #c8213f; padding: 2px 8px; border-radius: 6px; }
+.live-mq.is-repondue b { color: #9fe0b8; }
+.live-fenetre { max-width: min(420px, calc(100vw - 32px)); border: 0; border-radius: 20px; padding: 26px 24px 18px; background: #1d1726; color: #f6efe6; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+.live-fenetre::backdrop { background: rgba(20,12,24,.6); }
+.live-fenetre h2 { margin: 12px 0 6px; font-size: 26px; color: #fff; }
+.live-fenetre-theme { margin: 0 0 8px; font-weight: 600; color: #E9DFFA; }
+.live-fenetre-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 6px; }
+.live-fenetre-fermer { display: block; margin: 6px auto 0; border: 0; background: none; color: #cbbfd0; font: 14px var(--po-body, system-ui); text-decoration: underline; cursor: pointer; padding: 8px; }
+a.lien-en-direct { position: relative; }
+a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9px; width: 9px; height: 9px; border-radius: 50%; background: #c8213f; box-shadow: 0 0 0 2px #fff; }
+.barre-app a.lien-en-direct::after { top: 4px; right: 24%; }
