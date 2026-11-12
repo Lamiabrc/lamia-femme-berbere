@@ -843,6 +843,7 @@ page(
 
     <section id="mon-profil">
       <h2>Mon profil âme sœur</h2>
+      <div class="incomplet-bloc" id="a-completer" data-incomplet-bloc hidden></div>
       <div class="sincerite-bloc" id="sincerite" data-sincerite-bloc hidden></div>
       <p data-profil-modifier-haut hidden><button type="button" class="btn btn-ink"><svg class="ico" aria-hidden="true"><use href="/icones.svg#pencil"/></svg> Modifier mon profil</button></p>
       <p><button type="button" class="btn btn-line btn-installer" data-installer-bouton><svg class="ico" aria-hidden="true"><use href="/icones.svg#smartphone"/></svg> Installer l’application sur mon téléphone</button></p>

@@ -1254,5 +1254,21 @@
  "Choisis une raison pour envoyer ton signalement.": "Choose a reason to send your report.",
  "Vous ne vous verrez plus et Lamia est prévenue.": "You will no longer see each other and Lamia is informed.",
  "La discussion sera fermée, vous ne vous reverrez plus, et Lamia la lira.": "The conversation will be closed, you will not see each other again, and Lamia will read it.",
- "Annuler": "Cancel"
+ "Annuler": "Cancel",
+ "Ton profil n’est pas terminé": "Your profile is not finished",
+ "Pour l’instant, personne ne peut te voir. ": "For now, no one can see you. ",
+ "Voici ce qu’il reste à faire :": "Here is what is left to do:",
+ "Ajoute tes 2 photos": "Add your 2 photos",
+ "Sans tes 2 photos, tu ne peux ni swiper ni répondre. Elles ne sont jamais publiées.": "Without your 2 photos, you can neither swipe nor reply. They are never published.",
+ "Indique un contact valable": "Give a valid contact",
+ "Mets ton numéro de téléphone, ou le lien de ton profil TikTok, Instagram ou Facebook (un prénom ne suffit pas). Sans lui, ton profil n’est pas validé et personne ne te voit.": "Enter your phone number, or the link to your TikTok, Instagram or Facebook profile (a first name is not enough). Without it, your profile is not validated and no one sees you.",
+ "Corriger mon contact": "Fix my contact",
+ "Corrige ton adresse email": "Fix your email address",
+ "Ton adresse email n’est pas valable : Lamia ne peut pas te prévenir de tes matchs.": "Your email address is not valid: Lamia cannot tell you about your matches.",
+ "Corriger mon profil": "Fix my profile",
+ "Présente-toi en quelques phrases": "Introduce yourself in a few sentences",
+ "Dis qui tu es et qui tu cherches : un profil sans présentation est beaucoup moins choisi.": "Say who you are and who you are looking for: a profile without an introduction is chosen much less.",
+ "Écrire ma présentation": "Write my introduction",
+ "Ton profil n’est pas terminé : personne ne peut encore te voir.": "Your profile is not finished: no one can see you yet.",
+ "Voir ce qu’il manque": "See what is missing"
 }

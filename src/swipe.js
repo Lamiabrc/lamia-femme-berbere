@@ -115,6 +115,7 @@ function infos() {
     : `<p class="swipe-info is-choisi"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur-plein"/></svg> <strong>${choisi.nombre} personne${choisi.nombre > 1 ? 's t’ont' : ' t’a'} choisi·e</strong> <span class="swipe-flou" aria-hidden="true">n° ••• · n° •••</span><br><a href="/abonnement/?formule=passion">Découvre qui avec la formule Passion</a></p>`);
   if (matchs.limite) lignes.push(`<p class="swipe-info${matchs.actifs >= matchs.limite ? ' is-plein' : ''}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur-plein"/></svg> Matchs en cours : <strong>${matchs.actifs} / ${matchs.limite}</strong>${matchs.actifs >= matchs.limite ? ' · tu peux continuer à découvrir les profils, mais plus en choisir pour l’instant' : ''}</p>`);
   if (quota.limite) lignes.push(`<p class="swipe-info">Il te reste <strong>${quota.restants}</strong> profil${quota.restants > 1 ? 's' : ''} à swiper aujourd’hui (${quota.limite} par jour avec ta formule). <a href="/abonnement/">Plus de profils</a></p>`);
+  if (liste?.invisible) lignes.unshift('<p class="swipe-info is-plein">Ton profil n’est pas terminé : personne ne peut encore te voir. <a href="/mon-espace/#a-completer">Voir ce qu’il manque</a></p>');
   bandeau.innerHTML = lignes.join('');
 }
 function plusDeProfilsAujourdhui() {
