@@ -353,6 +353,7 @@ addEventListener('keydown', (e) => { if (document.querySelector('.swipe-fenetre'
     let liste;
     ({ profils: tous, quota, choisi, matchs = matchs, adresse, formule, algerie } = liste = await api({ action: 'annonce_swipe_liste' }, token));
     sincerite = liste.sincerite !== false;
+    if (!sincerite) setTimeout(demanderSincerite, 600); // obligatoire : demandée dès l'ouverture du swipe
     creditsCoeur = liste.coeurs_message || 0;
     boutonAbo(formule, algerie);
     infosAbo = { formule, algerie };
