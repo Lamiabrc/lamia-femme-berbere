@@ -4,6 +4,7 @@
 // « Qui m'a choisi·e » (Passion, Prestige) : ces profils passent en tête.
 import { api, esc, PUBLIC_KEY, matchsOuverts, matchPleinHtml } from './confidences-commun.js';
 import { O, lib, secteurLisible, foiEtVie, badgesProfil, origineLisible, metierEtReligion } from './matching-options.mjs';
+import { SINCERITE_HTML, brancherSincerite } from './sincerite.js';
 import { createClient } from '/vendor/supabase.mjs';
 
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', PUBLIC_KEY);
@@ -185,6 +186,14 @@ function celebrerMatch(ref) {
   for (let k = 0; k < 3; k += 1) setTimeout(() => eclat(r.left + r.width / 2, r.top + 60, ['', '', '', '', ''], 22), k * 280);
 }
 // Matchs au complet : avec qui, l'invitation à dématcher (raisons ouvertes dans l'espace) et l'abonnement pour plusieurs matchs.
+// Déclaration de bonne foi : demandée une fois, avant le premier cœur.
+let sincerite = true;
+function demanderSincerite() {
+  const d = fenetre(SINCERITE_HTML, 'swipe-sincerite');
+  d.querySelector('[data-fermer]')?.closest('p')?.remove();
+  brancherSincerite(d, async () => token, () => { sincerite = true; d.remove(); toast('Merci. Tu peux envoyer tes cœurs.'); });
+  return d;
+}
 async function limiteAtteinte() {
   vibrer(80);
   const ouverts = token ? await matchsOuverts(token) : [];
@@ -251,6 +260,7 @@ async function choisir(choix, message) {
   const ref = profils[0].ref;
   if (el) { el.style.transition = 'transform .35s ease, opacity .35s ease'; el.style.transform = `translateX(${choix === 'oui' ? 130 : -130}%) rotate(${choix === 'oui' ? 18 : -18}deg)`; el.style.opacity = '0'; }
   const profil = profils[0];
+  if (choix === 'oui' && !sincerite) { if (el) { el.style.transform = ''; el.style.opacity = ''; el.classList.remove('vers-oui', 'vers-non'); el.classList.add('is-refus'); setTimeout(() => el.classList.remove('is-refus'), 500); } occupe = false; return demanderSincerite(); }
   if (choix === 'oui' && matchs.limite && matchs.actifs >= matchs.limite) { if (el) { el.style.transform = ''; el.style.opacity = ''; el.classList.remove('vers-oui', 'vers-non'); el.classList.add('is-refus'); setTimeout(() => el.classList.remove('is-refus'), 500); } occupe = false; return limiteAtteinte(); }
   if (choix === 'oui') {
     const btn = document.querySelector('[data-swipe-oui]').getBoundingClientRect(); eclat(btn.left + btn.width / 2, btn.top + btn.height / 2); vibrer(18);
@@ -262,7 +272,7 @@ async function choisir(choix, message) {
     if (message) { creditsCoeur = Math.max(0, creditsCoeur - 1); try { localStorage.removeItem(`lfb-coeur-${ref}`); } catch { /* */ } toast('💌 Ton cœur et ton message sont partis'); }
     if (r?.matchs) { matchs = { ...matchs, ...r.matchs }; infos(); }
     if (r?.match) { dernier = null; majAnnuler(); celebrerMatch(r.ref); }
-  }).catch((err) => { if (err.code === 'hors_de_ses_criteres') return toast('Ce profil cherche quelqu’un d’un autre âge ou d’une autre zone : ton cœur n’est pas parti.'); if (err.code === 'coeur_requis') { creditsCoeur = 0; return toast('Ton cœur avec message n’est pas parti : il te faut un crédit. Ton choix n’a pas été enregistré.'); } if (err.code === 'quota_matchs') return quotaAtteint(err); if (err.code === 'limite_matchs') { matchs = { ...matchs, actifs: err.actifs ?? matchs.limite }; infos(); limiteAtteinte(); } });
+  }).catch((err) => { if (err.code === 'sincerite_requise') { sincerite = false; return demanderSincerite(); } if (err.code === 'hors_de_ses_criteres') return toast('Ce profil cherche quelqu’un d’un autre âge ou d’une autre zone : ton cœur n’est pas parti.'); if (err.code === 'coeur_requis') { creditsCoeur = 0; return toast('Ton cœur avec message n’est pas parti : il te faut un crédit. Ton choix n’a pas été enregistré.'); } if (err.code === 'quota_matchs') return quotaAtteint(err); if (err.code === 'limite_matchs') { matchs = { ...matchs, actifs: err.actifs ?? matchs.limite }; infos(); limiteAtteinte(); } });
   await new Promise((r) => setTimeout(r, 300));
   profils.shift();
   tous = tous.filter((p) => p.ref !== ref);
@@ -342,6 +352,7 @@ addEventListener('keydown', (e) => { if (document.querySelector('.swipe-fenetre'
     let formule, algerie;
     let liste;
     ({ profils: tous, quota, choisi, matchs = matchs, adresse, formule, algerie } = liste = await api({ action: 'annonce_swipe_liste' }, token));
+    sincerite = liste.sincerite !== false;
     creditsCoeur = liste.coeurs_message || 0;
     boutonAbo(formule, algerie);
     infosAbo = { formule, algerie };

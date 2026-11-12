@@ -13,6 +13,7 @@ function monde({ compte = true, tiktok = {} } = {}) {
     return json([]);
   };
   const read = async (u) => {
+    if (u.includes('declarations_sincerite')) return [{ user_id: 'ok' }]; // bonne foi déjà déclarée, sauf test dédié
     if (u.includes('annonce_files?annonce_id=eq.') && u.includes('kind=in.')) return medias ? [{ kind: 'photo' }, { kind: 'photo' }] : [];
     const h = u.match(/outil_tiktok\?h=in\.\(([0-9a-f,]+)\)/); if (h) { const f = h[1].split(',').find((x) => tiktok[x]); return f ? [{ outil_id: tiktok[f] }] : []; }
     if (u.includes('lien_h=eq.')) { const x = u.match(/lien_h=eq\.([0-9a-f]+)/)[1]; return db.annonces.filter((a) => a.lien_h === x && ['a_verifier', 'publiee'].includes(a.status)); }
@@ -121,6 +122,20 @@ test('barrière des critères : pas de cœur vers quelqu’un qui cherche un aut
   const r = await handleAnnonces('annonce_swipe', { ref: 31, choix: 'oui' }, ctx(yan));
   assert.equal(r.status, 409); assert.equal((await r.json()).error, 'hors_de_ses_criteres');
   assert.equal((await handleAnnonces('annonce_swipe', { ref: 31, choix: 'non' }, ctx(yan))).status, 200);
+});
+test('bonne foi : sans la déclaration, pas de cœur ; la déclaration s’enregistre avec la langue', async () => {
+  const { ctx, db } = monde();
+  db.annonces.push({ id: 'a1', ref: 21, user_id: 'u1', email: 'nina@example.com', status: 'publiee', prenom: 'Nina', genre: 'femme' });
+  const nina = { id: 'u1', email: 'nina@example.com' };
+  const envois = [];
+  const sans = { ...ctx(nina), read: async (u) => (u.includes('declarations_sincerite') ? [] : ctx(nina).read(u)), call: async (u, o) => { envois.push([u, o?.body]); return { ok: true, json: async () => [] }; } };
+  const r = await handleAnnonces('annonce_swipe', { ref: 31, choix: 'oui' }, sans);
+  assert.equal(r.status, 403); assert.equal((await r.json()).error, 'sincerite_requise');
+  assert.equal((await handleAnnonces('annonce_swipe', { ref: 31, choix: 'non' }, sans)).status, 200); // passer reste libre
+  assert.equal((await handleAnnonces('annonce_sincerite', {}, sans)).status, 400);
+  assert.equal((await handleAnnonces('annonce_sincerite', { accepte: true, langue: 'kab' }, sans)).status, 200);
+  const [u, corps] = envois.find(([x]) => x.includes('declarations_sincerite'));
+  assert.ok(u.includes('on_conflict=user_id')); assert.equal(JSON.parse(corps).langue, 'kab'); assert.equal(JSON.parse(corps).user_id, 'u1');
 });
 test('un profil tapé au hasard est refusé, un vrai texte passe (français, kabyle, arabe)', async () => {
   const { texteCredible } = await import('../content/matching-options.mjs');

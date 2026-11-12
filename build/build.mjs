@@ -833,6 +833,7 @@ page(
 
     <section id="mon-profil">
       <h2>Mon profil âme sœur</h2>
+      <div class="sincerite-bloc" id="sincerite" data-sincerite-bloc hidden></div>
       <p data-profil-modifier-haut hidden><button type="button" class="btn btn-ink"><svg class="ico" aria-hidden="true"><use href="/icones.svg#pencil"/></svg> Modifier mon profil</button></p>
       <p><button type="button" class="btn btn-line btn-installer" data-installer-bouton><svg class="ico" aria-hidden="true"><use href="/icones.svg#smartphone"/></svg> Installer l’application sur mon téléphone</button></p>
       <div class="espace-notifs" data-espace-notifs></div>
@@ -1457,6 +1458,12 @@ page(
       <div data-demandes></div>
     </div>
         <div class="cl-carte cl-export">
+      <h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#shield"/></svg> Déclaration de bonne foi <span data-n-sincerite></span></h3>
+      <p class="cl-aide">Chaque membre s’engage, dans sa langue : rencontre sérieuse, informations vraies, ni papiers ni argent, respect du non. Sans cet engagement, il ne peut ni envoyer de cœur ni répondre oui. Le bouton prévient ceux qui ne l’ont pas encore fait, une seule fois, s’ils ont activé les notifications ; les autres le verront en ouvrant l’application.</p>
+      <div class="cl-outils"><button class="cl-btn cl-plein" type="button" data-relance-sincerite disabled>…</button></div>
+      <p class="cl-statut" role="status" data-sincerite-statut-lamia></p>
+    </div>
+    <div class="cl-carte cl-export">
       <h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#camera"/></svg> Profils sans leurs photos <span data-n-sans-photos></span></h3>
       <p class="cl-aide">Tant qu’il manque 2 photos, la personne voit une demande dans l’application et ne peut ni swiper ni répondre. Le bouton lui envoie aussi une notification sur son téléphone, une seule fois, si elle les a activées.</p>
       <button class="cl-btn cl-plein" type="button" data-relance-medias>Envoyer la notification</button>
@@ -2170,7 +2177,7 @@ await cp(join(ROOT, 'public'), DIST, { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await writeFile(join(DIST, 'assets', 'editable.json'), JSON.stringify({ fields: [...EDITABLE, ...REGISTRE], defaults: DEFAULTS }));
-for (const f of ['lien-mot-de-passe.js', 'version-play.js', 'abonnement.js', 'abonnement-merci.js', 'swipe.js', 'swipe-accueil.js', 'nouveautes.js', 'confirmer.js', 'visio-invite.js', 'maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'soirees.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'annonces.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
+for (const f of ['lien-mot-de-passe.js', 'version-play.js', 'abonnement.js', 'abonnement-merci.js', 'swipe.js', 'swipe-accueil.js', 'sincerite.js', 'nouveautes.js', 'confirmer.js', 'visio-invite.js', 'maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'soirees.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'annonces.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
 await cp(join(ROOT, 'content', 'shipping.mjs'), join(DIST, 'assets', 'shipping.mjs'));
 await cp(join(ROOT, 'content', 'rubriques.mjs'), join(DIST, 'assets', 'rubriques.mjs'));
 await cp(join(ROOT, 'content', 'matching-options.mjs'), join(DIST, 'assets', 'matching-options.mjs'));

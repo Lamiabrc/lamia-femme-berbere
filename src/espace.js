@@ -356,6 +356,15 @@ async function monProfil(session) {
       catch { e.target.checked = !e.target.checked; st.textContent = 'Ça n’a pas été enregistré. Réessaie.'; }
       e.target.disabled = false;
     });
+    { // Déclaration de bonne foi : affichée tant que la personne ne s'est pas engagée.
+      const bloc = document.querySelector('[data-sincerite-bloc]');
+      if (bloc && p.sincerite === false) import('/assets/sincerite.js').then(({ SINCERITE_HTML, brancherSincerite }) => {
+        bloc.innerHTML = SINCERITE_HTML; bloc.hidden = false;
+        brancherSincerite(bloc, async () => (await supabase.auth.getSession()).data.session?.access_token, () => { bloc.innerHTML = '<p><strong>✓ Merci, ton engagement est enregistré.</strong></p>'; });
+        if (location.hash === '#sincerite') bloc.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }).catch(() => {});
+      else if (bloc) bloc.hidden = true;
+    }
     { // Le bouton « Modifier mon profil » est aussi tout en haut : plus besoin de descendre pour le trouver.
       const haut = document.querySelector('[data-profil-modifier-haut]');
       if (haut) { haut.hidden = false; haut.querySelector('button').onclick = () => { const b = box.querySelector('[data-profil-modifier]'); if (b) b.click(); else document.querySelector('#mes-fiches')?.scrollIntoView({ behavior: 'smooth' }); }; }
