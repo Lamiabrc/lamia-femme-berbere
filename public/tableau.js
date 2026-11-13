@@ -768,8 +768,9 @@ async function chargerComptes() {
     kpi('Inscrits à une soirée', l.filter((c) => c.inscriptions.some((i) => i.statut !== 'cancelled')).length),
     kpi('Avec annonce', l.filter((c) => c.annonces.length).length),
     kpi('Testeurs Google Play', l.filter((c) => c.testeur_play).length, `${l.filter((c) => c.testeur_play && !c.testeur_play.ajoute_at).length} à ajouter à la liste`),
-    kpi('Profil incomplet', l.filter(incomplet).length, 'genre, âge ou prénom manquant'),
+    kpi('Sans profil', l.filter((c) => c.sans_profil).length, 'à relancer ou à supprimer'),
   ].join('');
+  encartSansProfil();
   listeComptes();
   if (compteOuvert) ouvrirCompte(compteOuvert);
 }
@@ -784,6 +785,7 @@ function listeComptes() {
     fiche: (c) => c.fiches.length,
     testeur: (c) => c.testeur_play,
     incomplet,
+    sansprofil: (c) => c.sans_profil,
   }[filtreComptes];
   const l = comptes.comptes.filter(garde).filter((c) => !q || [nomDe(c), c.email, c.profil?.city, c.profil?.display_name, ...c.annonces.map((a) => a.ref), ...c.fiches.map((f) => f.ref)].join(' ').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes(q));
   // Des cartes, pas une liste sans fin : 24 à la fois, puis « Afficher plus ».
@@ -798,7 +800,7 @@ function listeComptes() {
     return `<article class="membre-carte" data-compte="${esc(c.id)}" tabindex="0" role="button">
       <header><strong>${esc(nomDe(c))}</strong>${num ? `<span class="membre-num">n° ${esc(num)}</span>` : ''}</header>
       <p class="membre-qui">${esc(qui) || '<span class="compte-badge is-alerte">genre et âge ?</span>'}</p>
-      <p class="membre-badges"><span class="compte-badge ${etat[1]}">${etat[0]}</span>${soirees ? `<span class="compte-badge is-bal">${soirees} soirée${soirees > 1 ? 's' : ''}</span>` : ''}${c.admin ? '<span class="compte-badge">toi (admin)</span>' : ''}${c.testeur_play ? '<span class="compte-badge is-bal">Testeur Play</span>' : ''}</p>
+      <p class="membre-badges"><span class="compte-badge ${etat[1]}">${etat[0]}</span>${soirees ? `<span class="compte-badge is-bal">${soirees} soirée${soirees > 1 ? 's' : ''}</span>` : ''}${c.admin ? '<span class="compte-badge">toi (admin)</span>' : ''}${c.testeur_play ? '<span class="compte-badge is-bal">Testeur Play</span>' : ''}${c.sans_profil && c.relance_le ? `<span class="compte-badge is-alerte">Relancé·e le ${esc(date(c.relance_le, { day: 'numeric', month: 'short' }))}</span>` : ''}</p>
       <small>${c.vu_le ? `Vu·e le ${esc(date(c.vu_le, { day: 'numeric', month: 'short' }))}` : 'Jamais reconnecté·e'} · inscrit·e le ${esc(date(c.cree_le, { day: 'numeric', month: 'short' }))}</small>
     </article>`;
   }).join('') : '<p class="aide">Aucun membre ne correspond.</p>';
@@ -839,6 +841,8 @@ function ouvrirCompte(id) {
     ...c.annonces.map((a) => `<li><div><strong>Annonce n° ${esc(a.ref)}</strong><small>${esc(ANNONCE[a.status] || a.status)}${a.test ? ' · test' : ''}</small></div><button class="btn btn-line" type="button" data-rencontres-aller="annonces">Voir dans Rencontres</button></li>`),
     ...c.fiches.map((x) => `<li><div><strong>Fiche de l’outil n° ${esc(x.ref)}</strong><small>${x.retiree ? 'retirée' : x.confirmee ? 'confirmée' : 'en attente de confirmation'}</small></div></li>`),
   ].join('') || '<li>Ni annonce ni fiche de l’outil liée à ce compte.</li>';
+  $$('[data-sp-un]').forEach((x) => { x.hidden = !c.sans_profil; x.disabled = false; });
+  $('[data-sp-un-statut]').textContent = c.sans_profil ? (c.relance_le ? `Sans profil · relancé·e le ${date(c.relance_le, { day: 'numeric', month: 'long' })}` : 'Sans profil · jamais relancé·e') : '';
   $('[data-compte-fiche]').hidden = false;
   $('[data-compte-fond]').hidden = false;
   $('[data-compte-form]').hidden = false;
@@ -981,6 +985,64 @@ $('[data-comptes]').addEventListener('click', (e) => { const l = e.target.closes
 $('[data-comptes]').addEventListener('keydown', (e) => { const l = e.target.closest('[data-compte]'); if (l && e.key === 'Enter') ouvrirCompte(l.dataset.compte); });
 $('[data-comptes-cherche]').addEventListener('input', () => { limiteComptes = 24; listeComptes(); });
 $('[data-comptes-plus]').addEventListener('click', () => { limiteComptes += 24; listeComptes(); });
+// ---- Comptes sans profil : un compte sans profil ne sert à rien. Relancer ou supprimer, un par un ou tous ensemble.
+const SEPT_JOURS = 7 * 864e5;
+const aSoiree = (c) => c.inscriptions.some((i) => i.statut !== 'cancelled');
+const sansProfil = () => (comptes?.comptes || []).filter((c) => c.sans_profil);
+const aRelancer = () => sansProfil().filter((c) => !c.relance_le);
+// Suppression en masse : seulement ceux déjà relancés depuis plus de 7 jours, et jamais un inscrit à une soirée.
+const aSupprimer = () => sansProfil().filter((c) => c.relance_le && Date.now() - new Date(c.relance_le).getTime() > SEPT_JOURS && !aSoiree(c));
+function encartSansProfil() {
+  const box = $('[data-sans-profil]'), n = sansProfil().length;
+  box.hidden = !n;
+  if (!n) return;
+  const r = aRelancer().length, s = aSupprimer().length;
+  box.innerHTML = `<h2>${n} compte${n > 1 ? 's' : ''} sans profil</h2>
+    <p class="aide">Sans profil, personne ne les voit. Relance-les ; ceux qui n’ont rien fait 7 jours après la relance peuvent être supprimés.</p>
+    <p class="actions"><button class="btn btn-ink" type="button" data-sp-masse="relancer" ${r ? '' : 'disabled'}>Relancer les ${r} pas encore relancés</button>
+    <button class="btn btn-line fiche-danger" type="button" data-sp-masse="supprimer" ${s ? '' : 'disabled'}>Supprimer les ${s} relancés depuis plus de 7 jours</button>
+    <button class="btn btn-line" type="button" data-sp-voir>Voir les ${n}</button> <span class="aide" data-sp-statut role="status"></span></p>`;
+}
+// Par paquets de 15 : chaque envoi reste court, et la progression s'affiche.
+async function traiterSansProfil(quoi, ids, dire) {
+  let faits = 0, ignores = 0;
+  for (let i = 0; i < ids.length; i += 15) {
+    dire(`${quoi === 'supprimer' ? 'Suppression' : 'Envoi'}… ${Math.min(i + 15, ids.length)} / ${ids.length}`);
+    const d = await conf({ action: quoi === 'supprimer' ? 'annonce_comptes_supprimer' : 'annonce_comptes_relancer', user_ids: ids.slice(i, i + 15), ...(quoi === 'supprimer' ? { confirmation: 'SUPPRIMER' } : {}) });
+    faits += (d.faits || []).length; ignores += (d.ignores || []).length;
+  }
+  return { faits, ignores };
+}
+const bilanSansProfil = (quoi, { faits, ignores }) => `${faits} ${quoi === 'supprimer' ? `compte${faits > 1 ? 's' : ''} supprimé${faits > 1 ? 's' : ''}` : `message${faits > 1 ? 's' : ''} envoyé${faits > 1 ? 's' : ''}`}${ignores ? ` · ${ignores} laissé${ignores > 1 ? 's' : ''} (profil, soirée, abonnement ou achat)` : ''}.`;
+document.addEventListener('click', async (e) => {
+  if (e.target.closest('[data-sp-voir]')) { const b = $('[data-filtre="sansprofil"]'); if (b) b.click(); return; }
+  const masse = e.target.closest('[data-sp-masse]');
+  if (masse) {
+    const quoi = masse.dataset.spMasse, ids = (quoi === 'supprimer' ? aSupprimer() : aRelancer()).map((c) => c.id);
+    if (!ids.length) return;
+    if (quoi === 'supprimer' && prompt(`Tu vas supprimer définitivement ${ids.length} compte(s) sans profil. Écris SUPPRIMER pour confirmer.`) !== 'SUPPRIMER') return;
+    if (quoi === 'relancer' && !confirm(`Envoyer le message « crée ton profil » à ${ids.length} personne(s) ?`)) return;
+    $$('[data-sp-masse]').forEach((x) => { x.disabled = true; });
+    let bilan = '';
+    try { bilan = bilanSansProfil(quoi, await traiterSansProfil(quoi, ids, (t) => { $('[data-sp-statut]').textContent = t; })); }
+    catch { bilan = 'Ça s’est arrêté en route. Actualise et relance ce qu’il reste.'; }
+    await chargerComptes();
+    const st = $('[data-sp-statut]'); if (st) st.textContent = bilan;
+    return;
+  }
+  const un = e.target.closest('[data-sp-un]');
+  if (un && compteOuvert) {
+    const quoi = un.dataset.spUn, st = $('[data-sp-un-statut]');
+    if (quoi === 'supprimer' && !confirm('Supprimer définitivement ce compte sans profil ?')) return;
+    un.disabled = true;
+    try {
+      const d = await traiterSansProfil(quoi, [compteOuvert], (t) => { st.textContent = t; });
+      if (quoi === 'supprimer' && d.faits) { fermerCompte(); await chargerComptes(); return; }
+      st.textContent = d.faits ? 'Message envoyé.' : 'Rien n’a été fait : ce compte a un profil, une soirée, un abonnement ou un achat.';
+      if (d.faits) await chargerComptes();
+    } catch { st.textContent = 'Ça n’a pas fonctionné. Réessaie dans un instant.'; un.disabled = false; }
+  }
+});
 // Fiche en pleine page : Modifier, Contacter, Bloquer en haut.
 document.addEventListener('click', (e) => {
   const b = e.target.closest('[data-fiche-aller]');

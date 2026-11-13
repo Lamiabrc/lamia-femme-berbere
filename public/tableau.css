@@ -415,3 +415,7 @@
 /* ---- Journal replié ---- */
 .tdb-journal [hidden] { display: none !important; }
 .tdb-plus-ligne { text-align: center; background: none !important; }
+
+.membres-action { margin-bottom: 16px; border-left: 6px solid var(--qvt-nuit); }
+.membres-action h2 { margin: 0 0 4px; }
+.membres-action .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 10px 0 0; }
