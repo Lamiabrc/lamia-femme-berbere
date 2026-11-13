@@ -79,6 +79,22 @@ function correspond(p) {
 }
 const nbFiltres = () => ['age_min', 'age_max', 'religion', 'pratique', 'pays', 'enfants'].filter((k) => filtres[k]).length + (filtres.non_fumeur ? 1 : 0) + (filtres.piece ? 1 : 0);
 function appliquer() { profils = tous.filter(correspond); const b = document.querySelector('[data-filtres-ouvrir] b'); if (b) b.textContent = nbFiltres() ? `(${nbFiltres()})` : ''; afficher(); }
+// Recherche par numéro (« profil n° 123 » dit en live) : le profil passe en haut de la pile, prêt pour le cœur.
+const CLE_PROFIL = 'lfb-profil-cherche';
+function chercherProfil(valeur, { discret = false } = {}) {
+  const st = document.querySelector('[data-cherche-statut]');
+  const ref = Number.parseInt(String(valeur || '').replace(/\D/g, ''), 10);
+  const dire = (t) => { if (st && !discret) st.textContent = t; };
+  if (!ref) return dire('Écris le numéro du profil.');
+  const p = tous.find((x) => Number(x.ref) === ref);
+  if (!p) return dire(`Le profil n° ${ref} n’est pas dans tes profils : hors de tes critères, déjà choisi, ou retiré.`);
+  dire('');
+  window.lfbEvent?.('recherche_profil');
+  profils = [p, ...profils.filter((x) => x !== p)];
+  afficher();
+  try { zone.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch { /* */ }
+}
+document.querySelector('[data-cherche-profil]')?.addEventListener('submit', (e) => { e.preventDefault(); chercherProfil(e.target.elements.ref.value); });
 function monterFiltres() {
   const zoneF = document.querySelector('[data-swipe-filtres]');
   if (!zoneF) return;
@@ -371,6 +387,10 @@ addEventListener('keydown', (e) => { if (document.querySelector('.swipe-fenetre'
     monterFiltres();
     appliquer();
     bienvenue();
+    // Profil demandé par un lien (?profil=123) ou cherché avant de créer son profil : on le remet devant.
+    let voulu = new URLSearchParams(location.search).get('profil');
+    try { voulu = voulu || localStorage.getItem(CLE_PROFIL); localStorage.removeItem(CLE_PROFIL); } catch { /* */ }
+    if (voulu) chercherProfil(voulu, { discret: !new URLSearchParams(location.search).get('profil') });
   } catch (err) {
     if (err.code === 'annonce_en_pause') return message('<h2>Ton annonce est en pause</h2><p>Reprends-la dans ton espace pour découvrir les profils.</p><p><a class="po-btn" href="/mon-espace/">Aller à mon espace</a></p>');
     if (err.code === 'photos_requises') return message('<h2>Ajoute 2 photos</h2><p>Puis les profils s’affichent ici.</p><p><a class="po-btn" href="/mon-espace/#photos">Ajouter mes photos</a></p>');

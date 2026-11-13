@@ -10,6 +10,8 @@ const boutons = bloc?.querySelector('[data-inv-boutons]');
 const changer = bloc?.querySelector('[data-inv-changer]');
 const titre = bloc?.querySelector('[data-inv-titre]');
 const CLE = 'lfb-cherche';
+const CLE_PROFIL = 'lfb-profil-cherche';
+const formCherche = bloc?.querySelector('[data-cherche-profil]');
 let tous = [], profils = [], occupe = false;
 
 const lire = () => { try { const v = localStorage.getItem(CLE); return v === 'femme' || v === 'homme' ? v : null; } catch { return null; } };
@@ -87,6 +89,24 @@ function montrer(genre) {
   afficher();
 }
 
+// Recherche par numéro : Lamia dit « profil n° 123 » en live, la personne le tape et le profil arrive en haut de la pile.
+// Le numéro est gardé : après la création du profil, le swipe le remet devant pour envoyer le cœur.
+function chercher(valeur) {
+  const st = formCherche?.querySelector('[data-cherche-statut]');
+  const ref = Number.parseInt(String(valeur || '').replace(/\D/g, ''), 10);
+  if (!ref) { if (st) st.textContent = 'Écris le numéro du profil.'; return; }
+  if (bloc.classList.contains('is-membre')) { location.assign(`/rencontres/swipe/?profil=${ref}`); return; }
+  const p = tous.find((x) => Number(x.ref) === ref);
+  if (!p) { if (st) st.textContent = `Le profil n° ${ref} n’est pas visible pour le moment.`; return; }
+  if (st) st.textContent = '';
+  try { localStorage.setItem(CLE_PROFIL, String(ref)); } catch { /* */ }
+  window.lfbEvent?.('recherche_profil');
+  garder(p.genre); montrer(p.genre);
+  profils = [p, ...profils.filter((x) => x !== p)];
+  afficher();
+  try { pile.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch { /* */ }
+}
+
 // Le cœur sans profil : on explique, on propose de créer son profil, et la carte reste.
 function inviter(el) {
   if (el) { el.style.transition = 'transform .25s ease'; el.style.transform = ''; el.classList.remove('vers-oui', 'vers-non'); }
@@ -131,6 +151,8 @@ function glisser(el) {
 }
 
 if (bloc && pile) {
+  formCherche?.addEventListener('submit', (e) => { e.preventDefault(); chercher(formCherche.elements.ref.value); });
+  const demande = new URLSearchParams(location.search).get('profil');
   bloc.addEventListener('click', (e) => {
     if (e.target.closest('[data-swipe-non]')) return choisir('non');
     if (e.target.closest('[data-swipe-oui]')) return choisir('oui');
@@ -146,6 +168,7 @@ if (bloc && pile) {
       if (session) {
         bloc.classList.add('is-membre');
         titre.textContent = 'Tes profils t’attendent';
+        if (demande) { chercher(demande); return; }
         pile.innerHTML = '<div class="swipe-message"><h2>Reprends ton swipe</h2><p>Les profils qui te correspondent, tes cœurs et tes matchs.</p><p class="po-actions"><a class="po-btn" href="/rencontres/swipe/">Swiper</a><a class="po-btn-verre" href="/mon-espace/">Mon espace</a></p></div>';
         return;
       }
@@ -153,6 +176,7 @@ if (bloc && pile) {
     try { ({ annonces: tous } = await api({ action: 'annonces_publiques' })); } catch { tous = []; }
     const v = lire();
     if (v) montrer(v); else { profils = [...tous]; afficher(); }
+    if (demande) chercher(demande);
   })();
 }
 
