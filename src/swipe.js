@@ -26,7 +26,7 @@ function carte(a) {
   const infos = [a.pays && lib(a.pays), a.situation && lib(a.situation), a.enfants === 'Oui' ? 'avec enfant(s)' : a.enfants === 'Non' ? 'sans enfant' : '', a.etudes && `études : ${lib(a.etudes).toLowerCase()}`].filter(Boolean);
   const ages = a.age_min || a.age_max ? ` (${a.age_min || 18} à ${a.age_max || 99} ans)` : '';
   const lieu = a.ville || (a.pays && lib(a.pays)) || '';
-  return `<article class="swipe-carte" data-ref="${a.ref}">
+  return `<article class="swipe-carte ${a.genre === 'homme' ? 'est-homme' : a.genre === 'femme' ? 'est-femme' : ''}" data-ref="${a.ref}">
     <span class="swipe-tampon is-oui" aria-hidden="true">Intéressé·e</span><span class="swipe-tampon is-non" aria-hidden="true">Pas pour moi</span>
     ${a.coeur_message ? `<p class="swipe-coeur-mot"><span aria-hidden="true">💌</span> « ${esc(a.coeur_message)} »</p>` : ''}
     ${a.ta_choisi ? '<span class="swipe-ta-choisi"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Ce profil t’a choisi·e</span>' : ''}

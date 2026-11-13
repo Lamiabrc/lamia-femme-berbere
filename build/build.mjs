@@ -207,6 +207,7 @@ function header(room) {
     <a class="cta-profil" href="/rencontres/#confier"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg><span>Créer mon profil</span></a>
   </div>
 </header>
+<div class="kabyle" aria-hidden="true"></div>
 <nav class="barre-app" aria-label="Raccourcis">
   <a href="/rencontres/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#profils"/></svg>Profils</a>
   <a href="/rencontres/swipe/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur"/></svg>Swipe</a>
@@ -217,7 +218,7 @@ function header(room) {
 }
 
 function footer() {
-  return `<div class="frise" aria-hidden="true"></div>
+  return `<div class="kabyle" aria-hidden="true"></div>
 <footer class="site-footer">
   <div class="footer-house">
     <p class="footer-sign">ⵣ</p>

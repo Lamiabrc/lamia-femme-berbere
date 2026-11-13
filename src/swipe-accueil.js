@@ -43,7 +43,7 @@ function carte(a) {
   const ages = a.age_min || a.age_max ? ` (${a.age_min || 18} à ${a.age_max || 99} ans)` : '';
   const lieu = a.ville || (a.pays && lib(a.pays)) || '';
   const tags = (a.caracteristiques || []).slice(0, 8);
-  return `<article class="swipe-carte" data-ref="${esc(a.ref)}">
+  return `<article class="swipe-carte ${a.genre === 'homme' ? 'est-homme' : a.genre === 'femme' ? 'est-femme' : ''}" data-ref="${esc(a.ref)}">
     <span class="swipe-tampon is-oui" aria-hidden="true">Intéressé·e</span><span class="swipe-tampon is-non" aria-hidden="true">Pas pour moi</span>
     <div class="swipe-resume">
       <svg class="swipe-bijou" viewBox="0 -22 180 276" aria-hidden="true" focusable="false"><use href="#bijou-${femme ? 'femme' : 'homme'}"/></svg>
