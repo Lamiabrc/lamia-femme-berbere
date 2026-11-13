@@ -93,3 +93,27 @@ test('comptes : les testeurs Google Play sont signalés', () => {
   assert.deepEqual(l.find((c) => c.id === 'u1').testeur_play, { demande_at: '2026-11-09', ajoute_at: null });
   assert.equal(l.find((c) => c.id === 'u2').testeur_play, null);
 });
+test('le tableau reprend genre, âge et ville du profil de rencontre quand la fiche du compte est vide', () => {
+  const [c] = assembler({
+    users: [{ id: 'u1', email: 'a@b.fr', created_at: '2026-01-01' }],
+    profils: [{ user_id: 'u1', real_first_name: 'Nina', gender: null, birth_date: null, city: null, country: null, profile_status: 'draft' }],
+    inscriptions: [], soirees: [], fiches: [],
+    annonces: [{ ref: 7, status: 'publiee', user_id: 'u1', email: 'a@b.fr', test: false, prenom: 'Nina', genre: 'femme', birth_date: '1992-05-01', ville: 'Lyon', pays: 'France' }],
+  });
+  assert.equal(c.profil.gender, 'femme');
+  assert.equal(c.profil.birth_date, '1992-05-01');
+  assert.equal(c.profil.city, 'Lyon');
+  assert.equal(c.profil.profile_status, 'active');
+});
+test('une fiche du live donne le genre et l’âge au tableau ; ce que le compte a déjà n’est pas remplacé', () => {
+  const [c] = assembler({
+    users: [{ id: 'u1', email: 'a@b.fr', created_at: '2026-01-01' }],
+    profils: [{ user_id: 'u1', real_first_name: 'Idir', gender: 'homme', birth_date: null, city: 'Paris', country: null, profile_status: 'draft' }],
+    inscriptions: [], soirees: [], annonces: [],
+    fiches: [{ ref: 3, user_id: 'u1', genre: 'femme', age: 41, ville: 'Lille', pays: 'France' }],
+  });
+  assert.equal(c.profil.gender, 'homme');
+  assert.equal(c.profil.city, 'Paris');
+  assert.equal(c.age_fiche, 41);
+  assert.equal(c.profil.profile_status, 'draft');
+});

@@ -741,7 +741,7 @@ const ageDe = (birth) => {
   return a;
 };
 const nomDe = (c) => c.prenom || '(sans prénom)';
-const incomplet = (c) => !c.profil || !c.profil.gender || !c.profil.birth_date || !(c.profil.real_first_name || c.profil.display_name);
+const incomplet = (c) => !c.profil || !c.profil.gender || (!c.profil.birth_date && c.age_fiche == null) || !(c.profil.real_first_name || c.profil.display_name || c.prenom);
 const salonCourt = (s) => String(s || '').replace(/^Grand salon · /, '');
 
 async function chargerComptes() {
@@ -755,7 +755,7 @@ async function chargerComptes() {
     kpi('Inscrits à une soirée', l.filter((c) => c.inscriptions.some((i) => i.statut !== 'cancelled')).length),
     kpi('Avec annonce', l.filter((c) => c.annonces.length).length),
     kpi('Testeurs Google Play', l.filter((c) => c.testeur_play).length, `${l.filter((c) => c.testeur_play && !c.testeur_play.ajoute_at).length} à ajouter à la liste`),
-    kpi('Profil incomplet', l.filter(incomplet).length, 'genre, date de naissance ou prénom manquant'),
+    kpi('Profil incomplet', l.filter(incomplet).length, 'genre, âge ou prénom manquant'),
   ].join('');
   listeComptes();
   if (compteOuvert) ouvrirCompte(compteOuvert);
@@ -774,7 +774,7 @@ function listeComptes() {
   }[filtreComptes];
   const l = comptes.comptes.filter(garde).filter((c) => !q || [nomDe(c), c.email, c.profil?.city, c.profil?.display_name, ...c.annonces.map((a) => a.ref), ...c.fiches.map((f) => f.ref)].join(' ').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes(q));
   $('[data-comptes]').innerHTML = l.length ? l.map((c) => {
-    const age = ageDe(c.profil?.birth_date);
+    const age = ageDe(c.profil?.birth_date) ?? c.age_fiche ?? null;
     const soirees = c.inscriptions.slice(0, 3).map((i) => `<span class="compte-badge ${i.statut === 'cancelled' ? 'is-annule' : 'is-bal'}">${esc(salonCourt(i.salon) || i.titre)}</span>`).join('');
     const liens = [...c.annonces.map((a) => `<span class="compte-badge">Annonce n° ${esc(a.ref)}</span>`), ...c.fiches.map((f) => `<span class="compte-badge">Fiche n° ${esc(f.ref)}</span>`)].join('');
     return `<tr class="compte-ligne" data-compte="${esc(c.id)}" tabindex="0">
