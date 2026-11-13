@@ -131,7 +131,7 @@ function infos() {
     : `<p class="swipe-info is-choisi"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur-plein"/></svg> <strong>${choisi.nombre} personne${choisi.nombre > 1 ? 's t’ont' : ' t’a'} choisi·e</strong> <span class="swipe-flou" aria-hidden="true">n° ••• · n° •••</span><br><a href="/abonnement/?formule=passion">Découvre qui avec la formule Passion</a></p>`);
   if (matchs.limite) lignes.push(`<p class="swipe-info${matchs.actifs >= matchs.limite ? ' is-plein' : ''}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur-plein"/></svg> Matchs en cours : <strong>${matchs.actifs} / ${matchs.limite}</strong>${matchs.actifs >= matchs.limite ? ' · tu peux continuer à découvrir les profils, mais plus en choisir pour l’instant' : ''}</p>`);
   if (quota.limite) lignes.push(`<p class="swipe-info">Il te reste <strong>${quota.restants}</strong> profil${quota.restants > 1 ? 's' : ''} à swiper aujourd’hui (${quota.limite} par jour avec ta formule). <a href="/abonnement/">Plus de profils</a></p>`);
-  if (liste?.invisible) lignes.unshift('<p class="swipe-info is-plein">Ton profil n’est pas terminé : personne ne peut encore te voir. <a href="/mon-espace/#a-completer">Voir ce qu’il manque</a></p>');
+  if (profilInvisible) lignes.unshift('<p class="swipe-info is-plein">Ton profil n’est pas terminé : personne ne peut encore te voir. <a href="/mon-espace/#a-completer">Voir ce qu’il manque</a></p>');
   if (tous.length ? !profils.some((x) => !x.revu) : chargeFait) lignes.unshift(`<p class="swipe-info"><strong>Tu as vu tous les profils qui te correspondent et qui te cherchent aussi.</strong> De nouveaux profils arrivent chaque jour. En attendant, tu revois ceux que tu avais passés ; tu peux aussi élargir ta recherche avec « Modifier mon profil ». <a href="/mon-espace/">Mon espace</a></p>`);
   bandeau.innerHTML = lignes.join('');
 }
@@ -207,6 +207,7 @@ function celebrerMatch(ref) {
 // Matchs au complet : avec qui, l'invitation à dématcher (raisons ouvertes dans l'espace) et l'abonnement pour plusieurs matchs.
 // Déclaration de bonne foi : demandée une fois, avant le premier cœur.
 let sincerite = true;
+let profilInvisible = false; // profil pas encore validé : personne ne le voit
 let chargeFait = false; // la pile a été chargée au moins une fois (pour distinguer « vide » de « pas encore là »)
 function demanderSincerite() {
   const d = fenetre(SINCERITE_HTML, 'swipe-sincerite');
@@ -375,6 +376,7 @@ addEventListener('keydown', (e) => { if (document.querySelector('.swipe-fenetre'
     let liste;
     ({ profils: tous, quota, choisi, matchs = matchs, adresse, formule, algerie } = liste = await api({ action: 'annonce_swipe_liste' }, token));
     sincerite = liste.sincerite !== false;
+    profilInvisible = Boolean(liste.invisible);
     chargeFait = true;
     if (!sincerite) setTimeout(demanderSincerite, 600); // obligatoire : demandée dès l'ouverture du swipe
     creditsCoeur = liste.coeurs_message || 0;
