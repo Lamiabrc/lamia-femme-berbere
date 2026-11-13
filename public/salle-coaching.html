@@ -119,7 +119,7 @@
   <div class="salle-barre">
     <button class="salle-btn" type="button" data-micro aria-pressed="true">Micro</button>
     <button class="salle-btn" type="button" data-camera aria-pressed="true">Caméra</button>
-    <button class="salle-btn is-line" type="button" data-fond>Fond : LFB</button>
+    <button class="salle-btn is-line" type="button" data-fond>Fond : Tayri</button>
     <button class="salle-btn is-line" type="button" data-copier hidden>Copier le lien d’invitation</button>
     <button class="salle-btn is-line" type="button" data-panneau-bouton hidden aria-pressed="true">Ma séance</button>
     <button class="salle-btn is-rouge" type="button" data-quitter>Quitter</button>
@@ -142,7 +142,7 @@ const FOND_PRESTATION = (() => { try { const f = new URL(decodeURIComponent(loca
 const FOND_IMAGE = new URL(`/images/coaching/fond-${FOND_PRESTATION}.jpg`, location.origin).href;
 // Les arrière-plans proposés, dans l'ordre du bouton. Le premier est posé automatiquement.
 const FONDS = [
-  { id: 'maison', nom: 'LFB', processor: { type: 'background-image', config: { source: FOND_IMAGE } } },
+  { id: 'maison', nom: 'Tayri', processor: { type: 'background-image', config: { source: FOND_IMAGE } } },
   { id: 'flou', nom: 'Flou', processor: { type: 'background-blur', config: { strength: 0.8 } } },
   { id: 'aucun', nom: 'Aucun', processor: { type: 'none' } },
 ];

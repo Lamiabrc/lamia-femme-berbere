@@ -155,7 +155,7 @@ ${noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" hr
 <script src="/assets/lien-mot-de-passe.js"></script>
 <script src="/assets/version-play.js"></script>
 <link rel="apple-touch-icon" href="/images/marque/lfb-icone-180.png">
-<meta name="apple-mobile-web-app-title" content="LFB">
+<meta name="apple-mobile-web-app-title" content="Tayri">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -1521,7 +1521,7 @@ page(
 
   <section class="cl-reglages" data-testeurs-vue hidden>
     <h2>Testeurs Google Play</h2>
-    <p class="cl-aide">Chaque membre qui répond « Oui » sur le site arrive ici (et tu reçois une alerte). Le matin, la tâche programmée l’ajoute à la liste « Testeurs LFB » de la Play Console ; le soir, il reçoit le lien du test dans sa conversation avec toi. Tu peux lui écrire ou ouvrir son profil.</p>
+    <p class="cl-aide">Chaque membre qui répond « Oui » sur le site arrive ici (et tu reçois une alerte). Le matin, la tâche programmée l’ajoute à la liste « Testeurs Tayri » de la Play Console ; le soir, il reçoit le lien du test dans sa conversation avec toi. Tu peux lui écrire ou ouvrir son profil.</p>
     <p class="cl-aide" data-testeurs-resume></p>
     <div class="cl-carte" data-testeurs></div>
   </section>

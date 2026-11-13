@@ -167,9 +167,9 @@ Signature (si envoi papier) : …</p>
   {
     path: '/suppression-compte/',
     finale: true,
-    title: 'Supprimer ton compte LFB',
+    title: 'Supprimer ton compte Tayri',
     body: `
-<p>Cette page concerne l’appli <strong>LFB · Lamia Femme Berbère</strong> et le site lamia-femme-berbere.com. Le compte est le même dans les deux. La développeuse est Lamia Bréchet Ighil.</p>
+<p>Cette page concerne l’appli <strong>Tayri · Lamia Femme Berbère</strong> et le site lamia-femme-berbere.com. Le compte est le même dans les deux. La développeuse est Lamia Bréchet Ighil.</p>
 
 <h2>Comment supprimer ton compte</h2>
 <ol>
@@ -178,7 +178,7 @@ Signature (si envoi papier) : …</p>
 <li>Confirme : la suppression est immédiate et définitive.</li>
 </ol>
 <p>Si tu as un abonnement en cours, résilie-le d’abord dans « Mon abonnement », puis reviens supprimer ton compte.</p>
-<p>Tu ne peux plus te connecter ? Écris depuis l’adresse de ton compte à <a href="mailto:lamia.brechet@outlook.fr">lamia.brechet@outlook.fr</a> en demandant la suppression de ton compte LFB.</p>
+<p>Tu ne peux plus te connecter ? Écris depuis l’adresse de ton compte à <a href="mailto:lamia.brechet@outlook.fr">lamia.brechet@outlook.fr</a> en demandant la suppression de ton compte Tayri.</p>
 
 <h2>Ce qui est supprimé</h2>
 <ul>
