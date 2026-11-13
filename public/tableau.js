@@ -142,6 +142,7 @@ async function aFaire() {
   try {
     const r = await fetch('/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ action: 'annonce_a_faire' }) });
     const { a_faire: f } = await r.json();
+    peindreCarte(f);
     const heure = (d) => new Date(d).toLocaleString('fr-FR', { weekday: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
     const MOTIF = (m) => esc(m || 'sans motif donné');
     // Chaque numéro ouvre le profil : qui c'est, son activité, ses blocages et signalements.
@@ -171,6 +172,40 @@ async function aFaire() {
       + (auto.length ? `<li class="afaire-auto"><details><summary>Le site s’en occupe tout seul (${auto.length})</summary><ol>${auto.map(li).join('')}</ol></details></li>` : '');
   } catch { box.innerHTML = '<li>La liste ne s’affiche pas pour le moment.</li>'; }
 }
+// Accueil : une carte d'actions. Au centre « À faire aujourd'hui », autour une branche par sujet,
+// une phrase et un seul bouton pour agir. Une branche sans rien à faire s'efface.
+async function peindreCarte(f) {
+  const box = $('[data-carte-actions]');
+  if (!box) return;
+  const heure = (d) => new Date(d).toLocaleString('fr-FR', { weekday: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
+  const s = (n) => (n > 1 ? 's' : '');
+  const dessiner = (sp) => {
+    const c = (f.coachings || [])[0], so = (f.soirees || [])[0], sig = (f.signalements || []).length;
+    const branches = [
+      ['Messages à répondre', f.confidences ? `${f.confidences} confidence${s(f.confidences)} attend${f.confidences > 1 ? 'ent' : ''} ta réponse` : 'Aucun message en attente', f.confidences ? '<a class="btn btn-ink" href="/confidences-lamia/">Répondre</a>' : ''],
+      ['Comptes sans profil', sp === null ? 'Calcul en cours…' : sp.total ? `${sp.total} compte${s(sp.total)} · ${sp.relancer} jamais relancé${s(sp.relancer)}${sp.supprimer ? ` · ${sp.supprimer} à supprimer` : ''}` : 'Tous les comptes ont un profil', sp?.total ? '<button class="btn btn-ink" type="button" data-carte-membres>Relancer ou supprimer</button>' : ''],
+      ['Coaching', c ? `Prochaine séance : ${heure(c.debut)}, ${c.prenom || c.email || '?'}` : 'Aucune séance réservée cette semaine', c ? '<button class="btn btn-ink" type="button" data-tab-aller="coaching">Ouvrir le coaching</button>' : ''],
+      ['Soirées', so ? `${so.titre}, ${heure(so.debut)} : ${so.inscrits} inscrit${s(so.inscrits)}` : 'Aucune soirée dans les 48 heures', so ? '<a class="btn btn-ink" href="/admin-bal.html">Poste du bal</a>' : ''],
+      ['Ventes', f.commandes ? `${f.commandes} commande${s(f.commandes)} payée${s(f.commandes)} à expédier` : 'Aucune commande à expédier', f.commandes ? '<button class="btn btn-ink" type="button" data-tab-aller="ventes">Préparer l’envoi</button>' : ''],
+      ['Signalements', sig ? `${sig} signalement${s(sig)} à traiter` : 'Aucun à traiter', sig ? '<button class="btn btn-ink" type="button" data-carte-detail>Traiter</button>' : ''],
+    ];
+    const n = branches.filter((x) => x[2]).length;
+    const place = ['1 / 1', '1 / 3', '2 / 3', '3 / 3', '3 / 1', '2 / 1'];
+    box.innerHTML = `<svg viewBox="0 0 300 300" preserveAspectRatio="none" aria-hidden="true"><g stroke="#cfc4b2" stroke-width=".6" fill="none"><path d="M150 150 L50 40"/><path d="M150 150 L250 40"/><path d="M150 150 L250 150"/><path d="M150 150 L250 260"/><path d="M150 150 L50 260"/><path d="M150 150 L50 150"/></g></svg>
+      <div class="carte-noeud"><strong>À faire<br>aujourd’hui</strong><span>${n ? `${n} action${s(n)}` : 'Rien à faire'}</span></div>
+      ${branches.map(([t, d, b], i) => `<div class="carte-branche${b ? '' : ' is-calme'}" style="grid-area:${place[i]}"><h3>${esc(t)}</h3><p>${esc(d)}</p>${b}</div>`).join('')}`;
+  };
+  dessiner(null);
+  // Les comptes sans profil demandent la liste des comptes : elle arrive juste après.
+  try {
+    if (!comptes) await chargerComptes();
+    dessiner({ total: sansProfil().length, relancer: aRelancer().length, supprimer: aSupprimer().length });
+  } catch { dessiner({ total: 0, relancer: 0, supprimer: 0 }); }
+}
+document.addEventListener('click', (e) => {
+  if (e.target.closest('[data-carte-membres]')) { ouvrir('comptes'); const b = $('[data-filtre="sansprofil"]'); if (b) b.click(); return; }
+  if (e.target.closest('[data-carte-detail]')) { const d = $('details[data-repli="chiffres"]'); if (d) d.open = true; $('[data-afaire]')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+});
 document.addEventListener('click', (e) => {
   const b = e.target.closest('[data-rencontres-aller]');
   if (!b) return;
