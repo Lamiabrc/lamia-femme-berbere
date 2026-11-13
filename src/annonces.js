@@ -521,7 +521,7 @@ function carte(a) {
   const ages = a.age_min || a.age_max ? ` · ${a.age_min || 18} à ${a.age_max || 99} ans` : '';
   const tags = a.caracteristiques || [];
   const infos = [a.genre === 'femme' ? 'Une femme' : 'Un homme', `${a.age} ans`, lib(a.pays), a.situation && lib(a.situation), a.enfants === 'Oui' ? 'avec enfant(s)' : a.enfants === 'Non' ? 'sans enfant' : '', a.etudes && `études : ${lib(a.etudes).toLowerCase()}`].filter(Boolean);
-  return `<article class="annonce-carte annonce-anonyme">
+  return `<article class="annonce-carte annonce-anonyme ${a.genre === 'homme' ? 'est-homme' : a.genre === 'femme' ? 'est-femme' : ''}">
     <div class="annonce-sceau" aria-hidden="true"><img src="/images/outil/${a.genre === 'femme' ? 'avatar-femme' : 'avatar-homme'}.webp" alt="" width="80" height="80"></div>
     <div class="annonce-texte">
       <p class="annonce-ref${a.piece_identite ? ' is-piece' : ''}">Profil n° ${a.ref} · ${a.piece_identite ? '✓ vérifié par Lamia' : a.outil ? (a.confirme ? '✓ vérifié par Lamia · confirmé' : '✓ vérifié par Lamia · en attente de confirmation') : '✓ profil vérifié'}</p>

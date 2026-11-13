@@ -2130,7 +2130,7 @@
  "Ce profil cherche quelqu’un d’un autre âge ou d’une autre zone : ton cœur n’est pas parti.": "Amaɣnu-a yettnadi ɣef win n leɛmeṛ nniḍen neɣ n temnaḍt nniḍen: ul-ik ur yettwazen ara.",
  "Ce profil cherche quelqu’un d’un autre âge ou d’une autre zone.": "Amaɣnu-a yettnadi ɣef win n leɛmeṛ nniḍen neɣ n temnaḍt nniḍen.",
  "Qui peut t’envoyer un cœur": "Anwa i izemren ad ak-d-yazen ul",
- ": seulement les personnes qui correspondent à ta tranche d’âge (à 2 ans près) et à la zone que tu as choisie. Vérifie tes critères avec « Modifier mon profil ».": ": ala wid yemṣadan d leɛmeṛ i tebɣiḍ (s snat n yiseggasen) d temnaḍt i tferneḍ. Senqed isefranen-ik s « Beddel amaɣnu-inu ».",
+ ": seulement les personnes qui correspondent à ta tranche d’âge (à 7 ans près) et à la zone que tu as choisie. Vérifie tes critères avec « Modifier mon profil ».": ": ala wid yemṣadan d leɛmeṛ i tebɣiḍ (s 7 n yiseggasen) d temnaḍt i tferneḍ. Senqed isefranen-ik s « Beddel amaɣnu-inu ».",
  "Ma déclaration de bonne foi": "Asentem-inu n nniya",
  "Avant d’envoyer un cœur, chacun s’engage ici, dans sa langue.": "Uqbel ad tazneḍ ul, yal yiwen yettɛahad dagi, s tutlayt-is.",
  "Je viens pour une rencontre sérieuse, en vue du mariage.": "Usiɣ-d i temlilit n tidet, s lebɣi n zzwaǧ.",
@@ -2169,5 +2169,7 @@
  "Dis qui tu es et qui tu cherches : un profil sans présentation est beaucoup moins choisi.": "Ini-d anwa-k, anwa i tettnadiḍ: amaɣnu war asissen drus i t-yettextiren.",
  "Écrire ma présentation": "Aru asissen-iw",
  "Ton profil n’est pas terminé : personne ne peut encore te voir.": "Amaɣnu-ik ur yekfi ara: yiwen ur k-yettwali ara tura.",
- "Voir ce qu’il manque": "Wali ayen ixuṣṣen"
+ "Voir ce qu’il manque": "Wali ayen ixuṣṣen",
+ "Tu as vu tous les profils qui te correspondent et qui te cherchent aussi.": "Twalaḍ akk imaɣnuten i k-iwulmen, i k-yettnadin daɣen.",
+ " De nouveaux profils arrivent chaque jour. En attendant, tu revois ceux que tu avais passés ; tu peux aussi élargir ta recherche avec « Modifier mon profil ».": " Imaɣnuten imaynuten ttawḍen-d yal ass. Ar imir, ad twaliḍ tikkelt nniḍen wid tɛeddaḍ; tzemreḍ daɣen ad tessehrewḍ anadi-k s « Beddel amaɣnu-inu »."
 }

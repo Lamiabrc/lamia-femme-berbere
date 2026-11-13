@@ -422,7 +422,7 @@ async function suivi(el, p) {
     q ? `<li><strong>Formule ${esc(q.nom)}</strong> : ${s.mises_mois} mise(s) en relation ce mois-ci${q.mises ? ` sur ${q.mises}` : ' (sans limite)'} · ${q.sd} speed dating inclus par mois</li>`
       : (p.algerie ? '<li><strong>Formule Découverte</strong> (gratuite)</li>' : '<li><strong>Formule Découverte</strong> (gratuite) · plusieurs matchs en même temps avec <a class="text-link" href="/abonnement/">une formule</a></li>'),
     q && q.nom !== 'Cœur' ? '<li><strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#camera"/></svg> Photo de ton match</strong> : incluse dans ta formule, si ton match l’accepte</li>' : '<li><strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#camera"/></svg> Photo de ton match</strong> : incluse à partir de la formule Passion, ou 3 € pour la voir 1 heure · <a class="text-link" href="/abonnement/?formule=passion">en savoir plus</a></li>',
-    '<li><strong>Qui peut t’envoyer un cœur</strong> : seulement les personnes qui correspondent à ta tranche d’âge (à 2 ans près) et à la zone que tu as choisie. Vérifie tes critères avec « Modifier mon profil ».</li>',
+    '<li><strong>Qui peut t’envoyer un cœur</strong> : seulement les personnes qui correspondent à ta tranche d’âge (à 7 ans près) et à la zone que tu as choisie. Vérifie tes critères avec « Modifier mon profil ».</li>',
     u.mise_en_relation || u.speed_dating ? `<li><strong>Achetés à l’unité</strong> : ${u.mise_en_relation || 0} match(s) supplémentaire(s) · ${u.speed_dating || 0} place(s) de speed dating</li>` : '',
   ].filter(Boolean).join('');
   // Demandes : les attentes regroupées en une ligne, le reste en court ; les terminées repliées.
