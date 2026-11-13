@@ -33,6 +33,7 @@ export const O = {
   pratiqueRecherche: ['Pas important', 'Pratiquant(e)', 'Pratique moderee', 'Non pratiquant(e)'],
   etudesRecherche: ['Pas important', 'Bac', 'Bac+', 'Bac+5', 'Plus de Bac+5'],
   hidjab: ['Pas important', 'Oui', 'Non'],
+  illustration: ['Sans foulard', 'Avec foulard'],
 };
 
 // Libellés affichés sur le site (avec accents), la valeur envoyée reste celle de l'outil.
@@ -105,6 +106,7 @@ export function choixPropres(m = {}) {
     pratiqueRecherche: un(m.pratiqueRecherche, O.pratiqueRecherche),
     etudesRecherche: un(m.etudesRecherche, O.etudesRecherche),
     rechercheFemmeHidjabiste: un(m.rechercheFemmeHidjabiste, O.hidjab),
+    illustration: un(m.illustration, O.illustration),
     caracteristiquesRecherche: plusieurs(m.caracteristiquesRecherche, O.caracteristiques, 6),
     accepteDivorce: m.accepteDivorce === true,
     accepteVeuf: m.accepteVeuf === true,
@@ -350,4 +352,16 @@ export function texteCredible(texte) {
     if (voyelles / latin.length < 0.2) return false;
   }
   return true;
+}
+
+// Illustration de la carte : jamais la vraie photo. Une illustration par tranche d'âge (et, pour une femme, avec ou sans
+// foulard selon son choix). `dispo` = les fichiers présents dans /images/portraits/ ; sans fichier, l'illustration historique.
+export function portraitDe(a, dispo = []) {
+  const femme = a?.genre === 'femme';
+  const age = Number(a?.age) || 0;
+  const tranche = age && age < 30 ? '25' : age < 40 ? '35' : age < 50 ? '45' : '55';
+  const base = `${femme ? 'femme' : 'homme'}-${tranche}`;
+  const voulu = femme && a?.illustration === 'Avec foulard' ? `${base}-foulard` : base;
+  for (const nom of [voulu, base]) if (dispo.includes(nom)) return `/images/portraits/${nom}.webp`;
+  return `/images/outil/avatar-${femme ? 'femme' : 'homme'}.webp`;
 }

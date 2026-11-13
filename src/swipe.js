@@ -3,7 +3,8 @@
 // Swipe sans limite. Matchs en même temps : 1 en Découverte (Lamia en débloque d'autres en live), 3 avec une formule.
 // « Qui m'a choisi·e » (Passion, Prestige) : ces profils passent en tête.
 import { api, esc, PUBLIC_KEY, matchsOuverts, matchPleinHtml } from './confidences-commun.js';
-import { O, lib, secteurLisible, foiEtVie, badgesProfil, origineLisible, metierEtReligion } from './matching-options.mjs';
+import { O, lib, secteurLisible, foiEtVie, badgesProfil, origineLisible, metierEtReligion, portraitDe } from './matching-options.mjs';
+import { PORTRAITS } from './portraits.mjs';
 import { SINCERITE_HTML, brancherSincerite } from './sincerite.js';
 import { SIGNALEMENT_HTML, lireSignalement } from './signaler.js';
 import { createClient } from '/vendor/supabase.mjs';
@@ -26,13 +27,15 @@ function carte(a) {
   const infos = [a.pays && lib(a.pays), a.situation && lib(a.situation), a.enfants === 'Oui' ? 'avec enfant(s)' : a.enfants === 'Non' ? 'sans enfant' : '', a.etudes && `études : ${lib(a.etudes).toLowerCase()}`].filter(Boolean);
   const ages = a.age_min || a.age_max ? ` (${a.age_min || 18} à ${a.age_max || 99} ans)` : '';
   const lieu = a.ville || (a.pays && lib(a.pays)) || '';
+  const portrait = esc(portraitDe(a, PORTRAITS));
   return `<article class="swipe-carte ${a.genre === 'homme' ? 'est-homme' : a.genre === 'femme' ? 'est-femme' : ''}" data-ref="${a.ref}">
     <span class="swipe-tampon is-oui" aria-hidden="true">Intéressé·e</span><span class="swipe-tampon is-non" aria-hidden="true">Pas pour moi</span>
     ${a.coeur_message ? `<p class="swipe-coeur-mot"><span aria-hidden="true">💌</span> « ${esc(a.coeur_message)} »</p>` : ''}
     ${a.ta_choisi ? '<span class="swipe-ta-choisi"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Ce profil t’a choisi·e</span>' : ''}
     ${a.revu ? '<span class="swipe-ta-choisi">Tu l’as déjà passé : une seconde chance ?</span>' : a.hors_criteres ? '<span class="swipe-ta-choisi"><svg class="ico" aria-hidden="true"><use href="/icones.svg#globe"/></svg> Un peu hors de tes critères</span>' : ''}
     <div class="swipe-resume">
-      <svg class="swipe-bijou" viewBox="0 -22 180 276" aria-hidden="true" focusable="false"><use href="#bijou-${femme ? 'femme' : 'homme'}"/></svg>
+      <svg class="swipe-bijou" viewBox="0 -22 180 276" aria-hidden="true" focusable="false">${femme ? `<use href="#bijou-femme-fond"/><image href="${portrait}" x="17" y="19" width="146" height="146" clip-path="url(#clip-rond)" preserveAspectRatio="xMidYMid slice"/><use href="#bijou-femme-devant"/>` : `<use href="#bijou-homme-fond"/><image href="${portrait}" x="-6" y="30" width="190" height="190" clip-path="url(#clip-triangle)" preserveAspectRatio="xMidYMid slice"/><use href="#bijou-homme-devant"/>`}</svg>
+      <small class="swipe-illustration">Illustration</small>
       <h2>${femme ? 'Une femme' : 'Un homme'}, ${esc(a.age)} ans</h2>
       ${lieu ? `<p class="swipe-lieu">${esc(lieu)}</p>` : ''}
       ${origineLisible(a.origine) ? `<p class="swipe-origine">${esc(origineLisible(a.origine))}</p>` : ''}

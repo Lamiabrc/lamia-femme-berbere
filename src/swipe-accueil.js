@@ -1,7 +1,8 @@
 // Accueil : le swipe tout de suite, même sans compte, sans aucune fenêtre à l'arrivée. La question
 // « un homme ou une femme ? » ne vient qu'au premier geste de swipe ; puis les profils défilent un par un. Le cœur demande un profil : sans profil, pas de match.
 import { api, esc, PUBLIC_KEY } from './confidences-commun.js';
-import { lib, secteurLisible, origineLisible, metierEtReligion } from './matching-options.mjs';
+import { lib, secteurLisible, origineLisible, metierEtReligion, portraitDe } from './matching-options.mjs';
+import { PORTRAITS } from './portraits.mjs';
 import { createClient } from '/vendor/supabase.mjs';
 
 const bloc = document.querySelector('[data-swipe-accueil]');
@@ -43,10 +44,12 @@ function carte(a) {
   const ages = a.age_min || a.age_max ? ` (${a.age_min || 18} à ${a.age_max || 99} ans)` : '';
   const lieu = a.ville || (a.pays && lib(a.pays)) || '';
   const tags = (a.caracteristiques || []).slice(0, 8);
+  const portrait = esc(portraitDe(a, PORTRAITS));
   return `<article class="swipe-carte ${a.genre === 'homme' ? 'est-homme' : a.genre === 'femme' ? 'est-femme' : ''}" data-ref="${esc(a.ref)}">
     <span class="swipe-tampon is-oui" aria-hidden="true">Intéressé·e</span><span class="swipe-tampon is-non" aria-hidden="true">Pas pour moi</span>
     <div class="swipe-resume">
-      <svg class="swipe-bijou" viewBox="0 -22 180 276" aria-hidden="true" focusable="false"><use href="#bijou-${femme ? 'femme' : 'homme'}"/></svg>
+      <svg class="swipe-bijou" viewBox="0 -22 180 276" aria-hidden="true" focusable="false">${femme ? `<use href="#bijou-femme-fond"/><image href="${portrait}" x="17" y="19" width="146" height="146" clip-path="url(#clip-rond)" preserveAspectRatio="xMidYMid slice"/><use href="#bijou-femme-devant"/>` : `<use href="#bijou-homme-fond"/><image href="${portrait}" x="-6" y="30" width="190" height="190" clip-path="url(#clip-triangle)" preserveAspectRatio="xMidYMid slice"/><use href="#bijou-homme-devant"/>`}</svg>
+      <small class="swipe-illustration">Illustration</small>
       <h2>${femme ? 'Une femme' : 'Un homme'}, ${esc(a.age)} ans</h2>
       ${lieu ? `<p class="swipe-lieu">${esc(lieu)}</p>` : ''}
       ${origineLisible(a.origine) ? `<p class="swipe-origine">${esc(origineLisible(a.origine))}</p>` : ''}
