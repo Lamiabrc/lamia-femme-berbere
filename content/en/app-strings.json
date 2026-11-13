@@ -1230,7 +1230,7 @@
  "Ce profil cherche quelqu’un d’un autre âge ou d’une autre zone : ton cœur n’est pas parti.": "This profile is looking for someone of another age or from another area: your heart was not sent.",
  "Ce profil cherche quelqu’un d’un autre âge ou d’une autre zone.": "This profile is looking for someone of another age or from another area.",
  "Qui peut t’envoyer un cœur": "Who can send you a heart",
- ": seulement les personnes qui correspondent à ta tranche d’âge (à 2 ans près) et à la zone que tu as choisie. Vérifie tes critères avec « Modifier mon profil ».": ": only people who match your age range (within 2 years) and the area you chose. Check your criteria with “Edit my profile”.",
+ ": seulement les personnes qui correspondent à ta tranche d’âge (à 7 ans près) et à la zone que tu as choisie. Vérifie tes critères avec « Modifier mon profil ».": ": only people who match your age range (within 7 years) and the area you chose. Check your criteria with “Edit my profile”.",
  "Ma déclaration de bonne foi": "My good-faith declaration",
  "Avant d’envoyer un cœur, chacun s’engage ici, dans sa langue.": "Before sending a heart, everyone commits here, in their own language.",
  "Je viens pour une rencontre sérieuse, en vue du mariage.": "I am here for a serious meeting, with marriage in mind.",
@@ -1273,5 +1273,7 @@
  "Voir ce qu’il manque": "See what is missing",
  "N° du profil": "Profile no.",
  "Chercher": "Search",
- "Écris le numéro du profil.": "Enter the profile number."
+ "Écris le numéro du profil.": "Enter the profile number.",
+ "Tu as vu tous les profils qui te correspondent et qui te cherchent aussi.": "You have seen all the profiles that match you and are also looking for you.",
+ " De nouveaux profils arrivent chaque jour. En attendant, tu revois ceux que tu avais passés ; tu peux aussi élargir ta recherche avec « Modifier mon profil ».": " New profiles arrive every day. Meanwhile, you see again those you had passed; you can also widen your search with “Edit my profile”."
 }

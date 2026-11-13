@@ -117,14 +117,15 @@ test('seconde chance : Passion renvoie une demande refusée, 2 fois au plus ; pa
   refuser(); assert.equal((await relancer('passion'))[0], 200);
   refuser(); assert.equal((await relancer('passion'))[1].error, 'relances_epuisees');
 });
-test('barrière des critères : pas de cœur vers quelqu’un qui cherche un autre âge (à 2 ans près) ou une autre zone', async () => {
+test('barrière des critères : pas de cœur vers quelqu’un qui cherche un autre âge (à 7 ans près) ou une autre zone', async () => {
   const { accepteParSesCriteres } = await import('../content/matching-options.mjs');
   const elle = { age_min: 45, age_max: 60, secteur: 'France' };
   assert.equal(accepteParSesCriteres(elle, { age: 28, pays: 'Algerie' }), false);
   assert.equal(accepteParSesCriteres(elle, { age: 28, pays: 'France' }), false);
   assert.equal(accepteParSesCriteres(elle, { age: 50, pays: 'Algerie' }), false);
-  assert.equal(accepteParSesCriteres(elle, { age: 43, pays: 'France' }), true); // 2 ans de marge
-  assert.equal(accepteParSesCriteres(elle, { age: 62, pays: 'France' }), true);
+  assert.equal(accepteParSesCriteres(elle, { age: 38, pays: 'France' }), true); // 7 ans de marge
+  assert.equal(accepteParSesCriteres(elle, { age: 37, pays: 'France' }), false);
+  assert.equal(accepteParSesCriteres(elle, { age: 67, pays: 'France' }), true);
   assert.equal(accepteParSesCriteres({}, { age: 28, pays: 'Algerie' }), true); // sans critère : tout le monde
   assert.equal(accepteParSesCriteres({ age_min: 25, age_max: 40, secteur: "N'importe ou" }, { age: 30, pays: 'Algerie' }), true);
   const { ctx, db } = monde();
