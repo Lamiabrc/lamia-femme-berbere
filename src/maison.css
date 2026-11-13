@@ -4182,3 +4182,10 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .incomplet-liste li > strong, .incomplet-liste li > span { display: block; }
 .incomplet-liste li > span { margin: .15rem 0 .5rem; color: #4d3c2a; }
 [data-profil-medias].is-vise { outline: 3px solid #d99a2b; outline-offset: 6px; border-radius: 12px; }
+
+/* Recherche d'un profil par son numéro (dit en live) */
+.swipe-cherche { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: center; margin: 0 auto 10px; max-width: 420px; }
+.swipe-cherche input { flex: 1 1 150px; min-width: 0; height: 44px; padding: 0 16px; border-radius: 999px; border: 1.5px solid rgba(47, 43, 61, .25); background: #fff; color: #272433; font: inherit; font-size: 16px; }
+.swipe-cherche button { height: 44px; padding: 0 20px; border-radius: 999px; border: 0; background: #2F2B3D; color: #fff; font: inherit; font-weight: 600; cursor: pointer; }
+.swipe-cherche-statut { flex: 1 0 100%; margin: 0; min-height: 0; text-align: center; font-size: 14px; color: #8a1024 !important; }
+.swipe-cherche-statut:empty { display: none; }
