@@ -67,7 +67,8 @@ export function formulaireHtml() {
         <label><input type="radio" name="genre" value="femme"> une femme</label>
         <label><input type="radio" name="genre" value="homme"> un homme</label>
       </fieldset>
-      <label>Ta date de naissance <small>(seul ton âge sera affiché)</small><input name="birth_date" type="date" max="${maxNaissance()}" required></label>
+      <label data-age>Ton âge<input name="age" type="number" min="18" max="99" inputmode="numeric" required></label>
+      <label data-naissance hidden>Ta date de naissance <small>(seul ton âge sera affiché)</small><input name="birth_date" type="date" max="${maxNaissance()}"></label>
       <label>Ta ville<input name="ville" maxlength="80" autocomplete="address-level2" required></label>
       <label>Ton pays de résidence<select name="pays">${opts(O.pays)}</select></label>
       <label data-plus-tard>Ton village ou ta région d’origine <small>(facultatif)</small><input name="villageOrigine" maxlength="80"></label>
@@ -351,8 +352,9 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
     const live = estLive();
     if (!f.prenom.value.trim()) manque('Ton prénom (ou un petit nom)', f.prenom);
     if (!form.querySelector('[name=genre]:checked')) manque('Femme ou homme', form.querySelector('[name=genre]')?.closest('label'));
-    if (!f.birth_date.value) manque('Ta date de naissance', f.birth_date);
-    else if (f.birth_date.value > maxNaissance()) manque('Ta date de naissance : il faut avoir 18 ans ou plus', f.birth_date);
+    const ans = Number.parseInt(f.age.value, 10);
+    if (!f.age.value.trim()) manque('Ton âge', f.age);
+    else if (!(ans >= 18 && ans <= 99)) manque('Ton âge : il faut avoir 18 ans ou plus', f.age);
     if (!form.querySelector('[name=origineTags]:checked')) manque('Ton origine', form.querySelector('[name=origineTags]')?.closest('.annonce-puces'));
     if (live && !f.tiktok_live.value.trim()) manque('Ton pseudo ou lien TikTok du live', f.tiktok_live);
     if (!live) {
@@ -401,7 +403,7 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
       say(st, 'Envoi de ton annonce…');
       const res = envoi?.res || await api({
         live, tiktok_live: f.tiktok_live.value,
-        action: 'annonce_deposer', prenom: f.prenom.value, genre: form.querySelector('[name=genre]:checked').value, birth_date: f.birth_date.value,
+        action: 'annonce_deposer', prenom: f.prenom.value, genre: form.querySelector('[name=genre]:checked').value, age: f.age.value,
         ville: f.ville.value, pays: f.pays.value, profil: f.profil.value, recherche: f.recherche.value,
         matching: lireMatching(form),
         age_min: f.age_min.value, age_max: f.age_max.value, email: session.user.email, sans_reseau: sansReseau(), telephone: sansReseau() ? f.telephone.value : '',
@@ -457,6 +459,7 @@ function monterEdition(form, st, p, token) {
   poser('age_min', p.age_min ?? ''); poser('age_max', p.age_max ?? '');
   const g = form.querySelector(`[name=genre][value="${p.genre}"]`); if (g) { g.checked = true; g.dispatchEvent(new Event('change', { bubbles: true })); }
   $$('[name=genre]', form).forEach((x) => { x.disabled = true; });
+  $('[data-age]', form).hidden = true; $('[data-naissance]', form).hidden = false;
   F.birth_date.value = p.birth_date || '';
   const m = p.matching || {};
   poser('niveauEtudeCategorie', m.niveauEtudeCategorie);

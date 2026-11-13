@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { handleAnnonces, pseudoTikTok, normLien, empreinteLien, lienContact } from '../lib/annonces.mjs';
+import { handleAnnonces, pseudoTikTok, normLien, empreinteLien, lienContact, ageAu } from '../lib/annonces.mjs';
 
 // Petite base en mémoire, juste assez pour les actions testées.
 function monde({ compte = true, tiktok = {} } = {}) {
@@ -375,4 +375,16 @@ test('cœur avec message : sans crédit, rien ne part (402) ; message vide refus
   r = await handleAnnonces('annonce_swipe', { ref: 31, choix: 'oui', message: 'Ta fiche m’a touchée' }, ctx(nina, 'decouverte'));
   assert.equal(r.status, 402);
   assert.equal((await r.json()).error, 'coeur_requis');
+});
+test('l’âge suffit à l’inscription : pas de date de naissance exigée, jamais en dessous de 18 ans', async () => {
+  const { ctx, db } = monde();
+  const { birth_date, ...sansDate } = complet;
+  let r = await handleAnnonces('annonce_deposer', { ...sansDate, age: '17' }, ctx(NINA));
+  assert.equal((await r.json()).error, 'mineur');
+  r = await handleAnnonces('annonce_deposer', { ...sansDate }, ctx(NINA));
+  assert.equal((await r.json()).error, 'invalid_birth_date');
+  r = await handleAnnonces('annonce_deposer', { ...sansDate, age: '34' }, ctx(NINA));
+  assert.equal(r.status, 200);
+  assert.equal(ageAu(db.annonces[0].birth_date, new Date('2026-10-29T20:00:00Z')), 34);
+  assert.equal(ageAu(db.annonces[0].birth_date, new Date('2027-10-29T20:00:00Z')), 35);
 });

@@ -1,5 +1,5 @@
-// Accueil : le swipe tout de suite, même sans compte. Une fenêtre demande « un homme ou une femme ? »,
-// puis les profils anonymes défilent un par un. Le cœur demande un profil : sans profil, pas de match.
+// Accueil : le swipe tout de suite, même sans compte, sans aucune fenêtre à l'arrivée. La question
+// « un homme ou une femme ? » ne vient qu'au premier geste de swipe ; puis les profils défilent un par un. Le cœur demande un profil : sans profil, pas de match.
 import { api, esc, PUBLIC_KEY } from './confidences-commun.js';
 import { lib, secteurLisible, origineLisible, metierEtReligion } from './matching-options.mjs';
 import { createClient } from '/vendor/supabase.mjs';
@@ -99,6 +99,8 @@ function inviter(el) {
 async function choisir(choix) {
   if (occupe || !profils.length) return;
   const el = pile.querySelector(`.swipe-carte[data-ref="${profils[0].ref}"]`);
+  // Premier geste : c'est maintenant qu'on demande qui la personne cherche.
+  if (!lire()) { if (el) { el.style.transition = 'transform .25s ease'; el.style.transform = ''; el.classList.remove('vers-oui', 'vers-non'); } return demander(); }
   if (choix === 'oui') return inviter(el);
   occupe = true;
   if (el) { el.style.transition = 'transform .35s ease, opacity .35s ease'; el.style.transform = 'translateX(-130%) rotate(-18deg)'; el.style.opacity = '0'; }
@@ -150,7 +152,7 @@ if (bloc && pile) {
     } catch { /* sans session : visiteur */ }
     try { ({ annonces: tous } = await api({ action: 'annonces_publiques' })); } catch { tous = []; }
     const v = lire();
-    if (v) montrer(v); else if (tous.length) demander(); else afficher();
+    if (v) montrer(v); else { profils = [...tous]; afficher(); }
   })();
 }
 
