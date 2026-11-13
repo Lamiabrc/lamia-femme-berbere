@@ -303,6 +303,18 @@ document.addEventListener('click', async (e) => {
   try { await conf({ action: 'annonce_moderateur', ref: b.dataset.modRetirer, oui: false }); chargerModerateurs(); } catch { b.disabled = false; }
 });
 
+// Journal : pas de liste sans fin. 12 lignes, puis « Afficher plus ».
+function replierJournal(box, max = 12) {
+  const l = [...box.querySelectorAll('li.tdb-evt')];
+  if (l.length <= max) return;
+  const cachees = [...box.children].slice([...box.children].indexOf(l[max]));
+  cachees.forEach((x) => { x.hidden = true; });
+  const li = document.createElement('li');
+  li.className = 'tdb-plus-ligne';
+  li.innerHTML = `<button type="button" class="btn btn-line">Afficher plus (${l.length - max})</button>`;
+  li.firstChild.addEventListener('click', () => { cachees.forEach((x) => { x.hidden = false; }); li.remove(); });
+  box.append(li);
+}
 async function chargerJournal() {
   const box = $('[data-journal]');
   try {
@@ -317,6 +329,7 @@ async function chargerJournal() {
       const c = cats[x.categorie] || { emoji: '•' };
       return `${sep}<li class="tdb-evt cat-${esc(x.categorie)}${x.lu ? '' : ' is-nouveau'}"><span class="tdb-evt-ico">${c.emoji}</span><div><p><b>${esc(x.titre)}</b> <small>${esc(date(x.created_at, { hour: '2-digit', minute: '2-digit' }))}${x.notifie ? '' : ' · sans notification'}</small></p>${(x.lignes || []).map((l) => `<p>${esc(l)}</p>`).join('')}</div>${x.lien ? `<button type="button" class="btn btn-line" data-journal-ouvrir="${esc(x.lien)}">Ouvrir</button>` : ''}</li>`;
     }).join('') || '<li>Rien pour le moment.</li>';
+    replierJournal(box);
     $('[data-retraits]').innerHTML = d.retraits.map((r) => `<li><span>${r.source === 'fiche' ? 'Fiche' : 'Profil'} n° ${r.ref} · ${r.genre === 'femme' ? 'femme' : 'homme'}${r.age ? `, ${r.age} ans` : ''}${r.lieu ? `, ${esc(r.lieu)}` : ''}<br><small>${esc(date(r.quand))} · ${r.effacement ? (r.fait ? 'effacée ✓' : '<b>veut être effacée de ton outil</b>') : 'ne veut plus apparaître sur le site (reste dans ton outil)'}</small></span>${r.effacement && !r.fait ? `<button type="button" class="btn btn-ink" data-effacement-fait="${r.ref}">C’est fait</button>` : ''}</li>`).join('') || '<li>Personne pour le moment.</li>';
     $('[data-appareils]').textContent = `Tes appareils qui reçoivent les alertes : ${d.appareils.lamia}. Membres abonnés aux notifications : ${d.appareils.membres}.`;
     $('[data-notifs-lamia]').innerHTML = Object.entries(cats).map(([k, c]) => `<label><input type="checkbox" name="${k}" ${d.notifs[k] ? 'checked' : ''}> <span>${c.emoji} ${esc(c.nom)}</span></label>`).join('') + '<p class="aide">Enregistré dès que tu coches. Les « matchs demandés » restent visibles ici et dans « Aujourd’hui ».</p>';
@@ -731,7 +744,7 @@ $('[data-textes-publier]').addEventListener('click', async () => {
 const GENRE = { femme: 'Femme', homme: 'Homme' };
 const PRESENCE = { registered: 'inscrit·e', checked_in: 'arrivé·e', attended: 'venu·e', no_show: 'absent·e', cancelled: 'annulée' };
 const ANNONCE = { brouillon: 'brouillon', a_verifier: 'à vérifier', publiee: 'publiée', retiree: 'retirée' };
-let filtreComptes = 'tous', compteOuvert = null;
+let filtreComptes = 'tous', compteOuvert = null, limiteComptes = 24;
 
 const ageDe = (birth) => {
   if (!birth) return null;
@@ -745,9 +758,9 @@ const incomplet = (c) => !c.profil || !c.profil.gender || (!c.profil.birth_date 
 const salonCourt = (s) => String(s || '').replace(/^Grand salon · /, '');
 
 async function chargerComptes() {
-  $('[data-comptes]').innerHTML = '<tr><td colspan="6">Chargement…</td></tr>';
+  $('[data-comptes]').innerHTML = '<p class="aide">Chargement…</p>';
   try { comptes = await api({ action: 'comptes_liste' }); }
-  catch (e) { $('[data-comptes]').innerHTML = `<tr><td colspan="6">${esc(e.message)}</td></tr>`; return; }
+  catch (e) { $('[data-comptes]').innerHTML = `<p class="aide">${esc(e.message)}</p>`; return; }
   const l = comptes.comptes;
   const kpi = (t, n, s) => `<div class="kpi"><span>${t}</span><strong>${n}</strong>${s ? `<small>${s}</small>` : ''}</div>`;
   $('[data-comptes-kpis]').innerHTML = [
@@ -773,18 +786,25 @@ function listeComptes() {
     incomplet,
   }[filtreComptes];
   const l = comptes.comptes.filter(garde).filter((c) => !q || [nomDe(c), c.email, c.profil?.city, c.profil?.display_name, ...c.annonces.map((a) => a.ref), ...c.fiches.map((f) => f.ref)].join(' ').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes(q));
-  $('[data-comptes]').innerHTML = l.length ? l.map((c) => {
+  // Des cartes, pas une liste sans fin : 24 à la fois, puis « Afficher plus ».
+  const ETAT = { publiee: ['Profil validé', 'is-ok'], a_verifier: ['À vérifier', 'is-alerte'], brouillon: ['Profil pas terminé', 'is-alerte'] };
+  $('[data-comptes]').innerHTML = l.length ? l.slice(0, limiteComptes).map((c) => {
     const age = ageDe(c.profil?.birth_date) ?? c.age_fiche ?? null;
-    const soirees = c.inscriptions.slice(0, 3).map((i) => `<span class="compte-badge ${i.statut === 'cancelled' ? 'is-annule' : 'is-bal'}">${esc(salonCourt(i.salon) || i.titre)}</span>`).join('');
-    const liens = [...c.annonces.map((a) => `<span class="compte-badge">Annonce n° ${esc(a.ref)}</span>`), ...c.fiches.map((f) => `<span class="compte-badge">Fiche n° ${esc(f.ref)}</span>`)].join('');
-    return `<tr class="compte-ligne" data-compte="${esc(c.id)}" tabindex="0">
-      <td><strong>${esc(nomDe(c))}${c.admin ? ' <span class="compte-badge">toi (admin)</span>' : ''}${c.testeur_play ? ` <span class="compte-badge is-bal" title="${c.testeur_play.ajoute_at ? 'Sur la liste Google Play' : 'En attente d’ajout à la liste Google Play'}">Testeur Play${c.testeur_play.ajoute_at ? '' : ' (à ajouter)'}</span>` : ''}</strong><small>${esc(c.email || '')}</small></td>
-      <td>${c.profil?.gender ? esc(GENRE[c.profil.gender]) : '<span class="compte-badge is-alerte">genre ?</span>'} ${age != null ? `· ${age} ans` : '<span class="compte-badge is-alerte">âge ?</span>'}</td>
-      <td>${esc(c.profil?.city || '')}</td>
-      <td>${soirees || '—'}</td>
-      <td>${liens || '—'}</td>
-      <td>${esc(date(c.cree_le, { day: 'numeric', month: 'short', year: 'numeric' }))}</td></tr>`;
-  }).join('') : '<tr><td colspan="6">Aucun compte ne correspond.</td></tr>';
+    const vraie = c.annonces.find((a) => !a.test && a.status === 'publiee') || c.annonces.find((a) => !a.test && ETAT[a.status]);
+    const num = vraie?.ref || c.fiches[0]?.ref || null;
+    const etat = vraie ? ETAT[vraie.status] : c.fiches.length ? ['Fiche du live', 'is-ok'] : ['Sans profil', ''];
+    const qui = [c.profil?.gender ? GENRE[c.profil.gender] : '', age != null ? `${age} ans` : '', c.profil?.city || ''].filter(Boolean).join(' · ');
+    const soirees = c.inscriptions.filter((i) => i.statut !== 'cancelled').length;
+    return `<article class="membre-carte" data-compte="${esc(c.id)}" tabindex="0" role="button">
+      <header><strong>${esc(nomDe(c))}</strong>${num ? `<span class="membre-num">n° ${esc(num)}</span>` : ''}</header>
+      <p class="membre-qui">${esc(qui) || '<span class="compte-badge is-alerte">genre et âge ?</span>'}</p>
+      <p class="membre-badges"><span class="compte-badge ${etat[1]}">${etat[0]}</span>${soirees ? `<span class="compte-badge is-bal">${soirees} soirée${soirees > 1 ? 's' : ''}</span>` : ''}${c.admin ? '<span class="compte-badge">toi (admin)</span>' : ''}${c.testeur_play ? '<span class="compte-badge is-bal">Testeur Play</span>' : ''}</p>
+      <small>${c.vu_le ? `Vu·e le ${esc(date(c.vu_le, { day: 'numeric', month: 'short' }))}` : 'Jamais reconnecté·e'} · inscrit·e le ${esc(date(c.cree_le, { day: 'numeric', month: 'short' }))}</small>
+    </article>`;
+  }).join('') : '<p class="aide">Aucun membre ne correspond.</p>';
+  const plus = $('[data-comptes-plus]');
+  plus.hidden = l.length <= limiteComptes;
+  plus.textContent = `Afficher plus (${Math.max(0, l.length - limiteComptes)} restants)`;
 }
 
 function ouvrirCompte(id) {
@@ -959,10 +979,31 @@ function fermerCompte() { compteOuvert = null; $('[data-compte-fiche]').hidden =
 
 $('[data-comptes]').addEventListener('click', (e) => { const l = e.target.closest('[data-compte]'); if (l) ouvrirCompte(l.dataset.compte); });
 $('[data-comptes]').addEventListener('keydown', (e) => { const l = e.target.closest('[data-compte]'); if (l && e.key === 'Enter') ouvrirCompte(l.dataset.compte); });
-$('[data-comptes-cherche]').addEventListener('input', listeComptes);
+$('[data-comptes-cherche]').addEventListener('input', () => { limiteComptes = 24; listeComptes(); });
+$('[data-comptes-plus]').addEventListener('click', () => { limiteComptes += 24; listeComptes(); });
+// Fiche en pleine page : Modifier, Contacter, Bloquer en haut.
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-fiche-aller]');
+  if (!b) return;
+  const cible = { modifier: '[data-compte-modifier]', contacter: '[data-compte-contacter]', bloquer: '[data-bloquer-compte]' }[b.dataset.ficheAller];
+  const el = $(cible);
+  if (!el) return;
+  if (el.tagName === 'DETAILS') el.open = true;
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+});
+$('[data-compte-ecrire]').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = e.target, st = $('[data-compte-ecrire-statut]');
+  const c = comptes?.comptes.find((x) => x.id === compteOuvert);
+  if (!c?.email) { st.textContent = 'Cette personne n’a pas de compte : écris-lui depuis ton outil.'; return; }
+  f.querySelector('button').disabled = true; st.textContent = 'Envoi…';
+  try { await conf({ action: 'lamia_ecrire_a', email: c.email, body: f.elements.body.value, name: nomDe(c) }); f.reset(); st.textContent = 'Message envoyé. Sa réponse arrivera dans tes Confidences.'; }
+  catch { st.textContent = 'Le message n’est pas parti. Réessaie dans un instant.'; }
+  f.querySelector('button').disabled = false;
+});
 $('[data-comptes-filtres]').addEventListener('click', (e) => {
   const b = e.target.closest('[data-filtre]'); if (!b) return;
-  filtreComptes = b.dataset.filtre;
+  filtreComptes = b.dataset.filtre; limiteComptes = 24;
   $$('[data-filtre]', $('[data-comptes-filtres]')).forEach((x) => x.classList.toggle('is-on', x === b));
   listeComptes();
 });
@@ -1079,7 +1120,9 @@ function peindreCoaching(d) {
   for (const c of d.creneaux || []) { const k = date(c.debut, { weekday: 'long', day: 'numeric', month: 'long' }); if (!parJour.has(k)) parJour.set(k, []); parJour.get(k).push(c); }
   const passe = (c) => new Date(c.debut).getTime() + ((c.duree_min || 15) + 15) * 60e3 < Date.now();
   const typeDe = (c) => ({ 30: ' · 30 min', 60: ' · Couple, 1 h' })[c.duree_min] || '';
-  $('[data-coaching-planning]').innerHTML = [...parJour].map(([k, l]) => `<h3>${esc(k)}</h3><ul class="tdb-retraits">${l.map((c) => `<li><span><b>${esc(date(c.debut, { hour: '2-digit', minute: '2-digit' }))}${typeDe(c)}</b> · ${c.user_id ? `${esc(c.prenom || '')} <small>${esc(c.email || '')}</small>` : '<small>Libre</small>'}</span>${passe(c) ? '' : `<span>${c.user_id ? `<button class="btn btn-ink" type="button" data-coaching-entrer="${esc(c.id)}">Entrer</button> ` : ''}<button class="link-button" type="button" data-coaching-fermer="${esc(c.id)}" data-reserve="${c.user_id ? '1' : ''}">${c.user_id ? 'Annuler' : 'Retirer'}</button></span>`}</li>`).join('')}</ul>`).join('') || '<p>Aucun créneau ouvert pour l’instant.</p>';
+  const cellule = (c) => `<li class="${c.user_id ? 'is-pris' : ''}${passe(c) ? ' is-passe' : ''}"><b>${esc(date(c.debut, { hour: '2-digit', minute: '2-digit' }))}${typeDe(c)}</b>${c.user_id ? `<span>${esc(c.prenom || c.email || '')}</span>` : '<small>Libre</small>'}${passe(c) ? '' : `<span class="planning-actions">${c.user_id ? `<button class="btn btn-ink" type="button" data-coaching-entrer="${esc(c.id)}">Entrer</button>` : ''}<button class="link-button" type="button" data-coaching-fermer="${esc(c.id)}" data-reserve="${c.user_id ? '1' : ''}">${c.user_id ? 'Annuler' : 'Retirer'}</button></span>`}</li>`;
+  const aVenir = [...parJour].filter(([, l]) => l.some((c) => !passe(c)));
+  $('[data-coaching-planning]').innerHTML = aVenir.length ? `<div class="planning-grille">${aVenir.map(([k, l]) => `<section><h3>${esc(k)}</h3><ul>${l.map(cellule).join('')}</ul></section>`).join('')}</div>` : '<p>Aucun créneau ouvert à venir.</p>';
   $('[data-coaching-abonnes]').innerHTML = (d.abonnes || []).map((a) => `<li><span><b>${esc(a.nom || a.email)}</b> <small>${a.reserve ? `Visio du mois : ${esc(date(a.reserve))}` : 'Pas encore de visio ce mois-ci'}</small></span></li>`).join('') || '<li>Pas encore d’abonné Prestige actif.</li>';
 }
 async function chargerAlertes() {
