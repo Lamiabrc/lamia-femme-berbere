@@ -1,6 +1,7 @@
 // Annonces de rencontre : dépôt (Patio et Confidences) et affichage des annonces vérifiées par Lamia.
 import { api, esc, PUBLIC_KEY, creerCompte, matchsOuverts, SECURITE_APPLI } from './confidences-commun.js';
-import { O, lib, secteurLisible, telephoneNormal, foiEtVie, badgesProfil, origineLisible, metierEtReligion, texteCredible } from './matching-options.mjs';
+import { O, lib, secteurLisible, telephoneNormal, foiEtVie, badgesProfil, origineLisible, metierEtReligion, texteCredible, portraitDe } from './matching-options.mjs';
+import { PORTRAITS } from './portraits.mjs';
 import { createClient } from '/vendor/supabase.mjs';
 
 // Compte (le même que « Mon espace ») : chaque profil y est lié pour pouvoir être modifié.
@@ -99,6 +100,7 @@ export function formulaireHtml() {
       <label>Ta taille <small>(en cm, facultatif)</small><input name="tailleCm" type="number" min="120" max="230" inputmode="numeric" placeholder="170"></label>
       <label>Ta religion <small>(facultatif)</small><select name="religion">${opts(O.religion, 'Je préfère ne pas dire')}</select></label>
       <label>Ta pratique <small>(facultatif)</small><select name="pratique">${opts(O.pratique, 'Je préfère ne pas dire')}</select></label>
+      <label data-illustration hidden>L’illustration de ta carte <small>(ta vraie photo n’est jamais montrée)</small><select name="illustration">${opts(O.illustration)}</select></label>
       <label class="annonce-large">Ta foi et ta pratique en quelques mots <small>(facultatif : prière, ramadan, ce qui compte pour toi…)</small><textarea name="religionTexte" rows="2" maxlength="300"></textarea></label>
       <label>Bouger pour l’amour ?<select name="mobiliteGeographique">${opts(O.mobilite)}</select></label>
       <label data-vision>Le travail dans le couple<select name="visionFinanciere"><option value="">Choisis d’abord femme ou homme</option></select></label>
@@ -335,6 +337,7 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
       const femme = e.target.value === 'femme';
       F.visionFinanciere.innerHTML = opts(femme ? O.visionFemme : O.visionHomme);
       $('[data-hidjab]', form).hidden = femme;
+      { const il = $('[data-illustration]', form); if (il) il.hidden = !femme; }
     }
     if (['caracteristiques', 'caracteristiquesRecherche'].includes(e.target.name) && e.target.checked && $$(`[name=${e.target.name}]:checked`, form).length > 6) { e.target.checked = false; say(st, 'Six choix au maximum : garde ceux qui te ressemblent le plus.'); }
   });
@@ -439,7 +442,7 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
   });
 }
 
-const CHAMPS = ['villageOrigine', 'langue', 'situation', 'enfants', 'nbEnfants', 'ageEnfants', 'desirEnfants', 'niveauEtudeCategorie', 'niveauEtudeDetail', 'etudesPaysObtention', 'profession', 'tailleCm', 'religion', 'pratique', 'mobiliteGeographique', 'visionFinanciere', 'fumeur', 'sport', 'alcool', 'chemma', 'religionTexte', 'autresModeVie', 'zoneGeo', 'religionRecherche', 'pratiqueRecherche', 'etudesRecherche', 'rechercheFemmeHidjabiste', 'contactReseau'];
+const CHAMPS = ['villageOrigine', 'langue', 'situation', 'enfants', 'nbEnfants', 'ageEnfants', 'desirEnfants', 'niveauEtudeCategorie', 'niveauEtudeDetail', 'etudesPaysObtention', 'profession', 'tailleCm', 'religion', 'pratique', 'mobiliteGeographique', 'visionFinanciere', 'fumeur', 'sport', 'alcool', 'chemma', 'religionTexte', 'autresModeVie', 'zoneGeo', 'religionRecherche', 'pratiqueRecherche', 'etudesRecherche', 'rechercheFemmeHidjabiste', 'illustration', 'contactReseau'];
 const LISTES = ['origineTags', 'caracteristiques', 'origineRechercheTags', 'caracteristiquesRecherche'];
 const CASES = ['kabyleUniquement', 'accepteDivorce', 'accepteVeuf', 'accepteEnfants'];
 function lireMatching(form) {
@@ -522,7 +525,7 @@ function carte(a) {
   const tags = a.caracteristiques || [];
   const infos = [a.genre === 'femme' ? 'Une femme' : 'Un homme', `${a.age} ans`, lib(a.pays), a.situation && lib(a.situation), a.enfants === 'Oui' ? 'avec enfant(s)' : a.enfants === 'Non' ? 'sans enfant' : '', a.etudes && `études : ${lib(a.etudes).toLowerCase()}`].filter(Boolean);
   return `<article class="annonce-carte annonce-anonyme ${a.genre === 'homme' ? 'est-homme' : a.genre === 'femme' ? 'est-femme' : ''}">
-    <div class="annonce-sceau" aria-hidden="true"><img src="/images/outil/${a.genre === 'femme' ? 'avatar-femme' : 'avatar-homme'}.webp" alt="" width="80" height="80"></div>
+    <div class="annonce-sceau" aria-hidden="true"><img src="${esc(portraitDe(a, PORTRAITS))}" alt="Illustration" width="80" height="80"></div>
     <div class="annonce-texte">
       <p class="annonce-ref${a.piece_identite ? ' is-piece' : ''}">Profil n° ${a.ref} · ${a.piece_identite ? '✓ vérifié par Lamia' : a.outil ? (a.confirme ? '✓ vérifié par Lamia · confirmé' : '✓ vérifié par Lamia · en attente de confirmation') : '✓ profil vérifié'}</p>
       ${badgesProfil(a)}
