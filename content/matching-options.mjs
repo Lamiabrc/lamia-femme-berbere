@@ -313,12 +313,19 @@ const SITUATION_DIFF = {
 };
 export function phrasesDifference(criteres = [], fiche = {}) {
   const f = fiche?.genre === 'femme' ? 1 : 0;
+  const pron = ['il', 'elle'][f];
+  // Chaque différence est dite avec l'information elle-même : « Sa situation n'est pas celle que tu cherches : il est divorcé. »
+  const avec = (phrase, info) => (info ? `${phrase} : ${info}.` : `${phrase}.`);
+  const minus = (x) => String(x || '').replace(/\.$/, '').replace(/^./, (c) => c.toLowerCase());
   const t = [];
-  if (criteres.includes('situation')) t.push(SITUATION_DIFF[fiche?.situation]?.[f] || 'Sa situation n’est pas celle que tu cherches.');
-  if (criteres.includes('age')) t.push('Son âge n’est pas dans la tranche que tu cherches.');
-  if (criteres.includes('secteur')) t.push(['Il ne vit pas là où tu cherches.', 'Elle ne vit pas là où tu cherches.'][f]);
-  if (criteres.includes('religion')) t.push('Sa religion ou sa pratique n’est pas celle que tu cherches.');
-  if (criteres.includes('enfants')) t.push('Pour les enfants, ce n’est pas ce que tu as demandé.');
+  if (criteres.includes('situation')) t.push(avec('Sa situation n’est pas celle que tu cherches', minus(SITUATION_DIFF[fiche?.situation]?.[f])));
+  if (criteres.includes('age')) t.push(avec('Son âge n’est pas dans la tranche que tu cherches', fiche?.age ? `${pron} a ${fiche.age} ans` : ''));
+  if (criteres.includes('secteur')) {
+    const ou = [fiche?.ville, fiche?.pays && lib(fiche.pays)].filter(Boolean);
+    t.push(avec(['Il ne vit pas là où tu cherches', 'Elle ne vit pas là où tu cherches'][f], fiche?.ville ? `${pron} vit à ${ou[0]}${ou[1] ? ` (${ou[1]})` : ''}` : ou.length ? `pays de résidence, ${ou[0]}` : ''));
+  }
+  if (criteres.includes('religion')) t.push(avec('Sa religion ou sa pratique n’est pas celle que tu cherches', [fiche?.religion, fiche?.pratique].filter(Boolean).map((x) => lib(x).toLowerCase()).join(', ')));
+  if (criteres.includes('enfants')) t.push(avec('Pour les enfants, ce n’est pas ce que tu as demandé', fiche?.enfants === 'Oui' ? `${pron} a des enfants` : fiche?.enfants === 'Non' ? `${pron} n’a pas d’enfant` : ''));
   if (criteres.some((c) => !['secteur', 'age', 'situation', 'religion', 'enfants'].includes(c))) t.push('Un autre de tes critères n’est pas respecté.');
   return t;
 }
