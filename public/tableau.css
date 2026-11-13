@@ -383,3 +383,39 @@
 .afaire-auto { list-style: none; }
 .afaire-auto summary { cursor: pointer; font-weight: 600; color: #252B78; }
 .afaire-auto ol { margin-top: 10px; opacity: .85; }
+
+/* ---- Membres : une grille de cartes, une fiche en pleine page ---- */
+.membres-grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+.membre-carte { display: grid; gap: 6px; align-content: start; padding: 16px; border-radius: 18px; background: #fff; border: 1px solid var(--qvt-sable); cursor: pointer; transition: transform .15s, box-shadow .15s; }
+.membre-carte:hover, .membre-carte:focus-visible { transform: translateY(-2px); box-shadow: 0 10px 24px -14px rgba(0, 0, 0, .35); outline: none; }
+.membre-carte header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.membre-carte header strong { font-size: 1.1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.membre-num { font-weight: 600; color: var(--qvt-taupe); white-space: nowrap; }
+.membre-carte p { margin: 0; }
+.membre-badges { display: flex; flex-wrap: wrap; gap: 6px; }
+.membre-carte small { color: var(--qvt-taupe); }
+.compte-badge.is-ok { background: #e3f3e6; color: #1f5a30; }
+.membres-plus { text-align: center; margin-top: 16px; }
+.compte-fiche { left: 0; width: 100%; padding: 24px clamp(16px, 4vw, 56px) 48px; box-shadow: none; }
+.compte-fiche .compte-tete, .fiche-actions, .fiche-corps { max-width: 1180px; margin-left: auto; margin-right: auto; }
+.fiche-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; margin-bottom: 4px; }
+.fiche-corps { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 20px; align-items: start; }
+.fiche-corps textarea { width: 100%; }
+@media (max-width: 900px) { .fiche-corps { grid-template-columns: 1fr; } }
+/* ---- Planning de coaching : une colonne par jour ---- */
+.planning-grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; align-items: start; }
+.planning-grille section { background: #fbf6f1; border-radius: 14px; padding: 10px; }
+.planning-grille h3 { margin: 0 0 8px; font-size: 1rem; text-transform: capitalize; }
+.planning-grille ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.planning-grille li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2px 8px; padding: 6px 9px; border-radius: 10px; background: #fff; border: 1px solid var(--qvt-sable); font-size: .92rem; }
+.planning-grille li.is-pris { background: #efe6fb; border-color: #cdb8ee; }
+.planning-grille li.is-passe { opacity: .5; }
+.planning-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.planning-actions .btn { padding: 4px 12px; }
+/* ---- Journal replié ---- */
+.tdb-journal [hidden] { display: none !important; }
+.tdb-plus-ligne { text-align: center; background: none !important; }
+
+.membres-action { margin-bottom: 16px; border-left: 6px solid var(--qvt-nuit); }
+.membres-action h2 { margin: 0 0 4px; }
+.membres-action .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 10px 0 0; }

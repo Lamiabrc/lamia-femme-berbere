@@ -16,11 +16,11 @@
   <nav class="tdb-onglets" aria-label="Rubriques" data-onglets hidden>
     <button type="button" data-tab="accueil" aria-current="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#house"/></svg> Aujourd’hui</button>
     <button type="button" data-tab="activite"><svg class="ico" aria-hidden="true"><use href="/icones.svg#map"/></svg> Activité</button>
-    <button type="button" data-tab="rencontres"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Profils</button>
-    <button type="button" data-tab="comptes"><svg class="ico" aria-hidden="true"><use href="/icones.svg#user"/></svg> Comptes</button>
+    <button type="button" data-tab="comptes"><svg class="ico" aria-hidden="true"><use href="/icones.svg#user"/></svg> Membres</button>
     <details class="tdb-plus" data-menu-plus>
       <summary>Plus <span class="tdb-pastille" data-journal-pastille hidden></span></summary>
       <div>
+      <button type="button" data-tab="rencontres"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Matchs à suivre</button>
       <button type="button" data-tab="application"><svg class="ico" aria-hidden="true"><use href="/icones.svg#smartphone"/></svg> Application <span class="tdb-pastille" data-journal-pastille hidden></span></button>
       <button type="button" data-tab="coaching"><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg> Coaching</button>
       <button type="button" data-tab="ventes">Ventes</button>
@@ -140,8 +140,8 @@
 
   <!-- ===================================================== Comptes -->
   <section data-panel="comptes" hidden>
-    <div class="tdb-entete"><h1 class="tdb-titre">Les comptes</h1><button class="btn btn-line" type="button" data-comptes-maj>Actualiser</button></div>
-    <p class="aide">Toutes les personnes qui ont un compte. Cherche un prénom, un email ou un n° de profil, puis clique pour voir son activité, lui offrir quelque chose ou la bloquer.</p>
+    <div class="tdb-entete"><h1 class="tdb-titre">Les membres</h1><button class="btn btn-line" type="button" data-comptes-maj>Actualiser</button></div>
+    <p class="aide">Une carte par personne. Clique sur une carte pour ouvrir sa fiche.</p>
     <div class="tdb-kpis" data-comptes-kpis></div>
     <div class="tdb-filtres">
       <label>Chercher<input type="search" data-comptes-cherche placeholder="Prénom, email, ville, n° de profil…" autocomplete="off"></label>
@@ -151,15 +151,26 @@
         <button type="button" data-filtre="annonce">Avec annonce</button>
         <button type="button" data-filtre="fiche">Avec fiche outil</button>
         <button type="button" data-filtre="testeur">Testeurs Google Play</button>
-        <button type="button" data-filtre="incomplet">Profil incomplet</button>
+        <button type="button" data-filtre="sansprofil">Sans profil</button>
       </div>
     </div>
-    <div class="tdb-table"><table><thead><tr><th>Personne</th><th>Genre · âge</th><th>Ville</th><th>Soirées</th><th>Annonce · fiche</th><th>Compte créé</th></tr></thead><tbody data-comptes><tr><td colspan="6">Chargement…</td></tr></tbody></table></div>
+    <div class="tdb-carte membres-action" data-sans-profil hidden></div>
+    <div class="membres-grille" data-comptes><p class="aide">Chargement…</p></div>
+    <p class="actions membres-plus"><button class="btn btn-line" type="button" data-comptes-plus hidden>Afficher plus</button></p>
 
     <div class="compte-fond" data-compte-fond hidden></div>
     <aside class="compte-fiche" data-compte-fiche hidden aria-label="Fiche du compte">
       <div class="compte-tete"><div><p class="compte-kicker" data-compte-email></p><h2 data-compte-nom></h2><p class="aide" data-compte-infos></p></div><button type="button" class="btn btn-line" data-compte-fermer>Fermer</button></div>
+      <p class="fiche-actions"><button class="btn btn-ink" type="button" data-fiche-aller="modifier">Modifier</button><button class="btn btn-ink" type="button" data-fiche-aller="contacter">Contacter</button><button class="btn btn-line" type="button" data-fiche-aller="bloquer">Bloquer</button><button class="btn btn-ink" type="button" data-sp-un="relancer" hidden>Lui demander de créer son profil</button><button class="btn btn-line fiche-danger" type="button" data-sp-un="supprimer" hidden>Supprimer ce compte</button> <span class="aide" data-sp-un-statut role="status"></span></p>
+      <div class="fiche-corps">
       <div data-compte-detail></div>
+      <div>
+      <details class="tdb-repli" data-compte-contacter><summary>Lui écrire</summary>
+      <form class="tdb-carte" data-compte-ecrire>
+        <label>Ton message<textarea name="body" rows="4" maxlength="4000" required></textarea></label>
+        <p class="actions"><button class="btn btn-ink" type="submit">Envoyer</button> <span class="aide" data-compte-ecrire-statut role="status"></span></p>
+      </form>
+      </details>
       <details class="tdb-repli" data-compte-modifier><summary>Corriger ses informations</summary>
       <form class="tdb-carte reglages" data-compte-form>
         <h3 style="margin-top:0">Profil</h3>
@@ -183,6 +194,8 @@
       <div class="tdb-carte">
         <h3 style="margin-top:0">Annonces et fiches de l’outil</h3>
         <ul class="compte-liste" data-compte-liens></ul>
+      </div>
+      </div>
       </div>
     </aside>
   </section>
