@@ -435,3 +435,8 @@ test('suppression : jamais un compte avec profil, une soirée, un abonnement, ni
   assert.deepEqual(d2.faits, []);
   assert.equal(d2.ignores[0].raison, 'abonnement');
 });
+test('plus de question sur la différence : l’espace n’affiche plus aucun avis à donner', async () => {
+  const { ctx } = monde();
+  const d = await (await handleAnnonces('annonce_avis_lamia', {}, ctx(NINA))).json();
+  assert.deepEqual(d.avis, []);
+});
