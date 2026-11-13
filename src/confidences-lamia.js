@@ -572,8 +572,8 @@ document.addEventListener('click', async (e) => {
 document.addEventListener('click', async (e) => {
   const b = e.target.closest('[data-proposer]');
   if (!b) return;
-  if (!confirm(`Proposer le profil n° ${b.dataset.cible} à la personne n° ${b.dataset.proposer} ? Elle le verra dans son espace LFB (fiche anonyme) et recevra une notification.`)) return;
+  if (!confirm(`Proposer le profil n° ${b.dataset.cible} à la personne n° ${b.dataset.proposer} ? Elle le verra dans son espace Tayri (fiche anonyme) et recevra une notification.`)) return;
   b.disabled = true;
   try { await api({ action: 'annonce_proposer', pour: b.dataset.proposer, cible: b.dataset.cible, score: b.dataset.score }, await jetonFrais()); b.textContent = 'Proposé'; }
-  catch (err) { b.disabled = false; alert(err.code === 'pas_de_compte' ? 'Cette personne n’a pas encore de compte LFB.' : 'La proposition n’est pas partie. Réessaie.'); }
+  catch (err) { b.disabled = false; alert(err.code === 'pas_de_compte' ? 'Cette personne n’a pas encore de compte Tayri.' : 'La proposition n’est pas partie. Réessaie.'); }
 });

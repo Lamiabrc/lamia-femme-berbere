@@ -18,6 +18,17 @@
       "permanent": true
     },
     {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "(?:www\\.)?tayri\\.(?:com|fr|app|love|net|org|eu|dz)"
+        }
+      ],
+      "destination": "https://lamia-femme-berbere.com/$1",
+      "permanent": true
+    },
+    {
       "source": "/patio(.*)",
       "destination": "/rencontres$1",
       "permanent": true
