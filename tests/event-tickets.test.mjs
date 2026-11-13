@@ -64,6 +64,7 @@ test('le prix vient de la base, jamais du navigateur', async () => {
   assert.equal(res.status, 200);
   assert.equal(stripe.created[0].line_items[0].price_data.unit_amount, 1200);
   assert.equal(stripe.created[0].metadata.user_id, USER);
+  assert.equal(stripe.created[0].allow_promotion_codes, true); // le code promo des abonné·es vaut pour les soirées
   assert.match(stripe.created[0].success_url, /^https:\/\/maison\.example\/speed-dating\/merci\//);
 });
 

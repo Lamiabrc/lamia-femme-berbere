@@ -57,6 +57,17 @@ test('déjà abonné : pas de second abonnement', async () => {
   const r = await actionAbonnement({ ...base, formule: 'passion' }, req, { env, fetcher, stripe: fauxStripe() });
   assert.equal(r.status, 409);
 });
+test('le code promo (tarif des abonné·es Facebook) est accepté sur les formules et les achats à l’unité', async () => {
+  for (const choix of [{ formule: 'passion' }, { formule: 'prestige', periode: 'an' }, { unite: 'speed_dating' }, { unite: 'coaching' }]) {
+    const s = fauxStripe();
+    const r = await actionAbonnement({ ...base, ...choix }, req, { env, fetcher: vide, stripe: s });
+    assert.equal(r.status, 200);
+    assert.equal(s.appels[0].allow_promotion_codes, true);
+    // Le prix de départ reste celui du serveur : la réduction est calculée par Stripe, jamais par le navigateur.
+    assert.ok(s.appels[0].line_items[0].price_data.unit_amount > 0);
+    assert.equal(s.appels[0].discounts, undefined);
+  }
+});
 test('achat à l’unité limité à 5', async () => {
   const s = fauxStripe();
   await actionAbonnement({ ...base, unite: 'speed_dating', quantite: 40 }, req, { env, fetcher: vide, stripe: s });
@@ -124,6 +135,7 @@ test('la photo du match : jamais sans compte, ni sans accord du match', async ()
   assert.equal((await payer(monde([{ id: 'c', ref: 12, photo_partage: true }]))).status, 200);
   assert.equal(s.appels[0].line_items[0].price_data.unit_amount, 300);
   assert.equal(s.appels[0].metadata.photo_ref, '12');
+  assert.equal(s.appels[0].allow_promotion_codes, true); // le code promo vaut aussi depuis Mon espace
   // Sans passer par Mon espace, le bouton public ne peut pas vendre la photo.
   assert.equal((await actionAbonnement({ ...base, unite: 'photo_match' }, req, { env, fetcher: vide, stripe: s })).status, 401);
 });
