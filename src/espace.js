@@ -604,6 +604,8 @@ async function mesFiches(session) {
   } catch { box.innerHTML = ''; }
 }
 
+// Une différence avec ce que la personne cherche : une ligne rouge sur le profil, jamais une question ni un blocage.
+const ligneDifference = (d) => (Array.isArray(d) && d.length ? `<p class="espace-diff-ligne">${d.map((p) => esc(p)).join(' ')}</p>` : '');
 // Profils proposés par Lamia (depuis son outil) : fiche anonyme et réponse oui / non.
 async function propositions(session) {
   const box = document.querySelector('[data-espace-propositions]');
@@ -618,6 +620,7 @@ async function propositions(session) {
       : `<p class="interet-boutons"><button type="button" class="btn btn-ink" data-proposition="oui" data-id="${esc(x.id)}">Ce profil m’intéresse</button><button type="button" class="btn btn-line" data-proposition="non" data-id="${esc(x.id)}">Pas pour moi</button></p>`;
     return `<article class="espace-achat interet-recu proposition"><div><p class="event-date">Proposé par Lamia · profil n° ${esc(f.ref)} · le ${esc(new Date(x.le).toLocaleDateString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { day: 'numeric', month: 'long' }))}</p>
       <h3>${esc(infos.join(' · '))}</h3>
+      ${ligneDifference(x.differences)}
       ${x.message ? `<p class="proposition-mot">« ${esc(x.message)} » <small>Lamia</small></p>` : ''}
       ${f.profil ? `<p><strong>Qui je suis :</strong> <span data-membre>${esc(f.profil)}</span></p>` : ''}
       ${f.recherche ? `<p><strong>Qui je cherche${esc(ages)} :</strong> <span data-membre>${esc(f.recherche)}</span></p>` : ''}
@@ -710,6 +713,7 @@ async function interetsRecus(session) {
       : `<p class="interet-boutons"><button type="button" class="btn btn-ink" data-repondre="oui" data-id="${esc(i.id)}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Ça m’intéresse aussi</button><button type="button" class="btn btn-line" data-repondre="non" data-id="${esc(i.id)}">Pas pour moi</button></p>`;
     return `<article class="espace-achat interet-recu"><div><p class="event-date">Profil n° ${esc(f.ref)} · intéressé·e par ta fiche n° ${esc(i.pour)} · le ${esc(new Date(i.le).toLocaleDateString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { day: 'numeric', month: 'long' }))}</p>
       <h3>${esc(infos.join(' · '))}</h3>
+      ${ligneDifference(i.differences)}
       ${f.profil ? `<p><strong>Qui je suis :</strong> <span data-membre>${esc(f.profil)}</span></p>` : ''}
       ${f.recherche ? `<p><strong>Qui je cherche${esc(ages)} :</strong> <span data-membre>${esc(f.recherche)}</span></p>` : ''}
       ${secteurLisible(f.secteur) ? `<p><strong>Cherche en :</strong> ${esc(secteurLisible(f.secteur))}</p>` : ''}
