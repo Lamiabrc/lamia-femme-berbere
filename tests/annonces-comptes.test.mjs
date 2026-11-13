@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { handleAnnonces, pseudoTikTok, normLien, empreinteLien, lienContact } from '../lib/annonces.mjs';
+import { handleAnnonces, pseudoTikTok, normLien, empreinteLien, lienContact, ageAu } from '../lib/annonces.mjs';
 
 // Petite base en mémoire, juste assez pour les actions testées.
 function monde({ compte = true, tiktok = {} } = {}) {
@@ -56,8 +56,6 @@ test('pas de réseau social : un numéro de téléphone valide est obligatoire',
   const sans = { ...complet, matching: { origineTags: ['Kabyle (Algerie)'] }, sans_reseau: true };
   let r = await handleAnnonces('annonce_deposer', { ...sans, telephone: '12' }, ctx(NINA));
   assert.equal((await r.json()).error, 'telephone_invalide');
-  r = await handleAnnonces('annonce_deposer', { ...complet, matching: {} }, ctx(NINA));
-  assert.equal((await r.json()).error, 'contact_requis');
   r = await handleAnnonces('annonce_deposer', { ...sans, telephone: '06 12 34 56 78' }, ctx(NINA));
   assert.equal(r.status, 200);
   assert.equal(db.annonces[0].phone, '+33612345678');
@@ -75,10 +73,22 @@ test('profil créé en live : formulaire allégé, fiche retrouvée par empreint
   assert.equal(db.annonces[0].live_declare, true);
   assert.equal(db.annonces[0].outil_id, 'outil-42');
 });
-test('hors live, textes et photos restent obligatoires', async () => {
+test('inscription courte : sans textes ni lien de réseau, le profil est accepté ; les 2 photos restent obligatoires', async () => {
+  const { ctx, db } = monde();
+  const court = { ...base, matching: { origineTags: ['Kabyle (Algerie)'] }, ville: 'Lyon', pays: 'France' };
+  let r = await handleAnnonces('annonce_deposer', court, ctx(NINA));
+  assert.equal((await r.json()).error, 'medias_requis');
+  r = await handleAnnonces('annonce_deposer', { ...court, medias: complet.medias }, ctx(NINA));
+  assert.equal(r.status, 200);
+  assert.equal(db.annonces[0].profil, '');
+  assert.ok(!db.annonces[0].matching.contactReseau);
+});
+test('un texte commencé doit faire 20 caractères au moins ; l’origine reste obligatoire', async () => {
   const { ctx } = monde();
-  const r = await handleAnnonces('annonce_deposer', { ...base, ville: 'Lyon', pays: 'France' }, ctx(NINA));
+  let r = await handleAnnonces('annonce_deposer', { ...complet, profil: 'Salut' }, ctx(NINA));
   assert.equal((await r.json()).error, 'textes_courts');
+  r = await handleAnnonces('annonce_deposer', { ...complet, matching: {} }, ctx(NINA));
+  assert.equal((await r.json()).error, 'origine_requise');
 });
 test('la personne corrige elle-même sa date de naissance, jamais en dessous de 18 ans', async () => {
   const { ctx, db } = monde();
@@ -365,4 +375,62 @@ test('cœur avec message : sans crédit, rien ne part (402) ; message vide refus
   r = await handleAnnonces('annonce_swipe', { ref: 31, choix: 'oui', message: 'Ta fiche m’a touchée' }, ctx(nina, 'decouverte'));
   assert.equal(r.status, 402);
   assert.equal((await r.json()).error, 'coeur_requis');
+});
+test('l’âge suffit à l’inscription : pas de date de naissance exigée, jamais en dessous de 18 ans', async () => {
+  const { ctx, db } = monde();
+  const { birth_date, ...sansDate } = complet;
+  let r = await handleAnnonces('annonce_deposer', { ...sansDate, age: '17' }, ctx(NINA));
+  assert.equal((await r.json()).error, 'mineur');
+  r = await handleAnnonces('annonce_deposer', { ...sansDate }, ctx(NINA));
+  assert.equal((await r.json()).error, 'invalid_birth_date');
+  r = await handleAnnonces('annonce_deposer', { ...sansDate, age: '34' }, ctx(NINA));
+  assert.equal(r.status, 200);
+  assert.equal(ageAu(db.annonces[0].birth_date, new Date('2026-10-29T20:00:00Z')), 34);
+  assert.equal(ageAu(db.annonces[0].birth_date, new Date('2027-10-29T20:00:00Z')), 35);
+});
+// ---- comptes sans profil : Lamia relance ou supprime, un par un ou plusieurs à la fois
+function mondeComptes({ formule = 'decouverte' } = {}) {
+  const U = (n) => `00000000-0000-4000-8000-00000000000${n}`;
+  const users = { [U(1)]: { id: U(1), email: 'vide@ex.fr', user_metadata: { first_name: 'Sam' } }, [U(2)]: { id: U(2), email: 'profil@ex.fr' }, [U(3)]: { id: U(3), email: 'soiree@ex.fr' }, [U(4)]: { id: U(4), email: 'lamia@ex.fr', app_metadata: { role: 'admin' } } };
+  const appels = [];
+  const json = async (x, ok = true) => ({ ok, json: async () => x });
+  const call = async (u, o = {}) => {
+    appels.push(`${o.method || 'GET'} ${u}`);
+    const m = u.match(/^\/auth\/v1\/admin\/users\/([0-9a-f-]+)$/);
+    if (m) return users[m[1]] ? json(users[m[1]]) : json({}, false);
+    return json([]);
+  };
+  const read = async (u) => {
+    if (u.startsWith('/rest/v1/annonces?or=') && u.includes('status=in.(a_verifier,publiee)')) return u.includes(U(2)) ? [{ ref: 5 }] : [];
+    if (u.startsWith('/rest/v1/event_registrations?user_id=eq.')) return u.includes(U(3)) ? [{ event_id: 'e' }] : [];
+    return [];
+  };
+  const ctx = (admin = true) => ({ formuleDe: async () => formule, env: { SUPABASE_SERVICE_ROLE_KEY: 'x' }, call, read, insert: async () => ({}), patch: async () => ({ ok: true }), admin, user: { id: U(4), email: 'lamia@ex.fr' }, ipHash: 'ip', now: () => new Date('2026-11-13T09:00:00Z'), email: async () => true, alerter: async () => {} });
+  return { U, ctx, appels };
+}
+test('comptes sans profil : réservé à Lamia, et la suppression demande une confirmation', async () => {
+  const { U, ctx } = mondeComptes();
+  let r = await handleAnnonces('annonce_comptes_relancer', { user_ids: [U(1)] }, ctx(false));
+  assert.equal(r.status, 403);
+  r = await handleAnnonces('annonce_comptes_supprimer', { user_ids: [U(1)] }, ctx());
+  assert.equal((await r.json()).error, 'confirmation_requise');
+});
+test('relance : seulement les comptes sans profil ; la date de relance est notée', async () => {
+  const { U, ctx, appels } = mondeComptes();
+  const d = await (await handleAnnonces('annonce_comptes_relancer', { user_ids: [U(1), U(2), U(4)] }, ctx())).json();
+  assert.deepEqual(d.faits, [U(1)]);
+  assert.deepEqual(d.ignores.map((x) => x.raison).sort(), ['a_un_profil', 'admin']);
+  assert.ok(appels.some((a) => a.startsWith('POST /rest/v1/relances_compte')));
+  assert.ok(!appels.some((a) => a.startsWith('DELETE /auth')));
+});
+test('suppression : jamais un compte avec profil, une soirée, un abonnement, ni l’admin', async () => {
+  const { U, ctx, appels } = mondeComptes();
+  const d = await (await handleAnnonces('annonce_comptes_supprimer', { user_ids: [U(1), U(2), U(3), U(4)], confirmation: 'supprimer' }, ctx())).json();
+  assert.deepEqual(d.faits, [U(1)]);
+  assert.deepEqual(d.ignores.map((x) => x.raison).sort(), ['a_un_profil', 'admin', 'soiree']);
+  assert.deepEqual(appels.filter((a) => a.startsWith('DELETE /auth')), [`DELETE /auth/v1/admin/users/${U(1)}`]);
+  const abo = mondeComptes({ formule: 'passion' });
+  const d2 = await (await handleAnnonces('annonce_comptes_supprimer', { user_ids: [abo.U(1)], confirmation: 'SUPPRIMER' }, abo.ctx())).json();
+  assert.deepEqual(d2.faits, []);
+  assert.equal(d2.ignores[0].raison, 'abonnement');
 });

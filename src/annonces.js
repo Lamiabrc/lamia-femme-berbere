@@ -39,7 +39,7 @@ const ERR = {
   telephone_invalide: 'Ce numéro de téléphone n’est pas valide. Mets-le en entier, avec l’indicatif si tu n’es pas en France (par ex. +213 5 12 34 56 78).',
   compte_autre_email: 'Tu es connecté(e) avec une autre adresse email : utilise celle de ton compte.',
   mot_de_passe: 'Choisis un mot de passe d’au moins 8 caractères.',
-  compte_existant: 'Un compte existe déjà avec cet email, mais le mot de passe ne correspond pas. Mets ton mot de passe, ou réinitialise-le dans « Mon espace ».',
+  compte_existant: 'Tu as déjà un compte avec cet email. Mets ton mot de passe, ou reçois un lien pour entrer sans mot de passe.',
   deja_profil: 'Tu as déjà un profil chez Lamia : modifie-le dans « Mon espace ».',
   deja_profil_lien: 'Un profil existe déjà avec ce lien de réseau social. Connecte-toi avec le compte qui l’a créé (« Mon espace »), ou écris à Lamia si ce n’est pas toi.',
   tiktok_live: 'Indique le pseudo ou le lien TikTok que tu avais en live, pour que Lamia retrouve ta fiche.',
@@ -59,16 +59,6 @@ const maxNaissance = () => { const d = new Date(); d.setFullYear(d.getFullYear()
 
 export function formulaireHtml() {
   return `<form class="annonce-form" data-annonce-form novalidate>
-  <div class="annonce-etape annonce-live" data-bloc-live>
-    <fieldset class="annonce-choix"><legend>As-tu déjà créé ton profil en live avec Lamia ?</legend>
-      <label><input type="radio" name="live" value="oui"> Oui</label>
-      <label><input type="radio" name="live" value="non"> Non, c’est la première fois</label>
-    </fieldset>
-    <div data-si-live hidden>
-      <label>Ton pseudo ou ton lien TikTok de l’époque<input name="tiktok_live" maxlength="200" placeholder="@tonpseudo"></label>
-      <p class="annonce-aide"><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg> Lamia retrouve ta fiche : ton profil est déjà chez elle, tu n’as que l’essentiel à remplir ci-dessous. <strong>Tes 3 premières mises en relation sont offertes.</strong></p>
-    </div>
-  </div>
   <div class="annonce-etape">
     <h3><span>1</span> Qui es-tu ?</h3>
     <div class="annonce-grille">
@@ -77,15 +67,24 @@ export function formulaireHtml() {
         <label><input type="radio" name="genre" value="femme"> une femme</label>
         <label><input type="radio" name="genre" value="homme"> un homme</label>
       </fieldset>
-      <label>Ta date de naissance <small>(seul ton âge sera affiché)</small><input name="birth_date" type="date" max="${maxNaissance()}" required></label>
+      <label data-age>Ton âge<input name="age" type="number" min="18" max="99" inputmode="numeric" required></label>
+      <label data-naissance hidden>Ta date de naissance <small>(seul ton âge sera affiché)</small><input name="birth_date" type="date" max="${maxNaissance()}"></label>
       <label>Ta ville<input name="ville" maxlength="80" autocomplete="address-level2" required></label>
       <label>Ton pays de résidence<select name="pays">${opts(O.pays)}</select></label>
-      <label>Ton village ou ta région d’origine <small>(facultatif)</small><input name="villageOrigine" maxlength="80"></label>
-      <label>Les langues que tu parles<input name="langue" maxlength="80" placeholder="Kabyle, tamazight, français…"></label>
+      <label data-plus-tard>Ton village ou ta région d’origine <small>(facultatif)</small><input name="villageOrigine" maxlength="80"></label>
+      <label data-plus-tard>Les langues que tu parles<input name="langue" maxlength="80" placeholder="Kabyle, tamazight, français…"></label>
     </div>
     <p class="annonce-sous" id="ton-origine">Ton origine <small>(affichée sur ton profil, 3 au maximum)</small></p>${puces('origineTags', O.origine)}
+    <div class="annonce-live" data-bloc-live>
+      <fieldset class="annonce-choix"><legend>As-tu déjà créé ton profil en live avec Lamia ?</legend>
+        <label><input type="checkbox" name="live" value="oui"> Oui</label>
+      </fieldset>
+      <div data-si-live hidden>
+        <label>Ton pseudo ou ton lien TikTok de l’époque<input name="tiktok_live" maxlength="200" placeholder="@tonpseudo"></label>
+      </div>
+    </div>
   </div>
-  <div class="annonce-etape" data-optionnel-live>
+  <div class="annonce-etape" data-optionnel-live data-plus-tard>
     <h3><span>2</span> Ta vie aujourd’hui</h3>
     <div class="annonce-grille">
       <label>Ta situation<select name="situation">${opts(O.situation)}</select></label>
@@ -112,7 +111,7 @@ export function formulaireHtml() {
     <p class="annonce-sous">Ce qui te ressemble <small>(jusqu’à 6)</small></p>${puces('caracteristiques', O.caracteristiques)}
     <label>Parle-nous de toi avec ton cœur <small>(ton caractère, tes valeurs, ce que tu aimes)</small><textarea name="profil" rows="5" maxlength="1500" placeholder="Écris comme si tu te présentais à une amie de Lamia."></textarea></label>
   </div>
-  <div class="annonce-etape" data-optionnel-live>
+  <div class="annonce-etape" data-optionnel-live data-plus-tard>
     <h3><span>3</span> La personne que tu cherches</h3>
     <div class="annonce-grille">
       <div class="annonce-ages"><label>Âge de</label><input name="age_min" type="number" min="18" max="99" inputmode="numeric" aria-label="Âge minimum" placeholder="25"><label>à</label><input name="age_max" type="number" min="18" max="99" inputmode="numeric" aria-label="Âge maximum" placeholder="40"><span>ans</span></div>
@@ -138,23 +137,22 @@ export function formulaireHtml() {
     <label class="annonce-depot">＋ Ajouter mes 2 photos<input type="file" accept="image/*" multiple data-medias></label>
     <ul class="annonce-apercu" data-medias-liste></ul>
   </div>
-  <div class="annonce-etape annonce-id">
+  <div class="annonce-etape annonce-id" data-plus-tard>
     <h3><span>5</span> Facultatif : ta pièce d’identité, pour un profil encore plus sûr</h3>
     <p class="annonce-aide">Ce n’est pas obligatoire. Mais un profil vérifié <strong>avec pièce d’identité</strong> porte un badge renforcé dans les annonces et inspire davantage confiance. Prends en photo ta carte d’identité, ton passeport ou ton titre de séjour, <strong>en posant ta main (ou un doigt) sur le numéro du document</strong> pour le cacher. Lamia vérifie seulement que la personne de l’annonce existe vraiment et qu’elle est majeure.</p>
     <p class="annonce-aide"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lock"/></svg> Cette photo n’est <strong>jamais publiée</strong>. Seule Lamia la voit, et elle est <strong>supprimée dès la vérification faite</strong>.</p>
     <label class="annonce-depot">＋ Ajouter la photo de ma pièce d’identité<input type="file" accept="image/*,.pdf,application/pdf" data-identite></label>
     <ul class="annonce-apercu" data-identite-liste></ul>
   </div>
-  <div class="annonce-etape">
+  <div class="annonce-etape" data-plus-tard>
     <h3><span>6</span> Ton contact (jamais affiché)</h3>
     <p class="annonce-aide" data-connecte hidden></p>
     <div class="annonce-grille">
       <label data-compte-email>Ton email<input name="email" type="email" autocomplete="email" required></label>
-      <label data-reseau>Ton lien TikTok, Instagram ou Facebook <small>(obligatoire)</small><input name="contactReseau" maxlength="200" placeholder="https://www.tiktok.com/@tonpseudo"></label>
+      <label data-reseau>Ton lien TikTok, Instagram ou Facebook <small>(facultatif)</small><input name="contactReseau" maxlength="200" placeholder="https://www.tiktok.com/@tonpseudo"></label>
     </div>
     <label class="annonce-case"><input type="checkbox" name="sans_reseau"> <span>Je n’ai aucun profil sur les réseaux sociaux : je donne mon numéro de téléphone à la place.</span></label>
     <label data-tel hidden>Ton numéro de téléphone <small>(obligatoire si tu n’as pas de réseau ; avec l’indicatif si tu n’es pas en France, par ex. +213…)</small><input name="telephone" type="tel" autocomplete="tel" maxlength="25" placeholder="06 12 34 56 78"></label>
-    <p class="annonce-aide">Ton lien de réseau social (ou, à défaut, ton numéro) est obligatoire : c’est par là que Lamia te contactera. Il n’est jamais affiché sur le site ni transmis à personne. Si tu as un réseau, ton numéro ne t’est demandé que plus tard, par Lamia elle-même, si un match te convient ; il reste chez elle.</p>
     <p class="annonce-aide">Tes coordonnées ne sont jamais affichées ni transmises : c’est Lamia qui te contacte pour une mise en relation.</p>
   </div>
   <label class="annonce-case" data-consent-depot><input type="checkbox" name="majeur"> <span>J’ai 18 ans ou plus et cette annonce est sincère : je cherche une vraie rencontre.</span></label>
@@ -258,11 +256,13 @@ function porteCompte(box) {
       }
       monterFormulaire(box);
     } catch (err) {
-      say(st, ERR[err.code] || 'Ça n’a pas fonctionné. Réessaie dans un instant.', true); btn.disabled = false;
+      // La personne a déjà un compte mais était sur « Créer mon profil » : on la met sur « Me connecter », sans la gronder.
+      if (err.code === 'compte_existant') $('[data-mode=connexion]', box)?.click();
+      say(st, ERR[err.code] || 'Ça n’a pas fonctionné. Réessaie dans un instant.', err.code !== 'compte_existant'); btn.disabled = false;
       // Compte existant ou mot de passe oublié : un lien de connexion par email, en un clic.
       if (['compte_existant', 'connexion'].includes(err.code)) {
         const lien = document.createElement('button');
-        lien.type = 'button'; lien.className = 'btn btn-line'; lien.textContent = 'Recevoir un lien de connexion par email';
+        lien.type = 'button'; lien.className = err.code === 'compte_existant' ? 'btn btn-ink' : 'btn btn-line'; lien.textContent = 'Recevoir un lien de connexion par email';
         st.append(document.createElement('br'), lien);
         lien.addEventListener('click', async () => {
           lien.disabled = true;
@@ -342,6 +342,8 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
   const corrige = (e) => e.target.closest?.('.is-manquant, label')?.classList.remove('is-manquant');
   form.addEventListener('input', corrige); form.addEventListener('change', corrige);
   if (existant) return monterEdition(form, st, existant, token);
+  // Inscription courte : l'essentiel d'abord (qui tu es, ton origine, tes 2 photos). Le reste se complète dans « Mon espace ».
+  $$('[data-plus-tard]', form).forEach((el) => { el.hidden = true; });
   // Tout ce qui manque, d'un coup : la liste exacte, chaque champ entouré, et un clic emmène au champ.
   const calculerManques = () => {
     const f = form.elements;
@@ -350,20 +352,17 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
     const live = estLive();
     if (!f.prenom.value.trim()) manque('Ton prénom (ou un petit nom)', f.prenom);
     if (!form.querySelector('[name=genre]:checked')) manque('Femme ou homme', form.querySelector('[name=genre]')?.closest('label'));
-    if (!f.birth_date.value) manque('Ta date de naissance', f.birth_date);
-    else if (f.birth_date.value > maxNaissance()) manque('Ta date de naissance : il faut avoir 18 ans ou plus', f.birth_date);
+    const ans = Number.parseInt(f.age.value, 10);
+    if (!f.age.value.trim()) manque('Ton âge', f.age);
+    else if (!(ans >= 18 && ans <= 99)) manque('Ton âge : il faut avoir 18 ans ou plus', f.age);
     if (!form.querySelector('[name=origineTags]:checked')) manque('Ton origine', form.querySelector('[name=origineTags]')?.closest('.annonce-puces'));
     if (live && !f.tiktok_live.value.trim()) manque('Ton pseudo ou lien TikTok du live', f.tiktok_live);
     if (!live) {
       if (!f.ville.value.trim()) manque('Ta ville', f.ville);
       if (!f.pays.value) manque('Ton pays', f.pays);
-      const n1 = f.profil.value.trim().length, n2 = f.recherche.value.trim().length;
-      if (n1 < 20) manque(`« Parle-nous de toi » : encore ${20 - n1} caractère${20 - n1 > 1 ? 's' : ''} au moins`, f.profil);
-      if (n2 < 20) manque(`« La personne que tu cherches » : encore ${20 - n2} caractère${20 - n2 > 1 ? 's' : ''} au moins`, f.recherche);
       if (medias.length < 2) manque('2 photos de toi', $('[data-medias]', form).closest('label'));
     }
-    if (sansReseau()) { if (!telephoneNormal(f.telephone.value)) manque(f.telephone.value.trim() ? 'Ton numéro de téléphone n’est pas valide (mets l’indicatif si tu n’es pas en France)' : 'Ton numéro de téléphone (puisque tu n’as pas de réseau social)', f.telephone); }
-    else if (!f.contactReseau.value.trim()) manque('Ton lien TikTok, Instagram ou Facebook (ou coche « Je n’ai aucun profil sur les réseaux »)', f.contactReseau);
+    if (sansReseau() && !telephoneNormal(f.telephone.value)) manque(f.telephone.value.trim() ? 'Ton numéro de téléphone n’est pas valide (mets l’indicatif si tu n’es pas en France)' : 'Ton numéro de téléphone (puisque tu n’as pas de réseau social)', f.telephone);
     if (!f.majeur.checked) manque('La case « J’ai 18 ans ou plus… »', f.majeur.closest('label'));
     if (!f.publication.checked) manque('La case « Je confie mon profil à Lamia… »', f.publication.closest('label'));
     if (identite.length && !f.identite_ok.checked) manque('La case d’accord pour ta pièce d’identité (ou retire la photo)', f.identite_ok.closest('label'));
@@ -404,7 +403,7 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
       say(st, 'Envoi de ton annonce…');
       const res = envoi?.res || await api({
         live, tiktok_live: f.tiktok_live.value,
-        action: 'annonce_deposer', prenom: f.prenom.value, genre: form.querySelector('[name=genre]:checked').value, birth_date: f.birth_date.value,
+        action: 'annonce_deposer', prenom: f.prenom.value, genre: form.querySelector('[name=genre]:checked').value, age: f.age.value,
         ville: f.ville.value, pays: f.pays.value, profil: f.profil.value, recherche: f.recherche.value,
         matching: lireMatching(form),
         age_min: f.age_min.value, age_max: f.age_max.value, email: session.user.email, sans_reseau: sansReseau(), telephone: sansReseau() ? f.telephone.value : '',
@@ -460,6 +459,7 @@ function monterEdition(form, st, p, token) {
   poser('age_min', p.age_min ?? ''); poser('age_max', p.age_max ?? '');
   const g = form.querySelector(`[name=genre][value="${p.genre}"]`); if (g) { g.checked = true; g.dispatchEvent(new Event('change', { bubbles: true })); }
   $$('[name=genre]', form).forEach((x) => { x.disabled = true; });
+  $('[data-age]', form).hidden = true; $('[data-naissance]', form).hidden = false;
   F.birth_date.value = p.birth_date || '';
   const m = p.matching || {};
   poser('niveauEtudeCategorie', m.niveauEtudeCategorie);
@@ -472,11 +472,11 @@ function monterEdition(form, st, p, token) {
   const btn = $('.annonce-envoyer', form); btn.textContent = 'Enregistrer mes modifications';
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    if (F.profil.value.trim().length < 20 || F.recherche.value.trim().length < 20) return say(st, ERR.textes_courts, true);
+    if ([F.profil, F.recherche].some((t) => t.value.trim() && t.value.trim().length < 20)) return say(st, ERR.textes_courts, true);
     if (!texteCredible(F.profil.value) || !texteCredible(F.recherche.value)) return say(st, ERR.textes_illisibles, true);
     if (!F.birth_date.value || F.birth_date.value > maxNaissance()) { F.birth_date.scrollIntoView({ block: 'center' }); return say(st, ERR.invalid_birth_date, true); }
     if (!form.querySelector('[name=origineTags]:checked')) { form.querySelector('#ton-origine')?.scrollIntoView({ block: 'center' }); return say(st, ERR.origine_requise, true); }
-    if (F.sans_reseau.checked ? !telephoneNormal(F.telephone.value) : !F.contactReseau.value.trim()) return say(st, F.sans_reseau.checked ? ERR.telephone_invalide : ERR.contact_requis, true);
+    if (F.sans_reseau.checked && !telephoneNormal(F.telephone.value)) return say(st, ERR.telephone_invalide, true);
     btn.disabled = true; say(st, 'Enregistrement…');
     try {
       await api({ action: 'annonce_modifier', prenom: F.prenom.value, birth_date: F.birth_date.value, ville: F.ville.value, pays: F.pays.value, profil: F.profil.value, recherche: F.recherche.value, age_min: F.age_min.value, age_max: F.age_max.value, anonyme_ok: F.anonyme_ok.checked, photo_partage: F.photo_partage.checked, sans_reseau: F.sans_reseau.checked, telephone: F.sans_reseau.checked ? F.telephone.value : '', matching: lireMatching(form) }, token);

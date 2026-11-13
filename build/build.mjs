@@ -326,6 +326,7 @@ const SWIPE_INVITE = `<section class="swipe-page accueil-swipe" id="profils-anon
   <div class="swipe-app">
     ${SWIPE_DEFS}
     <p class="accueil-swipe-titre" data-inv-titre>Les profils vérifiés, un par un</p>
+    <form class="swipe-cherche" data-cherche-profil role="search"><input name="ref" inputmode="numeric" autocomplete="off" maxlength="6" placeholder="N° du profil" aria-label="N° du profil"><button type="submit">Chercher</button><p class="swipe-cherche-statut" role="status" data-cherche-statut></p></form>
     <div class="swipe-pile" data-inv-pile><p class="annonce-vide">Les profils arrivent…</p></div>
     <div class="swipe-boutons" data-inv-boutons hidden><button type="button" data-swipe-non aria-label="Pas pour moi"><svg class="ico" aria-hidden="true"><use href="/icones.svg#croix"/></svg></button><button type="button" data-swipe-oui aria-label="Ce profil m’intéresse"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur-plein"/></svg></button></div>
     <p class="swipe-aide"><button type="button" class="confirmer-lien" data-inv-changer hidden>Changer : je cherche un homme / une femme</button></p>
@@ -843,6 +844,7 @@ page(
 
     <section id="mon-profil">
       <h2>Mon profil âme sœur</h2>
+      <div class="incomplet-bloc" id="a-completer" data-incomplet-bloc hidden></div>
       <div class="sincerite-bloc" id="sincerite" data-sincerite-bloc hidden></div>
       <p data-profil-modifier-haut hidden><button type="button" class="btn btn-ink"><svg class="ico" aria-hidden="true"><use href="/icones.svg#pencil"/></svg> Modifier mon profil</button></p>
       <p><button type="button" class="btn btn-line btn-installer" data-installer-bouton><svg class="ico" aria-hidden="true"><use href="/icones.svg#smartphone"/></svg> Installer l’application sur mon téléphone</button></p>
@@ -1755,6 +1757,7 @@ page(
   <p class="swipe-abo" data-swipe-abo hidden></p>
   <div class="swipe-infos" data-swipe-infos></div>
   <div class="swipe-filtres-zone" data-swipe-filtres></div>
+  <form class="swipe-cherche" data-cherche-profil role="search"><input name="ref" inputmode="numeric" autocomplete="off" maxlength="6" placeholder="N° du profil" aria-label="N° du profil"><button type="submit">Chercher</button><p class="swipe-cherche-statut" role="status" data-cherche-statut></p></form>
   <p class="swipe-compteur" data-swipe-compteur></p>
   <p class="swipe-adresse" data-swipe-adresse hidden></p>
   ${SWIPE_DEFS}

@@ -1,5 +1,5 @@
-// Accueil : le swipe tout de suite, même sans compte. Une fenêtre demande « un homme ou une femme ? »,
-// puis les profils anonymes défilent un par un. Le cœur demande un profil : sans profil, pas de match.
+// Accueil : le swipe tout de suite, même sans compte, sans aucune fenêtre à l'arrivée. La question
+// « un homme ou une femme ? » ne vient qu'au premier geste de swipe ; puis les profils défilent un par un. Le cœur demande un profil : sans profil, pas de match.
 import { api, esc, PUBLIC_KEY } from './confidences-commun.js';
 import { lib, secteurLisible, origineLisible, metierEtReligion } from './matching-options.mjs';
 import { createClient } from '/vendor/supabase.mjs';
@@ -10,6 +10,8 @@ const boutons = bloc?.querySelector('[data-inv-boutons]');
 const changer = bloc?.querySelector('[data-inv-changer]');
 const titre = bloc?.querySelector('[data-inv-titre]');
 const CLE = 'lfb-cherche';
+const CLE_PROFIL = 'lfb-profil-cherche';
+const formCherche = bloc?.querySelector('[data-cherche-profil]');
 let tous = [], profils = [], occupe = false;
 
 const lire = () => { try { const v = localStorage.getItem(CLE); return v === 'femme' || v === 'homme' ? v : null; } catch { return null; } };
@@ -87,6 +89,24 @@ function montrer(genre) {
   afficher();
 }
 
+// Recherche par numéro : Lamia dit « profil n° 123 » en live, la personne le tape et le profil arrive en haut de la pile.
+// Le numéro est gardé : après la création du profil, le swipe le remet devant pour envoyer le cœur.
+function chercher(valeur) {
+  const st = formCherche?.querySelector('[data-cherche-statut]');
+  const ref = Number.parseInt(String(valeur || '').replace(/\D/g, ''), 10);
+  if (!ref) { if (st) st.textContent = 'Écris le numéro du profil.'; return; }
+  if (bloc.classList.contains('is-membre')) { location.assign(`/rencontres/swipe/?profil=${ref}`); return; }
+  const p = tous.find((x) => Number(x.ref) === ref);
+  if (!p) { if (st) st.textContent = `Le profil n° ${ref} n’est pas visible pour le moment.`; return; }
+  if (st) st.textContent = '';
+  try { localStorage.setItem(CLE_PROFIL, String(ref)); } catch { /* */ }
+  window.lfbEvent?.('recherche_profil');
+  garder(p.genre); montrer(p.genre);
+  profils = [p, ...profils.filter((x) => x !== p)];
+  afficher();
+  try { pile.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch { /* */ }
+}
+
 // Le cœur sans profil : on explique, on propose de créer son profil, et la carte reste.
 function inviter(el) {
   if (el) { el.style.transition = 'transform .25s ease'; el.style.transform = ''; el.classList.remove('vers-oui', 'vers-non'); }
@@ -99,6 +119,8 @@ function inviter(el) {
 async function choisir(choix) {
   if (occupe || !profils.length) return;
   const el = pile.querySelector(`.swipe-carte[data-ref="${profils[0].ref}"]`);
+  // Premier geste : c'est maintenant qu'on demande qui la personne cherche.
+  if (!lire()) { if (el) { el.style.transition = 'transform .25s ease'; el.style.transform = ''; el.classList.remove('vers-oui', 'vers-non'); } return demander(); }
   if (choix === 'oui') return inviter(el);
   occupe = true;
   if (el) { el.style.transition = 'transform .35s ease, opacity .35s ease'; el.style.transform = 'translateX(-130%) rotate(-18deg)'; el.style.opacity = '0'; }
@@ -129,6 +151,8 @@ function glisser(el) {
 }
 
 if (bloc && pile) {
+  formCherche?.addEventListener('submit', (e) => { e.preventDefault(); chercher(formCherche.elements.ref.value); });
+  const demande = new URLSearchParams(location.search).get('profil');
   bloc.addEventListener('click', (e) => {
     if (e.target.closest('[data-swipe-non]')) return choisir('non');
     if (e.target.closest('[data-swipe-oui]')) return choisir('oui');
@@ -144,13 +168,15 @@ if (bloc && pile) {
       if (session) {
         bloc.classList.add('is-membre');
         titre.textContent = 'Tes profils t’attendent';
+        if (demande) { chercher(demande); return; }
         pile.innerHTML = '<div class="swipe-message"><h2>Reprends ton swipe</h2><p>Les profils qui te correspondent, tes cœurs et tes matchs.</p><p class="po-actions"><a class="po-btn" href="/rencontres/swipe/">Swiper</a><a class="po-btn-verre" href="/mon-espace/">Mon espace</a></p></div>';
         return;
       }
     } catch { /* sans session : visiteur */ }
     try { ({ annonces: tous } = await api({ action: 'annonces_publiques' })); } catch { tous = []; }
     const v = lire();
-    if (v) montrer(v); else if (tous.length) demander(); else afficher();
+    if (v) montrer(v); else { profils = [...tous]; afficher(); }
+    if (demande) chercher(demande);
   })();
 }
 
