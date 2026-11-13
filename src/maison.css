@@ -4189,3 +4189,6 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .swipe-cherche button { height: 44px; padding: 0 20px; border-radius: 999px; border: 0; background: #2F2B3D; color: #fff; font: inherit; font-weight: 600; cursor: pointer; }
 .swipe-cherche-statut { flex: 1 0 100%; margin: 0; min-height: 0; text-align: center; font-size: 14px; color: #8a1024 !important; }
 .swipe-cherche-statut:empty { display: none; }
+
+/* Différence avec ce que la personne cherche : une simple ligne rouge, rien de bloquant */
+.espace-diff-ligne { margin: 4px 0 8px; color: #b3261e !important; font-weight: 600; }
