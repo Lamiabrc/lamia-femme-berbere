@@ -97,6 +97,16 @@ async function chargerTesteurs() {
   } catch (err) { box.innerHTML = `<p class="cl-vide">${esc(erreur(err.code))}</p>`; }
 }
 $('[data-ouvrir-testeurs]').addEventListener('click', () => { location.hash = 'testeurs'; });
+$('[data-testeurs-relancer]').addEventListener('click', async (e) => {
+  const st = $('[data-testeurs-relance]');
+  if (!confirm('Envoyer la notification « Devenir testeur » à tous les testeurs de la liste ?')) return;
+  e.target.disabled = true; st.textContent = 'Envoi…';
+  try {
+    const r = await api({ action: 'lamia_testeurs_relancer' }, await jetonFrais());
+    st.textContent = `Notification reçue par ${r.membres_prevenus} testeur${r.membres_prevenus > 1 ? 's' : ''} sur ${r.testeurs} (les autres n’ont pas activé les notifications : ils verront le bandeau sur le site).`;
+  } catch (err) { st.textContent = erreur(err.code); }
+  e.target.disabled = false;
+});
 
 // ---------------------------------------------------------------- écrire la première à un membre (par son adresse email)
 $('[data-ouvrir-ecrire-a]').addEventListener('click', () => { const f = $('[data-ecrire-a]'); f.hidden = !f.hidden; if (!f.hidden) f.email.focus(); });

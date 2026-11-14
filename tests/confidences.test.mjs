@@ -202,3 +202,22 @@ test('le membre voit dans l’appli qu’il a un message de Lamia non lu', async
   await call(be, { action: 'mes_conversations' }, 'G');
   assert.equal((await call(be, { action: 'mes_non_lus' }, 'G')).body.non_lus, 0);
 });
+
+test('les testeurs de la liste reçoivent la notification « Devenir testeur » qui ouvre Google Play', async () => {
+  const be = backend({ users: { L: lamia, G: gratuit, N: nadia } });
+  const ua = createECDH('prime256v1'); ua.generateKeys();
+  be.db.push_subscriptions.push({ id: 'p1', user_id: 'g', pour: 'membre', endpoint: 'https://push.example/g', p256dh: b64u(ua.getPublicKey()), auth: b64u(randomBytes(16)) });
+  be.db.testeurs_play.push({ user_id: 'g', email: 'gratuit@exemple.fr', ajoute_at: '2026-11-14' }, { user_id: 'nadia', email: 'nadia@exemple.fr', ajoute_at: null });
+  // Bandeau : seul un membre sur la liste reçoit le lien.
+  assert.equal((await call(be, { action: 'testeur_play_moi' })).status, 401);
+  assert.deepEqual((await call(be, { action: 'testeur_play_moi' }, 'G')).body, { ok: true, sur_liste: true, lien: 'https://play.google.com/apps/testing/com.lamiafemmeberbere.lfb' });
+  assert.equal((await call(be, { action: 'testeur_play_moi' }, 'N')).body.sur_liste, false);
+  // Relance par Lamia seule.
+  assert.equal((await call(be, { action: 'lamia_testeurs_relancer' }, 'N')).status, 403);
+  const r = await call(be, { action: 'lamia_testeurs_relancer' }, 'L');
+  assert.deepEqual([r.body.testeurs, r.body.membres_prevenus, r.body.telephones], [1, 1, 1]);
+  assert.equal(be.pushes.length, 1);
+  // Le soir, le nouveau testeur reçoit aussi la notification.
+  await handleConfidences(req({ action: 'testeurs_play_cron' }), { env, fetcher: be.fetcher, cron: true });
+  assert.equal(be.pushes.length, 2);
+});

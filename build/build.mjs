@@ -1524,6 +1524,7 @@ page(
     <h2>Testeurs Google Play</h2>
     <p class="cl-aide">Chaque membre qui répond « Oui » sur le site arrive ici (et tu reçois une alerte). Le matin, la tâche programmée l’ajoute à la liste « Testeurs Tayri » de la Play Console ; le soir, il reçoit le lien du test dans sa conversation avec toi. Tu peux lui écrire ou ouvrir son profil.</p>
     <p class="cl-aide" data-testeurs-resume></p>
+    <p class="cl-aide">Google ne compte que ceux qui ont appuyé sur « Devenir testeur ». Sur le site, un bandeau le leur rappelle avec le bouton. <button type="button" class="cl-btn cl-petit" data-testeurs-relancer>Envoyer la notification « Devenir testeur »</button> <span data-testeurs-relance role="status"></span></p>
     <div class="cl-carte" data-testeurs></div>
   </section>
 
