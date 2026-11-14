@@ -438,3 +438,5 @@
   .carte-map > div { grid-area: auto !important; }
   .carte-noeud { width: auto; height: auto; border-radius: 18px; padding: 16px; justify-self: stretch; order: -1; }
 }
+.aide.is-erreur { color: #a3202a; font-weight: 600; }
+[data-statut-profil] p { margin: 8px 0; }
