@@ -333,3 +333,48 @@ test('fiche masquée dont l’annonce est en pause : pas de mise en relation', a
   await lancerPilote(ctx);
   assert.equal(db.annonce_interets.find((i) => i.id === 'i-1').statut, 'a_traiter');
 });
+
+// Tableau de bord, Activité : Lamia met deux personnes en relation à la main (14 nov. 2026).
+const matcherMain = (ctx, corps) => handleAnnonces('annonce_pilote', corps, { ...ctx({ id: 'adm', email: 'a@x.fr' }), admin: true });
+const annonceKarim = (extra = {}) => ({ id: 'a-karim', ref: 12, user_id: 'u-karim', email: 'karim@example.com', status: 'publiee', prenom: 'Karim', genre: 'homme', en_match: false, test: false, pays: 'France', matching: {}, ...extra });
+
+test('mise en relation à la main sans demande : la demande est créée et passe en relation', async () => {
+  const { db, ctx } = base({ annonces: [annonceNina(), annonceKarim()] });
+  const r = await lire(await matcherMain(ctx, { op: 'matcher', a: '11', b: '12' }));
+  assert.equal(r.status, 200);
+  assert.equal(r.fait, 'n° 11 ↔ n° 12');
+  const i = db.annonce_interets.find((x) => x.cible_ref === 12);
+  assert.equal(i.statut, 'mis_en_relation');
+  assert.equal(r.statut.matchs.length, 1);
+});
+
+test('mise en relation à la main : elle passe même quand la formule est déjà pleine', async () => {
+  const { db, ctx } = base({
+    annonces: [annonceNina(), annonceKarim(), { ...annonceKarim({ id: 'a-autre', ref: 13, user_id: 'u-autre', email: 'autre@example.com', prenom: 'Autre' }) }],
+    annonce_interets: [{ id: 'i-deja', demandeur_id: 'a-nina', cible_ref: 13, statut: 'mis_en_relation', reciproque: true, created_at: '2026-11-02T00:00:00Z' }],
+  });
+  const r = await lire(await matcherMain(ctx, { op: 'matcher', a: '12', b: '11' }));
+  assert.equal(r.status, 200);
+  assert.equal(db.annonce_interets.find((x) => x.demandeur_id === 'a-karim' && x.cible_ref === 11).statut, 'mis_en_relation');
+});
+
+test('mise en relation à la main : un profil pas validé donne un message clair', async () => {
+  const { ctx } = base({ annonces: [annonceNina(), annonceKarim({ status: 'a_verifier' })] });
+  const r = await lire(await matcherMain(ctx, { op: 'matcher', a: '11', b: '12' }));
+  assert.equal(r.status, 409);
+  assert.match(r.message, /n° 12 n’est pas encore validé/);
+});
+
+test('où en est un profil : ses matchs en cours et les oui réciproques en attente', async () => {
+  const { ctx } = base({
+    annonces: [annonceNina(), annonceKarim()],
+    annonce_interets: [
+      { id: 'i-1', demandeur_id: 'a-nina', cible_ref: 12, statut: 'mis_en_relation', reciproque: true, created_at: '2026-11-02T00:00:00Z' },
+      { id: 'i-2', demandeur_id: 'a-karim', cible_ref: 100009, statut: 'a_traiter', reciproque: true, created_at: '2026-11-02T00:00:00Z' },
+    ],
+  });
+  const r = await lire(await matcherMain(ctx, { op: 'statut', ref: '12' }));
+  assert.deepEqual(r.statut.matchs.map((m) => m.avec), [11]);
+  assert.deepEqual(r.statut.reciproques.map((m) => m.avec), [100009]);
+  assert.equal(r.statut.profil, 'validé');
+});
