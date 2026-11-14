@@ -74,6 +74,10 @@
   window.addEventListener('unhandledrejection', function (e) {
     var r = e && e.reason;
     var m = r && (r.message || (typeof r === 'string' ? r : ''));
-    if (m && !/AbortError|Failed to fetch|NetworkError|Load failed/i.test(m)) signaler('page', m, '', 0);
+    if (!m || /AbortError|Failed to fetch|NetworkError|Load failed/i.test(m)) return;
+    // L'endroit de l'erreur (fichier et ligne), pour que la correction ne soit pas une devinette.
+    var ou = '';
+    try { var l = /\/assets\/([\w.-]+\.js)[^:\s)]*:(\d+)/.exec(String((r && r.stack) || '')); if (l) ou = '/assets/' + l[1] + ':' + l[2]; } catch (x) { ou = ''; }
+    signaler('page', m, ou, 0);
   });
 })();
