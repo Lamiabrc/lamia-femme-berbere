@@ -117,6 +117,23 @@
     <div class="tdb-chiffres" data-pilote-chiffres></div>
     <div class="tdb-grille-app">
       <div class="tdb-carte">
+        <h2>Mettre en relation à la main</h2>
+        <form data-matcher-main class="tdb-form-pilote">
+          <label>Profil n°<input type="number" name="a" min="1" required inputmode="numeric"></label>
+          <label>avec le profil n°<input type="number" name="b" min="1" required inputmode="numeric"></label>
+          <button type="submit" class="btn btn-ink">Les mettre en relation</button>
+        </form>
+        <p class="aide" data-matcher-statut role="status">Les deux sont prévenus et une discussion de 7 jours s’ouvre. Ça marche même sans demande entre eux, et même si leur formule est déjà pleine.</p>
+      </div>
+      <div class="tdb-carte">
+        <h2>Où en est un profil ?</h2>
+        <form data-statut-cherche class="tdb-form-pilote">
+          <label>Profil n°<input type="number" name="ref" min="1" required inputmode="numeric"></label>
+          <button type="submit" class="btn btn-line">Voir son statut</button>
+        </form>
+        <div data-statut-profil role="status"></div>
+      </div>
+      <div class="tdb-carte">
         <h2>Réglages du pilote</h2>
         <form data-pilote-reglages class="tdb-form-pilote">
           <label class="tdb-coche"><input type="checkbox" name="actif"> Pilote automatique activé</label>
@@ -127,7 +144,7 @@
         <p class="aide">Les paires avec un blocage de ton algorithme (secteur, âge, religion…) ne sont jamais proposées automatiquement. Une personne qui dit non ne reçoit plus ce profil.</p>
       </div>
       <div class="tdb-carte">
-        <h2>Mises en relation</h2>
+        <h2>Mises en relation <small>(en cours d’abord)</small></h2>
         <ul class="tdb-liste-activite" data-pilote-relations></ul>
       </div>
       <div class="tdb-carte">

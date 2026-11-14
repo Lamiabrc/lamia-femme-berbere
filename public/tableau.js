@@ -251,7 +251,7 @@ document.addEventListener('submit', async (e) => {
 
 // ---------------------------------------------------------------- Application : journal « qui fait quoi », retraits, notifications
 let filtreJournal = '';
-const conf = async (body) => { const r = await fetch('/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(body) }); const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'erreur'); return d; };
+const conf = async (body) => { const r = await fetch('/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(body) }); const d = await r.json().catch(() => ({})); if (!r.ok) throw Object.assign(new Error(d.error || 'erreur'), { code: d.error, texte: d.message }); return d; };
 async function pastilleJournal() {
   try { const d = await conf({ action: 'annonce_journal', categorie: 'aucune' }); $$('[data-journal-pastille]').forEach((p) => { p.textContent = d.non_lus; p.hidden = !d.non_lus; }); } catch { /* */ }
 }
@@ -1188,13 +1188,46 @@ function peindreActivite(d) {
   const att = d.en_attente || [], bv = $('[data-valider-tout]');
   bv.hidden = !att.length; bv.textContent = `Profils en attente (${att.length}) : valider les complets, relancer les autres`;
   bv.title = att.map((a) => `${a.prenom || ''} n° ${a.ref}`).join(', ');
-  $('[data-pilote-bloques]').innerHTML = (d.bloques || []).map((x) => `<li><span><b>${escA(x.a)}</b> ↔ <b>${escA(x.b)}</b><small>${escA(x.raison)}</small></span></li>`).join('') || '<li>Rien de bloqué.</li>';
+  $('[data-pilote-bloques]').innerHTML = (d.bloques || []).map((x) => `<li><span><b>${escA(x.a)}</b> ↔ <b>${escA(x.b)}</b><small>${escA(x.raison)}</small></span><button type="button" class="link-button" data-forcer="${escA(x.id)}">Les mettre en relation</button></li>`).join('') || '<li>Rien de bloqué.</li>';
+  if (d.statut) peindreStatut(d.statut);
+}
+// Où en est une personne, en clair : ses matchs en cours et ce qui l'attend.
+function peindreStatut(s) {
+  const box = $('[data-statut-profil]');
+  if (!box) return;
+  if (!s.existe) { box.innerHTML = `<p class="aide is-erreur">Aucun profil n° ${escA(s.ref)}.</p>`; return; }
+  const quand = (iso) => (iso ? new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : '');
+  box.innerHTML = `<p><b>${escA(s.prenom || (s.fiche ? 'Fiche' : 'Profil'))} n° ${escA(s.ref)}</b> · ${escA(s.profil)}${s.compte ? '' : ' · pas de compte'}${s.pause ? ' · <b>en pause</b>' : ''}</p>
+    ${s.matchs.length ? `<p><b>${s.matchs.length} match(s) en cours :</b></p><ul class="tdb-liste-activite">${s.matchs.map((m) => `<li><span>avec n° ${escA(m.avec)}<small>depuis le ${escA(quand(m.depuis))} · ${escA(m.etat)}</small></span><button type="button" class="link-button" data-dematcher="${escA(m.id)}">Annuler ce match</button></li>`).join('')}</ul>` : '<p>Aucun match en cours : cette personne est libre.</p>'}
+    ${s.reciproques.length ? `<p><b>Les deux ont dit oui, en attente :</b></p><ul class="tdb-liste-activite">${s.reciproques.map((r) => `<li><span>avec n° ${escA(r.avec)}</span><button type="button" class="link-button" data-forcer="${escA(r.id)}">Les mettre en relation</button></li>`).join('')}</ul>` : ''}
+    <p class="aide">${s.demandes} demande(s) en attente · ${s.reserve} gardée(s) en réserve · ${s.propositions} proposition(s) sans réponse · ${s.termines} match(s) terminé(s)</p>`;
 }
 async function chargerActivite(corps = { op: 'etat' }) {
   $('[data-pilote-statut]').textContent = 'Chargement…';
   try { const d = await conf({ action: 'annonce_pilote', ...corps }); peindreActivite(d); if (d.lance) $('[data-pilote-statut]').textContent += ` ➜ Envoi fait : ${d.lance.propositions || 0} proposition(s), ${d.lance.relations?.length || 0} mise(s) en relation.`; }
-  catch { $('[data-pilote-statut]').textContent = 'L’activité ne se charge pas. Réessaie dans un instant.'; }
+  catch (err) { $('[data-pilote-statut]').textContent = err.texte || 'L’activité ne se charge pas. Réessaie dans un instant.'; }
 }
+// Le numéro affiché dans « Où en est… », pour le rafraîchir après une action.
+const refStatut = () => { const v = $('[data-statut-cherche]')?.ref.value.trim(); return v ? { ref: v } : {}; };
+// Mettre deux personnes en relation à la main, et voir où en est quelqu'un.
+$('[data-matcher-main]')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = e.target, st = $('[data-matcher-statut]'), a = f.a.value.trim(), b = f.b.value.trim();
+  if (!confirm(`Mettre en relation n° ${a} et n° ${b} ?\n\nLes deux sont prévenus et une discussion de 7 jours s’ouvre (si les deux ont un compte). Cela passe avant la limite de leur formule.`)) return;
+  f.querySelector('button').disabled = true; st.textContent = 'Mise en relation…'; st.classList.remove('is-erreur');
+  try {
+    const d = await conf({ action: 'annonce_pilote', op: 'matcher', a, b });
+    peindreActivite(d); st.textContent = `C’est fait : ${d.fait}. Les deux sont prévenus.`; f.reset();
+  } catch (err) { st.textContent = err.texte || 'Ça n’a pas fonctionné. Réessaie dans un instant.'; st.classList.add('is-erreur'); }
+  f.querySelector('button').disabled = false;
+});
+$('[data-statut-cherche]')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const box = $('[data-statut-profil]');
+  box.innerHTML = '<p class="aide">Chargement…</p>';
+  try { const d = await conf({ action: 'annonce_pilote', op: 'statut', ref: e.target.ref.value.trim() }); peindreActivite(d); }
+  catch (err) { box.innerHTML = `<p class="aide is-erreur">${escA(err.texte || 'Ça ne se charge pas. Réessaie.')}</p>`; }
+});
 $('[data-pilote-reglages]')?.addEventListener('submit', (e) => { e.preventDefault(); const f = e.target; chargerActivite({ op: 'reglages', actif: f.actif.checked, parPersonne: Number(f.parPersonne.value), scoreMin: Number(f.scoreMin.value) }); });
 $('[data-valider-tout]')?.addEventListener('click', async (e) => {
   if (!confirm(`Profils en attente : ${e.target.title}\n\nLes profils complets (photo, email, contact) sont validés. Aucun profil incomplet n’est validé : chacun reçoit un message avec ce qui lui manque, et il sera validé tout seul dès qu’il l’ajoute.`)) return;
@@ -1206,8 +1239,10 @@ $('[data-valider-tout]')?.addEventListener('click', async (e) => {
 $('[data-pilote-lancer]')?.addEventListener('click', (e) => { e.target.disabled = true; chargerActivite({ op: 'lancer' }).finally(() => { e.target.disabled = false; }); });
 document.addEventListener('click', (e) => {
   const d = e.target.closest('[data-dematcher]'), p = e.target.closest('[data-retirer-prop]');
-  if (d && confirm('Annuler ce match ? La discussion se ferme et leurs autres choix reviennent.')) chargerActivite({ op: 'dematcher', id: d.dataset.dematcher });
+  if (d && confirm('Annuler ce match ? La discussion se ferme et leurs autres choix reviennent.')) chargerActivite({ op: 'dematcher', id: d.dataset.dematcher, ...refStatut() });
   if (p) chargerActivite({ op: 'retirer_proposition', id: p.dataset.retirerProp });
+  const fo = e.target.closest('[data-forcer]');
+  if (fo && confirm('Les mettre en relation maintenant ? Les deux sont prévenus et la discussion s’ouvre. Cela passe avant la limite de leur formule.')) chargerActivite({ op: 'forcer', id: fo.dataset.forcer, ...refStatut() });
 });
 
 // ---------------------------------------------------------------- coaching Prestige : créneaux et réservations
