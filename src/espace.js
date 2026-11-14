@@ -412,7 +412,7 @@ async function monProfil(session) {
 
 // Suivi : mises en relation offertes et du mois, speed datings inclus, demandes envoyées.
 // « coeur » : ancienne formule (supprimée le 31/10/2026), gardée pour un éventuel ancien abonnement.
-const QUOTAS = { coeur: { nom: 'Cœur', mises: 3, sd: 1 }, passion: { nom: 'Passion', mises: 10, sd: 1 }, prestige: { nom: 'Prestige', mises: null, sd: 2 } };
+const QUOTAS = { coeur: { nom: 'Cœur', mises: 3, sd: 1 }, passion: { nom: 'Passion', mises: null, sd: 1 }, prestige: { nom: 'Prestige', mises: null, sd: 2 } };
 const ETAT_DEMANDE = { mis_en_relation: 'Match en cours', en_reserve: 'En réserve', pas_compatible: 'Sans suite', dematche: 'Match terminé' };
 const FIN_DEMANDE = { autre: 'Non de sa part', moi: 'Non de ta part', lamia: 'Annulée par Lamia', indispo: 'Plus disponible' };
 async function suivi(el, p) {

@@ -1681,7 +1681,7 @@ page(
       <p class="po-eyebrow">Par Lamia, marieuse kabyle</p>
       <h1 id="abo-titre">Les formules de rencontre kabyle</h1>
       <p class="po-sub">En gratuit, un match à la fois : dès qu’il se termine, un autre peut commencer.</p>
-      <p class="po-lead">Ou choisis le rythme qui te ressemble : 10 matchs par mois et 2 en cours, ou illimités et 5 en cours, avec le coaching et l’option mariage de Lamia. Sans engagement, résiliable en un clic depuis ton espace.</p>
+      <p class="po-lead">Ou choisis le rythme qui te ressemble : des matchs illimités, 2 ou 5 en cours en même temps, avec le coaching et l’option mariage de Lamia. Sans engagement, résiliable en un clic depuis ton espace.</p>
       <p class="po-lead">Les matchs sont gratuits pour tout le monde. Pour soutenir Lamia, <a class="text-link" href="/salon/">viens au live</a> : depuis l’Algérie, où le paiement en ligne n’est pas possible, ta présence compte autant.</p>
     </div>
     <figure class="po-lamia"><img src="/images/lamia/lamia-portrait-tatouages-rond-480.webp" alt="Lamia Femme Berbère" width="200" height="200"><figcaption>Lamia · ta marieuse</figcaption></figure>

@@ -246,7 +246,7 @@ test('swipe sans limite ; matchs en cours selon la formule : Découverte 1, Pass
   r = await handleAnnonces('annonce_swipe', { ref: 34, choix: 'oui' }, c('decouverte', 0));
   assert.equal(r.status, 200);
 });
-test('quotas : Découverte sans total (1 match à la fois) ; Passion 10 par mois, Prestige illimité', async () => {
+test('quotas : matchs illimités pour tout le monde (Lamia, 14 nov. 2026) ; seules les places en cours changent', async () => {
   const { ctx, db } = monde();
   db.annonces.push({ id: 'a1', ref: 21, user_id: 'u1', email: 'nina@example.com', status: 'publiee', prenom: 'Nina', genre: 'femme', en_match: false, matchs_bonus: 0, pays: 'France' });
   const nina = { id: 'u1', email: 'nina@example.com' };
@@ -260,8 +260,8 @@ test('quotas : Découverte sans total (1 match à la fois) ; Passion 10 par mois
   assert.equal((await oui('decouverte', 5))[0], 200);
   db.annonces[0].pays = 'France';
   assert.equal((await oui('passion', 9))[0], 200);
-  const [s, r] = await oui('passion', 10);
-  assert.equal(s, 409); assert.equal(r.error, 'quota_matchs');
+  assert.equal((await oui('passion', 10))[0], 200);
+  assert.equal((await oui('passion', 40))[0], 200);
   assert.equal((await oui('prestige', 50))[0], 200);
 });
 test('la personne choisie est prévenue par email (sans savoir qui), au plus une fois toutes les 12 h ; les deux le sont quand c’est réciproque', async () => {
