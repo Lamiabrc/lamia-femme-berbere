@@ -1635,7 +1635,7 @@ const tableauFormules = () => {
   const lignes = [
     ['Prix par mois', 'Gratuit', eurosAbo(pa.mois), `${eurosAbo(pr.lancement.prix)} pour les ${pr.lancement.places} premiers abonnés, ${eurosAbo(pr.mois)} pour les inscriptions suivantes`],
     ['Prix à l’année', '–', eurosAbo(prixAnnuel(pa)), `${eurosAbo(prixAnnuel(pr, 0))} pour les ${pr.lancement.places} premiers abonnés, ${eurosAbo(prixAnnuel(pr))} pour les inscriptions suivantes`],
-    ['Matchs', `${d.mises} offert`, `${pa.mises} par mois`, 'Illimités'],
+    ['Matchs', 'Illimités', 'Illimités', 'Illimités'],
     ['Matchs en cours en même temps', d.matchs, pa.matchs, pr.matchs],
     ['Speed datings inclus par mois', '–', pa.speedDatings, pr.speedDatings],
     ['Swipe sans limite', oui, oui, oui],
@@ -1646,7 +1646,6 @@ const tableauFormules = () => {
     ['Tes questions à Lamia sur ton profil', non, oui, oui],
     ['Les Confidences avec Lamia (messages et vocaux)', non, oui, oui],
     ['Profil prioritaire dans le matching', non, non, oui],
-    ['Annonce présentée en priorité en live', non, non, oui],
     ['Coaching avec Lamia', non, non, '1 visio de 15 minutes par mois'],
     ['Option mariage, de la rencontre aux familles', non, non, oui],
   ];

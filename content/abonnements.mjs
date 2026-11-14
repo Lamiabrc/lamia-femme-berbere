@@ -9,8 +9,8 @@ export const FORMULES = [
     avantages: ['Matchs illimités, 2 en cours en même temps', 'Seconde chance : après un « pas pour moi », tu peux renvoyer ta demande, 2 fois par profil', 'Qui t’a choisi·e : les profils qui t’ont swipé·e, en tête de ta pile', 'La photo de ton match, s’il ou elle l’accepte', '1 speed dating par mois inclus', 'Tes questions à Lamia pour améliorer ton profil', 'Tout ce que contient Découverte'],
     mises: null, speedDatings: 1, photoMatch: true, swipesJour: null, quiMaChoisi: true, relancesRefus: 2, matchs: 2 },
   { id: 'prestige', nom: 'Prestige', mois: 4900, lancement: { prix: 2200, places: 20 }, accroche: 'L’accompagnement personnel de Lamia, jusqu’au mariage',
-    avantages: ['Matchs illimités, 5 en cours en même temps', 'Ton profil passe en priorité dans le matching', '2 speed datings par mois inclus', 'Coaching : 1 visio de 15 minutes par mois avec Lamia, pour ton profil et tes rencontres', 'Option mariage : Lamia t’accompagne dans ton projet, de la rencontre aux familles', 'Ton annonce présentée en priorité en live', 'Tout ce que contient Passion'],
-    mises: null, speedDatings: 2, prioritaire: true, visio: 1, live: true, coaching: true, mariage: true, photoMatch: true, swipesJour: null, quiMaChoisi: true, relancesRefus: 2, matchs: 5 },
+    avantages: ['Matchs illimités, 5 en cours en même temps', 'Ton profil passe en priorité dans le matching', '2 speed datings par mois inclus', 'Coaching : 1 visio de 15 minutes par mois avec Lamia, pour ton profil et tes rencontres', 'Option mariage : Lamia t’accompagne dans ton projet, de la rencontre aux familles', 'Tout ce que contient Passion'],
+    mises: null, speedDatings: 2, prioritaire: true, visio: 1, coaching: true, mariage: true, photoMatch: true, swipesJour: null, quiMaChoisi: true, relancesRefus: 2, matchs: 5 },
 ];
 // À l'année : 2 mois offerts (on paie 10 mois).
 // Prix de lancement : valable pour les premiers abonnés, qui le gardent tant qu'ils restent abonnés (prix fixé chez Stripe à l'inscription).
