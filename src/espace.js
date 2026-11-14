@@ -264,7 +264,8 @@ async function achats(session) {
 // Profil confié à Lamia : état, avantages, modification, fin d'un match en cours.
 const ETAT_PROFIL = { a_verifier: 'En cours de vérification par Lamia', publiee: '✓ Vérifié par Lamia', refusee: 'Non retenu pour le moment' };
 async function appelProfil(body, session) {
-  const r = await fetch('/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` }, body: JSON.stringify(body) });
+  // 20 secondes au plus : si le site est saturé, on affiche « Réessaie » au lieu de rester sur « Un instant… ».
+  const r = await fetch('/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` }, body: JSON.stringify(body), signal: AbortSignal.timeout(20000) });
   const d = await r.json().catch(() => ({}));
   if (!r.ok || d.error) throw Object.assign(new Error(d.error || 'erreur'), { code: d.error });
   return d;
