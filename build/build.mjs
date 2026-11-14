@@ -154,6 +154,7 @@ ${noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" hr
 <link rel="manifest" href="/maison.webmanifest">
 <script src="/assets/lien-mot-de-passe.js"></script>
 <script src="/assets/version-play.js"></script>
+<script src="/assets/erreurs.js" charset="utf-8"></script>
 <link rel="apple-touch-icon" href="/images/marque/lfb-icone-180.png">
 <meta name="apple-mobile-web-app-title" content="Tayri">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -2191,7 +2192,7 @@ await cp(join(ROOT, 'public'), DIST, { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await writeFile(join(DIST, 'assets', 'editable.json'), JSON.stringify({ fields: [...EDITABLE, ...REGISTRE], defaults: DEFAULTS }));
-for (const f of ['lien-mot-de-passe.js', 'version-play.js', 'abonnement.js', 'abonnement-merci.js', 'swipe.js', 'swipe-accueil.js', 'sincerite.js', 'signaler.js', 'nouveautes.js', 'live.js', 'confirmer.js', 'visio-invite.js', 'maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'soirees.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'annonces.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
+for (const f of ['lien-mot-de-passe.js', 'version-play.js', 'erreurs.js', 'abonnement.js', 'abonnement-merci.js', 'swipe.js', 'swipe-accueil.js', 'sincerite.js', 'signaler.js', 'nouveautes.js', 'live.js', 'confirmer.js', 'visio-invite.js', 'maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'soirees.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'annonces.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
 await cp(join(ROOT, 'content', 'shipping.mjs'), join(DIST, 'assets', 'shipping.mjs'));
 await cp(join(ROOT, 'content', 'rubriques.mjs'), join(DIST, 'assets', 'rubriques.mjs'));
 await cp(join(ROOT, 'content', 'matching-options.mjs'), join(DIST, 'assets', 'matching-options.mjs'));

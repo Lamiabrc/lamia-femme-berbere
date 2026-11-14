@@ -157,3 +157,28 @@ test('annonce du soir : mise en avant 7 jours sur le site, sans rallonge au seco
   assert.equal((await appel(be, { action: 'live_outil_annonce_avant', cle: CLE, ref: 999 })).status, 404);
   assert.equal((await appel(be, { action: 'live_outil_annonce_avant', cle: 'mauvaise-cle-mais-assez-longue-pour-etre-lue-0000', ref: 32 })).status, 403);
 });
+
+// ---------------------------------------------------------------- les erreurs remontées par l'appli
+test('erreurs de l’appli : remontées sans compte ou avec, lues seulement par la console, avec le numéro du profil', async () => {
+  const be = monde();
+  Object.assign(be.db, { erreurs_appli: [], annonces: [{ id: 'a1', ref: 41, prenom: 'Nadia', status: 'publiee', user_id: 'nadia' }] });
+  assert.equal((await appel(be, { action: 'live_erreur', message: '' })).status, 400);
+  assert.equal((await appel(be, { action: 'live_erreur', type: 'appel', message: 'temporary_failure', appel: '/api/confidences/ · interet', statut: 502, page: '/rencontres/swipe/', appareil: 'Android 14', version: '9f1c' }, 'tn')).status, 200);
+  assert.equal((await appel(be, { action: 'live_erreur', type: 'nimporte', message: 'x is not defined'.padEnd(900, '!') })).status, 200);
+  assert.equal(be.db.erreurs_appli.length, 2);
+  assert.equal(be.db.erreurs_appli[0].user_id, 'nadia');
+  assert.equal(be.db.erreurs_appli[1].user_id, null);
+  assert.equal(be.db.erreurs_appli[1].type, 'page', 'un type inconnu devient « page »');
+  assert.equal(be.db.erreurs_appli[1].message.length, 300);
+  assert.equal((await appel(be, { action: 'live_outil_erreurs' })).status, 403, 'le public ne lit pas les erreurs');
+  const l = await appel(be, { action: 'live_outil_erreurs', cle: CLE });
+  assert.equal(l.body.erreurs.length, 2);
+  assert.equal(l.body.non_vues, 2);
+  const deNadia = l.body.erreurs.find((e) => e.connecte);
+  assert.equal(deNadia.ref, 41);
+  assert.equal(deNadia.prenom, 'Nadia');
+  assert.equal(deNadia.statut, 502);
+  assert.equal(deNadia.user_id, undefined);
+  await appel(be, { action: 'live_outil_erreurs_vues', cle: CLE });
+  assert.equal((await appel(be, { action: 'live_outil_erreurs', cle: CLE })).body.non_vues, 0);
+});
