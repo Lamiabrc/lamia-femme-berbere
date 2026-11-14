@@ -29,8 +29,11 @@ async function render() {
   $('[data-espace-in]').hidden = !session || recovering;
   if (!session || recovering) return;
   const u = session.user;
-  $('[data-espace-email]').textContent = u.email || '';
-  $('[data-espace-nom]').textContent = u.user_metadata?.first_name || '';
+  // Le titre « Bonjour … » est remplacé par la salutation de la discussion (« Azul … ») : le prénom n'y est alors plus.
+  // Sans cette précaution, le passage suivant (retour sur l'onglet, jeton renouvelé) plantait ici et plus rien ne se mettait à jour.
+  const zoneEmail = $('[data-espace-email]'), zoneNom = $('[data-espace-nom]');
+  if (zoneEmail) zoneEmail.textContent = u.email || '';
+  if (zoneNom) zoneNom.textContent = u.user_metadata?.first_name || '';
   $('[data-espace-admin]').hidden = u.app_metadata?.role !== 'admin';
   document.body.classList.toggle('espace-est-admin', u.app_metadata?.role === 'admin');
   achats(session);

@@ -42,6 +42,10 @@
     } catch (e) { /* jamais d'erreur à cause du signalement */ }
   }
 
+  var partie = false;
+  window.addEventListener('pagehide', function () { partie = true; });
+  window.addEventListener('beforeunload', function () { partie = true; });
+
   // Un appel au site qui échoue. Les refus normaux (pas connecté, pas le droit, déjà fait, trop de demandes) ne sont pas des erreurs.
   var NORMAUX = { 401: 1, 403: 1, 404: 1, 409: 1, 429: 1 };
   window.fetch = function (ressource, options) {
@@ -60,7 +64,13 @@
       return rep;
     }, function (err) {
       // Pas de réponse du tout : coupure de réseau. Rien à envoyer si on est hors ligne ; sinon on le note.
-      if (suivi && navigator.onLine !== false && !(err && err.name === 'AbortError')) signaler('reseau', 'pas de réponse du site', chemin + (action ? ' · ' + action : ''), 0);
+      // Quand on quitte une page, ses appels en cours sont coupés : ce n'est pas une panne. On attend donc un instant,
+      // et on ne signale que si la personne est toujours sur la page, à l'écran.
+      if (suivi && navigator.onLine !== false && !(err && err.name === 'AbortError')) {
+        setTimeout(function () {
+          if (!partie && document.visibilityState === 'visible') signaler('reseau', 'pas de réponse du site', chemin + (action ? ' · ' + action : ''), 0);
+        }, 1500);
+      }
       throw err;
     });
   };
@@ -74,6 +84,10 @@
   window.addEventListener('unhandledrejection', function (e) {
     var r = e && e.reason;
     var m = r && (r.message || (typeof r === 'string' ? r : ''));
-    if (m && !/AbortError|Failed to fetch|NetworkError|Load failed/i.test(m)) signaler('page', m, '', 0);
+    if (!m || /AbortError|Failed to fetch|NetworkError|Load failed/i.test(m)) return;
+    // L'endroit de l'erreur (fichier et ligne), pour que la correction ne soit pas une devinette.
+    var ou = '';
+    try { var l = /\/assets\/([\w.-]+\.js)[^:\s)]*:(\d+)/.exec(String((r && r.stack) || '')); if (l) ou = '/assets/' + l[1] + ':' + l[2]; } catch (x) { ou = ''; }
+    signaler('page', m, ou, 0);
   });
 })();
