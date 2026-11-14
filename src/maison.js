@@ -953,6 +953,35 @@ renderSocials();
   } catch { /* */ }
 })();
 
+// Testeurs sur la liste Google Play (14 nov. 2026) : bandeau avec le bouton qui ouvre directement « Devenir testeur ».
+// Google ne compte que ceux qui ont appuyé sur ce bouton. Revient tous les 2 jours tant que le membre n'a pas dit « C'est fait ».
+(function devenirTesteur() {
+  try {
+    if (window.LFB_PLAY || /^\/(confidences-lamia|tableau-de-bord|admin|pilotage)/.test(location.pathname)) return;
+    if (localStorage.getItem('lfb_testeur_fait') === '1') return;
+    if (Date.now() - Number(localStorage.getItem('lfb_testeur_relance') || 0) < 2 * 864e5) return;
+    const jeton = JSON.parse(localStorage.getItem('sb-tybwvxinigahhntfeeur-auth-token') || 'null')?.access_token;
+    if (!jeton) return;
+    fetch('/api/confidences', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jeton}` }, body: JSON.stringify({ action: 'testeur_play_moi' }) })
+      .then((r) => (r.ok ? r.json() : null)).then((r) => {
+        if (!r?.sur_liste || !/^https:\/\/play\.google\.com\//.test(r.lien || '')) return;
+        const d = document.createElement('div');
+        d.className = 'lfb-testeur-play';
+        d.setAttribute('role', 'region'); d.setAttribute('aria-label', 'Test de Tayri sur Google Play');
+        d.innerHTML = '<p><strong>Dernière étape pour tester Tayri.</strong> Sur ton téléphone Android, ouvre la page Google Play et appuie sur « Devenir testeur », avec ton adresse Gmail. Sans ça, Google ne te compte pas.</p><p><a class="btn btn-ink" target="_blank" rel="noopener" data-ouvrir>Devenir testeur</a> <button type="button" class="btn btn-line" data-fait>C’est fait</button> <button type="button" class="btn btn-line" data-plus-tard>Plus tard</button></p>';
+        d.querySelector('[data-ouvrir]').href = r.lien;
+        const garder = (k, v) => { try { localStorage.setItem(k, v); } catch { /* */ } };
+        d.querySelector('[data-ouvrir]').addEventListener('click', () => { garder('lfb_testeur_relance', String(Date.now())); setTimeout(() => d.remove(), 500); });
+        d.querySelector('[data-fait]').onclick = () => { garder('lfb_testeur_fait', '1'); d.remove(); };
+        d.querySelector('[data-plus-tard]').onclick = () => { garder('lfb_testeur_relance', String(Date.now())); d.remove(); };
+        // Un autre bandeau du même endroit (message de Lamia) passe d'abord.
+        let essais = 0;
+        const montrer = () => { if (document.querySelector('.lfb-testeur-play') && essais++ < 40) { setTimeout(montrer, 3000); return; } document.body.append(d); };
+        setTimeout(montrer, 3000);
+      }).catch(() => {});
+  } catch { /* */ }
+})();
+
 // Lamia en direct (12 nov. 2026) : pastille sur l'onglet Live et fenêtre à l'ouverture de l'appli, une fois par live.
 // L'état vient de /api/live/ (public, gardé 20 s par Vercel) et chaque appareil ne le relit qu'une fois par minute.
 (async function lamiaEnDirect() {
