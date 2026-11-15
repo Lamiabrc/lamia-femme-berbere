@@ -267,3 +267,11 @@ test('sans rencontre : un membre gratuit choisit « sans rencontre » et peut é
   await ferme({ action: 'sans_rencontre', choisir: false }, 'F');
   assert.equal((await ferme({ action: 'confidences_acces' }, 'F')).body.abonne, false);
 });
+
+test('pause dans les rencontres : la personne garde Lamia en poche et peut lui écrire', async () => {
+  const paul = { id: 'paul', email: 'paul@exemple.fr', email_confirmed_at: '2026', app_metadata: {} };
+  const be = backend({ users: { P: paul } });
+  be.db.annonces = [{ id: 'a-paul', user_id: 'paul', pause_at: '2026-11-15T10:00:00Z' }];
+  const r = await handleConfidences(req({ action: 'confidences_acces' }, 'P'), { env: { ...env, CONFIDENCES_OUVERTES: '' }, fetcher: be.fetcher, etat: async () => ({ abonnement: null }) });
+  assert.equal((await r.json()).abonne, true);
+});

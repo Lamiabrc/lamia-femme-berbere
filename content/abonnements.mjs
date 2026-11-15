@@ -3,14 +3,14 @@
 // le prix payé est toujours relu ici côté serveur, jamais repris du navigateur.
 export const FORMULES = [
   { id: 'decouverte', nom: 'Découverte', mois: 0, accroche: 'Pour commencer, sans rien payer',
-    avantages: ['Ton profil confié à Lamia, vérifié et affiché anonymement', 'Swipe sans limite', 'Matchs gratuits, 1 à la fois : dès qu’il se termine, un autre peut commencer', 'En live : 1 match supplémentaire toutes les 2 semaines', '7 jours de discussion avec ton match, puis vous échangez vos numéros', 'Le nombre de personnes qui t’ont choisi·e'],
+    avantages: ['Ton profil confié à Lamia, vérifié et affiché anonymement', 'Swipe sans limite', 'Matchs gratuits, 1 à la fois : dès qu’il se termine, un autre peut commencer', '7 jours de discussion avec ton match, puis vous échangez vos numéros', 'Le nombre de personnes qui t’ont choisi·e'],
     mises: 1, speedDatings: 0, swipesJour: null, matchs: 1, discussionJours: 7 },
   { id: 'passion', nom: 'Passion', mois: 900, accroche: 'Le choix des cœurs sérieux', vedette: true,
-    avantages: ['Matchs illimités, 2 en cours en même temps', 'Seconde chance : après un « pas pour moi », tu peux renvoyer ta demande, 2 fois par profil', 'Qui t’a choisi·e : les profils qui t’ont swipé·e, en tête de ta pile', 'La photo de ton match, s’il ou elle l’accepte', '1 speed dating par mois inclus', '14 jours de discussion avec ton match, au lieu de 7', 'Tout ce que contient Découverte'],
-    mises: null, speedDatings: 1, photoMatch: true, swipesJour: null, quiMaChoisi: true, relancesRefus: 2, matchs: 2, discussionJours: 14 },
+    avantages: ['Matchs illimités, 3 en cours en même temps', 'Seconde chance : après un « pas pour moi », tu peux renvoyer ta demande, 2 fois par profil', 'Qui t’a choisi·e : les profils qui t’ont swipé·e, en tête de ta pile', 'La photo de ton match, s’il ou elle l’accepte', '1 speed dating par mois inclus', '14 jours de discussion avec ton match, au lieu de 7', '1 cœur avec message chaque mois', 'Tout ce que contient Découverte'],
+    mises: null, speedDatings: 1, photoMatch: true, swipesJour: null, quiMaChoisi: true, relancesRefus: 2, matchs: 3, coeursMois: 1, discussionJours: 14 },
   { id: 'prestige', nom: 'Prestige', mois: 2900, lancement: { prix: 2200, places: 20 }, accroche: 'Le maximum de chances, en priorité',
-    avantages: ['Matchs illimités, 5 en cours en même temps', 'Ton profil passe en priorité dans le matching', 'Ton profil mis en avant 7 jours chaque mois', '5 cœurs avec message chaque mois', 'Des discussions sans limite de durée', '2 speed datings par mois inclus', '-20 % sur le love coaching avec Lamia', 'Tout ce que contient Passion'],
-    mises: null, speedDatings: 2, prioritaire: true, avantJours: 7, coeursMois: 5, remiseCoaching: 20, photoMatch: true, swipesJour: null, quiMaChoisi: true, relancesRefus: 2, matchs: 5, discussionJours: null },
+    avantages: ['Matchs illimités, 10 en cours en même temps', 'Ton profil passe en priorité dans le matching', 'Ton profil mis en avant 7 jours chaque mois', '3 cœurs avec message chaque mois', 'Des discussions sans limite de durée', '2 speed datings par mois inclus', '-20 % sur le love coaching avec Lamia', 'Tout ce que contient Passion'],
+    mises: null, speedDatings: 2, prioritaire: true, avantJours: 7, coeursMois: 3, remiseCoaching: 20, photoMatch: true, swipesJour: null, quiMaChoisi: true, relancesRefus: 2, matchs: 10, discussionJours: null },
 ];
 // À l'année : 2 mois offerts (on paie 10 mois).
 // Prix de lancement : valable pour les premiers abonnés, qui le gardent tant qu'ils restent abonnés (prix fixé chez Stripe à l'inscription).
