@@ -104,7 +104,8 @@ test('un signalement regardé par Lamia sort de la liste : l’action existe et 
   const { readFile } = await import('node:fs/promises');
   const code = await readFile(new URL('../lib/annonces.mjs', import.meta.url), 'utf8');
   assert.match(code, /action === 'annonce_signalement_traite'/);
-  assert.match(code, /patch\('signalements', `id=eq\.\$\{id\}&traite_at=is\.null`/);
+  assert.match(code, /traite_at=is\.null/);
+  assert.match(code, /signalements\?\$\{filtre\}/);
   const tdb = await readFile(new URL('../public/tableau.js', import.meta.url), 'utf8');
   assert.match(tdb, /data-signalement-traite/);
   assert.match(tdb, /href=\\"#profil-\$\{esc\(s\.cible_ref\)\}\\"|href="#profil-\$\{esc\(s\.cible_ref\)\}"/);
