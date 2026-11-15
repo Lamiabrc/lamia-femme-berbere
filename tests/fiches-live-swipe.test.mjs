@@ -391,3 +391,17 @@ test('mise en relation depuis la console de l’outil : la clé de liaison suffi
   assert.equal(r.fait, 'n° 11 ↔ n° 12');
   assert.equal(db.annonce_interets[0].statut, 'mis_en_relation');
 });
+
+// Le profil anonyme de son match (15 nov. 2026) : visible seulement par les deux personnes en relation.
+test('voir le profil de son match : oui en relation, non sinon', async () => {
+  const annonceKarim2 = { id: 'a-karim', ref: 12, user_id: 'u-karim', email: 'karim@example.com', status: 'publiee', prenom: 'Karim', genre: 'homme', en_match: true, test: false, pays: 'France', matching: {}, profil: 'Je suis calme.', recherche: 'Une femme sérieuse.' };
+  const { ctx } = base({ annonces: [annonceNina(), annonceKarim2], annonce_interets: [{ id: 'i-1', demandeur_id: 'a-nina', cible_ref: 12, statut: 'mis_en_relation', reciproque: true, created_at: '2026-11-02T00:00:00Z' }] });
+  const vu = await lire(await handleAnnonces('annonce_fiche_match', { ref: 12 }, ctx({ id: 'u-nina', email: 'nina@example.com', email_confirmed_at: '2026' })));
+  assert.equal(vu.status, 200);
+  assert.equal(vu.fiche.ref, 12);
+  assert.equal(vu.fiche.prenom, undefined);
+  const autreSens = await lire(await handleAnnonces('annonce_fiche_match', { ref: 11 }, ctx({ id: 'u-karim', email: 'karim@example.com', email_confirmed_at: '2026' })));
+  assert.equal(autreSens.status, 200);
+  const pasLui = await lire(await handleAnnonces('annonce_fiche_match', { ref: 99 }, ctx({ id: 'u-nina', email: 'nina@example.com', email_confirmed_at: '2026' })));
+  assert.equal(pasLui.status, 403);
+});

@@ -337,6 +337,27 @@ async function sansProfil(box, session) {
     catch { b.disabled = false; const st = box.querySelector('[data-sans-statut]'); if (st) st.textContent = 'Ça n’a pas marché. Réessaie dans un instant.'; }
   }));
 }
+// La fiche anonyme de son match, dans une fenêtre : on peut la relire à tout moment pendant la relation.
+async function voirProfilMatch(ref, session) {
+  const fen = document.createElement('div');
+  fen.className = 'swipe-fenetre espace-fiche-match'; fen.setAttribute('role', 'dialog'); fen.setAttribute('aria-modal', 'true');
+  fen.innerHTML = '<div class="swipe-fenetre-boite"><p>Un instant…</p></div>';
+  document.body.appendChild(fen);
+  const fermer = () => fen.remove();
+  fen.addEventListener('click', (e) => { if (e.target === fen || e.target.closest('[data-fermer]')) fermer(); });
+  try {
+    const { fiche: f } = await appelProfil({ action: 'annonce_fiche_match', ref }, session);
+    const infos = [f.genre === 'femme' ? 'Une femme' : 'Un homme', f.age && `${f.age} ans`, f.ville, f.pays, f.situation].filter(Boolean);
+    const origine = [origineLisible(f.origine), f.village && `de ${f.village}`].filter(Boolean).join(' · ');
+    const ages = f.age_min || f.age_max ? ` (${f.age_min || 18} à ${f.age_max || 99} ans)` : '';
+    fen.querySelector('.swipe-fenetre-boite').innerHTML = `<p class="event-date">Ton match · profil n° ${esc(f.ref)}</p><h2>${esc(infos.join(' · '))}</h2>
+      ${origine ? `<p><strong>${esc(origine)}</strong></p>` : ''}
+      ${f.metier ? `<p>${esc(f.metier)}</p>` : ''}
+      ${f.profil ? `<h3>Qui je suis</h3><p data-membre>${esc(f.profil)}</p>` : ''}
+      ${f.recherche ? `<h3>Qui je cherche${esc(ages)}</h3><p data-membre>${esc(f.recherche)}</p>` : ''}
+      <p class="po-actions"><button type="button" class="po-btn" data-fermer>Fermer</button></p>`;
+  } catch { fen.querySelector('.swipe-fenetre-boite').innerHTML = '<p>Son profil ne s’affiche pas pour le moment. Réessaie dans un instant.</p><p class="po-actions"><button type="button" class="po-btn" data-fermer>Fermer</button></p>'; }
+}
 async function monProfil(session) {
   const box = document.querySelector('[data-espace-profil]');
   if (!box) return;
@@ -348,7 +369,7 @@ async function monProfil(session) {
       ${p.nb_compatibles !== null && p.nb_compatibles !== undefined ? `<p>D’après l’outil de Lamia, tu pourrais correspondre à ${esc(p.nb_compatibles)} personne(s).</p>` : ''}
       ${p.matchs ? `<p class="espace-match"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Matchs en cours : <strong>${esc(p.matchs.actifs)} / ${esc(p.matchs.limite)}</strong>${p.matchs.actifs >= p.matchs.limite ? (p.matchs.formule === 'prestige' ? ' · mets fin à un match pour en choisir un autre.' : ' · mets fin à un match pour en choisir un autre, ou <a class="text-link" href="/abonnement/">passe à une formule supérieure</a>.') : ''}</p>` : ''}</div>
       <div class="espace-achat-droite">${!window.LFB_PLAY && p.matchs && p.matchs.formule !== 'prestige' ? (p.algerie ? '<a class="btn btn-line" href="/salon/">Plus de matchs au live</a> ' : `<a class="btn btn-ink espace-abo-btn" href="${p.matchs.formule === 'passion' ? '/abonnement/?formule=prestige">Passer à Prestige' : '/abonnement/">S’abonner'}</a> `) : ''}${p.fiche_live ? '<a class="btn btn-ink" href="#mes-fiches">Modifier mon profil</a>' : '<button class="btn btn-ink" type="button" data-profil-modifier>Modifier mon profil</button>'}</div></article>
-      ${(p.matchs_lies || []).length ? `<ul class="espace-matchs-liste">${p.matchs_lies.map((m) => `<li><span><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Match avec le profil n° ${esc(m.ref)}</span><button class="btn btn-line" type="button" data-profil-dematcher="${esc(m.ref)}">Mettre fin à ce match</button></li>`).join('')}</ul>` : ''}
+      ${(p.matchs_lies || []).length ? `<ul class="espace-matchs-liste">${p.matchs_lies.map((m) => `<li><span><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Match avec le profil n° ${esc(m.ref)}</span><button class="btn btn-ink" type="button" data-voir-match="${esc(m.ref)}">Voir son profil</button> <button class="btn btn-line" type="button" data-profil-dematcher="${esc(m.ref)}">Mettre fin à ce match</button></li>`).join('')}</ul>` : ''}
       ${p.medias_ok === false ? `<section class="espace-photos" id="photos"><h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#camera"/></svg> Il manque tes photos</h3><p>Ajoute <strong>2 photos de toi, visage visible,</strong> pour swiper et répondre aux personnes intéressées. Elles restent privées : elles ne sont pas affichées dans les profils.</p><div data-profil-medias></div></section>` : ''}
       ${p.demander_affichage ? `<section class="espace-photos" id="affichage" data-affichage><h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> Veux-tu que ton annonce soit visible ?</h3><p>Ton annonce n° ${esc(p.ref)} est validée. Si tu es d’accord, elle apparaît sur le site de façon anonyme : sans prénom, photo, ville ni contact.</p><p><button class="btn btn-ink" type="button" data-affichage-oui>Oui, je veux qu’elle soit visible</button> <button class="link-button" type="button" data-affichage-non>Non</button></p></section>` : ''}
       ${p.en_pause
@@ -422,6 +443,7 @@ async function monProfil(session) {
       monterFormulaire(zone, { existant: p, token: session.access_token });
       zone.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
+    box.querySelectorAll('[data-voir-match]').forEach((b) => b.addEventListener('click', () => voirProfilMatch(Number(b.dataset.voirMatch), session)));
     box.querySelectorAll('[data-profil-dematcher]').forEach((bouton) => bouton.addEventListener('click', async (e) => {
       if (!confirm(`Mettre fin à ton match avec le profil n° ${bouton.dataset.profilDematcher} ? Lamia sera prévenue, et une place se libère.`)) return;
       e.target.disabled = true;
