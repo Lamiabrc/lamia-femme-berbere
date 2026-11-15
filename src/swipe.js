@@ -176,10 +176,10 @@ function toast(texte) {
   document.body.appendChild(t); setTimeout(() => t.classList.add('is-sortie'), 1600); setTimeout(() => t.remove(), 2100);
 }
 const PALIERS = { 5: '5 coups de cœur ! Tu es lancé·e', 10: '10 coups de cœur : Lamia adore ton énergie', 25: '25 ! Ton âme sœur est peut-être tout près', 50: '50 coups de cœur : tu es une star du swipe' };
-function fenetre(html, classe = '') {
+function fenetre(html, classe = '', fermer = '<p class="po-actions"><button type="button" class="po-btn" data-fermer>Continuer</button></p>') {
   document.querySelector('.swipe-fenetre')?.remove();
   const d = document.createElement('div'); d.className = `swipe-fenetre ${classe}`; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true');
-  d.innerHTML = `<div class="swipe-fenetre-boite">${html}<p class="po-actions"><button type="button" class="po-btn" data-fermer>Continuer</button></p></div>`;
+  d.innerHTML = `<div class="swipe-fenetre-boite">${html}${fermer}</div>`;
   document.body.appendChild(d);
   d.addEventListener('click', (e) => { if (e.target === d || e.target.closest('[data-fermer]')) d.remove(); });
   return d;
@@ -336,15 +336,35 @@ document.querySelector('[data-swipe-mot]')?.addEventListener('click', () => {
   let brouillon = '';
   try { brouillon = localStorage.getItem(`lfb-coeur-${ref}`) || ''; } catch { /* */ }
   const algerie = infosAbo.algerie;
-  const d = fenetre(`<h2>💌 Un cœur avec un message</h2>
-    <p>Ta phrase part avec ton cœur. Ton profil passe en tête de sa pile, ta phrase affichée. Ça reste anonyme : numéros, liens et réseaux sont masqués.</p>
-    <label class="swipe-mot-champ">Ton message au profil n° ${esc(ref)}<textarea data-mot rows="3" maxlength="200" placeholder="Ex. : Ta fiche m’a touché·e, surtout ce que tu dis sur la famille.">${esc(brouillon)}</textarea></label>
+  // Plus intime (Lamia, 15 nov.) : une petite lettre, un compteur de caractères, la case bien alignée.
+  const d = fenetre(`<svg class="lettre-illu" viewBox="0 0 220 120" aria-hidden="true" focusable="false">
+      <defs><linearGradient id="lettre-env" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FCE9EF"/><stop offset="1" stop-color="#F4CFDB"/></linearGradient>
+      <radialGradient id="lettre-cire" cx="38%" cy="32%" r="70%"><stop offset="0" stop-color="#D2557F"/><stop offset="1" stop-color="#7E1F3F"/></radialGradient></defs>
+      <g fill="none" stroke="#C9A24A" stroke-width="1.6" opacity=".9"><path d="M14 60 l8-8 8 8 -8 8z M190 60 l8-8 8 8 -8 8z"/><path d="M22 60h10 M188 60h10" stroke-dasharray="2 3"/></g>
+      <g fill="#E7B9C8"><circle cx="40" cy="26" r="2.4"/><circle cx="182" cy="30" r="2"/><circle cx="56" cy="98" r="1.8"/><circle cx="168" cy="96" r="2.2"/></g>
+      <path d="M150 20c4-6 13-3 11 4-2 6-11 10-11 10s-9-4-11-10c-2-7 7-10 11-4z" fill="#E58FAC" opacity=".8"/>
+      <path d="M64 14c3-4 9-2 8 3-1 4-8 7-8 7s-7-3-8-7c-1-5 5-7 8-3z" fill="#E58FAC" opacity=".6"/>
+      <rect x="58" y="34" width="104" height="70" rx="8" fill="url(#lettre-env)" stroke="#D59AAE" stroke-width="1.5"/>
+      <path d="M58 40l52 36 52-36" fill="none" stroke="#D59AAE" stroke-width="1.5"/>
+      <path d="M66 98l30-22 M154 98l-30-22" stroke="#E7B9C8" stroke-width="1.2"/>
+      <g fill="none" stroke="#C9A24A" stroke-width="1.3"><path d="M70 92l4-4 4 4-4 4z M142 92l4-4 4 4-4 4z"/></g>
+      <circle cx="110" cy="76" r="15" fill="url(#lettre-cire)"/>
+      <path d="M110 84c-6-4-9-7-9-11 0-3 3-5 5-5 2 0 3 1 4 3 1-2 2-3 4-3 2 0 5 2 5 5 0 4-3 7-9 11z" fill="#FCE7EE"/>
+    </svg>
+    <h2>Un mot doux pour le n° ${esc(ref)}</h2>
+    <p class="lettre-intro">Quelques mots sincères, rien que pour cette personne. Ils arrivent avec ton cœur, et ton profil passe en premier dans sa pile.</p>
+    <label class="lettre-papier"><span class="sr-only">Ton message au profil n° ${esc(ref)}</span><textarea data-mot rows="5" maxlength="200" placeholder="Ce qui t’a touché·e dans son profil…">${esc(brouillon)}</textarea></label>
+    <p class="lettre-compte"><span data-mot-compte>0</span> / 200</p>
+    <p class="lettre-discret"><svg class="ico" aria-hidden="true"><use href="/icones.svg#shield"/></svg> Tu restes anonyme : numéros, liens et réseaux sont masqués.</p>
     ${creditsCoeur > 0
-      ? `<p class="po-actions"><button type="button" class="po-btn" data-mot-envoyer>Envoyer mon cœur</button></p><p class="swipe-mot-credits">${creditsCoeur} cœur${creditsCoeur > 1 ? 's' : ''} avec message disponible${creditsCoeur > 1 ? 's' : ''}</p>`
+      ? `<p class="po-actions"><button type="button" class="po-btn" data-mot-envoyer>Envoyer mon mot doux</button></p><p class="swipe-mot-credits">${creditsCoeur} mot${creditsCoeur > 1 ? 's' : ''} doux disponible${creditsCoeur > 1 ? 's' : ''}</p>`
       : algerie ? '<p>Le paiement en ligne n’est pas possible depuis l’Algérie : envoie un cœur simple, ou viens au live de Lamia.</p>'
-        : '<label class="swipe-case"><input type="checkbox" data-mot-cgv> J’accepte les <a class="text-link" href="/cgv/" target="_blank">conditions de vente</a></label><p class="po-actions"><button type="button" class="po-btn" data-mot-acheter>Envoyer pour 2 €</button></p><p class="swipe-mot-credits">Après le paiement, reviens ici : ton message t’attend.</p>'}`);
+        : '<label class="lettre-cgv"><input type="checkbox" data-mot-cgv><span>J’accepte les <a class="text-link" href="/cgv/" target="_blank">conditions de vente</a></span></label><p class="po-actions"><button type="button" class="po-btn" data-mot-acheter>Envoyer mon mot doux · 2 €</button></p><p class="swipe-mot-credits">Après le paiement, tu reviens ici : ton message t’attend.</p>'}`, 'is-lettre', '<p class="lettre-plus-tard"><button type="button" class="link-button" data-fermer>Plus tard</button></p>');
+  const compte = d.querySelector('[data-mot-compte]');
   const champ = d.querySelector('[data-mot]');
-  champ.addEventListener('input', () => { try { localStorage.setItem(`lfb-coeur-${ref}`, champ.value); } catch { /* */ } });
+  const compter = () => { compte.textContent = champ.value.length; compte.parentElement.classList.toggle('is-presque', champ.value.length >= 180); };
+  compter();
+  champ.addEventListener('input', () => { compter(); try { localStorage.setItem(`lfb-coeur-${ref}`, champ.value); } catch { /* */ } });
   d.querySelector('[data-mot-envoyer]')?.addEventListener('click', () => {
     const texte = champ.value.trim();
     if (texte.length < 2) { champ.focus(); return; }
