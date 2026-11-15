@@ -679,13 +679,14 @@ $('[data-espace-newpass]').addEventListener('submit', async (e) => {
 });
 
 // Déconnexion fiable : on efface la session de ce navigateur même si le serveur ne répond pas.
-$('[data-espace-logout]').addEventListener('click', async (e) => {
+// Deux boutons : en haut de Mon espace (bien visible dans l'appli) et dans « Mon compte » (15 nov. 2026).
+document.querySelectorAll('[data-espace-logout]').forEach((b) => b.addEventListener('click', async (e) => {
   e.target.disabled = true;
   e.target.textContent = 'Déconnexion…';
   try { await Promise.race([supabase.auth.signOut({ scope: 'local' }), new Promise((r) => setTimeout(r, 3000))]); } catch { /* on nettoie quand même */ }
   try { Object.keys(localStorage).filter((k) => k.startsWith('sb-')).forEach((k) => localStorage.removeItem(k)); } catch { /* stockage indisponible */ }
   location.replace(`${['en', 'ar', 'kab'].includes(document.documentElement.lang) ? `/${document.documentElement.lang}` : ''}/mon-espace/`);
-});
+}));
 
 $('[data-espace-mdp]').addEventListener('submit', async (e) => {
   e.preventDefault();
