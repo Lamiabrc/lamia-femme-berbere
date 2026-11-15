@@ -48,7 +48,7 @@ const ERR = {
   limite_matchs: 'Tu as atteint le nombre de matchs en cours de ta formule. Termines-en un depuis ton espace, prends une place de match en plus (5 € pour 30 jours), ou passe à une formule supérieure.',
   sincerite_requise: 'Avant d’envoyer un cœur, confirme ta déclaration de bonne foi dans « Mon espace ».',
   hors_de_ses_criteres: 'Ce profil cherche quelqu’un d’un autre âge ou d’une autre zone : ton cœur n’est pas parti.',
-  quota_matchs: 'Tu as utilisé tes matchs disponibles. Prends une place de match en plus à 5 €, ou viens au live de Lamia, du lundi au vendredi à 20 h : 1 match offert toutes les 2 semaines.',
+  quota_matchs: 'Tu as utilisé tes matchs disponibles. Prends une place de match en plus à 5 €, ou choisis une formule pour avoir plus de matchs en cours.',
   en_match: 'Tu as atteint le nombre de matchs en cours de ta formule : mets fin à l’un d’eux dans « Mon espace » pour en découvrir d’autres.',
 };
 const opts = (list, vide = 'Choisis…') => `<option value="">${vide}</option>${list.map((v) => `<option value="${esc(v)}">${esc(lib(v))}</option>`).join('')}`;
