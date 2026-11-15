@@ -426,3 +426,32 @@ test('paire bloquée : les deux sont prévenus une fois, avec la raison', async 
   await lancer();
   assert.equal(nos().length, 2);
 });
+
+// Miroir outil ↔ site (15 nov. 2026) : archivé ou supprimé dans l'outil = retiré du site (le compte reste) ; un doublon est relié.
+test('miroir : fiche archivée dans l’outil → fiche et profil de rencontre retirés, compte gardé ; doublon relié ; outil vide → rien', async () => {
+  const { createHash } = await import('node:crypto');
+  const cle = 'k'.repeat(40);
+  const monde = () => base({
+    platform_settings: [{ key: 'outil_liaison', value: { hash: createHash('sha256').update(cle).digest('hex') } }],
+    profils_outil: [FICHE(100001, 'u-rachid', 'homme'), FICHE(100002, 'u-sam', 'homme'), FICHE(100003, null, 'femme')],
+    annonces: [
+      { id: 'a-rachid', ref: 12, user_id: 'u-rachid', email: 'rachid@example.com', status: 'publiee', prenom: 'Rachid', genre: 'homme', en_match: false, test: false, fiche_ref: 100001, outil_id: 'o-100001', exportee_at: '2026-11-02T00:00:00Z' },
+      { id: 'a-sam', ref: 13, user_id: 'u-sam', email: 'sam@example.com', status: 'publiee', prenom: 'Sam', genre: 'homme', en_match: false, test: false, fiche_ref: null, outil_id: null },
+      { id: 'a-lea', ref: 14, user_id: 'u-lea', email: 'lea@example.com', status: 'publiee', prenom: 'Léa', genre: 'femme', en_match: false, test: false, fiche_ref: null, outil_id: null },
+    ],
+  });
+  let { db, ctx } = monde();
+  const r = await lire(await handleAnnonces('outil_synchro', { cle, actifs: ['o-100002', 'o-100003', 'site-annonce-13'], supprimes: ['o-100001', 'site-annonce-14'] }, ctx(null)));
+  assert.equal(r.status, 200);
+  assert.deepEqual(r.miroir, { fiches_retirees: 1, profils_retires: 2, doublons_relies: 1 });
+  const f = (ref) => db.profils_outil.find((x) => x.ref === ref), a = (ref) => db.annonces.find((x) => x.ref === ref);
+  assert.ok(f(100001).retire_at); assert.equal(f(100002).retire_at, null);
+  assert.deepEqual([a(12).status, a(14).status, a(13).status, a(13).outil_id], ['retiree', 'retiree', 'publiee', 'o-100002']);
+  assert.equal(a(12).user_id, 'u-rachid'); // le compte reste
+  assert.ok(r.retires_site.includes('site-annonce-12'));
+  // Outil vide ou abîmé : rien n'est touché.
+  ({ db, ctx } = monde());
+  const r2 = await lire(await handleAnnonces('outil_synchro', { cle, actifs: [], supprimes: ['o-100001'] }, ctx(null)));
+  assert.equal(r2.miroir.refuse, true);
+  assert.equal(db.profils_outil.find((x) => x.ref === 100001).retire_at, null);
+});
