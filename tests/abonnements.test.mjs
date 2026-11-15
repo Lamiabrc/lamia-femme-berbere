@@ -10,9 +10,9 @@ const fauxStripe = () => { const appels = []; return { appels, checkout: { sessi
 const vide = async () => ({ ok: true, json: async () => [] });
 
 test('les prix suivent la formule choisie par Lamia', () => {
-  assert.deepEqual(FORMULES.map((f) => [f.id, f.mois]), [['decouverte', 0], ['passion', 900], ['prestige', 4900]]);
-  assert.equal(prixMensuel(FORMULES[2], 0), 2200); assert.equal(prixMensuel(FORMULES[2], 19), 2200); assert.equal(prixMensuel(FORMULES[2], 20), 4900);
-  assert.equal(prixAnnuel(FORMULES[2], 0), 22000); assert.equal(prixAnnuel(FORMULES[2]), 49000); assert.equal(prixMensuel(FORMULES[1], 0), 900);
+  assert.deepEqual(FORMULES.map((f) => [f.id, f.mois]), [['decouverte', 0], ['passion', 900], ['prestige', 2900]]);
+  assert.equal(prixMensuel(FORMULES[2], 0), 2200); assert.equal(prixMensuel(FORMULES[2], 19), 2200); assert.equal(prixMensuel(FORMULES[2], 20), 2900);
+  assert.equal(prixAnnuel(FORMULES[2], 0), 22000); assert.equal(prixAnnuel(FORMULES[2]), 29000); assert.equal(prixMensuel(FORMULES[1], 0), 900);
 });
 test('abonnement mensuel et annuel : prix relus côté serveur', async () => {
   for (const [periode, montant, intervalle] of [['mois', 900, 'month'], ['an', 9000, 'year']]) {
@@ -27,9 +27,9 @@ test('abonnement mensuel et annuel : prix relus côté serveur', async () => {
     assert.equal(p.subscription_data.metadata.formule, 'passion');
   }
 });
-test('Prestige : 22 € pour les 20 premiers, puis 49 €, et le prix vient toujours du serveur', async () => {
+test('Prestige : 22 € pour les 20 premiers, puis 29 € (Lamia, 15 nov. 2026), et le prix vient toujours du serveur', async () => {
   const avec = (nb) => async (u) => ({ ok: true, json: async () => (String(u).includes('formule=eq.prestige') ? Array.from({ length: nb }, (_, i) => ({ id: i })) : []) });
-  for (const [nb, periode, montant] of [[0, 'mois', 2200], [19, 'mois', 2200], [20, 'mois', 4900], [21, 'mois', 4900], [19, 'an', 22000], [20, 'an', 49000]]) {
+  for (const [nb, periode, montant] of [[0, 'mois', 2200], [19, 'mois', 2200], [20, 'mois', 2900], [21, 'mois', 2900], [19, 'an', 22000], [20, 'an', 29000]]) {
     const s = fauxStripe();
     const r = await actionAbonnement({ ...base, formule: 'prestige', periode, prix: 1 }, req, { env, fetcher: avec(nb), stripe: s });
     assert.equal(r.status, 200);
@@ -39,7 +39,7 @@ test('Prestige : 22 € pour les 20 premiers, puis 49 €, et le prix vient touj
   let d = await (await actionAbonnement({ action: 'abonnement_places' }, req, { env, fetcher: avec(17) })).json();
   assert.equal(d.restantes, 3); assert.equal(d.prix, 2200);
   d = await (await actionAbonnement({ action: 'abonnement_places' }, req, { env, fetcher: avec(21) })).json();
-  assert.equal(d.restantes, 0); assert.equal(d.prix, 4900); assert.equal(d.prix_an, 49000);
+  assert.equal(d.restantes, 0); assert.equal(d.prix, 2900); assert.equal(d.prix_an, 29000);
   // Nombre de places illisible : pas de paiement, pour ne pas se tromper de prix.
   const s = fauxStripe();
   const r = await actionAbonnement({ ...base, formule: 'prestige' }, req, { env, fetcher: async (u) => (String(u).includes('formule=eq.prestige') ? { ok: false } : { ok: true, json: async () => [] }), stripe: s });
@@ -212,4 +212,14 @@ test('coaching de 30 minutes et Sauver mon couple : les prix de Lamia', () => {
   assert.equal(unite('coaching_30').prix, 3900);
   assert.equal(unite('sauver_couple').prix, 8900);
   assert.ok(!unite('sauver_couple').depuisEspace);
+});
+
+test('Prestige : -20 % sur le love coaching ; le passage en priorité en live ne se vend plus', async () => {
+  const { prixCoaching, unite, formule } = await import('../content/abonnements.mjs');
+  assert.equal(prixCoaching(unite('coaching'), formule('prestige')), 1200);
+  assert.equal(prixCoaching(unite('coaching_30'), formule('prestige')), 3120);
+  assert.equal(prixCoaching(unite('sauver_couple'), formule('prestige')), 7120);
+  assert.equal(prixCoaching(unite('sauver_couple'), formule('passion')), 8900);
+  assert.equal(prixCoaching(unite('speed_dating'), formule('prestige')), 1200);
+  assert.equal(unite('live_priorite').horsVente, true);
 });

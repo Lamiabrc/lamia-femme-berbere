@@ -45,10 +45,10 @@ const ERR = {
   tiktok_live: 'Indique le pseudo ou le lien TikTok que tu avais en live, pour que Lamia retrouve ta fiche.',
   enregistrement: 'Ton profil n’a pas pu être enregistré. Vérifie que tous les champs sont remplis, puis réessaie. Si ça recommence, écris à Lamia.',
   login_required: 'Ta connexion a expiré : reconnecte-toi dans « Mon espace », puis réessaie.',
-  limite_matchs: 'Tu as atteint le nombre de matchs en cours de ta formule. Termines-en un depuis ton espace, ou passe à une formule supérieure.',
+  limite_matchs: 'Tu as atteint le nombre de matchs en cours de ta formule. Termines-en un depuis ton espace, prends une place de match en plus (5 € pour 30 jours), ou passe à une formule supérieure.',
   sincerite_requise: 'Avant d’envoyer un cœur, confirme ta déclaration de bonne foi dans « Mon espace ».',
   hors_de_ses_criteres: 'Ce profil cherche quelqu’un d’un autre âge ou d’une autre zone : ton cœur n’est pas parti.',
-  quota_matchs: 'Tu as utilisé tes matchs disponibles. Prends un match supplémentaire à 5 €, ou viens au live de Lamia, du lundi au vendredi à 20 h : 1 match offert toutes les 2 semaines.',
+  quota_matchs: 'Tu as utilisé tes matchs disponibles. Prends une place de match en plus à 5 €, ou viens au live de Lamia, du lundi au vendredi à 20 h : 1 match offert toutes les 2 semaines.',
   en_match: 'Tu as atteint le nombre de matchs en cours de ta formule : mets fin à l’un d’eux dans « Mon espace » pour en découvrir d’autres.',
 };
 const opts = (list, vide = 'Choisis…') => `<option value="">${vide}</option>${list.map((v) => `<option value="${esc(v)}">${esc(lib(v))}</option>`).join('')}`;

@@ -84,8 +84,8 @@ async function monCoaching(session) {
     // Sans visio incluse ni achetée, la partie reste cachée : l'offre de coaching est dans les rubriques du haut (« Coaching »).
     bloc.hidden = !d.inclus;
     const intro = bloc.querySelector('[data-coaching-intro]');
-    if (intro) intro.textContent = d.prestige ? 'Ta formule Prestige comprend une visio de 15 minutes par mois avec Lamia, pour ton profil et tes rencontres. Elle n’est jamais enregistrée.' : 'Du temps en visio avec Lamia, pour ton profil, tes rencontres ou ton couple. Jamais enregistré.';
-    if (!d.inclus) { box.innerHTML = offre ? '<ul><li>Visio de 15 minutes · 15 € (incluse chaque mois avec Prestige)</li><li>Coaching de 30 minutes · 39 €</li><li>Sauver mon couple, 1 heure · 89 €</li></ul><p><a class="btn btn-ink" href="/abonnement/#unites">Choisir</a> <a class="text-link" href="/abonnement/?formule=prestige">Voir Prestige</a></p>' : ''; return; }
+    if (intro) intro.textContent = d.prestige ? 'Ton abonnement Prestige comprend encore ta visio de 15 minutes avec Lamia ce mois-ci. Elle n’est jamais enregistrée.' : 'Du temps en visio avec Lamia, pour ton profil, tes rencontres ou ton couple. Jamais enregistré.';
+    if (!d.inclus) { box.innerHTML = offre ? '<ul><li>Visio de 15 minutes · 15 € (-20 % avec Prestige)</li><li>Coaching de 30 minutes · 39 €</li><li>Sauver mon couple, 1 heure · 89 €</li></ul><p><a class="btn btn-ink" href="/abonnement/#unites">Choisir</a> <a class="text-link" href="/abonnement/?formule=prestige">Voir Prestige</a></p>' : ''; return; }
     const parJour = new Map();
     for (const c of d.creneaux || []) { const k = jour(c.debut); if (!parJour.has(k)) parJour.set(k, []); parJour.get(k).push(c); }
     box.innerHTML = `${d.prochaine ? `<img class="espace-coaching-img" src="/images/coaching/${({ 30: 'match-manuel', 60: 'couple' })[d.prochaine.duree] || 'prestige'}.webp" alt="" width="720" height="720"><h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg> Ta prochaine visio</h3><p><strong>${esc(jour(d.prochaine.debut))} à ${esc(heure(d.prochaine.debut))}</strong>, ${esc(d.prochaine.nom)} (${esc(d.prochaine.duree)} minutes).</p><p class="po-actions"><button class="btn btn-ink" type="button" data-coaching-entrer="${esc(d.prochaine.id)}">Entrer dans la visio</button>${d.prochaine.annulable ? `<button class="btn btn-line" type="button" data-coaching-annuler="${esc(d.prochaine.id)}">Annuler</button>` : ''}</p><p><small>La visio s’ouvre 10 minutes avant l’heure.${d.prochaine.annulable ? ' Tu peux annuler jusqu’à 24 heures avant.' : ''}</small></p>` : ''}
@@ -790,14 +790,14 @@ async function interetsRecus(session) {
 })();
 
 
-// ---------------------------------------------------------------- discussion après une mise en relation (7 jours, puis échange des numéros)
+// ---------------------------------------------------------------- discussion après une mise en relation (7 jours, 14 avec Passion, sans limite avec Prestige)
 async function discussions(session) {
   const bloc = document.querySelector('[data-espace-discussion-bloc]'), box = document.querySelector('[data-espace-discussion]');
   if (!bloc || !box) return;
   let liste = [], ouverte = null, salut = '', e = '·e';
   clearInterval(minuterieDiscussions);
   const heure = (d) => new Date(d).toLocaleString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { weekday: 'short', hour: '2-digit', minute: '2-digit' });
-  const reste = (d) => { const ms = new Date(d.ferme_at) - Date.now(); if (ms <= 0) return 'terminée'; const j = Math.floor(ms / 86400e3), h = Math.floor((ms % 86400e3) / 3600e3); return j ? `encore ${j} jour${j > 1 ? 's' : ''}${h ? ` et ${h} h` : ''}` : `encore ${h} h`; };
+  const reste = (d) => { const ms = new Date(d.ferme_at) - Date.now(); if (ms <= 0) return 'terminée'; if (ms > 365 * 86400e3) return 'sans limite de durée'; const j = Math.floor(ms / 86400e3), h = Math.floor((ms % 86400e3) / 3600e3); return j ? `encore ${j} jour${j > 1 ? 's' : ''}${h ? ` et ${h} h` : ''}` : `encore ${h} h`; };
   // Parcours vers le mariage : ouvert avec la discussion, les deux valident chaque étape.
   const vueParcours = (d) => {
     const p = d.parcours;

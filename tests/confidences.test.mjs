@@ -5,7 +5,8 @@ import { backend } from './fake-confidences.mjs';
 import { handleConfidences, verifierFichiers, jeton, jetonValide, enSilence, reglagesPropres } from '../lib/confidences.mjs';
 import { b64u } from '../lib/webpush.mjs';
 
-const env = { SUPABASE_SERVICE_ROLE_KEY: 'sb_secret_fixture', RESEND_API_KEY: 're_test' };
+// Les Confidences sont fermées depuis le 15 nov. 2026 ; ces tests vérifient leur fonctionnement quand elles sont rouvertes.
+const env = { SUPABASE_SERVICE_ROLE_KEY: 'sb_secret_fixture', RESEND_API_KEY: 're_test', CONFIDENCES_OUVERTES: 'true' };
 
 const req = (b, token, ip = '1.2.3.4') => new Request('https://x/api/confidences', { method: 'POST', headers: { 'content-type': 'application/json', 'x-forwarded-for': ip, ...(token ? { authorization: `Bearer ${token}` } : {}) }, body: JSON.stringify(b) });
 const call = async (be, b, token, ip) => { const r = await handleConfidences(req(b, token, ip), { env, fetcher: be.fetcher, etat: async (m) => ({ abonnement: m.startsWith('gratuit') ? null : { formule: 'passion' } }) }); return { status: r.status, body: await r.json() }; };
@@ -220,4 +221,32 @@ test('les testeurs de la liste reçoivent la notification « Devenir testeur » 
   // Le soir, le nouveau testeur reçoit aussi la notification.
   await handleConfidences(req({ action: 'testeurs_play_cron' }), { env, fetcher: be.fetcher, cron: true });
   assert.equal(be.pushes.length, 2);
+});
+
+test('email « Devenir testeur » une seule fois, et plus rien pour qui a ouvert la version Google Play', async () => {
+  const be = backend({ users: { L: lamia, G: gratuit, N: nadia } });
+  be.db.testeurs_play.push({ user_id: 'g', email: 'gratuit@exemple.fr', ajoute_at: '2026-11-14', play_vu_at: null, email_testeur_at: null }, { user_id: 'nadia', email: 'nadia@exemple.fr', ajoute_at: '2026-11-14', play_vu_at: null, email_testeur_at: null });
+  // Nadia ouvre la version Play : elle est notée et ne reçoit plus ni bandeau ni email.
+  assert.equal((await call(be, { action: 'testeur_play_vu' }, 'N')).status, 200);
+  assert.ok(be.db.testeurs_play.find((t) => t.user_id === 'nadia').play_vu_at);
+  assert.equal((await call(be, { action: 'testeur_play_moi' }, 'N')).body.sur_liste, false);
+  assert.equal((await call(be, { action: 'lamia_testeurs_email' }, 'G')).status, 403);
+  const r = await call(be, { action: 'lamia_testeurs_email' }, 'L');
+  assert.deepEqual([r.body.envoyes, r.body.reste], [1, 0]);
+  const mail = be.mails.at(-1);
+  assert.deepEqual(mail.to, ['gratuit@exemple.fr']);
+  assert.match(mail.html, /play\.google\.com\/apps\/testing\/com\.lamiafemmeberbere\.lfb/);
+  assert.match(mail.subject, /Devenir testeur|dernière étape/);
+  assert.equal((await call(be, { action: 'lamia_testeurs_email' }, 'L')).body.envoyes, 0);
+  const { body } = await call(be, { action: 'lamia_testeurs' }, 'L');
+  assert.ok(body.testeurs.find((t) => t.user_id === 'nadia').play_vu_at);
+});
+
+test('Confidences fermées (Lamia, 15 nov. 2026) : même un abonné ne peut plus en ouvrir, mais il répond à Lamia', async () => {
+  const ferme = { ...env, CONFIDENCES_OUVERTES: undefined };
+  const be = backend({ users: { N: nadia, L: lamia } });
+  const appel = async (b, token) => { const r = await handleConfidences(req(b, token), { env: ferme, fetcher: be.fetcher, etat: async () => ({ abonnement: { formule: 'prestige' } }) }); return { status: r.status, body: await r.json() }; };
+  assert.equal((await appel({ action: 'envoyer', consent: true, name: 'N', body: 'coucou' }, 'N')).body.error, 'reserve_abonnes');
+  assert.equal((await appel({ action: 'confidences_acces' }, 'N')).body.abonne, false);
+  assert.equal(be.db.confidence_threads.length, 0);
 });

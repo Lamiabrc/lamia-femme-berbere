@@ -4,25 +4,26 @@
 export const FORMULES = [
   { id: 'decouverte', nom: 'Découverte', mois: 0, accroche: 'Pour commencer, sans rien payer',
     avantages: ['Ton profil confié à Lamia, vérifié et affiché anonymement', 'Swipe sans limite', 'Matchs gratuits, 1 à la fois : dès qu’il se termine, un autre peut commencer', 'En live : 1 match supplémentaire toutes les 2 semaines', '7 jours de discussion avec ton match, puis vous échangez vos numéros', 'Le nombre de personnes qui t’ont choisi·e'],
-    mises: 1, speedDatings: 0, swipesJour: null, matchs: 1 },
+    mises: 1, speedDatings: 0, swipesJour: null, matchs: 1, discussionJours: 7 },
   { id: 'passion', nom: 'Passion', mois: 900, accroche: 'Le choix des cœurs sérieux', vedette: true,
-    avantages: ['Matchs illimités, 2 en cours en même temps', 'Seconde chance : après un « pas pour moi », tu peux renvoyer ta demande, 2 fois par profil', 'Qui t’a choisi·e : les profils qui t’ont swipé·e, en tête de ta pile', 'La photo de ton match, s’il ou elle l’accepte', '1 speed dating par mois inclus', 'Tes questions à Lamia pour améliorer ton profil', 'Tout ce que contient Découverte'],
-    mises: null, speedDatings: 1, photoMatch: true, swipesJour: null, quiMaChoisi: true, relancesRefus: 2, matchs: 2 },
-  { id: 'prestige', nom: 'Prestige', mois: 4900, lancement: { prix: 2200, places: 20 }, accroche: 'L’accompagnement personnel de Lamia, jusqu’au mariage',
-    avantages: ['Matchs illimités, 5 en cours en même temps', 'Ton profil passe en priorité dans le matching', '2 speed datings par mois inclus', 'Coaching : 1 visio de 15 minutes par mois avec Lamia, pour ton profil et tes rencontres', 'Option mariage : Lamia t’accompagne dans ton projet, de la rencontre aux familles', 'Tout ce que contient Passion'],
-    mises: null, speedDatings: 2, prioritaire: true, visio: 1, coaching: true, mariage: true, photoMatch: true, swipesJour: null, quiMaChoisi: true, relancesRefus: 2, matchs: 5 },
+    avantages: ['Matchs illimités, 2 en cours en même temps', 'Seconde chance : après un « pas pour moi », tu peux renvoyer ta demande, 2 fois par profil', 'Qui t’a choisi·e : les profils qui t’ont swipé·e, en tête de ta pile', 'La photo de ton match, s’il ou elle l’accepte', '1 speed dating par mois inclus', '14 jours de discussion avec ton match, au lieu de 7', 'Tout ce que contient Découverte'],
+    mises: null, speedDatings: 1, photoMatch: true, swipesJour: null, quiMaChoisi: true, relancesRefus: 2, matchs: 2, discussionJours: 14 },
+  { id: 'prestige', nom: 'Prestige', mois: 2900, lancement: { prix: 2200, places: 20 }, accroche: 'Le maximum de chances, en priorité',
+    avantages: ['Matchs illimités, 5 en cours en même temps', 'Ton profil passe en priorité dans le matching', 'Ton profil mis en avant 7 jours chaque mois', '5 cœurs avec message chaque mois', 'Des discussions sans limite de durée', '2 speed datings par mois inclus', '-20 % sur le love coaching avec Lamia', 'Tout ce que contient Passion'],
+    mises: null, speedDatings: 2, prioritaire: true, avantJours: 7, coeursMois: 5, remiseCoaching: 20, photoMatch: true, swipesJour: null, quiMaChoisi: true, relancesRefus: 2, matchs: 5, discussionJours: null },
 ];
 // À l'année : 2 mois offerts (on paie 10 mois).
 // Prix de lancement : valable pour les premiers abonnés, qui le gardent tant qu'ils restent abonnés (prix fixé chez Stripe à l'inscription).
 export const prixMensuel = (f, pris = 0) => (f.lancement && pris < f.lancement.places ? f.lancement.prix : f.mois);
 export const prixAnnuel = (f, pris = Infinity) => prixMensuel(f, pris) * 10;
 export const UNITES = [
-  { id: 'mise_en_relation', nom: 'Un match supplémentaire', prix: 500, texte: 'Un match de plus, sans abonnement. Il n’expire pas.' },
+  { id: 'mise_en_relation', nom: 'Une place de match en plus', prix: 500, jours: 30, texte: 'Un match en cours de plus, pendant 30 jours, sans changer de formule.' },
   { id: 'speed_dating', nom: 'Une soirée de speed dating', prix: 1200, texte: 'Une place pour une soirée de speed dating en ligne, à utiliser quand tu veux.' },
-  { id: 'coaching', nom: 'Une visio de coaching avec Lamia', prix: 1500, texte: '15 minutes en visio avec Lamia, sans enregistrement. Tu choisis ton créneau dans Mon espace après l’achat.' },
-  { id: 'coaching_30', nom: 'Coaching de 30 minutes et match manuel', prix: 3900, texte: '30 minutes en visio avec Lamia, sans enregistrement. Vous faites le point sur ta recherche, puis elle cherche avec toi, en direct, les profils qui te correspondent et lance la mise en relation tout de suite. Tu choisis ton créneau dans Mon espace après l’achat.' },
-  { id: 'sauver_couple', nom: 'Sauver mon couple', prix: 8900, texte: 'Une séance de love coaching : 1 heure en visio avec Lamia, à deux ou seul·e, sans enregistrement. Un accompagnement, sans garantie de résultat et sans remplacer une thérapie. Tu choisis ton créneau dans Mon espace après l’achat.' },
-  { id: 'live_priorite', nom: 'Passage en priorité en live', prix: 500, texte: 'Lamia présente ton annonce en priorité à son prochain live.' },
+  { id: 'coaching', nom: 'Une visio de coaching avec Lamia', prix: 1500, texte: '15 minutes en visio avec Lamia, sans enregistrement. Tu choisis ton créneau dans Mon espace après l’achat. -20 % avec Prestige.' },
+  { id: 'coaching_30', nom: 'Coaching de 30 minutes et match manuel', prix: 3900, texte: '30 minutes en visio avec Lamia, sans enregistrement. Vous faites le point sur ta recherche, puis elle cherche avec toi, en direct, les profils qui te correspondent et lance la mise en relation tout de suite. Tu choisis ton créneau dans Mon espace après l’achat. -20 % avec Prestige.' },
+  { id: 'sauver_couple', nom: 'Sauver mon couple', prix: 8900, texte: 'Une séance de love coaching : 1 heure en visio avec Lamia, à deux ou seul·e, sans enregistrement. Un accompagnement, sans garantie de résultat et sans remplacer une thérapie. Tu choisis ton créneau dans Mon espace après l’achat. -20 % avec Prestige.' },
+  // Plus vendu depuis le 15 nov. 2026 (Lamia ne vend rien en live) ; gardé pour lire d'anciens achats.
+  { id: 'live_priorite', nom: 'Passage en priorité en live', prix: 500, horsVente: true, texte: 'Lamia présente ton annonce en priorité à son prochain live.' },
   // S'achètent seulement depuis Mon espace : ils concernent un compte, un match ou une discussion.
   { id: 'prolonger_discussion', nom: 'Prolonger la discussion', prix: 300, jours: 7, depuisEspace: true, texte: '7 jours de plus avec ton match, pour vous deux. Depuis ta discussion, dans Mon espace.' },
   { id: 'profil_avant', nom: 'Profil mis en avant', prix: 500, jours: 7, depuisEspace: true, texte: 'Ton profil passe en tête du swipe pendant 7 jours, auprès des personnes qui correspondent à ses critères.' },
@@ -32,6 +33,9 @@ export const UNITES = [
 ];
 // Visuel de chaque prestation de coaching.
 export const FONDS_COACHING = { coaching: ['prestige', 'Salle de coaching, formule Prestige'], coaching_30: ['match-manuel', 'Coaching et match manuel'], sauver_couple: ['couple', 'Coaching couple'] };
+// Prestige : -20 % sur le love coaching (Lamia, 15 nov. 2026).
+export const COACHINGS = ['coaching', 'coaching_30', 'sauver_couple'];
+export const prixCoaching = (u, f) => (COACHINGS.includes(u.id) && f?.remiseCoaching ? Math.round((u.prix * (100 - f.remiseCoaching)) / 100) : u.prix);
 export const formule = (id) => FORMULES.find((f) => f.id === id) || null;
 export const unite = (id) => UNITES.find((u) => u.id === id) || null;
 export const euros = (c) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', minimumFractionDigits: c % 100 ? 2 : 0 }).format(c / 100);
