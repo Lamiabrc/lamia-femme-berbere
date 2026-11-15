@@ -64,8 +64,8 @@ export function formulaireHtml() {
     <div class="annonce-grille">
       <label>Ton prénom <small>(ou un petit nom)</small><input name="prenom" maxlength="60" autocomplete="given-name" required></label>
       <fieldset class="annonce-choix"><legend>Tu es</legend>
-        <label><input type="radio" name="genre" value="femme"> une femme</label>
-        <label><input type="radio" name="genre" value="homme"> un homme</label>
+        <label><input type="radio" name="genre" value="femme"> Femme</label>
+        <label><input type="radio" name="genre" value="homme"> Homme</label>
       </fieldset>
       <label data-age>Ton âge<input name="age" type="number" min="18" max="99" inputmode="numeric" required></label>
       <label data-naissance hidden>Ta date de naissance <small>(seul ton âge sera affiché)</small><input name="birth_date" type="date" max="${maxNaissance()}"></label>
