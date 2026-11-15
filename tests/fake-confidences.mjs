@@ -14,6 +14,7 @@ export function backend({ users = {} } = {}) {
       if (op === 'is' && val === 'null' && cell != null) return false;
       if (op === 'not' && val === 'is.null' && cell == null) return false;
       if (op === 'neq' && String(cell) === val) return false;
+      if (op === 'ilike' && String(cell ?? '').toLowerCase() !== val.toLowerCase()) return false;
       if (op === 'gte' && !(String(cell) >= val)) return false;
       if (op === 'in' && !val.slice(1, -1).split(',').map((x) => x.replace(/^"|"$/g, '')).includes(String(cell))) return false;
     }
