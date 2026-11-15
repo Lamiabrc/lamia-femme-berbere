@@ -440,3 +440,22 @@
 }
 .aide.is-erreur { color: #a3202a; font-weight: 600; }
 [data-statut-profil] p { margin: 8px 0; }
+
+/* Mes modérateurs : un tableau à part, en pleine largeur (15 nov. 2026). */
+.tdb-moderateurs { margin-bottom: 18px; }
+.tdb-moderateurs select { padding: 6px 10px; border: 1px solid var(--qvt-sable); border-radius: 10px; background: #fff; font: inherit; }
+.tdb-mod-ajout { display: flex; flex-wrap: wrap; gap: 12px 24px; margin-top: 10px; }
+/* Un membre par son numéro (page Membres). */
+.tdb-membre-num { margin-bottom: 18px; }
+.tdb-membre-num input, .tdb-moderateurs .tdb-mod-ajout input { min-height: 38px; padding: 6px 10px; border-radius: 10px; border: 1px solid #d9c7b0; font: inherit; }
+.tdb-membre-fiche { display: grid; gap: 10px; padding: 14px 16px; border-radius: 14px; background: #faf3ea; }
+.tdb-membre-fiche h3 { margin: 0; font-size: 18px; }
+.tdb-membre-fiche ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 3px; font-size: 14px; }
+.tdb-membre-fiche label { display: grid; gap: 4px; font-weight: 600; font-size: 14px; }
+.tdb-membre-fiche textarea { padding: 8px 10px; border-radius: 10px; border: 1px solid #d9c7b0; font: inherit; }
+.tdb-membre-fiche .tdb-filtres-journal { align-items: center; margin: 0; }
+.tdb-membre-fiche .tdb-filtres-journal input { width: 110px; }
+.tdb-membre-fiche button:disabled { opacity: .5; }
+.tdb-moderateurs select { width: auto; min-width: 130px; }
+.tdb-membre-num [data-membre-chercher] input { width: 200px; }
+.tdb-moderateurs [data-mod-liste] button { border: 1px solid #e6d6c0; background: #fff; border-radius: 999px; padding: 5px 11px; font: inherit; font-size: 13px; cursor: pointer; }

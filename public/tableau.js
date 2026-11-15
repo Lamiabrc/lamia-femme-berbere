@@ -255,6 +255,73 @@ const conf = async (body) => { const r = await fetch('/api/confidences/', { meth
 async function pastilleJournal() {
   try { const d = await conf({ action: 'annonce_journal', categorie: 'aucune' }); $$('[data-journal-pastille]').forEach((p) => { p.textContent = d.non_lus; p.hidden = !d.non_lus; }); } catch { /* */ }
 }
+// ---------------------------------------------------------------- Un membre par son numéro (les mêmes gestes que dans l'outil)
+const NOM_FORMULE = { passion: 'Passion', prestige: 'Prestige', coeur: 'Cœur' };
+const ERR_MEMBRE = { not_found: 'Aucun profil avec ce numéro.', injoignable: 'Cette personne n’a pas de compte sur le site : impossible d’ici.', offre_moderateur: 'Sa formule vient de son rôle de modérateur : elle se gère dans « Mes modérateurs » (page Application).', empty: 'Écris un message ou choisis un bouton.' };
+let membreVu = null;
+function dessinerMembre() {
+  const box = $('[data-membre-fiche]'), m = membreVu;
+  if (!box) return;
+  if (!m) { box.innerHTML = ''; return; }
+  const lignes = [
+    [m.genre, m.age ? `${m.age} ans` : '', [m.ville, m.pays].filter(Boolean).join(', ')].filter(Boolean).join(' · '),
+    `Profil : ${m.profil}${m.pause ? ' · en pause' : ''}${m.bloque ? ' · bloqué' : ''}${m.en_match ? ' · en match' : ''}`,
+    `Formule : ${m.formule ? `${NOM_FORMULE[m.formule] || m.formule}${m.formule_offerte ? ' (offerte)' : ''}${m.resiliation_prevue ? ' · résiliation prévue' : ''}` : 'aucune'}`,
+    m.compte ? (m.telephones ? 'Notifications activées sur son téléphone' : 'Notifications pas activées') : 'Pas de compte sur le site',
+    m.erreurs.length ? `${m.erreurs.length} problème(s) rencontré(s) sur le site en 3 jours` : '',
+  ].filter(Boolean);
+  const offre = (f) => `<button type="button" data-membre-offrir="${f}"${m.formule_offerte && m.formule === f ? ' class="is-on"' : ''}>${NOM_FORMULE[f]}</button>`;
+  box.innerHTML = `<div class="tdb-membre-fiche">
+    <h3>${esc(m.prenom || 'Sans prénom')} · <a class="fiche-ref" href="#profil-${esc(m.ref)}">n° ${esc(m.ref)}</a>${m.autre_ref ? ` <span class="aide">(aussi n° ${esc(m.autre_ref)} dans l’outil)</span>` : ''}</h3>
+    <ul>${lignes.map((l) => `<li>${esc(l)}</li>`).join('')}</ul>
+    ${m.joignable ? `<label>Lui écrire<textarea data-membre-texte rows="3" placeholder="Ton message (il arrive dans sa conversation privée avec toi)"></textarea></label>
+    <div class="tdb-filtres-journal"><button type="button" data-membre-envoyer="">Envoyer le message</button><button type="button" data-membre-envoyer="abonnement">Envoyer avec le bouton « Abonnement »</button><button type="button" data-membre-envoyer="profil">Envoyer avec le bouton « Compléter mon profil »</button></div>
+    <div class="tdb-filtres-journal"><span>Offrir une formule :</span>${offre('passion')}${offre('prestige')}${m.formule_offerte ? '<button type="button" data-membre-offrir="">Reprendre</button>' : ''}${m.formule && !m.formule_offerte ? `<span class="aide">il paie déjà ${esc(NOM_FORMULE[m.formule] || m.formule)} : son abonnement reste prioritaire</span>` : ''}</div>` : '<p class="aide">Cette personne n’a pas de compte sur le site : on ne peut ni lui écrire ni lui offrir une formule d’ici.</p>'}
+    <form data-membre-matcher class="tdb-filtres-journal"><span>Mettre en relation avec le n°</span><input name="b" inputmode="numeric" pattern="[0-9]+" required aria-label="Numéro de l’autre personne"> <button type="submit">Matcher</button></form>
+  </div>`;
+}
+async function voirMembre(ref) {
+  membreVu = (await conf({ action: 'live_outil_membre', ref: Number(ref) })).membre;
+  dessinerMembre();
+}
+const ditMembre = (t) => { const st = $('[data-membre-statut]'); if (st) st.textContent = t; };
+const erreurMembre = (err) => ditMembre(err.texte || ERR_MEMBRE[err.code] || 'Ça n’a pas fonctionné. Réessaie dans un instant.');
+document.addEventListener('submit', async (e) => {
+  if (e.target.matches('[data-membre-chercher]')) {
+    e.preventDefault();
+    ditMembre(''); membreVu = null; dessinerMembre();
+    try { await voirMembre(e.target.ref.value); } catch (err) { erreurMembre(err); }
+  }
+  if (e.target.matches('[data-membre-matcher]')) {
+    e.preventDefault();
+    if (!membreVu) return;
+    try { const d = await conf({ action: 'outil_matcher', a: membreVu.ref, b: Number(e.target.b.value) }); ditMembre(`Mis en relation : ${d.fait || ''}.`); e.target.reset(); }
+    catch (err) { erreurMembre(err); }
+  }
+});
+document.addEventListener('click', async (e) => {
+  const env = e.target.closest('[data-membre-envoyer]'), off = e.target.closest('[data-membre-offrir]');
+  if ((!env && !off) || !membreVu) return;
+  const m = membreVu, b = env || off;
+  b.disabled = true;
+  try {
+    if (env) {
+      const zone = $('[data-membre-texte]'), bouton = env.dataset.membreEnvoyer;
+      const d = await conf({ action: 'live_outil_membre_ecrire', ref: m.ref, texte: zone.value, ...(bouton ? { bouton } : {}) });
+      zone.value = '';
+      ditMembre(`Envoyé à ${m.prenom || `n° ${m.ref}`}. ${d.telephones ? 'Notification envoyée sur son téléphone.' : 'Pas de notification sur son téléphone (elles ne sont pas activées) : il le verra dans sa conversation.'}`);
+    } else {
+      const f = off.dataset.membreOffrir;
+      await conf({ action: 'live_outil_membre_formule', ref: m.ref, formule: f });
+      await voirMembre(m.ref);
+      ditMembre(f ? `Formule ${NOM_FORMULE[f]} offerte à ${m.prenom || `n° ${m.ref}`}. Il ne le sait pas encore : un message est prêt, à toi de l’envoyer.` : 'Formule offerte reprise.');
+      const zone = $('[data-membre-texte]');
+      if (f && zone && !zone.value) zone.value = `Bonne nouvelle : je t’offre la formule ${NOM_FORMULE[f]}. Elle est déjà active sur ton compte.`;
+    }
+  } catch (err) { erreurMembre(err); }
+  b.disabled = false;
+});
+
 // ---------------------------------------------------------------- Profils recommandés par Lamia
 async function chargerRecommandes() {
   const box = $('[data-reco-liste]');
@@ -285,10 +352,25 @@ async function chargerModerateurs() {
   if (!box) return;
   try {
     const { moderateurs = [], sansAnnonce = [] } = await conf({ action: 'annonce_moderateurs' });
-    const sans = sansAnnonce.map((m) => `<li><svg class="ico" aria-hidden="true"><use href="/icones.svg#shield"/></svg> ${esc(m)} · sans annonce · Passion offerte <button type="button" data-mod-retirer-email="${esc(m)}">Retirer</button></li>`).join('');
-    box.innerHTML = sans + (moderateurs.length ? moderateurs.map((p) => `<li><svg class="ico" aria-hidden="true"><use href="/icones.svg#shield"/></svg> Profil n° ${esc(p.ref)}${p.ville ? ` · ${esc(p.ville)}` : ''} · ${p.formule ? 'Passion offerte' : 'Passion en attente d’un compte'}${p.lien ? ` · <a href="${esc(p.lien)}">son lien personnel</a>` : ''} <button type="button" data-mod-retirer="${esc(p.ref)}">Retirer</button></li>`).join('') : (sans ? '' : '<li>Aucun modérateur pour l’instant.</li>'));
-  } catch { box.innerHTML = '<li>La liste ne s’affiche pas pour le moment.</li>'; }
+    const choix = (cle, valeur, formule, sansAucune) => `<select data-mod-formule ${cle}="${esc(valeur)}" aria-label="Formule offerte">${sansAucune ? '' : `<option value=""${formule ? '' : ' selected'}>Aucune</option>`}<option value="passion"${formule === 'passion' ? ' selected' : ''}>Passion</option><option value="prestige"${formule === 'prestige' ? ' selected' : ''}>Prestige</option></select>`;
+    const lignes = [
+      ...moderateurs.map((p) => `<tr><td>${p.prenom ? `<b>${esc(p.prenom)}</b>` : '<span class="aide">sans prénom</span>'}</td><td><a class="fiche-ref" href="#profil-${esc(p.num)}">n° ${esc(p.num)}</a>${p.num !== p.ref ? ` <span class="aide">(fiche n° ${esc(p.ref)})</span>` : ''}</td><td>${esc(p.ville || '')}</td><td>${p.compte ? choix('data-ref', p.ref, p.formule, false) : `<span class="aide">en attente d’un compte${p.lien ? ` · <a href="${esc(p.lien)}">son lien personnel</a>` : ''}</span>`}</td><td><button type="button" data-mod-retirer="${esc(p.ref)}">Retirer le badge</button></td></tr>`),
+      ...sansAnnonce.map((m) => `<tr><td><b>${esc(m.pseudo ? `@${m.pseudo}` : m.email)}</b></td><td><span class="aide">sans annonce</span></td><td></td><td>${choix('data-email', m.email, m.formule, true)}</td><td><button type="button" data-mod-retirer-email="${esc(m.email)}">Retirer le badge</button></td></tr>`),
+    ];
+    box.innerHTML = lignes.join('') || '<tr><td colspan="5">Aucun modérateur pour l’instant.</td></tr>';
+  } catch { box.innerHTML = '<tr><td colspan="5">La liste ne s’affiche pas pour le moment.</td></tr>'; }
 }
+document.addEventListener('change', async (e) => {
+  const s = e.target.closest('[data-mod-formule]');
+  if (!s) return;
+  const st = $('[data-mod-statut]');
+  s.disabled = true;
+  try {
+    await conf({ action: 'annonce_moderateur_formule', formule: s.value, ...(s.dataset.email ? { email: s.dataset.email } : { ref: s.dataset.ref }) });
+    if (st) st.textContent = s.value ? `Formule ${s.value === 'prestige' ? 'Prestige' : 'Passion'} offerte.` : 'Formule retirée, le badge reste.';
+  } catch (err) { if (st) st.textContent = (err.code || err.message) === 'sans_compte' ? 'Cette personne n’a pas encore de compte : la formule ne peut pas être offerte.' : 'Ça n’a pas fonctionné.'; }
+  chargerModerateurs();
+});
 async function chargerBeta() {
   const box = $('[data-beta-liste]');
   if (!box) return;
