@@ -37,8 +37,6 @@ function base(initial = {}) {
   const read = async (u) => {
     if (u.includes('declarations_sincerite')) return [{ user_id: 'ok' }]; // bonne foi déjà déclarée, sauf test dédié
     if (u.includes('annonce_files?annonce_id=eq.') && u.includes('kind=in.')) return [{ kind: 'photo' }, { kind: 'photo' }];
-    // Les fiches reliées à un compte ont leur profil et leurs 2 photos, sauf test dédié (règle du 15 nov. 2026).
-    if (u.includes('/annonces?user_id=in.(') && u.includes('select=id,user_id') && !db.sansPhotos) { const us = decodeURIComponent(u.match(/user_id=in\.\(([^)]*)\)/)[1]).split(','); return us.map((x) => db.annonces.find((a) => a.user_id === x) || { id: `a-${x}`, user_id: x }); }
     if (u.includes('annonce_files?kind=eq.photo&annonce_id=in.') && !db.annonce_files) return decodeURIComponent(u.match(/annonce_id=in\.\(([^)]*)\)/)[1]).split(',').flatMap((id) => [{ annonce_id: id }, { annonce_id: id }]); // tout le monde a ses 2 photos, sauf test dédié
     const [t, qs] = coupe(u); if (!t) return [];
     let l = filtrer(t, qs);
@@ -69,7 +67,7 @@ const annonceNina = () => ({ id: 'a-nina', ref: 11, user_id: 'u-nina', email: 'n
 const lire = async (r) => ({ status: r.status, ...(await r.json()) });
 
 test('fiche confirmée : le swipe s’ouvre, sans refaire de profil, et sa propre fiche n’apparaît pas', async () => {
-  const { db, ctx } = base({ profils_outil: [FICHE(100001, 'u-rachid', 'homme'), FICHE(100002, 'u-100002', 'femme'), FICHE(100003, 'u-100003', 'homme')] });
+  const { db, ctx } = base({ profils_outil: [FICHE(100001, 'u-rachid', 'homme'), FICHE(100002, null, 'femme'), FICHE(100003, null, 'homme')] });
   const r = await lire(await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID)));
   assert.equal(r.status, 200);
   assert.deepEqual(r.profils.map((p) => p.ref), [100002]); // que des femmes, jamais la sienne
@@ -182,11 +180,11 @@ test('zone et âge : dans les deux sens, en cas de doute on garde', async () => 
 test('liste : mes critères d’âge et de lieu, ceux qui me cherchent aussi d’abord, puis les mieux notés, score de la fiche repris', async () => {
   const { db, ctx } = base({
     profils_outil: [FICHE(100001, 'u-rachid', 'homme', { secteur: 'France', age_min: 25, age_max: 40 }),
-      FICHE(100002, 'u-100002', 'femme', { age: 30, secteur: 'France · Lyon', pays: 'France' }),
-      FICHE(100003, 'u-100003', 'femme', { age: 31, secteur: 'France', pays: 'France' }),
-      FICHE(100004, 'u-100004', 'femme', { age: 30, secteur: 'France', pays: 'Algerie' }),
-      FICHE(100005, 'u-100005', 'femme', { age: 55, secteur: 'France', pays: 'France' }),
-      FICHE(100006, 'u-100006', 'femme', { age: 30, secteur: 'Canada', pays: 'France' })],
+      FICHE(100002, null, 'femme', { age: 30, secteur: 'France · Lyon', pays: 'France' }),
+      FICHE(100003, null, 'femme', { age: 31, secteur: 'France', pays: 'France' }),
+      FICHE(100004, null, 'femme', { age: 30, secteur: 'France', pays: 'Algerie' }),
+      FICHE(100005, null, 'femme', { age: 55, secteur: 'France', pays: 'France' }),
+      FICHE(100006, null, 'femme', { age: 30, secteur: 'Canada', pays: 'France' })],
     scores_outil: [{ a_ref: 100001, b_ref: 100002, score: 40 }, { a_ref: 100003, b_ref: 100001, score: 90 }],
   });
   const r = await lire(await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID)));
@@ -199,7 +197,7 @@ test('liste : mes critères d’âge et de lieu, ceux qui me cherchent aussi d�
 });
 
 test('le swipe ne s’arrête jamais : les profils passés reviennent, jamais ceux déjà choisis ni bloqués', async () => {
-  const { db, ctx } = base({ profils_outil: [FICHE(100001, 'u-rachid', 'homme'), FICHE(100002, 'u-100002', 'femme'), FICHE(100003, 'u-100003', 'femme'), FICHE(100004, 'u-100004', 'femme')] });
+  const { db, ctx } = base({ profils_outil: [FICHE(100001, 'u-rachid', 'homme'), FICHE(100002, null, 'femme'), FICHE(100003, null, 'femme'), FICHE(100004, null, 'femme')] });
   await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID));
   await handleAnnonces('annonce_swipe', { ref: 100002, choix: 'non' }, ctx(RACHID));
   await handleAnnonces('annonce_swipe', { ref: 100003, choix: 'oui' }, ctx(RACHID));
@@ -220,7 +218,7 @@ test('recommandation : posée sur la fiche, visible dans la liste, retirable', a
   assert.match(badgesProfil({ recommande: true }), /Recommandé par Lamia/);
   assert.match(badgesProfil({ piece_identite: true }), /pièce d’identité/);
   assert.equal(badgesProfil({}), '');
-  const { db, ctx } = base({ profils_outil: [FICHE(100001, 'u-rachid', 'homme'), FICHE(100002, 'u-100002', 'femme', { recommande_at: '2026-11-03' })] });
+  const { db, ctx } = base({ profils_outil: [FICHE(100001, 'u-rachid', 'homme'), FICHE(100002, null, 'femme', { recommande_at: '2026-11-03' })] });
   const r = await lire(await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID)));
   assert.equal(r.profils[0].recommande, true);
   const admin = { ...ctx({ id: 'adm', email: 'a@x.fr' }), admin: true };
@@ -275,8 +273,7 @@ test('swipe : les personnes qui ont un compte passent d’abord, même moins bie
     scores_outil: [{ a_ref: 100001, b_ref: 100002, score: 95 }, { a_ref: 100001, b_ref: 100003, score: 40 }],
   });
   const r = await lire(await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID)));
-  // Depuis le 15 nov. 2026 : une fiche sans compte n'est plus proposée du tout (pas prévenue, le match ne marche pas).
-  assert.deepEqual(r.profils.map((p) => p.ref), [100003]);
+  assert.deepEqual(r.profils.map((p) => p.ref), [100003, 100002]);
 });
 
 
@@ -471,15 +468,16 @@ test('profil validé sans ses 2 photos : remis en attente et prévenu, revalidab
   assert.deepEqual(db.annonces.map((a) => [a.ref, a.status]), [[40, 'a_verifier'], [41, 'publiee'], [42, 'publiee']]);
 });
 
-test('une fiche n’est proposée que si son compte a ses 2 photos ; elle revient dès qu’il les a', async () => {
+test('fiche du live sans compte ou sans ses 2 photos : proposée, marquée « en attente de validation du profil »', async () => {
   const { db, ctx } = base({
     profils_outil: [FICHE(100001, 'u-rachid', 'homme'), FICHE(100002, 'u-lina', 'femme'), FICHE(100003, null, 'femme')],
     annonces: [{ id: 'a-lina', ref: 20, user_id: 'u-lina', email: 'lina@example.com', status: 'publiee', prenom: 'Lina', genre: 'femme', en_match: false, test: false, fiche_ref: 100002 }],
     annonce_files: [{ id: 'p1', annonce_id: 'a-lina', kind: 'photo' }],
   });
   let r = await lire(await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID)));
-  assert.deepEqual(r.profils.map((p) => p.ref), []);
+  const att = () => Object.fromEntries(r.profils.map((p) => [p.ref, p.attente_validation]));
+  assert.deepEqual(att(), { 100002: true, 100003: true });
   db.annonce_files.push({ id: 'p2', annonce_id: 'a-lina', kind: 'photo' });
   r = await lire(await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID)));
-  assert.deepEqual(r.profils.map((p) => p.ref), [100002]);
+  assert.deepEqual(att(), { 100002: false, 100003: true });
 });

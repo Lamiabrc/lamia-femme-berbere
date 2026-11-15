@@ -18,7 +18,7 @@ const bandeau = document.querySelector('[data-swipe-infos]');
 const message = (html) => { zone.innerHTML = `<div class="swipe-message">${html}</div>`; document.querySelector('[data-swipe-boutons]').hidden = true; };
 
 // La fiche : l'essentiel en grand, dans un bijou rond (femme) ou triangulaire (homme). Le reste s'ouvre avec « Voir le profil ».
-const statut = (a) => (a.piece_identite ? 'Vérifié avec pièce d’identité' : a.outil && !a.confirme ? 'En attente de confirmation' : 'Profil vérifié');
+const statut = (a) => (a.piece_identite ? 'Vérifié avec pièce d’identité' : a.attente_validation ? 'Annonce du live · en attente de validation du profil' : a.outil && !a.confirme ? 'En attente de confirmation' : 'Profil vérifié');
 function carte(a) {
   const femme = a.genre === 'femme';
   const mr = metierEtReligion(a);
@@ -41,7 +41,7 @@ function carte(a) {
       ${a.village ? `<p class="swipe-village">Originaire de ${esc(a.village)}</p>` : ''}
       ${mr.metier ? `<p class="swipe-metier">${esc(mr.metier)}</p>` : ''}
       ${mr.religion ? `<p class="swipe-religion">${esc(mr.religion)}</p>` : ''}
-      <p class="swipe-statut"><span aria-hidden="true">✓</span> ${statut(a)}</p>
+      <p class="swipe-statut${a.attente_validation ? ' is-attente' : ''}">${a.attente_validation ? '' : '<span aria-hidden="true">✓</span> '}${statut(a)}</p>
       <button type="button" class="swipe-voir" data-voir aria-expanded="false">Voir le profil</button>
     </div>
     <div class="swipe-texte" data-details hidden>

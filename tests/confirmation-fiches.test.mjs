@@ -9,8 +9,6 @@ function monde() {
   const alertes = [], patches = [];
   const read = async (u) => {
     if (u.startsWith('/rest/v1/profils_outil?ref=eq.')) { const r = Number(u.match(/ref=eq\.(\d+)/)[1]); return fiches.filter((f) => f.ref === r).map((f) => ({ ...f })); }
-    if (u.includes('/annonces?user_id=in.(')) return [{ id: 'a-5020', user_id: 'u-5020' }]; // son compte a son profil…
-    if (u.includes('annonce_files?kind=eq.photo')) return [{ annonce_id: 'a-5020' }, { annonce_id: 'a-5020' }]; // … et ses 2 photos
     if (u.startsWith('/rest/v1/profils_outil?visible=eq.true')) return fiches.filter((f) => f.visible && (!u.includes('confirme_at=not.is.null') || f.confirme_at) && (!u.includes('retire_at=is.null') || !f.retire_at));
     return [];
   };
@@ -21,8 +19,7 @@ function monde() {
 }
 
 test('une fiche non confirmée reste affichée, marquée « en attente de confirmation »', async () => {
-  const { ctx, fiches } = monde();
-  fiches[0].user_id = 'u-5020'; // reliée à un compte qui a ses 2 photos (sinon elle n'est pas proposée)
+  const { ctx } = monde();
   const r = await (await handleAnnonces('annonces_publiques', {}, ctx)).json();
   const f = r.annonces.find((a) => a.ref === 5020);
   assert.equal(f.confirme, false);
@@ -38,8 +35,7 @@ test('sans le bon jeton, impossible de voir ou de confirmer la fiche', async () 
   assert.equal(fiches[0].confirme_at, null);
 });
 test('la personne confirme : la fiche est marquée « confirmé » et Lamia est prévenue', async () => {
-  const { ctx, jeton, alertes, fiches } = monde();
-  fiches[0].user_id = 'u-5020';
+  const { ctx, jeton, alertes } = monde();
   let d = await (await handleAnnonces('annonce_fiche_outil', { n: '5020', t: jeton }, ctx)).json();
   assert.equal(d.confirme, false);
   assert.equal(d.fiche.outil_id, 'p-1'); // l'identifiant interne de l'outil ne contient aucune donnée personnelle
