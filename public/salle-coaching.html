@@ -122,6 +122,7 @@
     <div class="salle-page" data-page="seance"></div>
     <div class="salle-page" data-page="deroule" hidden>
       <div class="salle-chrono"><strong data-chrono>00:00</strong><button class="salle-btn" type="button" data-chrono-go>Démarrer la séance</button><button class="salle-btn is-line" type="button" data-chrono-raz hidden>Remettre à zéro</button></div>
+      <p data-prolonger-zone hidden><button class="salle-btn is-line" type="button" data-prolonger>Prolonger de 15 minutes</button> <span class="petit" data-prolonger-etat role="status"></span></p>
       <p class="petit" data-chrono-aide>Le chrono suit le déroulé et te souffle quoi dire, en haut de la vidéo. Toi seule le vois.</p>
       <p data-choix-duree hidden><label>Séance de <select data-duree><option value="15">15 minutes</option><option value="30">30 minutes</option><option value="60">1 heure (couple)</option></select></label></p>
       <div data-etapes></div>
@@ -375,6 +376,21 @@ function ouvrirPanneau() {
   $('[data-panneau]').hidden = false; $('[data-panneau-bouton]').hidden = false;
   if (!duree) { $('[data-choix-duree]').hidden = false; duree = 15; }
   peindreSeance(); peindreDeroule(); peindreQuestions();
+  // Séance réservée : Lamia peut repousser la fermeture de la salle, 15 minutes à la fois.
+  if (seanceId) {
+    $('[data-prolonger-zone]').hidden = false;
+    $('[data-prolonger]').addEventListener('click', async (e) => {
+      const etat = $('[data-prolonger-etat]');
+      e.target.disabled = true; etat.textContent = 'Un instant…';
+      try {
+        const d = await apiSite({ action: 'annonce_coaching_prolonger', id: seanceId });
+        etat.textContent = `La salle reste ouverte jusqu’à ${new Date(d.fin).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' })}.`;
+      } catch (err) {
+        etat.textContent = ({ maximum: 'Tu as déjà prolongé au maximum (2 heures).', terminee: 'La séance est déjà terminée.' })[err.message] || 'Ça n’a pas fonctionné. Réessaie.';
+      }
+      e.target.disabled = false;
+    });
+  }
   if (seanceId) apiSite({ action: 'annonce_coaching_seance', id: seanceId }).then((d) => { seance = d; peindreSeance(); peindreDeroule(); }, () => { $('[data-page="seance"]').innerHTML = '<p>La fiche ne se charge pas. Vérifie que tu es connectée au site dans ce navigateur (tableau de bord), puis recharge la page.</p>'; });
 }
 $('[data-panneau]').addEventListener('click', (e) => {
