@@ -317,12 +317,32 @@ async function mesSoirees(ins) {
   $('[data-espace-passees-bloc]').hidden = !passees.length;
   $('[data-espace-passees]').innerHTML = passees.map((r) => carte(r, '<p><a class="text-link" href="/speed-dating/souhaits/">Mon carnet de bal</a></p>')).join('');
 }
+// Sans annonce : deux chemins. Chercher l'âme sœur, ou venir « sans rencontre » (boutique, live, coaching de couple, écrire à Lamia).
+const SANS_RENCONTRE_HTML = `<article class="espace-achat espace-sans-rencontre" data-sans-profil><div><p class="event-date">Sans rencontre</p><h3>Tu viens pour tout le reste</h3>
+  <p>Pas de profil, pas de swipe : personne ne te voit. Tu profites de la boutique, des lives, du coaching de couple, et tu peux écrire à Lamia quand tu veux.</p>
+  <p class="espace-sans-liens"><a class="btn btn-ink" href="/confidences/#conversation">Écrire à Lamia</a> <a class="btn btn-line" href="/salon/">Le live</a> <a class="btn btn-line" href="/abonnement/#unites">Coaching de couple</a> <a class="btn btn-line" href="/boutique/">Boutique</a></p>
+  <p><button type="button" class="link-button" data-sans-rencontre="non">Finalement, je cherche quelqu’un</button></p></div></article>`;
+const CHOIX_HTML = `<div class="espace-choix" data-sans-profil><p>Tu n’as pas encore d’annonce chez Lamia. Qu’est-ce qui t’amène ?</p>
+  <p class="espace-sans-liens"><a class="btn btn-ink" href="/rencontres/#confier">Je cherche l’âme sœur</a> <button type="button" class="btn btn-line" data-sans-rencontre="oui">Je viens sans rencontre</button></p>
+  <p class="aide">Sans rencontre : boutique, live, coaching de couple, et écrire à Lamia. Gratuit.</p><p class="form-status" data-sans-statut role="status"></p></div>`;
+async function sansProfil(box, session) {
+  let sans = false;
+  try { ({ sans_rencontre: sans } = await appelProfil({ action: 'sans_rencontre' }, session)); } catch { /* on propose le choix */ }
+  box.innerHTML = sans ? SANS_RENCONTRE_HTML : CHOIX_HTML;
+  box.querySelectorAll('[data-sans-rencontre]').forEach((b) => b.addEventListener('click', async () => {
+    const oui = b.dataset.sansRencontre === 'oui';
+    if (!oui) { try { await appelProfil({ action: 'sans_rencontre', choisir: false }, session); } catch { /* */ } location.href = '/rencontres/#confier'; return; }
+    b.disabled = true;
+    try { await appelProfil({ action: 'sans_rencontre', choisir: true }, session); box.innerHTML = SANS_RENCONTRE_HTML; sansProfil(box, session); }
+    catch { b.disabled = false; const st = box.querySelector('[data-sans-statut]'); if (st) st.textContent = 'Ça n’a pas marché. Réessaie dans un instant.'; }
+  }));
+}
 async function monProfil(session) {
   const box = document.querySelector('[data-espace-profil]');
   if (!box) return;
   try {
     const { profil: p } = await appelProfil({ action: 'annonce_mon_profil' }, session);
-    if (!p) { box.innerHTML = '<p data-sans-profil>Tu n’as pas encore d’annonce chez Lamia. <a class="btn btn-ink" href="/rencontres/#confier">Créer une annonce</a> (les matchs sont gratuits).</p>'; return; }
+    if (!p) { await sansProfil(box, session); return; }
     box.innerHTML = `${p.test ? '<p class="espace-test"><svg class="ico" aria-hidden="true"><use href="/icones.svg#flask-conical"/></svg> <strong>Compte de test.</strong> Il sert uniquement à essayer l’application : il ne voit que les profils de test et ne contacte aucun vrai membre.</p>' : ''}<article class="espace-achat"><div><p class="event-date">Profil n° ${esc(p.ref)}</p><h3>${esc(ETAT_PROFIL[p.status] || p.status)}${p.status === 'publiee' && p.piece_identite ? ' · avec pièce d’identité' : ''}</h3>
       ${p.live ? `<p><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg> Profil créé en live avec Lamia${p.live_retrouve ? '' : ' (Lamia vérifie ta fiche)'} : <strong>tes matchs sont gratuits</strong>, 1 à la fois.</p>` : '<p>Tes matchs sont gratuits, 1 à la fois.</p>'}
       ${p.nb_compatibles !== null && p.nb_compatibles !== undefined ? `<p>D’après l’outil de Lamia, tu pourrais correspondre à ${esc(p.nb_compatibles)} personne(s).</p>` : ''}

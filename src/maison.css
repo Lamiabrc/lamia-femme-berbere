@@ -4204,3 +4204,6 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .annonce-carte.est-homme, .annonce-carte.est-femme { position: relative; }
 /* Différence avec ce que la personne cherche : une simple ligne rouge, rien de bloquant */
 .espace-diff-ligne { margin: 4px 0 8px; color: #b3261e !important; font-weight: 600; }
+/* Sans rencontre (15 nov. 2026) */
+.espace-sans-liens { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.espace-choix { padding: 4px 0; }

@@ -250,3 +250,20 @@ test('Confidences fermées (Lamia, 15 nov. 2026) : même un abonné ne peut plus
   assert.equal((await appel({ action: 'confidences_acces' }, 'N')).body.abonne, false);
   assert.equal(be.db.confidence_threads.length, 0);
 });
+
+test('sans rencontre : un membre gratuit choisit « sans rencontre » et peut écrire à Lamia la première', async () => {
+  const fred = { id: 'fred', email: 'fred@exemple.fr', email_confirmed_at: '2026', app_metadata: {}, user_metadata: { first_name: 'Fred' } };
+  const be = backend({ users: { F: fred } });
+  // Confidences fermées (réglage normal) : sans le choix, pas d'écriture.
+  const ferme = async (b, t) => { const r = await handleConfidences(req(b, t), { env: { ...env, CONFIDENCES_OUVERTES: '' }, fetcher: be.fetcher, etat: async () => ({ abonnement: null }) }); return { status: r.status, body: await r.json() }; };
+  assert.equal((await ferme({ action: 'ecrire', consent: true, body: 'bonjour' }, 'F')).body.error, 'reserve_abonnes');
+  assert.equal((await ferme({ action: 'sans_rencontre' }, 'F')).body.sans_rencontre, false);
+  assert.equal((await ferme({ action: 'sans_rencontre', choisir: true }, 'F')).body.sans_rencontre, true);
+  assert.equal((await ferme({ action: 'sans_rencontre' }, 'F')).body.sans_rencontre, true);
+  assert.equal((await ferme({ action: 'confidences_acces' }, 'F')).body.abonne, true);
+  const r = await ferme({ action: 'ecrire', consent: true, body: 'bonjour Lamia' }, 'F');
+  assert.equal(r.status, 200);
+  // Et il peut revenir en arrière.
+  await ferme({ action: 'sans_rencontre', choisir: false }, 'F');
+  assert.equal((await ferme({ action: 'confidences_acces' }, 'F')).body.abonne, false);
+});

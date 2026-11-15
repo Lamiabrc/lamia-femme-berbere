@@ -29,6 +29,13 @@ export function backend({ users = {} } = {}) {
       const t = (init.headers.Authorization || '').slice(7);
       return users[t] ? ok(users[t]) : ok({}, 401);
     }
+    if (url.pathname.startsWith('/auth/v1/admin/users/')) {
+      const id = url.pathname.split('/').pop();
+      const u = Object.values(users).find((x) => x.id === id);
+      if (!u) return ok({}, 404);
+      if (method === 'PUT') u.app_metadata = { ...(u.app_metadata || {}), ...(body.app_metadata || {}) };
+      return ok(u);
+    }
     if (url.hostname === 'api.resend.com') { mails.push(body); return ok({ id: 'm' }); }
     if (url.hostname === 'push.example') { pushes.push({ url: u, headers: init.headers }); return ok({}, 201); }
     if (url.pathname.startsWith('/storage/v1/object/upload/sign/confidences/')) {
