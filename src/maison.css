@@ -4236,3 +4236,6 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .espace-formule { display: inline-block; margin: 0 0 10px; padding: 6px 14px; border-radius: 999px; background: #F1ECF7; border: 1px solid #D9CCE8; }
 .espace-formule.is-passion { background: #FBE9EF; border-color: #E9B9C9; }
 .espace-formule.is-prestige { background: #FFF5DD; border-color: #C9A24A; }
+/* Mes photos (privées), 15 nov. 2026 */
+.espace-mes-photos-grille { display: flex; gap: 10px; flex-wrap: wrap; margin: 6px 0; }
+.espace-mes-photos-grille img { width: 110px; height: 140px; object-fit: cover; border-radius: 14px; border: 1px solid #EEDDD9; }
