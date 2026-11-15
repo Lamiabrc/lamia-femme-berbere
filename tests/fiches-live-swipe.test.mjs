@@ -378,3 +378,16 @@ test('où en est un profil : ses matchs en cours et les oui réciproques en atte
   assert.deepEqual(r.statut.reciproques.map((m) => m.avec), [100009]);
   assert.equal(r.statut.profil, 'validé');
 });
+
+test('mise en relation depuis la console de l’outil : la clé de liaison suffit, une mauvaise clé est refusée', async () => {
+  const { createHash } = await import('node:crypto');
+  const cle = 'c'.repeat(40);
+  const { db, ctx } = base({ annonces: [annonceNina(), annonceKarim()], platform_settings: [{ key: 'outil_liaison', value: { hash: createHash('sha256').update(cle).digest('hex') } }] });
+  const refuse = await handleAnnonces('outil_matcher', { cle: 'mauvaise-cle', a: 11, b: 12 }, { ...ctx(null), admin: false });
+  assert.equal(refuse.status, 403);
+  assert.equal(db.annonce_interets.length, 0);
+  const r = await lire(await handleAnnonces('outil_matcher', { cle, a: 11, b: 12, op: 'dematcher' }, { ...ctx(null), admin: false }));
+  assert.equal(r.status, 200);
+  assert.equal(r.fait, 'n° 11 ↔ n° 12');
+  assert.equal(db.annonce_interets[0].statut, 'mis_en_relation');
+});

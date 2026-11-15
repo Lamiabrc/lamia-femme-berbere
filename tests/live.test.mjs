@@ -182,3 +182,64 @@ test('erreurs de l’appli : remontées sans compte ou avec, lues seulement par 
   await appel(be, { action: 'live_outil_erreurs_vues', cle: CLE });
   assert.equal((await appel(be, { action: 'live_outil_erreurs', cle: CLE })).body.non_vues, 0);
 });
+
+// ---------------------------------------------------------------- « L'appli et moi » : un membre par son numéro
+function mondeMembres() {
+  const be = monde();
+  Object.assign(be.db, { abonnements: [{ email: 'Nadia@exemple.fr', formule: 'prestige', statut: 'actif', resiliation_prevue: false, created_at: '2026-11-01' }], formules_offertes: [], erreurs_appli: [{ user_id: 'nadia', created_at: '2026-11-15T07:00:00.000Z', type: 'page', message: 'Cannot set', page: '/mon-espace/', statut: 0 }] });
+  be.db.annonces.push({ ref: 173, prenom: 'Nadia', genre: 'Femme', birth_date: '1990-05-02', ville: 'Lyon', pays: 'France', status: 'publiee', email: 'nadia@exemple.fr', phone: '0600000000', user_id: 'nadia', en_match: false, bloque_at: null, pause_at: null });
+  be.db.profils_outil.push({ ref: 5120, genre: 'Femme', age: 36, ville: 'Lyon', pays: 'France', user_id: 'nadia', retire_at: null, bloque_at: null, pause_at: null }, { ref: 6000, genre: 'Homme', age: 41, ville: 'Paris', pays: 'France', user_id: null, retire_at: null, bloque_at: null, pause_at: null });
+  return be;
+}
+const maintenant = new Date('2026-11-15T08:00:00.000Z');
+
+test('un membre par son numéro : le numéro court et le numéro long mènent à la même personne, sans email ni téléphone', async () => {
+  const be = mondeMembres();
+  assert.equal((await appel(be, { action: 'live_outil_membre', ref: 173 })).status, 403);
+  const court = await appel(be, { action: 'live_outil_membre', cle: CLE, ref: 173 }, null, maintenant);
+  assert.equal(court.status, 200);
+  const m = court.body.membre;
+  assert.equal(m.ref, 173); assert.equal(m.autre_ref, 5120); assert.equal(m.prenom, 'Nadia'); assert.equal(m.age, 36);
+  assert.equal(m.formule, 'prestige'); assert.equal(m.telephones, 1); assert.equal(m.joignable, true); assert.equal(m.erreurs.length, 1);
+  assert.ok(!JSON.stringify(court.body).includes('exemple.fr')); assert.ok(!JSON.stringify(court.body).includes('0600000000'));
+  const long = await appel(be, { action: 'live_outil_membre', cle: CLE, ref: 5120 }, null, maintenant);
+  assert.equal(long.body.membre.ref, 173);
+  const seul = await appel(be, { action: 'live_outil_membre', cle: CLE, ref: 6000 }, null, maintenant);
+  assert.equal(seul.body.membre.ref, 6000); assert.equal(seul.body.membre.joignable, false); assert.equal(seul.body.membre.formule, '');
+  assert.equal((await appel(be, { action: 'live_outil_membre', cle: CLE, ref: 999 })).status, 404);
+  assert.equal((await appel(be, { action: 'live_outil_membre', cle: CLE, ref: 'abc' })).status, 400);
+});
+
+test('écrire à un membre par son numéro : message dans sa conversation, bouton vers une page du site', async () => {
+  const be = mondeMembres();
+  assert.equal((await appel(be, { action: 'live_outil_membre_ecrire', ref: 173, texte: 'Coucou' })).status, 403);
+  assert.equal((await appel(be, { action: 'live_outil_membre_ecrire', cle: CLE, ref: 173 })).status, 400);
+  assert.equal((await appel(be, { action: 'live_outil_membre_ecrire', cle: CLE, ref: 173, texte: 'x', bouton: 'https://ailleurs.example' })).status, 400);
+  assert.equal((await appel(be, { action: 'live_outil_membre_ecrire', cle: CLE, ref: 6000, texte: 'Coucou' })).status, 409);
+  const r = await appel(be, { action: 'live_outil_membre_ecrire', cle: CLE, ref: 5120, texte: 'Je passe ton annonce ce soir.', bouton: 'abonnement' });
+  assert.equal(r.status, 200); assert.equal(r.body.ref, 173);
+  assert.equal(be.db.confidence_threads.length, 1); assert.equal(be.db.confidence_threads[0].email, 'nadia@exemple.fr');
+  const msg = be.db.confidence_messages[0];
+  assert.equal(msg.author, 'lamia'); assert.equal(msg.ready, true);
+  assert.match(msg.body, /^Je passe ton annonce ce soir\.\n\nPour choisir ta formule, c’est ici : https:\/\/lamia-femme-berbere\.com\/abonnement\/$/);
+});
+
+test('offrir une formule à un membre par son numéro, puis la reprendre ; la formule d’un modérateur n’est pas retirée d’ici', async () => {
+  const be = mondeMembres();
+  be.db.abonnements.length = 0;
+  assert.equal((await appel(be, { action: 'live_outil_membre_formule', ref: 173, formule: 'prestige' })).status, 403);
+  assert.equal((await appel(be, { action: 'live_outil_membre_formule', cle: CLE, ref: 173, formule: 'or' })).status, 400);
+  assert.equal((await appel(be, { action: 'live_outil_membre_formule', cle: CLE, ref: 6000, formule: 'passion' })).status, 409);
+  const r = await appel(be, { action: 'live_outil_membre_formule', cle: CLE, ref: 5120, formule: 'prestige' });
+  assert.equal(r.status, 200);
+  assert.deepEqual(be.db.formules_offertes.map((f) => [f.email, f.formule, f.raison, f.ref]), [['nadia@exemple.fr', 'prestige', 'lamia', 173]]);
+  const vue = await appel(be, { action: 'live_outil_membre', cle: CLE, ref: 173 }, null, maintenant);
+  assert.equal(vue.body.membre.formule, 'prestige'); assert.equal(vue.body.membre.formule_offerte, true);
+  await appel(be, { action: 'live_outil_membre_formule', cle: CLE, ref: 173, formule: 'passion' });
+  assert.equal(be.db.formules_offertes.length, 1); assert.equal(be.db.formules_offertes[0].formule, 'passion');
+  assert.equal((await appel(be, { action: 'live_outil_membre_formule', cle: CLE, ref: 173, formule: '' })).status, 200);
+  assert.equal(be.db.formules_offertes.length, 0);
+  be.db.formules_offertes.push({ email: 'nadia@exemple.fr', formule: 'passion', raison: 'moderateur', ref: 173 });
+  assert.equal((await appel(be, { action: 'live_outil_membre_formule', cle: CLE, ref: 173, formule: '' })).status, 409);
+  assert.equal(be.db.formules_offertes.length, 1);
+});
