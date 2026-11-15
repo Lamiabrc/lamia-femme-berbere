@@ -347,15 +347,14 @@ document.querySelector('[data-swipe-mot]')?.addEventListener('click', () => {
       <path d="M44 28l66 46 66-46" fill="#FBEEDD" stroke="#D8B88E" stroke-width="1.5"/>
       <path d="M50 108l40-30 M170 108l-40-30" stroke="#E6CFAE" stroke-width="1.2"/>
       <g fill="none" stroke="#2E3A6E" stroke-width="1.7" stroke-linecap="round">
-        <path d="M110 30v18 M104 34h12 M105 40h10 M106 46h8"/>
-        <path d="M78 36l6 6 6-6 M130 36l6 6 6-6"/>
         <path d="M62 50v8 M58 54h8 M158 50v8 M154 54h8"/>
         <path d="M66 92l6 6 6-6 6 6 M138 98l6-6 6 6 6-6"/>
         <path d="M110 96l5 5-5 5-5-5z M96 101h6 M118 101h6"/>
       </g>
       <g fill="#2E3A6E"><circle cx="62" cy="47" r="1.5"/><circle cx="62" cy="61" r="1.5"/><circle cx="55" cy="54" r="1.5"/><circle cx="69" cy="54" r="1.5"/>
         <circle cx="158" cy="47" r="1.5"/><circle cx="158" cy="61" r="1.5"/><circle cx="151" cy="54" r="1.5"/><circle cx="165" cy="54" r="1.5"/>
-        <circle cx="110" cy="26" r="1.5"/><circle cx="84" cy="46" r="1.4"/><circle cx="136" cy="46" r="1.4"/></g>
+        </g>
+      <text x="110" y="50" text-anchor="middle" font-size="17" letter-spacing="2" fill="#2E3A6E" font-family="'Noto Sans Tifinagh', 'Ebrima', sans-serif">ⵜⴰⵢⵔⵉ</text>
       <circle cx="110" cy="74" r="14" fill="url(#lettre-cire)"/>
       <text x="110" y="80" text-anchor="middle" font-size="17" fill="#FCE7EE" font-family="serif">ⵣ</text>
     </svg>
