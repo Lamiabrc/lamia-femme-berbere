@@ -13,7 +13,7 @@ const req = (b, token) => new Request('https://x/api/confidences', { method: 'PO
 const appel = async (be, b, token, now) => { const r = await handleConfidences(req(b, token), { env, fetcher: be.fetcher, ...(now ? { now: () => now } : {}) }); return { status: r.status, body: await r.json() }; };
 
 function monde() {
-  const be = backend({ users: { tn: nadia } });
+  const be = backend({ users: { tn: nadia, tl: { id: 'lamia', email: 'lamia@exemple.fr', email_confirmed_at: '2026', app_metadata: { role: 'admin' } } } });
   Object.assign(be.db, { live_questions: [], nouveautes: [], member_profiles: [{ user_id: 'nadia', display_name: 'Nadia' }] });
   be.db.platform_settings.push({ key: 'outil_liaison', value: { hash: createHash('sha256').update(CLE).digest('hex') } }, { key: 'vapid', value: genererClesVapid() });
   const ua = createECDH('prime256v1'); ua.generateKeys();
@@ -242,4 +242,15 @@ test('offrir une formule à un membre par son numéro, puis la reprendre ; la fo
   be.db.formules_offertes.push({ email: 'nadia@exemple.fr', formule: 'passion', raison: 'moderateur', ref: 173 });
   assert.equal((await appel(be, { action: 'live_outil_membre_formule', cle: CLE, ref: 173, formule: '' })).status, 409);
   assert.equal(be.db.formules_offertes.length, 1);
+});
+
+test('le tableau de bord (Lamia connectée) fait les mêmes gestes sans la clé de l’outil ; un modérateur garde son rôle quand sa formule change', async () => {
+  const be = mondeMembres();
+  be.db.abonnements.length = 0;
+  assert.equal((await appel(be, { action: 'live_outil_membre', ref: 173 }, 'tn')).status, 403);
+  assert.equal((await appel(be, { action: 'live_outil_membre', ref: 173 }, 'tl', maintenant)).status, 200);
+  assert.equal((await appel(be, { action: 'live_outil_erreurs' }, 'tl', maintenant)).status, 200);
+  be.db.formules_offertes.push({ email: 'nadia@exemple.fr', formule: 'passion', raison: 'moderateur', ref: 173 });
+  assert.equal((await appel(be, { action: 'live_outil_membre_formule', ref: 173, formule: 'prestige' }, 'tl')).status, 200);
+  assert.deepEqual(be.db.formules_offertes.map((f) => [f.formule, f.raison]), [['prestige', 'moderateur']]);
 });

@@ -99,3 +99,32 @@ test('invitation sans annonce : formule seule ; refus : rien n’est offert', as
   assert.deepEqual(db.formules_offertes.map((o) => [o.email, o.ref]), [['oui@x.fr', null]]);
 });
 
+
+test('tableau des modérateurs : prénom, numéro court, formule ; Lamia change la formule ou la retire sans retirer le badge', async () => {
+  const { db, c } = ctx({ admin: true, comptes: { 10: { email: 'ana@x.fr' }, 100001: { email: 'bo@x.fr' } } });
+  Object.assign(db.annonces[0], { prenom: 'Ana', ville: 'Lyon', email: 'ana@x.fr', user_id: 'u-ana' });
+  db.annonces.push({ ref: 12, prenom: 'Bo', email: 'bo@x.fr', user_id: 'u-bo', fiche_ref: null });
+  db.profils_outil.push({ ref: 100001, ville: 'Paris', user_id: 'u-bo' }, { ref: 100002, ville: 'Alger', user_id: null });
+  await actionModeration('annonce_moderateur', { ref: 10, oui: true }, c);
+  await actionModeration('annonce_moderateur', { ref: 100001, oui: true }, c);
+  await actionModeration('annonce_moderateur', { ref: 100002, oui: true }, c);
+  db.formules_offertes.push({ email: 'tik@x.fr', formule: 'passion', raison: 'moderateur', ref: null });
+  db.moderateur_invitations.push({ email: 'tik@x.fr', pseudo: 'tiktokeuse', statut: 'accepte' });
+  const r = await lire(await actionModeration('annonce_moderateurs', {}, c));
+  assert.deepEqual(r.moderateurs.map((m) => [m.ref, m.num, m.prenom, m.compte, m.formule]), [[10, 10, 'Ana', true, 'passion'], [100001, 12, 'Bo', true, 'passion'], [100002, 100002, '', false, '']]);
+  assert.deepEqual(r.sansAnnonce, [{ email: 'tik@x.fr', pseudo: 'tiktokeuse', formule: 'passion' }]);
+  assert.ok(!JSON.stringify(r.moderateurs).includes('@'));
+
+  assert.equal((await actionModeration('annonce_moderateur_formule', { ref: 10, formule: 'prestige' }, { ...c, admin: false })).status, 403);
+  assert.equal((await actionModeration('annonce_moderateur_formule', { ref: 10, formule: 'or' }, c)).status, 400);
+  assert.equal((await actionModeration('annonce_moderateur_formule', { ref: 11, formule: 'prestige' }, c)).status, 404);
+  assert.equal((await actionModeration('annonce_moderateur_formule', { ref: 100002, formule: 'prestige' }, c)).status, 409);
+  await actionModeration('annonce_moderateur_formule', { ref: 10, formule: 'prestige' }, c);
+  assert.deepEqual(db.formules_offertes.filter((o) => o.email === 'ana@x.fr').map((o) => [o.formule, o.raison, o.ref]), [['prestige', 'moderateur', 10]]);
+  await actionModeration('annonce_moderateur_formule', { ref: 10, formule: '' }, c);
+  assert.equal(db.formules_offertes.filter((o) => o.email === 'ana@x.fr').length, 0);
+  assert.ok(db.annonces[0].moderateur_at);
+  await actionModeration('annonce_moderateur_formule', { email: 'tik@x.fr', formule: 'prestige' }, c);
+  assert.equal(db.formules_offertes.find((o) => o.email === 'tik@x.fr').formule, 'prestige');
+  assert.equal((await actionModeration('annonce_moderateur_formule', { email: 'tik@x.fr', formule: '' }, c)).status, 400);
+});
