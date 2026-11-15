@@ -155,7 +155,7 @@ ${noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" hr
 <script src="/assets/lien-mot-de-passe.js"></script>
 <script src="/assets/version-play.js"></script>
 <script src="/assets/erreurs.js" charset="utf-8"></script>
-<link rel="apple-touch-icon" href="/images/marque/lfb-icone-180.png">
+<link rel="apple-touch-icon" href="/images/marque/tayri-icone-180.png">
 <meta name="apple-mobile-web-app-title" content="Tayri">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
