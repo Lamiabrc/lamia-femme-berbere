@@ -223,3 +223,23 @@ test('écrire à un membre par son numéro : message dans sa conversation, bouto
   assert.equal(msg.author, 'lamia'); assert.equal(msg.ready, true);
   assert.match(msg.body, /^Je passe ton annonce ce soir\.\n\nPour choisir ta formule, c’est ici : https:\/\/lamia-femme-berbere\.com\/abonnement\/$/);
 });
+
+test('offrir une formule à un membre par son numéro, puis la reprendre ; la formule d’un modérateur n’est pas retirée d’ici', async () => {
+  const be = mondeMembres();
+  be.db.abonnements.length = 0;
+  assert.equal((await appel(be, { action: 'live_outil_membre_formule', ref: 173, formule: 'prestige' })).status, 403);
+  assert.equal((await appel(be, { action: 'live_outil_membre_formule', cle: CLE, ref: 173, formule: 'or' })).status, 400);
+  assert.equal((await appel(be, { action: 'live_outil_membre_formule', cle: CLE, ref: 6000, formule: 'passion' })).status, 409);
+  const r = await appel(be, { action: 'live_outil_membre_formule', cle: CLE, ref: 5120, formule: 'prestige' });
+  assert.equal(r.status, 200);
+  assert.deepEqual(be.db.formules_offertes.map((f) => [f.email, f.formule, f.raison, f.ref]), [['nadia@exemple.fr', 'prestige', 'lamia', 173]]);
+  const vue = await appel(be, { action: 'live_outil_membre', cle: CLE, ref: 173 }, null, maintenant);
+  assert.equal(vue.body.membre.formule, 'prestige'); assert.equal(vue.body.membre.formule_offerte, true);
+  await appel(be, { action: 'live_outil_membre_formule', cle: CLE, ref: 173, formule: 'passion' });
+  assert.equal(be.db.formules_offertes.length, 1); assert.equal(be.db.formules_offertes[0].formule, 'passion');
+  assert.equal((await appel(be, { action: 'live_outil_membre_formule', cle: CLE, ref: 173, formule: '' })).status, 200);
+  assert.equal(be.db.formules_offertes.length, 0);
+  be.db.formules_offertes.push({ email: 'nadia@exemple.fr', formule: 'passion', raison: 'moderateur', ref: 173 });
+  assert.equal((await appel(be, { action: 'live_outil_membre_formule', cle: CLE, ref: 173, formule: '' })).status, 409);
+  assert.equal(be.db.formules_offertes.length, 1);
+});
