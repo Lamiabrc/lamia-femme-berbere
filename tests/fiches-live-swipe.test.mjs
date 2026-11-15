@@ -228,26 +228,27 @@ test('recommandation : posée sur la fiche, visible dans la liste, retirable', a
   assert.equal((await handleAnnonces('annonce_recommander', { ref: 100001, oui: true }, ctx(RACHID))).status, 403);
 });
 
-test('Passion : 2 matchs en cours ; finir l’un garde l’autre et libère une place', async () => {
-  const { db, ctx } = base({ annonces: [annonceNina()], profils_outil: [FICHE(100001, 'u-rachid', 'homme'), FICHE(100003, 'u-karim', 'homme'), FICHE(100004, null, 'homme')] });
+test('Passion : 3 matchs en cours ; finir l’un garde les autres et libère une place', async () => {
+  const { db, ctx } = base({ annonces: [annonceNina()], profils_outil: [FICHE(100001, 'u-rachid', 'homme'), FICHE(100003, 'u-karim', 'homme'), FICHE(100005, 'u-yanis', 'homme'), FICHE(100004, null, 'homme')] });
   const KARIM = { id: 'u-karim', email: 'karim@example.com', user_metadata: { first_name: 'Karim' } };
+  const YANIS = { id: 'u-yanis', email: 'yanis@example.com', user_metadata: { first_name: 'Yanis' } };
   const passion = (u) => ({ ...ctx(u), formuleDe: async (mail) => (mail === NINA.email ? 'passion' : 'decouverte') });
-  for (const ref of [100001, 100003]) await handleAnnonces('annonce_swipe', { ref, choix: 'oui' }, passion(NINA));
-  for (const u of [RACHID, KARIM]) { await handleAnnonces('annonce_swipe_liste', {}, passion(u)); await handleAnnonces('annonce_swipe', { ref: 11, choix: 'oui' }, passion(u)); }
+  for (const ref of [100001, 100003, 100005]) await handleAnnonces('annonce_swipe', { ref, choix: 'oui' }, passion(NINA));
+  for (const u of [RACHID, KARIM, YANIS]) { await handleAnnonces('annonce_swipe_liste', {}, passion(u)); await handleAnnonces('annonce_swipe', { ref: 11, choix: 'oui' }, passion(u)); }
   const nina = db.annonces.find((a) => a.ref === 11);
-  assert.equal(db.annonce_interets.filter((i) => i.statut === 'mis_en_relation').length, 2);
-  assert.equal(nina.en_match, true); // ses 2 places sont prises
+  assert.equal(db.annonce_interets.filter((i) => i.statut === 'mis_en_relation').length, 3);
+  assert.equal(nina.en_match, true); // ses 3 places sont prises
   assert.equal((await lire(await handleAnnonces('annonce_swipe', { ref: 100004, choix: 'oui' }, passion(NINA)))).error, 'limite_matchs');
   const { profil } = await lire(await handleAnnonces('annonce_mon_profil', {}, passion(NINA)));
-  assert.equal(profil.matchs.limite, 2);
-  assert.equal(profil.matchs_lies.length, 2);
+  assert.equal(profil.matchs.limite, 3);
+  assert.equal(profil.matchs_lies.length, 3);
   // Discussion ouverte : le dématch passe par elle, pour se dire au revoir.
   assert.equal((await lire(await handleAnnonces('annonce_dematcher', { ref: 100001 }, passion(NINA)))).error, 'dematch_dans_discussion');
   for (const d of db.discussions) d.close_raison = 'expiree';
   await handleAnnonces('annonce_dematcher', { ref: 100001 }, passion(NINA));
-  assert.equal(db.annonce_interets.filter((i) => i.statut === 'mis_en_relation').length, 1);
-  assert.equal(nina.en_match, false); // une place libre, l'autre match continue
-  assert.equal(db.annonce_interets.find((i) => i.statut === 'mis_en_relation').cible_ref, 100003);
+  assert.equal(db.annonce_interets.filter((i) => i.statut === 'mis_en_relation').length, 2);
+  assert.equal(nina.en_match, false); // une place libre, les autres matchs continuent
+  assert.deepEqual(db.annonce_interets.filter((i) => i.statut === 'mis_en_relation').map((i) => i.cible_ref).sort(), [100003, 100005]);
 });
 test('match offert en live : un seul toutes les 2 semaines', async () => {
   const { db, ctx } = base({ annonces: [annonceNina()] });
@@ -345,6 +346,7 @@ test('mise en relation à la main sans demande : la demande est créée et passe
   assert.equal(r.fait, 'n° 11 ↔ n° 12');
   const i = db.annonce_interets.find((x) => x.cible_ref === 12);
   assert.equal(i.statut, 'mis_en_relation');
+  assert.equal(i.via, 'lamia_main');
   assert.equal(r.statut.matchs.length, 1);
 });
 
@@ -390,4 +392,37 @@ test('mise en relation depuis la console de l’outil : la clé de liaison suffi
   assert.equal(r.status, 200);
   assert.equal(r.fait, 'n° 11 ↔ n° 12');
   assert.equal(db.annonce_interets[0].statut, 'mis_en_relation');
+});
+
+// Le profil anonyme de son match (15 nov. 2026) : visible seulement par les deux personnes en relation.
+test('voir le profil de son match : oui en relation, non sinon', async () => {
+  const annonceKarim2 = { id: 'a-karim', ref: 12, user_id: 'u-karim', email: 'karim@example.com', status: 'publiee', prenom: 'Karim', genre: 'homme', en_match: true, test: false, pays: 'France', matching: {}, profil: 'Je suis calme.', recherche: 'Une femme sérieuse.' };
+  const { ctx } = base({ annonces: [annonceNina(), annonceKarim2], annonce_interets: [{ id: 'i-1', demandeur_id: 'a-nina', cible_ref: 12, statut: 'mis_en_relation', reciproque: true, created_at: '2026-11-02T00:00:00Z' }] });
+  const vu = await lire(await handleAnnonces('annonce_fiche_match', { ref: 12 }, ctx({ id: 'u-nina', email: 'nina@example.com', email_confirmed_at: '2026' })));
+  assert.equal(vu.status, 200);
+  assert.equal(vu.fiche.ref, 12);
+  assert.equal(vu.fiche.prenom, undefined);
+  assert.equal(vu.fiche.recommande, false); // match fait par le swipe, pas par Lamia
+  const autreSens = await lire(await handleAnnonces('annonce_fiche_match', { ref: 11 }, ctx({ id: 'u-karim', email: 'karim@example.com', email_confirmed_at: '2026' })));
+  assert.equal(autreSens.status, 200);
+  const pasLui = await lire(await handleAnnonces('annonce_fiche_match', { ref: 99 }, ctx({ id: 'u-nina', email: 'nina@example.com', email_confirmed_at: '2026' })));
+  assert.equal(pasLui.status, 403);
+});
+
+// Paires bloquées (15 nov. 2026) : les deux personnes sont prévenues, une seule fois par raison.
+test('paire bloquée : les deux sont prévenus une fois, avec la raison', async () => {
+  const karim = { id: 'a-karim', ref: 12, user_id: 'u-karim', email: 'karim@example.com', status: 'publiee', prenom: 'Karim', genre: 'homme', en_match: false, test: false, pays: 'France', matching: {} };
+  const { db, ctx } = base({
+    annonces: [{ ...annonceNina(), en_match: true }, karim],
+    annonce_interets: [{ id: 'i-b', demandeur_id: 'a-karim', cible_ref: 11, statut: 'a_traiter', reciproque: true, created_at: '2026-11-02T00:00:00Z' }],
+    platform_settings: [{ key: 'pilote', value: { actif: true } }],
+  });
+  const lancer = () => handleAnnonces('annonce_pilote', { op: 'lancer' }, { ...ctx({ id: 'adm', email: 'a@x.fr' }), admin: true });
+  await lancer();
+  assert.equal(db.annonce_interets.find((x) => x.id === 'i-b').bloque_alerte, 'plein:11');
+  const nos = () => (db.alertes_membres || []).filter((x) => /dit oui aussi|réciproque, mais/.test(x.titre));
+  assert.equal(nos().length, 2);
+  assert.ok(nos().some((x) => /Nina/.test(x.titre)) && nos().some((x) => /Karim/.test(x.titre)));
+  await lancer();
+  assert.equal(nos().length, 2);
 });

@@ -4261,3 +4261,63 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .guide-tableau .guide-non { color: #B9A5A9 !important; opacity: 1 !important; -webkit-text-fill-color: #B9A5A9; }
 .guide-tableau td small { color: #6E5A5E !important; opacity: 1 !important; -webkit-text-fill-color: #6E5A5E; }
 .guide-note { font-size: 13px; color: #7A6468; }
+/* Profil complet (niveau 2) vu par son match, 15 nov. 2026 : façon boudoir, rose poudré et touche kabyle */
+.fiche-n2 .swipe-fenetre-boite { max-width: 560px; max-height: 92vh; overflow-y: auto; padding: 0 0 18px; text-align: left; background: #FCF6F3; border: 1.5px solid #E6CCC7; }
+.fiche-n2-attente { padding: 40px; text-align: center; }
+.fiche-n2-tete { position: relative; padding: 26px 22px 20px; text-align: center; color: #4E3A3E; background: radial-gradient(120% 90% at 50% 0%, #FBE6E3 0%, #F3D9D5 60%, #EFD0CC 100%); border-bottom: 1px solid #E6CCC7; }
+.fiche-n2-tete.is-homme { background: radial-gradient(120% 90% at 50% 0%, #EEF0F8 0%, #DDE2F1 60%, #D3D9EE 100%); }
+.fiche-n2-tete::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 10px; background: repeating-linear-gradient(45deg, #C9A24A 0 2px, transparent 2px 9px), repeating-linear-gradient(-45deg, #C9A24A 0 2px, transparent 2px 9px); opacity: .35; }
+.fiche-n2-coeur { width: 44px; height: 44px; object-fit: contain; display: block; margin: 0 auto 6px; }
+.fiche-n2-sur { margin: 0; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; color: #8E5A62; }
+.fiche-n2-tete h2 { margin: 6px 0 4px; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 32px; font-weight: 600; color: #4E3A3E; }
+.fiche-n2-lieu { margin: 0; color: #6E5A5E; }
+.fiche-n2-origine { display: inline-block; margin: 10px 0 0; padding: 4px 14px; border-radius: 999px; background: rgba(255, 255, 255, .7); border: 1px solid #E2C6C2; font-weight: 600; color: #6E4A52; }
+.fiche-n2-badges { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 10px 0 0; }
+.fiche-n2-badges span { padding: 3px 10px; border-radius: 999px; background: #E6F2EC; color: #2F6B52; font-size: 13px; }
+.fiche-n2 section { margin: 16px 18px 0; padding: 14px 16px; border-radius: 16px; background: #fff; border: 1px solid #EEDDD9; box-shadow: 0 6px 18px -14px rgba(110, 70, 78, .45); }
+.fiche-n2 h3 { margin: 0 0 8px; font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 21px; font-weight: 600; color: #8E5A62; }
+.fiche-n2-portrait p { margin: 0; font-size: 16px; line-height: 1.6; color: #4E3A3E; }
+.fiche-n2 blockquote { margin: 0; padding: 2px 0 2px 14px; border-left: 3px solid #E2B9BE; font-size: 16px; line-height: 1.6; color: #4E3A3E; white-space: pre-line; }
+.fiche-n2-grille { display: grid; grid-template-columns: 1fr; }
+@media (min-width: 560px) { .fiche-n2-grille { grid-template-columns: 1fr 1fr; } .fiche-n2-grille section:first-child:nth-last-child(odd) { grid-column: 1 / -1; } }
+.fiche-n2-grille p { margin: 0 0 6px; }
+.fiche-n2-puces { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 0; }
+.fiche-n2-puces span { padding: 4px 11px; border-radius: 999px; background: #F8ECEA; border: 1px solid #EBD3D0; font-size: 14px; color: #6E4A52; }
+.fiche-n2-cherche dl { margin: 10px 0 0; display: grid; gap: 6px; }
+.fiche-n2-cherche dl div { display: grid; grid-template-columns: 92px 1fr; gap: 8px; }
+.fiche-n2-cherche dt { font-weight: 600; color: #8E5A62; }
+.fiche-n2-cherche dd { margin: 0; color: #4E3A3E; }
+.fiche-n2-plus { background: linear-gradient(180deg, #FFF8F0, #FBEFE6) !important; border-color: #E8D2B4 !important; }
+.fiche-n2-plus p { margin: 0 0 8px; }
+.fiche-n2-plus small { display: block; margin-top: 4px; color: #7A6468; }
+.fiche-n2-discret { margin: 14px 22px 0; font-size: 13px; color: #8A7480; text-align: center; }
+.fiche-n2 .po-btn { background: linear-gradient(135deg, #D2A3A6, #AE7880) !important; color: #fff !important; }
+/* Profil complet en bulles douces, sans défilement (15 nov. 2026) */
+.fiche-n2 .swipe-fenetre-boite { max-height: none; overflow: visible; }
+.fiche-n2-tete { padding: 18px 18px 16px; }
+.fiche-n2-tete h2 { font-size: 28px; margin: 4px 0 2px; }
+.fiche-n2-coeur { width: 40px; height: 40px; }
+.fiche-n2-scene { padding: 18px 18px 6px; min-height: 180px; display: grid; align-items: center; }
+.fiche-n2-bulle { padding: 16px 18px; border-radius: 22px 22px 22px 6px; background: #fff; border: 1px solid #EEDDD9; box-shadow: 0 10px 26px -16px rgba(110, 70, 78, .55); animation: bulle-douce .55s cubic-bezier(.2, .8, .25, 1) both; max-height: 52vh; overflow: auto; }
+.fiche-n2-bulle.is-plus { background: linear-gradient(180deg, #FFF8F0, #FBEFE6); border-color: #E8D2B4; }
+.fiche-n2-bulle h3 { margin-top: 0; }
+.fiche-n2-bulle h3 + * { margin-top: 0; }
+.fiche-n2-bulle p:last-child, .fiche-n2-bulle blockquote:last-child, .fiche-n2-bulle dl:last-child { margin-bottom: 0; }
+.fiche-n2-bulle > h3:not(:first-child) { margin-top: 14px; }
+.fiche-n2-bulle dl { margin: 6px 0 0; display: grid; gap: 6px; }
+.fiche-n2-bulle dl div { display: grid; grid-template-columns: 92px 1fr; gap: 8px; }
+.fiche-n2-bulle dt { font-weight: 600; color: #8E5A62; }
+.fiche-n2-bulle dd { margin: 0; color: #4E3A3E; }
+.fiche-n2-bulle small { display: block; margin-top: 4px; color: #7A6468; }
+@keyframes bulle-douce { from { opacity: 0; transform: translateY(14px) scale(.96); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .fiche-n2-bulle { animation: none; } }
+.fiche-n2-points { display: flex; justify-content: center; gap: 7px; margin: 10px 0 0; }
+.fiche-n2-points span { width: 7px; height: 7px; border-radius: 50%; background: #E9D6D3; transition: all .3s; }
+.fiche-n2-points span.is-vu { background: #D2A3A6; }
+.fiche-n2-points span.is-ici { width: 22px; border-radius: 4px; background: #AE7880; }
+.fiche-n2-nav { display: flex; justify-content: space-between; align-items: center; margin: 12px 18px 0; }
+.fiche-n2-nav .po-btn { margin: 0; }
+.fiche-n2-nav .link-button { color: #8A7480; }
+/* Mes photos (privées), 15 nov. 2026 */
+.espace-mes-photos-grille { display: flex; gap: 10px; flex-wrap: wrap; margin: 6px 0; }
+.espace-mes-photos-grille img { width: 110px; height: 140px; object-fit: cover; border-radius: 14px; border: 1px solid #EEDDD9; }

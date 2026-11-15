@@ -1687,7 +1687,7 @@ const tableauFormules = () => {
     ['La photo de ton match, s’il ou elle l’accepte', `${eurosAbo(UNITES.find((u) => u.id === 'photo_match').prix)} pour 1 heure`, 'Incluse', 'Incluse'],
     ['Profil prioritaire dans le matching', non, non, oui],
     ['Profil mis en avant', '5 € pour 7 jours', '5 € pour 7 jours', '7 jours chaque mois'],
-    ['Cœurs avec message', '2 € l’un', '2 € l’un', '5 chaque mois'],
+    ['Cœurs avec message', '2 € l’un', '1 chaque mois', '3 chaque mois'],
     ['Love coaching avec Lamia', 'À l’unité', 'À l’unité', '-20 %'],
   ];
   return `<h2 class="annonces-titre">Les formules en un coup d’œil</h2>
@@ -1695,7 +1695,7 @@ const tableauFormules = () => {
     <thead><tr><th scope="col"><span class="abo-cache">Ce qui est inclus</span></th>${[d, pa, pr].map((f) => `<th scope="col"${f.vedette ? ' class="is-vedette"' : ''}>${esc(f.nom)}</th>`).join('')}</tr></thead>
     <tbody>${lignes.map(([titre, ...cases]) => `<tr><th scope="row">${esc(titre)}</th>${cases.map((c) => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>
   </table></div>
-  <p class="abo-tableau-note">En live : 1 match supplémentaire offert toutes les 2 semaines, quelle que soit ta formule.</p>`;
+`;
 };
 const carteFormule = (f) => `<article class="abo-carte${f.vedette ? ' is-vedette' : ''}" data-formule="${f.id}">
   ${f.vedette ? '<p class="abo-ruban">Le plus choisi</p>' : ''}
@@ -1722,7 +1722,7 @@ page(
       <p class="po-eyebrow">Par Lamia, marieuse kabyle</p>
       <h1 id="abo-titre">Les formules de rencontre kabyle</h1>
       <p class="po-sub">En gratuit, un match à la fois : dès qu’il se termine, un autre peut commencer.</p>
-      <p class="po-lead">Ou choisis le rythme qui te ressemble : des matchs illimités, 2 ou 5 en cours en même temps, plus de temps pour discuter et ton profil mis en avant. Sans engagement, résiliable en un clic depuis ton espace.</p>
+      <p class="po-lead">Ou choisis le rythme qui te ressemble : des matchs illimités, 3 ou 10 en cours en même temps, plus de temps pour discuter et ton profil mis en avant. Sans engagement, résiliable en un clic depuis ton espace.</p>
       <p class="po-lead">Les matchs sont gratuits pour tout le monde. Pour soutenir Lamia, <a class="text-link" href="/salon/">viens au live</a> : depuis l’Algérie, où le paiement en ligne n’est pas possible, ta présence compte autant.</p>
     </div>
     <figure class="po-lamia"><img src="/images/lamia/lamia-portrait-tatouages-rond-480.webp" alt="Lamia Femme Berbère" width="200" height="200"><figcaption>Lamia · ta marieuse</figcaption></figure>
@@ -1754,7 +1754,7 @@ page(
     <h2>Questions fréquentes</h2>
     <ol>
       <li><strong>C’est quoi, un match ?</strong><span>Lamia te propose une personne qui te correspond vraiment. Si vous êtes d’accord tous les deux, elle vous met en contact. Ton numéro reste chez elle jusque-là.</span></li>
-      <li><strong>Plusieurs matchs en même temps, ça veut dire quoi ?</strong><span>Tu peux avoir 1 match en cours avec Découverte, 2 avec Passion et 5 avec Prestige. Quand tu mets fin à un match, une place se libère.</span></li>
+      <li><strong>Plusieurs matchs en même temps, ça veut dire quoi ?</strong><span>Tu peux avoir 1 match en cours avec Découverte, 3 avec Passion et 10 avec Prestige. Quand tu mets fin à un match, une place se libère.</span></li>
       <li><strong>Comment se passe le coaching ?</strong><span>Dans ton espace, tu choisis un créneau parmi ceux ouverts par Lamia : une visio de 15 minutes, non enregistrée, incluse chaque mois avec Prestige ou à 15 € à l’unité. Il existe aussi un coaching de 30 minutes à 39 €, avec une recherche de match faite en direct par Lamia, et « Sauver mon couple », 1 heure à deux ou seul·e, à 89 €. Tu peux annuler jusqu’à 24 heures avant et choisir un autre créneau.</span></li>
       <li><strong>Et les speed datings inclus ?</strong><span>Ta place aux soirées de speed dating en ligne de ton salon, dans la limite indiquée chaque mois. Lamia la note quand tu t’inscris.</span></li>
       <li><strong>Je peux arrêter quand je veux ?</strong><span>Oui. Dans ton espace, « Gérer mon abonnement » : tu résilies en un clic. Ton abonnement reste actif jusqu’à la fin de la période payée.</span></li>
