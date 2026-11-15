@@ -394,28 +394,35 @@ async function voirProfilMatch(ref, session) {
     const payant = window.LFB_PLAY ? '' : `<section class="fiche-n2-plus"><h3>Pour aller plus loin</h3>
         <p><button type="button" class="btn btn-ink" data-aller-photo>Voir sa photo</button> <small>Incluse avec Passion, ou 3 € pour 1 heure, si ${fe ? 'elle' : 'il'} accepte de la transmettre.</small></p>
         <p><a class="btn btn-line" href="/abonnement/#unites">Un coaching avant votre premier rendez-vous</a></p></section>`;
-    boite.innerHTML = `<header class="fiche-n2-tete is-${fe ? 'femme' : 'homme'}">
-        <img class="fiche-n2-coeur" src="/images/marque/tayri-coeur.webp" alt="" width="44" height="44">
+    // Pas de défilement (Lamia, 15 nov.) : des bulles douces qui apparaissent l'une après l'autre, avec « La suite », jusqu'à la fin.
+    const tete = `<header class="fiche-n2-tete is-${fe ? 'femme' : 'homme'}">
+        <img class="fiche-n2-coeur" src="/images/marque/tayri-coeur.webp" alt="" width="40" height="40">
         <p class="fiche-n2-sur">Ton match · profil n° ${esc(f.ref)}</p>
         <h2>${fe ? 'Une femme' : 'Un homme'}${f.age ? ` de ${esc(f.age)} ans` : ''}</h2>
-        <p class="fiche-n2-lieu">${esc([f.ville, f.pays && lib(f.pays)].filter(Boolean).join(' · '))}</p>
-        ${origine ? `<p class="fiche-n2-origine">${esc(origine)}</p>` : ''}
+        <p class="fiche-n2-lieu">${esc([f.ville, f.pays && lib(f.pays)].filter(Boolean).join(' · '))}${origine ? ` · <strong>${esc(origine)}</strong>` : ''}</p>
         ${badges.length ? `<p class="fiche-n2-badges">${badges.map((x) => `<span>✓ ${esc(x)}</span>`).join('')}</p>` : ''}
-      </header>
-      ${portrait ? `<section class="fiche-n2-portrait"><h3>Son portrait</h3><p>${esc(portrait)}</p></section>` : ''}
-      ${f.profil ? `<section class="fiche-n2-mots"><h3>En ses mots</h3><blockquote data-membre>${esc(f.profil)}</blockquote></section>` : ''}
-      <div class="fiche-n2-grille">
-        ${foi || f.religion_texte || (f.mode_vie || []).length || f.autres ? `<section><h3>Foi et mode de vie</h3>${foi ? `<p>${esc(majuscule(foi))}</p>` : ''}${f.religion_texte ? `<p data-membre><em>« ${esc(f.religion_texte)} »</em></p>` : ''}${(f.mode_vie || []).length ? `<p class="fiche-n2-puces">${puces(f.mode_vie)}</p>` : ''}${f.autres ? `<p data-membre>${esc(f.autres)}</p>` : ''}</section>` : ''}
-        ${(f.caracteristiques || []).length ? `<section><h3>Son caractère</h3><p class="fiche-n2-puces">${puces(f.caracteristiques)}</p></section>` : ''}
-        ${f.vision ? `<section><h3>Travail et foyer</h3><p>${esc(L(f.vision))}</p></section>` : ''}
-      </div>
-      ${f.recherche || cherche.length || (c.caracteristiques || []).length ? `<section class="fiche-n2-cherche"><h3>Ce qu’${fe ? 'elle' : 'il'} cherche</h3>
-        ${f.recherche ? `<blockquote data-membre>${esc(f.recherche)}</blockquote>` : ''}
-        ${cherche.length ? `<dl>${cherche.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>` : ''}
-        ${(c.caracteristiques || []).length ? `<p class="fiche-n2-puces">${(c.caracteristiques || []).map((x) => `<span>${esc(accorder(lib(x), !fe))}</span>`).join('')}</p>` : ''}</section>` : ''}
-      ${payant}
-      <p class="fiche-n2-discret">Pas de prénom, de photo ni de contact ici : c’est vous deux qui choisissez quand les partager. ${Il} voit ton profil de la même façon.</p>
-      <p class="po-actions"><button type="button" class="po-btn" data-fermer>Fermer</button></p>`;
+      </header>`;
+    const bulles = [
+      portrait && `<h3>Son portrait</h3><p>${esc(portrait)}</p>`,
+      f.profil && `<h3>En ses mots</h3><blockquote data-membre>${esc(f.profil)}</blockquote>`,
+      (foi || f.religion_texte || (f.mode_vie || []).length || f.autres) && `<h3>Foi et mode de vie</h3>${foi ? `<p>${esc(majuscule(foi))}</p>` : ''}${f.religion_texte ? `<p data-membre><em>« ${esc(f.religion_texte)} »</em></p>` : ''}${(f.mode_vie || []).length ? `<p class="fiche-n2-puces">${puces(f.mode_vie)}</p>` : ''}${f.autres ? `<p data-membre>${esc(f.autres)}</p>` : ''}`,
+      ((f.caracteristiques || []).length || f.vision) && `${(f.caracteristiques || []).length ? `<h3>Son caractère</h3><p class="fiche-n2-puces">${puces(f.caracteristiques)}</p>` : ''}${f.vision ? `<h3>Travail et foyer</h3><p>${esc(L(f.vision))}</p>` : ''}`,
+      f.recherche && `<h3>Ce qu’${fe ? 'elle' : 'il'} cherche</h3><blockquote data-membre>${esc(f.recherche)}</blockquote>`,
+      (cherche.length || (c.caracteristiques || []).length) && `<h3>${f.recherche ? 'En détail' : `Ce qu’${fe ? 'elle' : 'il'} cherche`}</h3>${cherche.length ? `<dl>${cherche.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>` : ''}${(c.caracteristiques || []).length ? `<p class="fiche-n2-puces">${(c.caracteristiques || []).map((x) => `<span>${esc(accorder(lib(x), !fe))}</span>`).join('')}</p>` : ''}`,
+      payant && payant.replace(/^<section class="fiche-n2-plus">|<\/section>$/g, ''),
+    ].filter(Boolean);
+    let i = 0;
+    const montrer = () => {
+      const fin = i === bulles.length - 1;
+      boite.innerHTML = `${tete}
+        <div class="fiche-n2-scene"><div class="fiche-n2-bulle${payant && fin ? ' is-plus' : ''}" data-membre-zone>${bulles[i]}</div></div>
+        <p class="fiche-n2-points" aria-label="Bulle ${i + 1} sur ${bulles.length}">${bulles.map((_, k) => `<span class="${k === i ? 'is-ici' : k < i ? 'is-vu' : ''}"></span>`).join('')}</p>
+        ${fin ? `<p class="fiche-n2-discret">Pas de prénom, de photo ni de contact ici : c’est vous deux qui choisissez quand les partager. ${Il} voit ton profil de la même façon.</p>` : ''}
+        <p class="fiche-n2-nav">${i ? '<button type="button" class="link-button" data-precedent>Retour</button>' : '<span></span>'}${fin ? '<button type="button" class="po-btn" data-fermer>Fin</button>' : '<button type="button" class="po-btn" data-suite>La suite</button>'}</p>`;
+      boite.querySelector('[data-suite]')?.addEventListener('click', () => { i += 1; montrer(); });
+      boite.querySelector('[data-precedent]')?.addEventListener('click', () => { i -= 1; montrer(); });
+    };
+    montrer();
   } catch { boite.innerHTML = '<p>Son profil ne s’affiche pas pour le moment. Réessaie dans un instant.</p><p class="po-actions"><button type="button" class="po-btn" data-fermer>Fermer</button></p>'; }
 }
 async function monProfil(session) {

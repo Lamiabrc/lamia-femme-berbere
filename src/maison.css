@@ -4267,3 +4267,29 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .fiche-n2-plus small { display: block; margin-top: 4px; color: #7A6468; }
 .fiche-n2-discret { margin: 14px 22px 0; font-size: 13px; color: #8A7480; text-align: center; }
 .fiche-n2 .po-btn { background: linear-gradient(135deg, #D2A3A6, #AE7880) !important; color: #fff !important; }
+/* Profil complet en bulles douces, sans défilement (15 nov. 2026) */
+.fiche-n2 .swipe-fenetre-boite { max-height: none; overflow: visible; }
+.fiche-n2-tete { padding: 18px 18px 16px; }
+.fiche-n2-tete h2 { font-size: 28px; margin: 4px 0 2px; }
+.fiche-n2-coeur { width: 40px; height: 40px; }
+.fiche-n2-scene { padding: 18px 18px 6px; min-height: 180px; display: grid; align-items: center; }
+.fiche-n2-bulle { padding: 16px 18px; border-radius: 22px 22px 22px 6px; background: #fff; border: 1px solid #EEDDD9; box-shadow: 0 10px 26px -16px rgba(110, 70, 78, .55); animation: bulle-douce .55s cubic-bezier(.2, .8, .25, 1) both; max-height: 52vh; overflow: auto; }
+.fiche-n2-bulle.is-plus { background: linear-gradient(180deg, #FFF8F0, #FBEFE6); border-color: #E8D2B4; }
+.fiche-n2-bulle h3 { margin-top: 0; }
+.fiche-n2-bulle h3 + * { margin-top: 0; }
+.fiche-n2-bulle p:last-child, .fiche-n2-bulle blockquote:last-child, .fiche-n2-bulle dl:last-child { margin-bottom: 0; }
+.fiche-n2-bulle > h3:not(:first-child) { margin-top: 14px; }
+.fiche-n2-bulle dl { margin: 6px 0 0; display: grid; gap: 6px; }
+.fiche-n2-bulle dl div { display: grid; grid-template-columns: 92px 1fr; gap: 8px; }
+.fiche-n2-bulle dt { font-weight: 600; color: #8E5A62; }
+.fiche-n2-bulle dd { margin: 0; color: #4E3A3E; }
+.fiche-n2-bulle small { display: block; margin-top: 4px; color: #7A6468; }
+@keyframes bulle-douce { from { opacity: 0; transform: translateY(14px) scale(.96); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .fiche-n2-bulle { animation: none; } }
+.fiche-n2-points { display: flex; justify-content: center; gap: 7px; margin: 10px 0 0; }
+.fiche-n2-points span { width: 7px; height: 7px; border-radius: 50%; background: #E9D6D3; transition: all .3s; }
+.fiche-n2-points span.is-vu { background: #D2A3A6; }
+.fiche-n2-points span.is-ici { width: 22px; border-radius: 4px; background: #AE7880; }
+.fiche-n2-nav { display: flex; justify-content: space-between; align-items: center; margin: 12px 18px 0; }
+.fiche-n2-nav .po-btn { margin: 0; }
+.fiche-n2-nav .link-button { color: #8A7480; }
