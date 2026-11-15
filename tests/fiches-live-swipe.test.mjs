@@ -345,6 +345,7 @@ test('mise en relation à la main sans demande : la demande est créée et passe
   assert.equal(r.fait, 'n° 11 ↔ n° 12');
   const i = db.annonce_interets.find((x) => x.cible_ref === 12);
   assert.equal(i.statut, 'mis_en_relation');
+  assert.equal(i.via, 'lamia_main');
   assert.equal(r.statut.matchs.length, 1);
 });
 
