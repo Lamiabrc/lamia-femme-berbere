@@ -459,3 +459,9 @@
 .tdb-moderateurs select { width: auto; min-width: 130px; }
 .tdb-membre-num [data-membre-chercher] input { width: 200px; }
 .tdb-moderateurs [data-mod-liste] button { border: 1px solid #e6d6c0; background: #fff; border-radius: 999px; padding: 5px 11px; font: inherit; font-size: 13px; cursor: pointer; }
+
+/* Précédent / Suivant dans la fiche d’un membre (15 nov. 2026) */
+.compte-nav { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+/* Choix oui / non et formule dans la fiche modérateur */
+.tdb-membre-fiche label.tdb-choix { display: inline-flex; align-items: center; gap: 6px; margin: 0 14px 0 0; font-weight: 500; }
+.tdb-membre-fiche label.tdb-choix input { width: auto; height: auto; margin: 0; }

@@ -480,6 +480,7 @@ async function monProfil(session) {
     { // Profil incomplet : ce qui manque, pourquoi ça bloque, et le bouton pour le régler.
       const bloc = document.querySelector('[data-incomplet-bloc]');
       const QUOI = {
+        photos_refusees: ['Envoie 2 photos valides', 'Lamia n’a pas pu valider tes photos. Envoie 2 photos de toi : des vraies photos de toi, et deux photos différentes. Ton compte est suspendu jusque-là (personne ne te voit, tu ne peux ni swiper ni répondre). Il est débloqué dès qu’elles sont envoyées. Elles ne sont jamais publiées.', 'Envoyer mes photos', 'photos'],
         photos: ['Ajoute tes 2 photos', 'Sans tes 2 photos, tu ne peux ni swiper ni répondre. Elles ne sont jamais publiées.', 'Ajouter mes photos', 'photos'],
         contact: ['Indique un contact valable', 'Mets ton numéro de téléphone, ou le lien de ton profil TikTok, Instagram ou Facebook (un prénom ne suffit pas). Sans lui, ton profil n’est pas validé et personne ne te voit.', 'Corriger mon contact', 'modifier'],
         email: ['Corrige ton adresse email', 'Ton adresse email n’est pas valable : Lamia ne peut pas te prévenir de tes matchs.', 'Corriger mon profil', 'modifier'],

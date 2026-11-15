@@ -892,6 +892,14 @@ async function chargerComptes() {
   if (compteOuvert) ouvrirCompte(compteOuvert);
 }
 
+// L'ordre de la liste affichée : « Suivant » ouvre la fiche d'après sans revenir à la liste (Lamia, 15 nov. 2026).
+let ordreComptes = [];
+function boutonsSuivant() {
+  const k = ordreComptes.indexOf(compteOuvert);
+  const prec = $('[data-compte-prec]'), suiv = $('[data-compte-suiv]');
+  if (prec) prec.hidden = k <= 0;
+  if (suiv) { suiv.hidden = k < 0 || k >= ordreComptes.length - 1; suiv.textContent = k >= 0 ? `Suivant (${k + 2}/${ordreComptes.length}) →` : 'Suivant →'; }
+}
 function listeComptes() {
   if (!comptes) return;
   const q = $('[data-comptes-cherche]').value.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -905,6 +913,7 @@ function listeComptes() {
     sansprofil: (c) => c.sans_profil,
   }[filtreComptes];
   const l = comptes.comptes.filter(garde).filter((c) => !q || [nomDe(c), c.email, c.profil?.city, c.profil?.display_name, ...c.annonces.map((a) => a.ref), ...c.fiches.map((f) => f.ref)].join(' ').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes(q));
+  ordreComptes = l.map((c) => c.id);
   // Des cartes, pas une liste sans fin : 24 à la fois, puis « Afficher plus ».
   const ETAT = { publiee: ['Profil validé', 'is-ok'], a_verifier: ['À vérifier', 'is-alerte'], brouillon: ['Profil pas terminé', 'is-alerte'] };
   $('[data-comptes]').innerHTML = l.length ? l.slice(0, limiteComptes).map((c) => {
@@ -963,6 +972,8 @@ function ouvrirCompte(id) {
   $('[data-compte-fiche]').hidden = false;
   $('[data-compte-fond]').hidden = false;
   $('[data-compte-form]').hidden = false;
+  boutonsSuivant();
+  $('[data-compte-fiche]').scrollTop = 0;
   chargerDetail({ user_id: id });
 }
 // ---------------------------------------------------------------- la fiche : qui, son activité, pourquoi une alerte, cadeaux, blocage
@@ -985,6 +996,7 @@ function profilComplet(a) {
   const badges = [a.identite_verifiee_at ? 'pièce d’identité validée' : '', a.recommande_at ? 'recommandé' : '', a.moderateur_at ? 'modérateur' : '', a.visible_anonyme === false ? 'masqué dans les profils' : '', a.outil_id || a.exportee_at ? 'importé dans l’outil' : 'pas encore importé dans l’outil'].filter(Boolean).join(' · ');
   return `<article class="profil-complet"><h4>Profil n° ${esc(a.ref)}</h4><p class="aide">${esc(badges)}</p>
     ${medias ? `<div class="profil-medias">${medias}</div>` : '<p class="aide">Aucune photo ni vidéo.</p>'}
+    ${a.photos_refusees_at ? `<p class="fiche-bloque">Photos refusées le ${esc(date(a.photos_refusees_at, { day: 'numeric', month: 'long' }))} : compte suspendu jusqu’à l’envoi de 2 nouvelles photos.</p>` : a.test ? '' : `<p><button class="btn btn-line fiche-danger" type="button" data-photos-refuser="${esc(a.ref)}">Photos non valides : suspendre jusqu’à de nouvelles photos</button></p>`}
     ${a.profil ? `<h5>Qui je suis</h5><p>${esc(a.profil)}</p>` : ''}${a.recherche ? `<h5>Qui je cherche${a.age_min || a.age_max ? ` · ${esc(a.age_min || 18)} à ${esc(a.age_max || 99)} ans` : ''}</h5><p>${esc(a.recherche)}</p>` : ''}
     <dl class="profil-champs">${lignesProfil([['Prénom', a.prenom], ['Âge', a.age], ['Genre', a.genre], ['Ville', a.ville], ['Pays', a.pays], ['Situation', a.situation], ['Email', a.email], ['Téléphone', a.phone], ...reponses, ['Ma note', a.note_lamia]])}</dl></article>`;
 }
@@ -1049,6 +1061,7 @@ async function ouvrirParRef(ref) {
   $('[data-compte-soirees]').innerHTML = '<li>Pas de compte.</li>';
   $('[data-compte-liens]').innerHTML = '';
   $('[data-compte-fiche]').hidden = false; $('[data-compte-fond]').hidden = false;
+  boutonsSuivant();
   chargerDetail({ ref });
 }
 function suivreHashProfil() {
@@ -1188,6 +1201,20 @@ $('[data-comptes-filtres]').addEventListener('click', (e) => {
 });
 $('[data-comptes-maj]').addEventListener('click', chargerComptes);
 $('[data-compte-fermer]').addEventListener('click', fermerCompte);
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-photos-refuser]');
+  if (!b) return;
+  if (!confirm(`Refuser les photos du profil n° ${b.dataset.photosRefuser} ?\n\nSes photos sont effacées et son compte est suspendu. La personne reçoit : « Transmets 2 photos valides (de toi, réelles et différentes) : ton compte est suspendu jusque-là. » Il est débloqué tout seul dès qu’elle les envoie.`)) return;
+  b.disabled = true;
+  try { await conf({ action: 'annonce_photos_refuser', ref: Number(b.dataset.photosRefuser) }); b.outerHTML = '<p class="fiche-bloque">Photos refusées : compte suspendu jusqu’à l’envoi de 2 nouvelles photos. La personne est prévenue.</p>'; }
+  catch { b.disabled = false; alert('Ça n’a pas fonctionné. Réessaie.'); }
+});
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-compte-suiv], [data-compte-prec]');
+  if (!b) return;
+  const k = ordreComptes.indexOf(compteOuvert) + (b.matches('[data-compte-suiv]') ? 1 : -1);
+  if (ordreComptes[k]) ouvrirCompte(ordreComptes[k]);
+});
 $('[data-compte-fond]').addEventListener('click', fermerCompte);
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('[data-compte-fiche]').hidden) fermerCompte(); });
 $('[data-compte-fiche]').addEventListener('click', (e) => { if (e.target.closest('[data-rencontres-aller]')) fermerCompte(); });
