@@ -344,7 +344,7 @@ async function monProfil(session) {
     const { profil: p } = await appelProfil({ action: 'annonce_mon_profil' }, session);
     if (!p) { await sansProfil(box, session); return; }
     box.innerHTML = `${p.test ? '<p class="espace-test"><svg class="ico" aria-hidden="true"><use href="/icones.svg#flask-conical"/></svg> <strong>Compte de test.</strong> Il sert uniquement à essayer l’application : il ne voit que les profils de test et ne contacte aucun vrai membre.</p>' : ''}<article class="espace-achat"><div><p class="event-date">Profil n° ${esc(p.ref)}</p><h3>${esc(ETAT_PROFIL[p.status] || p.status)}${p.status === 'publiee' && p.piece_identite ? ' · avec pièce d’identité' : ''}</h3>
-      ${p.live ? `<p><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg> Profil créé en live avec Lamia${p.live_retrouve ? '' : ' (Lamia vérifie ta fiche)'} : <strong>tes matchs sont gratuits</strong>, 1 à la fois.</p>` : '<p>Tes matchs sont gratuits, 1 à la fois.</p>'}
+      ${p.live ? `<p><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg> Profil créé en live avec Lamia${p.live_retrouve ? '' : ' (Lamia vérifie ta fiche)'}.</p>` : ''}
       ${p.nb_compatibles !== null && p.nb_compatibles !== undefined ? `<p>D’après l’outil de Lamia, tu pourrais correspondre à ${esc(p.nb_compatibles)} personne(s).</p>` : ''}
       ${p.matchs ? `<p class="espace-match"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Matchs en cours : <strong>${esc(p.matchs.actifs)} / ${esc(p.matchs.limite)}</strong>${p.matchs.actifs >= p.matchs.limite ? (p.matchs.formule === 'prestige' ? ' · mets fin à un match pour en choisir un autre.' : ' · mets fin à un match pour en choisir un autre, ou <a class="text-link" href="/abonnement/">passe à une formule supérieure</a>.') : ''}</p>` : ''}</div>
       <div class="espace-achat-droite">${!window.LFB_PLAY && p.matchs && p.matchs.formule !== 'prestige' ? (p.algerie ? '<a class="btn btn-line" href="/salon/">Plus de matchs au live</a> ' : `<a class="btn btn-ink espace-abo-btn" href="${p.matchs.formule === 'passion' ? '/abonnement/?formule=prestige">Passer à Prestige' : '/abonnement/">S’abonner'}</a> `) : ''}${p.fiche_live ? '<a class="btn btn-ink" href="#mes-fiches">Modifier mon profil</a>' : '<button class="btn btn-ink" type="button" data-profil-modifier>Modifier mon profil</button>'}</div></article>
@@ -441,14 +441,18 @@ async function suivi(el, p) {
   const a = etat?.abonnement, q = a ? QUOTAS[a.formule] : null, u = etat?.unites || {};
   const s = p.suivi || { mises_total: 0, mises_mois: 0 };
   const offertesRestantes = Math.max(0, (p.offertes || 1) - s.mises_total);
+  // Formules du 15 nov. 2026 : matchs illimités, seul le nombre de matchs en même temps change. Court et à jour.
+  const FORMULES = { decouverte: { nom: 'Découverte', prix: 'gratuite', jours: 7, sd: 0 }, passion: { nom: 'Passion', prix: '9 € par mois', jours: 14, sd: 1 }, prestige: { nom: 'Prestige', prix: 'abonnement', jours: null, sd: 2 }, coeur: { nom: 'Cœur', prix: 'ancienne formule', jours: 7, sd: 1 } };
+  const cle = a?.formule && FORMULES[a.formule] ? a.formule : (p.matchs?.formule && FORMULES[p.matchs.formule] ? p.matchs.formule : 'decouverte');
+  const f = FORMULES[cle];
   const lignes = [
-    q ? `<li><strong>Mises en relation offertes</strong> : ${offertesRestantes} sur ${p.offertes || 1} restante(s)</li>` : '<li><strong>Matchs gratuits</strong> : 1 à la fois, un nouveau dès que le précédent se termine</li>',
-    q ? `<li><strong>Formule ${esc(q.nom)}</strong> : ${s.mises_mois} mise(s) en relation ce mois-ci${q.mises ? ` sur ${q.mises}` : ' (sans limite)'} · ${q.sd} speed dating inclus par mois</li>`
-      : (p.algerie ? '<li><strong>Formule Découverte</strong> (gratuite)</li>' : '<li><strong>Formule Découverte</strong> (gratuite) · plusieurs matchs en même temps avec <a class="text-link" href="/abonnement/">une formule</a></li>'),
-    q && q.nom !== 'Cœur' ? '<li><strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#camera"/></svg> Photo de ton match</strong> : incluse dans ta formule, si ton match l’accepte</li>' : '<li><strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#camera"/></svg> Photo de ton match</strong> : incluse à partir de la formule Passion, ou 3 € pour la voir 1 heure · <a class="text-link" href="/abonnement/?formule=passion">en savoir plus</a></li>',
-    '<li><strong>Qui peut t’envoyer un cœur</strong> : seulement les personnes qui correspondent à ta tranche d’âge (à 7 ans près) et à la zone que tu as choisie. Vérifie tes critères avec « Modifier mon profil ».</li>',
-    u.mise_en_relation || u.speed_dating ? `<li><strong>Achetés à l’unité</strong> : ${u.mise_en_relation || 0} match(s) supplémentaire(s) · ${u.speed_dating || 0} place(s) de speed dating</li>` : '',
+    p.matchs ? `<li><strong>Matchs en cours</strong> : ${esc(p.matchs.actifs)} sur ${esc(p.matchs.limite)} en même temps</li>` : '',
+    `<li><strong>Discussion avec ton match</strong> : ${f.jours ? `${f.jours} jours` : 'sans limite de durée'}</li>`,
+    f.sd ? `<li><strong>Speed dating</strong> : ${f.sd} inclus par mois</li>` : '',
+    u.mise_en_relation || u.speed_dating ? `<li><strong>Achetés à l’unité</strong> : ${u.mise_en_relation || 0} place(s) de match · ${u.speed_dating || 0} place(s) de speed dating</li>` : '',
   ].filter(Boolean).join('');
+  const changer = window.LFB_PLAY || p.algerie ? '' : ` <a class="text-link" href="/abonnement/">${cle === 'decouverte' ? 'Voir les formules' : 'Changer'}</a>`;
+  const badgeFormule = `<p class="espace-formule is-${esc(cle)}">Ta formule : <strong>${esc(f.nom)}</strong> <small>(${esc(f.prix)})</small>${changer}</p>`;
   // Demandes : les attentes regroupées en une ligne, le reste en court ; les terminées repliées.
   const date = (d) => new Date(d).toLocaleDateString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { day: 'numeric', month: 'long' });
   const toutes = p.interets || [];
@@ -479,8 +483,8 @@ async function suivi(el, p) {
     ? `<h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Qui t’a choisi·e</h3><p>${cp.refs.map((r) => `<strong>n° ${esc(r)}</strong>`).join(', ')} : ${cp.nombre > 1 ? 'ces profils sont' : 'ce profil est'} en tête de ton <a class="text-link" href="/rencontres/swipe/">swipe</a>. Choisis-${cp.nombre > 1 ? 'les' : 'le'} à ton tour pour un intérêt réciproque.</p>`
     : `<h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> ${cp.nombre} personne${cp.nombre > 1 ? 's t’ont' : ' t’a'} choisi·e</h3><p>Découvre qui avec la formule <a class="text-link" href="/abonnement/?formule=passion">Passion</a>${peutPayer ? ', ou pour 2 € pendant 24 heures' : ''}.</p>${peutPayer ? boutonService('qui_choisi', 'Voir qui t’a choisi·e pendant 24 heures', '2 €', 'Voir qui · 2 €') : ''}`;
   const finAvant = p.en_avant_jusqu_a ? new Date(p.en_avant_jusqu_a).toLocaleDateString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { day: 'numeric', month: 'long' }) : '';
-  const blocAvant = finAvant ? `<h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#star"/></svg> Ton profil est mis en avant</h3><p>En tête du swipe jusqu’au ${esc(finAvant)}.</p>` : peutPayer ? `<h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#star"/></svg> Mets ton profil en avant</h3><p>En tête du swipe pendant 7 jours, auprès des personnes qui correspondent à ses critères. Lamia ne promet pas de match, mais tu seras vu·e plus tôt.</p>${boutonService('profil_avant', 'Profil mis en avant pendant 7 jours', '5 €', 'Mettre en avant · 5 €')}` : '';
-  el.innerHTML = `<h3>Mon suivi</h3><ul>${lignes}</ul>${blocChoisi}${blocAvant}${blocPhoto}
+  const blocAvant = finAvant ? `<h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#star"/></svg> Ton profil est mis en avant</h3><p>En tête du swipe jusqu’au ${esc(finAvant)}.</p>` : peutPayer ? `<h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#star"/></svg> Mets ton profil en avant</h3><p>7 jours en tête du swipe.</p>${boutonService('profil_avant', 'Profil mis en avant pendant 7 jours', '5 €', 'Mettre en avant · 5 €')}` : '';
+  el.innerHTML = `<h3>Mon suivi</h3>${badgeFormule}<ul>${lignes}</ul>${blocChoisi}${blocAvant}${blocPhoto}
     <p><a class="po-btn" href="/rencontres/swipe/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Swiper les profils</a></p>
     <h3>Mes demandes de match</h3>${demandes ? demandes : '<p>Aucune pour l’instant. <a class="text-link" href="/rencontres/#profils-anonymes">Voir les profils</a></p>'}`;
   el.querySelectorAll('[data-relancer]').forEach((b) => b.addEventListener('click', async () => {
@@ -520,7 +524,7 @@ function monAbonnement(etat, session) {
     ? `<article class="espace-achat"><div><p class="event-date">Abonnement ${a.periode === 'an' ? 'annuel' : 'mensuel'}</p><h3>Formule ${esc(NOMS_FORMULES[a.formule] || a.formule)}</h3>
         <p>${esc(ETATS_ABO[a.statut] || a.statut)}${a.fin_periode ? ` · ${a.resiliation_prevue ? 'se termine le' : 'prochaine échéance le'} ${esc(date(a.fin_periode))}` : ''}</p>${unites ? `<p>À l’unité : ${esc(unites)}</p>` : ''}</div>
         <div class="espace-achat-droite"><button class="btn btn-ink" type="button" data-gerer-abo>Gérer mon abonnement</button></div></article><p class="form-status" data-gerer-statut></p>`
-    : `<p>${unites ? `À l’unité : ${esc(unites)}. ` : ''}Pas d’abonnement en cours. Tes matchs sont gratuits, 1 à la fois. <a class="text-link" href="/abonnement/">Voir les formules</a> pour aller plus vite et soutenir le live.</p>`;
+    : `<p>${unites ? `À l’unité : ${esc(unites)}. ` : ''}Formule Découverte (gratuite) : 1 match en cours à la fois. <a class="text-link" href="/abonnement/">Voir les formules</a></p>`;
   box.querySelector('[data-gerer-abo]')?.addEventListener('click', async (e) => {
     const st = box.querySelector('[data-gerer-statut]'); e.target.disabled = true; st.textContent = 'Ouverture…';
     try {

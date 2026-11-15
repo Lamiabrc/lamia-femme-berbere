@@ -4207,3 +4207,7 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 /* Sans rencontre (15 nov. 2026) */
 .espace-sans-liens { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
 .espace-choix { padding: 4px 0; }
+/* Mon suivi : la formule se voit d'un coup d'œil (15 nov. 2026) */
+.espace-formule { display: inline-block; margin: 0 0 10px; padding: 6px 14px; border-radius: 999px; background: #F1ECF7; border: 1px solid #D9CCE8; }
+.espace-formule.is-passion { background: #FBE9EF; border-color: #E9B9C9; }
+.espace-formule.is-prestige { background: #FFF5DD; border-color: #C9A24A; }
