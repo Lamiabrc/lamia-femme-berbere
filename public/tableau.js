@@ -1321,7 +1321,7 @@ $('[data-valider-tout]')?.addEventListener('click', async (e) => {
 $('[data-pilote-lancer]')?.addEventListener('click', (e) => { e.target.disabled = true; chargerActivite({ op: 'lancer' }).finally(() => { e.target.disabled = false; }); });
 document.addEventListener('click', (e) => {
   const d = e.target.closest('[data-dematcher]'), p = e.target.closest('[data-retirer-prop]');
-  if (d && confirm('Annuler ce match ? La discussion se ferme et leurs autres choix reviennent.')) chargerActivite({ op: 'dematcher', id: d.dataset.dematcher, ...refStatut() });
+  if (d && confirm('Annuler ce match ? La discussion se ferme, leurs autres choix reviennent, et ce match ne sera pas compté.')) chargerActivite({ op: 'dematcher', id: d.dataset.dematcher, ...refStatut() });
   if (p) chargerActivite({ op: 'retirer_proposition', id: p.dataset.retirerProp });
   const fo = e.target.closest('[data-forcer]');
   if (fo && confirm('Les mettre en relation maintenant ? Les deux sont prévenus et la discussion s’ouvre. Cela passe avant la limite de leur formule.')) chargerActivite({ op: 'forcer', id: fo.dataset.forcer, ...refStatut() });
