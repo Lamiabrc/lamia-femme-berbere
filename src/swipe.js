@@ -227,8 +227,8 @@ function boutonAbo(formule, algerie) {
   z.innerHTML = algerie
     ? '<a class="swipe-abo-btn" href="/salon/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg> Plus de matchs : viens au live</a>'
     : formule === 'passion'
-      ? '<a class="swipe-abo-btn" href="/abonnement/?formule=prestige"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Passer à Prestige · matchs illimités</a>'
-      : '<a class="swipe-abo-btn" href="/abonnement/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> S’abonner · plus de matchs dès 9 €</a>';
+      ? '<a class="swipe-abo-btn" href="/abonnement/?formule=prestige"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Passer à Prestige · 5 matchs en cours</a>'
+      : '<a class="swipe-abo-btn" href="/abonnement/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> S’abonner · plus de matchs en cours dès 9 €</a>';
   z.hidden = false;
 }
 
@@ -236,7 +236,7 @@ function boutonAbo(formule, algerie) {
 function quotaAtteint({ algerie, formule } = {}) {
   vibrer(80);
   if (algerie || window.LFB_PLAY) return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg></p><h2>Viens me voir en live</h2><p>Tu as utilisé ton match. Pour en avoir d’autres, <strong>viens soutenir le live de Lamia</strong>, du lundi au vendredi à 20 h : elle peut t’offrir un match, une fois toutes les 2 semaines.</p><p class="po-actions"><a class="po-btn-verre" href="/salon/">Voir le live</a></p>`);
-  return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg></p><h2>Tes matchs disponibles sont utilisés</h2><p>Prends un <strong>match supplémentaire à 5 €</strong>, viens au <strong>live de Lamia</strong>, du lundi au vendredi à 20 h (1 match offert toutes les 2 semaines), ou choisis une formule : 2 matchs en cours avec Passion, 5 avec Prestige.</p><p class="po-actions"><a class="po-btn-verre" href="/salon/">Voir le live</a><a class="po-btn-verre" href="/abonnement/">Voir les formules</a></p>`);
+  return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg></p><h2>Tes matchs disponibles sont utilisés</h2><p>Prends <strong>une place de match en plus à 5 €</strong>, viens au <strong>live de Lamia</strong>, du lundi au vendredi à 20 h (1 match offert toutes les 2 semaines), ou choisis une formule : 2 matchs en cours avec Passion, 5 avec Prestige.</p><p class="po-actions"><a class="po-btn-verre" href="/salon/">Voir le live</a><a class="po-btn-verre" href="/abonnement/">Voir les formules</a></p>`);
 }
 // Bloquer ou signaler le profil affiché. Bloquer le retire tout de suite, et la personne n'en sait rien.
 function moderer(ref) {

@@ -3,9 +3,9 @@ import assert from 'node:assert/strict';
 import { actionCoaching, creneauxDe, moisParis, rappelsCoaching } from '../lib/coaching.mjs';
 
 const ID = (n) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
-function monde({ formule = 'prestige', statut = 'actif', now = '2026-11-03T12:00:00Z', achetees = 0, autres = {} } = {}) {
+function monde({ formule = 'prestige', statut = 'actif', now = '2026-11-03T12:00:00Z', achetees = 0, autres = {}, depuis = '2026-11-01T10:00:00Z' } = {}) {
   const credits = { n: achetees, utilises: 0, rendus: 0 };
-  const lignes = [], abonnements = [{ email: 'nina@example.com', nom: 'Nina', formule: 'prestige', statut: 'actif' }];
+  const lignes = [], abonnements = [{ email: 'nina@example.com', nom: 'Nina', formule: 'prestige', statut: 'actif', created_at: depuis }];
   let n = 0;
   const filtrer = (qs) => {
     let l = [...lignes];
@@ -41,7 +41,7 @@ function monde({ formule = 'prestige', statut = 'actif', now = '2026-11-03T12:00
   const prevenus = [], alertes = [];
   const t = { now: new Date(now) };
   const daily = [];
-  const ctx = (user, admin = false) => ({ env: { DAILY_API_KEY: 'k' }, call, read, patch, insert: async () => ({}), admin, user, now: () => t.now, alerter: async (x) => { alertes.push(x.titre); }, prevenirMembre: async (m, x) => { prevenus.push([m.email, x.titre]); }, etat: async () => ({ abonnement: formule ? { formule, statut } : null, unites: { coaching: credits.n, ...autres } }), consommer: async (_m, type) => { if (type !== 'coaching') { if (!autres[type]) return null; autres[type] -= 1; return 'achat-2'; } if (credits.n < 1) return null; credits.n -= 1; credits.utilises += 1; return 'achat-1'; }, rendre: async () => { credits.n += 1; credits.rendus += 1; return true; }, jeton: (id) => `signe-${id}`, jetonOk: (id, x) => x === `signe-${id}`,
+  const ctx = (user, admin = false) => ({ env: { DAILY_API_KEY: 'k' }, call, read, patch, insert: async () => ({}), admin, user, now: () => t.now, alerter: async (x) => { alertes.push(x.titre); }, prevenirMembre: async (m, x) => { prevenus.push([m.email, x.titre]); }, etat: async () => ({ abonnement: formule ? { formule, statut, created_at: depuis } : null, unites: { coaching: credits.n, ...autres } }), consommer: async (_m, type) => { if (type !== 'coaching') { if (!autres[type]) return null; autres[type] -= 1; return 'achat-2'; } if (credits.n < 1) return null; credits.n -= 1; credits.utilises += 1; return 'achat-1'; }, rendre: async () => { credits.n += 1; credits.rendus += 1; return true; }, jeton: (id) => `signe-${id}`, jetonOk: (id, x) => x === `signe-${id}`,
     fetcher: async (u, o) => { daily.push([u, o]); return new Response(JSON.stringify(u.includes('meeting-tokens') ? { token: 'jeton' } : { name: 'coaching-x', url: 'https://lfb.daily.co/coaching-x' })); } });
   return { lignes, ctx, prevenus, alertes, t, daily, credits };
 }
@@ -283,4 +283,13 @@ test('dans sa salle, Lamia a la fiche de la séance et garde ses notes privées'
   assert.equal((await go(w, 'annonce_coaching_notes', { id: a.id, notes: 'Veut se marier dans l’année.' }, LAMIA, true)).ok, true);
   const d = await go(w, 'annonce_coaching_seance', { id: a.id }, LAMIA, true);
   assert.equal(d.seance.duree, 15); assert.equal(d.seance.prenom, 'Nina'); assert.equal(d.seance.service, 'Visio de 15 minutes');
+});
+
+test('Prestige sans visio depuis le 15 nov. 2026 ; les anciens abonnés la gardent jusqu’à la fin de leur mois', async () => {
+  const neuf = monde({ depuis: '2026-11-16T10:00:00Z', now: '2026-11-17T12:00:00Z' });
+  assert.equal((await go(neuf, 'annonce_coaching', {})).inclus, false);
+  const ancien = monde({ depuis: '2026-11-03T10:00:00Z', now: '2026-11-20T12:00:00Z' });
+  assert.equal((await go(ancien, 'annonce_coaching', {})).inclus, true);
+  ancien.t.now = new Date('2026-12-03T11:00:00Z');
+  assert.equal((await go(ancien, 'annonce_coaching', {})).inclus, false);
 });

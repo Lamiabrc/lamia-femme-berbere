@@ -949,7 +949,7 @@ page(
     </details>
 
     <div class="espace-liens is-light">
-      <a href="/confidences/"><strong>Me confier à Lamia</strong><span>Écrire, laisser un vocal, échanger · réservé aux abonnés</span></a>
+      <a href="/confidences/#conversation"><strong>Ma conversation avec Lamia</strong><span>Quand Lamia t’écrit, tu lui réponds ici</span></a>
     </div>
   </div>
 </section>`,
@@ -1206,7 +1206,7 @@ page(
   '/confidences/',
   layout({
     title: 'Les Confidences avec Lamia · Un mot, un doute, une histoire',
-    description: 'Confie-toi à Lamia par écrit, par message vocal ou en conversation privée. Lamia te répond personnellement dès qu’elle est disponible.',
+    description: 'Ta conversation privée avec Lamia : elle t’écrit quand elle a besoin de toi, tu lui réponds. Et le signalement, ouvert à tous les membres.',
     path: '/confidences/',
     room: roomBySlug.confidences,
     scripts: ['/assets/membre.js', '/assets/confidences.js'],
@@ -1216,24 +1216,21 @@ page(
   <p class="conf-sur">Le petit salon</p>
   <h1>Les Confidences avec Lamia</h1>
   <p class="conf-sous">« Un mot, un doute, une histoire… je t’écoute. »</p>
-  <p class="conf-promesse">Réservées aux abonnés : Lamia leur répond personnellement.</p>
+  <p class="conf-promesse">Lamia t’écrit ici quand elle a besoin de toi, et tu lui réponds.</p>
 </section>
 
 <section class="conf-choix" aria-label="Comment veux-tu te confier ?">
-  <button type="button" class="conf-carte" data-choix="ecrire" aria-expanded="false"><span class="conf-icone" aria-hidden="true">✎</span><strong>Je préfère écrire</strong><small>Un message, et si tu veux des photos ou des documents.</small></button>
-  <button type="button" class="conf-carte" data-choix="parler" aria-expanded="false"><span class="conf-icone" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#mic"/></svg></span><strong>Je préfère parler</strong><small>Un message vocal, enregistré ici même.</small></button>
   <button type="button" class="conf-carte" data-choix="conversation" aria-expanded="false"><span class="conf-icone" aria-hidden="true">❦</span><strong>Échanger avec Lamia</strong><small>Une conversation privée, que tu retrouves quand tu veux.</small></button>
   <button type="button" class="conf-carte" data-choix="annonce" aria-expanded="false"><span class="conf-icone" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg></span><strong>Trouver mon âme sœur</strong><small>Ton profil, confié à Lamia et à son outil de matching.</small></button>
 </section>
 
 <section class="conf-panneau" data-panneau="reserve" id="reserve" hidden>
   <div class="conf-form">
-    <h2>Les Confidences sont réservées aux abonnés</h2>
-    <p>Pour écrire à Lamia ici, par message ou par vocal, il faut une formule Passion ou Prestige.</p>
+    <h2>Les Confidences sont fermées</h2>
+    <p>Lamia t’écrit directement dans ta conversation quand elle a besoin de toi, et tu lui réponds là.</p>
     <p>Tu peux toujours la contacter sur ses réseaux sociaux. Mais là-bas, elle ne saura pas de quel profil tu parles.</p>
     <ul class="conf-reseaux"><li><a href="https://www.tiktok.com/@lamiafemmeberbere" rel="noopener" target="_blank">TikTok</a></li><li data-social="instagram" hidden><a rel="noopener" target="_blank">Instagram</a></li><li><a href="https://www.facebook.com/femmeberberes/" rel="noopener" target="_blank">Facebook</a></li></ul>
-    <p data-hors-play><a class="conf-btn conf-btn-plein" href="/abonnement/">Voir les formules</a></p>
-    <p data-si-deconnecte><strong>Déjà abonné·e ?</strong> <button type="button" class="conf-lien" data-choix="conversation">Me connecter</button></p>
+    <p data-si-deconnecte><button type="button" class="conf-lien" data-choix="conversation">Me connecter pour voir ma conversation</button></p>
     <p><strong>Un faux profil ou un comportement inquiétant ?</strong> <a class="text-link" href="#signaler">Le signalement reste ouvert à tous les membres.</a></p>
   </div>
 </section>
@@ -1290,10 +1287,10 @@ page(
     <div class="conf-conv-tete"><h2>Ma conversation avec Lamia</h2><p><small data-conv-email></small> · <button type="button" class="conf-lien" data-conv-sortir>Me déconnecter</button></p></div>
     <div class="conf-fil" data-conv-fil aria-live="polite"></div>
     <div class="conf-conv-reserve" data-conv-reserve hidden>
-      <h3>Les Confidences sont réservées aux abonnés</h3>
+      <h3>Lamia ne t’a pas encore écrit</h3>
+      <p>Quand elle t’écrira, ta conversation s’ouvrira ici et tu pourras lui répondre.</p>
       <p>Tu peux toujours la contacter sur ses réseaux sociaux. Mais là-bas, elle ne saura pas de quel profil tu parles.</p>
     <ul class="conf-reseaux"><li><a href="https://www.tiktok.com/@lamiafemmeberbere" rel="noopener" target="_blank">TikTok</a></li><li data-social="instagram" hidden><a rel="noopener" target="_blank">Instagram</a></li><li><a href="https://www.facebook.com/femmeberberes/" rel="noopener" target="_blank">Facebook</a></li></ul>
-    <p data-hors-play><a class="conf-btn conf-btn-plein" href="/abonnement/">Voir les formules</a></p>
     </div>
     <form class="conf-composer" data-conv-form novalidate>
       <div data-conv-premier hidden>
@@ -1640,14 +1637,13 @@ const tableauFormules = () => {
     ['Speed datings inclus par mois', '–', pa.speedDatings, pr.speedDatings],
     ['Swipe sans limite', oui, oui, oui],
     ['Seconde chance après un « pas pour moi »', non, '2 fois par profil', '2 fois par profil'],
-    ['7 jours de discussion avec ton match', oui, oui, oui],
+    ['Discussion avec ton match', '7 jours', '14 jours', 'Sans limite'],
     ['Le profil de qui t’a choisi·e', 'Le nombre seulement', v(pa.quiMaChoisi), v(pr.quiMaChoisi)],
     ['La photo de ton match, s’il ou elle l’accepte', `${eurosAbo(UNITES.find((u) => u.id === 'photo_match').prix)} pour 1 heure`, 'Incluse', 'Incluse'],
-    ['Tes questions à Lamia sur ton profil', non, oui, oui],
-    ['Les Confidences avec Lamia (messages et vocaux)', non, oui, oui],
     ['Profil prioritaire dans le matching', non, non, oui],
-    ['Coaching avec Lamia', non, non, '1 visio de 15 minutes par mois'],
-    ['Option mariage, de la rencontre aux familles', non, non, oui],
+    ['Profil mis en avant', '5 € pour 7 jours', '5 € pour 7 jours', '7 jours chaque mois'],
+    ['Cœurs avec message', '2 € l’un', '2 € l’un', '5 chaque mois'],
+    ['Love coaching avec Lamia', 'À l’unité', 'À l’unité', '-20 %'],
   ];
   return `<h2 class="annonces-titre">Les formules en un coup d’œil</h2>
   <div class="abo-tableau-cadre" tabindex="0" role="region" aria-label="Tableau récapitulatif des formules"><table class="abo-tableau">
@@ -1669,7 +1665,7 @@ page(
   '/abonnement/',
   layout({
     title: 'Tarifs des rencontres kabyles · Formules Lamia',
-    description: 'Découverte gratuite, Passion à 9 €, Prestige à 22 € pour les 20 premiers abonnés, 49 € par mois pour les inscriptions suivantes. Sans engagement, résiliable en un clic.',
+    description: 'Découverte gratuite, Passion à 9 €, Prestige à 22 € pour les 20 premiers abonnés, 29 € par mois pour les inscriptions suivantes. Sans engagement, résiliable en un clic.',
     path: '/abonnement/',
     room: roomBySlug.patio,
     scripts: ['/assets/abonnement.js'],
@@ -1681,7 +1677,7 @@ page(
       <p class="po-eyebrow">Par Lamia, marieuse kabyle</p>
       <h1 id="abo-titre">Les formules de rencontre kabyle</h1>
       <p class="po-sub">En gratuit, un match à la fois : dès qu’il se termine, un autre peut commencer.</p>
-      <p class="po-lead">Ou choisis le rythme qui te ressemble : des matchs illimités, 2 ou 5 en cours en même temps, avec le coaching et l’option mariage de Lamia. Sans engagement, résiliable en un clic depuis ton espace.</p>
+      <p class="po-lead">Ou choisis le rythme qui te ressemble : des matchs illimités, 2 ou 5 en cours en même temps, plus de temps pour discuter et ton profil mis en avant. Sans engagement, résiliable en un clic depuis ton espace.</p>
       <p class="po-lead">Les matchs sont gratuits pour tout le monde. Pour soutenir Lamia, <a class="text-link" href="/salon/">viens au live</a> : depuis l’Algérie, où le paiement en ligne n’est pas possible, ta présence compte autant.</p>
     </div>
     <figure class="po-lamia"><img src="/images/lamia/lamia-portrait-tatouages-rond-480.webp" alt="Lamia Femme Berbère" width="200" height="200"><figcaption>Lamia · ta marieuse</figcaption></figure>
@@ -1696,7 +1692,7 @@ page(
   <div class="abo-grille">${FORMULES.map(carteFormule).join('')}</div>
   ${tableauFormules()}
   <h2 class="annonces-titre" id="unites">Sans abonnement, à l’unité</h2>
-  <div class="abo-unites">${UNITES.map((u) => `<article class="abo-carte abo-unite${FONDS_COACHING[u.id] ? ' abo-coaching' : ''}" id="unite-${u.id}">${FONDS_COACHING[u.id] ? `<img class="abo-coaching-img" src="/images/coaching/${FONDS_COACHING[u.id][0]}.webp" alt="${esc(FONDS_COACHING[u.id][1])}" width="720" height="720" loading="lazy">` : ''}<h3>${esc(u.nom)}</h3><p class="abo-prix">${eurosAbo(u.prix)}</p><p>${esc(u.texte)}</p>${u.depuisEspace ? (u.lien ? `<a class="po-btn-verre" href="${u.lien}">Dans le swipe</a>` : '<a class="po-btn-verre" href="/mon-espace/">Mon espace</a>') : `<button type="button" class="po-btn-verre" data-unite="${u.id}">Acheter</button>`}</article>`).join('')}</div>
+  <div class="abo-unites">${UNITES.filter((u) => !u.horsVente).map((u) => `<article class="abo-carte abo-unite${FONDS_COACHING[u.id] ? ' abo-coaching' : ''}" id="unite-${u.id}">${FONDS_COACHING[u.id] ? `<img class="abo-coaching-img" src="/images/coaching/${FONDS_COACHING[u.id][0]}.webp" alt="${esc(FONDS_COACHING[u.id][1])}" width="720" height="720" loading="lazy">` : ''}<h3>${esc(u.nom)}</h3><p class="abo-prix">${eurosAbo(u.prix)}</p><p>${esc(u.texte)}</p>${u.depuisEspace ? (u.lien ? `<a class="po-btn-verre" href="${u.lien}">Dans le swipe</a>` : '<a class="po-btn-verre" href="/mon-espace/">Mon espace</a>') : `<button type="button" class="po-btn-verre" data-unite="${u.id}">Acheter</button>`}</article>`).join('')}</div>
   <form class="abo-form annonce-form" data-abo-form hidden>
     <h2 data-abo-titre>Ta formule</h2>
     <p class="annonce-aide" data-abo-resume></p>

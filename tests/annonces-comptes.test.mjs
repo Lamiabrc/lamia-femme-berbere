@@ -440,3 +440,25 @@ test('plus de question sur la différence : l’espace n’affiche plus aucun av
   const d = await (await handleAnnonces('annonce_avis_lamia', {}, ctx(NINA))).json();
   assert.deepEqual(d.avis, []);
 });
+
+test('Prestige : chaque mois, 5 cœurs avec message et 7 jours de mise en avant, accordés une seule fois', async () => {
+  const { ctx, db } = monde();
+  db.annonces.push({ id: 'p1', ref: 41, user_id: 'u-pres', email: 'pres@example.com', status: 'publiee', prenom: 'Sara', genre: 'femme', en_match: false, pays: 'France', matching: {} });
+  db.achats_unite ||= [];
+  const sara = { id: 'u-pres', email: 'pres@example.com' };
+  const c = ctx(sara, 'prestige');
+  const base = c.insert;
+  const vus = new Set();
+  c.insert = async (t, row) => { if (t === 'achats_unite') { if (vus.has(row.stripe_session_id)) throw new Error('doublon'); vus.add(row.stripe_session_id); } return base(t, row); };
+  await handleAnnonces('annonce_swipe_liste', {}, c);
+  await handleAnnonces('annonce_swipe_liste', {}, c);
+  const dons = db.achats_unite.filter((x) => String(x.stripe_session_id).startsWith('offert-prestige-'));
+  assert.deepEqual(dons.map((x) => [x.type, x.quantite]).sort(), [['coeur_message', 5], ['profil_avant', 1]]);
+  assert.equal(db.annonces.find((x) => x.id === 'p1').avant_jusqu_a, '2026-11-05T20:00:00.000Z');
+  // Passion : rien de tout ça.
+  const { ctx: ctx2, db: db2 } = monde();
+  db2.annonces.push({ id: 'p2', ref: 42, user_id: 'u-pas', email: 'pas@example.com', status: 'publiee', prenom: 'Lina', genre: 'femme', en_match: false, pays: 'France', matching: {} });
+  db2.achats_unite ||= [];
+  await handleAnnonces('annonce_swipe_liste', {}, ctx2({ id: 'u-pas', email: 'pas@example.com' }, 'passion'));
+  assert.equal((db2.achats_unite || []).length, 0);
+});

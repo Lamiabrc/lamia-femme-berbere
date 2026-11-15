@@ -19,7 +19,7 @@ export const ERREURS = {
   login_required: 'Ta connexion a expiré. Reçois un nouveau lien de connexion.',
   upload_failed: 'Les fichiers ne sont pas arrivés. Vérifie ta connexion et réessaie.',
   forbidden: 'Cette action n’est pas autorisée.',
-  reserve_abonnes: 'Les Confidences sont réservées aux abonnés.',
+  reserve_abonnes: 'Les Confidences sont fermées : Lamia t’écrit dans ta conversation quand elle a besoin de toi.',
 };
 export const erreur = (code) => ERREURS[code] || 'L’envoi n’a pas fonctionné. Réessaie dans un instant.';
 
@@ -78,8 +78,8 @@ export function matchPleinHtml(ouverts, { formule = '', algerie = false } = {}) 
     : '<a class="po-btn" href="/mon-espace/#discussion">Choisir le match à terminer</a>';
   const abo = algerie
     ? '<p>Tu vis en Algérie : pour un match de plus, <a class="text-link" href="/salon/">viens au live de Lamia</a>.</p>'
-    : formule === 'prestige' ? ''
-      : `<p>Tu veux garder ${ouverts.length > 1 ? 'tes matchs' : 'ce match'} <em>et</em> dire oui à ce profil ? <a class="text-link" href="/abonnement/${formule === 'passion' ? '?formule=prestige' : ''}">${formule === 'passion' ? 'Prestige : 5 matchs en même temps' : 'Avec une formule, plusieurs matchs en même temps (2 avec Passion, 5 avec Prestige)'}</a>.</p>`;
+    : formule === 'prestige' ? '<p>Tu veux garder tes matchs <em>et</em> dire oui à ce profil ? <a class="text-link" href="/abonnement/#unite-mise_en_relation">Une place de match en plus · 5 € pour 30 jours</a>.</p>'
+      : `<p>Tu veux garder ${ouverts.length > 1 ? 'tes matchs' : 'ce match'} <em>et</em> dire oui à ce profil ? <a class="text-link" href="/abonnement/${formule === 'passion' ? '?formule=prestige' : ''}">${formule === 'passion' ? 'Prestige : 5 matchs en même temps' : 'Avec une formule, plusieurs matchs en même temps (2 avec Passion, 5 avec Prestige)'}</a>, ou <a class="text-link" href="/abonnement/#unite-mise_en_relation">une place de match en plus · 5 € pour 30 jours</a>.</p>`;
   return `<h2>Tu es déjà en match${avec ? ` avec ${avec}` : ''}</h2>
     ${ouverts.length ? `<p>${ouverts.length > 1 ? 'Ces matchs n’étaient pas assez bien pour toi ?' : 'Ce match n’était pas assez bien pour toi ?'} Pour dire oui à ce profil, dématche d’abord, avec élégance : tu choisis la raison et vous avez chacun deux messages pour vous dire au revoir.</p><p class="po-actions">${dematch}</p>` : '<p>Mets fin à un match depuis ton espace pour dire oui à ce profil.</p><p class="po-actions"><a class="po-btn" href="/mon-espace/">Mon espace</a></p>'}
     ${abo}
