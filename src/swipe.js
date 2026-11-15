@@ -23,7 +23,9 @@ function carte(a) {
   const femme = a.genre === 'femme';
   const mr = metierEtReligion(a);
   const tags = (a.caracteristiques || []).slice(0, 8);
-  const infos = [a.pays && lib(a.pays), a.situation && lib(a.situation), a.enfants === 'Oui' ? 'avec enfant(s)' : a.enfants === 'Non' ? 'sans enfant' : '', a.etudes && `études : ${lib(a.etudes).toLowerCase()}`].filter(Boolean);
+  // Carte courte (Lamia, 15 nov.) : le pays seulement sans ville, pas de « Partout », origine et village sur une ligne.
+  const infos = [!a.ville && a.pays && lib(a.pays), a.situation && lib(a.situation), a.enfants === 'Oui' ? 'avec enfant(s)' : a.enfants === 'Non' ? 'sans enfant' : '', a.etudes && lib(a.etudes).toLowerCase()].filter(Boolean);
+  const secteur = /^partout$/i.test(secteurLisible(a.secteur).trim()) ? '' : secteurLisible(a.secteur);
   const ages = a.age_min || a.age_max ? ` (${a.age_min || 18} à ${a.age_max || 99} ans)` : '';
   const lieu = a.ville || (a.pays && lib(a.pays)) || '';
   return `<article class="swipe-carte ${a.genre === 'homme' ? 'est-homme' : a.genre === 'femme' ? 'est-femme' : ''}" data-ref="${a.ref}">
@@ -48,9 +50,8 @@ function carte(a) {
       ${badgesProfil(a)}
       <h2>${femme ? 'Une femme' : 'Un homme'}, ${esc(a.age)} ans</h2>
       <p class="annonce-lieu"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lieu"/></svg>${esc([a.ville, ...infos].filter(Boolean).join(' · '))}</p>
-      ${origineLisible(a.origine) ? `<p class="annonce-origine">Origine : <b>${esc(origineLisible(a.origine))}</b></p>` : ''}
-      ${a.village ? `<p class="annonce-lieu"><svg class="ico" aria-hidden="true"><use href="/icones.svg#maison"/></svg> Originaire de ${esc(a.village)}</p>` : ''}
-      ${secteurLisible(a.secteur) ? `<p class="annonce-lieu annonce-secteur"><svg class="ico" aria-hidden="true"><use href="/icones.svg#boussole"/></svg> Cherche en : <b>${esc(secteurLisible(a.secteur))}</b></p>` : ''}
+      ${origineLisible(a.origine) || a.village ? `<p class="annonce-origine"><b>${esc([origineLisible(a.origine), a.village && `de ${a.village}`].filter(Boolean).join(' · '))}</b></p>` : ''}
+      ${secteur ? `<p class="annonce-lieu annonce-secteur"><svg class="ico" aria-hidden="true"><use href="/icones.svg#boussole"/></svg> Cherche en : <b>${esc(secteur)}</b></p>` : ''}
       ${tags.length ? `<p class="annonce-tags">${tags.map((t) => `<span>${esc(lib(t))}</span>`).join('')}</p>` : ''}
       ${a.profil ? `<h3>Qui je suis</h3><p data-membre>${esc(a.profil)}</p>` : ''}
       ${a.recherche ? `<h3>Qui je cherche${ages}</h3><p data-membre>${esc(a.recherche)}</p>` : ''}
@@ -227,8 +228,8 @@ function boutonAbo(formule, algerie) {
   z.innerHTML = algerie
     ? '<a class="swipe-abo-btn" href="/salon/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg> Plus de matchs : viens au live</a>'
     : formule === 'passion'
-      ? '<a class="swipe-abo-btn" href="/abonnement/?formule=prestige"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Passer à Prestige · 5 matchs en cours</a>'
-      : '<a class="swipe-abo-btn" href="/abonnement/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> S’abonner · plus de matchs en cours dès 9 €</a>';
+      ? '<a class="swipe-abo-btn" href="/abonnement/?formule=prestige"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Passer à Prestige</a>'
+      : '<a class="swipe-abo-btn" href="/abonnement/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> S’abonner dès 9 €</a>';
   z.hidden = false;
 }
 
