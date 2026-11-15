@@ -822,10 +822,10 @@ renderSocials();
       iosAutre ? 'Le plus simple : ouvre ce site dans Safari (l’application Safari, la boussole bleue).' : 'Tu es bien dans Safari : parfait.',
       'Touche le bouton Partager : le carré avec une flèche vers le haut (en bas de l’écran, ou en haut à droite sur iPad).',
       'Fais défiler et choisis « Sur l’écran d’accueil », puis touche « Ajouter » en haut à droite.',
-      'L’icône « Tayri » apparaît sur ton écran d’accueil : ouvre-la depuis là.'], copier: iosAutre };
-    if (samsung) return { titre: 'Sur Samsung Internet', liste: ['Touche le menu ≡ en bas à droite.', 'Choisis « Ajouter page à », puis « Écran d’accueil ».', 'Confirme : l’icône « Tayri » apparaît sur ton écran d’accueil.'] };
-    if (android) return { titre: 'Sur Android (Chrome)', liste: ['Touche les « ⋮ » en haut à droite de Chrome.', 'Choisis « Installer l’application » (ou « Ajouter à l’écran d’accueil »).', 'Confirme : l’icône « Tayri » apparaît avec tes autres applications.', 'Si rien de tout ça n’apparaît, mets Chrome à jour dans le Play Store, puis réessaie.', 'Tu viens de désinstaller l’appli ? Ferme Chrome complètement, rouvre cette page, puis recommence : Chrome met parfois quelques minutes à proposer de nouveau l’installation.'] };
-    return { titre: 'Sur ordinateur', liste: ['Dans Chrome ou Edge : clique sur l’icône d’installation (un écran avec une flèche) à droite de la barre d’adresse.', 'Ou ouvre le menu ⋮ puis « Installer Tayri… ».', 'Sur téléphone, c’est encore mieux : ouvre lamia-femme-berbere.com/application/ depuis ton téléphone.'] };
+      'L’icône « TAYRI » apparaît sur ton écran d’accueil : ouvre-la depuis là.'], copier: iosAutre };
+    if (samsung) return { titre: 'Sur Samsung Internet', liste: ['Touche le menu ≡ en bas à droite.', 'Choisis « Ajouter page à », puis « Écran d’accueil ».', 'Confirme : l’icône « TAYRI » apparaît sur ton écran d’accueil.'] };
+    if (android) return { titre: 'Sur Android (Chrome)', liste: ['Touche les « ⋮ » en haut à droite de Chrome.', 'Choisis « Installer l’application » (ou « Ajouter à l’écran d’accueil »).', 'Confirme : l’icône « TAYRI » apparaît avec tes autres applications.', 'Si rien de tout ça n’apparaît, mets Chrome à jour dans le Play Store, puis réessaie.', 'Tu viens de désinstaller l’appli ? Ferme Chrome complètement, rouvre cette page, puis recommence : Chrome met parfois quelques minutes à proposer de nouveau l’installation.'] };
+    return { titre: 'Sur ordinateur', liste: ['Dans Chrome ou Edge : clique sur l’icône d’installation (un écran avec une flèche) à droite de la barre d’adresse.', 'Ou ouvre le menu ⋮ puis « Installer TAYRI… ».', 'Sur téléphone, c’est encore mieux : ouvre lamia-femme-berbere.com/application/ depuis ton téléphone.'] };
   }
   function aide() {
     document.querySelector('.install-aide')?.remove();
@@ -939,7 +939,7 @@ renderSocials();
     if (!jeton || location.pathname.startsWith('/tableau-de-bord')) return;
     const d = document.createElement('div');
     d.className = 'lfb-testeur-play';
-    d.innerHTML = '<p><strong>Tayri arrive sur Google Play.</strong> Tu veux la tester en avant-première ?</p><p><button type="button" class="btn btn-ink" data-oui>Oui</button> <button type="button" class="btn btn-line" data-non>Non</button> <button type="button" class="btn btn-line" data-iphone>Non, je suis sur iPhone</button></p>';
+    d.innerHTML = '<p><strong>TAYRI arrive sur Google Play.</strong> Tu veux la tester en avant-première ?</p><p><button type="button" class="btn btn-ink" data-oui>Oui</button> <button type="button" class="btn btn-line" data-non>Non</button> <button type="button" class="btn btn-line" data-iphone>Non, je suis sur iPhone</button></p>';
     const fin = (v) => { try { localStorage.setItem('lfb_testeur_play', v); } catch { /* */ } };
     d.querySelector('[data-non]').onclick = () => { fin('non'); d.remove(); };
     d.querySelector('[data-iphone]').onclick = () => { fin('iphone'); d.remove(); };
@@ -967,8 +967,8 @@ renderSocials();
         if (!r?.sur_liste || !/^https:\/\/play\.google\.com\//.test(r.lien || '')) return;
         const d = document.createElement('div');
         d.className = 'lfb-testeur-play';
-        d.setAttribute('role', 'region'); d.setAttribute('aria-label', 'Test de Tayri sur Google Play');
-        d.innerHTML = '<p><strong>Dernière étape pour tester Tayri.</strong> Sur ton téléphone Android, ouvre la page Google Play et appuie sur « Devenir testeur », avec ton adresse Gmail. Sans ça, Google ne te compte pas.</p><p><a class="btn btn-ink" target="_blank" rel="noopener" data-ouvrir>Devenir testeur</a> <button type="button" class="btn btn-line" data-fait>C’est fait</button> <button type="button" class="btn btn-line" data-plus-tard>Plus tard</button></p>';
+        d.setAttribute('role', 'region'); d.setAttribute('aria-label', 'Test de TAYRI sur Google Play');
+        d.innerHTML = '<p><strong>Dernière étape pour tester TAYRI.</strong> Sur ton téléphone Android, ouvre la page Google Play et appuie sur « Devenir testeur », avec ton adresse Gmail. Sans ça, Google ne te compte pas.</p><p><a class="btn btn-ink" target="_blank" rel="noopener" data-ouvrir>Devenir testeur</a> <button type="button" class="btn btn-line" data-fait>C’est fait</button> <button type="button" class="btn btn-line" data-plus-tard>Plus tard</button></p>';
         d.querySelector('[data-ouvrir]').href = r.lien;
         const garder = (k, v) => { try { localStorage.setItem(k, v); } catch { /* */ } };
         d.querySelector('[data-ouvrir]').addEventListener('click', () => { garder('lfb_testeur_relance', String(Date.now())); setTimeout(() => d.remove(), 500); });

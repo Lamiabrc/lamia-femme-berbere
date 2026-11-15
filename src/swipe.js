@@ -338,7 +338,7 @@ document.querySelector('[data-swipe-mot]')?.addEventListener('click', () => {
   try { brouillon = localStorage.getItem(`lfb-coeur-${ref}`) || ''; } catch { /* */ }
   const algerie = infosAbo.algerie;
   // Plus intime (Lamia, 15 nov.) : une petite lettre, un compteur de caractères, la case bien alignée.
-  // Une lettre berbère : « Tayri » en tifinagh sur le rabat, le cœur du logo dans le sceau (Lamia, 15 nov.).
+  // Une lettre berbère : « TAYRI » en tifinagh sur le rabat, le cœur du logo dans le sceau (Lamia, 15 nov.).
   const d = fenetre(`<svg class="lettre-illu" viewBox="0 0 220 130" aria-hidden="true" focusable="false">
       <defs><linearGradient id="lettre-env" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF6EA"/><stop offset="1" stop-color="#F6E3CC"/></linearGradient></defs>
       <g fill="none" stroke="#C9A24A" stroke-width="1.4"><path d="M12 66l7-7 7 7-7 7z M194 66l7-7 7 7-7 7z"/></g>

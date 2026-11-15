@@ -173,7 +173,7 @@ function peindreCarte(f) {
   ];
   const place = ['1 / 1', '1 / 3', '2 / 3', '3 / 3', '3 / 1'];
   box.innerHTML = `<svg viewBox="0 0 300 300" preserveAspectRatio="none" aria-hidden="true"><g stroke="#cfc4b2" stroke-width=".6" fill="none"><path d="M150 150 L50 40"/><path d="M150 150 L250 40"/><path d="M150 150 L250 150"/><path d="M150 150 L250 260"/><path d="M150 150 L50 260"/></g></svg>
-    <div class="carte-noeud"><strong>Tayri</strong><span>${nbMembres === null ? '' : `${nbMembres} membre${s(nbMembres)}`}</span></div>
+    <div class="carte-noeud"><strong>TAYRI</strong><span>${nbMembres === null ? '' : `${nbMembres} membre${s(nbMembres)}`}</span></div>
     ${branches.map(([t, txt, b], i) => `<div class="carte-branche${(i === 0 && !sig) || (i === 4 && !conf) ? ' is-calme' : ''}" style="grid-area:${place[i]}"><h3>${esc(t)}</h3><p>${esc(txt)}</p>${b}</div>`).join('')}`;
   if (nbMembres === null) (comptes ? Promise.resolve() : chargerComptes()).then(() => { if (dernierAFaire) peindreCarte(dernierAFaire); }).catch(() => {});
 }
