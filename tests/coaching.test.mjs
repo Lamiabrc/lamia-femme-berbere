@@ -303,3 +303,26 @@ test('« Lamia t’attend dans la salle » : un bouton pour Lamia, le membre est
   const avant = w.prevenus?.length ?? 0;
   assert.equal((await go(w, 'annonce_coaching_attend', { id: a.id }, LAMIA, true)).ok, true);
 });
+
+test('prolonger une séance : la salle ferme 15 minutes plus tard, seule Lamia peut le faire', async () => {
+  const w = monde();
+  await ouvrir(w);
+  const a = w.lignes[0];
+  await go(w, 'annonce_coaching_reserver', { id: a.id });
+  const debut = new Date(a.debut).getTime();
+  w.t.now = new Date(debut + 20 * 60e3); // la séance de 15 min est finie, la salle ferme à 30 min
+  assert.equal((await go(w, 'annonce_coaching_prolonger', { id: a.id })).status, 403);
+  const p = await go(w, 'annonce_coaching_prolonger', { id: a.id }, LAMIA, true);
+  assert.equal(p.status, 200);
+  assert.equal(p.fin, new Date(debut + 45 * 60e3).toISOString());
+  assert.equal(a.prolonge_min, 15);
+  const [url, o] = w.daily.at(-1);
+  assert.match(url, new RegExp(`/rooms/coaching-${a.id}$`));
+  assert.equal(JSON.parse(o.body).properties.exp, Math.floor((debut + 45 * 60e3) / 1000));
+  // À 40 minutes, la salle aurait été fermée : elle est encore ouverte pour le membre.
+  w.t.now = new Date(debut + 40 * 60e3);
+  assert.equal((await go(w, 'annonce_coaching_rejoindre', { id: a.id })).status, 200);
+  w.t.now = new Date(debut + 50 * 60e3);
+  assert.equal((await go(w, 'annonce_coaching_rejoindre', { id: a.id })).error, 'terminee');
+  assert.equal((await go(w, 'annonce_coaching_prolonger', { id: a.id }, LAMIA, true)).error, 'terminee');
+});
