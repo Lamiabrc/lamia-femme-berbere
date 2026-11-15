@@ -318,9 +318,11 @@ async function mesSoirees(ins) {
   $('[data-espace-passees]').innerHTML = passees.map((r) => carte(r, '<p><a class="text-link" href="/speed-dating/souhaits/">Mon carnet de bal</a></p>')).join('');
 }
 // Sans annonce : deux chemins. Chercher l'âme sœur, ou venir « sans rencontre » (boutique, live, coaching de couple, écrire à Lamia).
+// Ce que Lamia garde pour chacun, même sans rencontre : écrire à Lamia, le live, le coaching de couple, la boutique.
+const LIENS_LAMIA = '<p class="espace-sans-liens"><a class="btn btn-ink" href="/confidences/#conversation">Écrire à Lamia</a> <a class="btn btn-line" href="/salon/">Le live</a> <a class="btn btn-line" href="/abonnement/#unites">Coaching de couple</a> <a class="btn btn-line" href="/boutique/">Boutique</a></p>';
 const SANS_RENCONTRE_HTML = `<article class="espace-achat espace-sans-rencontre" data-sans-profil><div><p class="event-date">Sans rencontre</p><h3>Tu viens pour tout le reste</h3>
   <p>Pas de profil, pas de swipe : personne ne te voit. Tu profites de la boutique, des lives, du coaching de couple, et tu peux écrire à Lamia quand tu veux.</p>
-  <p class="espace-sans-liens"><a class="btn btn-ink" href="/confidences/#conversation">Écrire à Lamia</a> <a class="btn btn-line" href="/salon/">Le live</a> <a class="btn btn-line" href="/abonnement/#unites">Coaching de couple</a> <a class="btn btn-line" href="/boutique/">Boutique</a></p>
+  ${LIENS_LAMIA}
   <p><button type="button" class="link-button" data-sans-rencontre="non">Finalement, je cherche quelqu’un</button></p></div></article>`;
 const CHOIX_HTML = `<div class="espace-choix" data-sans-profil><p>Tu n’as pas encore d’annonce chez Lamia. Qu’est-ce qui t’amène ?</p>
   <p class="espace-sans-liens"><a class="btn btn-ink" href="/rencontres/#confier">Je cherche l’âme sœur</a> <button type="button" class="btn btn-line" data-sans-rencontre="oui">Je viens sans rencontre</button></p>
@@ -352,18 +354,23 @@ async function monProfil(session) {
       ${p.medias_ok === false ? `<section class="espace-photos" id="photos"><h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#camera"/></svg> Il manque tes photos</h3><p>Ajoute <strong>2 photos de toi, visage visible,</strong> pour swiper et répondre aux personnes intéressées. Elles restent privées : elles ne sont pas affichées dans les profils.</p><div data-profil-medias></div></section>` : ''}
       ${p.demander_affichage ? `<section class="espace-photos" id="affichage" data-affichage><h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> Veux-tu que ton annonce soit visible ?</h3><p>Ton annonce n° ${esc(p.ref)} est validée. Si tu es d’accord, elle apparaît sur le site de façon anonyme : sans prénom, photo, ville ni contact.</p><p><button class="btn btn-ink" type="button" data-affichage-oui>Oui, je veux qu’elle soit visible</button> <button class="link-button" type="button" data-affichage-non>Non</button></p></section>` : ''}
       ${p.en_pause
-        ? '<section class="espace-photos espace-pause"><h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#pause"/></svg> Ton annonce est en pause</h3><p>Personne ne la voit et tu ne reçois plus de nouveau match. Tes discussions en cours continuent.</p><p><button class="btn btn-ink" type="button" data-annonce-pause="non"><svg class="ico" aria-hidden="true"><use href="/icones.svg#play"/></svg> Reprendre mon annonce</button></p></section>'
-        : '<p class="espace-pause"><button class="btn btn-line" type="button" data-annonce-pause="oui"><svg class="ico" aria-hidden="true"><use href="/icones.svg#pause"/></svg> Mettre mon annonce en pause</button><br><small>Elle devient invisible, sans rien effacer. Tes discussions continuent et tu la reprends quand tu veux.</small></p>'}
+        ? `<section class="espace-photos espace-pause"><h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#pause"/></svg> Tu as mis les rencontres en pause</h3><p>Personne ne voit ton profil et tu ne reçois plus de nouveau match. Rien n’est effacé, et tes discussions en cours continuent.</p>
+          <p><strong>Lamia reste dans ta poche :</strong></p>${LIENS_LAMIA}
+          <p><button class="btn btn-ink" type="button" data-annonce-pause="non"><svg class="ico" aria-hidden="true"><use href="/icones.svg#play"/></svg> Reprendre les rencontres</button></p></section>`
+        : `<div class="espace-pause" data-pause-zone><p><button class="btn btn-line" type="button" data-pause-ouvrir><svg class="ico" aria-hidden="true"><use href="/icones.svg#pause"/></svg> Faire une pause dans les rencontres</button><br><small>Ton profil devient invisible, sans rien effacer. Tu gardes Lamia en poche : le live, le coaching de couple, la boutique, et tu peux lui écrire.</small></p>
+          <div class="espace-pause-choix" data-pause-choix hidden><p><strong>Qu’est-ce qui se passe pour toi ?</strong></p><p class="espace-sans-liens"><button class="btn btn-ink" type="button" data-annonce-pause="oui" data-raison="pause">J’ai besoin de souffler</button> <button class="btn btn-ink" type="button" data-annonce-pause="oui" data-raison="couple">J’ai trouvé quelqu’un</button> <button class="link-button" type="button" data-pause-annuler>Annuler</button></p></div></div>`}
       ${p.medias_ok === false ? '' : '<section class="espace-photos espace-mes-photos" data-mes-photos hidden></section>'}
       <div class="espace-suivi" data-profil-suivi></div>
       <label class="annonce-case espace-photo"><input type="checkbox" data-profil-photo${p.photo_partage ? ' checked' : ''}> <span>Si un match me convient, Lamia peut transmettre <strong>ma photo</strong> à la personne avec qui elle me met en relation (et à elle seule).</span></label>
       <p class="form-status" data-profil-statut></p><div data-profil-edition hidden></div>`;
-    box.querySelector('[data-annonce-pause]')?.addEventListener('click', async (e) => {
-      const b = e.currentTarget, st = box.querySelector('[data-profil-statut]');
+    box.querySelector('[data-pause-ouvrir]')?.addEventListener('click', () => { box.querySelector('[data-pause-choix]').hidden = false; });
+    box.querySelector('[data-pause-annuler]')?.addEventListener('click', () => { box.querySelector('[data-pause-choix]').hidden = true; });
+    box.querySelectorAll('[data-annonce-pause]').forEach((b) => b.addEventListener('click', async () => {
+      const st = box.querySelector('[data-profil-statut]');
       b.disabled = true;
-      try { await appelProfil({ action: 'annonce_pause', pause: b.dataset.annoncePause === 'oui' }, session); await monProfil(session); }
+      try { await appelProfil({ action: 'annonce_pause', pause: b.dataset.annoncePause === 'oui', raison: b.dataset.raison || null }, session); await monProfil(session); }
       catch { b.disabled = false; if (st) st.textContent = 'Ça n’a pas marché. Réessaie dans un instant.'; }
-    });
+    }));
     { const zm = box.querySelector('[data-profil-medias]');
       if (zm) { const { monterAjoutMedias } = await import('/assets/annonces.js'); await monterAjoutMedias(zm, { token: session.access_token, deja: p.photos || 0, apres: () => monProfil(session) }); if (location.hash === '#photos') zm.closest('section').scrollIntoView({ block: 'center' }); } }
     box.querySelector('[data-affichage]')?.addEventListener('click', async (e) => {
