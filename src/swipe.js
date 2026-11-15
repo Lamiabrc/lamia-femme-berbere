@@ -337,7 +337,7 @@ document.querySelector('[data-swipe-mot]')?.addEventListener('click', () => {
   try { brouillon = localStorage.getItem(`lfb-coeur-${ref}`) || ''; } catch { /* */ }
   const algerie = infosAbo.algerie;
   // Plus intime (Lamia, 15 nov.) : une petite lettre, un compteur de caractères, la case bien alignée.
-  // Une lettre berbère ornée de tichrad (tatouages kabyles : croix pointées, chevrons, ligne du menton), demandée par Lamia.
+  // Une lettre berbère : « Tayri » en tifinagh sur le rabat, le cœur du logo dans le sceau (Lamia, 15 nov.).
   const d = fenetre(`<svg class="lettre-illu" viewBox="0 0 220 130" aria-hidden="true" focusable="false">
       <defs><linearGradient id="lettre-env" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF6EA"/><stop offset="1" stop-color="#F6E3CC"/></linearGradient>
       <radialGradient id="lettre-cire" cx="38%" cy="32%" r="70%"><stop offset="0" stop-color="#D2557F"/><stop offset="1" stop-color="#7E1F3F"/></radialGradient></defs>
@@ -346,17 +346,9 @@ document.querySelector('[data-swipe-mot]')?.addEventListener('click', () => {
       <rect x="44" y="22" width="132" height="92" rx="7" fill="url(#lettre-env)" stroke="#D8B88E" stroke-width="1.5"/>
       <path d="M44 28l66 46 66-46" fill="#FBEEDD" stroke="#D8B88E" stroke-width="1.5"/>
       <path d="M50 108l40-30 M170 108l-40-30" stroke="#E6CFAE" stroke-width="1.2"/>
-      <g fill="none" stroke="#2E3A6E" stroke-width="1.7" stroke-linecap="round">
-        <path d="M62 50v8 M58 54h8 M158 50v8 M154 54h8"/>
-        <path d="M66 92l6 6 6-6 6 6 M138 98l6-6 6 6 6-6"/>
-        <path d="M110 96l5 5-5 5-5-5z M96 101h6 M118 101h6"/>
-      </g>
-      <g fill="#2E3A6E"><circle cx="62" cy="47" r="1.5"/><circle cx="62" cy="61" r="1.5"/><circle cx="55" cy="54" r="1.5"/><circle cx="69" cy="54" r="1.5"/>
-        <circle cx="158" cy="47" r="1.5"/><circle cx="158" cy="61" r="1.5"/><circle cx="151" cy="54" r="1.5"/><circle cx="165" cy="54" r="1.5"/>
-        </g>
-      <text x="110" y="50" text-anchor="middle" font-size="17" letter-spacing="2" fill="#2E3A6E" font-family="'Noto Sans Tifinagh', 'Ebrima', sans-serif">ⵜⴰⵢⵔⵉ</text>
-      <circle cx="110" cy="74" r="14" fill="url(#lettre-cire)"/>
-      <text x="110" y="80" text-anchor="middle" font-size="17" fill="#FCE7EE" font-family="serif">ⵣ</text>
+      <text x="110" y="41" text-anchor="middle" font-size="17" letter-spacing="2" fill="#2E3A6E" font-family="'Noto Sans Tifinagh', 'Ebrima', sans-serif">ⵜⴰⵢⵔⵉ</text>
+      <circle cx="110" cy="76" r="22" fill="url(#lettre-cire)" opacity=".9"/>
+      <image href="/images/marque/tayri-coeur.webp" x="88" y="53" width="44" height="45"/>
     </svg>
     <h2>Un mot doux pour le n° ${esc(ref)}</h2>
     <p class="lettre-intro">Quelques mots sincères, rien que pour cette personne. Ils arrivent avec ton cœur, et ton profil passe en premier dans sa pile.</p>
