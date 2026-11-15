@@ -48,7 +48,7 @@ const ERR = {
   limite_matchs: 'Tu as atteint le nombre de matchs en cours de ta formule. Termines-en un depuis ton espace, prends une place de match en plus (5 € pour 30 jours), ou passe à une formule supérieure.',
   sincerite_requise: 'Avant d’envoyer un cœur, confirme ta déclaration de bonne foi dans « Mon espace ».',
   hors_de_ses_criteres: 'Ce profil cherche quelqu’un d’un autre âge ou d’une autre zone : ton cœur n’est pas parti.',
-  quota_matchs: 'Tu as utilisé tes matchs disponibles. Prends une place de match en plus à 5 €, ou viens au live de Lamia, du lundi au vendredi à 20 h : 1 match offert toutes les 2 semaines.',
+  quota_matchs: 'Tu as utilisé tes matchs disponibles. Prends une place de match en plus à 5 €, ou choisis une formule pour avoir plus de matchs en cours.',
   en_match: 'Tu as atteint le nombre de matchs en cours de ta formule : mets fin à l’un d’eux dans « Mon espace » pour en découvrir d’autres.',
 };
 const opts = (list, vide = 'Choisis…') => `<option value="">${vide}</option>${list.map((v) => `<option value="${esc(v)}">${esc(lib(v))}</option>`).join('')}`;
@@ -458,7 +458,7 @@ function monterEdition(form, st, p, token) {
   poser('prenom', p.prenom); poser('ville', p.ville); poser('pays', p.pays); poser('profil', p.profil); poser('recherche', p.recherche);
   poser('age_min', p.age_min ?? ''); poser('age_max', p.age_max ?? '');
   const g = form.querySelector(`[name=genre][value="${p.genre}"]`); if (g) { g.checked = true; g.dispatchEvent(new Event('change', { bubbles: true })); }
-  $$('[name=genre]', form).forEach((x) => { x.disabled = true; });
+  // Le genre reste modifiable : un mauvais clic à l'inscription (une femme inscrite « homme ») se corrige ici (Lamia, 15 nov. 2026).
   $('[data-age]', form).hidden = true; $('[data-naissance]', form).hidden = false;
   F.birth_date.value = p.birth_date || '';
   const m = p.matching || {};
@@ -479,7 +479,7 @@ function monterEdition(form, st, p, token) {
     if (F.sans_reseau.checked && !telephoneNormal(F.telephone.value)) return say(st, ERR.telephone_invalide, true);
     btn.disabled = true; say(st, 'Enregistrement…');
     try {
-      await api({ action: 'annonce_modifier', prenom: F.prenom.value, birth_date: F.birth_date.value, ville: F.ville.value, pays: F.pays.value, profil: F.profil.value, recherche: F.recherche.value, age_min: F.age_min.value, age_max: F.age_max.value, anonyme_ok: F.anonyme_ok.checked, photo_partage: F.photo_partage.checked, sans_reseau: F.sans_reseau.checked, telephone: F.sans_reseau.checked ? F.telephone.value : '', matching: lireMatching(form) }, token);
+      await api({ action: 'annonce_modifier', genre: form.querySelector('[name=genre]:checked')?.value, prenom: F.prenom.value, birth_date: F.birth_date.value, ville: F.ville.value, pays: F.pays.value, profil: F.profil.value, recherche: F.recherche.value, age_min: F.age_min.value, age_max: F.age_max.value, anonyme_ok: F.anonyme_ok.checked, photo_partage: F.photo_partage.checked, sans_reseau: F.sans_reseau.checked, telephone: F.sans_reseau.checked ? F.telephone.value : '', matching: lireMatching(form) }, token);
       say(st, '✓ Ton profil est à jour. Lamia est prévenue.');
     } catch (err) { say(st, ERR[err.code] || 'L’enregistrement n’a pas abouti. Réessaie dans un instant.', true); }
     btn.disabled = false;

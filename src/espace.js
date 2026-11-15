@@ -359,6 +359,7 @@ async function monProfil(session) {
           <p><button class="btn btn-ink" type="button" data-annonce-pause="non"><svg class="ico" aria-hidden="true"><use href="/icones.svg#play"/></svg> Reprendre les rencontres</button></p></section>`
         : `<div class="espace-pause" data-pause-zone><p><button class="btn btn-line" type="button" data-pause-ouvrir><svg class="ico" aria-hidden="true"><use href="/icones.svg#pause"/></svg> Faire une pause dans les rencontres</button><br><small>Ton profil devient invisible, sans rien effacer. Tu gardes Lamia en poche : le live, le coaching de couple, la boutique, et tu peux lui écrire.</small></p>
           <div class="espace-pause-choix" data-pause-choix hidden><p><strong>Qu’est-ce qui se passe pour toi ?</strong></p><p class="espace-sans-liens"><button class="btn btn-ink" type="button" data-annonce-pause="oui" data-raison="pause">J’ai besoin de souffler</button> <button class="btn btn-ink" type="button" data-annonce-pause="oui" data-raison="couple">J’ai trouvé quelqu’un</button> <button class="link-button" type="button" data-pause-annuler>Annuler</button></p></div></div>`}
+      ${p.medias_ok === false ? '' : '<section class="espace-photos espace-mes-photos" data-mes-photos hidden></section>'}
       <div class="espace-suivi" data-profil-suivi></div>
       <label class="annonce-case espace-photo"><input type="checkbox" data-profil-photo${p.photo_partage ? ' checked' : ''}> <span>Si un match me convient, Lamia peut transmettre <strong>ma photo</strong> à la personne avec qui elle me met en relation (et à elle seule).</span></label>
       <p class="form-status" data-profil-statut></p><div data-profil-edition hidden></div>`;
@@ -429,6 +430,15 @@ async function monProfil(session) {
       monterFormulaire(zone, { existant: p, token: session.access_token });
       zone.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
+    // Mes photos : visibles par moi seul·e ici, pour vérifier qu'elles sont bien arrivées. Jamais publiées.
+    { const z = box.querySelector('[data-mes-photos]');
+      if (z) appelProfil({ action: 'annonce_mes_photos' }, session).then(({ photos = [], partage }) => {
+        if (!photos.length) return;
+        z.innerHTML = `<h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#camera"/></svg> Mes photos</h3>
+          <p class="espace-mes-photos-grille">${photos.map((u) => `<img src="${esc(u)}" alt="Ma photo" loading="lazy">`).join('')}</p>
+          <p class="aide"><svg class="ico" aria-hidden="true"><use href="/icones.svg#shield"/></svg> Elles sont privées : personne ne les voit dans le swipe ni sur le site. Seule Lamia les voit pour vérifier ton profil${partage ? ', et ton match si vous êtes en relation et que tu as accepté de la transmettre' : ''}.</p>`;
+        z.hidden = false;
+      }).catch(() => {}); }
     box.querySelectorAll('[data-profil-dematcher]').forEach((bouton) => bouton.addEventListener('click', async (e) => {
       if (!confirm(`Mettre fin à ton match avec le profil n° ${bouton.dataset.profilDematcher} ? Lamia sera prévenue, et une place se libère.`)) return;
       e.target.disabled = true;
