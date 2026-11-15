@@ -486,7 +486,7 @@ page(
   <h2 id="live-direct-titre">Lamia est en live<span data-live-titre></span></h2>
   <div class="live-grille">
     <div><div class="live-video" data-live-video></div>
-    <p class="live-note">La vidéo vient de YouTube. Pour commenter et monter en invité : <a data-live-tiktok href="https://www.tiktok.com/@lamiafemmeberbere/live" rel="noopener" target="_blank">le live sur TikTok</a>.</p></div>
+    <p class="live-note">Le live est diffusé sur YouTube. Pour écrire dans le chat : <a data-live-youtube href="https://www.youtube.com/channel/UCw9wm85Fnv7gpzDLtgYsCfQ/live" rel="noopener" target="_blank">ouvrir le live sur YouTube</a>.</p></div>
     <div class="live-boite" data-live-question></div>
   </div>
 </section>

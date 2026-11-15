@@ -135,76 +135,50 @@ $$('details[data-repli],details[data-menu-plus]').forEach((d) => {
 // Sur téléphone, toucher à côté du volet « Plus » le referme.
 document.addEventListener('click', (e) => { const plus = $('[data-menu-plus]'); if (plus?.open && surTelephone() && !e.target.closest('[data-menu-plus]')) plus.open = false; });
 
-// ---------------------------------------------------------------- « À faire aujourd'hui » : tout ce qui attend Lamia, dans l'ordre
+// ---------------------------------------------------------------- Accueil : la carte (15 nov. 2026, Lamia : plus de « À faire aujourd'hui »).
+// Cinq branches : signalements, membres, personnes sous formule, matchs en cours, confidences. Un bouton pour chacune.
+let dernierAFaire = null;
 async function aFaire() {
-  const box = $('[data-afaire]');
+  const box = $('[data-carte-actions]');
   if (!box) return;
   try {
     const r = await fetch('/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ action: 'annonce_a_faire' }) });
     const { a_faire: f } = await r.json();
+    dernierAFaire = f;
     peindreCarte(f);
-    const heure = (d) => new Date(d).toLocaleString('fr-FR', { weekday: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
-    const MOTIF = (m) => esc(m || 'sans motif donné');
-    // Chaque numéro ouvre le profil : qui c'est, son activité, ses blocages et signalements.
-    const VOIR = (r) => (r ? `<a class="fiche-ref" href="#profil-${esc(r)}">n° ${esc(r)}</a>` : 'n° ?');
-    const PRESTA = { 15: 'Visio de 15 min', 30: 'Coaching 30 min et match manuel', 60: 'Sauver mon couple' };
-    // Ce qui te concerne : tes coachings, tes soirées, les blocages et signalements.
-    const miens = [
-      ...(f.coachings || []).map((c) => [`🎥 <b>${esc(PRESTA[c.duree] || 'Coaching')}</b> avec <b>${esc(c.prenom || c.email || '?')}</b>, ${esc(heure(c.debut))}`, '<button class="btn btn-line" type="button" data-tab-aller="coaching">Coaching</button>']),
-      (f.signalements || []).length && [`🚩 <b>${f.signalements.length} signalement(s) à traiter</b> :<br>${f.signalements.map((s) => `<span data-signalement>${VOIR(s.cible_ref)} signalé par ${VOIR(s.auteur_ref)}${s.created_at ? ` le ${esc(new Date(s.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }))}` : ''} · ${s.motif ? `« ${esc(s.motif)} »` : '<em>raison non demandée à l’époque (signalement d’avant le 12 nov.)</em>'} <a class="btn btn-line" href="#profil-${esc(s.cible_ref)}">Ouvrir</a> <button type="button" class="btn btn-line" data-signalement-traite="${esc(s.id)}">C’est traité</button><br></span>`).join('')}`, ''],
-      (f.blocages || []).length && [`🚫 <b>${f.blocages.length} blocage(s) cette semaine</b> (clique sur un numéro pour ouvrir le profil) :<br>${f.blocages.map((x) => `${VOIR(x.auteur_ref)} a bloqué ${VOIR(x.cible_ref)} · « ${MOTIF(x.motif)} »`).join('<br>')}`, ''],
-    ];
-    const lignes = [
-      ...miens,
-      ...f.soirees.map((s) => [`<b>${esc(s.titre)}</b>, ${esc(heure(s.debut))} · ${esc(s.salon)} : <b>${s.inscrits} inscrit(s)</b>, ${Math.max(0, s.places - s.inscrits)} place(s) libre(s). À 20 h 45, ouvre le bal.`, '<a class="btn btn-ink" href="/admin-bal.html">Poste du bal</a>']),
-      f.a_verifier.length && [`<b>${f.a_verifier.length} profil(s) incomplet(s)</b>, pas validé(s) automatiquement : ${f.a_verifier.map((r) => `n° ${r}${f.manques?.[r]?.length ? ` (manque : ${f.manques[r].join(', ')})` : ''}`).join(' · ')}. Valide-les toi-même si ça te va, ou demande-leur ce qui manque.`, '<button class="btn btn-ink" type="button" data-rencontres-aller="annonces">Vérifier</button>'],
-      f.reciproques && [`<b>${f.reciproques} intérêt(s) réciproque(s)</b> : les deux se sont choisis. Le site les met en relation tout seul dès que les différences éventuelles sont acceptées.`, '<button class="btn btn-ink" type="button" data-rencontres-aller="demandes">Voir</button>'],
-      f.demandes && [`<b>${f.demandes} match(s) demandé(s)</b> par ${f.personnes} personne(s) : en attente de la réponse de l’autre personne. Rien à faire de ton côté.`, '<button class="btn btn-line" type="button" data-rencontres-aller="demandes">Voir</button>'],
-      f.propositions_oui && [`<b>${f.propositions_oui} proposition(s) acceptée(s)</b> : la personne est intéressée par le profil que tu lui as proposé.`, '<button class="btn btn-line" type="button" data-rencontres-aller="demandes">Voir</button>'],
-      f.fiches_a_effacer && [`<b>${f.fiches_a_effacer} fiche(s) à effacer</b> dans ton outil (demandes des personnes).`, '<span class="aide">Outil › Site › Publipostage</span>'],
-      f.fiches_en_attente && [`<b>${f.fiches_en_attente} fiche(s) pas encore confirmée(s)</b> (${f.fiches_confirmees} confirmée(s)) : envoie les liens de confirmation.`, '<span class="aide">Outil › Site › Publipostage › « À prévenir »</span>'],
-      f.nouveautes_en_attente && [`<b>${f.nouveautes_en_attente} nouveauté(s)</b> partiront au prochain envoi de 18 h en notification.`, '<button class="btn btn-line" type="button" data-rencontres-aller="nouveautes">Voir</button>'],
-    ].filter(Boolean);
-    const li = ([t, b]) => `<li><span>${t}</span>${b}</li>`;
-    const nMiens = miens.filter(Boolean).length + f.soirees.length;
-    const mien = lignes.slice(0, nMiens), auto = lignes.slice(nMiens);
-    box.innerHTML = (mien.length ? mien.map(li).join('') : '<li>Rien pour toi aujourd’hui : pas de coaching, de soirée, de blocage ni de signalement en attente.</li>')
-      + (auto.length ? `<li class="afaire-auto"><details><summary>Le site s’en occupe tout seul (${auto.length})</summary><ol>${auto.map(li).join('')}</ol></details></li>` : '');
-  } catch { box.innerHTML = '<li>La liste ne s’affiche pas pour le moment.</li>'; }
+    peindreSignalements(f.signalements || []);
+  } catch { box.innerHTML = '<p class="aide">La carte ne s’affiche pas pour le moment.</p>'; }
 }
-// Accueil : une carte d'actions. Au centre « À faire aujourd'hui », autour une branche par sujet,
-// une phrase et un seul bouton pour agir. Une branche sans rien à faire s'efface.
-async function peindreCarte(f) {
+// La liste des signalements à traiter, sous la carte, ouverte par « Traiter ».
+function peindreSignalements(liste) {
+  const box = $('[data-carte-signalements]');
+  if (!box) return;
+  const VOIR = (r) => (r ? `<a class="fiche-ref" href="#profil-${esc(r)}">n° ${esc(r)}</a>` : 'n° ?');
+  box.innerHTML = liste.length ? `<h2>Signalements à traiter</h2><ul class="fiche-liste">${liste.map((s) => `<li data-signalement><span>${VOIR(s.cible_ref)} signalé par ${VOIR(s.auteur_ref)}${s.created_at ? ` le ${esc(new Date(s.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }))}` : ''} · ${s.motif ? `« ${esc(s.motif)} »` : '<em>raison non demandée à l’époque (signalement d’avant le 12 nov.)</em>'}</span> <span><a class="btn btn-line" href="#profil-${esc(s.cible_ref)}">Ouvrir</a> <button type="button" class="btn btn-line" data-signalement-traite="${esc(s.id)}">C’est traité</button></span></li>`).join('')}</ul>` : '<p class="aide">Aucun signalement à traiter.</p>';
+  if (!liste.length) box.hidden = true;
+}
+function peindreCarte(f) {
   const box = $('[data-carte-actions]');
   if (!box) return;
-  const heure = (d) => new Date(d).toLocaleString('fr-FR', { weekday: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
   const s = (n) => (n > 1 ? 's' : '');
-  const dessiner = (sp) => {
-    const c = (f.coachings || [])[0], so = (f.soirees || [])[0], sig = (f.signalements || []).length;
-    const branches = [
-      ['Messages à répondre', f.confidences ? `${f.confidences} confidence${s(f.confidences)} attend${f.confidences > 1 ? 'ent' : ''} ta réponse` : 'Aucun message en attente', f.confidences ? '<a class="btn btn-ink" href="/confidences-lamia/">Répondre</a>' : ''],
-      ['Comptes sans profil', sp === null ? 'Calcul en cours…' : sp.total ? `${sp.total} compte${s(sp.total)} · ${sp.relancer} jamais relancé${s(sp.relancer)}${sp.supprimer ? ` · ${sp.supprimer} à supprimer` : ''}` : 'Tous les comptes ont un profil', sp?.total ? '<button class="btn btn-ink" type="button" data-carte-membres>Relancer ou supprimer</button>' : ''],
-      ['Coaching', c ? `Prochaine séance : ${heure(c.debut)}, ${c.prenom || c.email || '?'}` : 'Aucune séance réservée cette semaine', c ? '<button class="btn btn-ink" type="button" data-tab-aller="coaching">Ouvrir le coaching</button>' : ''],
-      ['Soirées', so ? `${so.titre}, ${heure(so.debut)} : ${so.inscrits} inscrit${s(so.inscrits)}` : 'Aucune soirée dans les 48 heures', so ? '<a class="btn btn-ink" href="/admin-bal.html">Poste du bal</a>' : ''],
-      ['Ventes', f.commandes ? `${f.commandes} commande${s(f.commandes)} payée${s(f.commandes)} à expédier` : 'Aucune commande à expédier', f.commandes ? '<button class="btn btn-ink" type="button" data-tab-aller="ventes">Préparer l’envoi</button>' : ''],
-      ['Signalements', sig ? `${sig} signalement${s(sig)} à traiter` : 'Aucun à traiter', sig ? '<button class="btn btn-ink" type="button" data-carte-detail>Traiter</button>' : ''],
-    ];
-    const n = branches.filter((x) => x[2]).length;
-    const place = ['1 / 1', '1 / 3', '2 / 3', '3 / 3', '3 / 1', '2 / 1'];
-    box.innerHTML = `<svg viewBox="0 0 300 300" preserveAspectRatio="none" aria-hidden="true"><g stroke="#cfc4b2" stroke-width=".6" fill="none"><path d="M150 150 L50 40"/><path d="M150 150 L250 40"/><path d="M150 150 L250 150"/><path d="M150 150 L250 260"/><path d="M150 150 L50 260"/><path d="M150 150 L50 150"/></g></svg>
-      <div class="carte-noeud"><strong>À faire<br>aujourd’hui</strong><span>${n ? `${n} action${s(n)}` : 'Rien à faire'}</span></div>
-      ${branches.map(([t, d, b], i) => `<div class="carte-branche${b ? '' : ' is-calme'}" style="grid-area:${place[i]}"><h3>${esc(t)}</h3><p>${esc(d)}</p>${b}</div>`).join('')}`;
-  };
-  dessiner(null);
-  // Les comptes sans profil demandent la liste des comptes : elle arrive juste après.
-  try {
-    if (!comptes) await chargerComptes();
-    dessiner({ total: sansProfil().length, relancer: aRelancer().length, supprimer: aSupprimer().length });
-  } catch { dessiner({ total: 0, relancer: 0, supprimer: 0 }); }
+  const sig = (f.signalements || []).length, conf = f.confidences || 0, mc = f.matchs_en_cours || 0, sf = f.sous_formule || 0;
+  const nbMembres = comptes ? comptes.comptes.length : null;
+  const d = f.sous_formule_detail || {};
+  const branches = [
+    ['Signalements', sig ? `${sig} signalement${s(sig)} à traiter` : 'Aucun à traiter', sig ? '<button class="btn btn-ink" type="button" data-carte-signalements-ouvrir>Traiter</button>' : ''],
+    ['Membres', nbMembres === null ? 'Calcul en cours…' : `${nbMembres} compte${s(nbMembres)}`, '<button class="btn btn-ink" type="button" data-go="comptes">Voir les membres</button>'],
+    ['Sous formule', sf ? `${sf} personne${s(sf)}${d.passion || d.prestige ? ` · ${d.passion || 0} Passion, ${d.prestige || 0} Prestige` : ''}` : 'Personne pour l’instant', '<button class="btn btn-ink" type="button" data-rencontres-aller="abonnes">Voir les abonnés</button>'],
+    ['Matchs en cours', mc ? `${mc} match${s(mc)} en cours` : 'Aucun match en cours', '<button class="btn btn-ink" type="button" data-rencontres-aller="demandes">Voir, dématcher, matcher</button>'],
+    ['Confidences', conf ? `${conf} confidence${s(conf)} attend${conf > 1 ? 'ent' : ''} ta réponse` : 'Aucun message en attente', `<a class="btn ${conf ? 'btn-ink' : 'btn-line'}" href="/confidences-lamia/">${conf ? 'Répondre' : 'Ouvrir'}</a>`],
+  ];
+  const place = ['1 / 1', '1 / 3', '2 / 3', '3 / 3', '3 / 1'];
+  box.innerHTML = `<svg viewBox="0 0 300 300" preserveAspectRatio="none" aria-hidden="true"><g stroke="#cfc4b2" stroke-width=".6" fill="none"><path d="M150 150 L50 40"/><path d="M150 150 L250 40"/><path d="M150 150 L250 150"/><path d="M150 150 L250 260"/><path d="M150 150 L50 260"/></g></svg>
+    <div class="carte-noeud"><strong>Tayri</strong><span>${nbMembres === null ? '' : `${nbMembres} membre${s(nbMembres)}`}</span></div>
+    ${branches.map(([t, txt, b], i) => `<div class="carte-branche${(i === 0 && !sig) || (i === 4 && !conf) ? ' is-calme' : ''}" style="grid-area:${place[i]}"><h3>${esc(t)}</h3><p>${esc(txt)}</p>${b}</div>`).join('')}`;
+  if (nbMembres === null) (comptes ? Promise.resolve() : chargerComptes()).then(() => { if (dernierAFaire) peindreCarte(dernierAFaire); }).catch(() => {});
 }
 document.addEventListener('click', (e) => {
-  if (e.target.closest('[data-carte-membres]')) { ouvrir('comptes'); const b = $('[data-filtre="sansprofil"]'); if (b) b.click(); return; }
-  if (e.target.closest('[data-carte-detail]')) { const d = $('details[data-repli="chiffres"]'); if (d) d.open = true; $('[data-afaire]')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+  if (e.target.closest('[data-carte-signalements-ouvrir]')) { const b = $('[data-carte-signalements]'); if (b) { b.hidden = false; b.scrollIntoView({ behavior: 'smooth', block: 'start' }); } }
 });
 document.addEventListener('click', (e) => {
   const b = e.target.closest('[data-rencontres-aller]');
@@ -212,7 +186,7 @@ document.addEventListener('click', (e) => {
   aller = 'annonces'; const f = $('[data-rencontres]'); if (f) f.removeAttribute('src');
   ouvrir('rencontres');
   const cible = b.dataset.rencontresAller;
-  if (cible !== 'annonces') setTimeout(() => { try { const el = f.contentWindow.document.querySelector(cible === 'demandes' ? '[data-demandes]' : '[data-nouv-form]'); const pli = el?.closest('details'); if (pli) pli.open = true; el?.scrollIntoView({ behavior: 'smooth' }); } catch { /* */ } }, 2500);
+  if (cible !== 'annonces') setTimeout(() => { try { const el = f.contentWindow.document.querySelector(cible === 'demandes' ? '[data-demandes]' : cible === 'abonnes' ? '[data-abonnes]' : '[data-nouv-form]'); const pli = el?.closest('details'); if (pli) pli.open = true; el?.scrollIntoView({ behavior: 'smooth' }); } catch { /* */ } }, 2500);
 });
 
 // ---------------------------------------------------------------- Salons des soirées : confirmer une date, suivre les inscrits
