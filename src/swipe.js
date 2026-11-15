@@ -347,8 +347,7 @@ document.querySelector('[data-swipe-mot]')?.addEventListener('click', () => {
       <path d="M44 28l66 46 66-46" fill="#FBEEDD" stroke="#D8B88E" stroke-width="1.5"/>
       <path d="M50 108l40-30 M170 108l-40-30" stroke="#E6CFAE" stroke-width="1.2"/>
       <text x="110" y="41" text-anchor="middle" font-size="17" letter-spacing="2" fill="#2E3A6E" font-family="'Noto Sans Tifinagh', 'Ebrima', sans-serif">ⵜⴰⵢⵔⵉ</text>
-      <circle cx="110" cy="76" r="22" fill="url(#lettre-cire)" opacity=".9"/>
-      <image href="/images/marque/tayri-coeur.webp" x="88" y="53" width="44" height="45"/>
+      <image href="/images/marque/tayri-coeur.webp" x="96" y="61" width="28" height="29"/>
     </svg>
     <h2>Un mot doux pour le n° ${esc(ref)}</h2>
     <p class="lettre-intro">Quelques mots sincères, rien que pour cette personne. Ils arrivent avec ton cœur, et ton profil passe en premier dans sa pile.</p>
