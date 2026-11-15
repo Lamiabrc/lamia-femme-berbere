@@ -37,6 +37,7 @@ function base(initial = {}) {
   const read = async (u) => {
     if (u.includes('declarations_sincerite')) return [{ user_id: 'ok' }]; // bonne foi déjà déclarée, sauf test dédié
     if (u.includes('annonce_files?annonce_id=eq.') && u.includes('kind=in.')) return [{ kind: 'photo' }, { kind: 'photo' }];
+    if (u.includes('annonce_files?kind=eq.photo&annonce_id=in.') && !db.annonce_files) return decodeURIComponent(u.match(/annonce_id=in\.\(([^)]*)\)/)[1]).split(',').flatMap((id) => [{ annonce_id: id }, { annonce_id: id }]); // tout le monde a ses 2 photos, sauf test dédié
     const [t, qs] = coupe(u); if (!t) return [];
     let l = filtrer(t, qs);
     if (t === 'annonce_interets') l = l.map((i) => ({ ...i, annonces: db.annonces.find((a) => a.id === i.demandeur_id) }));
@@ -454,4 +455,15 @@ test('miroir : fiche archivée dans l’outil → fiche et profil de rencontre r
   const r2 = await lire(await handleAnnonces('outil_synchro', { cle, actifs: [], supprimes: ['o-100001'] }, ctx(null)));
   assert.equal(r2.miroir.refuse, true);
   assert.equal(db.profils_outil.find((x) => x.ref === 100001).retire_at, null);
+});
+
+test('profil validé sans ses 2 photos : remis en attente et prévenu, revalidable dès les photos ; les fiches du live ne sont pas touchées', async () => {
+  const { db, ctx } = base({
+    annonces: [{ id: 'a-x', ref: 40, user_id: 'u-x', email: 'x@example.com', status: 'publiee', prenom: 'Xa', genre: 'femme', test: false },
+      { id: 'a-y', ref: 41, user_id: 'u-y', email: 'y@example.com', status: 'publiee', prenom: 'Yo', genre: 'homme', test: false },
+      { id: 'a-f', ref: 42, user_id: 'u-f', email: 'f@example.com', status: 'publiee', prenom: 'Fi', genre: 'homme', test: false, fiche_ref: 100009 }],
+    annonce_files: [{ id: 'p1', annonce_id: 'a-y', kind: 'photo' }, { id: 'p2', annonce_id: 'a-y', kind: 'photo' }, { id: 'p3', annonce_id: 'a-x', kind: 'photo' }],
+  });
+  await lancerPilote(ctx);
+  assert.deepEqual(db.annonces.map((a) => [a.ref, a.status]), [[40, 'a_verifier'], [41, 'publiee'], [42, 'publiee']]);
 });
