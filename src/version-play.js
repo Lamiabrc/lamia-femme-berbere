@@ -8,6 +8,14 @@
   } catch (e) { /* stockage indisponible : version normale */ }
   if (!play) return;
   window.LFB_PLAY = true;
+  // Testeur Google Play : on note une fois qu'il a ouvert la version Play (donc qu'il l'a installée).
+  try {
+    var jeton = (JSON.parse(localStorage.getItem('sb-tybwvxinigahhntfeeur-auth-token') || 'null') || {}).access_token;
+    if (jeton && !localStorage.getItem('lfb-play-vu')) {
+      fetch('/api/confidences', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + jeton }, body: JSON.stringify({ action: 'testeur_play_vu' }) })
+        .then(function (r) { if (r.ok) localStorage.setItem('lfb-play-vu', '1'); }).catch(function () {});
+    }
+  } catch (e) { /* */ }
   document.documentElement.classList.add('version-play');
   if (/^\/(en\/)?abonnement(-merci)?\/?/.test(location.pathname)) { location.replace('/mon-espace/'); return; }
   // Tout lien vers les formules disparaît, avec sa phrase ou sa carte.
