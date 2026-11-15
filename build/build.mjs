@@ -871,6 +871,7 @@ page(
   </form>
 
   <div data-espace-in hidden>
+    <p class="espace-sortie"><button class="btn btn-line" type="button" data-espace-logout>Se déconnecter</button></p>
     <p class="lfb-azul" lang="ber">ⴰⵣⵓⵍ</p>
     <h1>Bonjour <span data-espace-nom></span></h1>
     ${RUBRIQUES}
