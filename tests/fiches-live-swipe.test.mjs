@@ -467,3 +467,17 @@ test('profil validé sans ses 2 photos : remis en attente et prévenu, revalidab
   await lancerPilote(ctx);
   assert.deepEqual(db.annonces.map((a) => [a.ref, a.status]), [[40, 'a_verifier'], [41, 'publiee'], [42, 'publiee']]);
 });
+
+test('fiche du live sans compte ou sans ses 2 photos : proposée, marquée « en attente de validation du profil »', async () => {
+  const { db, ctx } = base({
+    profils_outil: [FICHE(100001, 'u-rachid', 'homme'), FICHE(100002, 'u-lina', 'femme'), FICHE(100003, null, 'femme')],
+    annonces: [{ id: 'a-lina', ref: 20, user_id: 'u-lina', email: 'lina@example.com', status: 'publiee', prenom: 'Lina', genre: 'femme', en_match: false, test: false, fiche_ref: 100002 }],
+    annonce_files: [{ id: 'p1', annonce_id: 'a-lina', kind: 'photo' }],
+  });
+  let r = await lire(await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID)));
+  const att = () => Object.fromEntries(r.profils.map((p) => [p.ref, p.attente_validation]));
+  assert.deepEqual(att(), { 100002: true, 100003: true });
+  db.annonce_files.push({ id: 'p2', annonce_id: 'a-lina', kind: 'photo' });
+  r = await lire(await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID)));
+  assert.deepEqual(att(), { 100002: false, 100003: true });
+});
