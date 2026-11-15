@@ -150,12 +150,12 @@ ${noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" hr
 <meta name="twitter:image" content="${esc(socialImage)}">
 <meta name="twitter:image:alt" content="${esc(socialImageAlt)}">
 <meta name="theme-color" content="#2F2B3D">
-<link rel="icon" href="/images/marque/lamia-logo-net-160.webp" type="image/webp">
+<link rel="icon" href="/images/marque/tayri-icone-192.png" type="image/png">
 <link rel="manifest" href="/maison.webmanifest">
 <script src="/assets/lien-mot-de-passe.js"></script>
 <script src="/assets/version-play.js"></script>
 <script src="/assets/erreurs.js" charset="utf-8"></script>
-<link rel="apple-touch-icon" href="/images/marque/lfb-icone-180.png">
+<link rel="apple-touch-icon" href="/images/marque/tayri-icone-180.png">
 <meta name="apple-mobile-web-app-title" content="Tayri">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
