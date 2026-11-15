@@ -392,3 +392,21 @@ test('mise en relation depuis la console de l’outil : la clé de liaison suffi
   assert.equal(r.fait, 'n° 11 ↔ n° 12');
   assert.equal(db.annonce_interets[0].statut, 'mis_en_relation');
 });
+
+// Paires bloquées (15 nov. 2026) : les deux personnes sont prévenues, une seule fois par raison.
+test('paire bloquée : les deux sont prévenus une fois, avec la raison', async () => {
+  const karim = { id: 'a-karim', ref: 12, user_id: 'u-karim', email: 'karim@example.com', status: 'publiee', prenom: 'Karim', genre: 'homme', en_match: false, test: false, pays: 'France', matching: {} };
+  const { db, ctx } = base({
+    annonces: [{ ...annonceNina(), en_match: true }, karim],
+    annonce_interets: [{ id: 'i-b', demandeur_id: 'a-karim', cible_ref: 11, statut: 'a_traiter', reciproque: true, created_at: '2026-11-02T00:00:00Z' }],
+    platform_settings: [{ key: 'pilote', value: { actif: true } }],
+  });
+  const lancer = () => handleAnnonces('annonce_pilote', { op: 'lancer' }, { ...ctx({ id: 'adm', email: 'a@x.fr' }), admin: true });
+  await lancer();
+  assert.equal(db.annonce_interets.find((x) => x.id === 'i-b').bloque_alerte, 'plein:11');
+  const nos = () => (db.alertes_membres || []).filter((x) => /dit oui aussi|réciproque, mais/.test(x.titre));
+  assert.equal(nos().length, 2);
+  assert.ok(nos().some((x) => /Nina/.test(x.titre)) && nos().some((x) => /Karim/.test(x.titre)));
+  await lancer();
+  assert.equal(nos().length, 2);
+});
