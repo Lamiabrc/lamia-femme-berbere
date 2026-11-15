@@ -4211,7 +4211,7 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .is-lettre h2 { font-family: 'Cormorant Garamond', 'Cormorant', Georgia, serif; font-style: italic; font-weight: 600; font-size: 28px; line-height: 1.15; margin: 6px 0 8px; color: #6B1F3A; }
 .is-lettre .lettre-intro { font-size: 15px; line-height: 1.45; color: #5A4A55; margin: 0 0 14px; }
 .is-lettre .lettre-papier { display: block; text-align: left; padding: 12px 14px; border-radius: 18px; background: #fff; border: 1px solid #EBCFD8; box-shadow: 0 6px 18px -10px rgba(126, 31, 63, .35); }
-.is-lettre .lettre-illu { display: block; width: 190px; height: auto; margin: -6px auto 2px; }
+.is-lettre .lettre-illu { display: block; width: 220px; height: auto; margin: -6px auto 2px; }
 .is-lettre .lettre-papier textarea { width: 100%; box-sizing: border-box; min-height: 132px; padding: 10px 14px; border: 1px solid #E7C3CF; border-radius: 14px; resize: vertical; font: italic 17px/28px 'Cormorant Garamond', Georgia, serif; color: #3B2633; background: transparent; border: 0; padding: 4px 2px; min-height: 110px; }
 .is-lettre .lettre-papier:focus-within { border-color: #C2456F; box-shadow: 0 0 0 3px rgba(194, 69, 111, .15); }
 .is-lettre .lettre-papier textarea:focus { outline: none; }

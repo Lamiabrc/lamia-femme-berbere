@@ -337,19 +337,27 @@ document.querySelector('[data-swipe-mot]')?.addEventListener('click', () => {
   try { brouillon = localStorage.getItem(`lfb-coeur-${ref}`) || ''; } catch { /* */ }
   const algerie = infosAbo.algerie;
   // Plus intime (Lamia, 15 nov.) : une petite lettre, un compteur de caractères, la case bien alignée.
-  const d = fenetre(`<svg class="lettre-illu" viewBox="0 0 220 120" aria-hidden="true" focusable="false">
-      <defs><linearGradient id="lettre-env" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FCE9EF"/><stop offset="1" stop-color="#F4CFDB"/></linearGradient>
+  // Une lettre berbère ornée de tichrad (tatouages kabyles : croix pointées, chevrons, ligne du menton), demandée par Lamia.
+  const d = fenetre(`<svg class="lettre-illu" viewBox="0 0 220 130" aria-hidden="true" focusable="false">
+      <defs><linearGradient id="lettre-env" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF6EA"/><stop offset="1" stop-color="#F6E3CC"/></linearGradient>
       <radialGradient id="lettre-cire" cx="38%" cy="32%" r="70%"><stop offset="0" stop-color="#D2557F"/><stop offset="1" stop-color="#7E1F3F"/></radialGradient></defs>
-      <g fill="none" stroke="#C9A24A" stroke-width="1.6" opacity=".9"><path d="M14 60 l8-8 8 8 -8 8z M190 60 l8-8 8 8 -8 8z"/><path d="M22 60h10 M188 60h10" stroke-dasharray="2 3"/></g>
-      <g fill="#E7B9C8"><circle cx="40" cy="26" r="2.4"/><circle cx="182" cy="30" r="2"/><circle cx="56" cy="98" r="1.8"/><circle cx="168" cy="96" r="2.2"/></g>
-      <path d="M150 20c4-6 13-3 11 4-2 6-11 10-11 10s-9-4-11-10c-2-7 7-10 11-4z" fill="#E58FAC" opacity=".8"/>
-      <path d="M64 14c3-4 9-2 8 3-1 4-8 7-8 7s-7-3-8-7c-1-5 5-7 8-3z" fill="#E58FAC" opacity=".6"/>
-      <rect x="58" y="34" width="104" height="70" rx="8" fill="url(#lettre-env)" stroke="#D59AAE" stroke-width="1.5"/>
-      <path d="M58 40l52 36 52-36" fill="none" stroke="#D59AAE" stroke-width="1.5"/>
-      <path d="M66 98l30-22 M154 98l-30-22" stroke="#E7B9C8" stroke-width="1.2"/>
-      <g fill="none" stroke="#C9A24A" stroke-width="1.3"><path d="M70 92l4-4 4 4-4 4z M142 92l4-4 4 4-4 4z"/></g>
-      <circle cx="110" cy="76" r="15" fill="url(#lettre-cire)"/>
-      <path d="M110 84c-6-4-9-7-9-11 0-3 3-5 5-5 2 0 3 1 4 3 1-2 2-3 4-3 2 0 5 2 5 5 0 4-3 7-9 11z" fill="#FCE7EE"/>
+      <g fill="none" stroke="#C9A24A" stroke-width="1.4"><path d="M12 66l7-7 7 7-7 7z M194 66l7-7 7 7-7 7z"/></g>
+      <g fill="#C9A24A"><circle cx="19" cy="66" r="1.6"/><circle cx="201" cy="66" r="1.6"/></g>
+      <rect x="44" y="22" width="132" height="92" rx="7" fill="url(#lettre-env)" stroke="#D8B88E" stroke-width="1.5"/>
+      <path d="M44 28l66 46 66-46" fill="#FBEEDD" stroke="#D8B88E" stroke-width="1.5"/>
+      <path d="M50 108l40-30 M170 108l-40-30" stroke="#E6CFAE" stroke-width="1.2"/>
+      <g fill="none" stroke="#2E3A6E" stroke-width="1.7" stroke-linecap="round">
+        <path d="M110 30v18 M104 34h12 M105 40h10 M106 46h8"/>
+        <path d="M78 36l6 6 6-6 M130 36l6 6 6-6"/>
+        <path d="M62 50v8 M58 54h8 M158 50v8 M154 54h8"/>
+        <path d="M66 92l6 6 6-6 6 6 M138 98l6-6 6 6 6-6"/>
+        <path d="M110 96l5 5-5 5-5-5z M96 101h6 M118 101h6"/>
+      </g>
+      <g fill="#2E3A6E"><circle cx="62" cy="47" r="1.5"/><circle cx="62" cy="61" r="1.5"/><circle cx="55" cy="54" r="1.5"/><circle cx="69" cy="54" r="1.5"/>
+        <circle cx="158" cy="47" r="1.5"/><circle cx="158" cy="61" r="1.5"/><circle cx="151" cy="54" r="1.5"/><circle cx="165" cy="54" r="1.5"/>
+        <circle cx="110" cy="26" r="1.5"/><circle cx="84" cy="46" r="1.4"/><circle cx="136" cy="46" r="1.4"/></g>
+      <circle cx="110" cy="74" r="14" fill="url(#lettre-cire)"/>
+      <text x="110" y="80" text-anchor="middle" font-size="17" fill="#FCE7EE" font-family="serif">ⵣ</text>
     </svg>
     <h2>Un mot doux pour le n° ${esc(ref)}</h2>
     <p class="lettre-intro">Quelques mots sincères, rien que pour cette personne. Ils arrivent avec ton cœur, et ton profil passe en premier dans sa pile.</p>
