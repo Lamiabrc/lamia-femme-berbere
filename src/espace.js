@@ -380,7 +380,7 @@ async function voirProfilMatch(ref, session) {
     const L = (v) => accorder(lib(v), fe);
     const puces = (tab) => (tab || []).filter(Boolean).map((x) => `<span>${esc(L(x))}</span>`).join('');
     const origine = [origineLisible(f.origine), f.village && `de ${f.village}`].filter(Boolean).join(' · ');
-    const badges = [f.verifie && 'Identité vérifiée', f.recommande && 'Recommandé·e par Lamia'].filter(Boolean);
+    const badges = [f.verifie && 'Identité vérifiée', f.recommande && 'Match choisi par Lamia'].filter(Boolean);
     const portrait = portraitRedige(f);
     const foi = [f.religion && L(f.religion), f.pratique && minuscule(L(f.pratique))].filter(Boolean).join(', ');
     const c = f.cherche || {};

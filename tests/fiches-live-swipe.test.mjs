@@ -400,6 +400,7 @@ test('voir le profil de son match : oui en relation, non sinon', async () => {
   assert.equal(vu.status, 200);
   assert.equal(vu.fiche.ref, 12);
   assert.equal(vu.fiche.prenom, undefined);
+  assert.equal(vu.fiche.recommande, false); // match fait par le swipe, pas par Lamia
   const autreSens = await lire(await handleAnnonces('annonce_fiche_match', { ref: 11 }, ctx({ id: 'u-karim', email: 'karim@example.com', email_confirmed_at: '2026' })));
   assert.equal(autreSens.status, 200);
   const pasLui = await lire(await handleAnnonces('annonce_fiche_match', { ref: 99 }, ctx({ id: 'u-nina', email: 'nina@example.com', email_confirmed_at: '2026' })));
