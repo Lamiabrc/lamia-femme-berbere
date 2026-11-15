@@ -346,8 +346,22 @@ document.querySelector('[data-swipe-mot]')?.addEventListener('click', () => {
       <rect x="44" y="22" width="132" height="92" rx="7" fill="url(#lettre-env)" stroke="#D8B88E" stroke-width="1.5"/>
       <path d="M44 28l66 46 66-46" fill="#FBEEDD" stroke="#D8B88E" stroke-width="1.5"/>
       <path d="M50 108l40-30 M170 108l-40-30" stroke="#E6CFAE" stroke-width="1.2"/>
-      <text x="110" y="41" text-anchor="middle" font-size="17" letter-spacing="2" fill="#2E3A6E" font-family="'Noto Sans Tifinagh', 'Ebrima', sans-serif">ⵜⴰⵢⵔⵉ</text>
-      <image href="/images/marque/tayri-coeur.webp" x="96" y="61" width="28" height="29"/>
+      <g fill="none" stroke="#2E3A6E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" transform="translate(0 0)">
+        <path d="M78 37h10 M83 32v10"/>
+        <circle cx="96.8" cy="39.2" r="2.8"/>
+        <path d="M111.6 32.5h-6 l5 4.6 -5 4.6"/>
+        <ellipse cx="121.4" cy="37" rx="3.8" ry="4.6"/>
+        <path d="M138.4 32.5h-7 l4.4 4.5 -4.4 4.5h7"/>
+      </g>
+      <linearGradient id="lettre-argent" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E9E4DA"/><stop offset=".5" stop-color="#A9A39A"/><stop offset="1" stop-color="#D8CFC0"/></linearGradient>
+      <g transform="translate(110 75)">
+        <path d="M0 10C-11 3-13-3-13-6.5C-13-10.8-9.8-13.5-6.5-13.5C-3.4-13.5-1.2-11.6 0-9.4C1.2-11.6 3.4-13.5 6.5-13.5C9.8-13.5 13-10.8 13-6.5C13-3 11 3 0 10Z" fill="#FFF8EF" stroke="url(#lettre-argent)" stroke-width="1.6"/>
+        <path d="M0 6.2C-7.6 1.4-9-2.6-9-5C-9-7.8-6.9-9.6-4.6-9.6C-2.5-9.6-1-8.4 0-6.9C1-8.4 2.5-9.6 4.6-9.6C6.9-9.6 9-7.8 9-5C9-2.6 7.6 1.4 0 6.2Z" fill="none" stroke="#C9A24A" stroke-width=".7"/>
+        <path d="M0-6.2V3.4 M-3.6-5.6C-3.6-2.4 3.6-2.4 3.6 0.8 M3.6-5.6C3.6-2.4-3.6-2.4-3.6 0.8" fill="none" stroke="#7E1F3F" stroke-width=".9" stroke-linecap="round"/>
+        <circle cx="0" cy="-12.2" r="1.5" fill="#C2452F"/><circle cx="-10.6" cy="-5" r="1.1" fill="#C2452F"/><circle cx="10.6" cy="-5" r="1.1" fill="#C2452F"/>
+        <path d="M-5 6.5v3 M0 10v3 M5 6.5v3" stroke="#B8B0A3" stroke-width=".6"/>
+        <circle cx="-5" cy="10.4" r="1" fill="#C2452F"/><circle cx="0" cy="14" r="1.1" fill="#C2452F"/><circle cx="5" cy="10.4" r="1" fill="#C2452F"/>
+      </g>
     </svg>
     <h2>Un mot doux pour le n° ${esc(ref)}</h2>
     <p class="lettre-intro">Quelques mots sincères, rien que pour cette personne. Ils arrivent avec ton cœur, et ton profil passe en premier dans sa pile.</p>
