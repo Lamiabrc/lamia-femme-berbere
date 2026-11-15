@@ -346,31 +346,56 @@ document.addEventListener('click', async (e) => {
 });
 
 // ---------------------------------------------------------------- Modérateurs et bêta-testeurs
-const ERR_MOD = { not_found: 'Ce numéro de profil est introuvable.' };
+// Un profil par son numéro : où il en est, puis « Modérateur ? » et « Formule offerte », enregistrés ensemble (15 nov. 2026).
+const NOMS_F = { passion: 'Passion', prestige: 'Prestige', coeur: 'Cœur' };
+function dessinerModFiche(p) {
+  const box = $('[data-mod-fiche]');
+  if (!box) return;
+  const radio = (name, v, label, on) => `<label class="tdb-choix"><input type="radio" name="${name}" value="${v}"${on ? ' checked' : ''}> ${label}</label>`;
+  box.innerHTML = `<form class="tdb-membre-fiche" data-mod-definir="${esc(p.num)}">
+    <h3>${esc(p.prenom || 'Sans prénom')} · <a class="fiche-ref" href="#profil-${esc(p.num)}">n° ${esc(p.num)}</a>${p.fiche ? ` <span class="aide">(fiche du live n° ${esc(p.fiche)})</span>` : ''}</h3>
+    <ul>
+      <li>${esc([p.genre, p.age ? `${p.age} ans` : '', [p.ville, p.pays].filter(Boolean).join(', ')].filter(Boolean).join(' · '))}</li>
+      <li>Profil : <b>${esc(p.etat)}</b>${p.pause ? ' · en pause' : ''}</li>
+      <li>Compte sur le site : <b>${p.compte ? 'oui' : 'non (la formule ne pourra pas être offerte)'}</b></li>
+      <li>Modérateur : <b>${p.moderateur ? 'oui' : 'non'}</b></li>
+      <li>Formule : <b>${p.abonnement ? `${esc(NOMS_F[p.abonnement] || p.abonnement)} (payée)` : p.formule_offerte ? `${esc(NOMS_F[p.formule_offerte] || p.formule_offerte)} (offerte)` : 'Découverte (gratuite)'}</b></li>
+    </ul>
+    <p><strong>Est-ce un modérateur ?</strong> ${radio('moderateur', 'oui', 'Oui', p.moderateur)} ${radio('moderateur', 'non', 'Non', !p.moderateur)}</p>
+    <p><strong>Formule offerte :</strong> ${radio('formule', '', 'Aucune', !p.formule_offerte)} ${radio('formule', 'passion', 'Passion', p.formule_offerte === 'passion')} ${radio('formule', 'prestige', 'Prestige', p.formule_offerte === 'prestige')}</p>
+    ${p.abonnement ? '<p class="aide">Elle a un abonnement payé : il reste prioritaire, rien n’est touché.</p>' : ''}
+    <p><button type="submit" class="btn btn-ink">Enregistrer</button></p></form>`;
+}
+async function ouvrirModFiche(ref) {
+  const st = $('[data-mod-statut]'); if (st) st.textContent = '';
+  try { const { profil } = await conf({ action: 'annonce_moderateur_etat', ref: Number(ref) }); dessinerModFiche(profil); $('[data-mod-fiche]')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+  catch (err) { const box = $('[data-mod-fiche]'); if (box) box.innerHTML = ''; if (st) st.textContent = err.texte || 'Aucun profil avec ce numéro.'; }
+}
+document.addEventListener('submit', async (e) => {
+  if (e.target.matches('[data-mod-chercher]')) { e.preventDefault(); ouvrirModFiche(e.target.ref.value); }
+  if (e.target.matches('[data-mod-definir]')) {
+    e.preventDefault();
+    const f = e.target, st = $('[data-mod-statut]'), btn = f.querySelector('button[type=submit]');
+    btn.disabled = true;
+    try {
+      const { profil } = await conf({ action: 'annonce_moderateur_definir', ref: Number(f.dataset.modDefinir), moderateur: f.moderateur.value === 'oui', formule: f.formule.value });
+      dessinerModFiche(profil); chargerModerateurs();
+      if (st) st.textContent = `Enregistré : n° ${profil.num} ${profil.moderateur ? 'est modérateur' : 'n’est pas modérateur'}${profil.formule_offerte ? `, formule ${NOMS_F[profil.formule_offerte]} offerte` : ', sans formule offerte'}.`;
+    } catch (err) { btn.disabled = false; if (st) st.textContent = err.texte || 'Ça n’a pas fonctionné. Réessaie.'; }
+  }
+});
+document.addEventListener('click', (e) => { const b = e.target.closest('[data-mod-ouvrir]'); if (b) ouvrirModFiche(b.dataset.modOuvrir); });
 async function chargerModerateurs() {
   const box = $('[data-mod-liste]');
   if (!box) return;
   try {
-    const { moderateurs = [], sansAnnonce = [] } = await conf({ action: 'annonce_moderateurs' });
-    const choix = (cle, valeur, formule, sansAucune) => `<select data-mod-formule ${cle}="${esc(valeur)}" aria-label="Formule offerte">${sansAucune ? '' : `<option value=""${formule ? '' : ' selected'}>Aucune</option>`}<option value="passion"${formule === 'passion' ? ' selected' : ''}>Passion</option><option value="prestige"${formule === 'prestige' ? ' selected' : ''}>Prestige</option></select>`;
+    const { moderateurs = [] } = await conf({ action: 'annonce_moderateurs' });
     const lignes = [
-      ...moderateurs.map((p) => `<tr><td>${p.prenom ? `<b>${esc(p.prenom)}</b>` : '<span class="aide">sans prénom</span>'}</td><td><a class="fiche-ref" href="#profil-${esc(p.num)}">n° ${esc(p.num)}</a>${p.num !== p.ref ? ` <span class="aide">(fiche n° ${esc(p.ref)})</span>` : ''}</td><td>${esc(p.ville || '')}</td><td>${p.compte ? choix('data-ref', p.ref, p.formule, false) : `<span class="aide">en attente d’un compte${p.lien ? ` · <a href="${esc(p.lien)}">son lien personnel</a>` : ''}</span>`}</td><td><button type="button" data-mod-retirer="${esc(p.ref)}">Retirer le badge</button></td></tr>`),
-      ...sansAnnonce.map((m) => `<tr><td><b>${esc(m.pseudo ? `@${m.pseudo}` : m.email)}</b></td><td><span class="aide">sans annonce</span></td><td></td><td>${choix('data-email', m.email, m.formule, true)}</td><td><button type="button" data-mod-retirer-email="${esc(m.email)}">Retirer le badge</button></td></tr>`),
+      ...moderateurs.map((p) => `<tr><td>${p.prenom ? `<b>${esc(p.prenom)}</b>` : '<span class="aide">sans prénom</span>'}</td><td><a class="fiche-ref" href="#profil-${esc(p.num)}">n° ${esc(p.num)}</a></td><td>${esc(p.ville || '')}</td><td>${p.formule ? esc(p.formule === 'prestige' ? 'Prestige' : 'Passion') : '<span class="aide">aucune</span>'}</td><td><button type="button" data-mod-ouvrir="${esc(p.num)}">Modifier</button></td></tr>`),
     ];
     box.innerHTML = lignes.join('') || '<tr><td colspan="5">Aucun modérateur pour l’instant.</td></tr>';
   } catch { box.innerHTML = '<tr><td colspan="5">La liste ne s’affiche pas pour le moment.</td></tr>'; }
 }
-document.addEventListener('change', async (e) => {
-  const s = e.target.closest('[data-mod-formule]');
-  if (!s) return;
-  const st = $('[data-mod-statut]');
-  s.disabled = true;
-  try {
-    await conf({ action: 'annonce_moderateur_formule', formule: s.value, ...(s.dataset.email ? { email: s.dataset.email } : { ref: s.dataset.ref }) });
-    if (st) st.textContent = s.value ? `Formule ${s.value === 'prestige' ? 'Prestige' : 'Passion'} offerte.` : 'Formule retirée, le badge reste.';
-  } catch (err) { if (st) st.textContent = (err.code || err.message) === 'sans_compte' ? 'Cette personne n’a pas encore de compte : la formule ne peut pas être offerte.' : 'Ça n’a pas fonctionné.'; }
-  chargerModerateurs();
-});
 async function chargerBeta() {
   const box = $('[data-beta-liste]');
   if (!box) return;
@@ -385,12 +410,6 @@ async function chargerBeta() {
   } catch { box.innerHTML = '<li>La liste ne s’affiche pas pour le moment.</li>'; }
 }
 document.addEventListener('submit', async (e) => {
-  if (e.target.matches('[data-mod-form]')) {
-    e.preventDefault();
-    const st = $('[data-mod-statut]');
-    try { const r = await conf({ action: 'annonce_moderateur', ref: e.target.ref.value, oui: true }); st.textContent = `Profil n° ${e.target.ref.value} modérateur${r.formule ? ', Passion offerte.' : ' : Passion offerte dès qu’il aura un compte.'}`; e.target.reset(); chargerModerateurs(); }
-    catch (err) { st.textContent = ERR_MOD[err.code] || ERR_MOD[err.message] || 'Ça n’a pas fonctionné.'; }
-  }
   if (e.target.matches('[data-beta-form]')) {
     e.preventDefault();
     const st = $('[data-beta-statut]');
@@ -399,25 +418,6 @@ document.addEventListener('submit', async (e) => {
     try { const r = await conf({ action: 'annonce_beta_inviter', refs }); st.textContent = `${r.invites.length} invité(s)${r.deja.length ? `, ${r.deja.length} déjà invité(s)` : ''}${r.sansCompte.length ? `, sans compte : ${r.sansCompte.join(', ')}` : ''}.`; e.target.reset(); chargerBeta(); }
     catch { st.textContent = 'L’envoi n’a pas fonctionné.'; }
   }
-});
-document.addEventListener('submit', async (e) => {
-  if (!e.target.matches('[data-mod-inviter]')) return;
-  e.preventDefault();
-  const st = $('[data-mod-statut]');
-  try { const r = await conf({ action: 'annonce_moderateur_inviter', pseudo: e.target.pseudo.value }); st.innerHTML = `Lien à envoyer (une seule fois) : <a href="${esc(r.lien)}">${esc(r.lien)}</a>`; e.target.reset(); }
-  catch { st.textContent = 'Ça n’a pas fonctionné.'; }
-});
-document.addEventListener('click', async (e) => {
-  const x = e.target.closest('[data-mod-retirer-email]');
-  if (!x) return;
-  x.disabled = true;
-  try { await conf({ action: 'annonce_moderateur', email: x.dataset.modRetirerEmail, oui: false }); chargerModerateurs(); } catch { x.disabled = false; }
-});
-document.addEventListener('click', async (e) => {
-  const b = e.target.closest('[data-mod-retirer]');
-  if (!b) return;
-  b.disabled = true;
-  try { await conf({ action: 'annonce_moderateur', ref: b.dataset.modRetirer, oui: false }); chargerModerateurs(); } catch { b.disabled = false; }
 });
 
 // Journal : pas de liste sans fin. 12 lignes, puis « Afficher plus ».
