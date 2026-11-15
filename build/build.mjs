@@ -486,7 +486,7 @@ page(
   <h2 id="live-direct-titre">Lamia est en live<span data-live-titre></span></h2>
   <div class="live-grille">
     <div><div class="live-video" data-live-video></div>
-    <p class="live-note">La vidéo vient de YouTube. Pour commenter et monter en invité : <a data-live-tiktok href="https://www.tiktok.com/@lamiafemmeberbere/live" rel="noopener" target="_blank">le live sur TikTok</a>.</p></div>
+    <p class="live-note">Le live est diffusé sur YouTube. Pour écrire dans le chat : <a data-live-youtube href="https://www.youtube.com/channel/UCw9wm85Fnv7gpzDLtgYsCfQ/live" rel="noopener" target="_blank">ouvrir le live sur YouTube</a>.</p></div>
     <div class="live-boite" data-live-question></div>
   </div>
 </section>
@@ -1501,15 +1501,22 @@ page(
 
   <section class="cl-reglages" data-annonces-vue hidden>
     <h2>Gestion des profils</h2>
-    <p class="cl-aide">Dans l’ordre : les profils à valider, les matchs demandés, puis le reste.</p>
+    <p class="cl-aide">Dans l’ordre : les profils à valider, les matchs en cours, puis le reste.</p>
     <div class="cl-carte cl-export" data-a-valider-bloc hidden>
       <h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#shield"/></svg> Profils à valider <span data-n-a-valider></span></h3>
       <p class="cl-aide">Ces profils attendent ta validation : regarde-les, puis « Valider le profil » en bas de chaque carte.</p>
       <div data-annonces-a-valider></div>
     </div>
     <div class="cl-carte cl-export">
-      <h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> Matchs demandés <span data-n-demandes></span></h3>
-      <p class="cl-aide">Quand quelqu’un clique sur « Ce profil m’intéresse » ou swipe un profil à droite, la demande arrive ici. Quand deux personnes se choisissent l’une l’autre, la demande passe en tête avec « INTÉRÊT RÉCIPROQUE » et tu reçois une alerte (notification et email). Les demandes sont regroupées par personne et notées sur 100 selon leur potentiel (âge, religion, pratique, origine, enfants, situation, tabac, pays, dans les deux sens) : fais la mise en relation avec le meilleur potentiel, puis confirme dans ton outil. Personne d’autre ne la voit. Elle est aussi notée dans la fiche exportée vers ton outil.</p>
+      <h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Matchs en cours <span data-n-demandes></span></h3>
+      <p class="cl-aide">Le reste se fait tout seul : rien à traiter ici. Tu peux seulement dématcher un match en cours (il ne compte pas), ou matcher toi-même deux profils.</p>
+      <form class="cl-matcher" data-matcher-main>
+        <input name="a" inputmode="numeric" pattern="[0-9]+" placeholder="N° profil" required aria-label="Premier numéro">
+        <span aria-hidden="true">↔</span>
+        <input name="b" inputmode="numeric" pattern="[0-9]+" placeholder="N° profil" required aria-label="Second numéro">
+        <button class="cl-btn cl-plein" type="submit"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Matcher</button>
+      </form>
+      <p class="cl-statut" role="status" data-matcher-statut></p>
       <div data-demandes></div>
     </div>
         <div class="cl-carte cl-export">

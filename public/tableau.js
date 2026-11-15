@@ -135,76 +135,50 @@ $$('details[data-repli],details[data-menu-plus]').forEach((d) => {
 // Sur téléphone, toucher à côté du volet « Plus » le referme.
 document.addEventListener('click', (e) => { const plus = $('[data-menu-plus]'); if (plus?.open && surTelephone() && !e.target.closest('[data-menu-plus]')) plus.open = false; });
 
-// ---------------------------------------------------------------- « À faire aujourd'hui » : tout ce qui attend Lamia, dans l'ordre
+// ---------------------------------------------------------------- Accueil : la carte (15 nov. 2026, Lamia : plus de « À faire aujourd'hui »).
+// Cinq branches : signalements, membres, personnes sous formule, matchs en cours, confidences. Un bouton pour chacune.
+let dernierAFaire = null;
 async function aFaire() {
-  const box = $('[data-afaire]');
+  const box = $('[data-carte-actions]');
   if (!box) return;
   try {
     const r = await fetch('/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ action: 'annonce_a_faire' }) });
     const { a_faire: f } = await r.json();
+    dernierAFaire = f;
     peindreCarte(f);
-    const heure = (d) => new Date(d).toLocaleString('fr-FR', { weekday: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
-    const MOTIF = (m) => esc(m || 'sans motif donné');
-    // Chaque numéro ouvre le profil : qui c'est, son activité, ses blocages et signalements.
-    const VOIR = (r) => (r ? `<a class="fiche-ref" href="#profil-${esc(r)}">n° ${esc(r)}</a>` : 'n° ?');
-    const PRESTA = { 15: 'Visio de 15 min', 30: 'Coaching 30 min et match manuel', 60: 'Sauver mon couple' };
-    // Ce qui te concerne : tes coachings, tes soirées, les blocages et signalements.
-    const miens = [
-      ...(f.coachings || []).map((c) => [`🎥 <b>${esc(PRESTA[c.duree] || 'Coaching')}</b> avec <b>${esc(c.prenom || c.email || '?')}</b>, ${esc(heure(c.debut))}`, '<button class="btn btn-line" type="button" data-tab-aller="coaching">Coaching</button>']),
-      (f.signalements || []).length && [`🚩 <b>${f.signalements.length} signalement(s) à traiter</b> :<br>${f.signalements.map((s) => `<span data-signalement>${VOIR(s.cible_ref)} signalé par ${VOIR(s.auteur_ref)}${s.created_at ? ` le ${esc(new Date(s.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }))}` : ''} · ${s.motif ? `« ${esc(s.motif)} »` : '<em>raison non demandée à l’époque (signalement d’avant le 12 nov.)</em>'} <a class="btn btn-line" href="#profil-${esc(s.cible_ref)}">Ouvrir</a> <button type="button" class="btn btn-line" data-signalement-traite="${esc(s.id)}">C’est traité</button><br></span>`).join('')}`, ''],
-      (f.blocages || []).length && [`🚫 <b>${f.blocages.length} blocage(s) cette semaine</b> (clique sur un numéro pour ouvrir le profil) :<br>${f.blocages.map((x) => `${VOIR(x.auteur_ref)} a bloqué ${VOIR(x.cible_ref)} · « ${MOTIF(x.motif)} »`).join('<br>')}`, ''],
-    ];
-    const lignes = [
-      ...miens,
-      ...f.soirees.map((s) => [`<b>${esc(s.titre)}</b>, ${esc(heure(s.debut))} · ${esc(s.salon)} : <b>${s.inscrits} inscrit(s)</b>, ${Math.max(0, s.places - s.inscrits)} place(s) libre(s). À 20 h 45, ouvre le bal.`, '<a class="btn btn-ink" href="/admin-bal.html">Poste du bal</a>']),
-      f.a_verifier.length && [`<b>${f.a_verifier.length} profil(s) incomplet(s)</b>, pas validé(s) automatiquement : ${f.a_verifier.map((r) => `n° ${r}${f.manques?.[r]?.length ? ` (manque : ${f.manques[r].join(', ')})` : ''}`).join(' · ')}. Valide-les toi-même si ça te va, ou demande-leur ce qui manque.`, '<button class="btn btn-ink" type="button" data-rencontres-aller="annonces">Vérifier</button>'],
-      f.reciproques && [`<b>${f.reciproques} intérêt(s) réciproque(s)</b> : les deux se sont choisis. Le site les met en relation tout seul dès que les différences éventuelles sont acceptées.`, '<button class="btn btn-ink" type="button" data-rencontres-aller="demandes">Voir</button>'],
-      f.demandes && [`<b>${f.demandes} match(s) demandé(s)</b> par ${f.personnes} personne(s) : en attente de la réponse de l’autre personne. Rien à faire de ton côté.`, '<button class="btn btn-line" type="button" data-rencontres-aller="demandes">Voir</button>'],
-      f.propositions_oui && [`<b>${f.propositions_oui} proposition(s) acceptée(s)</b> : la personne est intéressée par le profil que tu lui as proposé.`, '<button class="btn btn-line" type="button" data-rencontres-aller="demandes">Voir</button>'],
-      f.fiches_a_effacer && [`<b>${f.fiches_a_effacer} fiche(s) à effacer</b> dans ton outil (demandes des personnes).`, '<span class="aide">Outil › Site › Publipostage</span>'],
-      f.fiches_en_attente && [`<b>${f.fiches_en_attente} fiche(s) pas encore confirmée(s)</b> (${f.fiches_confirmees} confirmée(s)) : envoie les liens de confirmation.`, '<span class="aide">Outil › Site › Publipostage › « À prévenir »</span>'],
-      f.nouveautes_en_attente && [`<b>${f.nouveautes_en_attente} nouveauté(s)</b> partiront au prochain envoi de 18 h en notification.`, '<button class="btn btn-line" type="button" data-rencontres-aller="nouveautes">Voir</button>'],
-    ].filter(Boolean);
-    const li = ([t, b]) => `<li><span>${t}</span>${b}</li>`;
-    const nMiens = miens.filter(Boolean).length + f.soirees.length;
-    const mien = lignes.slice(0, nMiens), auto = lignes.slice(nMiens);
-    box.innerHTML = (mien.length ? mien.map(li).join('') : '<li>Rien pour toi aujourd’hui : pas de coaching, de soirée, de blocage ni de signalement en attente.</li>')
-      + (auto.length ? `<li class="afaire-auto"><details><summary>Le site s’en occupe tout seul (${auto.length})</summary><ol>${auto.map(li).join('')}</ol></details></li>` : '');
-  } catch { box.innerHTML = '<li>La liste ne s’affiche pas pour le moment.</li>'; }
+    peindreSignalements(f.signalements || []);
+  } catch { box.innerHTML = '<p class="aide">La carte ne s’affiche pas pour le moment.</p>'; }
 }
-// Accueil : une carte d'actions. Au centre « À faire aujourd'hui », autour une branche par sujet,
-// une phrase et un seul bouton pour agir. Une branche sans rien à faire s'efface.
-async function peindreCarte(f) {
+// La liste des signalements à traiter, sous la carte, ouverte par « Traiter ».
+function peindreSignalements(liste) {
+  const box = $('[data-carte-signalements]');
+  if (!box) return;
+  const VOIR = (r) => (r ? `<a class="fiche-ref" href="#profil-${esc(r)}">n° ${esc(r)}</a>` : 'n° ?');
+  box.innerHTML = liste.length ? `<h2>Signalements à traiter</h2><ul class="fiche-liste">${liste.map((s) => `<li data-signalement><span>${VOIR(s.cible_ref)} signalé par ${VOIR(s.auteur_ref)}${s.created_at ? ` le ${esc(new Date(s.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }))}` : ''} · ${s.motif ? `« ${esc(s.motif)} »` : '<em>raison non demandée à l’époque (signalement d’avant le 12 nov.)</em>'}</span> <span><a class="btn btn-line" href="#profil-${esc(s.cible_ref)}">Ouvrir</a> <button type="button" class="btn btn-line" data-signalement-traite="${esc(s.id)}">C’est traité</button></span></li>`).join('')}</ul>` : '<p class="aide">Aucun signalement à traiter.</p>';
+  if (!liste.length) box.hidden = true;
+}
+function peindreCarte(f) {
   const box = $('[data-carte-actions]');
   if (!box) return;
-  const heure = (d) => new Date(d).toLocaleString('fr-FR', { weekday: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
   const s = (n) => (n > 1 ? 's' : '');
-  const dessiner = (sp) => {
-    const c = (f.coachings || [])[0], so = (f.soirees || [])[0], sig = (f.signalements || []).length;
-    const branches = [
-      ['Messages à répondre', f.confidences ? `${f.confidences} confidence${s(f.confidences)} attend${f.confidences > 1 ? 'ent' : ''} ta réponse` : 'Aucun message en attente', f.confidences ? '<a class="btn btn-ink" href="/confidences-lamia/">Répondre</a>' : ''],
-      ['Comptes sans profil', sp === null ? 'Calcul en cours…' : sp.total ? `${sp.total} compte${s(sp.total)} · ${sp.relancer} jamais relancé${s(sp.relancer)}${sp.supprimer ? ` · ${sp.supprimer} à supprimer` : ''}` : 'Tous les comptes ont un profil', sp?.total ? '<button class="btn btn-ink" type="button" data-carte-membres>Relancer ou supprimer</button>' : ''],
-      ['Coaching', c ? `Prochaine séance : ${heure(c.debut)}, ${c.prenom || c.email || '?'}` : 'Aucune séance réservée cette semaine', c ? '<button class="btn btn-ink" type="button" data-tab-aller="coaching">Ouvrir le coaching</button>' : ''],
-      ['Soirées', so ? `${so.titre}, ${heure(so.debut)} : ${so.inscrits} inscrit${s(so.inscrits)}` : 'Aucune soirée dans les 48 heures', so ? '<a class="btn btn-ink" href="/admin-bal.html">Poste du bal</a>' : ''],
-      ['Ventes', f.commandes ? `${f.commandes} commande${s(f.commandes)} payée${s(f.commandes)} à expédier` : 'Aucune commande à expédier', f.commandes ? '<button class="btn btn-ink" type="button" data-tab-aller="ventes">Préparer l’envoi</button>' : ''],
-      ['Signalements', sig ? `${sig} signalement${s(sig)} à traiter` : 'Aucun à traiter', sig ? '<button class="btn btn-ink" type="button" data-carte-detail>Traiter</button>' : ''],
-    ];
-    const n = branches.filter((x) => x[2]).length;
-    const place = ['1 / 1', '1 / 3', '2 / 3', '3 / 3', '3 / 1', '2 / 1'];
-    box.innerHTML = `<svg viewBox="0 0 300 300" preserveAspectRatio="none" aria-hidden="true"><g stroke="#cfc4b2" stroke-width=".6" fill="none"><path d="M150 150 L50 40"/><path d="M150 150 L250 40"/><path d="M150 150 L250 150"/><path d="M150 150 L250 260"/><path d="M150 150 L50 260"/><path d="M150 150 L50 150"/></g></svg>
-      <div class="carte-noeud"><strong>À faire<br>aujourd’hui</strong><span>${n ? `${n} action${s(n)}` : 'Rien à faire'}</span></div>
-      ${branches.map(([t, d, b], i) => `<div class="carte-branche${b ? '' : ' is-calme'}" style="grid-area:${place[i]}"><h3>${esc(t)}</h3><p>${esc(d)}</p>${b}</div>`).join('')}`;
-  };
-  dessiner(null);
-  // Les comptes sans profil demandent la liste des comptes : elle arrive juste après.
-  try {
-    if (!comptes) await chargerComptes();
-    dessiner({ total: sansProfil().length, relancer: aRelancer().length, supprimer: aSupprimer().length });
-  } catch { dessiner({ total: 0, relancer: 0, supprimer: 0 }); }
+  const sig = (f.signalements || []).length, conf = f.confidences || 0, mc = f.matchs_en_cours || 0, sf = f.sous_formule || 0;
+  const nbMembres = comptes ? comptes.comptes.length : null;
+  const d = f.sous_formule_detail || {};
+  const branches = [
+    ['Signalements', sig ? `${sig} signalement${s(sig)} à traiter` : 'Aucun à traiter', sig ? '<button class="btn btn-ink" type="button" data-carte-signalements-ouvrir>Traiter</button>' : ''],
+    ['Membres', nbMembres === null ? 'Calcul en cours…' : `${nbMembres} compte${s(nbMembres)}`, '<button class="btn btn-ink" type="button" data-go="comptes">Voir les membres</button>'],
+    ['Sous formule', sf ? `${sf} personne${s(sf)}${d.passion || d.prestige ? ` · ${d.passion || 0} Passion, ${d.prestige || 0} Prestige` : ''}` : 'Personne pour l’instant', '<button class="btn btn-ink" type="button" data-rencontres-aller="abonnes">Voir les abonnés</button>'],
+    ['Matchs en cours', mc ? `${mc} match${s(mc)} en cours` : 'Aucun match en cours', '<button class="btn btn-ink" type="button" data-rencontres-aller="demandes">Voir, dématcher, matcher</button>'],
+    ['Confidences', conf ? `${conf} confidence${s(conf)} attend${conf > 1 ? 'ent' : ''} ta réponse` : 'Aucun message en attente', `<a class="btn ${conf ? 'btn-ink' : 'btn-line'}" href="/confidences-lamia/">${conf ? 'Répondre' : 'Ouvrir'}</a>`],
+  ];
+  const place = ['1 / 1', '1 / 3', '2 / 3', '3 / 3', '3 / 1'];
+  box.innerHTML = `<svg viewBox="0 0 300 300" preserveAspectRatio="none" aria-hidden="true"><g stroke="#cfc4b2" stroke-width=".6" fill="none"><path d="M150 150 L50 40"/><path d="M150 150 L250 40"/><path d="M150 150 L250 150"/><path d="M150 150 L250 260"/><path d="M150 150 L50 260"/></g></svg>
+    <div class="carte-noeud"><strong>Tayri</strong><span>${nbMembres === null ? '' : `${nbMembres} membre${s(nbMembres)}`}</span></div>
+    ${branches.map(([t, txt, b], i) => `<div class="carte-branche${(i === 0 && !sig) || (i === 4 && !conf) ? ' is-calme' : ''}" style="grid-area:${place[i]}"><h3>${esc(t)}</h3><p>${esc(txt)}</p>${b}</div>`).join('')}`;
+  if (nbMembres === null) (comptes ? Promise.resolve() : chargerComptes()).then(() => { if (dernierAFaire) peindreCarte(dernierAFaire); }).catch(() => {});
 }
 document.addEventListener('click', (e) => {
-  if (e.target.closest('[data-carte-membres]')) { ouvrir('comptes'); const b = $('[data-filtre="sansprofil"]'); if (b) b.click(); return; }
-  if (e.target.closest('[data-carte-detail]')) { const d = $('details[data-repli="chiffres"]'); if (d) d.open = true; $('[data-afaire]')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+  if (e.target.closest('[data-carte-signalements-ouvrir]')) { const b = $('[data-carte-signalements]'); if (b) { b.hidden = false; b.scrollIntoView({ behavior: 'smooth', block: 'start' }); } }
 });
 document.addEventListener('click', (e) => {
   const b = e.target.closest('[data-rencontres-aller]');
@@ -212,7 +186,7 @@ document.addEventListener('click', (e) => {
   aller = 'annonces'; const f = $('[data-rencontres]'); if (f) f.removeAttribute('src');
   ouvrir('rencontres');
   const cible = b.dataset.rencontresAller;
-  if (cible !== 'annonces') setTimeout(() => { try { const el = f.contentWindow.document.querySelector(cible === 'demandes' ? '[data-demandes]' : '[data-nouv-form]'); const pli = el?.closest('details'); if (pli) pli.open = true; el?.scrollIntoView({ behavior: 'smooth' }); } catch { /* */ } }, 2500);
+  if (cible !== 'annonces') setTimeout(() => { try { const el = f.contentWindow.document.querySelector(cible === 'demandes' ? '[data-demandes]' : cible === 'abonnes' ? '[data-abonnes]' : '[data-nouv-form]'); const pli = el?.closest('details'); if (pli) pli.open = true; el?.scrollIntoView({ behavior: 'smooth' }); } catch { /* */ } }, 2500);
 });
 
 // ---------------------------------------------------------------- Salons des soirées : confirmer une date, suivre les inscrits
@@ -346,31 +320,56 @@ document.addEventListener('click', async (e) => {
 });
 
 // ---------------------------------------------------------------- Modérateurs et bêta-testeurs
-const ERR_MOD = { not_found: 'Ce numéro de profil est introuvable.' };
+// Un profil par son numéro : où il en est, puis « Modérateur ? » et « Formule offerte », enregistrés ensemble (15 nov. 2026).
+const NOMS_F = { passion: 'Passion', prestige: 'Prestige', coeur: 'Cœur' };
+function dessinerModFiche(p) {
+  const box = $('[data-mod-fiche]');
+  if (!box) return;
+  const radio = (name, v, label, on) => `<label class="tdb-choix"><input type="radio" name="${name}" value="${v}"${on ? ' checked' : ''}> ${label}</label>`;
+  box.innerHTML = `<form class="tdb-membre-fiche" data-mod-definir="${esc(p.num)}">
+    <h3>${esc(p.prenom || 'Sans prénom')} · <a class="fiche-ref" href="#profil-${esc(p.num)}">n° ${esc(p.num)}</a>${p.fiche ? ` <span class="aide">(fiche du live n° ${esc(p.fiche)})</span>` : ''}</h3>
+    <ul>
+      <li>${esc([p.genre, p.age ? `${p.age} ans` : '', [p.ville, p.pays].filter(Boolean).join(', ')].filter(Boolean).join(' · '))}</li>
+      <li>Profil : <b>${esc(p.etat)}</b>${p.pause ? ' · en pause' : ''}</li>
+      <li>Compte sur le site : <b>${p.compte ? 'oui' : 'non (la formule ne pourra pas être offerte)'}</b></li>
+      <li>Modérateur : <b>${p.moderateur ? 'oui' : 'non'}</b></li>
+      <li>Formule : <b>${p.abonnement ? `${esc(NOMS_F[p.abonnement] || p.abonnement)} (payée)` : p.formule_offerte ? `${esc(NOMS_F[p.formule_offerte] || p.formule_offerte)} (offerte)` : 'Découverte (gratuite)'}</b></li>
+    </ul>
+    <p><strong>Est-ce un modérateur ?</strong> ${radio('moderateur', 'oui', 'Oui', p.moderateur)} ${radio('moderateur', 'non', 'Non', !p.moderateur)}</p>
+    <p><strong>Formule offerte :</strong> ${radio('formule', '', 'Aucune', !p.formule_offerte)} ${radio('formule', 'passion', 'Passion', p.formule_offerte === 'passion')} ${radio('formule', 'prestige', 'Prestige', p.formule_offerte === 'prestige')}</p>
+    ${p.abonnement ? '<p class="aide">Elle a un abonnement payé : il reste prioritaire, rien n’est touché.</p>' : ''}
+    <p><button type="submit" class="btn btn-ink">Enregistrer</button></p></form>`;
+}
+async function ouvrirModFiche(ref) {
+  const st = $('[data-mod-statut]'); if (st) st.textContent = '';
+  try { const { profil } = await conf({ action: 'annonce_moderateur_etat', ref: Number(ref) }); dessinerModFiche(profil); $('[data-mod-fiche]')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+  catch (err) { const box = $('[data-mod-fiche]'); if (box) box.innerHTML = ''; if (st) st.textContent = err.texte || 'Aucun profil avec ce numéro.'; }
+}
+document.addEventListener('submit', async (e) => {
+  if (e.target.matches('[data-mod-chercher]')) { e.preventDefault(); ouvrirModFiche(e.target.ref.value); }
+  if (e.target.matches('[data-mod-definir]')) {
+    e.preventDefault();
+    const f = e.target, st = $('[data-mod-statut]'), btn = f.querySelector('button[type=submit]');
+    btn.disabled = true;
+    try {
+      const { profil } = await conf({ action: 'annonce_moderateur_definir', ref: Number(f.dataset.modDefinir), moderateur: f.moderateur.value === 'oui', formule: f.formule.value });
+      dessinerModFiche(profil); chargerModerateurs();
+      if (st) st.textContent = `Enregistré : n° ${profil.num} ${profil.moderateur ? 'est modérateur' : 'n’est pas modérateur'}${profil.formule_offerte ? `, formule ${NOMS_F[profil.formule_offerte]} offerte` : ', sans formule offerte'}.`;
+    } catch (err) { btn.disabled = false; if (st) st.textContent = err.texte || 'Ça n’a pas fonctionné. Réessaie.'; }
+  }
+});
+document.addEventListener('click', (e) => { const b = e.target.closest('[data-mod-ouvrir]'); if (b) ouvrirModFiche(b.dataset.modOuvrir); });
 async function chargerModerateurs() {
   const box = $('[data-mod-liste]');
   if (!box) return;
   try {
-    const { moderateurs = [], sansAnnonce = [] } = await conf({ action: 'annonce_moderateurs' });
-    const choix = (cle, valeur, formule, sansAucune) => `<select data-mod-formule ${cle}="${esc(valeur)}" aria-label="Formule offerte">${sansAucune ? '' : `<option value=""${formule ? '' : ' selected'}>Aucune</option>`}<option value="passion"${formule === 'passion' ? ' selected' : ''}>Passion</option><option value="prestige"${formule === 'prestige' ? ' selected' : ''}>Prestige</option></select>`;
+    const { moderateurs = [] } = await conf({ action: 'annonce_moderateurs' });
     const lignes = [
-      ...moderateurs.map((p) => `<tr><td>${p.prenom ? `<b>${esc(p.prenom)}</b>` : '<span class="aide">sans prénom</span>'}</td><td><a class="fiche-ref" href="#profil-${esc(p.num)}">n° ${esc(p.num)}</a>${p.num !== p.ref ? ` <span class="aide">(fiche n° ${esc(p.ref)})</span>` : ''}</td><td>${esc(p.ville || '')}</td><td>${p.compte ? choix('data-ref', p.ref, p.formule, false) : `<span class="aide">en attente d’un compte${p.lien ? ` · <a href="${esc(p.lien)}">son lien personnel</a>` : ''}</span>`}</td><td><button type="button" data-mod-retirer="${esc(p.ref)}">Retirer le badge</button></td></tr>`),
-      ...sansAnnonce.map((m) => `<tr><td><b>${esc(m.pseudo ? `@${m.pseudo}` : m.email)}</b></td><td><span class="aide">sans annonce</span></td><td></td><td>${choix('data-email', m.email, m.formule, true)}</td><td><button type="button" data-mod-retirer-email="${esc(m.email)}">Retirer le badge</button></td></tr>`),
+      ...moderateurs.map((p) => `<tr><td>${p.prenom ? `<b>${esc(p.prenom)}</b>` : '<span class="aide">sans prénom</span>'}</td><td><a class="fiche-ref" href="#profil-${esc(p.num)}">n° ${esc(p.num)}</a></td><td>${esc(p.ville || '')}</td><td>${p.formule ? esc(p.formule === 'prestige' ? 'Prestige' : 'Passion') : '<span class="aide">aucune</span>'}</td><td><button type="button" data-mod-ouvrir="${esc(p.num)}">Modifier</button></td></tr>`),
     ];
     box.innerHTML = lignes.join('') || '<tr><td colspan="5">Aucun modérateur pour l’instant.</td></tr>';
   } catch { box.innerHTML = '<tr><td colspan="5">La liste ne s’affiche pas pour le moment.</td></tr>'; }
 }
-document.addEventListener('change', async (e) => {
-  const s = e.target.closest('[data-mod-formule]');
-  if (!s) return;
-  const st = $('[data-mod-statut]');
-  s.disabled = true;
-  try {
-    await conf({ action: 'annonce_moderateur_formule', formule: s.value, ...(s.dataset.email ? { email: s.dataset.email } : { ref: s.dataset.ref }) });
-    if (st) st.textContent = s.value ? `Formule ${s.value === 'prestige' ? 'Prestige' : 'Passion'} offerte.` : 'Formule retirée, le badge reste.';
-  } catch (err) { if (st) st.textContent = (err.code || err.message) === 'sans_compte' ? 'Cette personne n’a pas encore de compte : la formule ne peut pas être offerte.' : 'Ça n’a pas fonctionné.'; }
-  chargerModerateurs();
-});
 async function chargerBeta() {
   const box = $('[data-beta-liste]');
   if (!box) return;
@@ -385,12 +384,6 @@ async function chargerBeta() {
   } catch { box.innerHTML = '<li>La liste ne s’affiche pas pour le moment.</li>'; }
 }
 document.addEventListener('submit', async (e) => {
-  if (e.target.matches('[data-mod-form]')) {
-    e.preventDefault();
-    const st = $('[data-mod-statut]');
-    try { const r = await conf({ action: 'annonce_moderateur', ref: e.target.ref.value, oui: true }); st.textContent = `Profil n° ${e.target.ref.value} modérateur${r.formule ? ', Passion offerte.' : ' : Passion offerte dès qu’il aura un compte.'}`; e.target.reset(); chargerModerateurs(); }
-    catch (err) { st.textContent = ERR_MOD[err.code] || ERR_MOD[err.message] || 'Ça n’a pas fonctionné.'; }
-  }
   if (e.target.matches('[data-beta-form]')) {
     e.preventDefault();
     const st = $('[data-beta-statut]');
@@ -399,25 +392,6 @@ document.addEventListener('submit', async (e) => {
     try { const r = await conf({ action: 'annonce_beta_inviter', refs }); st.textContent = `${r.invites.length} invité(s)${r.deja.length ? `, ${r.deja.length} déjà invité(s)` : ''}${r.sansCompte.length ? `, sans compte : ${r.sansCompte.join(', ')}` : ''}.`; e.target.reset(); chargerBeta(); }
     catch { st.textContent = 'L’envoi n’a pas fonctionné.'; }
   }
-});
-document.addEventListener('submit', async (e) => {
-  if (!e.target.matches('[data-mod-inviter]')) return;
-  e.preventDefault();
-  const st = $('[data-mod-statut]');
-  try { const r = await conf({ action: 'annonce_moderateur_inviter', pseudo: e.target.pseudo.value }); st.innerHTML = `Lien à envoyer (une seule fois) : <a href="${esc(r.lien)}">${esc(r.lien)}</a>`; e.target.reset(); }
-  catch { st.textContent = 'Ça n’a pas fonctionné.'; }
-});
-document.addEventListener('click', async (e) => {
-  const x = e.target.closest('[data-mod-retirer-email]');
-  if (!x) return;
-  x.disabled = true;
-  try { await conf({ action: 'annonce_moderateur', email: x.dataset.modRetirerEmail, oui: false }); chargerModerateurs(); } catch { x.disabled = false; }
-});
-document.addEventListener('click', async (e) => {
-  const b = e.target.closest('[data-mod-retirer]');
-  if (!b) return;
-  b.disabled = true;
-  try { await conf({ action: 'annonce_moderateur', ref: b.dataset.modRetirer, oui: false }); chargerModerateurs(); } catch { b.disabled = false; }
 });
 
 // Journal : pas de liste sans fin. 12 lignes, puis « Afficher plus ».
@@ -892,6 +866,14 @@ async function chargerComptes() {
   if (compteOuvert) ouvrirCompte(compteOuvert);
 }
 
+// L'ordre de la liste affichée : « Suivant » ouvre la fiche d'après sans revenir à la liste (Lamia, 15 nov. 2026).
+let ordreComptes = [];
+function boutonsSuivant() {
+  const k = ordreComptes.indexOf(compteOuvert);
+  const prec = $('[data-compte-prec]'), suiv = $('[data-compte-suiv]');
+  if (prec) prec.hidden = k <= 0;
+  if (suiv) { suiv.hidden = k < 0 || k >= ordreComptes.length - 1; suiv.textContent = k >= 0 ? `Suivant (${k + 2}/${ordreComptes.length}) →` : 'Suivant →'; }
+}
 function listeComptes() {
   if (!comptes) return;
   const q = $('[data-comptes-cherche]').value.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -905,6 +887,7 @@ function listeComptes() {
     sansprofil: (c) => c.sans_profil,
   }[filtreComptes];
   const l = comptes.comptes.filter(garde).filter((c) => !q || [nomDe(c), c.email, c.profil?.city, c.profil?.display_name, ...c.annonces.map((a) => a.ref), ...c.fiches.map((f) => f.ref)].join(' ').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes(q));
+  ordreComptes = l.map((c) => c.id);
   // Des cartes, pas une liste sans fin : 24 à la fois, puis « Afficher plus ».
   const ETAT = { publiee: ['Profil validé', 'is-ok'], a_verifier: ['À vérifier', 'is-alerte'], brouillon: ['Profil pas terminé', 'is-alerte'] };
   $('[data-comptes]').innerHTML = l.length ? l.slice(0, limiteComptes).map((c) => {
@@ -963,6 +946,8 @@ function ouvrirCompte(id) {
   $('[data-compte-fiche]').hidden = false;
   $('[data-compte-fond]').hidden = false;
   $('[data-compte-form]').hidden = false;
+  boutonsSuivant();
+  $('[data-compte-fiche]').scrollTop = 0;
   chargerDetail({ user_id: id });
 }
 // ---------------------------------------------------------------- la fiche : qui, son activité, pourquoi une alerte, cadeaux, blocage
@@ -985,6 +970,7 @@ function profilComplet(a) {
   const badges = [a.identite_verifiee_at ? 'pièce d’identité validée' : '', a.recommande_at ? 'recommandé' : '', a.moderateur_at ? 'modérateur' : '', a.visible_anonyme === false ? 'masqué dans les profils' : '', a.outil_id || a.exportee_at ? 'importé dans l’outil' : 'pas encore importé dans l’outil'].filter(Boolean).join(' · ');
   return `<article class="profil-complet"><h4>Profil n° ${esc(a.ref)}</h4><p class="aide">${esc(badges)}</p>
     ${medias ? `<div class="profil-medias">${medias}</div>` : '<p class="aide">Aucune photo ni vidéo.</p>'}
+    ${a.photos_refusees_at ? `<p class="fiche-bloque">Photos refusées le ${esc(date(a.photos_refusees_at, { day: 'numeric', month: 'long' }))} : compte suspendu jusqu’à l’envoi de 2 nouvelles photos.</p>` : a.test ? '' : `<p><button class="btn btn-line fiche-danger" type="button" data-photos-refuser="${esc(a.ref)}">Photos non valides : suspendre jusqu’à de nouvelles photos</button></p>`}
     ${a.profil ? `<h5>Qui je suis</h5><p>${esc(a.profil)}</p>` : ''}${a.recherche ? `<h5>Qui je cherche${a.age_min || a.age_max ? ` · ${esc(a.age_min || 18)} à ${esc(a.age_max || 99)} ans` : ''}</h5><p>${esc(a.recherche)}</p>` : ''}
     <dl class="profil-champs">${lignesProfil([['Prénom', a.prenom], ['Âge', a.age], ['Genre', a.genre], ['Ville', a.ville], ['Pays', a.pays], ['Situation', a.situation], ['Email', a.email], ['Téléphone', a.phone], ...reponses, ['Ma note', a.note_lamia]])}</dl></article>`;
 }
@@ -1049,6 +1035,7 @@ async function ouvrirParRef(ref) {
   $('[data-compte-soirees]').innerHTML = '<li>Pas de compte.</li>';
   $('[data-compte-liens]').innerHTML = '';
   $('[data-compte-fiche]').hidden = false; $('[data-compte-fond]').hidden = false;
+  boutonsSuivant();
   chargerDetail({ ref });
 }
 function suivreHashProfil() {
@@ -1188,6 +1175,20 @@ $('[data-comptes-filtres]').addEventListener('click', (e) => {
 });
 $('[data-comptes-maj]').addEventListener('click', chargerComptes);
 $('[data-compte-fermer]').addEventListener('click', fermerCompte);
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-photos-refuser]');
+  if (!b) return;
+  if (!confirm(`Refuser les photos du profil n° ${b.dataset.photosRefuser} ?\n\nSes photos sont effacées et son compte est suspendu. La personne reçoit : « Transmets 2 photos valides (de toi, réelles et différentes) : ton compte est suspendu jusque-là. » Il est débloqué tout seul dès qu’elle les envoie.`)) return;
+  b.disabled = true;
+  try { await conf({ action: 'annonce_photos_refuser', ref: Number(b.dataset.photosRefuser) }); b.outerHTML = '<p class="fiche-bloque">Photos refusées : compte suspendu jusqu’à l’envoi de 2 nouvelles photos. La personne est prévenue.</p>'; }
+  catch { b.disabled = false; alert('Ça n’a pas fonctionné. Réessaie.'); }
+});
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-compte-suiv], [data-compte-prec]');
+  if (!b) return;
+  const k = ordreComptes.indexOf(compteOuvert) + (b.matches('[data-compte-suiv]') ? 1 : -1);
+  if (ordreComptes[k]) ouvrirCompte(ordreComptes[k]);
+});
 $('[data-compte-fond]').addEventListener('click', fermerCompte);
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('[data-compte-fiche]').hidden) fermerCompte(); });
 $('[data-compte-fiche]').addEventListener('click', (e) => { if (e.target.closest('[data-rencontres-aller]')) fermerCompte(); });

@@ -45,7 +45,7 @@ function afficher() {
   const video = zone.querySelector('[data-live-video]');
   // La vidéo n'est chargée qu'une fois (sinon elle repartirait du début à chaque mise à jour).
   if (!video.firstChild) video.innerHTML = `<iframe src="${esc(etat.youtube)}" title="Le live de Lamia sur YouTube" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen loading="lazy"></iframe>`;
-  zone.querySelector('[data-live-tiktok]').href = etat.tiktok;
+  const yt = zone.querySelector('[data-live-youtube]'); if (yt && etat.youtube_page) yt.href = etat.youtube_page;
   if (!zone.querySelector('[data-live-form] textarea:focus')) boite();
 }
 

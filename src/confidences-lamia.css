@@ -194,3 +194,10 @@ legend { font-size: 14px; font-weight: 600; padding: 0 4px; }
 .cl-login, .cl-carte { grid-template-columns: minmax(0, 1fr); }
 .cl-carte { overflow-wrap: anywhere; }
 .cl-carte > * { min-width: 0; max-width: 100%; }
+
+/* Matchs en cours : dématcher, ou matcher deux numéros (15 nov. 2026) */
+.cl-matcher { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0; }
+.cl-matcher input { width: 7.5em; padding: 8px 10px; border: 1px solid var(--poudre-fonce); border-radius: 10px; font: inherit; }
+.cl-match-en-cours { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; justify-content: space-between; padding: 10px 0; border-top: 1px solid var(--poudre-fonce); }
+.cl-match-en-cours p { margin: 0; }
+.cl-match-en-cours .cl-coord { flex: 1 1 100%; order: 3; }

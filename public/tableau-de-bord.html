@@ -52,6 +52,7 @@
   <section data-panel="accueil" hidden>
     <h1 class="tdb-titre">Bonjour Lamia</h1>
     <div class="carte-map" data-carte-actions><p class="aide">Un instant…</p></div>
+    <div class="tdb-carte" data-carte-signalements hidden></div>
     <details class="tdb-repli" data-repli="chiffres"><summary>Le détail, les chiffres et les autres outils</summary>
     <div class="tdb-tuiles" data-tuiles aria-label="Chiffres clés"></div>
     <div class="tdb-outils" aria-label="Mes outils">
@@ -68,11 +69,6 @@
       <a href="/pilotage.html"><strong>Pilotage</strong><span>Feuille de route</span></a>
       <a href="/" target="_blank" rel="noopener"><strong>Voir le site</strong><span>Comme un visiteur</span></a>
     </div></details>
-    <div class="tdb-carte tdb-afaire">
-      <h2>À faire aujourd’hui</h2>
-      <p class="aide">Ce qui te concerne : tes coachings, tes soirées, les blocages et signalements. Les matchs et les profils, le site s’en occupe tout seul (replié en bas).</p>
-      <ol data-afaire><li>Un instant…</li></ol>
-    </div>
     <div class="tdb-graphes" data-graphes><p class="aide">Les graphiques arrivent…</p></div>
     <div class="tdb-deux">
       <div class="tdb-carte"><h2>Le parcours des membres</h2><p class="aide">Sur tous les comptes, combien de personnes à chaque étape.</p><div data-parcours></div></div>
@@ -187,7 +183,7 @@
 
     <div class="compte-fond" data-compte-fond hidden></div>
     <aside class="compte-fiche" data-compte-fiche hidden aria-label="Fiche du compte">
-      <div class="compte-tete"><div><p class="compte-kicker" data-compte-email></p><h2 data-compte-nom></h2><p class="aide" data-compte-infos></p></div><button type="button" class="btn btn-line" data-compte-fermer>Fermer</button></div>
+      <div class="compte-tete"><div><p class="compte-kicker" data-compte-email></p><h2 data-compte-nom></h2><p class="aide" data-compte-infos></p></div><div class="compte-nav"><button type="button" class="btn btn-line" data-compte-prec hidden>← Précédent</button><button type="button" class="btn btn-ink" data-compte-suiv hidden>Suivant →</button><button type="button" class="btn btn-line" data-compte-fermer>Fermer</button></div></div>
       <p class="fiche-actions"><button class="btn btn-ink" type="button" data-fiche-aller="modifier">Modifier</button><button class="btn btn-ink" type="button" data-fiche-aller="contacter">Contacter</button><button class="btn btn-line" type="button" data-fiche-aller="bloquer">Bloquer</button><button class="btn btn-ink" type="button" data-sp-un="relancer" hidden>Lui demander de créer son profil</button><button class="btn btn-line fiche-danger" type="button" data-sp-un="supprimer" hidden>Supprimer ce compte</button> <span class="aide" data-sp-un-statut role="status"></span></p>
       <div class="fiche-corps">
       <div data-compte-detail></div>
@@ -232,13 +228,11 @@
     <p class="aide">Tout ce qui se passe dans l’application, avec qui l’a fait. Les notifications de ton téléphone viennent d’ici : tu choisis en bas celles qui sonnent. Les autres restent dans ce journal.</p>
     <div class="tdb-carte tdb-moderateurs" id="moderateurs">
       <h2><svg class="ico" aria-hidden="true"><use href="/icones.svg#shield"/></svg> Mes modérateurs</h2>
-      <p class="aide">Ils portent le badge « Modérateur ». Tu choisis la formule que tu leur offres, sans paiement. Clique sur un numéro pour ouvrir le profil.</p>
+      <p class="aide">Seulement ceux qui ont validé (un compte relié à leur profil). Pour nommer quelqu’un, changer sa formule ou retirer le badge : son numéro ci-dessous.</p>
       <div class="tdb-table"><table><thead><tr><th>Prénom</th><th>Profil</th><th>Ville</th><th>Formule offerte</th><th></th></tr></thead><tbody data-mod-liste><tr><td colspan="5">Chargement…</td></tr></tbody></table></div>
+      <form data-mod-chercher class="tdb-filtres-journal"><input name="ref" inputmode="numeric" pattern="[0-9]+" placeholder="N° du profil" required aria-label="Numéro du profil"> <button type="submit">Voir où en est ce profil</button></form>
+      <div data-mod-fiche></div>
       <p class="aide" data-mod-statut role="status"></p>
-      <div class="tdb-mod-ajout">
-        <form data-mod-form class="tdb-filtres-journal"><input name="ref" inputmode="numeric" pattern="[0-9]+" placeholder="N° du profil" required aria-label="Numéro du profil"> <button type="submit">Nommer modérateur</button></form>
-        <form data-mod-inviter class="tdb-filtres-journal"><input name="pseudo" placeholder="@pseudo, sans annonce" required aria-label="Pseudo TikTok"> <button type="submit">Créer un lien d’invitation</button></form>
-      </div>
     </div>
     <div class="tdb-grille-app">
       <div class="tdb-carte">
