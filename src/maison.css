@@ -4321,3 +4321,10 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 /* Mes photos (privées), 15 nov. 2026 */
 .espace-mes-photos-grille { display: flex; gap: 10px; flex-wrap: wrap; margin: 6px 0; }
 .espace-mes-photos-grille img { width: 110px; height: 140px; object-fit: cover; border-radius: 14px; border: 1px solid #EEDDD9; }
+/* Fenêtre « Il manque une information » (15 nov. 2026) */
+.annonce-fenetre-manques .swipe-fenetre-boite { text-align: left; }
+.annonce-fenetre-manques h2 { margin-top: 0; }
+.manques-liste { list-style: none; margin: 10px 0 4px; padding: 0; display: grid; gap: 8px; }
+.manques-aller { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 14px; border: 1.5px solid #E2C6C2; background: #FCF4F2; color: #4E3A3E; font: inherit; text-align: left; cursor: pointer; }
+.manques-aller b { flex: none; color: #8E5A62; font-size: 14px; }
+.is-manquant.is-vise, .is-vise.is-manquant { outline: 3px solid #d99a2b !important; outline-offset: 4px; border-radius: 12px; transition: outline-color .3s; }

@@ -97,7 +97,7 @@ export function formulaireHtml() {
       <label>Diplôme obtenu en<select name="etudesPaysObtention">${opts(O.etudesPaysObtention)}</select></label>
       <label>Ta profession<input name="profession" maxlength="80"></label>
       <label>Ta taille <small>(en cm, facultatif)</small><input name="tailleCm" type="number" min="120" max="230" inputmode="numeric" placeholder="170"></label>
-      <label>Ta religion <small>(facultatif)</small><select name="religion">${opts(O.religion, 'Je préfère ne pas dire')}</select></label>
+      <label>Ta religion<select name="religion">${opts(O.religion)}</select></label>
       <label>Ta pratique <small>(facultatif)</small><select name="pratique">${opts(O.pratique, 'Je préfère ne pas dire')}</select></label>
       <label class="annonce-large">Ta foi et ta pratique en quelques mots <small>(facultatif : prière, ramadan, ce qui compte pour toi…)</small><textarea name="religionTexte" rows="2" maxlength="300"></textarea></label>
       <label>Bouger pour l’amour ?<select name="mobiliteGeographique">${opts(O.mobilite)}</select></label>
@@ -363,6 +363,7 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
       if (medias.length < 2) manque('2 photos de toi', $('[data-medias]', form).closest('label'));
     }
     if (sansReseau() && !telephoneNormal(f.telephone.value)) manque(f.telephone.value.trim() ? 'Ton numéro de téléphone n’est pas valide (mets l’indicatif si tu n’es pas en France)' : 'Ton numéro de téléphone (puisque tu n’as pas de réseau social)', f.telephone);
+    manques.push(...manquesEssentiels(form));
     if (!f.majeur.checked) manque('La case « J’ai 18 ans ou plus… »', f.majeur.closest('label'));
     if (!f.publication.checked) manque('La case « Je confie mon profil à Lamia… »', f.publication.closest('label'));
     if (identite.length && !f.identite_ok.checked) manque('La case d’accord pour ta pièce d’identité (ou retire la photo)', f.identite_ok.closest('label'));
@@ -391,7 +392,7 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
     const f = form.elements;
     const live = estLive();
     const manques = calculerManques();
-    if (manques.length) { etapes?.allerA(manques[0].el); afficherManques(manques, etapes ? etapes.courante() : st); return; }
+    if (manques.length) { etapes?.allerA(manques[0].el); afficherManques(manques, etapes ? etapes.courante() : st); fenetreManques(manques, form, { allerA: (el) => etapes?.allerA(el) }); return; }
     const session = await sessionActive();
     if (!session) { monterFormulaire(box); return; }
     const btn = $('.annonce-envoyer', form); btn.disabled = true;
@@ -450,6 +451,46 @@ function lireMatching(form) {
   return m;
 }
 
+// Ce qui manque, dans une fenêtre claire (Lamia, 15 nov. 2026) : chaque champ à compléter, avec un bouton qui y mène
+// et le surligne. Utilisé à la création et à la modification du profil.
+function fenetreManques(manques, form, { titre = 'Il manque une information', allerA = null } = {}) {
+  document.querySelector('.annonce-fenetre-manques')?.remove();
+  $$('.is-manquant', form).forEach((x) => x.classList.remove('is-manquant'));
+  manques.forEach((m) => (m.el?.closest('label') || m.el)?.classList.add('is-manquant'));
+  const d = document.createElement('div');
+  d.className = 'swipe-fenetre annonce-fenetre-manques'; d.setAttribute('role', 'alertdialog'); d.setAttribute('aria-modal', 'true');
+  d.innerHTML = `<div class="swipe-fenetre-boite"><h2>${manques.length > 1 ? `Il manque ${manques.length} informations` : esc(titre)}</h2>
+    <p>Complète ${manques.length > 1 ? 'ces champs' : 'ce champ'} pour enregistrer ton profil :</p>
+    <ol class="manques-liste">${manques.map((m, k) => `<li><button type="button" class="manques-aller" data-aller="${k}"><span>${esc(m.texte)}</span><b>Compléter →</b></button></li>`).join('')}</ol>
+    <p class="po-actions"><button type="button" class="po-btn" data-aller="0">Compléter maintenant</button></p></div>`;
+  document.body.appendChild(d);
+  d.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-aller]');
+    if (!b && e.target !== d) return;
+    d.remove();
+    const el = manques[b ? Number(b.dataset.aller) : 0]?.el;
+    if (!el) return;
+    allerA?.(el);
+    const cible = el.closest('label') || el;
+    try { cible.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch { /* */ }
+    cible.classList.add('is-manquant', 'is-vise'); setTimeout(() => cible.classList.remove('is-vise'), 2400);
+    const champ = cible.matches('input,select,textarea') ? cible : cible.querySelector('input,select,textarea');
+    setTimeout(() => champ?.focus({ preventScroll: true }), 450);
+  });
+}
+// L'essentiel demandé à tous (religion, études, situation, âge recherché) : sans lui, le profil n'est pas proposé.
+function manquesEssentiels(form) {
+  const f = form.elements, out = [];
+  const m = (texte, el) => out.push({ texte, el });
+  if (!f.situation?.value) m('Ta situation (célibataire, divorcé·e…)', f.situation);
+  if (!f.niveauEtudeCategorie?.value) m('Ton niveau d’études', f.niveauEtudeCategorie);
+  if (!f.religion?.value) m('Ta religion (tu peux choisir « Je préfère ne pas dire »)', f.religion);
+  const amin = Number.parseInt(f.age_min?.value, 10), amax = Number.parseInt(f.age_max?.value, 10);
+  if (!(amin >= 18) || !(amax >= 18)) m('L’âge de la personne que tu cherches (de … à … ans)', f.age_min);
+  else if (amin > amax) m('L’âge recherché : le premier âge doit être plus petit que le second', f.age_min);
+  return out;
+}
+
 // « Mon espace » : le même formulaire, prérempli, pour modifier son profil.
 function monterEdition(form, st, p, token) {
   const F = form.elements;
@@ -472,16 +513,26 @@ function monterEdition(form, st, p, token) {
   const btn = $('.annonce-envoyer', form); btn.textContent = 'Enregistrer mes modifications';
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    if ([F.profil, F.recherche].some((t) => t.value.trim() && t.value.trim().length < 20)) return say(st, ERR.textes_courts, true);
-    if (!texteCredible(F.profil.value) || !texteCredible(F.recherche.value)) return say(st, ERR.textes_illisibles, true);
-    if (!F.birth_date.value || F.birth_date.value > maxNaissance()) { F.birth_date.scrollIntoView({ block: 'center' }); return say(st, ERR.invalid_birth_date, true); }
-    if (!form.querySelector('[name=origineTags]:checked')) { form.querySelector('#ton-origine')?.scrollIntoView({ block: 'center' }); return say(st, ERR.origine_requise, true); }
-    if (F.sans_reseau.checked && !telephoneNormal(F.telephone.value)) return say(st, ERR.telephone_invalide, true);
+    const manques = [];
+    const m = (texte, el) => manques.push({ texte, el });
+    if (!F.birth_date.value || F.birth_date.value > maxNaissance()) m('Ta date de naissance (18 ans ou plus)', F.birth_date);
+    if (!form.querySelector('[name=origineTags]:checked')) m('Ton origine (kabyle, chaouie, touarègue, amazighe ou autre)', form.querySelector('[name=origineTags]')?.closest('.annonce-puces') || form.querySelector('#ton-origine'));
+    manques.push(...manquesEssentiels(form));
+    for (const [t, nom] of [[F.profil, 'Ta présentation'], [F.recherche, 'Qui tu cherches']]) {
+      if (t.value.trim() && t.value.trim().length < 20) m(`${nom} : quelques phrases de plus (20 caractères au moins)`, t);
+      else if (!texteCredible(t.value)) m(`${nom} : écris avec de vrais mots`, t);
+    }
+    if (F.sans_reseau.checked && !telephoneNormal(F.telephone.value)) m('Ton numéro de téléphone (avec l’indicatif si tu n’es pas en France)', F.telephone);
+    if (manques.length) { say(st, `Il manque ${manques.length > 1 ? `${manques.length} informations` : 'une information'} : regarde les champs entourés.`, true); return fenetreManques(manques, form); }
     btn.disabled = true; say(st, 'Enregistrement…');
     try {
       await api({ action: 'annonce_modifier', genre: form.querySelector('[name=genre]:checked')?.value, prenom: F.prenom.value, birth_date: F.birth_date.value, ville: F.ville.value, pays: F.pays.value, profil: F.profil.value, recherche: F.recherche.value, age_min: F.age_min.value, age_max: F.age_max.value, anonyme_ok: F.anonyme_ok.checked, photo_partage: F.photo_partage.checked, sans_reseau: F.sans_reseau.checked, telephone: F.sans_reseau.checked ? F.telephone.value : '', matching: lireMatching(form) }, token);
       say(st, '✓ Ton profil est à jour. Lamia est prévenue.');
-    } catch (err) { say(st, ERR[err.code] || 'L’enregistrement n’a pas abouti. Réessaie dans un instant.', true); }
+    } catch (err) {
+      const champ = { missing_lieu: F.pays, telephone_invalide: F.telephone, invalid_birth_date: F.birth_date, mineur: F.birth_date, textes_courts: F.profil, textes_illisibles: F.profil }[err.code];
+      say(st, ERR[err.code] || 'L’enregistrement n’a pas abouti. Réessaie dans un instant.', true);
+      if (champ) fenetreManques([{ texte: ERR[err.code] || 'Ce champ est à corriger', el: champ }], form, { titre: 'Un champ est à corriger' });
+    }
     btn.disabled = false;
   });
 }
