@@ -18,6 +18,49 @@ import { LANGUES, PAGES_RENCONTRES, dictionnaire, motifs, pageTraduite, liensLan
 import { EDITABLE, defaults, applyOverrides } from '../content/editable.mjs';
 import { FORMULES, UNITES, FONDS_COACHING, prixAnnuel, prixMensuel, euros as eurosAbo } from '../content/abonnements.mjs';
 
+// « Comment ça marche » : trois boutons qui s'ouvrent (Lamia, 15 nov. 2026) : le swipe, les formules en tableau, ce que voit ton match.
+function guideTroisBoutons() {
+  const [D, P, X] = ['decouverte', 'passion', 'prestige'].map((id) => FORMULES.find((f) => f.id === id));
+  const oui = '<span class="guide-oui" aria-label="inclus">✓</span>', non = '<span class="guide-non" aria-label="non inclus">–</span>';
+  const prix = (f) => (!f.mois ? 'Gratuit' : f.lancement ? `${eurosAbo(f.lancement.prix)} <small>puis ${eurosAbo(f.mois)}</small>` : eurosAbo(f.mois));
+  const jours = (f) => (f.discussionJours ? `${f.discussionJours} jours` : 'Sans limite');
+  const lignes = [
+    ['Prix par mois', ...[D, P, X].map(prix)],
+    ['Matchs', 'Illimités', 'Illimités', 'Illimités'],
+    ['Matchs en cours en même temps', ...[D, P, X].map((f) => String(f.matchs))],
+    ['Discussion avec ton match', ...[D, P, X].map(jours)],
+    ['Swipe', 'Sans limite', 'Sans limite', 'Sans limite'],
+    ['Seconde chance', ...[D, P, X].map((f) => (f.relancesRefus ? `${oui} <small>${f.relancesRefus} fois</small>` : non))],
+    ['Qui t’a choisi·e', ...[D, P, X].map((f) => (f.quiMaChoisi ? oui : non))],
+    ['Photo de ton match', '<small>3 € / 1 h</small>', oui, oui],
+    ['Speed dating par mois', ...[D, P, X].map((f) => (f.speedDatings ? String(f.speedDatings) : non))],
+    ['Profil mis en avant', ...[D, P, X].map((f) => (f.avantJours ? `${f.avantJours} jours / mois` : non))],
+    ['Mots doux offerts', ...[D, P, X].map((f) => (f.coeursMois ? `${f.coeursMois} / mois` : non))],
+    ['Love coaching', ...[D, P, X].map((f) => (f.remiseCoaching ? `-${f.remiseCoaching} %` : non))],
+  ];
+  return `<div class="guide-trois">
+    <details class="guide-bouton"><summary><span class="guide-ico" aria-hidden="true">♡</span> Le swipe</summary><div class="guide-panneau">
+      <ol class="guide-etapes">
+        <li><strong>Tu découvres des profils anonymes</strong><span>Un numéro, un âge, une région, et ce que la personne a écrit. Jamais de prénom ni de photo.</span></li>
+        <li><strong>Cœur à droite, croix à gauche</strong><span>Sans limite. Tu ne vois que les personnes qui correspondent à vos critères (âge à 7 ans près, zone).</span></li>
+        <li><strong>Vous vous choisissez tous les deux ?</strong><span>C’est un match : une discussion privée s’ouvre dans ton espace, et tu découvres son profil complet.</span></li>
+        <li><strong>Pour te faire remarquer</strong><span>Un mot doux (2 €) arrive avec ton cœur et te met en tête de sa pile.</span></li>
+      </ol>
+      <p class="po-actions"><a class="po-btn" href="/rencontres/swipe/">Aller au swipe</a></p></div></details>
+    <details class="guide-bouton"><summary><span class="guide-ico" aria-hidden="true">✦</span> Les formules</summary><div class="guide-panneau">
+      <div class="guide-tableau-defile"><table class="guide-tableau"><thead><tr><th></th>${[D, P, X].map((f) => `<th class="${f.vedette ? 'is-vedette' : ''}">${f.nom}</th>`).join('')}</tr></thead>
+      <tbody>${lignes.map(([k, ...v]) => `<tr><th scope="row">${k}</th>${v.map((x, i) => `<td class="${[D, P, X][i].vedette ? 'is-vedette' : ''}">${x}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+      <p class="guide-note">Sans engagement. Les matchs sont illimités pour tout le monde : la formule change le nombre de matchs en cours en même temps.</p>
+      <p class="po-actions"><a class="po-btn" href="/abonnement/">Choisir ma formule</a></p></div></details>
+    <details class="guide-bouton"><summary><span class="guide-ico" aria-hidden="true">⇄</span> Ce que voit ton match</summary><div class="guide-panneau">
+      <ol class="guide-etapes guide-niveaux">
+        <li><strong>Dans le swipe : l’annonce</strong><span>Ton âge, ta région, ton origine et le texte que tu as choisi. Anonyme, pour tout le monde.</span></li>
+        <li><strong>Au match : le profil complet</strong><span>Ton match, et lui seul, voit tout ton profil : situation, enfants, études, métier, foi et mode de vie, caractère, ce que tu cherches. Jamais ton prénom, ta photo, ta date de naissance ni ton contact.</span></li>
+        <li><strong>Quand vous le décidez</strong><span>Ta photo, si tu as accepté de la transmettre (incluse avec Passion, ou 3 € pour 1 heure). Vos numéros, seulement si vous les échangez tous les deux dans la discussion.</span></li>
+      </ol></div></details>
+  </div>`;
+}
+
 const placesLancement = (f) => (f.lancement ? `<p class="abo-places" data-prestige-places>${eurosAbo(f.lancement.prix)} pour les ${f.lancement.places} premiers abonnés, qui gardent ce prix. Ensuite, ${eurosAbo(f.mois)} par mois pour les nouvelles inscriptions.</p>` : '');
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -384,6 +427,7 @@ ${SWIPE_INVITE}
       <li><strong>Elle cherche pour toi</strong><span>Son outil de matching compare les profils, et Lamia choisit avec son regard.</span></li>
       <li><strong>Elle vous présente</strong><span>Si vous êtes d’accord tous les deux, elle vous met en contact. C’est gratuit.</span></li>
     </ol>
+    ${guideTroisBoutons()}
     <p class="po-actions"><a class="po-btn" data-cta-profil href="/rencontres/#confier"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> <span>Créer mon profil ou connexion</span></a></p>
   </div>
 
@@ -1593,6 +1637,7 @@ ${SWIPE_INVITE}
       <li><strong>Tu sais combien te correspondent</strong><span>Lamia te dit avec combien de personnes tu pourrais correspondre. Personne ne sait qui matche avec qui.</span></li>
       <li><strong>Lamia vous présente</strong><span>Si vous êtes d’accord tous les deux, elle vous met en contact. Ton numéro reste chez elle jusque-là. C’est gratuit.</span></li>
     </ol>
+    ${guideTroisBoutons()}
     <p class="po-actions"><button type="button" class="po-btn" data-annonce-ouvrir data-cta-profil aria-expanded="false"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> <span>Créer mon profil ou connexion</span></button></p>
   </details>
   <details class="patio-etapes po-panel po-replie" id="questions">

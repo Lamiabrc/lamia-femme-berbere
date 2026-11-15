@@ -4236,3 +4236,28 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .espace-formule { display: inline-block; margin: 0 0 10px; padding: 6px 14px; border-radius: 999px; background: #F1ECF7; border: 1px solid #D9CCE8; }
 .espace-formule.is-passion { background: #FBE9EF; border-color: #E9B9C9; }
 .espace-formule.is-prestige { background: #FFF5DD; border-color: #C9A24A; }
+/* « Comment ça marche » : trois boutons (15 nov. 2026) */
+.guide-trois { display: grid; gap: 10px; margin: 18px 0 8px; text-align: left; }
+.guide-bouton { border-radius: 18px; background: #fff; border: 1px solid #E8D6D2; box-shadow: 0 6px 18px -14px rgba(110, 70, 78, .45); overflow: hidden; }
+.guide-bouton > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 14px 18px; font-weight: 700; font-size: 17px; color: #4E3A3E; }
+.guide-bouton > summary::-webkit-details-marker { display: none; }
+.guide-bouton > summary::after { content: '+'; margin-left: auto; font-size: 22px; font-weight: 400; color: #AE7880; transition: transform .2s; }
+.guide-bouton[open] > summary::after { transform: rotate(45deg); }
+.guide-bouton[open] > summary { background: #FBEFEC; border-bottom: 1px solid #EEDDD9; }
+.guide-ico { display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: #F3E1DE; color: #8E5A62; font-size: 16px; }
+.guide-panneau { padding: 14px 16px 6px; }
+.guide-etapes { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.guide-etapes li { display: grid; gap: 2px; padding: 10px 12px; border-radius: 12px; background: #FCF6F4; }
+.guide-etapes li strong { color: #6E4A52; }
+.guide-tableau-defile { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 -4px; }
+.guide-tableau { width: 100%; min-width: 360px; border-collapse: separate; border-spacing: 0; font-size: 14px; }
+.guide-tableau th, .guide-tableau td { padding: 9px 8px; text-align: center; border-bottom: 1px solid #F0E3E0; vertical-align: middle; }
+.guide-tableau thead th { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 18px; color: #8E5A62; }
+.guide-tableau tbody th { text-align: left; font-weight: 600; color: #4E3A3E; }
+.guide-tableau .is-vedette { background: #FBEFEC; }
+.guide-tableau thead .is-vedette { border-radius: 12px 12px 0 0; }
+.guide-tableau small { color: #8A7480; }
+.guide-tableau .guide-oui { color: #2F6B52 !important; font-weight: 800; font-size: 17px; opacity: 1 !important; -webkit-text-fill-color: #2F6B52; }
+.guide-tableau .guide-non { color: #B9A5A9 !important; opacity: 1 !important; -webkit-text-fill-color: #B9A5A9; }
+.guide-tableau td small { color: #6E5A5E !important; opacity: 1 !important; -webkit-text-fill-color: #6E5A5E; }
+.guide-note { font-size: 13px; color: #7A6468; }
