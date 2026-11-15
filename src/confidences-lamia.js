@@ -82,9 +82,9 @@ async function chargerTesteurs() {
   try {
     const { testeurs, lien } = await api({ action: 'lamia_testeurs' }, await jetonFrais());
     const surListe = testeurs.filter((t) => t.ajoute_at).length;
-    $('[data-testeurs-resume]').innerHTML = `${testeurs.length} testeur${testeurs.length > 1 ? 's' : ''} · ${surListe} sur la liste Google Play · ${testeurs.filter((t) => t.lien_envoye).length} ont reçu le lien · il en faut au moins 12. Lien du test : <a href="${esc(lien)}" target="_blank" rel="noopener">${esc(lien)}</a>`;
+    $('[data-testeurs-resume]').innerHTML = `${testeurs.length} testeur${testeurs.length > 1 ? 's' : ''} · ${surListe} sur la liste Google Play · ${testeurs.filter((t) => t.lien_envoye).length} ont reçu le lien · ${testeurs.filter((t) => t.email_testeur_at).length} ont reçu l’email « Devenir testeur » · <b>${testeurs.filter((t) => t.play_vu_at).length} ont ouvert la version Google Play</b> (seulement ceux connectés à leur compte) · il en faut au moins 12 inscrits. Lien du test : <a href="${esc(lien)}" target="_blank" rel="noopener">${esc(lien)}</a>`;
     box.innerHTML = testeurs.length ? testeurs.map((t) => {
-      const etat = t.lien_envoye ? 'lien envoyé' : t.ajoute_at ? `sur la liste depuis le ${jourCourt(t.ajoute_at)}` : 'à ajouter à la liste (demain matin)';
+      const etat = t.play_vu_at ? `appli Google Play ouverte le ${jourCourt(t.play_vu_at)}` : t.lien_envoye ? 'lien envoyé' : t.ajoute_at ? `sur la liste depuis le ${jourCourt(t.ajoute_at)}` : 'à ajouter à la liste (demain matin)';
       const profil = t.ref ? `/tableau-de-bord#profil-${t.ref}` : `/tableau-de-bord#compte-${t.user_id}`;
       return `<p class="cl-coord"><b>${esc(t.prenom || t.email.split('@')[0])}</b>${t.ref ? ` · n° ${esc(t.ref)}` : ''} · ${esc(t.email)} · « Oui » le ${esc(jourCourt(t.demande_at))} · <b>${esc(etat)}</b>
         ${t.thread_id ? `<a class="cl-btn cl-petit" href="#${esc(t.thread_id)}">Conversation</a>` : `<button type="button" class="cl-btn cl-petit" data-testeur-ecrire="${esc(t.email)}">Écrire</button>`}
@@ -97,6 +97,16 @@ async function chargerTesteurs() {
   } catch (err) { box.innerHTML = `<p class="cl-vide">${esc(erreur(err.code))}</p>`; }
 }
 $('[data-ouvrir-testeurs]').addEventListener('click', () => { location.hash = 'testeurs'; });
+$('[data-testeurs-email]').addEventListener('click', async (e) => {
+  const st = $('[data-testeurs-relance]');
+  e.target.disabled = true; st.textContent = 'Envoi des emails…';
+  try {
+    const r = await api({ action: 'lamia_testeurs_email' }, await jetonFrais());
+    st.textContent = `${r.envoyes} email${r.envoyes > 1 ? 's' : ''} envoyé${r.envoyes > 1 ? 's' : ''}${r.reste ? `, il en reste ${r.reste} : appuie encore une fois` : ''}.`;
+    chargerTesteurs();
+  } catch (err) { st.textContent = erreur(err.code); }
+  e.target.disabled = false;
+});
 $('[data-testeurs-relancer]').addEventListener('click', async (e) => {
   const st = $('[data-testeurs-relance]');
   if (!confirm('Envoyer la notification « Devenir testeur » à tous les testeurs de la liste ?')) return;

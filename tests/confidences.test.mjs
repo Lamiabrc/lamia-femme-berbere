@@ -221,3 +221,22 @@ test('les testeurs de la liste reçoivent la notification « Devenir testeur » 
   await handleConfidences(req({ action: 'testeurs_play_cron' }), { env, fetcher: be.fetcher, cron: true });
   assert.equal(be.pushes.length, 2);
 });
+
+test('email « Devenir testeur » une seule fois, et plus rien pour qui a ouvert la version Google Play', async () => {
+  const be = backend({ users: { L: lamia, G: gratuit, N: nadia } });
+  be.db.testeurs_play.push({ user_id: 'g', email: 'gratuit@exemple.fr', ajoute_at: '2026-11-14', play_vu_at: null, email_testeur_at: null }, { user_id: 'nadia', email: 'nadia@exemple.fr', ajoute_at: '2026-11-14', play_vu_at: null, email_testeur_at: null });
+  // Nadia ouvre la version Play : elle est notée et ne reçoit plus ni bandeau ni email.
+  assert.equal((await call(be, { action: 'testeur_play_vu' }, 'N')).status, 200);
+  assert.ok(be.db.testeurs_play.find((t) => t.user_id === 'nadia').play_vu_at);
+  assert.equal((await call(be, { action: 'testeur_play_moi' }, 'N')).body.sur_liste, false);
+  assert.equal((await call(be, { action: 'lamia_testeurs_email' }, 'G')).status, 403);
+  const r = await call(be, { action: 'lamia_testeurs_email' }, 'L');
+  assert.deepEqual([r.body.envoyes, r.body.reste], [1, 0]);
+  const mail = be.mails.at(-1);
+  assert.deepEqual(mail.to, ['gratuit@exemple.fr']);
+  assert.match(mail.html, /play\.google\.com\/apps\/testing\/com\.lamiafemmeberbere\.lfb/);
+  assert.match(mail.subject, /Devenir testeur|dernière étape/);
+  assert.equal((await call(be, { action: 'lamia_testeurs_email' }, 'L')).body.envoyes, 0);
+  const { body } = await call(be, { action: 'lamia_testeurs' }, 'L');
+  assert.ok(body.testeurs.find((t) => t.user_id === 'nadia').play_vu_at);
+});
