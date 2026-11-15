@@ -28,7 +28,7 @@ function carte(a) {
   const lieu = a.ville || (a.pays && lib(a.pays)) || '';
   return `<article class="swipe-carte ${a.genre === 'homme' ? 'est-homme' : a.genre === 'femme' ? 'est-femme' : ''}" data-ref="${a.ref}">
     <span class="swipe-tampon is-oui" aria-hidden="true">Intéressé·e</span><span class="swipe-tampon is-non" aria-hidden="true">Pas pour moi</span>
-    ${a.coeur_message ? `<p class="swipe-coeur-mot"><span aria-hidden="true">💌</span> « ${esc(a.coeur_message)} »</p>` : ''}
+    ${a.coeur_message ? `<p class="swipe-coeur-mot"><img class="tayri-coeur-mini" src="/images/marque/tayri-coeur.webp" alt="" width="18" height="18"> « ${esc(a.coeur_message)} »</p>` : ''}
     ${a.ta_choisi ? '<span class="swipe-ta-choisi"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Ce profil t’a choisi·e</span>' : ''}
     ${a.revu ? '<span class="swipe-ta-choisi">Tu l’as déjà passé : une seconde chance ?</span>' : a.hors_criteres ? '<span class="swipe-ta-choisi"><svg class="ico" aria-hidden="true"><use href="/icones.svg#globe"/></svg> Un peu hors de tes critères</span>' : ''}
     <div class="swipe-resume">
@@ -200,7 +200,7 @@ function bienvenue() {
 }
 function celebrerMatch(ref) {
   vibrer([40, 60, 40, 60, 120]);
-  const d = fenetre(`<p class="swipe-match-coeurs" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg></p><h2>C’est réciproque !</h2><p>Le profil <strong>n° ${esc(ref)}</strong> t’a choisi·e aussi. Lamia est prévenue à l’instant : elle regarde votre compatibilité et revient vers toi pour la mise en relation.</p>`, 'is-match');
+  const d = fenetre(`<p class="swipe-match-coeurs" aria-hidden="true"><img class="tayri-coeur-match" src="/images/marque/tayri-coeur.webp" alt="" width="84" height="84"></p><h2>C’est réciproque !</h2><p>Le profil <strong>n° ${esc(ref)}</strong> t’a choisi·e aussi. Lamia est prévenue à l’instant : elle regarde votre compatibilité et revient vers toi pour la mise en relation.</p>`, 'is-match');
   const r = d.querySelector('.swipe-fenetre-boite').getBoundingClientRect();
   for (let k = 0; k < 3; k += 1) setTimeout(() => eclat(r.left + r.width / 2, r.top + 60, ['', '', '', '', ''], 22), k * 280);
 }
