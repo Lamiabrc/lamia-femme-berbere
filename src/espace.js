@@ -483,6 +483,7 @@ async function monProfil(session) {
         photos: ['Ajoute tes 2 photos', 'Sans tes 2 photos, tu ne peux ni swiper ni répondre. Elles ne sont jamais publiées.', 'Ajouter mes photos', 'photos'],
         contact: ['Indique un contact valable', 'Mets ton numéro de téléphone, ou le lien de ton profil TikTok, Instagram ou Facebook (un prénom ne suffit pas). Sans lui, ton profil n’est pas validé et personne ne te voit.', 'Corriger mon contact', 'modifier'],
         email: ['Corrige ton adresse email', 'Ton adresse email n’est pas valable : Lamia ne peut pas te prévenir de tes matchs.', 'Corriger mon profil', 'modifier'],
+        essentiel: ['Complète l’essentiel', 'Ta religion, ton niveau d’études, ta situation et l’âge que tu recherches : sans eux, ton profil n’est pas proposé dans le swipe, pour éviter les matchs qui ne collent pas.', 'Compléter mon profil', 'modifier'],
         textes: ['Présente-toi en quelques phrases', 'Dis qui tu es et qui tu cherches : un profil sans présentation est beaucoup moins choisi.', 'Écrire ma présentation', 'modifier'],
       };
       const manques = (p.a_completer || []).filter((k) => QUOI[k]);
