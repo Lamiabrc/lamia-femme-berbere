@@ -354,10 +354,18 @@ document.querySelector('[data-swipe-mot]')?.addEventListener('click', () => {
         <path d="M138.4 32.5h-7 l4.4 4.5 -4.4 4.5h7"/>
       </g>
       <linearGradient id="lettre-argent" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E9E4DA"/><stop offset=".5" stop-color="#A9A39A"/><stop offset="1" stop-color="#D8CFC0"/></linearGradient>
-      <g transform="translate(110 75)">
+      <g transform="translate(110 75) scale(1.25)">
         <path d="M0 10C-11 3-13-3-13-6.5C-13-10.8-9.8-13.5-6.5-13.5C-3.4-13.5-1.2-11.6 0-9.4C1.2-11.6 3.4-13.5 6.5-13.5C9.8-13.5 13-10.8 13-6.5C13-3 11 3 0 10Z" fill="#FFF8EF" stroke="url(#lettre-argent)" stroke-width="1.6"/>
         <path d="M0 6.2C-7.6 1.4-9-2.6-9-5C-9-7.8-6.9-9.6-4.6-9.6C-2.5-9.6-1-8.4 0-6.9C1-8.4 2.5-9.6 4.6-9.6C6.9-9.6 9-7.8 9-5C9-2.6 7.6 1.4 0 6.2Z" fill="none" stroke="#C9A24A" stroke-width=".7"/>
-        <path d="M0-6.2V3.4 M-3.6-5.6C-3.6-2.4 3.6-2.4 3.6 0.8 M3.6-5.6C3.6-2.4-3.6-2.4-3.6 0.8" fill="none" stroke="#7E1F3F" stroke-width=".9" stroke-linecap="round"/>
+        <!-- Les deux corps entrelacés du logo : deux têtes, les bras levés, les corps qui se croisent en ⵣ -->
+        <g fill="none" stroke-linecap="round" stroke-width="1.15">
+          <path d="M-1.9-4.4C-4-5.6-5.6-7.2-6.1-8.6" stroke="#8D867C"/>
+          <path d="M1.9-4.4C4-5.6 5.6-7.2 6.1-8.6" stroke="#B08A3A"/>
+          <path d="M-1.6-4.2C-1.9-1.2 2.6 0.2 2.4 4.6" stroke="#8D867C"/>
+          <path d="M1.6-4.2C1.9-1.2-2.6 0.2-2.4 4.6" stroke="#B08A3A"/>
+          <path d="M-1.4-3C0.2-1.6 1.8-2.4 2.6-3.6" stroke="#8D867C" stroke-width=".8"/>
+        </g>
+        <circle cx="-1.5" cy="-6.1" r="1.25" fill="#8D867C"/><circle cx="1.6" cy="-5.6" r="1.15" fill="#B08A3A"/>
         <circle cx="0" cy="-12.2" r="1.5" fill="#C2452F"/><circle cx="-10.6" cy="-5" r="1.1" fill="#C2452F"/><circle cx="10.6" cy="-5" r="1.1" fill="#C2452F"/>
         <path d="M-5 6.5v3 M0 10v3 M5 6.5v3" stroke="#B8B0A3" stroke-width=".6"/>
         <circle cx="-5" cy="10.4" r="1" fill="#C2452F"/><circle cx="0" cy="14" r="1.1" fill="#C2452F"/><circle cx="5" cy="10.4" r="1" fill="#C2452F"/>
