@@ -293,3 +293,13 @@ test('Prestige sans visio depuis le 15 nov. 2026 ; les anciens abonnés la garde
   ancien.t.now = new Date('2026-12-03T11:00:00Z');
   assert.equal((await go(ancien, 'annonce_coaching', {})).inclus, false);
 });
+
+test('« Lamia t’attend dans la salle » : un bouton pour Lamia, le membre est prévenu', async () => {
+  const w = monde();
+  await ouvrir(w);
+  const a = w.lignes[0];
+  await go(w, 'annonce_coaching_reserver', { id: a.id });
+  assert.equal((await go(w, 'annonce_coaching_attend', { id: a.id })).status, 403);
+  const avant = w.prevenus?.length ?? 0;
+  assert.equal((await go(w, 'annonce_coaching_attend', { id: a.id }, LAMIA, true)).ok, true);
+});

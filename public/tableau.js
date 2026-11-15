@@ -1252,9 +1252,12 @@ function peindreCoaching(d) {
   for (const c of d.creneaux || []) { const k = date(c.debut, { weekday: 'long', day: 'numeric', month: 'long' }); if (!parJour.has(k)) parJour.set(k, []); parJour.get(k).push(c); }
   const passe = (c) => new Date(c.debut).getTime() + ((c.duree_min || 15) + 15) * 60e3 < Date.now();
   const typeDe = (c) => ({ 30: ' · 30 min', 60: ' · Couple, 1 h' })[c.duree_min] || '';
-  const cellule = (c) => `<li class="${c.user_id ? 'is-pris' : ''}${passe(c) ? ' is-passe' : ''}"><b>${esc(date(c.debut, { hour: '2-digit', minute: '2-digit' }))}${typeDe(c)}</b>${c.user_id ? `<span>${esc(c.prenom || c.email || '')}</span>` : '<small>Libre</small>'}${passe(c) ? '' : `<span class="planning-actions">${c.user_id ? `<button class="btn btn-ink" type="button" data-coaching-entrer="${esc(c.id)}">Entrer</button>` : ''}<button class="link-button" type="button" data-coaching-fermer="${esc(c.id)}" data-reserve="${c.user_id ? '1' : ''}">${c.user_id ? 'Annuler' : 'Retirer'}</button></span>`}</li>`;
+  const cellule = (c) => `<li class="${c.user_id ? 'is-pris' : ''}${passe(c) ? ' is-passe' : ''}"><b>${esc(date(c.debut, { hour: '2-digit', minute: '2-digit' }))}${typeDe(c)}</b>${c.user_id ? `<span>${esc(c.prenom || c.email || '')}</span>` : '<small>Libre</small>'}${passe(c) ? '' : `<span class="planning-actions">${c.user_id ? `<button class="btn btn-ink" type="button" data-coaching-entrer="${esc(c.id)}">Entrer</button><button class="btn btn-line" type="button" data-coaching-attend="${esc(c.id)}">Lamia t’attend</button>` : ''}<button class="link-button" type="button" data-coaching-fermer="${esc(c.id)}" data-reserve="${c.user_id ? '1' : ''}">${c.user_id ? 'Annuler' : 'Retirer'}</button></span>`}</li>`;
   const aVenir = [...parJour].filter(([, l]) => l.some((c) => !passe(c)));
-  $('[data-coaching-planning]').innerHTML = aVenir.length ? `<div class="planning-grille">${aVenir.map(([k, l]) => `<section><h3>${esc(k)}</h3><ul>${l.map(cellule).join('')}</ul></section>`).join('')}</div>` : '<p>Aucun créneau ouvert à venir.</p>';
+  // Séance en cours ou dans moins d'une heure : en haut, en grand, avec Entrer et « Lamia t'attend ».
+  const proche = (d.creneaux || []).filter((c) => c.user_id && !passe(c) && new Date(c.debut).getTime() - Date.now() < 3600e3);
+  const bandeau = proche.map((c) => `<div class="tdb-carte" style="border:2px solid #7a1f2b"><h2>${new Date(c.debut) <= Date.now() ? 'Séance en cours' : 'Prochaine séance'} · ${esc(date(c.debut, { hour: '2-digit', minute: '2-digit' }))}${typeDe(c)}</h2><p><b>${esc(c.prenom || c.email || '')}</b></p><p><button class="btn btn-ink" type="button" data-coaching-entrer="${esc(c.id)}">Entrer dans la salle</button> <button class="btn btn-line" type="button" data-coaching-attend="${esc(c.id)}">Prévenir : Lamia t’attend</button></p></div>`).join('');
+  $('[data-coaching-planning]').innerHTML = bandeau + (aVenir.length ? `<div class="planning-grille">${aVenir.map(([k, l]) => `<section><h3>${esc(k)}</h3><ul>${l.map(cellule).join('')}</ul></section>`).join('')}</div>` : '<p>Aucun créneau ouvert à venir.</p>');
   $('[data-coaching-abonnes]').innerHTML = (d.abonnes || []).map((a) => `<li><span><b>${esc(a.nom || a.email)}</b> <small>${a.reserve ? `Visio du mois : ${esc(date(a.reserve))}` : 'Pas encore de visio ce mois-ci'}</small></span></li>`).join('') || '<li>Pas encore d’abonné Prestige actif.</li>';
 }
 async function chargerAlertes() {
@@ -1269,6 +1272,13 @@ async function chargerAlertes() {
     z.innerHTML = `${dons}<h3>Dernières alertes</h3><ul class="tdb-retraits">${d.alertes.map((a) => `<li><span><b>${esc(a.prenom || a.email || 'Membre')}</b> · ${esc(date(a.created_at))}<br><small>${esc(a.titre)}</small><br><small>Envoyée par ${esc(canal(a))}</small></span><span>${a.vu_at ? `<b>Vue</b><br><small>${esc(date(a.vu_at))}</small>` : '<small>Pas encore vue</small>'}</span></li>`).join('')}</ul>`;
   } catch { z.innerHTML = '<p class="aide">Les alertes ne se chargent pas pour le moment.</p>'; }
 }
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-coaching-attend]');
+  if (!b) return;
+  b.disabled = true;
+  try { await conf({ action: 'annonce_coaching_attend', id: b.dataset.coachingAttend }); b.textContent = 'Prévenu·e ✓'; }
+  catch (err) { b.disabled = false; b.textContent = err.message === 'terminee' ? 'Séance terminée' : 'Réessayer'; }
+});
 document.addEventListener('click', async (e) => {
   const b = e.target.closest('[data-cadeau-relancer]');
   if (!b || !confirm('Renvoyer à cette personne un rappel de son cadeau (notification et email) ?')) return;
