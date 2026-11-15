@@ -398,7 +398,7 @@ document.addEventListener('click', async (e) => {
   if (d === 'resultat') { const nb = carte.querySelector('[data-nb]')?.value; if (nb === '' || nb == null) return say(st, 'Indique le nombre de profils compatibles.', true); if (!confirm(`Envoyer à cette personne : ${nb} profil(s) compatible(s) ?`)) return; }
   say(st, 'Un instant…');
   try { await api({ action: 'annonce_moderer', annonce_id: carte.dataset.id, decision: d, note: carte.querySelector('[data-note]').value, nb: carte.querySelector('[data-nb]')?.value }, await jetonFrais()); await chargerAnnonces(); }
-  catch (err) { say(st, erreur(err.code), true); }
+  catch (err) { say(st, err.data?.message || erreur(err.code), true); }
 });
 $('[data-ouvrir-annonces]')?.addEventListener('click', () => { location.hash = 'annonces'; });
 
