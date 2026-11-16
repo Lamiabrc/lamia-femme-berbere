@@ -132,7 +132,7 @@ async function monCoaching(session) {
 const ETAT_DEMASQUE = {
   a_repondre: null,
   attente: 'Tu as dit oui. On attend la réponse de l’autre personne.',
-  confirme: 'Confirmé des deux côtés : Lamia va vous mettre en relation.',
+  confirme: 'Confirmé des deux côtés : vous êtes mis en relation.',
   pas_cette_fois: 'Pas de démasquage cette fois.',
 };
 // Bloquer ou signaler un profil depuis Mon espace (demandes reçues, propositions, discussions).
@@ -144,11 +144,11 @@ document.addEventListener('click', async (e) => {
   if (!session) return;
   const ref = bouton.dataset.modererBloquer;
   const { demanderSignalement } = await import('/assets/signaler.js');
-  const sig = await demanderSignalement(`Profil n° ${ref}`, 'Vous ne vous verrez plus et Lamia est prévenue.');
+  const sig = await demanderSignalement(`Profil n° ${ref}`, 'Vous ne vous verrez plus. La modération est prévenue.');
   if (!sig) return;
   try {
     await appelProfil({ action: 'annonce_bloquer_signaler', ref, ...sig }, session);
-    alert('C’est fait. Lamia est prévenue.');
+    alert('C’est fait. La modération est prévenue.');
     render();
   } catch { alert('Ça n’a pas abouti. Réessaie dans un instant.'); }
 });
@@ -278,7 +278,7 @@ async function achats(session) {
 }
 
 // Profil confié à Lamia : état, avantages, modification, fin d'un match en cours.
-const ETAT_PROFIL = { a_verifier: 'En cours de vérification par Lamia', publiee: '✓ Vérifié par Lamia', refusee: 'Non retenu pour le moment' };
+const ETAT_PROFIL = { a_verifier: 'En cours de vérification', publiee: '✓ Vérifié', refusee: 'Non retenu pour le moment' };
 async function appelProfil(body, session) {
   // 20 secondes au plus : si le site est saturé, on affiche « Réessaie » au lieu de rester sur « Un instant… ».
   const r = await fetch('/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` }, body: JSON.stringify(body), signal: AbortSignal.timeout(20000) });
@@ -398,7 +398,7 @@ async function voirProfilMatch(ref, session) {
     const L = (v) => accorder(lib(v), fe);
     const puces = (tab) => (tab || []).filter(Boolean).map((x) => `<span>${esc(L(x))}</span>`).join('');
     const origine = [origineLisible(f.origine), f.village && `de ${f.village}`].filter(Boolean).join(' · ');
-    const badges = [f.verifie && 'Identité vérifiée', f.recommande && 'Match choisi par Lamia'].filter(Boolean);
+    const badges = [f.verifie && 'Identité vérifiée', f.recommande && 'Match recommandé'].filter(Boolean);
     const portrait = portraitRedige(f);
     const foi = [f.religion && L(f.religion), f.pratique && minuscule(L(f.pratique))].filter(Boolean).join(', ');
     const c = f.cherche || {};
@@ -467,8 +467,8 @@ async function monProfil(session) {
     const { profil: p } = await appelProfil({ action: 'annonce_mon_profil' }, session);
     if (!p) { await sansProfil(box, session); return; }
     box.innerHTML = `${p.test ? '<p class="espace-test"><svg class="ico" aria-hidden="true"><use href="/icones.svg#flask-conical"/></svg> <strong>Compte de test.</strong> Il sert uniquement à essayer l’application : il ne voit que les profils de test et ne contacte aucun vrai membre.</p><p class="espace-test-mode"><span>Voir l’espace :</span> <a class="btn btn-ink" href="/mon-espace/" aria-current="page">Célibataire</a> <a class="btn btn-line" href="/notre-couple/?test=1">En couple</a></p>' : ''}<article class="espace-achat"><div><p class="event-date">Profil n° ${esc(p.ref)}</p><h3>${esc(ETAT_PROFIL[p.status] || p.status)}${p.status === 'publiee' && p.piece_identite ? ' · avec pièce d’identité' : ''}</h3>
-      ${p.live ? `<p><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg> Profil créé en live avec Lamia${p.live_retrouve ? '' : ' (Lamia vérifie ta fiche)'}.</p>` : ''}
-      ${p.nb_compatibles !== null && p.nb_compatibles !== undefined ? `<p>D’après l’outil de Lamia, tu pourrais correspondre à ${esc(p.nb_compatibles)} personne(s).</p>` : ''}
+      ${p.live ? `<p><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg> Profil créé en live${p.live_retrouve ? '' : ' (ta fiche est en vérification)'}.</p>` : ''}
+      ${p.nb_compatibles !== null && p.nb_compatibles !== undefined ? `<p>D’après notre algorithme, tu pourrais correspondre à ${esc(p.nb_compatibles)} personne(s).</p>` : ''}
       ${p.matchs?.places_en_attente && p.matchs.choix_multiples !== 'non' ? `<div class="espace-multiples" data-multiples>
         <p><strong>Ta formule permet d’autres matchs.</strong> Tu es en ce moment en discussion avec ton match : s’il s’ouvre d’autres matchs, ton match le verra.</p>
         ${p.matchs.choix_multiples === '24h' ? '<p class="aide">C’est noté : d’autres matchs pourront s’ouvrir 24 h après le début de ta discussion.</p>' : ''}
@@ -487,7 +487,7 @@ async function monProfil(session) {
           <div class="espace-pause-choix" data-pause-choix hidden><p><strong>Qu’est-ce qui se passe pour toi ?</strong></p><p class="espace-sans-liens"><button class="btn btn-ink" type="button" data-annonce-pause="oui" data-raison="pause">J’ai besoin de souffler</button> <button class="btn btn-ink" type="button" data-annonce-pause="oui" data-raison="couple">J’ai trouvé quelqu’un</button> <button class="link-button" type="button" data-pause-annuler>Annuler</button></p></div></div>`}
       ${p.medias_ok === false ? '' : '<section class="espace-photos espace-mes-photos" data-mes-photos hidden></section>'}
       <div class="espace-suivi" data-profil-suivi></div>
-      <label class="annonce-case espace-photo"><input type="checkbox" data-profil-photo${p.photo_partage ? ' checked' : ''}> <span>Si un match me convient, Lamia peut transmettre <strong>ma photo</strong> à la personne avec qui elle me met en relation (et à elle seule).</span></label>
+      <label class="annonce-case espace-photo"><input type="checkbox" data-profil-photo${p.photo_partage ? ' checked' : ''}> <span>Si un match me convient, <strong>ma photo</strong> peut être transmise à la personne avec qui elle me met en relation (et à elle seule).</span></label>
       <p class="form-status" data-profil-statut></p><div data-profil-edition hidden></div>`;
     box.querySelector('[data-pause-ouvrir]')?.addEventListener('click', () => { box.querySelector('[data-pause-choix]').hidden = false; });
     box.querySelector('[data-pause-annuler]')?.addEventListener('click', () => { box.querySelector('[data-pause-choix]').hidden = true; });
@@ -518,10 +518,10 @@ async function monProfil(session) {
     { // Profil incomplet : ce qui manque, pourquoi ça bloque, et le bouton pour le régler.
       const bloc = document.querySelector('[data-incomplet-bloc]');
       const QUOI = {
-        photos_refusees: ['Envoie 2 photos valides', 'Lamia n’a pas pu valider tes photos. Envoie 2 photos de toi : des vraies photos de toi, et deux photos différentes. Ton compte est suspendu jusque-là (personne ne te voit, tu ne peux ni swiper ni répondre). Il est débloqué dès qu’elles sont envoyées. Elles ne sont jamais publiées.', 'Envoyer mes photos', 'photos'],
+        photos_refusees: ['Envoie 2 photos valides', 'Tes photos n’ont pas pu être validées. Envoie 2 photos de toi : des vraies photos de toi, et deux photos différentes. Ton compte est suspendu jusque-là (personne ne te voit, tu ne peux ni swiper ni répondre). Il est débloqué dès qu’elles sont envoyées. Elles ne sont jamais publiées.', 'Envoyer mes photos', 'photos'],
         photos: ['Ajoute tes 2 photos', 'Sans tes 2 photos, tu ne peux ni swiper ni répondre. Elles ne sont jamais publiées.', 'Ajouter mes photos', 'photos'],
         contact: ['Indique un contact valable', 'Mets ton numéro de téléphone, ou le lien de ton profil TikTok, Instagram ou Facebook (un prénom ne suffit pas). Sans lui, ton profil n’est pas validé et personne ne te voit.', 'Corriger mon contact', 'modifier'],
-        email: ['Corrige ton adresse email', 'Ton adresse email n’est pas valable : Lamia ne peut pas te prévenir de tes matchs.', 'Corriger mon profil', 'modifier'],
+        email: ['Corrige ton adresse email', 'Ton adresse email n’est pas valable : on ne peut pas te prévenir de tes matchs.', 'Corriger mon profil', 'modifier'],
         essentiel: ['Complète l’essentiel', 'Ta religion, ton niveau d’études, ta situation et l’âge que tu recherches : sans eux, ton profil n’est pas proposé dans le swipe, pour éviter les matchs qui ne collent pas.', 'Compléter mon profil', 'modifier'],
         textes: ['Présente-toi en quelques phrases', 'Dis qui tu es et qui tu cherches : un profil sans présentation est beaucoup moins choisi.', 'Écrire ma présentation', 'modifier'],
       };
@@ -569,11 +569,11 @@ async function monProfil(session) {
         if (!photos.length) return;
         z.innerHTML = `<h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#camera"/></svg> Mes photos</h3>
           <p class="espace-mes-photos-grille">${photos.map((u) => `<img src="${esc(u)}" alt="Ma photo" loading="lazy">`).join('')}</p>
-          <p class="aide"><svg class="ico" aria-hidden="true"><use href="/icones.svg#shield"/></svg> Elles sont privées : personne ne les voit dans le swipe ni sur le site. Seule Lamia les voit pour vérifier ton profil${partage ? ', et ton match si vous êtes en relation et que tu as accepté de la transmettre' : ''}.</p>`;
+          <p class="aide"><svg class="ico" aria-hidden="true"><use href="/icones.svg#shield"/></svg> Elles sont privées : personne ne les voit dans le swipe ni sur le site. Seule la modération les voit pour vérifier ton profil${partage ? ', et ton match si vous êtes en relation et que tu as accepté de la transmettre' : ''}.</p>`;
         z.hidden = false;
       }).catch(() => {}); }
     box.querySelectorAll('[data-profil-dematcher]').forEach((bouton) => bouton.addEventListener('click', async (e) => {
-      if (!confirm(`Mettre fin à ton match avec le profil n° ${bouton.dataset.profilDematcher} ? Lamia sera prévenue, et une place se libère.`)) return;
+      if (!confirm(`Mettre fin à ton match avec le profil n° ${bouton.dataset.profilDematcher} ? Une place se libère.`)) return;
       e.target.disabled = true;
       try { await appelProfil({ action: 'annonce_dematcher', ref: Number(bouton.dataset.profilDematcher) }, session); monProfil(session); }
       catch (err) { if (err.code === 'dematch_dans_discussion') { e.target.disabled = false; document.querySelector('[data-espace-discussion-bloc]')?.scrollIntoView({ behavior: 'smooth' }); alert('Vous avez une discussion ouverte : utilise le bouton « Dématcher » sous votre discussion, pour vous dire au revoir.'); return; } box.querySelector('[data-profil-statut]').textContent = 'Ça n’a pas fonctionné. Réessaie, ou écris à Lamia.'; e.target.disabled = false; }
@@ -585,7 +585,7 @@ async function monProfil(session) {
 // « coeur » : ancienne formule (supprimée le 31/10/2026), gardée pour un éventuel ancien abonnement.
 const QUOTAS = { coeur: { nom: 'Cœur', mises: 3, sd: 1 }, passion: { nom: 'Passion', mises: null, sd: 1 }, prestige: { nom: 'Prestige', mises: null, sd: 2 } };
 const ETAT_DEMANDE = { mis_en_relation: 'Match en cours', en_reserve: 'En réserve', pas_compatible: 'Sans suite', dematche: 'Match terminé' };
-const FIN_DEMANDE = { autre: 'Non de sa part', moi: 'Non de ta part', lamia: 'Annulée par Lamia', indispo: 'Plus disponible' };
+const FIN_DEMANDE = { autre: 'Non de sa part', moi: 'Non de ta part', lamia: 'Annulée', indispo: 'Plus disponible' };
 async function suivi(el, p) {
   const etat = await etatAbo;
   const a = etat?.abonnement, q = a ? QUOTAS[a.formule] : null, u = etat?.unites || {};
@@ -625,7 +625,7 @@ async function suivi(el, p) {
     if (pm.accepte === false) return `${titre}<p>Ton match n’a pas (encore) accepté de transmettre sa photo.</p>`;
     if (pm.achetable && peutPayer) return `${titre}<p>Vois sa photo pendant 1 heure pour 3 €, ou tant que dure le match avec la formule <a class="text-link" href="/abonnement/?formule=passion">Passion</a>.</p><label class="annonce-case"><input type="checkbox" data-photo-cgv="${esc(pm.ref)}"> <span>J’accepte les <a href="/cgv/#abonnement" target="_blank">conditions de vente</a> et je demande que l’heure commence dès le paiement.</span></label><p><button class="btn btn-ink" type="button" data-photo-acheter="${esc(pm.ref)}">Voir la photo · 3 €</button></p><p class="form-status" data-photo-statut="${esc(pm.ref)}"></p>`;
     if (!pm.inclus) return `${titre}<p>Elle est incluse à partir de la formule <a class="text-link" href="/abonnement/?formule=passion">Passion</a>, si ton match accepte de la transmettre.</p>`;
-    return `${titre}<p>Lamia te la transmet dès que possible.</p>`;
+    return `${titre}<p>Elle t’est transmise dès que possible.</p>`;
   };
   const blocPhoto = (p.matchs_lies || []).map(unePhoto).join('');
   const cp = p.choisi_par || { nombre: 0, refs: [] };
@@ -832,11 +832,11 @@ async function propositions(session) {
     const rep = x.reponse === 'oui' ? '<p class="espace-match">Tu as dit oui ! Si l’autre personne dit oui aussi, vous êtes mis en relation tout de suite et une discussion s’ouvre ici.</p>'
       : x.reponse === 'non' ? '<p>Tu as répondu : pas pour moi.</p>'
       : `<p class="interet-boutons"><button type="button" class="btn btn-ink" data-proposition="oui" data-id="${esc(x.id)}">Ce profil m’intéresse</button><button type="button" class="btn btn-line" data-proposition="non" data-id="${esc(x.id)}">Pas pour moi</button></p>`;
-    return `<article class="espace-achat interet-recu proposition"><div><p class="event-date">Proposé par Lamia · profil n° ${esc(f.ref)} · le ${esc(new Date(x.le).toLocaleDateString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { day: 'numeric', month: 'long' }))}</p>
+    return `<article class="espace-achat interet-recu proposition"><div><p class="event-date">Proposé pour toi · profil n° ${esc(f.ref)} · le ${esc(new Date(x.le).toLocaleDateString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { day: 'numeric', month: 'long' }))}</p>
       <h3>${esc(infos.join(' · '))}</h3>
       ${ligneDifference(x.differences)}
       ${boutonVoirProfil(f, x.differences)}
-      ${x.message ? `<p class="proposition-mot">« ${esc(x.message)} » <small>Lamia</small></p>` : ''}
+      ${x.message ? `<p class="proposition-mot">« ${esc(x.message)} »</p>` : ''}
       ${f.profil ? `<p><strong>Qui je suis :</strong> <span data-membre>${esc(f.profil)}</span></p>` : ''}
       ${f.recherche ? `<p><strong>Qui je cherche${esc(ages)} :</strong> <span data-membre>${esc(f.recherche)}</span></p>` : ''}
       ${secteurLisible(f.secteur) ? `<p><strong>Cherche en :</strong> ${esc(secteurLisible(f.secteur))}</p>` : ''}
@@ -895,7 +895,7 @@ async function avisLamia(session) {
     const rep = x.reponse === 'oui' ? '<p class="espace-match"><svg class="ico" aria-hidden="true"><use href="/icones.svg#thumbs-up"/></svg> Tu as dit oui : c’est noté.</p><p>Pense à mettre à jour ce que tu recherches pour recevoir aussi ce genre de profils : <a class="text-link" href="#mon-profil">Modifier mon annonce</a>.</p>'
       : x.reponse === 'non' ? '<p>Tu as répondu non : c’est noté, merci.</p>'
       : `<p><strong>Tu acceptes quand même ?</strong></p><p class="interet-boutons"><button type="button" class="btn btn-ink" data-avis="oui" data-id="${esc(x.id)}">Oui</button><button type="button" class="btn btn-line" data-avis="non" data-id="${esc(x.id)}">Non</button></p>`;
-    return `<article class="espace-achat interet-recu proposition"><div><p class="event-date"><svg class="ico" aria-hidden="true"><use href="/icones.svg#message-circle"/></svg> Lamia te demande ton avis · profil n° ${esc(f.ref)}</p>
+    return `<article class="espace-achat interet-recu proposition"><div><p class="event-date"><svg class="ico" aria-hidden="true"><use href="/icones.svg#message-circle"/></svg> Ton avis · profil n° ${esc(f.ref)}</p>
       ${(() => { const d = phrasesDifference(criteresDeQuestion(x.question), f); return d.length ? `<p class="espace-diff-intro">Ce profil ne correspond pas à ce que tu as demandé :</p><ul class="espace-diff">${d.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>` : `<p class="proposition-mot">${esc(x.question)}</p>`; })()}
       <h3>${esc(infos.join(' · '))}</h3>
       ${f.profil ? `<p><strong>Qui je suis :</strong> <span data-membre>${esc(f.profil)}</span></p>` : ''}
@@ -923,7 +923,7 @@ async function interetsRecus(session) {
     const f = i.fiche;
     const infos = [f.genre === 'femme' ? 'Une femme' : 'Un homme', f.age && `${f.age} ans`, f.ville, f.pays, f.situation].filter(Boolean);
     const ages = f.age_min || f.age_max ? ` · ${f.age_min || 18} à ${f.age_max || 99} ans` : '';
-    const rep = i.reponse === 'oui' ? '<p class="espace-match"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Tu as dit oui : c’est réciproque, Lamia est prévenue.</p>'
+    const rep = i.reponse === 'oui' ? '<p class="espace-match"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Tu as dit oui : c’est réciproque, vous êtes mis en relation très vite.</p>'
       : i.reponse === 'non' ? '<p>Tu as répondu : pas pour moi.</p>'
       : `<p class="interet-boutons"><button type="button" class="btn btn-ink" data-repondre="oui" data-id="${esc(i.id)}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Ça m’intéresse aussi</button><button type="button" class="btn btn-line" data-repondre="non" data-id="${esc(i.id)}">Pas pour moi</button></p>`;
     return `<article class="espace-achat interet-recu"><div><p class="event-date">Profil n° ${esc(f.ref)} · intéressé·e par ta fiche n° ${esc(i.pour)} · le ${esc(new Date(i.le).toLocaleDateString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { day: 'numeric', month: 'long' }))}</p>
@@ -1178,14 +1178,14 @@ async function discussions(session) {
     if (!e.target.closest('[data-disc-signaler]')) return;
     const id = e.target.closest('[data-disc]').dataset.disc;
     const { demanderSignalement } = await import('/assets/signaler.js');
-    const sig = await demanderSignalement('Bloquer et signaler', 'La discussion sera fermée, vous ne vous reverrez plus, et Lamia la lira.');
+    const sig = await demanderSignalement('Bloquer et signaler', 'La discussion sera fermée, vous ne vous reverrez plus, et la modération la lira.');
     if (!sig) return;
     try {
       await appelProfil({ action: 'annonce_discussion_signaler', id, ...sig }, session);
       // Un signalement protège aussi : les deux personnes ne se revoient plus, et le match s'arrête.
       const avec = liste.find((x) => x.id === id)?.avec_ref;
       if (avec) await appelProfil({ action: 'annonce_bloquer', ref: avec, motif: 'Discussion signalée' }, session).catch(() => {});
-      clearInterval(minuterieDiscussions); await charger(); alert('Merci. Lamia est prévenue.'); } catch { alert('Le signalement n’est pas parti. Réessaie.'); }
+      clearInterval(minuterieDiscussions); await charger(); alert('Merci. La modération est prévenue.'); } catch { alert('Le signalement n’est pas parti. Réessaie.'); }
   });
   ecouter(box, 'keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && e.target.matches('textarea')) { e.preventDefault(); e.target.form.requestSubmit(); } });
 }
