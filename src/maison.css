@@ -4682,3 +4682,8 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .connexion-sociale-titre { margin: 0; font-size: .95rem; opacity: .8; }
 .connexion-sociale-liste { display: flex; flex-wrap: wrap; gap: 10px; }
 .connexion-sociale-bouton { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; }
+/* Cartes dorées des jeux (avec l'abonnement Couple) */
+.couple .couple-carte-jeu.is-doree { background: linear-gradient(160deg, #6b4a12, #c9a14f 55%, #8a2640); box-shadow: 0 14px 34px rgba(201, 161, 79, .45), inset 0 0 0 2px rgba(255, 236, 190, .55); }
+.couple .couple-doree { color: #ffe9b0; font-weight: 700; }
+.couple .couple-carte-jeu-texte.is-floue { filter: blur(7px); user-select: none; }
+.couple .couple-doree-cadenas { margin: -4px 0 12px; font-weight: 600; }
