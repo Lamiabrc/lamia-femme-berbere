@@ -186,6 +186,7 @@ function vue(c) {
         return `<section class="couple-carte couple-magie">${photo(PHOTOS.magie)}
           <p class="couple-etincelles" aria-hidden="true"><i>✦</i><i>✦</i><i>✦</i></p>
           <h2>Et si on se mariait ?</h2>
+          <p class="couple-kab-ligne"><span lang="kab">Asuter</span> · la demande, en kabyle</p>
           <p>Fais ta demande à ${sonNom}. S’il ou elle dit oui, votre parcours de fiançailles s’ouvre : les familles, la bague, le henné, la robe, le grand jour…</p>
           <p><button type="button" class="couple-bouton-magique" data-demande-ouvrir>Et si on se mariait ? 💍</button></p>
           <form class="couple-demande-form" data-demande-form hidden>
@@ -205,7 +206,7 @@ function vue(c) {
       <ol class="couple-parcours">${etapesDef.map((e, i) => { const dt = jalons[e.cle], fini = e.prepa.every((k) => faits.has(k)); return `<li class="couple-carte couple-etape${fini ? ' is-fini' : ''}">
         ${e.image ? photo(e.image) : `<div class="couple-etape-illu">${img(e.cle, 'ci-xxl')}</div>`}
         <p class="couple-etape-num">Étape ${i + 1}${fini ? ' · c’est prêt ♡' : ''}</p>
-        <h3>${esc(e.nom)}</h3><p class="aide">${esc(e.texte)}</p>
+        <h3>${esc(e.nom)}${e.kab ? ` <span class="couple-kab" lang="kab">${esc(e.kab)}</span>` : ''}</h3><p class="aide">${esc(e.texte)}</p>
         <label class="couple-etape-date">${img('planning', 'ci-s')}<span>${dt ? esc(new Date(`${dt}T12:00:00`).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })) + (joursAvant(dt) > 0 ? ` · J-${joursAvant(dt)}` : joursAvant(dt) === 0 ? ' · aujourd’hui !' : ' · c’est fait ♡') : 'Choisir la date'}</span><input type="date" value="${esc(dt || '')}" data-jalon="${esc(e.cle)}" aria-label="Date : ${esc(e.nom)}"></label>
         <ul class="couple-prepa-liste">${e.prepa.map((k) => `<li><label><input type="checkbox" data-prepa="${esc(k)}"${faits.has(k) ? ' checked' : ''}> <span>${esc(prepaDef[k] || k)}</span></label></li>`).join('')}</ul>
       </li>`; }).join('')}</ol>
@@ -243,6 +244,7 @@ function vue(c) {
   zone.innerHTML = `<section class="couple-carte couple-tete">
       <img class="couple-tete-photo" src="${PHOTOS.banniere}" alt="" decoding="async">
       <span class="couple-tete-coeurs" aria-hidden="true"><i>♥</i><i>♥</i><i>♥</i><i>♥</i><i>♥</i></span>
+      <p class="couple-azul" lang="kab">Azul !</p>
       <p class="couple-noms"><span>${esc(moi?.prenom || 'Moi')}</span> ${img('fiancailles', 'ci-l couple-bat')} <span>${lui ? esc(lui.prenom) : '<em>en attente</em>'}</span></p>
       ${lui ? `${jourJ > 0 ? `<p class="couple-tete-meteo">💍 J-${jourJ} avant le grand jour</p>` : ''}${sienne?.aujourdhui ? `<p class="couple-tete-meteo">Aujourd’hui ${esc(lui.prenom)} : ${img(`h${sienne.humeur}`, 'ci-xs')} ${esc(sienne.mot.toLowerCase())}</p>` : ''}` : `<div class="couple-code"><p>Invite ton ou ta partenaire 💌</p><p class="couple-code-valeur">${c.code ? esc(c.code) : '—'}</p>${c.code ? (() => { const t = invitation(c.code); return `<p class="couple-envois"><a class="btn btn-ink" href="sms:?&body=${encodeURIComponent(t)}">Par SMS</a><a class="btn btn-ink" href="https://wa.me/?text=${encodeURIComponent(t)}" target="_blank" rel="noopener">WhatsApp</a><a class="btn btn-line" href="mailto:?subject=${encodeURIComponent('Rejoins notre espace de couple 💞')}&body=${encodeURIComponent(t)}">Par email</a>${navigator.share ? `<button type="button" class="btn btn-line" data-couple-partager="${esc(c.code)}">Autre…</button>` : ''}</p>`; })() : ''}<p><button type="button" class="link-button" data-couple-code>Nouveau code</button></p></div>`}
     </section>

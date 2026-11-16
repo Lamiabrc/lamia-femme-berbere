@@ -160,6 +160,10 @@ const HOME_UNIVERSES = [
   },
 ];
 
+// TAYRI, l'appli : pour se rencontrer, et aussi un lieu de couple virtuel (Lamia, 16 nov. 2026).
+const TAYRI_DESCRIPTION = 'TAYRI, l’appli de Lamia Femme Berbère : rencontre kabyle sérieuse en vue du mariage (profils vérifiés, swipe, speed dating, live), et un lieu de couple virtuel pour les amoureux : météo du cœur, mots doux, jeux d’amour à distance, la demande « Et si on se mariait ? » et tout le parcours jusqu’au mariage.';
+const TAYRI_LD = { '@type': 'MobileApplication', '@id': SITE_URL + '/#tayri', name: 'TAYRI', alternateName: 'TAYRI · Lamia Femme Berbère', description: TAYRI_DESCRIPTION, applicationCategory: 'LifestyleApplication', operatingSystem: 'Android, iOS, Web', url: SITE_URL + '/', image: SITE_URL + '/images/marque/tayri-icone-512.png', inLanguage: 'fr', publisher: { '@id': SITE_URL + '/#organisation' }, offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' } };
+
 // ---------------------------------------------------------------- gabarit commun
 
 // Pièces sombres passées au style clair et pastel de la Maison.
@@ -244,7 +248,7 @@ function header(room) {
         <div class="maison-menu-etage"><p>Rencontres</p><ul><li><a href="/rencontres/#profils-anonymes"><strong>Les profils</strong></a></li><li><a href="/rencontres/swipe/"><strong>Swiper les profils</strong></a></li><li><a href="/rencontres/#confier"><strong>Créer mon profil</strong></a></li><li><a href="/speed-dating/"><strong>Speed dating</strong></a></li><li><a href="/abonnement/"><strong>Les formules</strong></a></li><li><a href="/salon/"><strong>Le live</strong></a></li><li><a href="/confidences/"><strong>Écrire à Lamia</strong></a></li></ul></div>
         <div class="maison-menu-etage"><p>L’univers de Lamia</p><ul><li><a href="/lamia-brechet/"><strong>Qui est Lamia</strong></a></li><li><a href="/ecrin/"><strong>Bijoux kabyles</strong></a></li><li><a href="/werdi-ouvre-les-yeux/"><strong>Le livre Werdi</strong></a></li><li><a href="/boutique/"><strong>La boutique</strong></a></li><li><a href="/galerie/"><strong>La galerie</strong></a></li></ul></div>
         <div class="maison-menu-etage maison-menu-langues"><p>Langue</p><ul><li><a href="/" hreflang="fr" lang="fr"><strong>Français</strong></a></li><li><a href="/en/" hreflang="en" lang="en"><strong>English</strong></a></li><li><a href="/ar/" hreflang="ar" lang="ar" dir="rtl"><strong>العربية</strong></a></li><li><a href="/kab/" hreflang="kab" lang="kab"><strong>Taqbaylit</strong></a></li></ul></div>
-        <div class="maison-menu-etage"><p>Mon compte</p><ul><li><a href="/mon-espace/"><strong>Mon espace</strong></a></li><li data-menu-couple hidden><a href="/notre-couple/">Notre couple</a></li><li><a href="/application/"><strong>L’application</strong></a></li></ul></div>
+        <div class="maison-menu-etage"><p>Mon compte</p><ul><li><a href="/mon-espace/"><strong>Mon espace</strong></a></li><li data-menu-couple hidden><a href="/notre-couple/">Notre couple</a></li><li><a href="/espace-couple/">TAYRI pour les couples</a></li><li><a href="/application/"><strong>L’application</strong></a></li></ul></div>
       </div>
     </details>
     <a class="cloche" href="/nouveautes/" aria-label="Les nouveautés"><svg class="ico" aria-hidden="true"><use href="/icones.svg#cloche"/></svg><b data-cloche-point hidden></b></a>
@@ -387,12 +391,12 @@ ${RUBRIQUES}
 page(
   '/',
   layout({
-    title: 'Rencontre kabyle sérieuse pour le mariage · Lamia',
-    description: 'Rencontre kabyle en vue du mariage : profils vérifiés, présentations faites par Lamia, marieuse kabyle. Les matchs sont gratuits.',
+    title: 'TAYRI · Rencontre kabyle et espace de couple · Lamia',
+    description: 'TAYRI, l’appli de Lamia : rencontre kabyle sérieuse en vue du mariage, puis votre espace de couple virtuel : jeux d’amour, fiançailles, mariage.',
     path: '/',
     room: roomBySlug.hall,
     scripts: ['/assets/annonces.js', '/assets/swipe-accueil.js'],
-    body: `<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@graph': [{ '@type': 'Organization', '@id': SITE_URL + '/#organisation', name: 'Lamia Femme Berbère', url: SITE_URL + '/', logo: SITE_URL + '/images/lamia/lamia-portrait-tatouages-rond-480.webp', founder: { '@type': 'Person', name: 'Lamia Bréchet Ighil', url: SITE_URL + '/lamia-brechet/' }, sameAs: ['https://www.tiktok.com/@lamiafemmeberbere', 'https://www.facebook.com/femmeberberes/'] }, { '@type': 'WebSite', '@id': SITE_URL + '/#site', name: 'Lamia Femme Berbère', url: SITE_URL + '/', publisher: { '@id': SITE_URL + '/#organisation' }, inLanguage: ['fr', 'en'] }] })}</script>
+    body: `<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@graph': [{ '@type': 'Organization', '@id': SITE_URL + '/#organisation', name: 'Lamia Femme Berbère', url: SITE_URL + '/', logo: SITE_URL + '/images/lamia/lamia-portrait-tatouages-rond-480.webp', founder: { '@type': 'Person', name: 'Lamia Bréchet Ighil', url: SITE_URL + '/lamia-brechet/' }, sameAs: ['https://www.tiktok.com/@lamiafemmeberbere', 'https://www.facebook.com/femmeberberes/'] }, { '@type': 'WebSite', '@id': SITE_URL + '/#site', name: 'Lamia Femme Berbère', alternateName: 'TAYRI', url: SITE_URL + '/', publisher: { '@id': SITE_URL + '/#organisation' }, inLanguage: ['fr', 'en'] }, TAYRI_LD] })}</script>
 <div class="po-app accueil">
 ${SWIPE_INVITE}
 <section class="po-hero accueil-hero" aria-labelledby="accueil-titre">
@@ -833,7 +837,7 @@ page(
     body: `<section class="espace couple">
   <p class="room-name"><span class="pip" aria-hidden="true"></span>Notre couple</p>
   <h1>Notre couple</h1>
-  <p class="couple-devise">Votre jardin à deux, jusqu’au grand jour ♡</p>
+  <p class="couple-devise">Votre jardin à deux, jusqu’au grand jour ♡ <span lang="kab">Tayri</span>, c’est l’amour en kabyle.</p>
   <div data-couple><p class="loading">Un instant…</p></div>
 </section>`,
   }),
@@ -2119,15 +2123,49 @@ page(
   })
 );
 
+// L'univers des couples, page publique pour Google et les réseaux (Lamia, 16 nov. 2026 : « proposer TAYRI comme un lieu de couple aussi virtuel »).
+{
+  const U = (id, w = 900, h) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}${h ? `&h=${h}` : ''}&q=70`;
+  const BLOCS = [
+    ['photo-1782786660893-d2fd16cb49b7', 'Votre bulle à deux', 'La météo du cœur de chacun, la question du jour, les mots doux qui arrivent sur le téléphone de l’autre.'],
+    ['photo-1766963026693-e73b058176dd', 'Des jeux d’amour à distance', 'Tu préfères, vérités tendres, quiz de nous, défis… et pour les plus audacieux, « Un peu piquant » et « Coquin ».'],
+    ['photo-1584115838497-f317f7455abe', '« Et si on se mariait ? »', 'Un bouton magique pour faire sa demande. Quand l’autre dit oui, votre parcours s’ouvre.'],
+    ['photo-1774660811278-3a9710b375cd', 'Jusqu’au grand jour', 'Les familles, les fiançailles, le henné, la robe, le civil, la fête, le voyage : chaque étape avec sa date et sa liste.'],
+    ['photo-1623217509141-6f735087b50c', 'Planning et souvenirs', 'Un calendrier à deux, des idées de moments, et un bocal où glisser vos plus beaux souvenirs.'],
+    ['photo-1552334543-63c1f649eece', 'Lamia à vos côtés', 'Coaching de couple, lives sur l’amour et le mariage kabyle, et un cadeau de Lamia le jour de votre mariage.'],
+  ];
+  page(
+    '/espace-couple/',
+    layout({
+      title: 'TAYRI pour les couples : votre espace à deux · Lamia',
+      description: 'Un lieu de couple virtuel : jeux d’amour à distance, mots doux, la demande « Et si on se mariait ? » et le parcours jusqu’au mariage kabyle. Gratuit à deux.',
+      ogTitle: 'TAYRI, aussi pour les couples 💍',
+      ogDescription: 'Votre espace à deux : jeux d’amour à distance, mots doux, la demande en mariage et tout le parcours jusqu’au grand jour. À découvrir sans compte.',
+      ogImage: U('photo-1782786660893-d2fd16cb49b7', 1200, 630), ogImageAlt: 'Deux mains avec alliances au coucher du soleil', ogImageWidth: 1200, ogImageHeight: 630,
+      path: '/espace-couple/',
+      room: roomBySlug.hall,
+      body: `<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebPage', name: 'TAYRI pour les couples', description: 'Un lieu de couple virtuel : jeux d’amour à distance, mots doux, demande en mariage et parcours jusqu’au mariage.', url: SITE_URL + '/espace-couple/', about: { '@id': SITE_URL + '/#tayri' } })}</script>
+<section class="room-head couple-landing-tete"><p class="room-name"><span class="pip" aria-hidden="true"></span>TAYRI · pour les couples</p>
+<h1>Votre lieu de couple, même à distance</h1>
+<p class="lead"><span lang="kab">Tayri</span>, c’est l’amour en kabyle. Vous vous êtes trouvés ? TAYRI continue avec vous : un espace rien qu’à vous deux, pour vous aimer au quotidien et préparer votre mariage.</p>
+<p class="bal-actions"><a class="btn btn-ink" href="/notre-couple/?demo=1">Voir l’espace en un clic, sans compte</a> <a class="btn btn-line" href="/mon-espace/?retour=${encodeURIComponent('/notre-couple/?inviter=1')}">Créer notre espace 💞</a></p></section>
+<section class="couple-landing-grille">${BLOCS.map(([id, t, d]) => `<article class="couple-landing-bloc"><img src="${U(id, 700)}" alt="" loading="lazy" decoding="async" width="700" height="438"><h2>${t}</h2><p>${d}</p></article>`).join('')}</section>
+<section class="article couple-landing-fin"><h2>Gratuit à deux</h2><p>L’espace de couple est gratuit. L’abonnement Couple ajoute les mots doux animés, ton mot à toi et les jeux dorés.</p>
+<p class="bal-actions"><a class="btn btn-ink" href="/notre-couple/?demo=1">Découvrir l’espace de Sara et Amine</a></p>
+<p class="aide">Pas encore en couple ? <a class="text-link" href="/rencontres/">Les rencontres kabyles de Lamia</a>. Photos : Unsplash.</p></section>`,
+    })
+  );
+}
+
 // L'application installable
 page(
   '/application/',
   layout({
-    title: 'L’application de rencontre kabyle de Lamia',
-    description: 'Installe l’application de Lamia sur ton téléphone : les profils vérifiés, le swipe, ton espace, le live et le speed dating à portée de doigt.',
+    title: 'TAYRI, l’application de Lamia : rencontre et couple',
+    description: 'Installe TAYRI : profils kabyles vérifiés, swipe, live et speed dating pour te rencontrer, puis votre espace de couple virtuel jusqu’au mariage.',
     path: '/application/',
     room: roomBySlug.boutique,
-    body: `<section class="room-head"><p class="room-name"><span class="pip" aria-hidden="true"></span>L’application</p><h1>L’application de rencontre kabyle de Lamia</h1><p class="lead">Installe l’application de Lamia sur ton téléphone : une icône sur ton écran d’accueil, les profils vérifiés, le swipe, ton espace et le live en plein écran, sans passer par un magasin d’applications de lourd.</p>
+    body: `<section class="room-head"><p class="room-name"><span class="pip" aria-hidden="true"></span>L’application</p><h1>TAYRI, l’application de Lamia</h1><p class="lead">Installe TAYRI sur ton téléphone : une icône sur ton écran d’accueil pour te rencontrer (profils vérifiés, swipe, live), puis, une fois à deux, <a class="text-link" href="/espace-couple/">votre espace de couple</a>. Rien de lourd à télécharger.</p>
 <p class="bal-actions"><button type="button" class="btn btn-ink btn-installer" data-installer-bouton><svg class="ico" aria-hidden="true"><use href="/icones.svg#smartphone"/></svg> Installer l’application</button><span data-installee hidden>✓ L’application est déjà installée sur cet appareil.</span></p></section>
 <section class="article"><h2>Sur Android</h2><ol><li>Ouvre lamia-femme-berbere.com dans Chrome.</li><li>Touche le bouton « Installer l’application » ci-dessus, ou le menu ⋮ puis « Installer l’application ».</li><li>Confirme : l’icône de la Maison apparaît sur ton écran d’accueil.</li></ol>
 <h2>Sur iPhone</h2><ol><li>Ouvre lamia-femme-berbere.com dans Safari.</li><li>Touche le bouton Partager (le carré avec une flèche vers le haut).</li><li>Choisis « Sur l’écran d’accueil », puis « Ajouter ».</li></ol>
