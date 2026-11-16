@@ -370,6 +370,7 @@ const RUBRIQUES = `<nav class="lfb-rubriques" aria-label="Tout ce que Lamia prop
   <a href="/speed-dating/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#theater"/></svg><strong>Speed dating</strong></a>
   <a href="/boutique/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#gem"/></svg><strong>Boutique</strong></a>
   <a href="/salon/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#live"/></svg><strong>Live</strong></a>
+  <a href="/notre-couple/" data-menu-couple hidden><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg><strong>Notre couple</strong><small>Votre espace à deux</small></a>
 </nav>`;
 // Le swipe ouvert à tous (accueil et page Profils) : src/swipe-accueil.js le fait vivre.
 const SWIPE_INVITE = `<section class="swipe-page accueil-swipe" id="profils-anonymes" data-swipe-accueil aria-label="Les profils">
@@ -406,11 +407,11 @@ ${SWIPE_INVITE}
       <p class="lfb-azul lfb-azul-hero" lang="ber">ⴰⵣⵓⵍ</p>
       <p class="po-eyebrow">${esc(T('accueil.surtitre', 'Accueil', 'Petite ligne au-dessus du titre', 'La marieuse kabyle · rencontres sérieuses'))}</p>
       <h1 id="accueil-titre">${esc(T('accueil.titre', 'Accueil', 'Grand titre', 'Trouve ton âme sœur kabyle et amazigh'))}</h1>
-      <p class="po-sub">${esc(T('accueil.sous-titre', 'Accueil', 'Phrase sous le titre', 'Profils vérifiés. Lamia vous présente. En vue du mariage.'))}</p>
+      <p class="po-sub">${esc(T('accueil.sous-titre', 'Accueil', 'Phrase sous le titre', 'Profils vérifiés. En vue du mariage.'))}</p>
       <p class="po-actions"><a class="po-btn" data-cta-profil href="/rencontres/#confier"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> <span>Créer mon profil ou connexion</span></a><a class="po-btn-verre" href="/rencontres/#profils-anonymes">Voir les profils</a></p>
-      <p class="accueil-couple"><a href="/abonnement/#unite-sauver_couple"><strong>${esc(T('accueil.couple-titre', 'Accueil', 'Encadré couple : la question', 'T’es en couple et tu veux tenter une dernière chose avant de rompre ?'))}</strong><span>${esc(T('accueil.couple-action', 'Accueil', 'Encadré couple : le bouton', 'Réserve une séance de love coaching en ligne'))}</span><small><b>1 heure en visio avec Lamia</b><i> · ${UNITES.find((u) => u.id === 'sauver_couple').prix / 100} €</i></small></a></p>
+      <p class="accueil-couple"><a href="/espace-couple/"><strong>${esc(T('accueil.couple-titre', 'Accueil', 'Encadré couple : la question', 'Déjà en couple ? TAYRI continue avec vous'))}</strong><span>${esc(T('accueil.couple-action', 'Accueil', 'Encadré couple : le bouton', 'Votre espace à deux : jeux d’amour, mots doux, « Et si on se mariait ? »'))}</span><small><b>Gratuit à deux</b><i> · à découvrir sans compte</i></small></a></p>
       <ul class="accueil-preuves">
-        <li>✓ Chaque profil vérifié par Lamia</li>
+        <li>✓ Chaque profil vérifié</li>
         <li>✓ Matchs gratuits, 1 à la fois</li>
         <li>✓ Live du lundi au vendredi, 20 h</li>
         <li>✓ France, Algérie, Maghreb, Canada, Europe</li>
@@ -909,8 +910,6 @@ page(
         <a href="/admin-soirees/"><strong>Mes soirées et précommandes</strong><span>Inscrits, salons, précommandes du livre et du collier</span></a>
         <a href="/admin-bal.html"><strong>Maîtresse du bal</strong><span>Ouvrir les portes, lancer les tours, souhaits réciproques</span></a>
         <a href="/confidences-lamia/"><strong>Confidences</strong><span>Lire et répondre, vocaux, notifications</span></a>
-        <a href="/admin.html"><strong>Signalements</strong><span>Profils signalés, écrits et audio</span></a>
-        <a href="/pilotage.html"><strong>Pilotage</strong><span>Feuille de route et indicateurs</span></a>
       </div>
       <p class="espace-admin-note">Ce compte sert à gérer la Maison. Pour essayer l’application comme un membre, connecte-toi avec un compte de test.</p>
     </section>

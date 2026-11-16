@@ -965,7 +965,7 @@ renderSocials();
     const jeton = JSON.parse(localStorage.getItem('sb-tybwvxinigahhntfeeur-auth-token') || 'null')?.access_token;
     if (!jeton) { montrer(false); return; }
     if (c) montrer(c.v);
-    if (c && Date.now() - c.lu < 6 * 36e5) return;
+    if (c && c.v && Date.now() - c.lu < 6 * 36e5) return; // « pas en couple » se revérifie à chaque page : un couple créé apparaît tout de suite
     fetch('/api/confidences', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jeton}` }, body: JSON.stringify({ action: 'couple_suis_je' }) })
       .then((r) => (r.ok ? r.json() : null)).then((r) => {
         if (!r) return;
