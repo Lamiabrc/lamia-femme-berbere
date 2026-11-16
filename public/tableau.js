@@ -61,6 +61,13 @@ async function charger() {
   try { data = await api({ action: 'dashboard' }); } catch (e) { return message(e.message, true); }
   const v = data.ventes, i = data.inscrits, a = data.alertes, vis = data.visites;
   $('[data-k="ventes-total"]').textContent = money(v.total_cents + (v.app?.total || 0));
+  // L'essentiel en haut de l'accueil : abonnés payants et argent encaissé (appli + boutique).
+  if (v.app) {
+    $('[data-k="abonnes"]').textContent = String(v.app.abonnes);
+    $('[data-k="abonnes-detail"]').textContent = `${money(v.app.par_mois)} par mois s’ils restent`;
+  }
+  $('[data-k="argent"]').textContent = money((v.total_cents || 0) + (v.app?.total || 0));
+  $('[data-k="argent-detail"]').textContent = v.app ? `${money(v.app.mois)} ce mois-ci` : '';
   $('[data-k="ventes-detail"]').textContent = `${v.app ? `${money(v.app.total)} dans l’appli · ${v.app.abonnes} abonné${v.app.abonnes > 1 ? 's' : ''} · ` : ''}${v.nombre} commande${v.nombre > 1 ? 's' : ''} boutique · ${v.payees} à expédier`;
   $('[data-k="inscrits"]').textContent = i.total;
   $('[data-k="inscrits-detail"]').textContent = `+${i.nouveaux_7j} cette semaine`;
