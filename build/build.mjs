@@ -837,7 +837,7 @@ page(
     body: `<section class="espace couple">
   <p class="room-name"><span class="pip" aria-hidden="true"></span>Notre couple</p>
   <h1>Notre couple</h1>
-  <p class="couple-devise">Votre jardin à deux, jusqu’au grand jour ♡</p>
+  <p class="couple-devise">Votre jardin à deux, jusqu’au grand jour ♡ <span lang="kab">Tayri</span>, c’est l’amour en kabyle.</p>
   <div data-couple><p class="loading">Un instant…</p></div>
 </section>`,
   }),
@@ -2147,7 +2147,7 @@ page(
       body: `<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebPage', name: 'TAYRI pour les couples', description: 'Un lieu de couple virtuel : jeux d’amour à distance, mots doux, demande en mariage et parcours jusqu’au mariage.', url: SITE_URL + '/espace-couple/', about: { '@id': SITE_URL + '/#tayri' } })}</script>
 <section class="room-head couple-landing-tete"><p class="room-name"><span class="pip" aria-hidden="true"></span>TAYRI · pour les couples</p>
 <h1>Votre lieu de couple, même à distance</h1>
-<p class="lead">Vous vous êtes trouvés ? TAYRI continue avec vous : un espace rien qu’à vous deux, pour vous aimer au quotidien et préparer votre mariage.</p>
+<p class="lead"><span lang="kab">Tayri</span>, c’est l’amour en kabyle. Vous vous êtes trouvés ? TAYRI continue avec vous : un espace rien qu’à vous deux, pour vous aimer au quotidien et préparer votre mariage.</p>
 <p class="bal-actions"><a class="btn btn-ink" href="/notre-couple/?demo=1">Voir l’espace en un clic, sans compte</a> <a class="btn btn-line" href="/mon-espace/?retour=${encodeURIComponent('/notre-couple/?inviter=1')}">Créer notre espace 💞</a></p></section>
 <section class="couple-landing-grille">${BLOCS.map(([id, t, d]) => `<article class="couple-landing-bloc"><img src="${U(id, 700)}" alt="" loading="lazy" decoding="async" width="700" height="438"><h2>${t}</h2><p>${d}</p></article>`).join('')}</section>
 <section class="article couple-landing-fin"><h2>Gratuit à deux</h2><p>L’espace de couple est gratuit. L’abonnement Couple ajoute les mots doux animés, ton mot à toi et les jeux dorés.</p>

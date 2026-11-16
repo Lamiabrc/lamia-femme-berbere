@@ -4702,3 +4702,8 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .couple-landing-bloc img { display: block; width: 100%; height: 170px; object-fit: cover; background: linear-gradient(135deg, #fdeef2, #f3edfb); }
 .couple-landing-bloc h2 { margin: 14px 16px 6px; font-size: 1.3rem; }
 .couple-landing-bloc p { margin: 0 16px 16px; color: #5b4e6e; }
+/* Mots kabyles dans l'espace couple */
+.couple .couple-azul { margin: 0 0 2px; text-align: center; font-family: var(--serif); font-style: italic; color: #b0475f; }
+.couple .couple-kab { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: .85em; color: #b0475f; }
+.couple .couple-kab-ligne { margin: -4px 0 10px; font-size: .9rem; color: #8a7c95; }
+.couple .couple-kab-ligne span { font-family: var(--serif); font-style: italic; color: #b0475f; font-size: 1.05rem; }
