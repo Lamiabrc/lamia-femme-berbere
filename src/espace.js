@@ -502,6 +502,8 @@ async function monProfil(session) {
     }
     { // Déclaration de bonne foi : affichée tant que la personne ne s'est pas engagée.
       const bloc = document.querySelector('[data-sincerite-bloc]');
+      // Charte déjà signée : le bandeau des valeurs de l'accueil ne s'affiche plus.
+      try { if (p.sincerite === true) localStorage.setItem('lfb-charte', '1'); else if (p.sincerite === false) localStorage.removeItem('lfb-charte'); } catch {}
       if (bloc && p.sincerite === false) import('/assets/sincerite.js').then(({ SINCERITE_HTML, brancherSincerite }) => {
         bloc.innerHTML = SINCERITE_HTML; bloc.hidden = false;
         brancherSincerite(bloc, async () => (await supabase.auth.getSession()).data.session?.access_token, () => { bloc.innerHTML = '<p><strong>✓ Merci, ton engagement est enregistré.</strong></p>'; });

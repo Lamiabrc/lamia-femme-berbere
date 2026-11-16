@@ -398,7 +398,7 @@ addEventListener('keydown', (e) => { if (document.querySelector('.swipe-fenetre'
     let formule, algerie;
     let liste;
     ({ profils: tous, quota, choisi, matchs = matchs, adresse, formule, algerie } = liste = await api({ action: 'annonce_swipe_liste' }, token));
-    sincerite = liste.sincerite !== false;
+    sincerite = liste.sincerite !== false; try { if (sincerite) localStorage.setItem('lfb-charte', '1'); } catch {}
     profilInvisible = Boolean(liste.invisible);
     chargeFait = true;
     if (!sincerite) setTimeout(demanderSincerite, 600); // obligatoire : demandée dès l'ouverture du swipe

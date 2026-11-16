@@ -379,10 +379,10 @@ const SWIPE_INVITE = `<section class="swipe-page accueil-swipe" id="profils-anon
 </section>
 ${RUBRIQUES}
 <aside class="lfb-valeurs" aria-label="Nos valeurs">
-  <p class="lfb-valeurs-titre">Un parcours qui suit l’éducation et les valeurs kabyles</p>
-  <p class="lfb-valeurs-mots"><span>Pudeur</span><span>Discrétion</span><span>Respect</span></p>
-  <p class="lfb-valeurs-texte">On n’affiche pas les femmes, et on ne les cache pas non plus : on les respecte. On valorise thirougza et irgazen, avec le même respect. Chaque religion et chaque valeur a sa place, sans renier les nôtres.</p>
-</aside>`;
+  <p class="lfb-valeurs-mots"><span>Pudeur</span><span aria-hidden="true">·</span><span>Discrétion</span><span aria-hidden="true">·</span><span>Respect</span></p>
+  <details class="lfb-valeurs-plus"><summary>Un parcours qui suit l’éducation et les valeurs kabyles</summary><p class="lfb-valeurs-texte">On n’affiche pas les femmes, et on ne les cache pas non plus : on les respecte. On valorise thirougza et irgazen, avec le même respect. Chaque religion et chaque valeur a sa place, sans renier les nôtres.</p></details>
+</aside>
+<script>try { if (localStorage.getItem('lfb-charte')) document.currentScript.previousElementSibling.hidden = true; } catch {}</script>`;
 page(
   '/',
   layout({

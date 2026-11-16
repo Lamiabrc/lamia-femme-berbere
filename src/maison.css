@@ -4344,3 +4344,17 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .annonce-choix input[name=genre]:focus-visible { outline: 3px solid #b9a3dd; outline-offset: 2px; }
 /* Fiche du live pas encore validée (15 nov. 2026) */
 .po-app.po-app .swipe-carte .swipe-statut.is-attente { background: #f3ece2; color: #7a6248; }
+
+/* Bandeau des valeurs : discret (une ligne + « en savoir plus »), caché une fois la charte signée (16 nov. 2026) */
+.lfb-valeurs { padding: 10px 16px 12px; background: transparent; color: var(--ink, #2b2236); border-top: 1px solid rgba(122, 30, 52, .18); border-bottom: 1px solid rgba(122, 30, 52, .18); }
+.lfb-valeurs[hidden] { display: none; }
+.lfb-valeurs-mots { gap: 8px; margin: 0 auto 4px !important; }
+.lfb-valeurs-mots span { padding: 0; border: 0; border-radius: 0; color: #7a1e34; font-size: 12.5px; letter-spacing: .12em; }
+.lfb-valeurs-plus > summary { list-style: none; cursor: pointer; font-family: var(--serif); font-size: 15px; color: #6b5a72; text-decoration: underline; text-decoration-color: rgba(107, 90, 114, .35); text-underline-offset: 3px; }
+.lfb-valeurs-plus > summary::-webkit-details-marker { display: none; }
+.po-app .lfb-valeurs p.lfb-valeurs-texte, .lfb-valeurs p.lfb-valeurs-texte { margin-top: 8px; font-size: 14.5px; color: #4a3f52 !important; -webkit-text-fill-color: #4a3f52; }
+
+/* Menu au téléphone : il s'arrête au-dessus de la barre du bas, tout se voit en faisant défiler (16 nov. 2026) */
+@media (max-width: 760px) {
+  .maison-menu-panneau { max-height: calc(100vh - 170px - env(safe-area-inset-bottom)); max-height: calc(100dvh - 170px - env(safe-area-inset-bottom)); overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding-bottom: 20px; }
+}
