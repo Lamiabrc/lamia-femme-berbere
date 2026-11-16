@@ -481,3 +481,15 @@ test('fiche du live sans compte ou sans ses 2 photos : proposée, marquée « en
   r = await lire(await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID)));
   assert.deepEqual(att(), { 100002: false, 100003: true });
 });
+
+test('revenir en arrière dans le swipe : Découverte seulement le dernier profil', async () => {
+  const { db, ctx } = base({
+    profils_outil: [FICHE(100001, 'u-rachid', 'homme')],
+    annonce_passes: [{ demandeur_id: 'a-rachid', cible_ref: 31, created_at: '2026-11-16T09:00:00Z' }, { demandeur_id: 'a-rachid', cible_ref: 30, created_at: '2026-11-16T08:00:00Z' }], // la base les rend du plus récent au plus ancien
+  });
+  await lire(await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID))); // crée son profil interne
+  const id = db.annonces.find((a) => a.user_id === 'u-rachid').id;
+  db.annonce_passes.forEach((p) => { p.demandeur_id = id; });
+  assert.equal((await handleAnnonces('annonce_swipe_annuler', { ref: 30 }, ctx(RACHID))).status, 403);
+  assert.equal((await handleAnnonces('annonce_swipe_annuler', { ref: 31 }, ctx(RACHID))).status, 200);
+});
