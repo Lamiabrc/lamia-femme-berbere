@@ -2,7 +2,7 @@
 import { createClient } from '/vendor/supabase.mjs';
 import { creerCompte, api } from './confidences-commun.js';
 import { boutonsSociaux, completerPrenom } from './connexion-sociale.mjs';
-import { secteurLisible, origineLisible, phrasesDifference, criteresDeQuestion, lib } from './matching-options.mjs';
+import { secteurLisible, origineLisible, phrasesDifference, criteresDeQuestion, lib, foiEtVie, badgesProfil, metierEtReligion } from './matching-options.mjs';
 
 // Un petit « ? » à ouvrir au lieu d'un paragraphe d'explication (Lamia, 16 nov. 2026 : « trop de texte »).
 const aideQ = (texte) => `<details class="aide-q"><summary aria-label="Comprendre"><span aria-hidden="true">?</span></summary><p>${texte}</p></details>`;
@@ -788,6 +788,39 @@ async function mesFiches(session) {
 // Une différence avec ce que la personne cherche : une ligne rouge sur le profil, jamais une question ni un blocage.
 const ligneDifference = (d) => (Array.isArray(d) && d.length ? `<p class="espace-diff-ligne">${d.map((p) => esc(p)).join(' ')}</p>` : '');
 // Profils proposés par Lamia (depuis son outil) : fiche anonyme et réponse oui / non.
+// « Voir son profil » sur chaque demande reçue (Lamia, 16 nov. 2026) : le profil complet, comme dans le swipe, avec les différences en rouge.
+const fichesVues = new Map();
+const boutonVoirProfil = (f, diffs) => { fichesVues.set(String(f.ref), { f, diffs }); return `<p class="interet-voir"><button type="button" class="btn btn-line" data-voir-profil="${esc(f.ref)}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#user"/></svg> Voir son profil</button></p>`; };
+function ouvrirProfil(ref) {
+  const x = fichesVues.get(String(ref));
+  if (!x) return;
+  const { f, diffs } = x, femme = f.genre === 'femme', mr = metierEtReligion(f);
+  const ages = f.age_min || f.age_max ? ` (${f.age_min || 18} à ${f.age_max || 99} ans)` : '';
+  const tags = (f.caracteristiques || []).slice(0, 10);
+  document.querySelector('.espace-profil-fenetre')?.remove();
+  const d = document.createElement('div');
+  d.className = 'espace-profil-fenetre'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-label', `Profil n° ${f.ref}`);
+  d.innerHTML = `<div class="espace-profil-boite">
+    <button type="button" class="espace-profil-fermer" data-fermer aria-label="Fermer">✕</button>
+    <p class="annonce-ref">Profil n° ${esc(f.ref)}</p>${badgesProfil(f)}
+    <h2>${femme ? 'Une femme' : 'Un homme'}${f.age ? `, ${esc(f.age)} ans` : ''}</h2>
+    ${ligneDifference(diffs)}
+    <p class="annonce-lieu">${esc([f.ville, f.pays && lib(f.pays), f.situation && lib(f.situation)].filter(Boolean).join(' · '))}</p>
+    ${origineLisible(f.origine) || f.village ? `<p class="annonce-origine"><b>${esc([origineLisible(f.origine), f.village && `de ${f.village}`].filter(Boolean).join(' · '))}</b></p>` : ''}
+    ${mr.metier ? `<p>${esc(mr.metier)}</p>` : ''}${mr.religion ? `<p>${esc(mr.religion)}</p>` : ''}
+    ${secteurLisible(f.secteur) ? `<p><strong>Cherche en :</strong> ${esc(secteurLisible(f.secteur))}</p>` : ''}
+    ${tags.length ? `<p class="annonce-tags">${tags.map((t) => `<span>${esc(lib(t))}</span>`).join('')}</p>` : ''}
+    ${f.profil ? `<h3>Qui je suis</h3><p data-membre>${esc(f.profil)}</p>` : ''}
+    ${f.recherche ? `<h3>Qui je cherche${esc(ages)}</h3><p data-membre>${esc(f.recherche)}</p>` : ''}
+    ${foiEtVie(f).replace(/<h4>/g, '<h3>').replace(/<\/h4>/g, '</h3>')}
+    <p><button type="button" class="btn btn-ink" data-fermer>Revenir à la demande</button></p></div>`;
+  document.body.appendChild(d);
+  d.querySelector('[data-fermer]').focus();
+  d.addEventListener('click', (e) => { if (e.target === d || e.target.closest('[data-fermer]')) d.remove(); });
+  document.addEventListener('keydown', function esc_(e) { if (e.key === 'Escape') { d.remove(); document.removeEventListener('keydown', esc_); } });
+}
+document.addEventListener('click', (e) => { const b = e.target.closest('[data-voir-profil]'); if (b) ouvrirProfil(b.dataset.voirProfil); });
+
 async function propositions(session) {
   const box = document.querySelector('[data-espace-propositions]');
   if (!box) return;
@@ -802,6 +835,7 @@ async function propositions(session) {
     return `<article class="espace-achat interet-recu proposition"><div><p class="event-date">Proposé pour toi · profil n° ${esc(f.ref)} · le ${esc(new Date(x.le).toLocaleDateString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { day: 'numeric', month: 'long' }))}</p>
       <h3>${esc(infos.join(' · '))}</h3>
       ${ligneDifference(x.differences)}
+      ${boutonVoirProfil(f, x.differences)}
       ${x.message ? `<p class="proposition-mot">« ${esc(x.message)} »</p>` : ''}
       ${f.profil ? `<p><strong>Qui je suis :</strong> <span data-membre>${esc(f.profil)}</span></p>` : ''}
       ${f.recherche ? `<p><strong>Qui je cherche${esc(ages)} :</strong> <span data-membre>${esc(f.recherche)}</span></p>` : ''}
@@ -895,6 +929,7 @@ async function interetsRecus(session) {
     return `<article class="espace-achat interet-recu"><div><p class="event-date">Profil n° ${esc(f.ref)} · intéressé·e par ta fiche n° ${esc(i.pour)} · le ${esc(new Date(i.le).toLocaleDateString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { day: 'numeric', month: 'long' }))}</p>
       <h3>${esc(infos.join(' · '))}</h3>
       ${ligneDifference(i.differences)}
+      ${boutonVoirProfil(f, i.differences)}
       ${f.profil ? `<p><strong>Qui je suis :</strong> <span data-membre>${esc(f.profil)}</span></p>` : ''}
       ${f.recherche ? `<p><strong>Qui je cherche${esc(ages)} :</strong> <span data-membre>${esc(f.recherche)}</span></p>` : ''}
       ${secteurLisible(f.secteur) ? `<p><strong>Cherche en :</strong> ${esc(secteurLisible(f.secteur))}</p>` : ''}
