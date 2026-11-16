@@ -1,7 +1,7 @@
 // « Notre couple » : créer, inviter par code, planning partagé (pour nous deux / pour moi), faire plaisir, quitter.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { actionCouple } from '../lib/couple.mjs';
+import { actionCouple, ouvrirCoupleDuo } from '../lib/couple.mjs';
 
 function monde() {
   const db = { couples: [], couple_membres: [], couple_activites: [], cadeaux_demandes: [] };
@@ -55,4 +55,21 @@ test('notre couple : créer, rejoindre par code, planning partagé, faire plaisi
   assert.equal(db.couples.length, 1);
   await actionCouple('couple_quitter', {}, ctx(AMINE));
   assert.equal(db.couples.length, 0);
+});
+
+test('fin de discussion « en couple » des deux côtés : l’espace commun s’ouvre (ou l’autre rejoint l’espace déjà créé)', async () => {
+  const { db, ctx } = monde();
+  const c = ctx(AMINE);
+  let id = await ouvrirCoupleDuo(c, [{ user_id: 'u-amine', prenom: 'Amine' }, { user_id: 'u-sara', prenom: 'Sara' }], 'd-1');
+  assert.ok(id);
+  assert.equal(db.couple_membres.filter((m) => m.couple_id === id).length, 2);
+  assert.equal(db.couples[0].discussion_id, 'd-1');
+  // Déjà ensemble : rien de nouveau.
+  assert.equal(await ouvrirCoupleDuo(c, [{ user_id: 'u-amine' }, { user_id: 'u-sara' }]), id);
+  assert.equal(db.couples.length, 1);
+  // Karim avait créé son espace seul : Nadia le rejoint.
+  const k = await lire(await actionCouple('couple_creer', {}, ctx({ id: 'u-karim', email: 'k@x.fr', user_metadata: { first_name: 'Karim' } })));
+  id = await ouvrirCoupleDuo(c, [{ user_id: 'u-karim' }, { user_id: 'u-nadia', prenom: 'Nadia' }]);
+  assert.equal(id, k.couple.id);
+  assert.equal(db.couple_membres.filter((m) => m.couple_id === id).length, 2);
 });

@@ -4373,3 +4373,8 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .couple .couple-cadeau.is-choisi { border-color: #4a3470; background: #f3edfb; }
 .couple .couple-cadeau-form { display: grid; gap: 10px; margin-top: 12px; }
 .couple .couple-quitter { text-align: center; }
+
+/* Fin des 7 jours : « on est en couple » ou « c'est fini » (16 nov. 2026) */
+.disc-fin { margin: 12px 0; padding: 14px 16px; border-radius: 18px; background: #f7f0fb; border: 1px solid #e3d4ef; }
+.disc-fin p { margin: 0 0 8px; }
+.disc-fin.is-couple { background: #fdf0f3; border-color: #f0cdd6; text-align: center; }

@@ -950,6 +950,20 @@ async function discussions(session) {
   const raisonsDematch = [['physique', 'Physique'], ['enfants', 'Enfants'], ['localisation', 'Localisation'], ['caractere', 'Caractère'], ['valeurs', 'Valeurs'], ['parcours', 'Une étape du parcours'], ['autre', 'Autre raison']]
     .map(([v, t]) => `<label><input type="radio" name="raison" value="${v}" required> ${t}</label>`).join('');
   let dematchOuvert = null;
+  // Fin des 7 jours (Lamia, 16 nov. 2026) : une bulle « C'est fini ? ou on est en couple ? ».
+  // Si les deux disent « en couple », leur espace commun s'ouvre et la discussion ne se termine plus.
+  const finBulle = (d) => {
+    const f = d.fin || {};
+    if (f.couple) return '<div class="disc-fin is-couple"><p><strong>Vous êtes en couple 💞</strong></p><p><a class="btn btn-ink" href="/notre-couple/">Notre espace de couple</a></p></div>';
+    if (d.dematch || d.close_raison === 'signalee') return '';
+    const bientot = d.ouverte && new Date(d.ferme_at) - Date.now() < 24 * 3600e3;
+    if (!bientot && d.ouverte) return '';
+    if (f.mien === 'couple') return `<div class="disc-fin"><p>Tu as dit que vous êtes en couple. ${esc(d.avec)} n’a pas encore répondu.</p></div>`;
+    if (f.mien === 'fini') return '';
+    return `<div class="disc-fin"><p><strong>${d.ouverte ? 'Votre discussion se termine bientôt.' : 'Vos 7 jours sont passés.'}</strong> Et maintenant ?</p>
+      <p class="espace-sans-liens"><button type="button" class="btn btn-ink" data-disc-fin="couple">On est en couple 💞</button> <button type="button" class="btn btn-line" data-disc-fin="fini">C’est fini</button></p>
+      ${f.son_couple ? `<p class="aide">${esc(d.avec)} a dit que vous êtes en couple.</p>` : ''}</div>`;
+  };
   const vue = (d) => {
     const msgs = d.messages.map((m) => `<p class="disc-msg ${m.moi ? 'is-moi' : ''}${m.lamia ? ' is-systeme' : ''}"><span>${esc(m.texte)}</span><small>${esc(heure(m.le))}</small></p>`).join('') || `<p class="disc-vide">${salut ? `${esc(salut)}, dis` : 'Dis'} bonjour à ${esc(d.avec)}</p>`;
     const numeros = d.echange
@@ -974,6 +988,7 @@ async function discussions(session) {
         : '<p class="disc-prenom-lien"><button type="button" class="link-button" data-disc-prenom="partager"><svg class="ico" aria-hidden="true"><use href="/icones.svg#hand"/></svg> Partager mon prénom</button></p>') : ''}
       ${d.dematch ? '' : numeros}
       ${d.prolongeable && !window.LFB_PLAY && new Date(d.ferme_at) - Date.now() < 72 * 3600e3 ? `<div class="disc-prolonger">${d.ouverte ? '' : '<p>Votre discussion est terminée, mais vous pouvez la rouvrir.</p>'}${boutonService('prolonger_discussion', 'Prolonger la discussion de 7 jours', '3 €', '7 jours de plus · 3 €', d.id)}</div>` : ''}
+      ${finBulle(d)}
       ${d.ouverte && !d.dematch ? (dematchOuvert === d.id ? `<form class="disc-dematch" data-disc-dematch-form>
         <h4><svg class="ico" aria-hidden="true"><use href="/icones.svg#handshake"/></svg> Tu peux dématcher, avec élégance</h4>
         <p>Tu as encore <strong>deux messages</strong> à écrire pour rester ${e === '' ? 'courtois et gentleman' : e === 'e' ? 'courtoise et élégante' : 'courtois·e et élégant·e'}. Si tu confirmes, ton match sera informé de ton dématch et attendra un au revoir, voire une raison.</p>
@@ -1029,6 +1044,16 @@ async function discussions(session) {
     if (champ) champ.hidden = e.target.value !== 'parcours';
   });
   ecouter(box, 'click', async (e) => {
+    const finBtn = e.target.closest('[data-disc-fin]');
+    if (finBtn) {
+      finBtn.disabled = true;
+      try {
+        const r = await appelProfil({ action: 'annonce_discussion_fin', id: finBtn.closest('[data-disc]').dataset.disc, choix: finBtn.dataset.discFin }, session);
+        if (r.couple) { location.href = '/notre-couple/'; return; }
+        await charger();
+      } catch { finBtn.disabled = false; }
+      return;
+    }
     const choixPrenom = e.target.closest('[data-disc-prenom]');
     if (choixPrenom) {
       choixPrenom.disabled = true;
