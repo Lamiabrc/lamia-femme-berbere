@@ -25,8 +25,11 @@ function ecouter(box, type, fn) {
 }
 let minuterieDiscussions = null;
 
+// Revenir là où on allait après la connexion (ex. l'invitation dans l'espace couple), même après le lien reçu par email.
+try { const r = new URLSearchParams(location.search).get('retour'); if (r && /^\/[a-z0-9-]/i.test(r)) localStorage.setItem('lfb-retour', r); } catch { /* */ }
 async function render() {
   const { data: { session } } = await supabase.auth.getSession();
+  if (session && !recovering) { try { const r = localStorage.getItem('lfb-retour'); if (r) { localStorage.removeItem('lfb-retour'); location.replace(r); return; } } catch { /* */ } }
   $('[data-espace-newpass]').hidden = !recovering;
   $('[data-espace-out]').hidden = !!session || recovering;
   $('[data-espace-in]').hidden = !session || recovering;
@@ -41,6 +44,7 @@ async function render() {
   document.body.classList.toggle('espace-est-admin', u.app_metadata?.role === 'admin');
   achats(session);
   monProfil(session);
+  choixOuverture();
   mesFiches(session);
   interetsRecus(session);
   avisLamia(session);
@@ -430,6 +434,23 @@ async function voirProfilMatch(ref, session) {
     montrer();
   } catch { boite.innerHTML = '<p>Son profil ne s’affiche pas pour le moment. Réessaie dans un instant.</p><p class="po-actions"><button type="button" class="po-btn" data-fermer>Fermer</button></p>'; }
 }
+// À la première ouverture (Lamia, 16 nov. 2026) : « Célibataire ou en couple ? », pour aller tout de suite au bon espace.
+function choixOuverture() {
+  try { if (localStorage.getItem('lfb-espace-choix')) return; } catch { return; }
+  if (document.querySelector('.swipe-fenetre')) return;
+  const d = document.createElement('div'); d.className = 'swipe-fenetre choix-ouverture'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true');
+  d.innerHTML = `<div class="swipe-fenetre-boite"><p class="choix-coeur" aria-hidden="true">❤</p><h2>Où en es-tu ?</h2>
+    <p class="choix-boutons"><button type="button" class="po-btn" data-choix="celibataire">Je suis célibataire 💫</button><button type="button" class="po-btn choix-couple" data-choix="couple">Je suis en couple 💞</button></p></div>`;
+  document.body.appendChild(d);
+  d.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-choix]');
+    if (!b && e.target !== d) return;
+    try { localStorage.setItem('lfb-espace-choix', b?.dataset.choix || 'plus-tard'); } catch { /* */ }
+    d.remove();
+    if (b?.dataset.choix === 'couple') location.href = '/notre-couple/?inviter=1';
+  });
+}
+
 async function monProfil(session) {
   const box = document.querySelector('[data-espace-profil]');
   if (!box) return;
