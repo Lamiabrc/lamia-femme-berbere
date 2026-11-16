@@ -34,7 +34,7 @@ function vue(c) {
     </section>
     ${c.conversion ? `<section class="couple-carte couple-conversion">
       <h2>Ton abonnement devient « ${esc(c.conversion.vers)} » ? 💞</h2>
-      <p>Tu as la formule <strong>${c.conversion.formule === 'prestige' ? 'Prestige' : 'Passion'}</strong> pour les rencontres. Maintenant que vous êtes en couple, elle peut devenir <strong>${esc(c.conversion.vers)}</strong> : mots doux avec leurs animations, le fil avec vos proches, des points cadeau${c.conversion.formule === 'prestige' ? ', et Lamia dans votre fil une fois par mois' : ''}, pour vous deux.</p>
+      <p>Tu as la formule <strong>${c.conversion.formule === 'prestige' ? 'Prestige' : 'Passion'}</strong> pour les rencontres. Maintenant que vous êtes en couple, elle peut devenir <strong>${esc(c.conversion.vers)}</strong> : mots doux avec leurs animations et ton mot à toi, pour vous deux ; bientôt le fil avec vos proches et des points cadeau${c.conversion.formule === 'prestige' ? ', et Lamia dans votre fil une fois par mois' : ''}.</p>
       ${c.conversion.annuel ? '<p class="aide">Ton abonnement est à l’année : écris à Lamia pour le transformer.</p>' : `<p class="aide">${(c.conversion.vers_prix / 100).toLocaleString('fr-FR')} € par mois pour vous deux. <strong>Le premier mois reste au prix que tu paies aujourd’hui</strong>, rien à payer de plus maintenant. Ta formule de rencontre s’arrête à ta prochaine échéance. Sans engagement.</p>
       <p class="espace-sans-liens"><button type="button" class="btn btn-ink" data-conversion-oui>Oui, je passe en Couple</button> <button type="button" class="btn btn-line" data-conversion-non>Pas maintenant</button></p>`}
     </section>` : ''}
@@ -44,8 +44,8 @@ function vue(c) {
       ${Boolean(c.niveau) ? `<form class="couple-mot-libre" data-mot-libre><input name="texte" maxlength="200" placeholder="Ou écris le tien…" aria-label="Ton mot doux"><button type="submit" class="btn btn-ink" aria-label="Envoyer">❤</button></form>` : `<p class="couple-mot-libre"><button type="button" class="link-button" data-couple-abo>✍️ Écrire ton propre mot doux 🔒</button></p>`}
       ${Boolean(c.niveau) ? '' : `<div class="couple-abo" data-couple-abo-box hidden>
         <div class="couple-offres">
-          <label class="couple-offre"><input type="radio" name="offre" value="couple" checked><strong>Couple Amour</strong><span>18 € / mois pour vous deux</span><small>Tous les mots doux animés, ton mot à toi, le fil avec vos proches (1 proche inclus), 5 € de points cadeau par mois.</small></label>
-          <label class="couple-offre"><input type="radio" name="offre" value="couple_prestige"><strong>Couple Prestige</strong><span>38 € / mois pour vous deux</span><small>Tout Couple Amour, Lamia dans votre fil une fois par mois, 10 € de points cadeau par mois, un plus beau cadeau de mariage.</small></label>
+          <label class="couple-offre"><input type="radio" name="offre" value="couple" checked><strong>Couple Amour</strong><span>18 € / mois pour vous deux</span><small>Tous les mots doux animés, ton mot à toi, et bientôt le fil avec vos proches (1 proche inclus) et 5 € de points cadeau par mois.</small></label>
+          <label class="couple-offre"><input type="radio" name="offre" value="couple_prestige"><strong>Couple Prestige</strong><span>38 € / mois pour vous deux</span><small>Tout Couple Amour et un plus beau cadeau de mariage ; bientôt, Lamia dans votre fil une fois par mois et 10 € de points cadeau par mois.</small></label>
         </div>
         <label class="annonce-case"><input type="checkbox" data-couple-cgv> <span>J’accepte les <a class="text-link" href="/cgv/" target="_blank" rel="noopener">conditions de vente</a></span></label>
         <p><button type="button" class="btn btn-ink" data-couple-payer>M’abonner pour nous deux 💞</button></p></div>`}` : '<p class="aide">Dès que ton ou ta partenaire vous rejoint, vous pourrez vous envoyer des mots doux.</p>'}
