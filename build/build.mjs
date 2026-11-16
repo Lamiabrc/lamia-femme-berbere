@@ -824,7 +824,7 @@ page(
   '/notre-couple/',
   layout({
     title: 'Notre couple · Lamia Femme Berbère',
-    description: 'Votre espace à deux : planning d’activités de couple, coaching, lives et boutique.',
+    description: 'Votre espace à deux : météo du cœur, jeux d’amour, planning, fiançailles et préparation du mariage.',
     path: '/notre-couple/',
     room: roomBySlug.hall,
     ambiance: 'espace',
@@ -833,6 +833,7 @@ page(
     body: `<section class="espace couple">
   <p class="room-name"><span class="pip" aria-hidden="true"></span>Notre couple</p>
   <h1>Notre couple</h1>
+  <p class="couple-devise">Votre jardin à deux, jusqu’au grand jour ♡</p>
   <div data-couple><p class="loading">Un instant…</p></div>
 </section>`,
   }),
@@ -2263,7 +2264,7 @@ await cp(join(ROOT, 'public'), DIST, { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await writeFile(join(DIST, 'assets', 'editable.json'), JSON.stringify({ fields: [...EDITABLE, ...REGISTRE], defaults: DEFAULTS }));
-for (const f of ['lien-mot-de-passe.js', 'version-play.js', 'erreurs.js', 'abonnement.js', 'abonnement-merci.js', 'couple.js', 'swipe.js', 'swipe-accueil.js', 'sincerite.js', 'signaler.js', 'nouveautes.js', 'live.js', 'confirmer.js', 'visio-invite.js', 'maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'soirees.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'annonces.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
+for (const f of ['lien-mot-de-passe.js', 'version-play.js', 'erreurs.js', 'abonnement.js', 'abonnement-merci.js', 'couple.js', 'couple-images.js', 'swipe.js', 'swipe-accueil.js', 'sincerite.js', 'signaler.js', 'nouveautes.js', 'live.js', 'confirmer.js', 'visio-invite.js', 'maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'soirees.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'annonces.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
 await cp(join(ROOT, 'content', 'shipping.mjs'), join(DIST, 'assets', 'shipping.mjs'));
 await cp(join(ROOT, 'content', 'rubriques.mjs'), join(DIST, 'assets', 'rubriques.mjs'));
 await cp(join(ROOT, 'content', 'matching-options.mjs'), join(DIST, 'assets', 'matching-options.mjs'));

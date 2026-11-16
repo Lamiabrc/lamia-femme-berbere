@@ -4482,3 +4482,154 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 
 /* « Notre couple » dans le menu : caché tant que le membre n’est pas en couple */
 [data-menu-couple][hidden] { display: none !important; }
+/* Notre couple plus riche, comme l'espace Famille de QVT Box (16 nov. 2026) : onglets, météo du cœur, question du jour, calendrier, bocal */
+.couple .couple-onglets { position: sticky; top: 64px; z-index: 5; display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin: 0 0 14px; padding: 5px; border-radius: 18px; background: rgba(255, 255, 255, .92); border: 1px solid rgba(74, 52, 112, .12); box-shadow: 0 6px 18px rgba(47, 43, 61, .06); backdrop-filter: blur(6px); }
+.couple .couple-onglets button { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 7px 2px; border: 0; border-radius: 14px; background: transparent; font: inherit; font-size: .74rem; font-weight: 600; color: #5b4e6e; cursor: pointer; line-height: 1.15; }
+.couple .couple-onglets button span { font-size: 1.25rem; }
+.couple .couple-onglets button[aria-current] { background: #4a3470; color: #fff; }
+.couple .couple-pastille { position: absolute; top: 5px; right: 14%; width: 9px; height: 9px; border-radius: 50%; background: #e0435f; }
+.couple .couple-tete-meteo { margin: 6px 0 0; text-align: center; color: #6b5a72; }
+.couple .couple-sous { margin: 12px 0 6px; font-size: .95rem; font-weight: 600; color: #4a3470; }
+.couple .couple-meteo { background: linear-gradient(135deg, #fffaf3, #f8f1fd); }
+.couple .couple-meteo-form { display: grid; gap: 10px; }
+.couple .couple-humeurs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.couple .couple-humeurs label { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 2px; border-radius: 14px; border: 1.5px solid #ece3f3; background: #fff; cursor: pointer; }
+.couple .couple-humeurs input, .couple .couple-besoins input { position: absolute; opacity: 0; pointer-events: none; }
+.couple .couple-humeurs span { font-size: 1.7rem; transition: transform .15s; }
+.couple .couple-humeurs small { font-size: .72rem; color: #6b5a72; }
+.couple .couple-humeurs label:has(input:checked) { border-color: #4a3470; background: #f3edfb; }
+.couple .couple-humeurs label:has(input:checked) span { transform: scale(1.18); }
+.couple .couple-besoins { display: flex; flex-wrap: wrap; gap: 6px; }
+.couple .couple-besoins label { cursor: pointer; }
+.couple .couple-besoins span { display: inline-block; padding: 7px 12px; border-radius: 999px; border: 1.5px solid #ece3f3; background: #fff; font-size: .88rem; }
+.couple .couple-besoins label:has(input:checked) span { border-color: #b0475f; background: #fdeef2; color: #8d2d48; font-weight: 600; }
+.couple .couple-humeurs label:has(input:focus-visible), .couple .couple-besoins label:has(input:focus-visible) span { outline: 2px solid #4a3470; outline-offset: 2px; }
+.couple .couple-meteo-moi { display: flex; align-items: center; gap: 12px; margin: 0 0 6px; }
+.couple .couple-meteo-moi > span:last-child { display: flex; flex-direction: column; }
+.couple .couple-meteo-moi small { color: #6b5a72; }
+.couple .couple-meteo-moi em { color: #5b4e6e; margin-top: 2px; }
+.couple .couple-gros { font-size: 2.6rem; line-height: 1; }
+.couple .couple-lui { background: #fff8fa; border-color: #f3d6de; }
+.couple .couple-idees { display: grid; gap: 8px; }
+.couple .couple-idee { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; padding: 10px 12px; border-radius: 14px; border: 1.5px solid #ece3f3; background: #fff; font: inherit; text-align: left; color: #2b2236; cursor: pointer; }
+.couple .couple-idee b { flex: none; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: #4a3470; color: #fff; font-size: 1.1rem; }
+.couple .couple-idee:disabled { opacity: .55; }
+.couple .couple-semaine-grille { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; font-size: 1.35rem; }
+.couple .couple-semaine-grille .cal-nom { font-size: .75rem; }
+.couple .cal-nom { font-size: .75rem; font-weight: 700; color: #8a7c95; text-transform: uppercase; text-align: center; }
+.couple .couple-question { background: linear-gradient(135deg, #f4f8ff, #f8f1fd); border-color: #d9d3f0; }
+.couple .couple-q { margin: 0 0 10px; font-family: var(--serif); font-size: 1.2rem; line-height: 1.3; }
+.couple .couple-rep { margin: 0 0 8px; padding: 9px 14px; border-radius: 16px; background: #fff; display: flex; flex-direction: column; }
+.couple .couple-rep small { font-size: .75rem; color: #6b5a72; }
+.couple .couple-rep.is-moi { background: #4a3470; color: #fff; }
+.couple .couple-rep.is-moi small { color: #e5dcf3; }
+.couple .couple-rep.is-cache { background: #fff7e8; color: #7a5a1e; }
+.couple .couple-defi { background: linear-gradient(135deg, #f1faf6, #fbf8ee); border-color: #cfe7dc; }
+.couple .couple-defi > p:first-of-type { font-weight: 600; }
+.couple .cal { margin: 0 0 6px; }
+.couple .cal-tete { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.couple .cal-tete strong { text-transform: capitalize; }
+.couple .cal-tete .link-button { font-size: 1.6rem; padding: 0 12px; line-height: 1; }
+.couple .cal-grille { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.couple .cal-jour { min-height: 46px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 1px; padding: 5px 0 3px; border-radius: 12px; border: 1px solid transparent; background: #faf7fd; font: inherit; font-size: .9rem; color: #2b2236; cursor: pointer; }
+.couple .cal-jour i { font-style: normal; font-size: .78rem; line-height: 1; }
+.couple .cal-jour.a-quelque-chose { background: #fdeef2; }
+.couple .cal-jour.is-auj { border-color: #b0475f; font-weight: 700; }
+.couple .cal-jour.is-choisi { background: #4a3470; color: #fff; }
+.couple .cal-detail { margin-top: 10px; padding: 12px 14px; border-radius: 16px; background: #faf7fd; }
+.couple .cal-detail > p:first-child { margin: 0 0 4px; text-transform: capitalize; }
+.couple .couple-theme { border-top: 1px solid rgba(74, 52, 112, .1); padding: 8px 0; }
+.couple .couple-theme summary { cursor: pointer; font-weight: 600; color: #4a3470; padding: 4px 0 8px; }
+.couple .couple-bocal { background: linear-gradient(135deg, #fffaf0, #f6f9ff); border-color: #eadfc4; }
+.couple .couple-souvenir-form { display: grid; gap: 8px; margin: 8px 0; }
+.couple .couple-souvenirs { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 8px; }
+.couple .couple-souvenirs li { padding: 10px 14px; border-radius: 14px; background: #fff; border: 1px solid #f0e6cf; display: flex; flex-direction: column; }
+.couple .couple-souvenirs small { color: #8a7c6a; }
+.couple .couple-pioche { padding: 14px; border-radius: 16px; background: #fff3d6; font-family: var(--serif); font-size: 1.15rem; text-align: center; }
+.couple .couple-pioche.is-anim { animation: couple-pioche .5s ease-out; }
+@keyframes couple-pioche { from { transform: scale(.85) rotate(-2deg); opacity: 0; } to { transform: none; opacity: 1; } }
+.couple .couple-soutien-liste { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; }
+.couple .couple-soutien-liste a { display: flex; flex-direction: column; gap: 2px; padding: 14px 12px; border-radius: 16px; border: 1.5px solid #ece3f3; background: #fbf8fe; color: #2b2236; text-decoration: none; }
+.couple .couple-soutien-liste a span { font-size: 1.6rem; }
+.couple .couple-soutien-liste small { color: #6b5a72; }
+.couple-bulle { position: fixed; left: 50%; bottom: 84px; z-index: 95; transform: translateX(-50%); max-width: calc(100vw - 32px); margin: 0; padding: 10px 16px; border-radius: 999px; background: #2b2236; color: #fff; font-weight: 600; box-shadow: 0 8px 24px rgba(0, 0, 0, .18); animation: couple-pioche .25s ease-out; }
+@media (prefers-reduced-motion: reduce) { .couple .couple-pioche.is-anim, .couple-bulle { animation: none; } }
+/* Notre couple : des images au lieu des emoji, une ambiance d'amour, les jeux et les fiançailles (16 nov. 2026) */
+.espace.couple { position: relative; background:
+  radial-gradient(circle at 12% 8%, rgba(246, 180, 198, .35), transparent 38%),
+  radial-gradient(circle at 92% 30%, rgba(205, 184, 242, .3), transparent 40%),
+  radial-gradient(circle at 20% 75%, rgba(235, 203, 134, .22), transparent 40%),
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cpath d='M20 26s-6-3.8-6-8a3.3 3.3 0 0 1 6-1.9 3.3 3.3 0 0 1 6 1.9c0 4.2-6 8-6 8z' fill='%23E0567A' fill-opacity='.07'/%3E%3Cpath d='M66 72s-4-2.5-4-5.3a2.2 2.2 0 0 1 4-1.3 2.2 2.2 0 0 1 4 1.3c0 2.8-4 5.3-4 5.3z' fill='%237A1F35' fill-opacity='.06'/%3E%3C/svg%3E"); }
+.couple .couple-devise { margin: -6px 0 16px; font-family: var(--serif); font-style: italic; color: #8d2d48; }
+.couple .ci { display: inline-block; flex: none; vertical-align: middle; filter: drop-shadow(0 2px 4px rgba(122, 31, 53, .12)); }
+.couple .ci-xs { width: 18px; height: 18px; filter: none; }
+.couple .ci-s { width: 30px; height: 30px; }
+.couple .ci-m { width: 34px; height: 34px; }
+.couple .ci-l { width: 46px; height: 46px; }
+.couple .ci-xl { width: 64px; height: 64px; }
+.couple .ci-xxl { width: 96px; height: 96px; }
+.couple .couple-titre { display: flex; align-items: center; gap: 10px; }
+.couple .couple-carte { box-shadow: 0 10px 30px rgba(122, 31, 53, .06); }
+.couple .couple-tete { position: relative; overflow: hidden; background: linear-gradient(135deg, #fff1f5, #f6effc 60%, #fff7e8); border-color: #f2cbd6; }
+.couple .couple-noms { display: flex; align-items: center; justify-content: center; gap: 10px; position: relative; }
+.couple .couple-noms .ci { animation: couple-bat 1.8s ease-in-out infinite; }
+.couple .couple-tete-coeurs i { position: absolute; bottom: -10px; font-style: normal; color: #e0567a; opacity: 0; animation: couple-monte 7s linear infinite; }
+.couple .couple-tete-coeurs i:nth-child(1) { left: 8%; font-size: 14px; } .couple .couple-tete-coeurs i:nth-child(2) { left: 26%; font-size: 10px; animation-delay: 1.4s; } .couple .couple-tete-coeurs i:nth-child(3) { left: 52%; font-size: 12px; animation-delay: 2.8s; color: #c9a14f; } .couple .couple-tete-coeurs i:nth-child(4) { left: 74%; font-size: 9px; animation-delay: 4.2s; } .couple .couple-tete-coeurs i:nth-child(5) { left: 90%; font-size: 13px; animation-delay: 5.6s; color: #a78bd9; }
+@keyframes couple-monte { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: .55; } 100% { transform: translateY(-150px); opacity: 0; } }
+.couple .couple-onglets { grid-template-columns: repeat(6, 1fr); gap: 2px; padding: 4px; }
+.couple .couple-onglets button { font-size: .68rem; padding: 6px 0 5px; }
+.couple .couple-onglets button[aria-current] { background: linear-gradient(135deg, #8a2640, #4a3470); }
+.couple .couple-humeurs label .ci { transition: transform .15s; }
+.couple .couple-humeurs label:has(input:checked) .ci { transform: scale(1.12); }
+.couple .couple-liste li > .ci { margin-left: -2px; }
+.couple .couple-idee > .ci { margin: -4px 0; }
+.couple .couple-idee span { flex: 1; }
+.couple .couple-semaine-grille .ci { margin: 0 auto; }
+.couple .couple-vide { display: block; width: 8px; height: 8px; margin: 11px auto; border-radius: 50%; background: #e6dcef; }
+.couple .cal-jour .ci { margin-top: 1px; }
+.couple .cal-jour.is-jalon { background: linear-gradient(135deg, #fbf0d6, #f6b4c6); }
+.couple .couple-cadeau .ci { margin-bottom: 2px; }
+.couple .couple-soutien-liste a .ci { margin-bottom: 4px; }
+/* Jeux */
+.couple .couple-paquets { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 10px 0 4px; }
+.couple .couple-paquet { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 12px; border-radius: 18px; border: 1.5px solid #ece3f3; background: #fff; font: inherit; text-align: left; color: #2b2236; cursor: pointer; }
+.couple .couple-paquet small { color: #6b5a72; font-size: .8rem; }
+.couple .couple-paquet.is-piquant { border-color: #f3b4c2; background: linear-gradient(135deg, #fff, #fdeef2); }
+.couple .couple-paquet.is-choisi { border-color: #8a2640; box-shadow: 0 0 0 2px rgba(138, 38, 64, .15); }
+.couple .couple-carte-jeu { margin: 14px 0 6px; padding: 18px 16px; border-radius: 22px; background: linear-gradient(160deg, #4a3470, #8a2640); color: #fff; box-shadow: 0 14px 30px rgba(74, 52, 112, .25); animation: couple-carte .45s ease-out; }
+.couple .couple-carte-jeu.is-piquant { background: linear-gradient(160deg, #8a2640, #d6496b); }
+.couple .couple-carte-jeu.is-preferes, .couple .couple-carte-jeu.is-quiz { background: linear-gradient(160deg, #5b4e86, #a46a8f); }
+.couple .couple-carte-jeu.is-defis { background: linear-gradient(160deg, #1f5f57, #4a3470); }
+.couple .couple-carte-jeu-nom { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: .85rem; opacity: .9; }
+.couple .couple-carte-jeu-texte { margin: 0 0 14px; font-family: var(--serif); font-size: 1.35rem; line-height: 1.3; }
+.couple .couple-carte-jeu .btn-line { background: rgba(255, 255, 255, .14); color: #fff; border-color: rgba(255, 255, 255, .5); }
+.couple .couple-carte-jeu .btn-ink { background: #fff; color: #8a2640; }
+.couple .couple-carte-jeu input { background: #fff; }
+@keyframes couple-carte { from { transform: rotateY(70deg) scale(.9); opacity: 0; } to { transform: none; opacity: 1; } }
+.couple .couple-a-toi { background: #fff8fa; border-color: #f3d6de; }
+.couple .couple-parties { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.couple .couple-parties li { display: flex; gap: 10px; align-items: flex-start; }
+.couple .couple-parties li > span { display: flex; flex-direction: column; gap: 2px; }
+.couple .couple-parties em { color: #8d2d48; }
+.couple .couple-parties small { color: #6b5a72; }
+/* Fiançailles et mariage */
+.couple .couple-jourj { text-align: center; background: linear-gradient(160deg, #fff7e8, #fdeef2 55%, #f3edfb); border-color: #efd9b0; }
+.couple .couple-jourj p { margin: 0; }
+.couple .couple-jourj-chiffre { font-family: var(--serif); font-size: 2.6rem; color: #8a2640; line-height: 1.1; margin-top: 6px !important; }
+.couple .couple-etapes { list-style: none; margin: 0; padding: 0 0 0 4px; position: relative; }
+.couple .couple-etapes::before { content: ''; position: absolute; left: 20px; top: 18px; bottom: 18px; width: 2px; background: linear-gradient(#f6b4c6, #ebcb86); }
+.couple .couple-etapes li { position: relative; display: flex; align-items: center; gap: 10px; padding: 8px 0; }
+.couple .couple-etapes li > span { flex: 1; display: flex; flex-direction: column; }
+.couple .couple-etapes small { color: #6b5a72; }
+.couple .couple-etapes li:not(.a-date) .ci { opacity: .55; }
+.couple .couple-etapes li.is-passe strong { color: #8a2640; }
+.couple .couple-etapes input[type=date] { width: 128px; flex: none; font-size: .85rem; padding: 6px; }
+.couple .couple-jauge { height: 10px; border-radius: 999px; background: #f3edfb; overflow: hidden; }
+.couple .couple-jauge span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #f6b4c6, #8a2640); transition: width .4s; }
+.couple .couple-prepa-liste { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 2px; }
+.couple .couple-prepa-liste label { display: flex; align-items: center; gap: 10px; padding: 7px 0; cursor: pointer; }
+.couple .couple-prepa-liste input { width: 22px; height: 22px; accent-color: #8a2640; flex: none; }
+.couple .couple-prepa-liste input:checked + span { text-decoration: line-through; color: #8a7c95; }
+@media (prefers-reduced-motion: reduce) { .couple .couple-noms .ci, .couple .couple-tete-coeurs i, .couple .couple-carte-jeu { animation: none; } .couple .couple-tete-coeurs { display: none; } }
+.couple .couple-humeurs label, .couple .couple-besoins label { position: relative; }
+.couple .couple-humeurs input, .couple .couple-besoins input { inset: 0; width: 100%; height: 100%; margin: 0; }

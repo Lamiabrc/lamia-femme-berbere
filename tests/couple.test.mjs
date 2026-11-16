@@ -15,7 +15,7 @@ function monde() {
   }));
   const coupe = (u) => { const m = u.match(/^\/rest\/v1\/([a-z_]+)\??(.*)$/); return [m[1], m[2]]; };
   const read = async (u) => { const [t, qs] = coupe(u); return filtrer(t, qs); };
-  const insert = async (t, row) => { const r = { id: id(), ...row }; db[t].push(r); return r; };
+  const insert = async (t, row) => { const r = { id: id(), created_at: new Date(Date.parse('2026-11-16T10:00:00Z') + n * 1000).toISOString(), ...row }; db[t].push(r); return r; };
   const patch = async (t, f, row) => { filtrer(t, f).forEach((l) => Object.assign(l, row)); };
   const call = async (u, o) => { if (o?.method === 'DELETE') { const [t, qs] = coupe(u); const out = new Set(filtrer(t, qs)); db[t] = db[t].filter((l) => !out.has(l)); } return { ok: true }; };
   const alertes = [];
@@ -98,4 +98,67 @@ test('on s’est mariés : photo dans le stockage privé, adresse obligatoire, L
   assert.equal((await actionCouple('couple_mariage', { path: `mariages/${r0.couple.id}/1.jpg`, adresse: 'Rennes' }, ctx(SARA))).status, 400);
   assert.equal((await actionCouple('couple_mariage', { path: `mariages/${r0.couple.id}/1.jpg`, adresse: '12 rue des Lilas, 35000 Rennes', date: '2027-06-12' }, ctx(SARA))).status, 200);
   assert.ok(alertes.some((t) => t.includes('se sont mariés')));
+});
+
+test('météo du cœur, question du jour, bocal à souvenirs : rien ne déborde dans le planning ni dans les mots doux', async () => {
+  const { db, ctx } = monde();
+  const pousses = [];
+  const avec = (u) => ({ ...ctx(u), pousser: async (uid, m) => { pousses.push([uid, m.titre]); return 1; } });
+  const r0 = await lire(await actionCouple('couple_creer', {}, avec(AMINE)));
+  await actionCouple('couple_rejoindre', { code: r0.couple.code }, avec(SARA));
+  assert.equal((await actionCouple('couple_humeur', { humeur: 9 }, avec(SARA))).status, 400);
+  await actionCouple('couple_humeur', { humeur: 2, besoin: 'ecoute', note: 'Grosse journée' }, avec(SARA));
+  // Une seule météo par jour : la nouvelle remplace l'ancienne.
+  let r = await lire(await actionCouple('couple_humeur', { humeur: 4, besoin: 'tendresse' }, avec(SARA)));
+  assert.equal(db.couple_activites.filter((x) => x.type === 'humeur').length, 1);
+  assert.equal(r.couple.meteo.moi.derniere.emoji, '😊');
+  assert.equal(r.couple.meteo.moi.semaine.at(-1), 4);
+  r = await lire(await actionCouple('couple_etat', {}, avec(AMINE)));
+  assert.equal(r.couple.meteo.lui.derniere.besoin, 'tendresse');
+  assert.ok(r.suggestions.tendresse.length >= 2);
+  assert.ok(pousses.some(([uid]) => uid === 'u-amine'));
+  // Gardée pour soi : l'autre ne la voit pas.
+  await actionCouple('couple_humeur', { humeur: 1, partage: false }, avec(AMINE));
+  r = await lire(await actionCouple('couple_etat', {}, avec(SARA)));
+  assert.equal(r.couple.meteo.lui.derniere, null);
+  // Question du jour : la réponse de l'autre se découvre après avoir répondu.
+  assert.ok(r.couple.question.texte.endsWith('?'));
+  await actionCouple('couple_reponse', { texte: 'Notre balade à Tichy' }, avec(AMINE));
+  r = await lire(await actionCouple('couple_etat', {}, avec(SARA)));
+  assert.deepEqual([r.couple.question.a_repondu, r.couple.question.sa_reponse], [true, null]);
+  r = await lire(await actionCouple('couple_reponse', { texte: 'Le mariage de ma sœur' }, avec(SARA)));
+  assert.equal(r.couple.question.sa_reponse, 'Notre balade à Tichy');
+  await actionCouple('couple_reponse', { texte: 'Le jour où on s’est rencontrés' }, avec(SARA));
+  assert.equal(db.couple_activites.filter((x) => x.type === 'question').length, 2);
+  r = await lire(await actionCouple('couple_souvenir', { texte: 'Le thé à la menthe chez ta grand-mère', quand: '2026-08-02' }, avec(SARA)));
+  assert.deepEqual(r.couple.souvenirs.map((x) => x.texte), ['Le thé à la menthe chez ta grand-mère']);
+  assert.equal(r.couple.activites.length, 0);
+  assert.equal(r.couple.mots.length, 0);
+  assert.ok(r.couple.defi.length > 10);
+});
+
+test('jeux d’amour à distance et fiançailles : la carte part chez l’autre, qui seul y répond ; étapes et liste du mariage', async () => {
+  const { db, ctx } = monde();
+  const pousses = [];
+  const avec = (u) => ({ ...ctx(u), pousser: async (uid, m) => { pousses.push([uid, m.titre]); return 1; } });
+  const r0 = await lire(await actionCouple('couple_creer', {}, avec(AMINE)));
+  await actionCouple('couple_rejoindre', { code: r0.couple.code }, avec(SARA));
+  assert.equal((await actionCouple('couple_jeu', { jeu: 'piquant', i: 99 }, avec(AMINE))).status, 400);
+  let r = await lire(await actionCouple('couple_jeu', { jeu: 'piquant', i: 0 }, avec(AMINE)));
+  const carte = r.couple.jeux[0];
+  assert.deepEqual([carte.jeu, carte.de_moi, carte.reponse], ['piquant', true, null]);
+  assert.ok(pousses.some(([uid]) => uid === 'u-sara'));
+  assert.equal((await actionCouple('couple_jeu_repondre', { id: carte.id, texte: 'Moi ?' }, avec(AMINE))).status, 403);
+  r = await lire(await actionCouple('couple_jeu_repondre', { id: carte.id, texte: 'Sous la pluie, à Tizi' }, avec(SARA)));
+  assert.equal(r.couple.jeux[0].reponse, 'Sous la pluie, à Tizi');
+  await actionCouple('couple_jalon', { cle: 'mariage', date: '2027-07-10' }, avec(SARA));
+  r = await lire(await actionCouple('couple_jalon', { cle: 'mariage', date: '2027-08-14' }, avec(AMINE)));
+  assert.deepEqual(r.couple.jalons, { mariage: '2027-08-14' });
+  await actionCouple('couple_prepa', { cle: 'salle' }, avec(SARA));
+  r = await lire(await actionCouple('couple_etat', {}, avec(AMINE)));
+  assert.deepEqual(r.couple.prepa, ['salle']);
+  r = await lire(await actionCouple('couple_prepa', { cle: 'salle', fait: false }, avec(AMINE)));
+  assert.deepEqual(r.couple.prepa, []);
+  assert.equal(db.couple_activites.filter((x) => x.type === 'jalon').length, 1);
+  assert.equal(r.couple.activites.length, 0);
 });
