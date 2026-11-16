@@ -47,8 +47,8 @@ function vue(c) {
       <p class="form-status" role="status" data-couple-statut></p>
     </section>
     <section class="couple-carte">
-      <h2>Faire plaisir</h2>
-      <div class="couple-cadeaux">${Object.entries(cadeaux).map(([k, v]) => `<button type="button" class="couple-cadeau" data-cadeau="${k}"><span aria-hidden="true">${{ bijou: '💍', chocolat: '🍫', fleurs: '💐' }[k] || '🎁'}</span>${esc({ bijou: 'Bijou', chocolat: 'Chocolats', fleurs: 'Fleurs' }[k] || v)}</button>`).join('')}</div>
+      <h2>Liste de cadeaux</h2>
+      <div class="couple-cadeaux">${Object.entries(cadeaux).map(([k, v]) => `<button type="button" class="couple-cadeau" data-cadeau="${k}"><span aria-hidden="true">${{ bijou: '💍', parfum: '🌸', fleurs: '💐', chocolat: '🍫', diner: '🍽️', spa: '💆', weekend: '🧳', coffret: '🎀', photo: '📸', autre: '🎁' }[k] || '🎁'}</span>${esc({ bijou: 'Bijou', parfum: 'Parfum', fleurs: 'Fleurs', chocolat: 'Chocolats', diner: 'Dîner', spa: 'Spa à deux', weekend: 'Week-end', coffret: 'Coffret beauté', photo: 'Séance photo', autre: 'Autre idée' }[k] || v)}</button>`).join('')}</div>
       <form class="couple-cadeau-form" data-cadeau-form hidden><input type="hidden" name="type"><label>Un mot pour Lamia (facultatif)<input name="note" maxlength="300" placeholder="Pour quand, pour quelle occasion…"></label><button type="submit" class="btn btn-ink">Envoyer ma demande</button></form>
     </section>
     ${AUTOUR}
