@@ -229,6 +229,7 @@ test('Passion → abonnement Couple : seulement avec l’accord, prix Couple à 
   const stripe = {
     subscriptions: { retrieve: async (id) => ({ id, metadata: { formule: 'passion' }, items: { data: [{ id: 'si_1' }] } }), update: async (id, p) => { appels.push(p); return { id }; } },
     products: { create: async () => ({ id: 'prod_couple' }) },
+    coupons: { create: async (c) => { appels.push({ coupon: c }); return { id: 'coupon_1' }; } },
   };
   const ecrits = [];
   const monde = (abo) => async (u, init = {}) => {
@@ -238,13 +239,21 @@ test('Passion → abonnement Couple : seulement avec l’accord, prix Couple à 
     if (url.includes('/rest/v1/abonnements?')) return { ok: true, json: async () => abo };
     return { ok: true, json: async () => [] };
   };
-  const ABO = { id: 'a1', formule: 'passion', periode: 'mois', stripe_subscription_id: 'sub_1' };
+  const ABO = { id: 'a1', formule: 'passion', periode: 'mois', prix_centimes: 900, stripe_subscription_id: 'sub_1' };
   assert.equal((await actionAbonnement({ action: 'abonnement_vers_couple' }, authReq, { env, fetcher: monde([ABO]), stripe })).status, 400);
   assert.equal((await actionAbonnement({ action: 'abonnement_vers_couple', accord: true }, authReq, { env, fetcher: monde([{ ...ABO, periode: 'an' }]), stripe })).status, 409);
   const r = await actionAbonnement({ action: 'abonnement_vers_couple', accord: true }, authReq, { env, fetcher: monde([ABO]), stripe });
   assert.equal(r.status, 200);
-  assert.equal(appels[0].items[0].price_data.unit_amount, 1800);
-  assert.equal(appels[0].proration_behavior, 'none');
-  assert.equal(appels[0].metadata.formule, 'couple');
+  // Le premier mois reste à 9 € : remise unique de 9 €, puis 18 €.
+  assert.deepEqual([appels[0].coupon.amount_off, appels[0].coupon.duration], [900, 'once']);
+  assert.equal(appels[1].items[0].price_data.unit_amount, 1800);
+  assert.equal(appels[1].proration_behavior, 'none');
+  assert.deepEqual(appels[1].discounts, [{ coupon: 'coupon_1' }]);
+  assert.equal(appels[1].metadata.formule, 'couple');
+  // Prestige → Couple Prestige (38 €).
+  const r2 = await actionAbonnement({ action: 'abonnement_vers_couple', accord: true }, authReq, { env, fetcher: monde([{ ...ABO, formule: 'prestige', prix_centimes: 2200 }]), stripe });
+  assert.equal(r2.status, 200);
+  assert.equal(appels.at(-1).items[0].price_data.unit_amount, 3800);
+  assert.equal(appels.at(-2).coupon.amount_off, 1600);
   assert.ok(ecrits.some(([u, body]) => u.includes('abonnements?id=eq.a1') && body.includes('"formule":"couple"')));
 });

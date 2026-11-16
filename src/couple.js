@@ -33,17 +33,20 @@ function vue(c) {
       ${lui ? '' : `<div class="couple-code"><p>Envoie ce code à ton ou ta partenaire :</p><p class="couple-code-valeur">${c.code ? esc(c.code) : '—'}</p><p class="espace-sans-liens">${c.code ? `<button type="button" class="btn btn-ink" data-couple-partager="${esc(c.code)}">Envoyer le code</button>` : ''} <button type="button" class="btn btn-line" data-couple-code>Nouveau code</button></p></div>`}
     </section>
     ${c.conversion ? `<section class="couple-carte couple-conversion">
-      <h2>Ton abonnement devient « Couple » ? 💞</h2>
-      <p>Tu as la formule <strong>${c.conversion.formule === 'prestige' ? 'Prestige' : 'Passion'}</strong> pour les rencontres. Maintenant que vous êtes en couple, elle peut devenir l’<strong>abonnement Couple</strong> : mots doux avec leurs animations, ton mot écrit toi-même, pour vous deux.</p>
-      ${c.conversion.annuel ? '<p class="aide">Ton abonnement est à l’année : écris à Lamia pour le transformer.</p>' : `<p class="aide">18 € par mois à partir de ta prochaine échéance, rien à payer aujourd’hui. Ta formule de rencontre s’arrête à ce moment-là. Sans engagement.</p>
+      <h2>Ton abonnement devient « ${esc(c.conversion.vers)} » ? 💞</h2>
+      <p>Tu as la formule <strong>${c.conversion.formule === 'prestige' ? 'Prestige' : 'Passion'}</strong> pour les rencontres. Maintenant que vous êtes en couple, elle peut devenir <strong>${esc(c.conversion.vers)}</strong> : mots doux avec leurs animations, le fil avec vos proches, des points cadeau${c.conversion.formule === 'prestige' ? ', et Lamia dans votre fil une fois par mois' : ''}, pour vous deux.</p>
+      ${c.conversion.annuel ? '<p class="aide">Ton abonnement est à l’année : écris à Lamia pour le transformer.</p>' : `<p class="aide">${(c.conversion.vers_prix / 100).toLocaleString('fr-FR')} € par mois pour vous deux. <strong>Le premier mois reste au prix que tu paies aujourd’hui</strong>, rien à payer de plus maintenant. Ta formule de rencontre s’arrête à ta prochaine échéance. Sans engagement.</p>
       <p class="espace-sans-liens"><button type="button" class="btn btn-ink" data-conversion-oui>Oui, je passe en Couple</button> <button type="button" class="btn btn-line" data-conversion-non>Pas maintenant</button></p>`}
     </section>` : ''}
     <section class="couple-carte couple-mots">
       <h2>Nos mots doux <span aria-hidden="true">💌</span></h2>
-      ${lui ? `<div class="couple-mots-boutons">${motsDoux.map((m) => { const payant = motsPayants.includes(m) && !c.premium; return `<button type="button" class="couple-mot${motsPayants.includes(m) ? ' is-premium' : ''}" ${payant ? 'data-couple-abo' : `data-mot="${esc(m)}"`}>${esc(m)}${payant ? ' <span class="couple-cadenas" aria-label="Avec l’abonnement Couple">🔒</span>' : ''}</button>`; }).join('')}</div>
-      ${c.premium ? `<form class="couple-mot-libre" data-mot-libre><input name="texte" maxlength="200" placeholder="Ou écris le tien…" aria-label="Ton mot doux"><button type="submit" class="btn btn-ink" aria-label="Envoyer">❤</button></form>` : `<p class="couple-mot-libre"><button type="button" class="link-button" data-couple-abo>✍️ Écrire ton propre mot doux 🔒</button></p>`}
-      ${c.premium ? '' : `<div class="couple-abo" data-couple-abo-box hidden>
-        <div class="avec-aide"><strong>Abonnement Couple · 18 € par mois</strong>${aideQ('« Je t’aime » et « Tu me manques » avec leur animation tendre, les mots doux les plus envoyés, et ton mot écrit toi-même. Un seul abonnement suffit pour vous deux. Sans engagement.')}</div>
+      ${lui ? `<div class="couple-mots-boutons">${motsDoux.map((m) => { const payant = motsPayants.includes(m) && !Boolean(c.niveau); return `<button type="button" class="couple-mot${motsPayants.includes(m) ? ' is-premium' : ''}" ${payant ? 'data-couple-abo' : `data-mot="${esc(m)}"`}>${esc(m)}${payant ? ' <span class="couple-cadenas" aria-label="Avec l’abonnement Couple">🔒</span>' : ''}</button>`; }).join('')}</div>
+      ${Boolean(c.niveau) ? `<form class="couple-mot-libre" data-mot-libre><input name="texte" maxlength="200" placeholder="Ou écris le tien…" aria-label="Ton mot doux"><button type="submit" class="btn btn-ink" aria-label="Envoyer">❤</button></form>` : `<p class="couple-mot-libre"><button type="button" class="link-button" data-couple-abo>✍️ Écrire ton propre mot doux 🔒</button></p>`}
+      ${Boolean(c.niveau) ? '' : `<div class="couple-abo" data-couple-abo-box hidden>
+        <div class="couple-offres">
+          <label class="couple-offre"><input type="radio" name="offre" value="couple" checked><strong>Couple Amour</strong><span>18 € / mois pour vous deux</span><small>Tous les mots doux animés, ton mot à toi, le fil avec vos proches (1 proche inclus), 5 € de points cadeau par mois.</small></label>
+          <label class="couple-offre"><input type="radio" name="offre" value="couple_prestige"><strong>Couple Prestige</strong><span>38 € / mois pour vous deux</span><small>Tout Couple Amour, Lamia dans votre fil une fois par mois, 10 € de points cadeau par mois, un plus beau cadeau de mariage.</small></label>
+        </div>
         <label class="annonce-case"><input type="checkbox" data-couple-cgv> <span>J’accepte les <a class="text-link" href="/cgv/" target="_blank" rel="noopener">conditions de vente</a></span></label>
         <p><button type="button" class="btn btn-ink" data-couple-payer>M’abonner pour nous deux 💞</button></p></div>`}` : '<p class="aide">Dès que ton ou ta partenaire vous rejoint, vous pourrez vous envoyer des mots doux.</p>'}
       ${(c.mots || []).length ? `<ul class="couple-fil">${c.mots.map((m) => `<li class="${m.de_moi ? 'is-moi' : ''}">${m.animation ? `<span class="couple-anim anim-${esc(m.animation)}" aria-hidden="true">${{ coeur: '<i>❤</i><b>✦</b><b>✦</b><b>✦</b>', manque: '<i>💗</i><i>💗</i>', retrouver: '<i>🤍</i><i>❤</i>' }[m.animation] || ''}</span>` : ''}<span>${esc(m.texte)}</span><small>${m.de_moi ? 'Toi' : esc(lui?.prenom || '')} · ${esc(new Date(m.le).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }))}</small></li>`).join('')}</ul>` : ''}
@@ -110,7 +113,7 @@ zone.addEventListener('click', async (e) => {
     if (!box.querySelector('[data-couple-cgv]').checked) { statut('Coche les conditions de vente pour continuer.'); return; }
     const b = e.target.closest('[data-couple-payer]'); b.disabled = true;
     try {
-      const r = await fetch('/api/preorder', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'abonnement_payer', formule: 'couple', periode: 'mois', cgv_accepted: true, nom: moiInfo.nom || moiInfo.email, email: moiInfo.email }) });
+      const r = await fetch('/api/preorder', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'abonnement_payer', formule: box.querySelector('[name=offre]:checked')?.value || 'couple', periode: 'mois', cgv_accepted: true, nom: moiInfo.nom || moiInfo.email, email: moiInfo.email }) });
       const d = await r.json().catch(() => ({}));
       if (r.ok && d.url) { location.href = d.url; return; }
       statut(d.error === 'deja_abonne' ? 'Tu as déjà l’abonnement Couple.' : 'Le paiement n’a pas pu s’ouvrir. Réessaie dans un instant.');
@@ -121,7 +124,7 @@ zone.addEventListener('click', async (e) => {
   if (e.target.closest('[data-conversion-non]')) { e.target.closest('.couple-conversion').remove(); return; }
   const conv = e.target.closest('[data-conversion-oui]');
   if (conv) {
-    if (!confirm('Ton abonnement de rencontre devient l’abonnement Couple, 18 € par mois à ta prochaine échéance. Tu confirmes ?')) return;
+    if (!confirm('Ton abonnement de rencontre devient un abonnement Couple. Le premier mois reste au même prix, puis le prix Couple. Tu confirmes ?')) return;
     conv.disabled = true;
     try {
       const { data: { session } } = await supabase.auth.getSession();

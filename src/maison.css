@@ -4462,3 +4462,9 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .couple .couple-mariage-form { display: grid; gap: 10px; margin-top: 12px; }
 .couple .couple-mariage-ok { margin: 8px 0 0; padding: 12px 14px; border-radius: 14px; background: #fff; font-weight: 600; color: #8d2d48; }
 .couple .couple-conversion { background: linear-gradient(135deg, #f6effc, #fff5f7); border-color: #d9c6ef; }
+.couple .couple-offres { display: grid; gap: 10px; margin-bottom: 12px; }
+.couple .couple-offre { display: grid; gap: 2px; padding: 12px 14px 12px 40px; position: relative; border-radius: 14px; border: 1.5px solid #e6dcef; background: #fff; cursor: pointer; }
+.couple .couple-offre input { position: absolute; left: 12px; top: 14px; width: 18px; height: 18px; accent-color: #4a3470; }
+.couple .couple-offre:has(input:checked) { border-color: #4a3470; background: #f6f0fc; }
+.couple .couple-offre span { color: #8d2d48; font-weight: 600; }
+.couple .couple-offre small { color: #6b5a72; }
