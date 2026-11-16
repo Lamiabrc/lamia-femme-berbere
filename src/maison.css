@@ -4430,3 +4430,24 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .couple-coeur-vole { position: fixed; bottom: 80px; z-index: 90; pointer-events: none; color: #e0567a; animation: couple-vole 2.4s ease-out forwards; }
 @keyframes couple-vole { from { transform: translateY(0) scale(.6); opacity: 1; } to { transform: translateY(-70vh) scale(1.2); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .couple .couple-bat, .couple-coeur-vole { animation: none; } }
+/* Mots doux de l'abonnement Couple : cadenas et animations tendres (16 nov. 2026) */
+.couple .couple-mot.is-premium { border-color: #e7a9bb; background: linear-gradient(135deg, #fff, #fff0f4); }
+.couple .couple-cadenas { font-size: .8em; margin-left: 2px; }
+.couple .couple-abo { margin-top: 12px; padding: 14px; border-radius: 16px; background: #fff; border: 1.5px dashed #e7a9bb; }
+.couple .couple-fil li { position: relative; }
+.couple .couple-anim { position: relative; display: block; height: 54px; margin-bottom: 4px; }
+.couple .couple-anim i, .couple .couple-anim b { position: absolute; font-style: normal; font-weight: 400; }
+.couple .anim-coeur i { left: 50%; top: 4px; font-size: 38px; transform: translateX(-50%); animation: couple-bat 1.2s ease-in-out infinite; color: #e0435f; }
+.couple .anim-coeur b { font-size: 12px; color: #f2b84b; animation: couple-scintille 1.8s ease-in-out infinite; }
+.couple .anim-coeur b:nth-of-type(1) { left: 28%; top: 6px; } .couple .anim-coeur b:nth-of-type(2) { right: 26%; top: 2px; animation-delay: .6s; } .couple .anim-coeur b:nth-of-type(3) { right: 34%; bottom: 0; animation-delay: 1.2s; }
+@keyframes couple-scintille { 0%, 100% { opacity: 0; transform: scale(.5); } 50% { opacity: 1; transform: scale(1.2); } }
+.couple .anim-manque i { top: 10px; font-size: 28px; }
+.couple .anim-manque i:first-child { left: 10%; animation: couple-cherche-g 2.4s ease-in-out infinite; } .couple .anim-manque i:last-child { right: 10%; animation: couple-cherche-d 2.4s ease-in-out infinite; }
+@keyframes couple-cherche-g { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(60%); } }
+@keyframes couple-cherche-d { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-60%); } }
+.couple .anim-retrouver i { top: 10px; font-size: 28px; }
+.couple .anim-retrouver i:first-child { left: 0; animation: couple-rejoint-g 2.6s ease-in-out infinite; } .couple .anim-retrouver i:last-child { right: 0; animation: couple-rejoint-d 2.6s ease-in-out infinite; }
+@keyframes couple-rejoint-g { 0% { transform: translateX(0); } 50%, 70% { transform: translateX(calc(50px)); } 100% { transform: translateX(0); } }
+@keyframes couple-rejoint-d { 0% { transform: translateX(0); } 50%, 70% { transform: translateX(calc(-50px)); } 100% { transform: translateX(0); } }
+.couple .couple-fil li.is-moi .couple-anim i { filter: drop-shadow(0 0 4px rgba(255,255,255,.6)); }
+@media (prefers-reduced-motion: reduce) { .couple .couple-anim i, .couple .couple-anim b { animation: none; } }

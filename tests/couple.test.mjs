@@ -80,8 +80,12 @@ test('mots doux : le mot part chez l’autre (notification) et s’affiche dans 
   const avec = (u) => ({ ...ctx(u), pousser: async (uid, m) => { pousses.push([uid, m.texte]); return 1; } });
   const r0 = await lire(await actionCouple('couple_creer', {}, avec(AMINE)));
   await actionCouple('couple_rejoindre', { code: r0.couple.code }, avec(SARA));
-  const r = await lire(await actionCouple('couple_mot', { texte: 'Je t’aime ❤️' }, avec(SARA)));
-  assert.deepEqual(pousses, [['u-amine', 'Je t’aime ❤️']]);
-  assert.deepEqual(r.couple.mots.map((m) => [m.texte, m.de_moi]), [['Je t’aime ❤️', true]]);
+  // « Je t'aime » et le mot libre viennent avec l'abonnement Couple ; « Je pense à toi » est gratuit.
+  assert.equal((await actionCouple('couple_mot', { texte: 'Je t’aime ❤️' }, avec(SARA))).status, 402);
+  assert.equal((await actionCouple('couple_mot', { texte: 'Mon soleil' }, avec(SARA))).status, 402);
+  const r = await lire(await actionCouple('couple_mot', { texte: 'Je pense à toi 💭' }, avec(SARA)));
+  assert.deepEqual(pousses, [['u-amine', 'Je pense à toi 💭']]);
+  assert.deepEqual(r.couple.mots.map((m) => [m.texte, m.de_moi]), [['Je pense à toi 💭', true]]);
+  assert.equal(r.couple.premium, false);
   assert.equal(r.couple.activites.length, 0);
 });
