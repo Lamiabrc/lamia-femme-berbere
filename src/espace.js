@@ -433,7 +433,7 @@ async function monProfil(session) {
   try {
     const { profil: p } = await appelProfil({ action: 'annonce_mon_profil' }, session);
     if (!p) { await sansProfil(box, session); return; }
-    box.innerHTML = `${p.test ? '<p class="espace-test"><svg class="ico" aria-hidden="true"><use href="/icones.svg#flask-conical"/></svg> <strong>Compte de test.</strong> Il sert uniquement à essayer l’application : il ne voit que les profils de test et ne contacte aucun vrai membre.</p>' : ''}<article class="espace-achat"><div><p class="event-date">Profil n° ${esc(p.ref)}</p><h3>${esc(ETAT_PROFIL[p.status] || p.status)}${p.status === 'publiee' && p.piece_identite ? ' · avec pièce d’identité' : ''}</h3>
+    box.innerHTML = `${p.test ? '<p class="espace-test"><svg class="ico" aria-hidden="true"><use href="/icones.svg#flask-conical"/></svg> <strong>Compte de test.</strong> Il sert uniquement à essayer l’application : il ne voit que les profils de test et ne contacte aucun vrai membre.</p><p class="espace-test-mode"><span>Voir l’espace :</span> <a class="btn btn-ink" href="/mon-espace/" aria-current="page">Célibataire</a> <a class="btn btn-line" href="/notre-couple/?test=1">En couple</a></p>' : ''}<article class="espace-achat"><div><p class="event-date">Profil n° ${esc(p.ref)}</p><h3>${esc(ETAT_PROFIL[p.status] || p.status)}${p.status === 'publiee' && p.piece_identite ? ' · avec pièce d’identité' : ''}</h3>
       ${p.live ? `<p><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg> Profil créé en live avec Lamia${p.live_retrouve ? '' : ' (Lamia vérifie ta fiche)'}.</p>` : ''}
       ${p.nb_compatibles !== null && p.nb_compatibles !== undefined ? `<p>D’après l’outil de Lamia, tu pourrais correspondre à ${esc(p.nb_compatibles)} personne(s).</p>` : ''}
       ${p.matchs ? `<p class="espace-match"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Matchs en cours : <strong>${esc(p.matchs.actifs)} / ${esc(p.matchs.limite)}</strong>${p.matchs.actifs >= p.matchs.limite ? (p.matchs.formule === 'prestige' ? ' · mets fin à un match pour en choisir un autre.' : ' · mets fin à un match pour en choisir un autre, ou <a class="text-link" href="/abonnement/">passe à une formule supérieure</a>.') : ''}</p>` : ''}</div>
@@ -956,11 +956,14 @@ async function discussions(session) {
     const f = d.fin || {};
     if (f.couple) return '<div class="disc-fin is-couple"><p><strong>Vous êtes en couple 💞</strong></p><p><a class="btn btn-ink" href="/notre-couple/">Notre espace de couple</a></p></div>';
     if (d.dematch || d.close_raison === 'signalee') return '';
+    // On demande aussi à ceux qui ont échangé leurs numéros, et à ceux qui se parlent depuis plus d'une semaine
+    // (Passion : 14 jours, Prestige : sans fin — la question vient au bout de 7 jours). Lamia, 16 nov. 2026.
     const bientot = d.ouverte && new Date(d.ferme_at) - Date.now() < 24 * 3600e3;
-    if (!bientot && d.ouverte) return '';
+    const uneSemaine = d.ouverte_at && Date.now() - new Date(d.ouverte_at) >= 7 * 86400e3;
+    if (d.ouverte && !bientot && !uneSemaine && !d.echange) return '';
     if (f.mien === 'couple') return `<div class="disc-fin"><p>Tu as dit que vous êtes en couple. ${esc(d.avec)} n’a pas encore répondu.</p></div>`;
     if (f.mien === 'fini') return '';
-    return `<div class="disc-fin"><p><strong>${d.ouverte ? 'Votre discussion se termine bientôt.' : 'Vos 7 jours sont passés.'}</strong> Et maintenant ?</p>
+    return `<div class="disc-fin"><p><strong>${d.echange ? 'Vous avez échangé vos numéros.' : !d.ouverte ? 'Votre discussion est terminée.' : bientot ? 'Votre discussion se termine bientôt.' : 'Cela fait plus d’une semaine que vous vous parlez.'}</strong> Où en êtes-vous ?</p>
       <p class="espace-sans-liens"><button type="button" class="btn btn-ink" data-disc-fin="couple">On est en couple 💞</button> <button type="button" class="btn btn-line" data-disc-fin="fini">C’est fini</button></p>
       ${f.son_couple ? `<p class="aide">${esc(d.avec)} a dit que vous êtes en couple.</p>` : ''}</div>`;
   };

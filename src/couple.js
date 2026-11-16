@@ -99,5 +99,7 @@ zone.addEventListener('submit', (e) => {
   const { data: { session } } = await supabase.auth.getSession().catch(() => ({ data: {} }));
   if (!session) { zone.innerHTML = `<section class="couple-carte"><p>Connecte-toi pour ouvrir votre espace de couple.</p><p><a class="btn btn-ink" href="/mon-espace/?retour=/notre-couple/">Me connecter</a></p></section>${AUTOUR}`; return; }
   token = session.access_token;
+  // Profil de test de Lamia : bascule entre l'espace célibataire et l'espace en couple (16 nov. 2026).
+  if (new URLSearchParams(location.search).has('test')) zone.insertAdjacentHTML('beforebegin', '<p class="espace-test-mode"><span>Voir l’espace :</span> <a class="btn btn-line" href="/mon-espace/">Célibataire</a> <a class="btn btn-ink" href="/notre-couple/?test=1" aria-current="page">En couple</a></p>');
   charger();
 })();

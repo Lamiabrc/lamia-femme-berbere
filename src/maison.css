@@ -4378,3 +4378,6 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .disc-fin { margin: 12px 0; padding: 14px 16px; border-radius: 18px; background: #f7f0fb; border: 1px solid #e3d4ef; }
 .disc-fin p { margin: 0 0 8px; }
 .disc-fin.is-couple { background: #fdf0f3; border-color: #f0cdd6; text-align: center; }
+/* Compte de test : voir l'espace célibataire ou en couple */
+.espace-test-mode { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 14px; }
+.espace-test-mode .btn { padding: 8px 16px; }
