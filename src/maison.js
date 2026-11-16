@@ -953,6 +953,28 @@ renderSocials();
   } catch { /* */ }
 })();
 
+// « Notre couple » dans le menu : seulement pour les membres en couple (Lamia, 16 nov. : sinon c'est déprimant).
+// Réponse gardée 6 heures sur l'appareil pour ne pas interroger le serveur à chaque page.
+(function menuCouple() {
+  try {
+    const liens = document.querySelectorAll('[data-menu-couple]');
+    if (!liens.length) return;
+    const montrer = (v) => liens.forEach((x) => { x.hidden = !v; });
+    let c = null;
+    try { c = JSON.parse(localStorage.getItem('lfb-en-couple') || 'null'); } catch { /* */ }
+    const jeton = JSON.parse(localStorage.getItem('sb-tybwvxinigahhntfeeur-auth-token') || 'null')?.access_token;
+    if (!jeton) { montrer(false); return; }
+    if (c) montrer(c.v);
+    if (c && Date.now() - c.lu < 6 * 36e5) return;
+    fetch('/api/confidences', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jeton}` }, body: JSON.stringify({ action: 'couple_suis_je' }) })
+      .then((r) => (r.ok ? r.json() : null)).then((r) => {
+        if (!r) return;
+        montrer(r.en_couple);
+        try { localStorage.setItem('lfb-en-couple', JSON.stringify({ v: Boolean(r.en_couple), lu: Date.now() })); } catch { /* */ }
+      }).catch(() => {});
+  } catch { /* */ }
+})();
+
 // Testeurs sur la liste Google Play (14 nov. 2026) : bandeau avec le bouton qui ouvre directement « Devenir testeur ».
 // Google ne compte que ceux qui ont appuyé sur ce bouton. Revient tous les 2 jours tant que le membre n'a pas dit « C'est fait ».
 (function devenirTesteur() {

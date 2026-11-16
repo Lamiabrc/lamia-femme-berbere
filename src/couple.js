@@ -11,6 +11,7 @@ const jour = (iso) => new Date(iso).toLocaleDateString('fr-FR', { weekday: 'shor
 const appel = async (body) => { const { data: { session } } = await supabase.auth.getSession(); token = session?.access_token || token; return api(body, token); };
 const ERREURS = { couple_requis: 'Ce mot doux vient avec l’abonnement Couple.', code_invalide: 'Ce code ne marche pas (ou il a expiré). Demande-lui un nouveau code.', complet: 'Cet espace a déjà ses deux membres.', deja_en_couple: 'Tu as déjà un espace de couple.', titre_requis: 'Écris ce que vous allez faire.' };
 
+const invitation = (code) => `Rejoins notre espace de couple 💞 chez Lamia Femme Berbère : ${location.origin}/notre-couple/?code=${code} (code : ${code})`;
 const AUTOUR = `<section class="couple-carte"><h2>Autour de vous</h2>
   <p class="espace-sans-liens"><a class="btn btn-ink" href="/abonnement/#unite-sauver_couple">Coaching de couple</a> <a class="btn btn-line" href="/salon/">Les lives</a> <a class="btn btn-line" href="/boutique/">La boutique</a> <a class="btn btn-line" href="/confidences/#conversation">Écrire à Lamia</a></p></section>`;
 
@@ -30,13 +31,13 @@ function vue(c) {
     ${a.de_moi ? `<button type="button" class="link-button" data-act-suppr="${esc(a.id)}" aria-label="Retirer">✕</button>` : ''}</li>`;
   zone.innerHTML = `<section class="couple-carte couple-tete">
       <p class="couple-noms">${esc(moi?.prenom || 'Moi')} <span class="couple-bat" aria-hidden="true">❤</span> ${lui ? esc(lui.prenom) : '<em>en attente</em>'}</p>
-      ${lui ? '' : `<div class="couple-code"><p>Envoie ce code à ton ou ta partenaire :</p><p class="couple-code-valeur">${c.code ? esc(c.code) : '—'}</p><p class="espace-sans-liens">${c.code ? `<button type="button" class="btn btn-ink" data-couple-partager="${esc(c.code)}">Envoyer le code</button>` : ''} <button type="button" class="btn btn-line" data-couple-code>Nouveau code</button></p></div>`}
+      ${lui ? '' : `<div class="couple-code"><p>Invite ton ou ta partenaire 💌</p><p class="couple-code-valeur">${c.code ? esc(c.code) : '—'}</p>${c.code ? (() => { const t = invitation(c.code); return `<p class="couple-envois"><a class="btn btn-ink" href="sms:?&body=${encodeURIComponent(t)}">Par SMS</a><a class="btn btn-ink" href="https://wa.me/?text=${encodeURIComponent(t)}" target="_blank" rel="noopener">WhatsApp</a><a class="btn btn-line" href="mailto:?subject=${encodeURIComponent('Rejoins notre espace de couple 💞')}&body=${encodeURIComponent(t)}">Par email</a>${navigator.share ? `<button type="button" class="btn btn-line" data-couple-partager="${esc(c.code)}">Autre…</button>` : ''}</p>`; })() : ''}<p><button type="button" class="link-button" data-couple-code>Nouveau code</button></p></div>`}
     </section>
     <section class="couple-carte couple-mots">
       <h2>Nos mots doux <span aria-hidden="true">💌</span></h2>
       ${lui ? `<div class="couple-mots-boutons">${motsDoux.map((m) => { const payant = motsPayants.includes(m) && !c.premium; return `<button type="button" class="couple-mot${motsPayants.includes(m) ? ' is-premium' : ''}" ${payant ? 'data-couple-abo' : `data-mot="${esc(m)}"`}>${esc(m)}${payant ? ' <span class="couple-cadenas" aria-label="Avec l’abonnement Couple">🔒</span>' : ''}</button>`; }).join('')}</div>
       ${c.premium ? `<form class="couple-mot-libre" data-mot-libre><input name="texte" maxlength="200" placeholder="Ou écris le tien…" aria-label="Ton mot doux"><button type="submit" class="btn btn-ink" aria-label="Envoyer">❤</button></form>` : `<p class="couple-mot-libre"><button type="button" class="link-button" data-couple-abo>✍️ Écrire ton propre mot doux 🔒</button></p>`}
-      ${c.premium ? '' : `<div class="couple-abo" data-couple-abo-box hidden>
+      ${c.premium ? '' : window.LFB_PLAY ? '<div class="couple-abo" data-couple-abo-box hidden><p class="aide">Ces mots doux viennent avec l’abonnement Couple, qui ne s’achète pas dans cette version de l’appli.</p></div>' : `<div class="couple-abo" data-couple-abo-box hidden>
         <div class="avec-aide"><strong>Abonnement Couple · 18 € par mois</strong>${aideQ('« Je t’aime » et « Tu me manques » avec leur animation tendre, les mots doux les plus envoyés, et ton mot écrit toi-même. Un seul abonnement suffit pour vous deux. Sans engagement.')}</div>
         <label class="annonce-case"><input type="checkbox" data-couple-cgv> <span>J’accepte les <a class="text-link" href="/cgv/" target="_blank" rel="noopener">conditions de vente</a></span></label>
         <p><button type="button" class="btn btn-ink" data-couple-payer>M’abonner pour nous deux 💞</button></p></div>`}` : '<p class="aide">Dès que ton ou ta partenaire vous rejoint, vous pourrez vous envoyer des mots doux.</p>'}
@@ -78,6 +79,10 @@ async function charger() {
   try {
     const r = await appel({ action: 'couple_etat' });
     types = r.types || {}; cadeaux = r.cadeaux || {}; motsDoux = r.mots_doux || []; motsPayants = r.mots_payants || [];
+    const q = new URLSearchParams(location.search);
+    if (!r.couple && q.get('code')) return faire({ action: 'couple_rejoindre', code: q.get('code') });
+    if (!r.couple && q.has('inviter')) return faire({ action: 'couple_creer' });
+    try { localStorage.setItem('lfb-en-couple', JSON.stringify({ v: Boolean(r.couple), lu: Date.now() })); } catch { /* */ }
     if (r.couple) vue(r.couple); else accueil();
   } catch { zone.innerHTML = '<p class="aide">L’espace ne s’affiche pas pour le moment. Réessaie dans un instant.</p>'; }
 }
@@ -117,7 +122,7 @@ zone.addEventListener('click', async (e) => {
   if (e.target.closest('[data-couple-code]')) return faire({ action: 'couple_code' });
   const p = e.target.closest('[data-couple-partager]');
   if (p) {
-    const texte = `Rejoins notre espace de couple chez Lamia Femme Berbère avec ce code : ${p.dataset.couplePartager} — ${location.origin}/notre-couple/`;
+    const texte = invitation(p.dataset.couplePartager);
     if (navigator.share) navigator.share({ text: texte }).catch(() => {}); else { navigator.clipboard?.writeText(texte); statut('Code copié : colle-le dans un message.'); }
     return;
   }
@@ -158,7 +163,7 @@ zone.addEventListener('submit', (e) => {
 
 (async () => {
   const { data: { session } } = await supabase.auth.getSession().catch(() => ({ data: {} }));
-  if (!session) { zone.innerHTML = `<section class="couple-carte"><p>Connecte-toi pour ouvrir votre espace de couple.</p><p><a class="btn btn-ink" href="/mon-espace/?retour=/notre-couple/">Me connecter</a></p></section>${AUTOUR}`; return; }
+  if (!session) { const code = new URLSearchParams(location.search).get('code'); zone.innerHTML = `<section class="couple-carte"><p>${code ? 'Ton ou ta partenaire t’invite dans votre espace de couple 💞 Crée ton compte ou connecte-toi, puis reviens sur ce lien.' : 'Connecte-toi pour ouvrir votre espace de couple.'}</p><p><a class="btn btn-ink" href="/mon-espace/?retour=${encodeURIComponent(location.pathname + location.search)}">Me connecter</a></p></section>${AUTOUR}`; return; }
   token = session.access_token;
   moiInfo = { email: session.user?.email || '', nom: [session.user?.user_metadata?.first_name, session.user?.user_metadata?.last_name].filter(Boolean).join(' ') };
   // Profil de test de Lamia : bascule entre l'espace célibataire et l'espace en couple (16 nov. 2026).
