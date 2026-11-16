@@ -855,6 +855,7 @@ page(
 
   <div data-espace-out hidden>
     <h1>Se connecter</h1>
+    <div class="connexion-sociale" data-connexion-sociale hidden></div>
     <div class="espace-grid">
       <form class="espace-card espace-card-vedette" data-espace-reset>
         <h2>Me connecter sans mot de passe</h2>
@@ -2264,7 +2265,7 @@ await cp(join(ROOT, 'public'), DIST, { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await writeFile(join(DIST, 'assets', 'editable.json'), JSON.stringify({ fields: [...EDITABLE, ...REGISTRE], defaults: DEFAULTS }));
-for (const f of ['lien-mot-de-passe.js', 'version-play.js', 'erreurs.js', 'abonnement.js', 'abonnement-merci.js', 'couple.js', 'couple-images.js', 'couple-demo.js', 'swipe.js', 'swipe-accueil.js', 'sincerite.js', 'signaler.js', 'nouveautes.js', 'live.js', 'confirmer.js', 'visio-invite.js', 'maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'soirees.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'annonces.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
+for (const f of ['lien-mot-de-passe.js', 'version-play.js', 'erreurs.js', 'abonnement.js', 'abonnement-merci.js', 'couple.js', 'couple-images.js', 'couple-demo.js', 'swipe.js', 'swipe-accueil.js', 'sincerite.js', 'signaler.js', 'nouveautes.js', 'live.js', 'confirmer.js', 'visio-invite.js', 'maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'soirees.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'connexion-sociale.mjs', 'annonces.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
 await cp(join(ROOT, 'content', 'shipping.mjs'), join(DIST, 'assets', 'shipping.mjs'));
 await cp(join(ROOT, 'content', 'rubriques.mjs'), join(DIST, 'assets', 'rubriques.mjs'));
 await cp(join(ROOT, 'content', 'matching-options.mjs'), join(DIST, 'assets', 'matching-options.mjs'));

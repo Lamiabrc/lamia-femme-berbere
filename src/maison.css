@@ -4675,3 +4675,10 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 @media (prefers-reduced-motion: reduce) { .couple .couple-bouton-magique, .couple .couple-bouton-magique::after, .couple-demande-ecran *, .couple-demande-ecran { animation: none !important; } }
 .couple .couple-credits { margin: -8px 0 14px; text-align: right; font-size: .72rem; color: #8a7c95; }
 .couple .couple-photo, .couple .couple-tete-photo, .couple-demande-boite img { background: linear-gradient(135deg, #fdeef2, #f3edfb); }
+
+/* Connexion avec Google, Facebook, LinkedIn (boutons affichés seulement pour les réseaux activés) */
+.connexion-sociale { display: grid; gap: 10px; margin: 0 0 18px; }
+.connexion-sociale[hidden] { display: none; }
+.connexion-sociale-titre { margin: 0; font-size: .95rem; opacity: .8; }
+.connexion-sociale-liste { display: flex; flex-wrap: wrap; gap: 10px; }
+.connexion-sociale-bouton { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; }

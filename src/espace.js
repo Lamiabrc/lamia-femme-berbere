@@ -1,6 +1,7 @@
 // Mon espace : connexion, mot de passe, soirées réservées, liens d'administration.
 import { createClient } from '/vendor/supabase.mjs';
 import { creerCompte, api } from './confidences-commun.js';
+import { boutonsSociaux, completerPrenom } from './connexion-sociale.mjs';
 import { secteurLisible, origineLisible, phrasesDifference, criteresDeQuestion, lib } from './matching-options.mjs';
 
 // Un petit « ? » à ouvrir au lieu d'un paragraphe d'explication (Lamia, 16 nov. 2026 : « trop de texte »).
@@ -35,6 +36,7 @@ async function render() {
   $('[data-espace-in]').hidden = !session || recovering;
   if (!session || recovering) return;
   const u = session.user;
+  completerPrenom(supabase, u);
   // Le titre « Bonjour … » est remplacé par la salutation de la discussion (« Azul … ») : le prénom n'y est alors plus.
   // Sans cette précaution, le passage suivant (retour sur l'onglet, jeton renouvelé) plantait ici et plus rien ne se mettait à jour.
   const zoneEmail = $('[data-espace-email]'), zoneNom = $('[data-espace-nom]');
@@ -683,6 +685,8 @@ function monAbonnement(etat, session) {
     } catch { st.textContent = 'La gestion de l’abonnement n’a pas pu s’ouvrir. Écris à Lamia depuis les Confidences.'; e.target.disabled = false; }
   });
 }
+
+boutonsSociaux(supabase, { url: 'https://tybwvxinigahhntfeeur.supabase.co', cle: 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc', zone: $('[data-connexion-sociale]'), retour: '/mon-espace/', onErreur: () => say($('[data-espace-status]'), 'La connexion avec ce compte n’a pas fonctionné. Réessaie, ou utilise ton email.', true) });
 
 $('[data-espace-login]').addEventListener('submit', async (e) => {
   e.preventDefault();
