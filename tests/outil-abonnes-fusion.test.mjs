@@ -87,16 +87,14 @@ test('publier : une annonce fusionnée avec sa fiche ne revient pas, une nouvell
   await handleAnnonces('outil_publier', { cle, profils: [profil('fiche-1'), profil('site-annonce-38'), profil('site-annonce-99')] }, deps);
   const masque = patches.find((x) => x.table === 'annonces' && x.valeur.visible_anonyme === false);
   const affiche = patches.find((x) => x.table === 'annonces' && x.valeur.visible_anonyme === true);
-  assert.match(masque.filtre, /exportee_at=not\.is\.null/);
-  assert.match(masque.filtre, /not\.in\.\(99\)/);
+  assert.match(masque.filtre, /ref=in\.\(38\)/); // le doublon seulement
   assert.match(affiche.filtre, /ref=in\.\(99\)/);
 });
 
-test('publier avec la liste de l’outil : seules les annonces décochées sortent', async () => {
+test('publier avec la liste de l’outil : le site est la référence, une annonce décochée dans l’outil reste affichée', async () => {
   const { patches, deps } = harnais({ 'annonces?ref=in.(99)': [{ ref: 99, outil_id: null, user_id: 'u9' }] });
   await handleAnnonces('outil_publier', { cle, retires_site: ['site-annonce-12', 'site-annonce-99', 'fiche-1'], profils: [{ outil_id: 'site-annonce-99', genre: 'femme', age: 30 }] }, deps);
   const masque = patches.filter((x) => x.table === 'annonces' && x.valeur.visible_anonyme === false);
-  assert.equal(masque.length, 1);
-  assert.match(masque[0].filtre, /ref=in\.\(12\)/);
+  assert.equal(masque.length, 0);
 });
 

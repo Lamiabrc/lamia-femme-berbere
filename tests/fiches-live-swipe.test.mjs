@@ -460,7 +460,7 @@ test('miroir : fiche archivée dans l’outil → fiche et profil de rencontre r
   assert.equal(db.profils_outil.find((x) => x.ref === 100001).retire_at, null);
 });
 
-test('profil validé sans ses 2 photos : remis en attente et prévenu, revalidable dès les photos ; les fiches du live ne sont pas touchées', async () => {
+test('profil validé sans ses 2 photos : remis en attente et prévenu, revalidable dès les photos ; les profils créés en live aussi (16 nov. 2026)', async () => {
   const { db, ctx } = base({
     annonces: [{ id: 'a-x', ref: 40, user_id: 'u-x', email: 'x@example.com', status: 'publiee', prenom: 'Xa', genre: 'femme', test: false },
       { id: 'a-y', ref: 41, user_id: 'u-y', email: 'y@example.com', status: 'publiee', prenom: 'Yo', genre: 'homme', test: false },
@@ -468,7 +468,7 @@ test('profil validé sans ses 2 photos : remis en attente et prévenu, revalidab
     annonce_files: [{ id: 'p1', annonce_id: 'a-y', kind: 'photo' }, { id: 'p2', annonce_id: 'a-y', kind: 'photo' }, { id: 'p3', annonce_id: 'a-x', kind: 'photo' }],
   });
   await lancerPilote(ctx);
-  assert.deepEqual(db.annonces.map((a) => [a.ref, a.status]), [[40, 'a_verifier'], [41, 'publiee'], [42, 'publiee']]);
+  assert.deepEqual(db.annonces.map((a) => [a.ref, a.status]), [[40, 'a_verifier'], [41, 'publiee'], [42, 'a_verifier']]);
 });
 
 test('fiche du live sans compte ou sans ses 2 photos : proposée, marquée « en attente de validation du profil »', async () => {
