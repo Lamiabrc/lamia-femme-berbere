@@ -424,8 +424,8 @@ zone.addEventListener('submit', (e) => {
   if (f.matches('[data-cadeau-form]')) return faire({ action: 'couple_cadeau', type: f.type.value, note: f.note.value }, () => { f.hidden = true; zone.querySelectorAll('[data-cadeau]').forEach((x) => x.classList.remove('is-choisi')); f.reset(); f.insertAdjacentHTML('afterend', '<p class="form-status">C’est envoyé : Lamia s’en occupe et revient vers toi.</p>'); });
 });
 
-// Démo (aperçus Vercel et poste local seulement) : l'espace de Sara et Amine, pour voir le rendu sans compte.
-const enDemo = /\.vercel\.app$|^localhost$|^127\.0\.0\.1$/.test(location.hostname) && new URLSearchParams(location.search).has('demo');
+// Démo : l'espace de Sara et Amine (inventés), pour voir l'univers sans compte (Lamia, 16 nov. 2026 : « un clic pour le voir sans compte »).
+const enDemo = new URLSearchParams(location.search).has('demo');
 async function demo() {
   const { DEMO } = await import('./couple-demo.js');
   const k = DEMO.consts;
@@ -434,7 +434,9 @@ async function demo() {
   if (mode === 'demande') { c.demande = { ...c.demande, statut: 'attente' }; c.jalons = {}; c.prepa = []; }
   if (mode === 'bouton') { c.demande = null; c.jalons = {}; c.prepa = []; }
   preparerImages();
-  zone.insertAdjacentHTML('beforebegin', '<p class="espace-test-mode"><span>Démo :</span> <a class="btn btn-line" href="?demo=1">Fiancés</a> <a class="btn btn-line" href="?demo=bouton">Le bouton</a> <a class="btn btn-line" href="?demo=demande">La demande</a></p>');
+  zone.insertAdjacentHTML('beforebegin', `<div class="couple-demo-bandeau"><p><strong>Découvre l’espace de Sara et Amine</strong> : un exemple, rien n’est envoyé.</p>
+    <p class="couple-demo-liens"><a class="btn btn-line" href="?demo=1">Fiancés</a> <a class="btn btn-line" href="?demo=bouton">Le bouton magique</a> <a class="btn btn-line" href="?demo=demande">La demande</a></p>
+    <p><a class="btn btn-ink" href="/mon-espace/?retour=${encodeURIComponent('/notre-couple/?inviter=1')}">Créer notre espace de couple 💞</a></p></div>`);
   vue(c);
 }
 

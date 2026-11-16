@@ -4691,3 +4691,8 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .couple .couple-paquet.is-dore { border-color: #e2c27f; background: linear-gradient(135deg, #fffaf0, #fdeef2); }
 .couple .couple-paquet-badge { position: absolute; top: 8px; right: 8px; padding: 2px 8px; border-radius: 999px; background: linear-gradient(110deg, #c9a14f, #8a2640); color: #fff; font-size: .7rem; font-weight: 700; }
 .couple .couple-carte-jeu.is-coquin { background: linear-gradient(160deg, #5a1630, #b0475f); }
+.couple .couple-demo-bandeau { margin: 0 0 14px; padding: 14px 16px; border-radius: 20px; background: linear-gradient(135deg, #fff1f5, #f3edfb); border: 1.5px dashed #e2a3b6; }
+.couple .couple-demo-bandeau p { margin: 0 0 10px; }
+.couple .couple-demo-bandeau p:last-child { margin: 0; }
+.couple .couple-demo-liens { display: flex; flex-wrap: wrap; gap: 6px; }
+.couple .couple-demo-liens .btn { padding: 6px 12px; font-size: .85rem; }
