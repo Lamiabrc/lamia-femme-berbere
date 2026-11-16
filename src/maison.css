@@ -4633,3 +4633,43 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 @media (prefers-reduced-motion: reduce) { .couple .couple-noms .ci, .couple .couple-tete-coeurs i, .couple .couple-carte-jeu { animation: none; } .couple .couple-tete-coeurs { display: none; } }
 .couple .couple-humeurs label, .couple .couple-besoins label { position: relative; }
 .couple .couple-humeurs input, .couple .couple-besoins input { inset: 0; width: 100%; height: 100%; margin: 0; }
+/* De vraies images, et le bouton magique « Et si on se mariait ? » (16 nov. 2026) */
+.couple .couple-tete { padding-top: 0; }
+.couple .couple-tete-photo { display: block; width: calc(100% + 36px); max-width: none; margin: 0 -18px 12px; height: 120px; object-fit: cover; border-radius: 20px 20px 0 0; }
+.couple .couple-photo { display: block; width: calc(100% + 36px); max-width: none; height: 170px; margin: -18px -18px 14px; object-fit: cover; border-radius: 20px 20px 0 0; }
+.couple .couple-magie { position: relative; text-align: center; overflow: hidden; background: linear-gradient(170deg, #fff8ef, #fdeef2 60%, #f3edfb); border-color: #efd9b0; }
+.couple .couple-magie h2 { font-size: 1.7rem; color: #8a2640; }
+.couple .couple-bouton-magique { position: relative; overflow: hidden; display: inline-block; padding: 16px 28px; border: 0; border-radius: 999px; background: linear-gradient(110deg, #8a2640, #d6496b 45%, #c9a14f 70%, #8a2640); background-size: 250% 100%; color: #fff; font: inherit; font-size: 1.15rem; font-weight: 700; cursor: pointer; box-shadow: 0 10px 28px rgba(138, 38, 64, .35), 0 0 0 4px rgba(246, 180, 198, .35); animation: couple-magie 3.2s ease-in-out infinite; }
+.couple .couple-bouton-magique::after, .couple-demande-ecran .couple-bouton-magique::after { content: ''; position: absolute; top: 0; left: -60%; width: 40%; height: 100%; background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .55), transparent); animation: couple-reflet 2.6s ease-in-out infinite; }
+@keyframes couple-magie { 0%, 100% { background-position: 0 0; transform: scale(1); } 50% { background-position: 100% 0; transform: scale(1.04); } }
+@keyframes couple-reflet { 0% { left: -60%; } 60%, 100% { left: 130%; } }
+.couple .couple-etincelles { position: absolute; inset: 14px 0 auto; margin: 0; pointer-events: none; }
+.couple .couple-etincelles i { position: absolute; font-style: normal; color: #c9a14f; animation: couple-scintille 2s ease-in-out infinite; }
+.couple .couple-etincelles i:nth-child(1) { left: 12%; } .couple .couple-etincelles i:nth-child(2) { right: 14%; top: 30px; animation-delay: .7s; } .couple .couple-etincelles i:nth-child(3) { left: 45%; top: 70px; animation-delay: 1.4s; color: #d6496b; }
+.couple .couple-demande-form { display: grid; gap: 10px; text-align: left; margin-top: 10px; }
+.couple .couple-deja { margin: 14px 0 0; font-size: .9rem; }
+.couple .couple-demande-mots { font-family: var(--serif); font-style: italic; font-size: 1.1rem; color: #8a2640; margin: 10px 0 !important; }
+.couple .couple-jourj .couple-jauge { margin: 14px 0 6px; }
+.couple .couple-parcours { list-style: none; margin: 0; padding: 0; counter-reset: etape; }
+.couple .couple-etape { position: relative; overflow: hidden; }
+.couple .couple-etape h3 { margin: 0 0 4px; font-family: var(--serif); font-size: 1.35rem; color: #2b2236; }
+.couple .couple-etape-num { margin: 0; font-size: .8rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #b0475f; }
+.couple .couple-etape.is-fini { border-color: #e7c27a; }
+.couple .couple-etape.is-fini .couple-etape-num { color: #8f6a1e; }
+.couple .couple-etape-illu { display: grid; place-items: center; height: 150px; margin: -18px -18px 14px; border-radius: 20px 20px 0 0; background: linear-gradient(135deg, #fdeef2, #f3edfb 55%, #fbf0d6); }
+.couple .couple-etape-date { position: relative; display: flex; align-items: center; gap: 10px; margin: 10px 0 4px; padding: 10px 12px; border-radius: 14px; background: #faf7fd; border: 1.5px solid #ece3f3; cursor: pointer; font-weight: 600; }
+.couple .couple-etape-date input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+/* L'écran de la demande */
+.couple-demande-ecran { position: fixed; inset: 0; z-index: 120; display: grid; place-items: center; padding: 16px; background: radial-gradient(circle at 50% 30%, rgba(214, 73, 107, .55), rgba(43, 10, 22, .92) 70%); animation: couple-pioche .4s ease-out; overflow: hidden; }
+.couple-demande-boite { position: relative; width: min(420px, 100%); max-height: calc(100dvh - 32px); overflow: auto; padding: 0 20px 22px; border-radius: 26px; background: linear-gradient(170deg, #fffaf2, #fdeef2); text-align: center; box-shadow: 0 30px 80px rgba(0, 0, 0, .45); }
+.couple-demande-boite img { display: block; width: calc(100% + 40px); max-width: none; height: 190px; margin: 0 -20px 14px; object-fit: cover; border-radius: 26px 26px 0 0; }
+.couple-demande-fermer { position: absolute; top: 10px; right: 12px; z-index: 1; width: 34px; height: 34px; border: 0; border-radius: 50%; background: rgba(255, 255, 255, .85); font-size: 1rem; cursor: pointer; }
+.couple-demande-de { margin: 0 0 6px; color: #8a2640; font-weight: 600; }
+.couple-demande-message { margin: 0 0 10px; font-family: var(--serif); font-style: italic; font-size: 1.15rem; color: #2b2236; }
+.couple-demande-question { margin: 6px 0 16px; font-family: var(--serif); font-size: 2rem; color: #8a2640; line-height: 1.15; }
+.couple-demande-boutons { display: grid; gap: 10px; margin: 0; }
+.couple-demande-bravo { margin: 26px 0 0; font-size: 4rem; animation: couple-bat 1.2s ease-in-out infinite; }
+.couple-demande-ecran .couple-bouton-magique { position: relative; overflow: hidden; padding: 16px 28px; border: 0; border-radius: 999px; background: linear-gradient(110deg, #8a2640, #d6496b 45%, #c9a14f 70%, #8a2640); background-size: 250% 100%; color: #fff; font: inherit; font-size: 1.25rem; font-weight: 700; cursor: pointer; animation: couple-magie 3.2s ease-in-out infinite; }
+.couple-petales i { position: absolute; top: -40px; font-style: normal; color: #ffd6e0; font-size: 18px; opacity: .85; animation: couple-petale linear infinite; }
+@keyframes couple-petale { from { transform: translateY(0) rotate(0); } to { transform: translateY(110vh) rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .couple .couple-bouton-magique, .couple .couple-bouton-magique::after, .couple-demande-ecran *, .couple-demande-ecran { animation: none !important; } }

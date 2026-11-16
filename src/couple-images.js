@@ -55,6 +55,7 @@ const DESSINS = {
   civil: ['lilas', '<rect x="15.5" y="12.5" width="17" height="23" rx="2" fill="#fff"/><path d="M19.5 18h9M19.5 22h9M19.5 26h5"/><circle cx="28" cy="30.5" r="2.5" fill="#F7B6C6"/>'],
   voyage: ['menthe', '<path d="M12 27l23-9-6 17-5-6-6 3z" fill="#fff"/><path d="M24 29l11-11"/>'],
 };
+DESSINS.familles = DESSINS.famille; DESSINS.tenues = DESSINS.bijou; DESSINS.mariage_jour = DESSINS.mariage;
 const FONDS = { rose: ['#FDE3EA', '#F6B4C6'], lilas: ['#EFE6FC', '#CDB8F2'], or: ['#FBF0D6', '#EBCB86'], menthe: ['#E3F4EE', '#A9DCCB'] };
 
 // Les dégradés, une seule fois dans la page.

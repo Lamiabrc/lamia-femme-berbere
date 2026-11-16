@@ -8,7 +8,7 @@ const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', PUBLIC
 const zone = document.querySelector('[data-couple]');
 let token = null, types = {}, cadeaux = {}, motsDoux = [], motsPayants = [], moiInfo = {};
 // Plus riche, comme l'espace Famille de QVT Box (16 nov. 2026) : des onglets, la météo du cœur, la question du jour, un calendrier, le bocal à souvenirs.
-let humeurs = {}, besoins = {}, suggestions = {}, idees = {}, jeuxDef = {}, jalonsDef = {}, prepaDef = {}, dernier = null, moisVu = null, jourChoisi = null, tirage = null;
+let humeurs = {}, besoins = {}, suggestions = {}, idees = {}, jeuxDef = {}, jalonsDef = {}, prepaDef = {}, etapesDef = [], demandeMontree = false, dernier = null, moisVu = null, jourChoisi = null, tirage = null;
 let onglet = (() => { try { return localStorage.getItem('lfb-couple-onglet') || 'nous'; } catch { return 'nous'; } })();
 if (new URLSearchParams(location.search).get('onglet')) onglet = new URLSearchParams(location.search).get('onglet');
 const ONGLETS = [['nous', 'Nous'], ['douceurs', 'Douceurs'], ['jeux', 'Jeux'], ['planning', 'Planning'], ['mariage', 'Mariage'], ['aide', 'Soutien']];
@@ -31,6 +31,7 @@ function accueil() {
 }
 
 // Un titre de carte avec sa petite image.
+const photo = (src, alt = '') => `<img class="couple-photo" src="${src}" alt="${esc(alt)}" loading="lazy" decoding="async">`;
 const titre = (nom, texte) => `<h2 class="couple-titre">${img(nom, 'ci-m')}<span>${texte}</span></h2>`;
 const joursAvant = (iso) => Math.ceil((new Date(`${iso}T00:00:00`) - new Date(new Date().toDateString())) / 86400e3);
 
@@ -66,7 +67,7 @@ function vue(c) {
   const ajout = (t, type) => `<button type="button" class="couple-idee" data-ajout-titre="${esc(t)}" data-ajout-type="${esc(type)}">${img(type, 'ci-s')}<span>${esc(t)}</span><b aria-label="Ajouter au planning">+</b></button>`;
   const meteo = c.meteo || {}, mienne = meteo.moi?.derniere, sienne = meteo.lui?.derniere, q = c.question || {};
   const aJouer = (c.jeux || []).filter((j) => !j.de_moi && !j.reponse);
-  const pastilles = { nous: Boolean(sienne?.aujourdhui) || (q.a_repondu && !q.ma_reponse), jeux: aJouer.length > 0 };
+  const pastilles = { nous: Boolean(sienne?.aujourdhui) || (q.a_repondu && !q.ma_reponse), jeux: aJouer.length > 0, mariage: Boolean(c.demande && !c.demande.de_moi && c.demande.statut !== 'oui') };
   const besoinDe = (m) => (m.besoin_nom && m.besoin !== 'rien' ? `<small>Besoin : ${esc(m.besoin_nom.toLowerCase())}</small>` : '');
 
   const formMeteo = `<form class="couple-meteo-form" data-meteo>
@@ -168,19 +169,39 @@ function vue(c) {
       ${Object.entries(idees).map(([theme, liste], i) => `<details class="couple-theme"${i === 0 ? ' open' : ''}><summary>${esc(theme)}</summary><div class="couple-idees">${liste.map(([t, ty]) => ajout(t, ty)).join('')}</div></details>`).join('')}
     </section>`,
 
-    mariage: `<section class="couple-carte couple-jourj">
-        ${img('fiancailles', 'ci-xxl')}
+    mariage: (() => {
+      const d = c.demande, ouvert = d?.statut === 'oui';
+      if (!lui) return `<section class="couple-carte couple-magie">${photo('/images/couple/grand-jour.webp')}<h2>Et si on se mariait ?</h2><p class="aide">Dès que ton ou ta partenaire vous rejoint, ce bouton magique s’allume 💍</p></section>`;
+      if (!ouvert) {
+        if (d && d.statut === 'attente' && d.de_moi) return `<section class="couple-carte couple-magie is-partie">${photo('/images/couple/grand-jour.webp')}<p class="couple-etincelles" aria-hidden="true"><i>✦</i><i>✦</i><i>✦</i></p><h2>Ta demande est partie 💌</h2><p>${sonNom} va la découvrir en ouvrant votre espace. Garde ton téléphone près de ton cœur…</p></section>`;
+        if (d && d.statut === 'reflexion' && d.de_moi) return `<section class="couple-carte couple-magie">${photo('/images/couple/grand-jour.webp')}<h2>${sonNom} prend le temps d’y réfléchir 🌙</h2><p class="aide">Ta demande est bien arrivée. Un grand oui se prépare parfois doucement.</p></section>`;
+        if (d && !d.de_moi) return `<section class="couple-carte couple-magie">${photo('/images/couple/grand-jour.webp')}<h2>${sonNom} t’a posé une question…</h2><p><button type="button" class="couple-bouton-magique" data-demande-voir>Ouvrir sa demande 💍</button></p></section>`;
+        return `<section class="couple-carte couple-magie">${photo('/images/couple/grand-jour.webp')}
+          <p class="couple-etincelles" aria-hidden="true"><i>✦</i><i>✦</i><i>✦</i></p>
+          <h2>Et si on se mariait ?</h2>
+          <p>Fais ta demande à ${sonNom}. S’il ou elle dit oui, votre parcours de fiançailles s’ouvre : les familles, la bague, le henné, la robe, le grand jour…</p>
+          <p><button type="button" class="couple-bouton-magique" data-demande-ouvrir>Et si on se mariait ? 💍</button></p>
+          <form class="couple-demande-form" data-demande-form hidden>
+            <label>Tes mots pour ${sonNom} (facultatif)<textarea name="message" rows="4" maxlength="600" placeholder="Depuis que tu es entré·e dans ma vie…"></textarea></label>
+            <button type="submit" class="btn btn-ink">Faire ma demande 💍</button></form>
+          <p class="couple-deja"><button type="button" class="link-button" data-demande-deja>Déjà fiancés ? Ouvrir notre parcours</button></p>
+        </section>`;
+      }
+      return `<section class="couple-carte couple-jourj">
+        ${photo('/images/couple/grand-jour.webp')}
         ${jourJ !== null ? (jourJ > 0 ? `<p class="couple-jourj-chiffre">J-${jourJ}</p><p>avant le grand jour, le ${esc(new Date(`${jalons.mariage}T12:00:00`).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }))}</p>` : jourJ === 0 ? '<p class="couple-jourj-chiffre">C’est aujourd’hui !</p><p>Tous nos vœux de bonheur 💍</p>' : '<p class="couple-jourj-chiffre">Mariés ♡</p><p>Envoyez votre photo plus bas : Lamia vous offre un cadeau.</p>')
-          : '<p class="couple-jourj-chiffre">Le grand jour</p><p>Fixez sa date ci-dessous : le compte à rebours commence.</p>'}
-      </section>
-      <section class="couple-carte">${titre('demande', 'Nos grandes étapes')}
-        <ol class="couple-etapes">${Object.entries(jalonsDef).map(([k, v]) => { const d = jalons[k], passe = d && joursAvant(d) < 0; return `<li class="${d ? 'a-date' : ''}${passe ? ' is-passe' : ''}">${img(k, 'ci-m')}<span><strong>${esc(v)}</strong><small>${d ? `${esc(new Date(`${d}T12:00:00`).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }))}${passe ? ' · c’est fait ♡' : joursAvant(d) === 0 ? ' · aujourd’hui !' : ` · dans ${joursAvant(d)} j`}` : 'Date à fixer'}</small></span><input type="date" value="${esc(d || '')}" data-jalon="${esc(k)}" aria-label="Date : ${esc(v)}"></li>`; }).join('')}</ol>
-      </section>
-      <section class="couple-carte couple-prepa">${titre('planning', 'Préparer notre mariage')}
+          : '<p class="couple-jourj-chiffre">Fiancés 💍</p><p>Fixez la date du grand jour plus bas : le compte à rebours commence.</p>'}
+        ${d.message ? `<p class="couple-demande-mots">« ${esc(d.message)} »</p>` : ''}
         <div class="couple-jauge" role="progressbar" aria-valuemin="0" aria-valuemax="${nbPrepa}" aria-valuenow="${faits.size}"><span style="width:${Math.round((faits.size / (nbPrepa || 1)) * 100)}%"></span></div>
-        <p class="aide">${faits.size} sur ${nbPrepa} · cochée par l’un, cochée pour les deux.</p>
-        <ul class="couple-prepa-liste">${Object.entries(prepaDef).map(([k, v]) => `<li><label><input type="checkbox" data-prepa="${esc(k)}"${faits.has(k) ? ' checked' : ''}> <span>${esc(v)}</span></label></li>`).join('')}</ul>
+        <p class="aide">${faits.size} sur ${nbPrepa} préparatifs · cochés par l’un, cochés pour les deux</p>
       </section>
+      <ol class="couple-parcours">${etapesDef.map((e, i) => { const dt = jalons[e.cle], fini = e.prepa.every((k) => faits.has(k)); return `<li class="couple-carte couple-etape${fini ? ' is-fini' : ''}">
+        ${e.image ? photo(e.image) : `<div class="couple-etape-illu">${img(e.cle, 'ci-xxl')}</div>`}
+        <p class="couple-etape-num">Étape ${i + 1}${fini ? ' · c’est prêt ♡' : ''}</p>
+        <h3>${esc(e.nom)}</h3><p class="aide">${esc(e.texte)}</p>
+        <label class="couple-etape-date">${img('planning', 'ci-s')}<span>${dt ? esc(new Date(`${dt}T12:00:00`).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })) + (joursAvant(dt) > 0 ? ` · J-${joursAvant(dt)}` : joursAvant(dt) === 0 ? ' · aujourd’hui !' : ' · c’est fait ♡') : 'Choisir la date'}</span><input type="date" value="${esc(dt || '')}" data-jalon="${esc(e.cle)}" aria-label="Date : ${esc(e.nom)}"></label>
+        <ul class="couple-prepa-liste">${e.prepa.map((k) => `<li><label><input type="checkbox" data-prepa="${esc(k)}"${faits.has(k) ? ' checked' : ''}> <span>${esc(prepaDef[k] || k)}</span></label></li>`).join('')}</ul>
+      </li>`; }).join('')}</ol>
       <section class="couple-carte couple-inspi">${titre('fleurs', 'Pour vous inspirer')}
         <div class="couple-soutien-liste">
           <a href="/guides/mariage-kabyle/">${img('henne', 'ci-l')}<strong>Le mariage kabyle</strong><small>Le henné, la robe, la fête</small></a>
@@ -188,7 +209,7 @@ function vue(c) {
           <a href="/abonnement/#unite-sauver_couple">${img('coaching', 'ci-l')}<strong>Coaching avant le mariage</strong><small>Une séance avec Lamia, à deux</small></a>
           <a href="/salon/">${img('rendez_vous', 'ci-l')}<strong>Les lives</strong><small>Les thèmes mariage de Lamia</small></a>
         </div></section>
-      ${lui ? `<section class="couple-carte couple-mariage">
+      <section class="couple-carte couple-mariage">
       ${titre('fiancailles', 'On s’est mariés')}
       <div class="avec-aide"><button type="button" class="btn btn-ink" data-mariage-ouvrir>Nous nous sommes mariés !</button>${aideQ('Félicitations ! Envoie une photo de votre mariage : Lamia vous offre un cadeau. La photo reste privée, elle n’est jamais publiée.')}</div>
       <form class="couple-mariage-form" data-mariage-form hidden>
@@ -196,7 +217,8 @@ function vue(c) {
         <label>La date du mariage<input name="date" type="date" value="${esc(jalons.mariage || '')}"></label>
         <label>Adresse pour recevoir le cadeau<textarea name="adresse" rows="3" maxlength="400" required placeholder="Prénom Nom, rue, code postal, ville, pays"></textarea></label>
         <button type="submit" class="btn btn-ink">Envoyer à Lamia 🎁</button>
-      </form></section>` : ''}`,
+      </form></section>`;
+    })(),
 
     aide: `<section class="couple-carte couple-soutien">${titre('aide', 'Besoin d’un coup de main ?')}
       <p class="aide">Une dispute qui revient, un passage difficile, un projet à deux : Lamia vous accompagne.</p>
@@ -211,6 +233,7 @@ function vue(c) {
   if (!panneaux[onglet]) onglet = 'nous';
 
   zone.innerHTML = `<section class="couple-carte couple-tete">
+      <img class="couple-tete-photo" src="/images/couple/banniere.webp" alt="" decoding="async">
       <span class="couple-tete-coeurs" aria-hidden="true"><i>♥</i><i>♥</i><i>♥</i><i>♥</i><i>♥</i></span>
       <p class="couple-noms"><span>${esc(moi?.prenom || 'Moi')}</span> ${img('fiancailles', 'ci-l couple-bat')} <span>${lui ? esc(lui.prenom) : '<em>en attente</em>'}</span></p>
       ${lui ? `${jourJ > 0 ? `<p class="couple-tete-meteo">💍 J-${jourJ} avant le grand jour</p>` : ''}${sienne?.aujourdhui ? `<p class="couple-tete-meteo">Aujourd’hui ${esc(lui.prenom)} : ${img(`h${sienne.humeur}`, 'ci-xs')} ${esc(sienne.mot.toLowerCase())}</p>` : ''}` : `<div class="couple-code"><p>Invite ton ou ta partenaire 💌</p><p class="couple-code-valeur">${c.code ? esc(c.code) : '—'}</p>${c.code ? (() => { const t = invitation(c.code); return `<p class="couple-envois"><a class="btn btn-ink" href="sms:?&body=${encodeURIComponent(t)}">Par SMS</a><a class="btn btn-ink" href="https://wa.me/?text=${encodeURIComponent(t)}" target="_blank" rel="noopener">WhatsApp</a><a class="btn btn-line" href="mailto:?subject=${encodeURIComponent('Rejoins notre espace de couple 💞')}&body=${encodeURIComponent(t)}">Par email</a>${navigator.share ? `<button type="button" class="btn btn-line" data-couple-partager="${esc(c.code)}">Autre…</button>` : ''}</p>`; })() : ''}<p><button type="button" class="link-button" data-couple-code>Nouveau code</button></p></div>`}
@@ -223,12 +246,46 @@ function vue(c) {
     </section>` : ''}
     <nav class="couple-onglets" aria-label="Notre espace">${ONGLETS.map(([k, n]) => `<button type="button" data-onglet="${k}"${k === onglet ? ' aria-current="page"' : ''}>${img(k, 'ci-m')}${n}${pastilles[k] && onglet !== k ? '<i class="couple-pastille" aria-label="Nouveau"></i>' : ''}</button>`).join('')}</nav>
     <div class="couple-panneau">${panneaux[onglet]}</div>`;
+  if (c.demande && !c.demande.de_moi && c.demande.statut === 'attente' && !demandeMontree) { demandeMontree = true; laDemande(c); }
+}
+
+// La demande en mariage, en grand : l'écran s'habille, les pétales tombent, et on répond.
+function laDemande(c) {
+  const lui = c.membres.find((m) => !m.moi), d = c.demande;
+  document.querySelector('.couple-demande-ecran')?.remove();
+  const e = document.createElement('div');
+  e.className = 'couple-demande-ecran'; e.setAttribute('role', 'dialog'); e.setAttribute('aria-modal', 'true'); e.setAttribute('aria-label', 'Demande en mariage');
+  e.innerHTML = `<div class="couple-petales" aria-hidden="true">${Array.from({ length: 16 }, (_, i) => `<i style="left:${(i * 37) % 100}%;animation-delay:${(i % 8) * 0.6}s;animation-duration:${6 + (i % 5)}s">${['🌸', '❤', '✦', '🤍'][i % 4]}</i>`).join('')}</div>
+    <div class="couple-demande-boite">
+      <button type="button" class="couple-demande-fermer" data-fermer aria-label="Fermer">✕</button>
+      <img src="/images/couple/grand-jour.webp" alt="">
+      <p class="couple-demande-de">${esc(lui?.prenom || 'Ton amour')} a une question pour toi…</p>
+      ${d.message ? `<p class="couple-demande-message">« ${esc(d.message)} »</p>` : ''}
+      <p class="couple-demande-question">Et si on se mariait ?</p>
+      <p class="couple-demande-boutons"><button type="button" class="couple-bouton-magique" data-oui>Oui ! 💍</button><button type="button" class="btn btn-line" data-reflechir>Laisse-moi y réfléchir</button></p>
+    </div>`;
+  document.body.appendChild(e);
+  e.querySelector('[data-oui]').focus();
+  e.addEventListener('click', async (ev) => {
+    if (ev.target.closest('[data-fermer]')) { e.remove(); return; }
+    const oui = ev.target.closest('[data-oui]'), non = ev.target.closest('[data-reflechir]');
+    if (!oui && !non) return;
+    e.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+    try {
+      const r = await appel({ action: 'couple_demande_repondre', oui: Boolean(oui) });
+      if (oui) {
+        e.querySelector('.couple-demande-boite').innerHTML = '<p class="couple-demande-bravo">💍</p><p class="couple-demande-question">Vous êtes fiancés !</p><p>Votre parcours vers le grand jour s’ouvre…</p>';
+        coeurs(); setTimeout(coeurs, 700);
+        setTimeout(() => { e.remove(); onglet = 'mariage'; if (r.couple) vue(r.couple); zone.querySelector('.couple-onglets')?.scrollIntoView({ behavior: 'smooth' }); }, 3200);
+      } else { e.remove(); if (r.couple) vue(r.couple); bulle('Prends ton temps 🌙 Tu pourras dire oui depuis l’onglet Mariage.'); }
+    } catch { e.querySelectorAll('button').forEach((b) => { b.disabled = false; }); bulle('Ça n’a pas fonctionné. Réessaie dans un instant.'); }
+  });
 }
 
 async function charger() {
   try {
     const r = await appel({ action: 'couple_etat' });
-    types = r.types || {}; cadeaux = r.cadeaux || {}; humeurs = r.humeurs || {}; besoins = r.besoins || {}; suggestions = r.suggestions || {}; idees = r.idees || {}; jeuxDef = r.jeux || {}; jalonsDef = r.jalons || {}; prepaDef = r.prepa || {}; motsDoux = r.mots_doux || []; motsPayants = r.mots_payants || [];
+    types = r.types || {}; cadeaux = r.cadeaux || {}; humeurs = r.humeurs || {}; besoins = r.besoins || {}; suggestions = r.suggestions || {}; idees = r.idees || {}; jeuxDef = r.jeux || {}; jalonsDef = r.jalons || {}; prepaDef = r.prepa || {}; etapesDef = r.etapes || []; motsDoux = r.mots_doux || []; motsPayants = r.mots_payants || [];
     const q = new URLSearchParams(location.search);
     if (!r.couple && q.get('code')) return faire({ action: 'couple_rejoindre', code: q.get('code') });
     if (!r.couple && q.has('inviter')) return faire({ action: 'couple_creer' });
@@ -272,6 +329,9 @@ zone.addEventListener('click', async (e) => {
   if (paquet) { const j = jeuxDef[paquet.dataset.jeu]; tirage = { jeu: paquet.dataset.jeu, i: Math.floor(Math.random() * j.cartes.length) }; vue(dernier); zone.querySelector('[data-tirage]')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
   if (e.target.closest('[data-jeu-autre]')) { const n = jeuxDef[tirage.jeu].cartes.length; tirage = { ...tirage, i: (tirage.i + 1 + Math.floor(Math.random() * (n - 1))) % n }; vue(dernier); return; }
   if (e.target.closest('[data-jeu-envoyer]')) { const t = tirage; tirage = null; return faire({ action: 'couple_jeu', jeu: t.jeu, i: t.i }, () => { coeurs(); bulle('Carte envoyée 💌'); }); }
+  if (e.target.closest('[data-demande-ouvrir]')) { const f = zone.querySelector('[data-demande-form]'); f.hidden = false; e.target.closest('[data-demande-ouvrir]').hidden = true; f.message.focus(); return; }
+  if (e.target.closest('[data-demande-voir]')) { laDemande(dernier); return; }
+  if (e.target.closest('[data-demande-deja]')) { if (confirm('Vous êtes déjà fiancés ? Votre parcours s’ouvre pour vous deux.')) faire({ action: 'couple_demande', deja: true }, () => coeurs()); return; }
   if (e.target.closest('[data-piocher]')) { const l = dernier?.souvenirs || [], x = l[Math.floor(Math.random() * l.length)], p = zone.querySelector('[data-pioche]'); if (x && p) { p.hidden = false; p.textContent = `✨ ${x.texte}`; p.classList.remove('is-anim'); void p.offsetWidth; p.classList.add('is-anim'); } return; }
   if (e.target.closest('[data-couple-creer]')) return faire({ action: 'couple_creer' });
   if (e.target.closest('[data-couple-abo]')) { const box = zone.querySelector('[data-couple-abo-box]'); if (box) { box.hidden = false; box.scrollIntoView({ behavior: 'smooth', block: 'center' }); } return; }
@@ -344,6 +404,7 @@ zone.addEventListener('submit', (e) => {
     return;
   }
   if (f.matches('[data-meteo]')) { if (!f.humeur.value) return bulle('Choisis comment tu te sens.'); return faire({ action: 'couple_humeur', humeur: Number(f.humeur.value), besoin: f.besoin?.value || null, note: f.note.value, partage: f.partage ? f.partage.checked : true }, () => bulle(f.partage && !f.partage.checked ? 'C’est noté, rien que pour toi.' : 'C’est partagé 💞')); }
+  if (f.matches('[data-demande-form]')) { f.querySelector('[type=submit]').disabled = true; return faire({ action: 'couple_demande', message: f.message.value }, () => { coeurs(); setTimeout(coeurs, 600); }); }
   if (f.matches('[data-jeu-reponse]')) return faire({ action: 'couple_jeu_repondre', id: f.dataset.jeuReponse, texte: f.texte.value }, () => { coeurs(); bulle('Réponse envoyée 💞'); });
   if (f.matches('[data-reponse]')) return faire({ action: 'couple_reponse', texte: f.texte.value }, () => coeurs());
   if (f.matches('[data-souvenir]')) return faire({ action: 'couple_souvenir', texte: f.texte.value, quand: f.quand.value || null }, () => bulle('Dans le bocal ✨'));

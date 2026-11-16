@@ -162,3 +162,30 @@ test('jeux d’amour à distance et fiançailles : la carte part chez l’autre,
   assert.equal(db.couple_activites.filter((x) => x.type === 'jalon').length, 1);
   assert.equal(r.couple.activites.length, 0);
 });
+
+test('« Et si on se mariait ? » : la demande part chez l’autre ; oui = parcours ouvert, Lamia prévenue ; « déjà fiancés » ouvre tout de suite', async () => {
+  const { ctx, alertes } = monde();
+  const pousses = [];
+  const avec = (u) => ({ ...ctx(u), pousser: async (uid, m) => { pousses.push([uid, m.titre]); return 1; } });
+  const r0 = await lire(await actionCouple('couple_creer', {}, avec(AMINE)));
+  assert.equal((await actionCouple('couple_demande', {}, avec(AMINE))).status, 409); // seul : pas encore de demande possible
+  await actionCouple('couple_rejoindre', { code: r0.couple.code }, avec(SARA));
+  let r = await lire(await actionCouple('couple_demande', { message: 'Veux-tu marcher à mes côtés toute la vie ?' }, avec(AMINE)));
+  assert.deepEqual([r.couple.demande.de_moi, r.couple.demande.statut], [true, 'attente']);
+  assert.ok(pousses.some(([uid, t]) => uid === 'u-sara' && t.includes('question')));
+  assert.equal((await actionCouple('couple_demande_repondre', { oui: true }, avec(AMINE))).status, 404); // on ne répond pas à sa propre demande
+  r = await lire(await actionCouple('couple_demande_repondre', { oui: false }, avec(SARA)));
+  assert.equal(r.couple.demande.statut, 'reflexion');
+  r = await lire(await actionCouple('couple_demande_repondre', { oui: true }, avec(SARA)));
+  assert.equal(r.couple.demande.statut, 'oui');
+  assert.equal(r.couple.demande.message, 'Veux-tu marcher à mes côtés toute la vie ?');
+  assert.deepEqual(Object.keys(r.couple.jalons), ['demande']);
+  assert.ok(alertes.some((t) => t.includes('se fiancent')));
+  assert.ok(pousses.some(([uid, t]) => uid === 'u-amine' && t.includes('a dit oui')));
+
+  const autre = monde();
+  const a0 = await lire(await actionCouple('couple_creer', {}, autre.ctx(AMINE)));
+  await actionCouple('couple_rejoindre', { code: a0.couple.code }, autre.ctx(SARA));
+  r = await lire(await actionCouple('couple_demande', { deja: true }, autre.ctx(SARA)));
+  assert.equal(r.couple.demande.statut, 'oui');
+});
