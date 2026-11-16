@@ -456,7 +456,7 @@ async function monProfil(session) {
     box.querySelectorAll('[data-annonce-pause]').forEach((b) => b.addEventListener('click', async () => {
       const st = box.querySelector('[data-profil-statut]');
       b.disabled = true;
-      try { await appelProfil({ action: 'annonce_pause', pause: b.dataset.annoncePause === 'oui', raison: b.dataset.raison || null }, session); await monProfil(session); }
+      try { await appelProfil({ action: 'annonce_pause', pause: b.dataset.annoncePause === 'oui', raison: b.dataset.raison || null }, session); if (b.dataset.raison === 'couple') { location.href = '/notre-couple/'; return; } await monProfil(session); }
       catch { b.disabled = false; if (st) st.textContent = 'Ça n’a pas marché. Réessaie dans un instant.'; }
     }));
     { const zm = box.querySelector('[data-profil-medias]');

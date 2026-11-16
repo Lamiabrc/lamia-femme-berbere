@@ -4344,3 +4344,32 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .annonce-choix input[name=genre]:focus-visible { outline: 3px solid #b9a3dd; outline-offset: 2px; }
 /* Fiche du live pas encore validée (15 nov. 2026) */
 .po-app.po-app .swipe-carte .swipe-statut.is-attente { background: #f3ece2; color: #7a6248; }
+
+/* Notre couple (16 nov. 2026) */
+.couple .couple-carte { margin: 0 0 18px; padding: 18px; border-radius: 20px; background: #fff; border: 1px solid rgba(74, 52, 112, .12); }
+.couple .couple-carte h2 { margin: 0 0 10px; font-size: 1.25rem; }
+.couple .couple-noms { margin: 0; font-family: var(--serif); font-size: 1.6rem; text-align: center; }
+.couple .couple-noms span { color: #b0475f; margin: 0 6px; }
+.couple .couple-code { text-align: center; margin-top: 10px; }
+.couple .couple-code-valeur { font-size: 2rem; letter-spacing: .3em; font-weight: 700; color: #4a3470; margin: 4px 0 10px; }
+.couple .couple-rejoindre { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; margin-top: 14px; }
+.couple .couple-rejoindre label { flex: 1 1 160px; }
+.couple .couple-liste { list-style: none; margin: 0; padding: 0; }
+.couple .couple-liste li { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid rgba(74, 52, 112, .1); }
+.couple .couple-liste li > span { flex: 1; display: flex; flex-direction: column; }
+.couple .couple-liste small { color: #6b5a72; }
+.couple .couple-liste li.is-fait strong { text-decoration: line-through; opacity: .6; }
+.couple .couple-coche input { width: 22px; height: 22px; accent-color: #4a3470; }
+.couple .couple-ajout { margin-top: 12px; }
+.couple .couple-ajout > summary { list-style: none; display: inline-flex; cursor: pointer; }
+.couple .couple-ajout > summary::-webkit-details-marker { display: none; }
+.couple .couple-ajout form { display: grid; gap: 10px; margin-top: 12px; }
+.couple .couple-pour { display: flex; gap: 16px; border: 0; padding: 0; margin: 0; }
+.couple .couple-faites { margin-top: 12px; }
+.couple .couple-faites summary { cursor: pointer; color: #4a3470; font-weight: 600; }
+.couple .couple-cadeaux { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.couple .couple-cadeau { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 6px; border-radius: 16px; border: 1.5px solid #e6dcef; background: #fbf8fe; font: inherit; font-weight: 600; color: #2b2236; cursor: pointer; }
+.couple .couple-cadeau span { font-size: 1.8rem; }
+.couple .couple-cadeau.is-choisi { border-color: #4a3470; background: #f3edfb; }
+.couple .couple-cadeau-form { display: grid; gap: 10px; margin-top: 12px; }
+.couple .couple-quitter { text-align: center; }

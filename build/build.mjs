@@ -243,7 +243,7 @@ function header(room) {
         <div class="maison-menu-etage"><p>Rencontres</p><ul><li><a href="/rencontres/#profils-anonymes"><strong>Les profils</strong></a></li><li><a href="/rencontres/swipe/"><strong>Swiper les profils</strong></a></li><li><a href="/rencontres/#confier"><strong>Créer mon profil</strong></a></li><li><a href="/speed-dating/"><strong>Speed dating</strong></a></li><li><a href="/abonnement/"><strong>Les formules</strong></a></li><li><a href="/salon/"><strong>Le live</strong></a></li><li><a href="/confidences/"><strong>Écrire à Lamia</strong></a></li></ul></div>
         <div class="maison-menu-etage"><p>L’univers de Lamia</p><ul><li><a href="/lamia-brechet/"><strong>Qui est Lamia</strong></a></li><li><a href="/ecrin/"><strong>Bijoux kabyles</strong></a></li><li><a href="/werdi-ouvre-les-yeux/"><strong>Le livre Werdi</strong></a></li><li><a href="/boutique/"><strong>La boutique</strong></a></li><li><a href="/galerie/"><strong>La galerie</strong></a></li></ul></div>
         <div class="maison-menu-etage maison-menu-langues"><p>Langue</p><ul><li><a href="/" hreflang="fr" lang="fr"><strong>Français</strong></a></li><li><a href="/en/" hreflang="en" lang="en"><strong>English</strong></a></li><li><a href="/ar/" hreflang="ar" lang="ar" dir="rtl"><strong>العربية</strong></a></li><li><a href="/kab/" hreflang="kab" lang="kab"><strong>Taqbaylit</strong></a></li></ul></div>
-        <div class="maison-menu-etage"><p>Mon compte</p><ul><li><a href="/mon-espace/"><strong>Mon espace</strong></a></li><li><a href="/application/"><strong>L’application</strong></a></li></ul></div>
+        <div class="maison-menu-etage"><p>Mon compte</p><ul><li><a href="/mon-espace/"><strong>Mon espace</strong></a></li><li><a href="/notre-couple/">Notre couple</a></li><li><a href="/application/"><strong>L’application</strong></a></li></ul></div>
       </div>
     </details>
     <a class="cloche" href="/nouveautes/" aria-label="Les nouveautés"><svg class="ico" aria-hidden="true"><use href="/icones.svg#cloche"/></svg><b data-cloche-point hidden></b></a>
@@ -817,6 +817,25 @@ for (const g of GUIDES) {
 </article>`,
   }));
 }
+
+// Notre couple : espace à deux, à part des rencontres (Lamia, 16 nov. 2026)
+page(
+  '/notre-couple/',
+  layout({
+    title: 'Notre couple · Lamia Femme Berbère',
+    description: 'Votre espace à deux : planning d’activités de couple, coaching, lives et boutique.',
+    path: '/notre-couple/',
+    room: roomBySlug.hall,
+    ambiance: 'espace',
+    noindex: true,
+    scripts: ['/assets/couple.js'],
+    body: `<section class="espace couple">
+  <p class="room-name"><span class="pip" aria-hidden="true"></span>Notre couple</p>
+  <h1>Notre couple</h1>
+  <div data-couple><p class="loading">Un instant…</p></div>
+</section>`,
+  }),
+);
 
 // Mon espace : connexion des membres et de Lamia
 page(
@@ -2241,7 +2260,7 @@ await cp(join(ROOT, 'public'), DIST, { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await writeFile(join(DIST, 'assets', 'editable.json'), JSON.stringify({ fields: [...EDITABLE, ...REGISTRE], defaults: DEFAULTS }));
-for (const f of ['lien-mot-de-passe.js', 'version-play.js', 'erreurs.js', 'abonnement.js', 'abonnement-merci.js', 'swipe.js', 'swipe-accueil.js', 'sincerite.js', 'signaler.js', 'nouveautes.js', 'live.js', 'confirmer.js', 'visio-invite.js', 'maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'soirees.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'annonces.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
+for (const f of ['lien-mot-de-passe.js', 'version-play.js', 'erreurs.js', 'abonnement.js', 'abonnement-merci.js', 'couple.js', 'swipe.js', 'swipe-accueil.js', 'sincerite.js', 'signaler.js', 'nouveautes.js', 'live.js', 'confirmer.js', 'visio-invite.js', 'maison.css', 'maison.js', 'membre.js', 'antichambre.js', 'soirees.js', 'bal.js', 'espace.js', 'confidences.js', 'confidences-commun.js', 'annonces.js', 'enregistreur.js', 'confidences-lamia.js', 'confidences-lamia.css']) await cp(join(ROOT, 'src', f), join(DIST, 'assets', f));
 await cp(join(ROOT, 'content', 'shipping.mjs'), join(DIST, 'assets', 'shipping.mjs'));
 await cp(join(ROOT, 'content', 'rubriques.mjs'), join(DIST, 'assets', 'rubriques.mjs'));
 await cp(join(ROOT, 'content', 'matching-options.mjs'), join(DIST, 'assets', 'matching-options.mjs'));
