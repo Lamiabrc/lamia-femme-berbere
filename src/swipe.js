@@ -153,7 +153,7 @@ function afficher() {
   // Fin de la pile : on repart pour un tour, le swipe ne s'arrête jamais.
   if (!profils.length && !tous.length && dejaCharge && !enRecharge) { recharger(); return; }
   if (!profils.length && tous.length) return message(`<p class="swipe-coeur"></p><h2>Aucun profil avec ces filtres</h2><p>${tous.length} profil${tous.length > 1 ? 's restent' : ' reste'} à découvrir si tu élargis ta recherche : ouvre les filtres et enlève un critère.</p>`);
-  if (!profils.length) return message(`<p class="swipe-coeur"><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg></p><h2>Tu as vu tous les profils pour le moment</h2>${coeurs ? `<p><strong>${coeurs} coup${coeurs > 1 ? 's' : ''} de cœur</strong> envoyé${coeurs > 1 ? 's' : ''} aujourd’hui</p>` : ''}<p>Lamia a noté tes choix. Si une personne que tu as choisie te choisit aussi, Lamia est prévenue tout de suite et revient vers toi pour la mise en relation. Ton identité n’est jamais révélée : les autres ne voient qu’un numéro de profil.</p><p>De nouveaux profils arrivent chaque semaine : reviens bientôt.</p><p><a class="po-btn" href="/mon-espace/">Suivre mes demandes</a></p>`);
+  if (!profils.length) return message(`<p class="swipe-coeur"><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg></p><h2>Tu as vu tous les profils pour le moment</h2>${coeurs ? `<p><strong>${coeurs} coup${coeurs > 1 ? 's' : ''} de cœur</strong> envoyé${coeurs > 1 ? 's' : ''} aujourd’hui</p>` : ''}<p>Tes choix sont notés. Si une personne que tu as choisie te choisit aussi, vous êtes mis en relation. Ton identité n’est jamais révélée : les autres ne voient qu’un numéro de profil.</p><p>De nouveaux profils arrivent chaque semaine : reviens bientôt.</p><p><a class="po-btn" href="/mon-espace/">Suivre mes demandes</a></p>`);
   zone.innerHTML = profils.slice(0, 2).reverse().map(carte).join('');
   document.querySelector('[data-swipe-boutons]').hidden = false;
   glisser(zone.lastElementChild);
@@ -176,7 +176,7 @@ function toast(texte) {
   const t = document.createElement('div'); t.className = 'swipe-toast'; t.textContent = texte;
   document.body.appendChild(t); setTimeout(() => t.classList.add('is-sortie'), 1600); setTimeout(() => t.remove(), 2100);
 }
-const PALIERS = { 5: '5 coups de cœur ! Tu es lancé·e', 10: '10 coups de cœur : Lamia adore ton énergie', 25: '25 ! Ton âme sœur est peut-être tout près', 50: '50 coups de cœur : tu es une star du swipe' };
+const PALIERS = { 5: '5 coups de cœur ! Tu es lancé·e', 10: '10 coups de cœur : on adore ton énergie', 25: '25 ! Ton âme sœur est peut-être tout près', 50: '50 coups de cœur : tu es une star du swipe' };
 function fenetre(html, classe = '', fermer = '<p class="po-actions"><button type="button" class="po-btn" data-fermer>Continuer</button></p>') {
   document.querySelector('.swipe-fenetre')?.remove();
   const d = document.createElement('div'); d.className = `swipe-fenetre ${classe}`; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true');
@@ -201,7 +201,7 @@ function bienvenue() {
 }
 function celebrerMatch(ref) {
   vibrer([40, 60, 40, 60, 120]);
-  const d = fenetre(`<p class="swipe-match-coeurs" aria-hidden="true"><img class="tayri-coeur-match" src="/images/marque/tayri-coeur.webp" alt="" width="84" height="84"></p><h2>C’est réciproque !</h2><p>Le profil <strong>n° ${esc(ref)}</strong> t’a choisi·e aussi. Lamia est prévenue à l’instant : elle regarde votre compatibilité et revient vers toi pour la mise en relation.</p>`, 'is-match');
+  const d = fenetre(`<p class="swipe-match-coeurs" aria-hidden="true"><img class="tayri-coeur-match" src="/images/marque/tayri-coeur.webp" alt="" width="84" height="84"></p><h2>C’est réciproque !</h2><p>Le profil <strong>n° ${esc(ref)}</strong> t’a choisi·e aussi. Vous êtes mis en relation très vite : ta discussion s’ouvre dans ton espace.</p>`, 'is-match');
   const r = d.querySelector('.swipe-fenetre-boite').getBoundingClientRect();
   for (let k = 0; k < 3; k += 1) setTimeout(() => eclat(r.left + r.width / 2, r.top + 60, ['', '', '', '', ''], 22), k * 280);
 }
@@ -241,7 +241,7 @@ function quotaAtteint({ algerie, formule } = {}) {
 }
 // Bloquer ou signaler le profil affiché. Bloquer le retire tout de suite, et la personne n'en sait rien.
 function moderer(ref) {
-  const d = fenetre(`<h2>Profil n° ${esc(ref)}</h2><p>Vous ne vous verrez plus et vous ne pourrez plus vous écrire. Lamia reçoit une alerte et regarde ce profil. La personne n’est pas prévenue.</p>${SIGNALEMENT_HTML}<p class="po-actions"><button type="button" class="po-btn" data-bloquer><svg class="ico" aria-hidden="true"><use href="/icones.svg#flag"/></svg> Bloquer et signaler</button></p><p class="form-status" role="status" data-moderer-statut></p>`);
+  const d = fenetre(`<h2>Profil n° ${esc(ref)}</h2><p>Vous ne vous verrez plus et vous ne pourrez plus vous écrire. La modération reçoit une alerte et regarde ce profil. La personne n’est pas prévenue.</p>${SIGNALEMENT_HTML}<p class="po-actions"><button type="button" class="po-btn" data-bloquer><svg class="ico" aria-hidden="true"><use href="/icones.svg#flag"/></svg> Bloquer et signaler</button></p><p class="form-status" role="status" data-moderer-statut></p>`);
   const envoyer = async (action, fin) => {
     const sig = lireSignalement(d, d.querySelector('[data-moderer-statut]'));
     if (!sig) return;
@@ -366,7 +366,7 @@ document.querySelector('[data-swipe-mot]')?.addEventListener('click', () => {
     <p class="lettre-discret"><svg class="ico" aria-hidden="true"><use href="/icones.svg#shield"/></svg> Tu restes anonyme : numéros, liens et réseaux sont masqués.</p>
     ${creditsCoeur > 0
       ? `<p class="po-actions"><button type="button" class="po-btn" data-mot-envoyer>Envoyer mon mot doux</button></p><p class="swipe-mot-credits">${creditsCoeur} mot${creditsCoeur > 1 ? 's' : ''} doux disponible${creditsCoeur > 1 ? 's' : ''}</p>`
-      : algerie ? '<p>Le paiement en ligne n’est pas possible depuis l’Algérie : envoie un cœur simple, ou viens au live de Lamia.</p>'
+      : algerie ? '<p>Le paiement en ligne n’est pas possible depuis l’Algérie : envoie un cœur simple, ou viens au live.</p>'
         : '<label class="lettre-cgv"><input type="checkbox" data-mot-cgv><span>J’accepte les <a class="text-link" href="/cgv/" target="_blank">conditions de vente</a></span></label><p class="po-actions"><button type="button" class="po-btn" data-mot-acheter>Envoyer mon mot doux · 2 €</button></p><p class="swipe-mot-credits">Après le paiement, tu reviens ici : ton message t’attend.</p>'}`, 'is-lettre', '<p class="lettre-plus-tard"><button type="button" class="link-button" data-fermer>Plus tard</button></p>');
   const compte = d.querySelector('[data-mot-compte]');
   const champ = d.querySelector('[data-mot]');
@@ -395,7 +395,7 @@ addEventListener('keydown', (e) => { if (document.querySelector('.swipe-fenetre'
 
 (async () => {
   const { data: { session } } = await supabase.auth.getSession().catch(() => ({ data: {} }));
-  if (!session) return message('<h2>Connecte-toi pour swiper</h2><p>Il faut un compte et un profil confié à Lamia pour découvrir les profils et dire lesquels t’intéressent.</p><p class="po-actions"><a class="po-btn" href="/rencontres/#confier">Créer mon compte et mon profil</a><a class="po-btn-verre" href="/mon-espace/">Me connecter</a></p>');
+  if (!session) return message('<h2>Connecte-toi pour swiper</h2><p>Il faut un compte et un profil pour découvrir les profils et dire lesquels t’intéressent.</p><p class="po-actions"><a class="po-btn" href="/rencontres/#confier">Créer mon compte et mon profil</a><a class="po-btn-verre" href="/mon-espace/">Me connecter</a></p>');
   token = session.access_token;
   try {
     let adresse;
@@ -431,7 +431,7 @@ addEventListener('keydown', (e) => { if (document.querySelector('.swipe-fenetre'
     if (err.code === 'fiche_a_confirmer') return message(`<h2>Confirme ta fiche</h2><p>Puis les profils s’affichent ici.</p><p><a class="po-btn" href="${String(err.data?.lien || '/mon-espace/').replace(/"/g, '')}">Confirmer ma fiche</a></p>`);
     if (err.code === 'fiche_live') return message('<h2>Ta fiche du live est bien là</h2><p>Il lui manque ton âge ou ton genre pour que tu puisses swiper. Écris à Lamia pour qu’elle la complète : inutile de refaire un profil.</p><p><a class="po-btn" href="/mon-espace/">Aller dans mon espace</a></p>');
     if (err.code === 'moderateur_sans_annonce') return message('<h2><svg class="ico" aria-hidden="true"><use href="/icones.svg#shield"/></svg> Ton compte modérateur</h2><p>Tu peux lire toutes les annonces anonymes. Sans annonce à toi, tu ne swipes pas et tu ne matches pas. Tu peux en créer une quand tu veux.</p><p><a class="po-btn" href="/rencontres/#confier">Créer une annonce</a> <a class="po-btn" href="/rencontres/">Voir les annonces</a></p>');
-    if (err.code === 'pas_de_profil') return message('<h2>Crée d’abord ton profil</h2><p>Pour swiper, Lamia a besoin de connaître ton profil : c’est lui qui sera proposé aux personnes qui te correspondent.</p><p><a class="po-btn" href="/rencontres/#confier"><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> Créer mon profil</a></p>');
+    if (err.code === 'pas_de_profil') return message('<h2>Crée d’abord ton profil</h2><p>Pour swiper, il faut ton profil : c’est lui qui sera proposé aux personnes qui te correspondent.</p><p><a class="po-btn" href="/rencontres/#confier"><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> Créer mon profil</a></p>');
     if (err.code === 'en_match') return message('<h2><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Tes matchs en cours sont au complet</h2><p>Tu peux mettre fin à l’un d’eux depuis ton espace pour choisir d’autres profils.</p><p><a class="po-btn" href="/mon-espace/">Mon espace</a></p>');
     message('<h2>Les profils ne s’affichent pas pour le moment</h2><p>Réessaie dans un instant.</p>');
   }
