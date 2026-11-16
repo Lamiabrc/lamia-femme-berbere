@@ -505,6 +505,8 @@ async function monProfil(session) {
     }
     { // Déclaration de bonne foi : affichée tant que la personne ne s'est pas engagée.
       const bloc = document.querySelector('[data-sincerite-bloc]');
+      // Charte déjà signée : le bandeau des valeurs de l'accueil ne s'affiche plus.
+      try { if (p.sincerite === true) localStorage.setItem('lfb-charte', '1'); else if (p.sincerite === false) localStorage.removeItem('lfb-charte'); } catch {}
       if (bloc && p.sincerite === false) import('/assets/sincerite.js').then(({ SINCERITE_HTML, brancherSincerite }) => {
         bloc.innerHTML = SINCERITE_HTML; bloc.hidden = false;
         brancherSincerite(bloc, async () => (await supabase.auth.getSession()).data.session?.access_token, () => { bloc.innerHTML = '<p><strong>✓ Merci, ton engagement est enregistré.</strong></p>'; });
@@ -1005,8 +1007,30 @@ async function discussions(session) {
       ${d.ouverte ? `<p><button type="button" class="link-button" data-disc-signaler><svg class="ico" aria-hidden="true"><use href="/icones.svg#flag"/></svg> Bloquer et signaler</button></p>` : ''}
     </article>`;
   };
+  // Encart « Mes matchs » en haut de Mon espace (Lamia, 16 nov. 2026) : les matchs en cours avec deux actions simples,
+  // et l'historique à déplier. La discussion complète reste plus bas.
+  const resume = () => {
+    const el = $('[data-mes-matchs]');
+    if (!el) return;
+    const enCours = liste.filter((d) => d.ouverte && !d.dematch), passes = liste.filter((d) => !d.ouverte || d.dematch);
+    el.hidden = !liste.length;
+    if (!liste.length) return;
+    const fin = (d) => d.dematch ? `dématché${d.dematch.raison ? ` · ${esc(d.dematch.raison)}` : ''}` : d.echange ? 'numéros échangés' : d.close_raison === 'signalee' ? 'fermé (signalé)' : 'terminé';
+    el.innerHTML = `<h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Mes matchs</h3>
+      ${enCours.length ? `<ul class="mm-liste">${enCours.map((d) => `<li><span><strong>${esc(d.avec)}</strong><small>${esc(reste(d))}</small></span><span class="mm-actions"><button type="button" class="btn btn-ink" data-mm-voir="${esc(d.id)}">Voir la discussion</button><button type="button" class="btn btn-line" data-mm-dematcher="${esc(d.id)}">Dématcher</button></span></li>`).join('')}</ul>` : '<p>Aucun match en cours pour l’instant.</p>'}
+      ${passes.length ? `<details class="mm-histo"><summary>Historique (${passes.length})</summary><ul>${passes.map((d) => `<li><strong>${esc(d.avec)}</strong> · ${fin(d)}${d.ferme_at ? ` · ${esc(new Date(d.ferme_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }))}` : ''} <button type="button" class="link-button" data-mm-voir="${esc(d.id)}">Relire</button></li>`).join('')}</ul></details>` : ''}`;
+  };
+  if ($('[data-mes-matchs]')) ecouter($('[data-mes-matchs]'), 'click', (ev) => {
+    const voir = ev.target.closest('[data-mm-voir]'), dem = ev.target.closest('[data-mm-dematcher]');
+    if (!voir && !dem) return;
+    const id = (voir || dem).dataset.mmVoir || (voir || dem).dataset.mmDematcher;
+    if (dem) { dematchOuvert = id; afficher(); }
+    const art = box.querySelector(`[data-disc="${CSS.escape(id)}"]`);
+    (dem ? art?.querySelector('[data-disc-dematch-form]') : art)?.scrollIntoView({ behavior: 'smooth', block: dem ? 'center' : 'start' });
+  });
   const afficher = () => {
     bloc.hidden = !liste.length;
+    resume();
     if (!liste.length) return;
     const brouillons = Object.fromEntries([...box.querySelectorAll('[data-disc]')].map((a) => [a.dataset.disc, a.querySelector('textarea')?.value || '']));
     box.innerHTML = liste.map(vue).join('');
