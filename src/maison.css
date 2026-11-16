@@ -4451,3 +4451,7 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 @keyframes couple-rejoint-d { 0% { transform: translateX(0); } 50%, 70% { transform: translateX(calc(-50px)); } 100% { transform: translateX(0); } }
 .couple .couple-fil li.is-moi .couple-anim i { filter: drop-shadow(0 0 4px rgba(255,255,255,.6)); }
 @media (prefers-reduced-motion: reduce) { .couple .couple-anim i, .couple .couple-anim b { animation: none; } }
+/* On s'est mariés (16 nov. 2026) */
+.couple .couple-mariage { background: linear-gradient(135deg, #fffaf0, #fdf1f4); border-color: #f0dcc0; }
+.couple .couple-mariage-form { display: grid; gap: 10px; margin-top: 12px; }
+.couple .couple-mariage-ok { margin: 8px 0 0; padding: 12px 14px; border-radius: 14px; background: #fff; font-weight: 600; color: #8d2d48; }

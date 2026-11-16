@@ -61,6 +61,15 @@ function vue(c) {
       <div class="couple-cadeaux">${Object.entries(cadeaux).map(([k, v]) => `<button type="button" class="couple-cadeau" data-cadeau="${k}"><span aria-hidden="true">${{ bijou: '💍', parfum: '🌸', fleurs: '💐', chocolat: '🍫', diner: '🍽️', spa: '💆', weekend: '🧳', coffret: '🎀', photo: '📸', autre: '🎁' }[k] || '🎁'}</span>${esc({ bijou: 'Bijou', parfum: 'Parfum', fleurs: 'Fleurs', chocolat: 'Chocolats', diner: 'Dîner', spa: 'Spa à deux', weekend: 'Week-end', coffret: 'Coffret beauté', photo: 'Séance photo', autre: 'Autre idée' }[k] || v)}</button>`).join('')}</div>
       <form class="couple-cadeau-form" data-cadeau-form hidden><input type="hidden" name="type"><label>Un mot pour Lamia (facultatif)<input name="note" maxlength="300" placeholder="Pour quand, pour quelle occasion…"></label><button type="submit" class="btn btn-ink">Envoyer ma demande</button></form>
     </section>
+    ${lui ? `<section class="couple-carte couple-mariage">
+      <h2>On s’est mariés 💍</h2>
+      <div class="avec-aide"><button type="button" class="btn btn-ink" data-mariage-ouvrir>Nous nous sommes mariés !</button>${aideQ('Félicitations ! Envoie une photo de votre mariage : Lamia vous offre un cadeau. La photo reste privée, elle n’est jamais publiée.')}</div>
+      <form class="couple-mariage-form" data-mariage-form hidden>
+        <label>Une photo de votre mariage<input name="photo" type="file" accept="image/*" required></label>
+        <label>La date du mariage<input name="date" type="date"></label>
+        <label>Adresse pour recevoir le cadeau<textarea name="adresse" rows="3" maxlength="400" required placeholder="Prénom Nom, rue, code postal, ville, pays"></textarea></label>
+        <button type="submit" class="btn btn-ink">Envoyer à Lamia 🎁</button>
+      </form></section>` : ''}
     ${AUTOUR}
     <p class="couple-quitter"><button type="button" class="link-button" data-couple-quitter>Quitter cet espace</button></p>`;
 }
@@ -102,6 +111,7 @@ zone.addEventListener('click', async (e) => {
     } catch { statut('Le paiement n’a pas pu s’ouvrir. Réessaie dans un instant.'); }
     b.disabled = false; return;
   }
+  if (e.target.closest('[data-mariage-ouvrir]')) { const f = zone.querySelector('[data-mariage-form]'); f.hidden = false; f.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
   const mot = e.target.closest('[data-mot]');
   if (mot) { mot.disabled = true; return faire({ action: 'couple_mot', texte: mot.dataset.mot }, () => coeurs()); }
   if (e.target.closest('[data-couple-code]')) return faire({ action: 'couple_code' });
@@ -124,6 +134,22 @@ zone.addEventListener('change', (e) => {
 zone.addEventListener('submit', (e) => {
   e.preventDefault();
   const f = e.target;
+  if (f.matches('[data-mariage-form]')) {
+    const fichier = f.photo.files[0], btn = f.querySelector('[type=submit]'), dire = (t) => { let p = f.querySelector('.form-status'); if (!p) { p = document.createElement('p'); p.className = 'form-status'; f.append(p); } p.textContent = t; };
+    if (!fichier) return dire('Choisis une photo de votre mariage.');
+    btn.disabled = true; dire('Envoi de la photo…');
+    (async () => {
+      try {
+        const { upload } = await appel({ action: 'couple_mariage_photo', mime: fichier.type || 'image/jpeg', size: fichier.size });
+        const r = await fetch(upload.url, { method: 'PUT', headers: { apikey: PUBLIC_KEY, 'Content-Type': upload.type, 'x-upsert': 'false' }, body: fichier });
+        if (!r.ok) throw new Error('envoi');
+        await appel({ action: 'couple_mariage', path: upload.path, adresse: f.adresse.value, date: f.date.value });
+        f.outerHTML = '<p class="couple-mariage-ok">💍 Félicitations à vous deux ! Lamia a bien reçu votre photo : votre cadeau arrive.</p>';
+        coeurs();
+      } catch (err) { btn.disabled = false; dire(err.code === 'adresse_requise' ? 'Écris l’adresse complète pour recevoir le cadeau.' : err.code === 'photo_invalide' ? 'Cette photo ne passe pas : choisis une image de moins de 15 Mo.' : 'L’envoi n’a pas marché. Réessaie dans un instant.'); }
+    })();
+    return;
+  }
   if (f.matches('[data-mot-libre]')) return faire({ action: 'couple_mot', texte: f.texte.value }, () => coeurs());
   if (f.matches('[data-couple-rejoindre]')) return faire({ action: 'couple_rejoindre', code: f.code.value });
   if (f.matches('[data-act-ajouter]')) return faire({ action: 'couple_activite_ajouter', titre: f.titre.value, type: f.type.value, quand: f.quand.value ? new Date(f.quand.value).toISOString() : null, pour_nous: f.pour.value === 'nous' });

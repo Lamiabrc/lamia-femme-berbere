@@ -89,3 +89,13 @@ test('mots doux : le mot part chez l’autre (notification) et s’affiche dans 
   assert.equal(r.couple.premium, false);
   assert.equal(r.couple.activites.length, 0);
 });
+
+test('on s’est mariés : photo dans le stockage privé, adresse obligatoire, Lamia prévenue', async () => {
+  const { ctx, alertes } = monde();
+  const r0 = await lire(await actionCouple('couple_creer', {}, ctx(AMINE)));
+  await actionCouple('couple_rejoindre', { code: r0.couple.code }, ctx(SARA));
+  assert.equal((await actionCouple('couple_mariage', { path: 'mariages/autre/1.jpg', adresse: '12 rue des Lilas, 35000 Rennes' }, ctx(SARA))).status, 400);
+  assert.equal((await actionCouple('couple_mariage', { path: `mariages/${r0.couple.id}/1.jpg`, adresse: 'Rennes' }, ctx(SARA))).status, 400);
+  assert.equal((await actionCouple('couple_mariage', { path: `mariages/${r0.couple.id}/1.jpg`, adresse: '12 rue des Lilas, 35000 Rennes', date: '2027-06-12' }, ctx(SARA))).status, 200);
+  assert.ok(alertes.some((t) => t.includes('se sont mariés')));
+});
