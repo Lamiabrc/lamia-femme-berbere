@@ -4461,6 +4461,14 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .couple .couple-mariage { background: linear-gradient(135deg, #fffaf0, #fdf1f4); border-color: #f0dcc0; }
 .couple .couple-mariage-form { display: grid; gap: 10px; margin-top: 12px; }
 .couple .couple-mariage-ok { margin: 8px 0 0; padding: 12px 14px; border-radius: 14px; background: #fff; font-weight: 600; color: #8d2d48; }
+/* Choix à l'ouverture : célibataire ou en couple ; invitation du partenaire (16 nov. 2026) */
+.choix-ouverture .swipe-fenetre-boite { text-align: center; }
+.choix-ouverture .choix-coeur { font-size: 2.4rem; color: #d6496b; margin: 0; animation: couple-bat 1.6s ease-in-out infinite; }
+.choix-ouverture .choix-boutons { display: grid; gap: 10px; margin-top: 14px; }
+.choix-ouverture .choix-couple { background: linear-gradient(135deg, #d6496b, #8d2d48); }
+.couple .couple-envois { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.swipe-fenetre.choix-ouverture .choix-coeur { color: #d6496b !important; -webkit-text-fill-color: #d6496b; }
+.swipe-fenetre.choix-ouverture .po-btn.choix-couple { background: linear-gradient(135deg, #e0567a, #8d2d48) !important; }
 
 /* « Notre couple » dans le menu : caché tant que le membre n’est pas en couple */
 [data-menu-couple][hidden] { display: none !important; }
