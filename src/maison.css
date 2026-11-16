@@ -4358,3 +4358,11 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 @media (max-width: 760px) {
   .maison-menu-panneau { max-height: calc(100vh - 170px - env(safe-area-inset-bottom)); max-height: calc(100dvh - 170px - env(safe-area-inset-bottom)); overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding-bottom: 20px; }
 }
+/* Petit « ? » à ouvrir pour comprendre (16 nov. 2026) */
+.avec-aide { margin: 0 0 1em; display: flex; flex-wrap: nowrap; align-items: center; gap: 10px; }
+.avec-aide > .btn { margin: 0; min-width: 0; }
+.aide-q { display: inline-block; position: relative; flex: none; }
+.aide-q > summary { list-style: none; cursor: pointer; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid #4a3470; color: #4a3470; background: #fff; font-weight: 700; font-size: 15px; line-height: 1; }
+.aide-q > summary::-webkit-details-marker { display: none; }
+.aide-q[open] > summary { background: #4a3470; color: #fff; }
+.aide-q > p { position: absolute; z-index: 20; right: -6px; top: calc(100% + 8px); width: min(290px, calc(100vw - 48px)); margin: 0; padding: 12px 14px; border-radius: 14px; background: #2b2236; color: #fff; font-size: .9rem; line-height: 1.45; box-shadow: 0 8px 24px rgba(0,0,0,.18); }

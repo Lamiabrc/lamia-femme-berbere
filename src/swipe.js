@@ -12,7 +12,7 @@ const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', PUBLIC
 const zone = document.querySelector('[data-swipe]');
 const compteur = document.querySelector('[data-swipe-compteur]');
 let infosAbo = {}, creditsCoeur = 0;
-let tour = 1, tourAnnonce = false, dejaCharge = false, enRecharge = false, envoi = Promise.resolve(), tous = [], profils = [], token = null, occupe = false, quota = { limite: null, restants: null }, choisi = { nombre: 0, refs: [] }, matchs = { actifs: 0, limite: 1, formule: 'decouverte' }, dernier = null, coeurs = 0;
+let tour = 1, tourAnnonce = false, dejaCharge = false, enRecharge = false, envoi = Promise.resolve(), tous = [], profils = [], token = null, occupe = false, quota = { limite: null, restants: null }, choisi = { nombre: 0, refs: [] }, matchs = { actifs: 0, limite: 1, formule: 'decouverte' }, coeurs = 0;
 const bandeau = document.querySelector('[data-swipe-infos]');
 
 const message = (html) => { zone.innerHTML = `<div class="swipe-message">${html}</div>`; document.querySelector('[data-swipe-boutons]').hidden = true; };
@@ -249,7 +249,7 @@ function moderer(ref) {
     try { await api({ action, ref, ...sig }, token); fin(); }
     catch { d.querySelectorAll('button').forEach((x) => { x.disabled = false; }); d.querySelector('[data-moderer-statut]').textContent = 'Ça n’a pas abouti. Réessaie dans un instant.'; }
   };
-  d.querySelector('[data-bloquer]').addEventListener('click', () => envoyer('annonce_bloquer_signaler', () => { d.remove(); tous = tous.filter((p) => p.ref !== ref); profils = profils.filter((p) => p.ref !== ref); if (dernier?.profil.ref === ref) { dernier = null; majAnnuler(); } afficher(); toast('C’est fait. Vous ne vous verrez plus, Lamia est prévenue.'); }));
+  d.querySelector('[data-bloquer]').addEventListener('click', () => envoyer('annonce_bloquer_signaler', () => { d.remove(); tous = tous.filter((p) => p.ref !== ref); profils = profils.filter((p) => p.ref !== ref); historique = historique.filter((x) => x.profil.ref !== ref); garderDernier(); majAnnuler(); afficher(); toast('C’est fait. Vous ne vous verrez plus, Lamia est prévenue.'); }));
 }
 zone.addEventListener('click', (e) => { const b = e.target.closest('[data-moderer]'); if (b) moderer(Number(b.dataset.moderer)); });
 zone.addEventListener('click', (e) => {
@@ -259,22 +259,26 @@ zone.addEventListener('click', (e) => {
   if (!d.hidden) d.scrollTop = 0;
 });
 
+// Revenir en arrière (Lamia, 16 nov. 2026) : le dernier profil pour tout le monde, jusqu'à 10 en Passion, sans limite en Prestige.
+// Les profils passés restent annulables même après avoir fermé l'appli (fiches anonymes gardées sur ce téléphone).
+let retourMax = 1;
 function annulerDernier() {
-  if (!dernier || occupe) return;
-  const d = dernier; dernier = null; garderDernier();
-  api({ action: 'annonce_swipe_annuler', ref: d.profil.ref }, token).catch(() => {});
+  if (!historique.length || occupe) return;
+  const d = historique.pop(); garderDernier();
+  api({ action: 'annonce_swipe_annuler', ref: d.profil.ref }, token).catch((err) => { if (err.code === 'retour_limite') toast('Revenir plus loin en arrière : avec la formule Passion (10 profils) ou Prestige (sans limite).'); });
   if (d.choix === 'oui') coeurs = Math.max(0, coeurs - 1);
   tous = [d.profil, ...tous.filter((p) => p.ref !== d.profil.ref)]; profils = [d.profil, ...profils.filter((p) => p.ref !== d.profil.ref)];
   majAnnuler(); afficher(); vibrer(10);
   zone.lastElementChild?.classList.add('is-retour');
 }
-// Le dernier swipe reste annulable même après avoir fermé l'appli (fiche anonyme gardée sur ce téléphone).
-const CLE_DERNIER = 'lfb-swipe-dernier';
-function garderDernier() { try { if (dernier) localStorage.setItem(CLE_DERNIER, JSON.stringify(dernier)); else localStorage.removeItem(CLE_DERNIER); } catch { /* */ } }
+const CLE_DERNIER = 'lfb-swipe-historique';
+let historique = [];
+function garderDernier() { try { localStorage.setItem(CLE_DERNIER, JSON.stringify(historique.slice(-50))); } catch { /* */ } }
 function restaurerDernier() {
-  try { const d = JSON.parse(localStorage.getItem(CLE_DERNIER) || 'null'); if (d?.profil?.ref) { dernier = d; majAnnuler(); } } catch { /* */ }
+  try { const h = JSON.parse(localStorage.getItem(CLE_DERNIER) || '[]'); if (Array.isArray(h)) { historique = h.filter((d) => d?.profil?.ref); majAnnuler(); } } catch { /* */ }
 }
-const majAnnuler = () => { const b = document.querySelector('[data-swipe-annuler]'); if (b) b.disabled = !dernier; };
+function noterSwipe(d) { historique.push(d); if (retourMax && historique.length > retourMax) historique = historique.slice(-retourMax); garderDernier(); majAnnuler(); }
+const majAnnuler = () => { const b = document.querySelector('[data-swipe-annuler]'); if (b) b.disabled = !historique.length; };
 
 async function choisir(choix, message) {
   if (occupe || !profils.length) return;
@@ -290,11 +294,11 @@ async function choisir(choix, message) {
     coeurs += 1; if (PALIERS[coeurs]) setTimeout(() => toast(PALIERS[coeurs]), 350);
     window.lfbEvent?.('swipe_interesse');
   } else vibrer(8);
-  dernier = { profil, choix }; garderDernier(); majAnnuler();
+  noterSwipe({ profil, choix });
   envoi = api({ action: 'annonce_swipe', ref, choix, ...(message ? { message } : {}) }, token).then((r) => {
     if (message) { creditsCoeur = Math.max(0, creditsCoeur - 1); try { localStorage.removeItem(`lfb-coeur-${ref}`); } catch { /* */ } toast('💌 Ton cœur et ton message sont partis'); }
     if (r?.matchs) { matchs = { ...matchs, ...r.matchs }; infos(); }
-    if (r?.match) { dernier = null; majAnnuler(); celebrerMatch(r.ref); }
+    if (r?.match) { historique = historique.filter((d) => d.profil.ref !== ref); garderDernier(); majAnnuler(); celebrerMatch(r.ref); }
   }).catch((err) => { if (err.code === 'sincerite_requise') { sincerite = false; return demanderSincerite(); } if (err.code === 'hors_de_ses_criteres') return toast('Ce profil cherche quelqu’un d’un autre âge ou d’une autre zone : ton cœur n’est pas parti.'); if (err.code === 'coeur_requis') { creditsCoeur = 0; return toast('Ton cœur avec message n’est pas parti : il te faut un crédit. Ton choix n’a pas été enregistré.'); } if (err.code === 'quota_matchs') return quotaAtteint(err); if (err.code === 'limite_matchs') { matchs = { ...matchs, actifs: err.actifs ?? matchs.limite }; infos(); limiteAtteinte(); } });
   await new Promise((r) => setTimeout(r, 300));
   profils.shift();
@@ -403,6 +407,8 @@ addEventListener('keydown', (e) => { if (document.querySelector('.swipe-fenetre'
     chargeFait = true;
     if (!sincerite) setTimeout(demanderSincerite, 600); // obligatoire : demandée dès l'ouverture du swipe
     creditsCoeur = liste.coeurs_message || 0;
+    retourMax = liste.retour === null ? 0 : (liste.retour || 1); // 0 = sans limite
+    if (retourMax && historique.length > retourMax) { historique = historique.slice(-retourMax); garderDernier(); majAnnuler(); }
     boutonAbo(formule, algerie);
     infosAbo = { formule, algerie };
     dejaCharge = true;
