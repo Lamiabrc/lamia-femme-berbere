@@ -1554,6 +1554,9 @@ page(
       <p class="cl-aide">Tant qu’il manque 2 photos, la personne voit une demande dans l’application et ne peut ni swiper ni répondre. Le bouton lui envoie aussi une notification sur son téléphone, une seule fois, si elle les a activées.</p>
       <button class="cl-btn cl-plein" type="button" data-relance-medias>Envoyer la notification</button>
       <p class="cl-statut" data-relance-statut></p>
+      <p class="cl-aide" data-suspendre-liste></p>
+      <button class="cl-btn" type="button" data-suspendre-sans-photos hidden>Suspendre les profils validés sans photos et les prévenir</button>
+      <p class="cl-statut" data-suspendre-statut></p>
     </div>
         <div class="cl-carte cl-export">
       <h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#credit-card"/></svg> Abonnés et achats à l’unité <span data-n-abonnes></span></h3>
