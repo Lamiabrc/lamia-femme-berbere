@@ -4469,3 +4469,6 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .couple .couple-envois { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
 .swipe-fenetre.choix-ouverture .choix-coeur { color: #d6496b !important; -webkit-text-fill-color: #d6496b; }
 .swipe-fenetre.choix-ouverture .po-btn.choix-couple { background: linear-gradient(135deg, #e0567a, #8d2d48) !important; }
+
+/* « Notre couple » dans le menu : caché tant que le membre n’est pas en couple */
+[data-menu-couple][hidden] { display: none !important; }
