@@ -4468,3 +4468,17 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .couple .couple-offre:has(input:checked) { border-color: #4a3470; background: #f6f0fc; }
 .couple .couple-offre span { color: #8d2d48; font-weight: 600; }
 .couple .couple-offre small { color: #6b5a72; }
+/* Places en plus pendant un match : l'accord d'abord (16 nov. 2026) */
+.espace-multiples { margin: 10px 0; padding: 14px 16px; border-radius: 16px; background: #fff8ec; border: 1px solid #f0dcb4; }
+.espace-multiples p { margin: 0 0 8px; }
+/* Choix à l'ouverture : célibataire ou en couple ; invitation du partenaire (16 nov. 2026) */
+.choix-ouverture .swipe-fenetre-boite { text-align: center; }
+.choix-ouverture .choix-coeur { font-size: 2.4rem; color: #d6496b; margin: 0; animation: couple-bat 1.6s ease-in-out infinite; }
+.choix-ouverture .choix-boutons { display: grid; gap: 10px; margin-top: 14px; }
+.choix-ouverture .choix-couple { background: linear-gradient(135deg, #d6496b, #8d2d48); }
+.couple .couple-envois { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.swipe-fenetre.choix-ouverture .choix-coeur { color: #d6496b !important; -webkit-text-fill-color: #d6496b; }
+.swipe-fenetre.choix-ouverture .po-btn.choix-couple { background: linear-gradient(135deg, #e0567a, #8d2d48) !important; }
+
+/* « Notre couple » dans le menu : caché tant que le membre n’est pas en couple */
+[data-menu-couple][hidden] { display: none !important; }

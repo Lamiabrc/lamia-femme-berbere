@@ -53,6 +53,7 @@ function base(initial = {}) {
   const call = async (u, o = {}) => {
     if (o.method === 'DELETE') { const [t, qs] = coupe(u); const sup = new Set(filtrer(t, qs)); db[t] = db[t].filter((l) => !sup.has(l)); return new Response('[]'); }
     if (u.includes('/auth/v1/admin/users/')) return new Response(JSON.stringify({ id: u.split('/').pop(), email: 'x@example.com', user_metadata: {} }));
+    if (o.method === 'POST' && u.includes('/platform_settings?on_conflict=key')) { const row = JSON.parse(o.body); db.platform_settings = [...db.platform_settings.filter((x) => x.key !== row.key), row]; return new Response('[]'); }
     return new Response('[]');
   };
   const alertes = [];
@@ -234,6 +235,8 @@ test('Passion : 3 matchs en cours ; finir l’un garde les autres et libère une
   const KARIM = { id: 'u-karim', email: 'karim@example.com', user_metadata: { first_name: 'Karim' } };
   const YANIS = { id: 'u-yanis', email: 'yanis@example.com', user_metadata: { first_name: 'Yanis' } };
   const passion = (u) => ({ ...ctx(u), formuleDe: async (mail) => (mail === NINA.email ? 'passion' : 'decouverte') });
+  // Nina accepte que d'autres matchs s'ouvrent pendant sa discussion (son match le verra).
+  await handleAnnonces('annonce_matchs_multiples', { choix: 'oui' }, passion(NINA));
   for (const ref of [100001, 100003, 100005]) await handleAnnonces('annonce_swipe', { ref, choix: 'oui' }, passion(NINA));
   for (const u of [RACHID, KARIM, YANIS]) { await handleAnnonces('annonce_swipe_liste', {}, passion(u)); await handleAnnonces('annonce_swipe', { ref: 11, choix: 'oui' }, passion(u)); }
   const nina = db.annonces.find((a) => a.ref === 11);
@@ -492,4 +495,21 @@ test('revenir en arrière dans le swipe : Découverte seulement le dernier profi
   db.annonce_passes.forEach((p) => { p.demandeur_id = id; });
   assert.equal((await handleAnnonces('annonce_swipe_annuler', { ref: 30 }, ctx(RACHID))).status, 403);
   assert.equal((await handleAnnonces('annonce_swipe_annuler', { ref: 31 }, ctx(RACHID))).status, 200);
+});
+
+test('formule prise pendant un match : pas d’autre match sans l’accord de la personne (réclamation du 16 nov. 2026)', async () => {
+  const { db, ctx } = base({ annonces: [annonceNina()], profils_outil: [FICHE(100001, 'u-rachid', 'homme'), FICHE(100003, 'u-karim', 'homme')] });
+  const KARIM = { id: 'u-karim', email: 'karim@example.com', user_metadata: { first_name: 'Karim' } };
+  const passion = (u) => ({ ...ctx(u), formuleDe: async (mail) => (mail === NINA.email ? 'passion' : 'decouverte') });
+  for (const ref of [100001, 100003]) await handleAnnonces('annonce_swipe', { ref, choix: 'oui' }, passion(NINA));
+  for (const u of [RACHID, KARIM]) { await handleAnnonces('annonce_swipe_liste', {}, passion(u)); await handleAnnonces('annonce_swipe', { ref: 11, choix: 'oui' }, passion(u)); }
+  // Une seule mise en relation : la deuxième attend l'accord de Nina.
+  assert.equal(db.annonce_interets.filter((i) => i.statut === 'mis_en_relation').length, 1);
+  const { profil } = await lire(await handleAnnonces('annonce_mon_profil', {}, passion(NINA)));
+  assert.equal(profil.matchs.places_en_attente, true);
+  // « Pas pendant le premier échange » : rien avant 24 h.
+  await handleAnnonces('annonce_matchs_multiples', { choix: '24h' }, passion(NINA));
+  const r = await lire(await handleAnnonces('annonce_mon_profil', {}, passion(NINA)));
+  assert.equal(r.profil.matchs.choix_multiples, '24h');
+  assert.equal(r.profil.matchs.limite, 1);
 });
