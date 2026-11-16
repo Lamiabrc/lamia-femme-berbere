@@ -4333,5 +4333,14 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .espace-sortie { display: flex; justify-content: flex-end; margin: 0 0 -8px; }
 .espace-sortie .btn { padding: 8px 16px; font-size: .9rem; }
 
+/* Femme / homme (Modifier mon profil et création) : deux cases de même largeur, alignées, coche bien visible (15 nov. 2026) */
+.annonce-choix:has(input[name=genre]) { display: flex; flex-wrap: nowrap; gap: 10px; width: 100%; min-width: 0; max-width: 100%; box-sizing: border-box; }
+.annonce-choix:has(input[name=genre]) legend { width: 100%; margin-bottom: 8px; }
+.annonce-choix:has(input[name=genre]) label, .annonce-form .annonce-choix:has(input[name=genre]) label { flex: 1 1 0; min-width: 0; display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1.5px solid #d9cde6; border-radius: 14px; background: #fff; color: #2b2236; font-size: 16px; white-space: nowrap; line-height: 1.2; box-sizing: border-box; cursor: pointer; }
+.annonce-choix:has(input[name=genre]) label:has(input:checked) { border-color: #4a3470; background: #f3edfb; font-weight: 600; }
+.annonce-choix input[name=genre], .po-app .annonce-choix input[name=genre], .annonce-form .annonce-choix input[name=genre] { appearance: none; -webkit-appearance: none; flex: 0 0 24px; width: 24px; min-width: 24px; height: 24px; min-height: 0; padding: 0; margin: 0; box-shadow: none; border: 2px solid #4a3470; border-radius: 50%; background: #fff; display: grid; place-content: center; }
+.annonce-choix input[name=genre]:checked { background: #4a3470; }
+.annonce-choix input[name=genre]:checked::before { content: ""; width: 7px; height: 12px; margin-top: -3px; border: solid #fff; border-width: 0 3px 3px 0; transform: rotate(45deg); }
+.annonce-choix input[name=genre]:focus-visible { outline: 3px solid #b9a3dd; outline-offset: 2px; }
 /* Fiche du live pas encore validée (15 nov. 2026) */
 .po-app.po-app .swipe-carte .swipe-statut.is-attente { background: #f3ece2; color: #7a6248; }
