@@ -19,6 +19,12 @@ const message = (html) => { zone.innerHTML = `<div class="swipe-message">${html}
 
 // La fiche : l'essentiel en grand, dans un bijou rond (femme) ou triangulaire (homme). Le reste s'ouvre avec « Voir le profil ».
 const statut = (a) => (a.piece_identite ? 'Vérifié avec pièce d’identité' : a.attente_validation ? 'Annonce du live · en attente de validation du profil' : a.outil && !a.confirme ? 'En attente de confirmation' : 'Profil vérifié');
+// Ce que la personne recherche, en une ligne lisible (âge, religion, pratique, études, origine, et ce qu'elle accepte).
+function cherche(a) {
+  const c = a.cherche || {};
+  const ages = a.age_min || a.age_max ? `${a.age_min || 18} à ${a.age_max || 99} ans` : '';
+  return [ages, c.religion && lib(c.religion), c.pratique && lib(c.pratique).toLowerCase(), c.etudes && `études : ${lib(c.etudes)}`, c.kabyle ? 'kabyle uniquement' : (c.origines || []).length ? `origine : ${c.origines.map(lib).join(', ')}` : '', c.enfants && 'accepte les enfants', c.divorce && 'accepte un divorce', c.veuf && 'accepte un veuvage'].filter(Boolean);
+}
 function carte(a) {
   const femme = a.genre === 'femme';
   const mr = metierEtReligion(a);
@@ -41,6 +47,7 @@ function carte(a) {
       ${a.village ? `<p class="swipe-village">Originaire de ${esc(a.village)}</p>` : ''}
       ${mr.metier ? `<p class="swipe-metier">${esc(mr.metier)}</p>` : ''}
       ${mr.religion ? `<p class="swipe-religion">${esc(mr.religion)}</p>` : ''}
+      ${cherche(a).length ? `<p class="swipe-cherche"><b>Recherche :</b> ${esc(cherche(a).join(' · '))}</p>` : ''}
       <p class="swipe-statut${a.attente_validation ? ' is-attente' : ''}">${a.attente_validation ? '' : '<span aria-hidden="true">✓</span> '}${statut(a)}</p>
       <button type="button" class="swipe-voir" data-voir aria-expanded="false">Voir le profil</button>
     </div>
@@ -54,7 +61,7 @@ function carte(a) {
       ${secteur ? `<p class="annonce-lieu annonce-secteur"><svg class="ico" aria-hidden="true"><use href="/icones.svg#boussole"/></svg> Cherche en : <b>${esc(secteur)}</b></p>` : ''}
       ${tags.length ? `<p class="annonce-tags">${tags.map((t) => `<span>${esc(lib(t))}</span>`).join('')}</p>` : ''}
       ${a.profil ? `<h3>Qui je suis</h3><p data-membre>${esc(a.profil)}</p>` : ''}
-      ${a.recherche ? `<h3>Qui je cherche${ages}</h3><p data-membre>${esc(a.recherche)}</p>` : ''}
+      ${a.recherche || cherche(a).length ? `<h3>Qui je cherche${ages}</h3>${cherche(a).length ? `<p class="annonce-tags">${cherche(a).map((t) => `<span>${esc(t)}</span>`).join('')}</p>` : ''}${a.recherche ? `<p data-membre>${esc(a.recherche)}</p>` : ''}` : ''}
       ${foiEtVie(a).replace(/<h4>/g, '<h3>').replace(/<\/h4>/g, '</h3>')}
       <p class="profil-moderer"><button type="button" class="link-button" data-moderer="${a.ref}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#flag"/></svg> Bloquer et signaler</button></p>
     </div>
@@ -63,9 +70,15 @@ function carte(a) {
 
 // ---------------------------------------------------------------- filtres (âge, religion, pratique, pays, enfants, tabac, pièce d'identité)
 const CLE_FILTRES = 'lfb-swipe-filtres';
-let filtres = { age_min: '', age_max: '', religion: '', pratique: '', pays: '', enfants: '', non_fumeur: false, piece: false, inclure_inconnus: true };
+let filtres = { age_min: '', age_max: '', religion: '', pratique: '', pays: '', enfants: '', situation: '', etudes: '', non_fumeur: false, piece: false, inclure_inconnus: true };
 const lireFiltres = () => { try { return JSON.parse(localStorage.getItem(CLE_FILTRES) || 'null'); } catch { return null; } };
 const garderFiltres = () => { try { localStorage.setItem(CLE_FILTRES, JSON.stringify(filtres)); } catch { /* */ } };
+// Statut marital et niveau d'études (demande d'une membre, 16 nov. 2026). Les valeurs varient un peu (accents, « Célibataire ») : on les ramène à une seule.
+const sansAccent = (v) => String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+const SITUATIONS = [['jamais', 'Jamais marié(e)'], ['divorce', 'Divorcé(e)'], ['veuf', 'Veuf / veuve'], ['separe', 'Séparé(e)'], ['papier', 'Marié(e) sur papier uniquement']];
+const situationDe = (v) => { const x = sansAccent(v); if (!x) return ''; if (/jamais|celibataire/.test(x)) return 'jamais'; if (/divorc/.test(x)) return 'divorce'; if (/veu/.test(x)) return 'veuf'; if (/separ/.test(x)) return 'separe'; if (/papier/.test(x)) return 'papier'; return ''; };
+const NIVEAUX = [['2', 'Collège ou plus'], ['3', 'Lycée ou plus'], ['4', 'Universitaire']];
+const niveauDe = (v) => { const x = sansAccent(v); if (!x) return 0; if (/univ|master|licence|doctor|bac ?\+/.test(x)) return 4; if (/lycee|bac/.test(x)) return 3; if (/college/.test(x)) return 2; if (/primaire/.test(x)) return 1; return 0; };
 function correspond(p) {
   const f = filtres, inconnu = (v) => !v && f.inclure_inconnus;
   if (f.age_min && p.age < Number(f.age_min)) return false;
@@ -74,11 +87,13 @@ function correspond(p) {
   if (f.pratique && p.pratique !== f.pratique && !inconnu(p.pratique)) return false;
   if (f.pays && p.pays !== f.pays) return false;
   if (f.enfants && p.enfants !== f.enfants && !inconnu(p.enfants)) return false;
+  if (f.situation) { const s = situationDe(p.situation); if (s ? s !== f.situation : !f.inclure_inconnus) return false; }
+  if (f.etudes) { const n = niveauDe(p.etudes); if (n ? n < Number(f.etudes) : !f.inclure_inconnus) return false; }
   if (f.non_fumeur) { const t = (p.mode_vie || []).find((x) => /^Fumeur/.test(x)); if (t ? t !== 'Fumeur: non' : !f.inclure_inconnus) return false; }
   if (f.piece && !p.piece_identite) return false;
   return true;
 }
-const nbFiltres = () => ['age_min', 'age_max', 'religion', 'pratique', 'pays', 'enfants'].filter((k) => filtres[k]).length + (filtres.non_fumeur ? 1 : 0) + (filtres.piece ? 1 : 0);
+const nbFiltres = () => ['age_min', 'age_max', 'religion', 'pratique', 'pays', 'enfants', 'situation', 'etudes'].filter((k) => filtres[k]).length + (filtres.non_fumeur ? 1 : 0) + (filtres.piece ? 1 : 0);
 function appliquer() { profils = tous.filter(correspond); const b = document.querySelector('[data-filtres-ouvrir] b'); if (b) b.textContent = nbFiltres() ? `(${nbFiltres()})` : ''; afficher(); }
 // Recherche par numéro (« profil n° 123 » dit en live) : le profil passe en haut de la pile, prêt pour le cœur.
 const CLE_PROFIL = 'lfb-profil-cherche';
@@ -110,6 +125,8 @@ function monterFiltres() {
         <label>Pratique<select name="pratique">${opt(O.pratique, filtres.pratique)}</select></label>
         <label>Pays<select name="pays">${opt(pays, filtres.pays)}</select></label>
         <label>Enfants<select name="enfants"><option value="">Peu importe</option><option value="Non"${filtres.enfants === 'Non' ? ' selected' : ''}>Sans enfant</option><option value="Oui"${filtres.enfants === 'Oui' ? ' selected' : ''}>Avec enfant(s)</option></select></label>
+        <label>Statut marital<select name="situation"><option value="">Peu importe</option>${SITUATIONS.map(([v, t]) => `<option value="${v}"${filtres.situation === v ? ' selected' : ''}>${t}</option>`).join('')}</select></label>
+        <label>Études<select name="etudes"><option value="">Peu importe</option>${NIVEAUX.map(([v, t]) => `<option value="${v}"${filtres.etudes === v ? ' selected' : ''}>${t}</option>`).join('')}</select></label>
       </div>
       <label class="swipe-case"><input type="checkbox" name="non_fumeur"${filtres.non_fumeur ? ' checked' : ''}> Non-fumeur seulement</label>
       <label class="swipe-case"><input type="checkbox" name="piece"${filtres.piece ? ' checked' : ''}> Vérifiés avec pièce d’identité seulement</label>
@@ -117,12 +134,12 @@ function monterFiltres() {
       <p class="swipe-filtres-bas"><span data-filtres-nombre></span><button type="button" class="po-btn-verre" data-filtres-effacer>Tout effacer</button><button type="submit" class="po-btn">Voir les profils</button></p>
     </form>`;
   const form = zoneF.querySelector('[data-filtres]'), bouton = zoneF.querySelector('[data-filtres-ouvrir]');
-  const lire = () => { const F = form.elements; filtres = { age_min: F.age_min.value, age_max: F.age_max.value, religion: F.religion.value, pratique: F.pratique.value, pays: F.pays.value, enfants: F.enfants.value, non_fumeur: F.non_fumeur.checked, piece: F.piece.checked, inclure_inconnus: F.inclure_inconnus.checked }; };
+  const lire = () => { const F = form.elements; filtres = { age_min: F.age_min.value, age_max: F.age_max.value, religion: F.religion.value, pratique: F.pratique.value, pays: F.pays.value, enfants: F.enfants.value, situation: F.situation.value, etudes: F.etudes.value, non_fumeur: F.non_fumeur.checked, piece: F.piece.checked, inclure_inconnus: F.inclure_inconnus.checked }; };
   const compter = () => { lire(); const n = tous.filter(correspond).length; zoneF.querySelector('[data-filtres-nombre]').textContent = `${n} profil${n > 1 ? 's' : ''} correspond${n > 1 ? 'ent' : ''}`; };
   bouton.addEventListener('click', () => { form.hidden = !form.hidden; bouton.setAttribute('aria-expanded', String(!form.hidden)); if (!form.hidden) compter(); });
   form.addEventListener('input', compter); form.addEventListener('change', compter);
   form.addEventListener('submit', (e) => { e.preventDefault(); lire(); garderFiltres(); form.hidden = true; bouton.setAttribute('aria-expanded', 'false'); appliquer(); });
-  zoneF.querySelector('[data-filtres-effacer]').addEventListener('click', () => { filtres = { age_min: '', age_max: '', religion: '', pratique: '', pays: '', enfants: '', non_fumeur: false, piece: false, inclure_inconnus: true }; garderFiltres(); monterFiltres(); appliquer(); });
+  zoneF.querySelector('[data-filtres-effacer]').addEventListener('click', () => { filtres = { age_min: '', age_max: '', religion: '', pratique: '', pays: '', enfants: '', situation: '', etudes: '', non_fumeur: false, piece: false, inclure_inconnus: true }; garderFiltres(); monterFiltres(); appliquer(); });
 }
 
 function infos() {
