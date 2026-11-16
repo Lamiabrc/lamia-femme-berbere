@@ -32,6 +32,12 @@ function vue(c) {
       <p class="couple-noms">${esc(moi?.prenom || 'Moi')} <span class="couple-bat" aria-hidden="true">❤</span> ${lui ? esc(lui.prenom) : '<em>en attente</em>'}</p>
       ${lui ? '' : `<div class="couple-code"><p>Envoie ce code à ton ou ta partenaire :</p><p class="couple-code-valeur">${c.code ? esc(c.code) : '—'}</p><p class="espace-sans-liens">${c.code ? `<button type="button" class="btn btn-ink" data-couple-partager="${esc(c.code)}">Envoyer le code</button>` : ''} <button type="button" class="btn btn-line" data-couple-code>Nouveau code</button></p></div>`}
     </section>
+    ${c.conversion ? `<section class="couple-carte couple-conversion">
+      <h2>Ton abonnement devient « Couple » ? 💞</h2>
+      <p>Tu as la formule <strong>${c.conversion.formule === 'prestige' ? 'Prestige' : 'Passion'}</strong> pour les rencontres. Maintenant que vous êtes en couple, elle peut devenir l’<strong>abonnement Couple</strong> : mots doux avec leurs animations, ton mot écrit toi-même, pour vous deux.</p>
+      ${c.conversion.annuel ? '<p class="aide">Ton abonnement est à l’année : écris à Lamia pour le transformer.</p>' : `<p class="aide">18 € par mois à partir de ta prochaine échéance, rien à payer aujourd’hui. Ta formule de rencontre s’arrête à ce moment-là. Sans engagement.</p>
+      <p class="espace-sans-liens"><button type="button" class="btn btn-ink" data-conversion-oui>Oui, je passe en Couple</button> <button type="button" class="btn btn-line" data-conversion-non>Pas maintenant</button></p>`}
+    </section>` : ''}
     <section class="couple-carte couple-mots">
       <h2>Nos mots doux <span aria-hidden="true">💌</span></h2>
       ${lui ? `<div class="couple-mots-boutons">${motsDoux.map((m) => { const payant = motsPayants.includes(m) && !c.premium; return `<button type="button" class="couple-mot${motsPayants.includes(m) ? ' is-premium' : ''}" ${payant ? 'data-couple-abo' : `data-mot="${esc(m)}"`}>${esc(m)}${payant ? ' <span class="couple-cadenas" aria-label="Avec l’abonnement Couple">🔒</span>' : ''}</button>`; }).join('')}</div>
@@ -112,6 +118,19 @@ zone.addEventListener('click', async (e) => {
     b.disabled = false; return;
   }
   if (e.target.closest('[data-mariage-ouvrir]')) { const f = zone.querySelector('[data-mariage-form]'); f.hidden = false; f.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+  if (e.target.closest('[data-conversion-non]')) { e.target.closest('.couple-conversion').remove(); return; }
+  const conv = e.target.closest('[data-conversion-oui]');
+  if (conv) {
+    if (!confirm('Ton abonnement de rencontre devient l’abonnement Couple, 18 € par mois à ta prochaine échéance. Tu confirmes ?')) return;
+    conv.disabled = true;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const r = await fetch('/api/preorder', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` }, body: JSON.stringify({ action: 'abonnement_vers_couple', accord: true }) });
+      if (!r.ok) throw new Error();
+      coeurs(); await charger();
+    } catch { conv.disabled = false; statut('Le changement n’a pas pu se faire. Réessaie, ou écris à Lamia.'); }
+    return;
+  }
   const mot = e.target.closest('[data-mot]');
   if (mot) { mot.disabled = true; return faire({ action: 'couple_mot', texte: mot.dataset.mot }, () => coeurs()); }
   if (e.target.closest('[data-couple-code]')) return faire({ action: 'couple_code' });

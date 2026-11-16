@@ -4461,3 +4461,4 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .couple .couple-mariage { background: linear-gradient(135deg, #fffaf0, #fdf1f4); border-color: #f0dcc0; }
 .couple .couple-mariage-form { display: grid; gap: 10px; margin-top: 12px; }
 .couple .couple-mariage-ok { margin: 8px 0 0; padding: 12px 14px; border-radius: 14px; background: #fff; font-weight: 600; color: #8d2d48; }
+.couple .couple-conversion { background: linear-gradient(135deg, #f6effc, #fff5f7); border-color: #d9c6ef; }

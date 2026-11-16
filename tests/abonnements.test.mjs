@@ -223,3 +223,28 @@ test('Prestige : -20 % sur le love coaching ; le passage en priorité en live ne
   assert.equal(prixCoaching(unite('speed_dating'), formule('prestige')), 1200);
   assert.equal(unite('live_priorite').horsVente, true);
 });
+
+test('Passion → abonnement Couple : seulement avec l’accord, prix Couple à la prochaine échéance, pas pour l’annuel', async () => {
+  const appels = [];
+  const stripe = {
+    subscriptions: { retrieve: async (id) => ({ id, metadata: { formule: 'passion' }, items: { data: [{ id: 'si_1' }] } }), update: async (id, p) => { appels.push(p); return { id }; } },
+    products: { create: async () => ({ id: 'prod_couple' }) },
+  };
+  const ecrits = [];
+  const monde = (abo) => async (u, init = {}) => {
+    const url = String(u);
+    if (url.includes('/auth/v1/user')) return { ok: true, status: 200, json: async () => NINA_U };
+    if (init.method === 'PATCH' || init.method === 'POST') { ecrits.push([url, init.body]); return { ok: true, json: async () => [] }; }
+    if (url.includes('/rest/v1/abonnements?')) return { ok: true, json: async () => abo };
+    return { ok: true, json: async () => [] };
+  };
+  const ABO = { id: 'a1', formule: 'passion', periode: 'mois', stripe_subscription_id: 'sub_1' };
+  assert.equal((await actionAbonnement({ action: 'abonnement_vers_couple' }, authReq, { env, fetcher: monde([ABO]), stripe })).status, 400);
+  assert.equal((await actionAbonnement({ action: 'abonnement_vers_couple', accord: true }, authReq, { env, fetcher: monde([{ ...ABO, periode: 'an' }]), stripe })).status, 409);
+  const r = await actionAbonnement({ action: 'abonnement_vers_couple', accord: true }, authReq, { env, fetcher: monde([ABO]), stripe });
+  assert.equal(r.status, 200);
+  assert.equal(appels[0].items[0].price_data.unit_amount, 1800);
+  assert.equal(appels[0].proration_behavior, 'none');
+  assert.equal(appels[0].metadata.formule, 'couple');
+  assert.ok(ecrits.some(([u, body]) => u.includes('abonnements?id=eq.a1') && body.includes('"formule":"couple"')));
+});
