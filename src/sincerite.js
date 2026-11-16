@@ -21,7 +21,7 @@ export function brancherSincerite(racine, jeton, apres) {
   if (!b) return;
   b.addEventListener('click', async () => {
     b.disabled = true;
-    try { await api({ action: 'annonce_sincerite', accepte: true, langue: langue() }, await jeton()); apres?.(); }
+    try { await api({ action: 'annonce_sincerite', accepte: true, langue: langue() }, await jeton()); try { localStorage.setItem('lfb-charte', '1'); } catch {} apres?.(); }
     catch { b.disabled = false; if (st) st.textContent = 'Ça n’a pas fonctionné. Réessaie dans un instant.'; }
   });
 }
