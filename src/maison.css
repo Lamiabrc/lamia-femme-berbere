@@ -4707,3 +4707,9 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .couple .couple-kab { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: .85em; color: #b0475f; }
 .couple .couple-kab-ligne { margin: -4px 0 10px; font-size: .9rem; color: #8a7c95; }
 .couple .couple-kab-ligne span { font-family: var(--serif); font-style: italic; color: #b0475f; font-size: 1.05rem; }
+/* « Voir son profil » sur une demande reçue */
+.interet-voir { margin: 8px 0 4px; }
+.espace-profil-fenetre { position: fixed; inset: 0; z-index: 110; display: grid; place-items: center; padding: 16px; background: rgba(43, 34, 54, .55); }
+.espace-profil-boite { position: relative; width: min(560px, 100%); max-height: calc(100dvh - 32px); overflow: auto; padding: 22px 20px; border-radius: 22px; background: #fff; box-shadow: 0 24px 60px rgba(0, 0, 0, .3); }
+.espace-profil-boite h2 { margin: 4px 0 8px; }
+.espace-profil-fermer { position: absolute; top: 10px; right: 12px; width: 34px; height: 34px; border: 0; border-radius: 50%; background: #f3edfb; font-size: 1rem; cursor: pointer; }
