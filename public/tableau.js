@@ -453,12 +453,21 @@ async function chargerDiscussions(id = null) {
   const box = $('[data-discussions]');
   try {
     const d = await conf({ action: 'annonce_discussions_admin', id });
-    box.innerHTML = d.discussions.map((x) => `<li><span>n° ${x.a_ref} ${esc(x.a_prenom || '')} ↔ n° ${x.b_ref} ${esc(x.b_prenom || '')}<br><span class="etat-pastel is-${esc(x.etat)}">${esc(ETATS_DISC[x.etat] || x.etat)}</span> <small>${x.messages} message(s) · depuis le ${esc(date(x.ouverte_at, { day: 'numeric', month: 'short' }))}</small></span>${x.etat === 'signalee' ? `<button type="button" class="btn btn-ink" data-lire-discussion="${esc(x.id)}">Lire</button>` : ''}</li>`).join('') || '<li>Aucune discussion pour le moment.</li>';
+    box.innerHTML = d.discussions.map((x) => `<li><span>n° ${x.a_ref} ${esc(x.a_prenom || '')} ↔ n° ${x.b_ref} ${esc(x.b_prenom || '')}<br><span class="etat-pastel is-${esc(x.etat)}">${esc(ETATS_DISC[x.etat] || x.etat)}</span> <small>${x.messages} message(s) · depuis le ${esc(date(x.ouverte_at, { day: 'numeric', month: 'short' }))}</small></span>${x.lamia_invitee ? ' <span class="etat-pastel is-invitee">tu es invitée</span>' : ''}${x.etat === 'signalee' || x.lamia_invitee ? `<button type="button" class="btn btn-ink" data-lire-discussion="${esc(x.id)}">${x.lamia_invitee ? 'Lire et répondre' : 'Lire'}</button>` : ''}</li>`).join('') || '<li>Aucune discussion pour le moment.</li>';
     const lue = $('[data-discussion-lue]');
-    if (d.messages) { const x = d.discussions.find((y) => y.id === id); lue.hidden = false; lue.innerHTML = `<h3>Discussion signalée</h3>${d.messages.map((m) => `<p><small><b>${esc(m.qui)}</b> · ${esc(date(m.created_at))}</small><br>${esc(m.texte)}</p>`).join('') || '<p>Aucun message.</p>'}`; void x; }
+    if (d.messages) { const x = d.discussions.find((y) => y.id === id); lue.hidden = false; lue.innerHTML = `<h3>${x?.lamia_invitee ? 'Discussion où tu es invitée' : 'Discussion signalée'}</h3>${d.messages.map((m) => `<p><small><b>${esc(m.qui)}</b> · ${esc(date(m.created_at))}</small><br>${esc(m.texte)}</p>`).join('') || '<p>Aucun message.</p>'}${x?.lamia_invitee ? `<form class="tdb-filtres-journal" data-lamia-ecrire="${esc(x.id)}"><textarea name="texte" rows="3" maxlength="2000" required placeholder="Ton message, comme une wali…" style="width:100%"></textarea><button type="submit" class="btn btn-ink">Envoyer</button></form>` : ''}`; void x; }
   } catch { box.innerHTML = '<li>Les discussions ne s’affichent pas pour le moment.</li>'; }
 }
 document.addEventListener('click', (e) => { const b = e.target.closest('[data-lire-discussion]'); if (b) chargerDiscussions(b.dataset.lireDiscussion); });
+// Lamia répond dans une discussion où elle a été invitée (20 €) : les deux sont prévenus.
+document.addEventListener('submit', async (e) => {
+  const f = e.target.closest('[data-lamia-ecrire]');
+  if (!f) return;
+  e.preventDefault();
+  const btn = f.querySelector('button'); btn.disabled = true;
+  try { await conf({ action: 'annonce_discussion_lamia_ecrire', id: f.dataset.lamiaEcrire, texte: f.texte.value }); message('Ton message est parti, les deux sont prévenus.'); chargerDiscussions(f.dataset.lamiaEcrire); }
+  catch { btn.disabled = false; message('Le message n’est pas parti. Réessaie.', true); }
+});
 document.addEventListener('change', async (e) => {
   const form = e.target.closest('[data-notifs-lamia]');
   if (!form) return;

@@ -4412,3 +4412,9 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .aide-q > summary::-webkit-details-marker { display: none; }
 .aide-q[open] > summary { background: #4a3470; color: #fff; }
 .aide-q > p { position: absolute; z-index: 20; right: -6px; top: calc(100% + 8px); width: min(290px, calc(100vw - 48px)); margin: 0; padding: 12px 14px; border-radius: 14px; background: #2b2236; color: #fff; font-size: .9rem; line-height: 1.45; box-shadow: 0 8px 24px rgba(0,0,0,.18); }
+/* Lamia invitée dans une discussion (16 nov. 2026) */
+.disc-msg.is-lamia span { background: #fff4e0; color: #5a3d12; border: 1px solid #f0d9a8; }
+.disc-lamia { display: block; font-size: .78rem; letter-spacing: .04em; color: #a0711f; margin-bottom: 2px; }
+.disc-inviter { margin: 8px 0; }
+.disc-inviter > p { margin: 0; }
+.disc-lamia-la { font-size: .9rem; color: #a0711f; margin: 8px 0; }
