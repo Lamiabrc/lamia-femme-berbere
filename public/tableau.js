@@ -1013,7 +1013,7 @@ function rendreDetail(d) {
   const liste = (l, f, vide) => (l.length ? `<ul class="fiche-liste">${l.map(f).join('')}</ul>` : `<p class="aide">${vide}</p>`);
   box.innerHTML = `${c.bloque ? '<p class="fiche-bloque"><svg class="ico" aria-hidden="true"><use href="/icones.svg#ban"/></svg> Ce compte est bloqué.</p>' : ''}${pourquoi}
     <div class="tdb-carte"><h3 style="margin-top:0">À qui est ce profil</h3><ul class="fiche-liste">${qui || '<li>Compte sans profil.</li>'}</ul>
-      <p class="aide">Formule : ${esc({ decouverte: 'Découverte', passion: 'Passion', prestige: 'Prestige' }[d.formule] || d.formule)} · Dernière activité : ${esc(quand(c.derniere_action) || 'aucune')}</p></div>
+      <p class="aide">Formule : ${esc({ decouverte: 'Découverte', passion: 'Passion', prestige: 'Prestige', couple: 'Couple Amour', couple_prestige: 'Couple Prestige' }[d.formule] || d.formule)}${d.formule_offerte ? ' (offerte)' : ''} · Dernière activité : ${esc(quand(c.derniere_action) || 'aucune')}</p></div>
     ${blocComplet}
     <div class="tdb-carte"><h3 style="margin-top:0">Son activité</h3><div class="fiche-chiffres">
       ${[['Swipes oui', a.swipes_oui], ['Swipes non', a.swipes_non], ['Demandes', a.demandes], ['Choisi·e par', a.recus], ['Matchs en cours', a.en_cours.length], ['Dématchs', a.dematchs], ['Messages', a.messages], ['Photos', a.photos]].map(([n, v]) => `<div><b>${esc(v)}</b><span>${esc(n)}</span></div>`).join('')}</div>
@@ -1021,7 +1021,7 @@ function rendreDetail(d) {
     <div class="tdb-carte"><h3 style="margin-top:0"><svg class="ico" aria-hidden="true"><use href="/icones.svg#gift"/></svg> Offrir</h3>
       <p class="aide">Reste à utiliser : ${d.credits.match} match(s), ${d.credits.speed_dating} soirée(s), ${d.credits.coaching} coaching(s). La personne est prévenue.</p>
       <form class="fiche-offrir" data-offrir>
-        <label>Quoi<select name="quoi"><option value="match">Match</option><option value="speed_dating">Speed dating</option><option value="coaching">Coaching</option><option value="produit">Produit</option></select></label>
+        <label>Quoi<select name="quoi"><option value="match">Match</option><option value="speed_dating">Speed dating</option><option value="coaching">Coaching</option><option value="produit">Produit</option>${(d.annonces || []).length ? `<option value="formule_passion">Formule Passion</option><option value="formule_prestige">Formule Prestige</option>${d.formule_offerte ? '<option value="formule_">Reprendre la formule offerte</option>' : ''}` : ''}</select></label>
         <label data-offrir-nombre>Combien<select name="quantite">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => `<option>${n}</option>`).join('')}</select></label>
         <label data-offrir-produit hidden>Produit<select name="product_id">${(d.produits || []).map((p) => `<option value="${esc(p.id)}" data-numerique="${p.product_type === 'digital' ? '1' : ''}">${esc(p.name)}${Number.isInteger(p.stock_qty) ? ` (stock ${p.stock_qty})` : ''}</option>`).join('')}</select></label>
         <div data-offrir-adresse hidden><label>Adresse<input name="line1" maxlength="200"></label><label>Code postal<input name="postal_code" maxlength="20"></label><label>Ville<input name="city" maxlength="100"></label><label>Pays<input name="country" maxlength="60" value="France"></label></div>
@@ -1082,8 +1082,8 @@ $('[data-compte-detail]').addEventListener('click', async (e) => {
 $('[data-compte-detail]').addEventListener('change', (e) => {
   const f = e.target.closest('[data-offrir]');
   if (!f) return;
-  const produit = f.elements.quoi.value === 'produit';
-  $('[data-offrir-nombre]', f).hidden = produit;
+  const produit = f.elements.quoi.value === 'produit', formule = f.elements.quoi.value.startsWith('formule_');
+  $('[data-offrir-nombre]', f).hidden = produit || formule;
   $('[data-offrir-produit]', f).hidden = !produit;
   $('[data-offrir-adresse]', f).hidden = !produit || f.elements.product_id.selectedOptions[0]?.dataset.numerique === '1';
 });
@@ -1095,6 +1095,18 @@ $('[data-compte-detail]').addEventListener('submit', async (e) => {
   if (!confirm('Offrir ce cadeau ? La personne en est prévenue tout de suite.')) return;
   st.textContent = 'Un instant…';
   const ERREURS = { adresse_requise: 'Indique son adresse pour l’envoi.', stock_vide: 'Ce produit n’est plus en stock.', produit_indisponible: 'Ce produit n’est plus disponible.' };
+  // Offrir une formule depuis la fiche (16 nov. 2026 : « dans la fiche, on ne peut pas donner des formules »).
+  // Même chemin que la fiche membre de l'outil, puis la personne est prévenue par un message.
+  if (quoi.startsWith('formule_')) {
+    const formule = quoi.slice(8), ref = detailCourant.annonces?.[0]?.ref, nom = { passion: 'Passion', prestige: 'Prestige' }[formule];
+    try {
+      await conf({ action: 'live_outil_membre_formule', ref, formule });
+      if (formule) await conf({ action: 'live_outil_membre_ecrire', ref, texte: `Bonne nouvelle : je t’offre la formule ${nom}. Elle est déjà active sur ton compte. Lamia` }).catch(() => null);
+      message(formule ? `Formule ${nom} offerte, la personne est prévenue.` : 'Formule offerte reprise.');
+      chargerDetail({ user_id: detailCourant.compte.id });
+    } catch (err) { st.textContent = { injoignable: 'Cette personne n’a pas d’email : impossible de lui offrir une formule.', not_found: 'Profil introuvable.', offre_moderateur: 'C’est un modérateur : sa formule se gère dans « Modérateurs ».' }[err.code] || 'Ça n’a pas abouti. Réessaie dans un instant.'; }
+    return;
+  }
   try {
     await conf({ action: 'annonce_offrir', user_id: detailCourant.compte.id, quoi, quantite: f.elements.quantite.value, product_id: f.elements.product_id.value, adresse: { line1: f.elements.line1.value, postal_code: f.elements.postal_code.value, city: f.elements.city.value, country: f.elements.country.value } });
     message('Cadeau offert, la personne est prévenue.');
