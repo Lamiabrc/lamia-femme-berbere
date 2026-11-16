@@ -212,6 +212,13 @@ async function mesBlocages(session) {
   box.hidden = !liste.length;
   box.querySelector('[data-blocages-liste]').innerHTML = liste.map((x) => `<li>Profil n° ${esc(x.ref)} <button type="button" class="link-button" data-debloquer="${esc(x.ref)}">Débloquer</button></li>`).join('');
   ecouter(box, 'click', async (e) => {
+    const mc = e.target.closest('[data-multiples-choix]');
+    if (mc) {
+      if (mc.dataset.multiplesChoix === 'oui' && !confirm('D’autres matchs pourront s’ouvrir, et ton match actuel le verra. Tu confirmes ?')) return;
+      mc.disabled = true;
+      try { await appelProfil({ action: 'annonce_matchs_multiples', choix: mc.dataset.multiplesChoix }, session); await monProfil(session); } catch { mc.disabled = false; }
+      return;
+    }
     const b = e.target.closest('[data-debloquer]');
     if (!b) return;
     b.disabled = true;
@@ -460,6 +467,11 @@ async function monProfil(session) {
     box.innerHTML = `${p.test ? '<p class="espace-test"><svg class="ico" aria-hidden="true"><use href="/icones.svg#flask-conical"/></svg> <strong>Compte de test.</strong> Il sert uniquement à essayer l’application : il ne voit que les profils de test et ne contacte aucun vrai membre.</p><p class="espace-test-mode"><span>Voir l’espace :</span> <a class="btn btn-ink" href="/mon-espace/" aria-current="page">Célibataire</a> <a class="btn btn-line" href="/notre-couple/?test=1">En couple</a></p>' : ''}<article class="espace-achat"><div><p class="event-date">Profil n° ${esc(p.ref)}</p><h3>${esc(ETAT_PROFIL[p.status] || p.status)}${p.status === 'publiee' && p.piece_identite ? ' · avec pièce d’identité' : ''}</h3>
       ${p.live ? `<p><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg> Profil créé en live avec Lamia${p.live_retrouve ? '' : ' (Lamia vérifie ta fiche)'}.</p>` : ''}
       ${p.nb_compatibles !== null && p.nb_compatibles !== undefined ? `<p>D’après l’outil de Lamia, tu pourrais correspondre à ${esc(p.nb_compatibles)} personne(s).</p>` : ''}
+      ${p.matchs?.places_en_attente && p.matchs.choix_multiples !== 'non' ? `<div class="espace-multiples" data-multiples>
+        <p><strong>Ta formule permet d’autres matchs.</strong> Tu es en ce moment en discussion avec ton match : s’il s’ouvre d’autres matchs, ton match le verra.</p>
+        ${p.matchs.choix_multiples === '24h' ? '<p class="aide">C’est noté : d’autres matchs pourront s’ouvrir 24 h après le début de ta discussion.</p>' : ''}
+        <p class="espace-sans-liens"><button type="button" class="btn btn-line" data-multiples-choix="non">Je reste avec mon match</button> <button type="button" class="btn btn-line" data-multiples-choix="24h">Pas pendant notre premier échange (24 h)</button> <button type="button" class="btn btn-ink" data-multiples-choix="oui">Ouvrir d’autres matchs</button></p>
+      </div>` : ''}
       ${p.matchs ? `<p class="espace-match"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Matchs en cours : <strong>${esc(p.matchs.actifs)} / ${esc(p.matchs.limite)}</strong>${p.matchs.actifs >= p.matchs.limite ? (p.matchs.formule === 'prestige' ? ' · mets fin à un match pour en choisir un autre.' : ' · mets fin à un match pour en choisir un autre, ou <a class="text-link" href="/abonnement/">passe à une formule supérieure</a>.') : ''}</p>` : ''}</div>
       <div class="espace-achat-droite">${!window.LFB_PLAY && p.matchs && p.matchs.formule !== 'prestige' ? (p.algerie ? '<a class="btn btn-line" href="/salon/">Plus de matchs au live</a> ' : `<a class="btn btn-ink espace-abo-btn" href="${p.matchs.formule === 'passion' ? '/abonnement/?formule=prestige">Passer à Prestige' : '/abonnement/">S’abonner'}</a> `) : ''}${p.fiche_live ? '<a class="btn btn-ink" href="#mes-fiches">Modifier mon profil</a>' : '<button class="btn btn-ink" type="button" data-profil-modifier>Modifier mon profil</button>'}</div></article>
       ${(p.matchs_lies || []).length ? `<ul class="espace-matchs-liste">${p.matchs_lies.map((m) => `<li><span><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Match avec le profil n° ${esc(m.ref)}</span><button class="btn btn-ink" type="button" data-voir-match="${esc(m.ref)}">Voir son profil complet</button> <button class="btn btn-line" type="button" data-profil-dematcher="${esc(m.ref)}">Mettre fin à ce match</button></li>`).join('')}</ul>` : ''}

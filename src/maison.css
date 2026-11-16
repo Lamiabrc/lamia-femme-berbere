@@ -4461,6 +4461,9 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .couple .couple-mariage { background: linear-gradient(135deg, #fffaf0, #fdf1f4); border-color: #f0dcc0; }
 .couple .couple-mariage-form { display: grid; gap: 10px; margin-top: 12px; }
 .couple .couple-mariage-ok { margin: 8px 0 0; padding: 12px 14px; border-radius: 14px; background: #fff; font-weight: 600; color: #8d2d48; }
+/* Places en plus pendant un match : l'accord d'abord (16 nov. 2026) */
+.espace-multiples { margin: 10px 0; padding: 14px 16px; border-radius: 16px; background: #fff8ec; border: 1px solid #f0dcb4; }
+.espace-multiples p { margin: 0 0 8px; }
 /* Choix à l'ouverture : célibataire ou en couple ; invitation du partenaire (16 nov. 2026) */
 .choix-ouverture .swipe-fenetre-boite { text-align: center; }
 .choix-ouverture .choix-coeur { font-size: 2.4rem; color: #d6496b; margin: 0; animation: couple-bat 1.6s ease-in-out infinite; }
