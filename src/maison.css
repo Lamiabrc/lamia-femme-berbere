@@ -4687,3 +4687,7 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .couple .couple-doree { color: #ffe9b0; font-weight: 700; }
 .couple .couple-carte-jeu-texte.is-floue { filter: blur(7px); user-select: none; }
 .couple .couple-doree-cadenas { margin: -4px 0 12px; font-weight: 600; }
+.couple .couple-paquet { position: relative; }
+.couple .couple-paquet.is-dore { border-color: #e2c27f; background: linear-gradient(135deg, #fffaf0, #fdeef2); }
+.couple .couple-paquet-badge { position: absolute; top: 8px; right: 8px; padding: 2px 8px; border-radius: 999px; background: linear-gradient(110deg, #c9a14f, #8a2640); color: #fff; font-size: .7rem; font-weight: 700; }
+.couple .couple-carte-jeu.is-coquin { background: linear-gradient(160deg, #5a1630, #b0475f); }

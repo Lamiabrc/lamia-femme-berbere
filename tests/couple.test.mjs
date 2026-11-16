@@ -198,13 +198,14 @@ test('humeur gardée pour soi : elle reste « pour moi » quand on la modifie', 
   assert.equal(r.couple.meteo.moi.derniere.partage, false);
 });
 
-test('cartes dorées : une sur trois (et « Un peu piquant » après la troisième) demande l’abonnement Couple', async () => {
+test('jeux dorés : « Un peu piquant » et « Coquin » avec l’abonnement Couple (la première carte est offerte) ; les autres jeux sont gratuits', async () => {
   const { ctx } = monde();
   const r0 = await lire(await actionCouple('couple_creer', {}, ctx(AMINE)));
   await actionCouple('couple_rejoindre', { code: r0.couple.code }, ctx(SARA));
-  assert.equal((await actionCouple('couple_jeu', { jeu: 'preferes', i: 2 }, ctx(AMINE))).status, 402);
+  assert.equal((await actionCouple('couple_jeu', { jeu: 'coquin', i: 3 }, ctx(AMINE))).status, 402);
   assert.equal((await actionCouple('couple_jeu', { jeu: 'piquant', i: 5 }, ctx(AMINE))).status, 402);
-  assert.equal((await actionCouple('couple_jeu', { jeu: 'preferes', i: 1 }, ctx(AMINE))).status, 200);
+  assert.equal((await actionCouple('couple_jeu', { jeu: 'coquin', i: 0 }, ctx(AMINE))).status, 200);
+  assert.equal((await actionCouple('couple_jeu', { jeu: 'preferes', i: 2 }, ctx(AMINE))).status, 200);
   const r = await lire(await actionCouple('couple_etat', {}, ctx(AMINE)));
-  assert.deepEqual(r.cartes_dorees.preferes.slice(0, 3), [false, false, true]);
+  assert.deepEqual(r.jeux_dores, ['piquant', 'coquin']);
 });
