@@ -897,6 +897,7 @@ page(
       <p><button type="button" class="btn btn-line btn-installer" data-installer-bouton><svg class="ico" aria-hidden="true"><use href="/icones.svg#smartphone"/></svg> Installer l’application sur mon téléphone</button></p>
       <div class="espace-notifs" data-espace-notifs></div>
       <div class="espace-profil" data-espace-profil><p class="loading">Un instant…</p></div>
+      <div class="espace-profil mes-matchs" data-mes-matchs hidden></div>
       <div class="espace-profil" id="mes-fiches" data-espace-fiches></div>
     </section>
 

@@ -4344,3 +4344,14 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .annonce-choix input[name=genre]:focus-visible { outline: 3px solid #b9a3dd; outline-offset: 2px; }
 /* Fiche du live pas encore validée (15 nov. 2026) */
 .po-app.po-app .swipe-carte .swipe-statut.is-attente { background: #f3ece2; color: #7a6248; }
+
+/* Encart « Mes matchs » (16 nov. 2026) */
+.mes-matchs .mm-liste { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 10px; }
+.mes-matchs .mm-liste li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; padding: 10px 0; border-top: 1px solid rgba(74, 52, 112, .12); }
+.mes-matchs .mm-liste li > span:first-child { display: flex; flex-direction: column; }
+.mes-matchs .mm-liste small { color: #6b5a72; }
+.mes-matchs .mm-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.mes-matchs .mm-actions .btn { padding: 8px 14px; font-size: .92rem; }
+.mes-matchs .mm-histo { margin-top: 10px; }
+.mes-matchs .mm-histo summary { cursor: pointer; font-weight: 600; color: #4a3470; }
+.mes-matchs .mm-histo ul { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 6px; }
