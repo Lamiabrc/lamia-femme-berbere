@@ -465,3 +465,10 @@
 /* Choix oui / non et formule dans la fiche modérateur */
 .tdb-membre-fiche label.tdb-choix { display: inline-flex; align-items: center; gap: 6px; margin: 0 14px 0 0; font-weight: 500; }
 .tdb-membre-fiche label.tdb-choix input { width: auto; height: auto; margin: 0; }
+
+/* L'essentiel en haut de l'accueil : abonnés et argent généré, lisibles d'un coup d'œil au téléphone (16 nov. 2026) */
+.tdb-essentiel { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0 0 18px; }
+.tdb-gros { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 16px 18px; border: 0; border-radius: 18px; background: #2b2236; color: #fff; text-align: left; font: inherit; cursor: pointer; }
+.tdb-gros span { font-size: .95rem; opacity: .85; }
+.tdb-gros strong { font-size: clamp(1.9rem, 8vw, 2.6rem); line-height: 1.1; font-weight: 700; }
+.tdb-gros small { font-size: .85rem; opacity: .8; }
