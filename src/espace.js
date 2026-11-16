@@ -436,7 +436,7 @@ async function monProfil(session) {
   try {
     const { profil: p } = await appelProfil({ action: 'annonce_mon_profil' }, session);
     if (!p) { await sansProfil(box, session); return; }
-    box.innerHTML = `${p.test ? '<p class="espace-test"><svg class="ico" aria-hidden="true"><use href="/icones.svg#flask-conical"/></svg> <strong>Compte de test.</strong> Il sert uniquement à essayer l’application : il ne voit que les profils de test et ne contacte aucun vrai membre.</p>' : ''}<article class="espace-achat"><div><p class="event-date">Profil n° ${esc(p.ref)}</p><h3>${esc(ETAT_PROFIL[p.status] || p.status)}${p.status === 'publiee' && p.piece_identite ? ' · avec pièce d’identité' : ''}</h3>
+    box.innerHTML = `${p.test ? '<p class="espace-test"><svg class="ico" aria-hidden="true"><use href="/icones.svg#flask-conical"/></svg> <strong>Compte de test.</strong> Il sert uniquement à essayer l’application : il ne voit que les profils de test et ne contacte aucun vrai membre.</p><p class="espace-test-mode"><span>Voir l’espace :</span> <a class="btn btn-ink" href="/mon-espace/" aria-current="page">Célibataire</a> <a class="btn btn-line" href="/notre-couple/?test=1">En couple</a></p>' : ''}<article class="espace-achat"><div><p class="event-date">Profil n° ${esc(p.ref)}</p><h3>${esc(ETAT_PROFIL[p.status] || p.status)}${p.status === 'publiee' && p.piece_identite ? ' · avec pièce d’identité' : ''}</h3>
       ${p.live ? `<p><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg> Profil créé en live avec Lamia${p.live_retrouve ? '' : ' (Lamia vérifie ta fiche)'}.</p>` : ''}
       ${p.nb_compatibles !== null && p.nb_compatibles !== undefined ? `<p>D’après l’outil de Lamia, tu pourrais correspondre à ${esc(p.nb_compatibles)} personne(s).</p>` : ''}
       ${p.matchs ? `<p class="espace-match"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Matchs en cours : <strong>${esc(p.matchs.actifs)} / ${esc(p.matchs.limite)}</strong>${p.matchs.actifs >= p.matchs.limite ? (p.matchs.formule === 'prestige' ? ' · mets fin à un match pour en choisir un autre.' : ' · mets fin à un match pour en choisir un autre, ou <a class="text-link" href="/abonnement/">passe à une formule supérieure</a>.') : ''}</p>` : ''}</div>
@@ -459,7 +459,7 @@ async function monProfil(session) {
     box.querySelectorAll('[data-annonce-pause]').forEach((b) => b.addEventListener('click', async () => {
       const st = box.querySelector('[data-profil-statut]');
       b.disabled = true;
-      try { await appelProfil({ action: 'annonce_pause', pause: b.dataset.annoncePause === 'oui', raison: b.dataset.raison || null }, session); await monProfil(session); }
+      try { await appelProfil({ action: 'annonce_pause', pause: b.dataset.annoncePause === 'oui', raison: b.dataset.raison || null }, session); if (b.dataset.raison === 'couple') { location.href = '/notre-couple/'; return; } await monProfil(session); }
       catch { b.disabled = false; if (st) st.textContent = 'Ça n’a pas marché. Réessaie dans un instant.'; }
     }));
     { const zm = box.querySelector('[data-profil-medias]');
@@ -955,6 +955,23 @@ async function discussions(session) {
   const raisonsDematch = [['physique', 'Physique'], ['enfants', 'Enfants'], ['localisation', 'Localisation'], ['caractere', 'Caractère'], ['valeurs', 'Valeurs'], ['parcours', 'Une étape du parcours'], ['autre', 'Autre raison']]
     .map(([v, t]) => `<label><input type="radio" name="raison" value="${v}" required> ${t}</label>`).join('');
   let dematchOuvert = null;
+  // Fin des 7 jours (Lamia, 16 nov. 2026) : une bulle « C'est fini ? ou on est en couple ? ».
+  // Si les deux disent « en couple », leur espace commun s'ouvre et la discussion ne se termine plus.
+  const finBulle = (d) => {
+    const f = d.fin || {};
+    if (f.couple) return '<div class="disc-fin is-couple"><p><strong>Vous êtes en couple 💞</strong></p><p><a class="btn btn-ink" href="/notre-couple/">Notre espace de couple</a></p></div>';
+    if (d.dematch || d.close_raison === 'signalee') return '';
+    // On demande aussi à ceux qui ont échangé leurs numéros, et à ceux qui se parlent depuis plus d'une semaine
+    // (Passion : 14 jours, Prestige : sans fin — la question vient au bout de 7 jours). Lamia, 16 nov. 2026.
+    const bientot = d.ouverte && new Date(d.ferme_at) - Date.now() < 24 * 3600e3;
+    const uneSemaine = d.ouverte_at && Date.now() - new Date(d.ouverte_at) >= 7 * 86400e3;
+    if (d.ouverte && !bientot && !uneSemaine && !d.echange) return '';
+    if (f.mien === 'couple') return `<div class="disc-fin"><p>Tu as dit que vous êtes en couple. ${esc(d.avec)} n’a pas encore répondu.</p></div>`;
+    if (f.mien === 'fini') return '';
+    return `<div class="disc-fin"><p><strong>${d.echange ? 'Vous avez échangé vos numéros.' : !d.ouverte ? 'Votre discussion est terminée.' : bientot ? 'Votre discussion se termine bientôt.' : 'Cela fait plus d’une semaine que vous vous parlez.'}</strong> Où en êtes-vous ?</p>
+      <p class="espace-sans-liens"><button type="button" class="btn btn-ink" data-disc-fin="couple">On est en couple 💞</button> <button type="button" class="btn btn-line" data-disc-fin="fini">C’est fini</button></p>
+      ${f.son_couple ? `<p class="aide">${esc(d.avec)} a dit que vous êtes en couple.</p>` : ''}</div>`;
+  };
   const vue = (d) => {
     const msgs = d.messages.map((m) => `<p class="disc-msg ${m.moi ? 'is-moi' : ''}${m.lamia ? ' is-systeme' : ''}"><span>${esc(m.texte)}</span><small>${esc(heure(m.le))}</small></p>`).join('') || `<p class="disc-vide">${salut ? `${esc(salut)}, dis` : 'Dis'} bonjour à ${esc(d.avec)}</p>`;
     const numeros = d.echange
@@ -979,6 +996,7 @@ async function discussions(session) {
         : '<p class="disc-prenom-lien"><button type="button" class="link-button" data-disc-prenom="partager"><svg class="ico" aria-hidden="true"><use href="/icones.svg#hand"/></svg> Partager mon prénom</button></p>') : ''}
       ${d.dematch ? '' : numeros}
       ${d.prolongeable && !window.LFB_PLAY && new Date(d.ferme_at) - Date.now() < 72 * 3600e3 ? `<div class="disc-prolonger">${d.ouverte ? '' : '<p>Votre discussion est terminée, mais vous pouvez la rouvrir.</p>'}${boutonService('prolonger_discussion', 'Prolonger la discussion de 7 jours', '3 €', '7 jours de plus · 3 €', d.id)}</div>` : ''}
+      ${finBulle(d)}
       ${d.ouverte && !d.dematch ? (dematchOuvert === d.id ? `<form class="disc-dematch" data-disc-dematch-form>
         <h4><svg class="ico" aria-hidden="true"><use href="/icones.svg#handshake"/></svg> Tu peux dématcher, avec élégance</h4>
         <p>Tu as encore <strong>deux messages</strong> à écrire pour rester ${e === '' ? 'courtois et gentleman' : e === 'e' ? 'courtoise et élégante' : 'courtois·e et élégant·e'}. Si tu confirmes, ton match sera informé de ton dématch et attendra un au revoir, voire une raison.</p>
@@ -1056,6 +1074,16 @@ async function discussions(session) {
     if (champ) champ.hidden = e.target.value !== 'parcours';
   });
   ecouter(box, 'click', async (e) => {
+    const finBtn = e.target.closest('[data-disc-fin]');
+    if (finBtn) {
+      finBtn.disabled = true;
+      try {
+        const r = await appelProfil({ action: 'annonce_discussion_fin', id: finBtn.closest('[data-disc]').dataset.disc, choix: finBtn.dataset.discFin }, session);
+        if (r.couple) { location.href = '/notre-couple/'; return; }
+        await charger();
+      } catch { finBtn.disabled = false; }
+      return;
+    }
     const choixPrenom = e.target.closest('[data-disc-prenom]');
     if (choixPrenom) {
       choixPrenom.disabled = true;
