@@ -4342,3 +4342,5 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .annonce-choix input[name=genre]:checked { background: #4a3470; }
 .annonce-choix input[name=genre]:checked::before { content: ""; width: 7px; height: 12px; margin-top: -3px; border: solid #fff; border-width: 0 3px 3px 0; transform: rotate(45deg); }
 .annonce-choix input[name=genre]:focus-visible { outline: 3px solid #b9a3dd; outline-offset: 2px; }
+/* Fiche du live pas encore validée (15 nov. 2026) */
+.po-app.po-app .swipe-carte .swipe-statut.is-attente { background: #f3ece2; color: #7a6248; }

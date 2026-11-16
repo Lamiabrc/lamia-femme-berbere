@@ -974,8 +974,10 @@ function profilComplet(a) {
     ${a.profil ? `<h5>Qui je suis</h5><p>${esc(a.profil)}</p>` : ''}${a.recherche ? `<h5>Qui je cherche${a.age_min || a.age_max ? ` · ${esc(a.age_min || 18)} à ${esc(a.age_max || 99)} ans` : ''}</h5><p>${esc(a.recherche)}</p>` : ''}
     <dl class="profil-champs">${lignesProfil([['Prénom', a.prenom], ['Âge', a.age], ['Genre', a.genre], ['Ville', a.ville], ['Pays', a.pays], ['Situation', a.situation], ['Email', a.email], ['Téléphone', a.phone], ...reponses, ['Ma note', a.note_lamia]])}</dl></article>`;
 }
-function ficheComplete(f) {
-  return `<article class="profil-complet"><h4>Fiche de l’outil n° ${esc(f.ref)}</h4><p class="aide">Ses photos et ses contacts sont dans ton outil.</p>
+// Le site ne reçoit jamais les photos de l'outil : on dit ce qu'il sait vraiment (15 nov. 2026, fiche 5026).
+function ficheComplete(f, photosSite) {
+  return `<article class="profil-complet"><h4>Fiche de l’outil n° ${esc(f.ref)}</h4>
+    <p class="aide">${photosSite ? `${photosSite} photo${photosSite > 1 ? 's' : ''} envoyée${photosSite > 1 ? 's' : ''} sur le site (voir son profil ci-dessus).` : 'Aucune photo sur le site.'} Les photos de ton outil, s’il y en a, ne sont jamais envoyées au site.</p>
     ${f.profil ? `<h5>Qui je suis</h5><p>${esc(f.profil)}</p>` : ''}${f.recherche ? `<h5>Qui je cherche${f.age_min || f.age_max ? ` · ${esc(f.age_min || 18)} à ${esc(f.age_max || 99)} ans` : ''}</h5><p>${esc(f.recherche)}</p>` : ''}
     <dl class="profil-champs">${lignesProfil([['Âge', f.age], ['Genre', f.genre], ['Ville', f.ville], ['Village', f.village], ['Pays', f.pays], ['Secteur', f.secteur], ['Situation', f.situation], ['Enfants', f.enfants], ['Études', f.etudes], ['Origine', f.origine], ['Religion', f.religion], ['Pratique', f.pratique], ['Mode de vie', f.mode_vie], ['Caractéristiques', f.caracteristiques], ['Modification demandée', f.modif_demandee]])}</dl></article>`;
 }
@@ -985,7 +987,7 @@ function rendreDetail(d) {
   const carte = (titre, html, ouvert = false) => `<details class="tdb-repli" ${ouvert ? 'open' : ''}><summary>${titre}</summary><div>${html}</div></details>`;
   const pourquoi = d.journal?.length ? `<div class="tdb-carte fiche-pourquoi"><h3 style="margin-top:0">Pourquoi tu as reçu une alerte</h3><ul class="fiche-liste">${d.journal.slice(0, 4).map((j) => `<li><strong>${avecRefs(j.titre)}</strong><small>${esc(quand(j.created_at))}</small>${(j.lignes || []).map((l) => `<div>${avecRefs(l)}</div>`).join('')}</li>`).join('')}</ul></div>` : '';
   const qui = [...(d.annonces || []).map((a) => `<li><strong>Profil n° ${esc(a.ref)}</strong> · ${esc(a.prenom || '')}, ${esc(a.age ?? '?')} ans · ${esc(a.genre || '')}<small>${esc([a.ville, a.pays].filter(Boolean).join(', '))} · ${esc(ANNONCE[a.status] || a.status)}${a.test ? ' · test' : ''}${a.en_match ? ' · en match' : ''}</small></li>`), ...(d.fiches || []).map((f) => `<li><strong>Fiche de l’outil n° ${esc(f.ref)}</strong> · ${esc(f.age ?? '?')} ans · ${esc(f.genre || '')}<small>${esc([f.ville, f.pays].filter(Boolean).join(', '))} · ${f.retiree ? 'retirée' : f.confirmee ? 'confirmée' : 'en attente de confirmation'}</small></li>`)].join('');
-  const complet = [...(d.annonces || []).map(profilComplet), ...(d.fiches || []).map(ficheComplete)].join('');
+  const complet = [...(d.annonces || []).map(profilComplet), ...(d.fiches || []).map((f) => ficheComplete(f, (d.annonces || []).reduce((n, a) => n + (a.medias || []).filter((m) => m.kind === 'photo').length, 0)))].join('');
   const blocComplet = complet ? `<div class="tdb-carte"><h3 style="margin-top:0">Son profil complet</h3>${complet}</div>` : '';
   if (d.sans_compte) {
     box.innerHTML = `${pourquoi}<div class="tdb-carte"><h3 style="margin-top:0">À qui est ce profil</h3><ul class="fiche-liste">${qui}</ul><p class="aide">Cette personne n’a pas de compte. Son prénom et ses contacts sont dans ton outil de live (cherche ce n° dans « Le site »).</p></div>${blocComplet}${(d.choisi_par || []).length ? `<div class="tdb-carte"><h3 style="margin-top:0">Choisie par</h3><ul class="fiche-liste">${d.choisi_par.map((x) => `<li>${refBouton(x.ref)} ${esc(x.prenom || '')}<small>${esc(STATUT_DEMANDE[x.statut] || x.statut)} · ${esc(quand(x.le))}</small></li>`).join('')}</ul></div>` : ''}`;
