@@ -277,7 +277,7 @@ function laDemande(c) {
     if (!oui && !non) return;
     e.querySelectorAll('button').forEach((b) => { b.disabled = true; });
     try {
-      const r = await appel({ action: 'couple_demande_repondre', oui: Boolean(oui) });
+      const r = enDemo ? { couple: { ...dernier, demande: { ...dernier.demande, statut: oui ? 'oui' : 'reflexion' }, jalons: { demande: new Date().toISOString().slice(0, 10) } } } : await appel({ action: 'couple_demande_repondre', oui: Boolean(oui) });
       if (oui) {
         e.querySelector('.couple-demande-boite').innerHTML = '<p class="couple-demande-bravo">💍</p><p class="couple-demande-question">Vous êtes fiancés !</p><p>Votre parcours vers le grand jour s’ouvre…</p>';
         coeurs(); setTimeout(coeurs, 700);
@@ -315,6 +315,7 @@ function bulle(t) {
 }
 const statut = (t) => { const s = zone.querySelector('[data-couple-statut]'); if (s) s.textContent = t; else bulle(t); };
 async function faire(body, apres) {
+  if (enDemo) { bulle('Démo : rien n’est envoyé 💞'); return; }
   try { const r = await appel(body); if (r.couple !== undefined) { if (r.couple) vue(r.couple); else accueil(); } apres?.(r); }
   catch (err) { statut(ERREURS[err.code] || 'Ça n’a pas fonctionné. Réessaie dans un instant.'); }
 }
@@ -419,7 +420,22 @@ zone.addEventListener('submit', (e) => {
   if (f.matches('[data-cadeau-form]')) return faire({ action: 'couple_cadeau', type: f.type.value, note: f.note.value }, () => { f.hidden = true; zone.querySelectorAll('[data-cadeau]').forEach((x) => x.classList.remove('is-choisi')); f.reset(); f.insertAdjacentHTML('afterend', '<p class="form-status">C’est envoyé : Lamia s’en occupe et revient vers toi.</p>'); });
 });
 
+// Démo (aperçus Vercel et poste local seulement) : l'espace de Sara et Amine, pour voir le rendu sans compte.
+const enDemo = /\.vercel\.app$|^localhost$|^127\.0\.0\.1$/.test(location.hostname) && new URLSearchParams(location.search).has('demo');
+async function demo() {
+  const { DEMO } = await import('./couple-demo.js');
+  const k = DEMO.consts;
+  types = k.types; cadeaux = k.cadeaux; humeurs = k.humeurs; besoins = k.besoins; suggestions = k.suggestions; idees = k.idees; jeuxDef = k.jeux; jalonsDef = k.jalons; prepaDef = k.prepa; etapesDef = k.etapes; motsDoux = k.mots_doux; motsPayants = k.mots_payants;
+  const c = structuredClone(DEMO.couple), mode = new URLSearchParams(location.search).get('demo');
+  if (mode === 'demande') { c.demande = { ...c.demande, statut: 'attente' }; c.jalons = {}; c.prepa = []; }
+  if (mode === 'bouton') { c.demande = null; c.jalons = {}; c.prepa = []; }
+  preparerImages();
+  zone.insertAdjacentHTML('beforebegin', '<p class="espace-test-mode"><span>Démo :</span> <a class="btn btn-line" href="?demo=1">Fiancés</a> <a class="btn btn-line" href="?demo=bouton">Le bouton</a> <a class="btn btn-line" href="?demo=demande">La demande</a></p>');
+  vue(c);
+}
+
 (async () => {
+  if (enDemo) return demo();
   const { data: { session } } = await supabase.auth.getSession().catch(() => ({ data: {} }));
   if (!session) { const code = new URLSearchParams(location.search).get('code'); zone.innerHTML = `<section class="couple-carte"><p>${code ? 'Ton ou ta partenaire t’invite dans votre espace de couple 💞 Crée ton compte ou connecte-toi, puis reviens sur ce lien.' : 'Connecte-toi pour ouvrir votre espace de couple.'}</p><p><a class="btn btn-ink" href="/mon-espace/?retour=${encodeURIComponent(location.pathname + location.search)}">Me connecter</a></p></section>${AUTOUR}`; return; }
   token = session.access_token;
