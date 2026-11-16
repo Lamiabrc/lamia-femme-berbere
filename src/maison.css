@@ -4673,3 +4673,5 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .couple-petales i { position: absolute; top: -40px; font-style: normal; color: #ffd6e0; font-size: 18px; opacity: .85; animation: couple-petale linear infinite; }
 @keyframes couple-petale { from { transform: translateY(0) rotate(0); } to { transform: translateY(110vh) rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .couple .couple-bouton-magique, .couple .couple-bouton-magique::after, .couple-demande-ecran *, .couple-demande-ecran { animation: none !important; } }
+.couple .couple-credits { margin: -8px 0 14px; text-align: right; font-size: .72rem; color: #8a7c95; }
+.couple .couple-photo, .couple .couple-tete-photo, .couple-demande-boite img { background: linear-gradient(135deg, #fdeef2, #f3edfb); }

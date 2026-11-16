@@ -31,9 +31,13 @@ function accueil() {
 }
 
 // Un titre de carte avec sa petite image.
+// De vraies photos (Unsplash, licence libre), choisies par Lamia le 16 nov. 2026 : « des images plus réelles, regarde sur internet ».
+const UNS = (id, w = 900) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=70`;
+const PHOTOS = { banniere: UNS('photo-1782786660893-d2fd16cb49b7', 1000), demande: UNS('photo-1584115838497-f317f7455abe'), magie: UNS('photo-1766963026693-e73b058176dd'), fiances: UNS('photo-1552334543-63c1f649eece') };
 const photo = (src, alt = '') => `<img class="couple-photo" src="${src}" alt="${esc(alt)}" loading="lazy" decoding="async">`;
 const titre = (nom, texte) => `<h2 class="couple-titre">${img(nom, 'ci-m')}<span>${texte}</span></h2>`;
-const joursAvant = (iso) => Math.ceil((new Date(`${iso}T00:00:00`) - new Date(new Date().toDateString())) / 86400e3);
+// En jours de calendrier (en UTC, pour ne pas compter l'heure du changement d'heure).
+const joursAvant = (iso) => { const [a, m, j] = iso.split('-').map(Number), n = new Date(); return Math.round((Date.UTC(a, m - 1, j) - Date.UTC(n.getFullYear(), n.getMonth(), n.getDate())) / 86400e3); };
 
 // Le calendrier du mois : une image par activité prévue ; on touche un jour pour voir ou ajouter.
 function calendrier(c) {
@@ -75,7 +79,7 @@ function vue(c) {
       <p class="couple-sous">Aujourd’hui, j’aurais besoin…</p>
       <div class="couple-besoins">${Object.entries(besoins).map(([k, v]) => `<label><input type="radio" name="besoin" value="${k}"${k === mienne?.besoin ? ' checked' : ''}><span>${esc(v)}</span></label>`).join('')}</div>
       <input name="note" maxlength="200" placeholder="Un mot sur ta journée (facultatif)" aria-label="Un mot sur ta journée" value="${esc(mienne?.note || '')}">
-      ${lui ? `<label class="annonce-case"><input type="checkbox" name="partage" checked> <span>Partager avec ${sonNom}</span></label>` : ''}
+      ${lui ? `<label class="annonce-case"><input type="checkbox" name="partage"${mienne && mienne.partage === false ? '' : ' checked'}> <span>Partager avec ${sonNom}</span></label>` : ''}
       <button type="submit" class="btn btn-ink">${mienne?.aujourdhui ? 'Mettre à jour' : 'Partager'}</button></form>`;
 
   // Le tirage en cours dans les jeux (une carte au hasard, qu'on envoie ou qu'on change).
@@ -171,12 +175,12 @@ function vue(c) {
 
     mariage: (() => {
       const d = c.demande, ouvert = d?.statut === 'oui';
-      if (!lui) return `<section class="couple-carte couple-magie">${photo('/images/couple/grand-jour.webp')}<h2>Et si on se mariait ?</h2><p class="aide">Dès que ton ou ta partenaire vous rejoint, ce bouton magique s’allume 💍</p></section>`;
+      if (!lui) return `<section class="couple-carte couple-magie">${photo(PHOTOS.magie)}<h2>Et si on se mariait ?</h2><p class="aide">Dès que ton ou ta partenaire vous rejoint, ce bouton magique s’allume 💍</p></section>`;
       if (!ouvert) {
-        if (d && d.statut === 'attente' && d.de_moi) return `<section class="couple-carte couple-magie is-partie">${photo('/images/couple/grand-jour.webp')}<p class="couple-etincelles" aria-hidden="true"><i>✦</i><i>✦</i><i>✦</i></p><h2>Ta demande est partie 💌</h2><p>${sonNom} va la découvrir en ouvrant votre espace. Garde ton téléphone près de ton cœur…</p></section>`;
-        if (d && d.statut === 'reflexion' && d.de_moi) return `<section class="couple-carte couple-magie">${photo('/images/couple/grand-jour.webp')}<h2>${sonNom} prend le temps d’y réfléchir 🌙</h2><p class="aide">Ta demande est bien arrivée. Un grand oui se prépare parfois doucement.</p></section>`;
-        if (d && !d.de_moi) return `<section class="couple-carte couple-magie">${photo('/images/couple/grand-jour.webp')}<h2>${sonNom} t’a posé une question…</h2><p><button type="button" class="couple-bouton-magique" data-demande-voir>Ouvrir sa demande 💍</button></p></section>`;
-        return `<section class="couple-carte couple-magie">${photo('/images/couple/grand-jour.webp')}
+        if (d && d.statut === 'attente' && d.de_moi) return `<section class="couple-carte couple-magie is-partie">${photo(PHOTOS.magie)}<p class="couple-etincelles" aria-hidden="true"><i>✦</i><i>✦</i><i>✦</i></p><h2>Ta demande est partie 💌</h2><p>${sonNom} va la découvrir en ouvrant votre espace. Garde ton téléphone près de ton cœur…</p></section>`;
+        if (d && d.statut === 'reflexion' && d.de_moi) return `<section class="couple-carte couple-magie">${photo(PHOTOS.magie)}<h2>${sonNom} prend le temps d’y réfléchir 🌙</h2><p class="aide">Ta demande est bien arrivée. Un grand oui se prépare parfois doucement.</p></section>`;
+        if (d && !d.de_moi) return `<section class="couple-carte couple-magie">${photo(PHOTOS.magie)}<h2>${sonNom} t’a posé une question…</h2><p><button type="button" class="couple-bouton-magique" data-demande-voir>Ouvrir sa demande 💍</button></p></section>`;
+        return `<section class="couple-carte couple-magie">${photo(PHOTOS.magie)}
           <p class="couple-etincelles" aria-hidden="true"><i>✦</i><i>✦</i><i>✦</i></p>
           <h2>Et si on se mariait ?</h2>
           <p>Fais ta demande à ${sonNom}. S’il ou elle dit oui, votre parcours de fiançailles s’ouvre : les familles, la bague, le henné, la robe, le grand jour…</p>
@@ -188,7 +192,7 @@ function vue(c) {
         </section>`;
       }
       return `<section class="couple-carte couple-jourj">
-        ${photo('/images/couple/grand-jour.webp')}
+        ${photo(PHOTOS.fiances)}
         ${jourJ !== null ? (jourJ > 0 ? `<p class="couple-jourj-chiffre">J-${jourJ}</p><p>avant le grand jour, le ${esc(new Date(`${jalons.mariage}T12:00:00`).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }))}</p>` : jourJ === 0 ? '<p class="couple-jourj-chiffre">C’est aujourd’hui !</p><p>Tous nos vœux de bonheur 💍</p>' : '<p class="couple-jourj-chiffre">Mariés ♡</p><p>Envoyez votre photo plus bas : Lamia vous offre un cadeau.</p>')
           : '<p class="couple-jourj-chiffre">Fiancés 💍</p><p>Fixez la date du grand jour plus bas : le compte à rebours commence.</p>'}
         ${d.message ? `<p class="couple-demande-mots">« ${esc(d.message)} »</p>` : ''}
@@ -209,6 +213,7 @@ function vue(c) {
           <a href="/abonnement/#unite-sauver_couple">${img('coaching', 'ci-l')}<strong>Coaching avant le mariage</strong><small>Une séance avec Lamia, à deux</small></a>
           <a href="/salon/">${img('rendez_vous', 'ci-l')}<strong>Les lives</strong><small>Les thèmes mariage de Lamia</small></a>
         </div></section>
+      <p class="couple-credits">Photos : Unsplash</p>
       <section class="couple-carte couple-mariage">
       ${titre('fiancailles', 'On s’est mariés')}
       <div class="avec-aide"><button type="button" class="btn btn-ink" data-mariage-ouvrir>Nous nous sommes mariés !</button>${aideQ('Félicitations ! Envoie une photo de votre mariage : Lamia vous offre un cadeau. La photo reste privée, elle n’est jamais publiée.')}</div>
@@ -233,7 +238,7 @@ function vue(c) {
   if (!panneaux[onglet]) onglet = 'nous';
 
   zone.innerHTML = `<section class="couple-carte couple-tete">
-      <img class="couple-tete-photo" src="/images/couple/banniere.webp" alt="" decoding="async">
+      <img class="couple-tete-photo" src="${PHOTOS.banniere}" alt="" decoding="async">
       <span class="couple-tete-coeurs" aria-hidden="true"><i>♥</i><i>♥</i><i>♥</i><i>♥</i><i>♥</i></span>
       <p class="couple-noms"><span>${esc(moi?.prenom || 'Moi')}</span> ${img('fiancailles', 'ci-l couple-bat')} <span>${lui ? esc(lui.prenom) : '<em>en attente</em>'}</span></p>
       ${lui ? `${jourJ > 0 ? `<p class="couple-tete-meteo">💍 J-${jourJ} avant le grand jour</p>` : ''}${sienne?.aujourdhui ? `<p class="couple-tete-meteo">Aujourd’hui ${esc(lui.prenom)} : ${img(`h${sienne.humeur}`, 'ci-xs')} ${esc(sienne.mot.toLowerCase())}</p>` : ''}` : `<div class="couple-code"><p>Invite ton ou ta partenaire 💌</p><p class="couple-code-valeur">${c.code ? esc(c.code) : '—'}</p>${c.code ? (() => { const t = invitation(c.code); return `<p class="couple-envois"><a class="btn btn-ink" href="sms:?&body=${encodeURIComponent(t)}">Par SMS</a><a class="btn btn-ink" href="https://wa.me/?text=${encodeURIComponent(t)}" target="_blank" rel="noopener">WhatsApp</a><a class="btn btn-line" href="mailto:?subject=${encodeURIComponent('Rejoins notre espace de couple 💞')}&body=${encodeURIComponent(t)}">Par email</a>${navigator.share ? `<button type="button" class="btn btn-line" data-couple-partager="${esc(c.code)}">Autre…</button>` : ''}</p>`; })() : ''}<p><button type="button" class="link-button" data-couple-code>Nouveau code</button></p></div>`}
@@ -258,7 +263,7 @@ function laDemande(c) {
   e.innerHTML = `<div class="couple-petales" aria-hidden="true">${Array.from({ length: 16 }, (_, i) => `<i style="left:${(i * 37) % 100}%;animation-delay:${(i % 8) * 0.6}s;animation-duration:${6 + (i % 5)}s">${['🌸', '❤', '✦', '🤍'][i % 4]}</i>`).join('')}</div>
     <div class="couple-demande-boite">
       <button type="button" class="couple-demande-fermer" data-fermer aria-label="Fermer">✕</button>
-      <img src="/images/couple/grand-jour.webp" alt="">
+      <img src="${PHOTOS.demande}" alt="">
       <p class="couple-demande-de">${esc(lui?.prenom || 'Ton amour')} a une question pour toi…</p>
       ${d.message ? `<p class="couple-demande-message">« ${esc(d.message)} »</p>` : ''}
       <p class="couple-demande-question">Et si on se mariait ?</p>

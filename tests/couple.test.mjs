@@ -189,3 +189,11 @@ test('« Et si on se mariait ? » : la demande part chez l’autre ; oui = parco
   r = await lire(await actionCouple('couple_demande', { deja: true }, autre.ctx(SARA)));
   assert.equal(r.couple.demande.statut, 'oui');
 });
+
+test('humeur gardée pour soi : elle reste « pour moi » quand on la modifie', async () => {
+  const { ctx } = monde();
+  const r0 = await lire(await actionCouple('couple_creer', {}, ctx(AMINE)));
+  await actionCouple('couple_rejoindre', { code: r0.couple.code }, ctx(SARA));
+  const r = await lire(await actionCouple('couple_humeur', { humeur: 2, partage: false }, ctx(SARA)));
+  assert.equal(r.couple.meteo.moi.derniere.partage, false);
+});
