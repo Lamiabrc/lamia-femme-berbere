@@ -5,7 +5,7 @@ import { createClient } from '/vendor/supabase.mjs';
 
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', PUBLIC_KEY);
 const zone = document.querySelector('[data-couple]');
-let token = null, types = {}, cadeaux = {};
+let token = null, types = {}, cadeaux = {}, motsDoux = [];
 const aideQ = (texte) => `<details class="aide-q"><summary aria-label="Comprendre"><span aria-hidden="true">?</span></summary><p>${texte}</p></details>`;
 const jour = (iso) => new Date(iso).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' }) + (/T00:00/.test(iso) ? '' : ` · ${new Date(iso).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`);
 const appel = async (body) => { const { data: { session } } = await supabase.auth.getSession(); token = session?.access_token || token; return api(body, token); };
@@ -29,11 +29,17 @@ function vue(c) {
     <span><strong>${esc(a.titre)}</strong><small>${esc(a.type_nom)}${a.quand ? ` · ${esc(jour(a.quand))}` : ''}${a.pour_nous ? '' : ' · pour moi'}</small></span>
     ${a.de_moi ? `<button type="button" class="link-button" data-act-suppr="${esc(a.id)}" aria-label="Retirer">✕</button>` : ''}</li>`;
   zone.innerHTML = `<section class="couple-carte couple-tete">
-      <p class="couple-noms">${esc(moi?.prenom || 'Moi')} <span aria-hidden="true">♡</span> ${lui ? esc(lui.prenom) : '<em>en attente</em>'}</p>
+      <p class="couple-noms">${esc(moi?.prenom || 'Moi')} <span class="couple-bat" aria-hidden="true">❤</span> ${lui ? esc(lui.prenom) : '<em>en attente</em>'}</p>
       ${lui ? '' : `<div class="couple-code"><p>Envoie ce code à ton ou ta partenaire :</p><p class="couple-code-valeur">${c.code ? esc(c.code) : '—'}</p><p class="espace-sans-liens">${c.code ? `<button type="button" class="btn btn-ink" data-couple-partager="${esc(c.code)}">Envoyer le code</button>` : ''} <button type="button" class="btn btn-line" data-couple-code>Nouveau code</button></p></div>`}
     </section>
+    <section class="couple-carte couple-mots">
+      <h2>Nos mots doux <span aria-hidden="true">💌</span></h2>
+      ${lui ? `<div class="couple-mots-boutons">${motsDoux.map((m) => `<button type="button" class="couple-mot" data-mot="${esc(m)}">${esc(m)}</button>`).join('')}</div>
+      <form class="couple-mot-libre" data-mot-libre><input name="texte" maxlength="200" placeholder="Ou écris le tien…" aria-label="Ton mot doux"><button type="submit" class="btn btn-ink" aria-label="Envoyer">❤</button></form>` : '<p class="aide">Dès que ton ou ta partenaire vous rejoint, vous pourrez vous envoyer des mots doux.</p>'}
+      ${(c.mots || []).length ? `<ul class="couple-fil">${c.mots.map((m) => `<li class="${m.de_moi ? 'is-moi' : ''}"><span>${esc(m.texte)}</span><small>${m.de_moi ? 'Toi' : esc(lui?.prenom || '')} · ${esc(new Date(m.le).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }))}</small></li>`).join('')}</ul>` : ''}
+    </section>
     <section class="couple-carte">
-      <h2>Notre planning</h2>
+      <h2>Notre planning <span aria-hidden="true">♡</span></h2>
       ${avenir.length ? `<ul class="couple-liste">${avenir.map(ligne).join('')}</ul>` : '<p class="aide">Rien de prévu pour l’instant.</p>'}
       <details class="couple-ajout"><summary class="btn btn-ink">Ajouter une activité</summary>
         <form data-act-ajouter>
@@ -47,7 +53,7 @@ function vue(c) {
       <p class="form-status" role="status" data-couple-statut></p>
     </section>
     <section class="couple-carte">
-      <h2>Liste de cadeaux</h2>
+      <h2>Liste de cadeaux <span aria-hidden="true">🎁</span></h2>
       <div class="couple-cadeaux">${Object.entries(cadeaux).map(([k, v]) => `<button type="button" class="couple-cadeau" data-cadeau="${k}"><span aria-hidden="true">${{ bijou: '💍', parfum: '🌸', fleurs: '💐', chocolat: '🍫', diner: '🍽️', spa: '💆', weekend: '🧳', coffret: '🎀', photo: '📸', autre: '🎁' }[k] || '🎁'}</span>${esc({ bijou: 'Bijou', parfum: 'Parfum', fleurs: 'Fleurs', chocolat: 'Chocolats', diner: 'Dîner', spa: 'Spa à deux', weekend: 'Week-end', coffret: 'Coffret beauté', photo: 'Séance photo', autre: 'Autre idée' }[k] || v)}</button>`).join('')}</div>
       <form class="couple-cadeau-form" data-cadeau-form hidden><input type="hidden" name="type"><label>Un mot pour Lamia (facultatif)<input name="note" maxlength="300" placeholder="Pour quand, pour quelle occasion…"></label><button type="submit" class="btn btn-ink">Envoyer ma demande</button></form>
     </section>
@@ -58,9 +64,18 @@ function vue(c) {
 async function charger() {
   try {
     const r = await appel({ action: 'couple_etat' });
-    types = r.types || {}; cadeaux = r.cadeaux || {};
+    types = r.types || {}; cadeaux = r.cadeaux || {}; motsDoux = r.mots_doux || [];
     if (r.couple) vue(r.couple); else accueil();
   } catch { zone.innerHTML = '<p class="aide">L’espace ne s’affiche pas pour le moment. Réessaie dans un instant.</p>'; }
+}
+// Une pluie de petits cœurs quand on envoie un mot doux.
+function coeurs() {
+  for (let i = 0; i < 14; i += 1) {
+    const c = document.createElement('span');
+    c.className = 'couple-coeur-vole'; c.textContent = ['❤', '💕', '💖', '💗'][i % 4];
+    c.style.left = `${10 + Math.random() * 80}vw`; c.style.animationDelay = `${Math.random() * .5}s`; c.style.fontSize = `${16 + Math.random() * 18}px`;
+    document.body.appendChild(c); setTimeout(() => c.remove(), 2600);
+  }
 }
 const statut = (t) => { const s = zone.querySelector('[data-couple-statut]'); if (s) s.textContent = t; };
 async function faire(body, apres) {
@@ -70,6 +85,8 @@ async function faire(body, apres) {
 
 zone.addEventListener('click', async (e) => {
   if (e.target.closest('[data-couple-creer]')) return faire({ action: 'couple_creer' });
+  const mot = e.target.closest('[data-mot]');
+  if (mot) { mot.disabled = true; return faire({ action: 'couple_mot', texte: mot.dataset.mot }, () => coeurs()); }
   if (e.target.closest('[data-couple-code]')) return faire({ action: 'couple_code' });
   const p = e.target.closest('[data-couple-partager]');
   if (p) {
@@ -90,6 +107,7 @@ zone.addEventListener('change', (e) => {
 zone.addEventListener('submit', (e) => {
   e.preventDefault();
   const f = e.target;
+  if (f.matches('[data-mot-libre]')) return faire({ action: 'couple_mot', texte: f.texte.value }, () => coeurs());
   if (f.matches('[data-couple-rejoindre]')) return faire({ action: 'couple_rejoindre', code: f.code.value });
   if (f.matches('[data-act-ajouter]')) return faire({ action: 'couple_activite_ajouter', titre: f.titre.value, type: f.type.value, quand: f.quand.value ? new Date(f.quand.value).toISOString() : null, pour_nous: f.pour.value === 'nous' });
   if (f.matches('[data-cadeau-form]')) return faire({ action: 'couple_cadeau', type: f.type.value, note: f.note.value }, () => { f.hidden = true; zone.querySelectorAll('[data-cadeau]').forEach((x) => x.classList.remove('is-choisi')); f.reset(); f.insertAdjacentHTML('afterend', '<p class="form-status">C’est envoyé : Lamia s’en occupe et revient vers toi.</p>'); });
