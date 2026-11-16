@@ -3,6 +3,9 @@ import { createClient } from '/vendor/supabase.mjs';
 import { creerCompte, api } from './confidences-commun.js';
 import { secteurLisible, origineLisible, phrasesDifference, criteresDeQuestion, lib } from './matching-options.mjs';
 
+// Un petit « ? » à ouvrir au lieu d'un paragraphe d'explication (Lamia, 16 nov. 2026 : « trop de texte »).
+const aideQ = (texte) => `<details class="aide-q"><summary aria-label="Comprendre"><span aria-hidden="true">?</span></summary><p>${texte}</p></details>`;
+
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc');
 const $ = (s, r = document) => r.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
@@ -445,7 +448,7 @@ async function monProfil(session) {
         ? `<section class="espace-photos espace-pause"><h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#pause"/></svg> Tu as mis les rencontres en pause</h3><p>Personne ne voit ton profil et tu ne reçois plus de nouveau match. Rien n’est effacé, et tes discussions en cours continuent.</p>
           <p><strong>Lamia reste dans ta poche :</strong></p>${LIENS_LAMIA}
           <p><button class="btn btn-ink" type="button" data-annonce-pause="non"><svg class="ico" aria-hidden="true"><use href="/icones.svg#play"/></svg> Reprendre les rencontres</button></p></section>`
-        : `<div class="espace-pause" data-pause-zone><p><button class="btn btn-line" type="button" data-pause-ouvrir><svg class="ico" aria-hidden="true"><use href="/icones.svg#pause"/></svg> Faire une pause dans les rencontres</button><br><small>Ton profil devient invisible, sans rien effacer. Tu gardes Lamia en poche : le live, le coaching de couple, la boutique, et tu peux lui écrire.</small></p>
+        : `<div class="espace-pause" data-pause-zone><div class="avec-aide"><button class="btn btn-line" type="button" data-pause-ouvrir><svg class="ico" aria-hidden="true"><use href="/icones.svg#pause"/></svg> Faire une pause dans les rencontres</button>${aideQ('Ton profil devient invisible, sans rien effacer. Tu gardes Lamia en poche : le live, le coaching de couple, la boutique, et tu peux lui écrire.')}</div>
           <div class="espace-pause-choix" data-pause-choix hidden><p><strong>Qu’est-ce qui se passe pour toi ?</strong></p><p class="espace-sans-liens"><button class="btn btn-ink" type="button" data-annonce-pause="oui" data-raison="pause">J’ai besoin de souffler</button> <button class="btn btn-ink" type="button" data-annonce-pause="oui" data-raison="couple">J’ai trouvé quelqu’un</button> <button class="link-button" type="button" data-pause-annuler>Annuler</button></p></div></div>`}
       ${p.medias_ok === false ? '' : '<section class="espace-photos espace-mes-photos" data-mes-photos hidden></section>'}
       <div class="espace-suivi" data-profil-suivi></div>
@@ -896,7 +899,7 @@ async function interetsRecus(session) {
       return;
     }
     if (Notification.permission === 'denied') return dire('<p><svg class="ico" aria-hidden="true"><use href="/icones.svg#bell-off"/></svg> Les notifications sont bloquées pour ce site dans les réglages de ton téléphone. Autorise-les dans les réglages du navigateur, puis recharge la page.</p>');
-    dire('<p><svg class="ico" aria-hidden="true"><use href="/icones.svg#bell"/></svg> Sois prévenu·e tout de suite quand quelqu’un s’intéresse à toi, quand c’est réciproque, quand Lamia te trouve un match… et des nouveautés de la boutique, des articles et des lives.</p><p><button type="button" class="btn btn-ink" data-notif-on>Activer les notifications</button></p>');
+    dire(`<div class="avec-aide"><button type="button" class="btn btn-ink" data-notif-on><svg class="ico" aria-hidden="true"><use href="/icones.svg#bell"/></svg> Activer les notifications</button>${aideQ('Sois prévenu·e tout de suite quand quelqu’un s’intéresse à toi, quand c’est réciproque, quand Lamia te trouve un match… et des nouveautés de la boutique, des articles et des lives.')}</div>`);
   }
   ecouter(box, 'click', async (e) => {
     const { data: { session } } = await supabase.auth.getSession();
