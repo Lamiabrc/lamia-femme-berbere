@@ -8,7 +8,7 @@ const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', PUBLIC
 const zone = document.querySelector('[data-couple]');
 let token = null, types = {}, cadeaux = {}, motsDoux = [], motsPayants = [], moiInfo = {};
 // Plus riche, comme l'espace Famille de QVT Box (16 nov. 2026) : des onglets, la météo du cœur, la question du jour, un calendrier, le bocal à souvenirs.
-let humeurs = {}, besoins = {}, suggestions = {}, idees = {}, jeuxDef = {}, jalonsDef = {}, prepaDef = {}, etapesDef = [], demandeMontree = false, dernier = null, moisVu = null, jourChoisi = null, tirage = null;
+let humeurs = {}, besoins = {}, suggestions = {}, idees = {}, jeuxDef = {}, dorees = {}, jeuxDores = [], jalonsDef = {}, prepaDef = {}, etapesDef = [], demandeMontree = false, dernier = null, moisVu = null, jourChoisi = null, tirage = null;
 let onglet = (() => { try { return localStorage.getItem('lfb-couple-onglet') || 'nous'; } catch { return 'nous'; } })();
 if (new URLSearchParams(location.search).get('onglet')) onglet = new URLSearchParams(location.search).get('onglet');
 const ONGLETS = [['nous', 'Nous'], ['douceurs', 'Douceurs'], ['jeux', 'Jeux'], ['planning', 'Planning'], ['mariage', 'Mariage'], ['aide', 'Soutien']];
@@ -16,7 +16,7 @@ const cleJour = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2
 const aideQ = (texte) => `<details class="aide-q"><summary aria-label="Comprendre"><span aria-hidden="true">?</span></summary><p>${texte}</p></details>`;
 const jour = (iso) => new Date(iso).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' }) + (/T00:00/.test(iso) ? '' : ` · ${new Date(iso).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`);
 const appel = async (body) => { const { data: { session } } = await supabase.auth.getSession(); token = session?.access_token || token; return api(body, token); };
-const ERREURS = { couple_requis: 'Ce mot doux vient avec l’abonnement Couple.', code_invalide: 'Ce code ne marche pas (ou il a expiré). Demande-lui un nouveau code.', complet: 'Cet espace a déjà ses deux membres.', deja_en_couple: 'Tu as déjà un espace de couple.', titre_requis: 'Écris ce que vous allez faire.' };
+const ERREURS = { couple_requis: 'Ça vient avec l’abonnement Couple.', code_invalide: 'Ce code ne marche pas (ou il a expiré). Demande-lui un nouveau code.', complet: 'Cet espace a déjà ses deux membres.', deja_en_couple: 'Tu as déjà un espace de couple.', titre_requis: 'Écris ce que vous allez faire.' };
 
 const invitation = (code) => `Rejoins notre espace de couple 💞 chez Lamia Femme Berbère : ${location.origin}/notre-couple/?code=${code} (code : ${code})`;
 const AUTOUR = `<section class="couple-carte"><h2>Autour de vous</h2>
@@ -83,10 +83,13 @@ function vue(c) {
       <button type="submit" class="btn btn-ink">${mienne?.aujourdhui ? 'Mettre à jour' : 'Partager'}</button></form>`;
 
   // Le tirage en cours dans les jeux (une carte au hasard, qu'on envoie ou qu'on change).
-  const carteTiree = tirage && jeuxDef[tirage.jeu] ? `<div class="couple-carte-jeu is-${esc(tirage.jeu)}" data-tirage>
-      <p class="couple-carte-jeu-nom">${img(tirage.jeu, 'ci-s')} ${esc(jeuxDef[tirage.jeu].nom)}</p>
-      <p class="couple-carte-jeu-texte">${esc(jeuxDef[tirage.jeu].cartes[tirage.i])}</p>
-      <p class="espace-sans-liens"><button type="button" class="btn btn-line" data-jeu-autre>Une autre carte</button> ${lui ? `<button type="button" class="btn btn-ink" data-jeu-envoyer>L’envoyer à ${sonNom} 💌</button>` : ''}</p></div>` : '';
+  const doree = tirage && dorees[tirage.jeu]?.[tirage.i], fermee = doree && !c.niveau;
+  // Un jeu doré sans abonnement : on ouvre toujours sur la carte offerte.
+  const carteTiree = tirage && jeuxDef[tirage.jeu] ? `<div class="couple-carte-jeu is-${esc(tirage.jeu)}${doree ? ' is-doree' : ''}" data-tirage>
+      <p class="couple-carte-jeu-nom">${img(tirage.jeu, 'ci-s')} ${esc(jeuxDef[tirage.jeu].nom)}${jeuxDores.includes(tirage.jeu) ? ` · <span class="couple-doree">${doree ? '✦ Jeu doré' : '✦ Carte offerte'}</span>` : ''}</p>
+      <p class="couple-carte-jeu-texte${fermee ? ' is-floue' : ''}" ${fermee ? 'aria-hidden="true"' : ''}>${esc(jeuxDef[tirage.jeu].cartes[tirage.i])}</p>
+      ${fermee ? `<p class="couple-doree-cadenas">🔒 Les jeux « Un peu piquant » et « Coquin » viennent avec l’abonnement Couple${window.LFB_PLAY ? '.' : ' : 18 € par mois pour vous deux.'}</p>` : ''}
+      <p class="espace-sans-liens"><button type="button" class="btn btn-line" data-jeu-autre>Une autre carte</button> ${fermee ? (window.LFB_PLAY ? '' : '<button type="button" class="btn btn-ink" data-jeu-abo>Débloquer les jeux dorés ✦</button>') : lui ? `<button type="button" class="btn btn-ink" data-jeu-envoyer>L’envoyer à ${sonNom} 💌</button>` : ''}</p></div>` : '';
 
   const jalons = c.jalons || {}, faits = new Set(c.prepa || []), nbPrepa = Object.keys(prepaDef).length;
   const jourJ = jalons.mariage ? joursAvant(jalons.mariage) : null;
@@ -147,7 +150,7 @@ function vue(c) {
           <form class="couple-mot-libre" data-jeu-reponse="${esc(j.id)}"><input name="texte" maxlength="400" required placeholder="Ta réponse…" aria-label="Ta réponse"><button type="submit" class="btn btn-ink">Répondre</button></form></div>`).join('')}</section>` : ''}
       <section class="couple-carte couple-jeux">${titre('jeux', 'Jeux d’amour à distance')}
         <p class="aide">Tire une carte et envoie-la à ${sonNom}. Simple, tendre, ou un peu piquant 🌶️ : ça reste entre vous deux.</p>
-        <div class="couple-paquets">${Object.entries(jeuxDef).map(([k, j]) => `<button type="button" class="couple-paquet is-${esc(k)}${tirage?.jeu === k ? ' is-choisi' : ''}" data-jeu="${esc(k)}">${img(k, 'ci-l')}<strong>${esc(j.nom)}</strong><small>${esc(j.sous)}</small></button>`).join('')}</div>
+        <div class="couple-paquets">${Object.entries(jeuxDef).map(([k, j]) => `<button type="button" class="couple-paquet is-${esc(k)}${jeuxDores.includes(k) ? ' is-dore' : ''}${tirage?.jeu === k ? ' is-choisi' : ''}" data-jeu="${esc(k)}">${jeuxDores.includes(k) ? `<span class="couple-paquet-badge">${c.niveau ? '✦ Couple' : '🔒 Couple'}</span>` : ''}${img(k, 'ci-l')}<strong>${esc(j.nom)}</strong><small>${esc(j.sous)}</small></button>`).join('')}</div>
         ${carteTiree}
         ${lui ? '' : '<p class="aide">Dès que ton ou ta partenaire vous rejoint, vous pourrez jouer à deux.</p>'}
       </section>
@@ -290,7 +293,7 @@ function laDemande(c) {
 async function charger() {
   try {
     const r = await appel({ action: 'couple_etat' });
-    types = r.types || {}; cadeaux = r.cadeaux || {}; humeurs = r.humeurs || {}; besoins = r.besoins || {}; suggestions = r.suggestions || {}; idees = r.idees || {}; jeuxDef = r.jeux || {}; jalonsDef = r.jalons || {}; prepaDef = r.prepa || {}; etapesDef = r.etapes || []; motsDoux = r.mots_doux || []; motsPayants = r.mots_payants || [];
+    types = r.types || {}; cadeaux = r.cadeaux || {}; humeurs = r.humeurs || {}; besoins = r.besoins || {}; suggestions = r.suggestions || {}; idees = r.idees || {}; jeuxDef = r.jeux || {}; jalonsDef = r.jalons || {}; prepaDef = r.prepa || {}; etapesDef = r.etapes || []; dorees = r.cartes_dorees || {}; jeuxDores = r.jeux_dores || []; motsDoux = r.mots_doux || []; motsPayants = r.mots_payants || [];
     const q = new URLSearchParams(location.search);
     if (!r.couple && q.get('code')) return faire({ action: 'couple_rejoindre', code: q.get('code') });
     if (!r.couple && q.has('inviter')) return faire({ action: 'couple_creer' });
@@ -332,7 +335,7 @@ zone.addEventListener('click', async (e) => {
   const idee = e.target.closest('[data-ajout-titre]');
   if (idee) { idee.disabled = true; return faire({ action: 'couple_activite_ajouter', titre: idee.dataset.ajoutTitre, type: idee.dataset.ajoutType, pour_nous: true }, () => bulle('Ajouté à votre planning ♡')); }
   const paquet = e.target.closest('[data-jeu]');
-  if (paquet) { const j = jeuxDef[paquet.dataset.jeu]; tirage = { jeu: paquet.dataset.jeu, i: Math.floor(Math.random() * j.cartes.length) }; vue(dernier); zone.querySelector('[data-tirage]')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+  if (paquet) { const j = jeuxDef[paquet.dataset.jeu], offerte = jeuxDores.includes(paquet.dataset.jeu) && !dernier?.niveau && tirage?.jeu !== paquet.dataset.jeu; tirage = { jeu: paquet.dataset.jeu, i: offerte ? 0 : Math.floor(Math.random() * j.cartes.length) }; vue(dernier); zone.querySelector('[data-tirage]')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
   if (e.target.closest('[data-jeu-autre]')) { const n = jeuxDef[tirage.jeu].cartes.length; tirage = { ...tirage, i: (tirage.i + 1 + Math.floor(Math.random() * (n - 1))) % n }; vue(dernier); return; }
   if (e.target.closest('[data-jeu-envoyer]')) { const t = tirage; tirage = null; return faire({ action: 'couple_jeu', jeu: t.jeu, i: t.i }, () => { coeurs(); bulle('Carte envoyée 💌'); }); }
   if (e.target.closest('[data-demande-ouvrir]')) { const f = zone.querySelector('[data-demande-form]'); f.hidden = false; e.target.closest('[data-demande-ouvrir]').hidden = true; f.message.focus(); return; }
@@ -340,6 +343,7 @@ zone.addEventListener('click', async (e) => {
   if (e.target.closest('[data-demande-deja]')) { if (confirm('Vous êtes déjà fiancés ? Votre parcours s’ouvre pour vous deux.')) faire({ action: 'couple_demande', deja: true }, () => coeurs()); return; }
   if (e.target.closest('[data-piocher]')) { const l = dernier?.souvenirs || [], x = l[Math.floor(Math.random() * l.length)], p = zone.querySelector('[data-pioche]'); if (x && p) { p.hidden = false; p.textContent = `✨ ${x.texte}`; p.classList.remove('is-anim'); void p.offsetWidth; p.classList.add('is-anim'); } return; }
   if (e.target.closest('[data-couple-creer]')) return faire({ action: 'couple_creer' });
+  if (e.target.closest('[data-jeu-abo]')) { onglet = 'douceurs'; try { localStorage.setItem('lfb-couple-onglet', onglet); } catch { /* */ } vue(dernier); const box = zone.querySelector('[data-couple-abo-box]'); if (box) { box.hidden = false; box.scrollIntoView({ behavior: 'smooth', block: 'center' }); } return; }
   if (e.target.closest('[data-couple-abo]')) { const box = zone.querySelector('[data-couple-abo-box]'); if (box) { box.hidden = false; box.scrollIntoView({ behavior: 'smooth', block: 'center' }); } return; }
   if (e.target.closest('[data-couple-payer]')) {
     const box = zone.querySelector('[data-couple-abo-box]');
@@ -420,17 +424,19 @@ zone.addEventListener('submit', (e) => {
   if (f.matches('[data-cadeau-form]')) return faire({ action: 'couple_cadeau', type: f.type.value, note: f.note.value }, () => { f.hidden = true; zone.querySelectorAll('[data-cadeau]').forEach((x) => x.classList.remove('is-choisi')); f.reset(); f.insertAdjacentHTML('afterend', '<p class="form-status">C’est envoyé : Lamia s’en occupe et revient vers toi.</p>'); });
 });
 
-// Démo (aperçus Vercel et poste local seulement) : l'espace de Sara et Amine, pour voir le rendu sans compte.
-const enDemo = /\.vercel\.app$|^localhost$|^127\.0\.0\.1$/.test(location.hostname) && new URLSearchParams(location.search).has('demo');
+// Démo : l'espace de Sara et Amine (inventés), pour voir l'univers sans compte (Lamia, 16 nov. 2026 : « un clic pour le voir sans compte »).
+const enDemo = new URLSearchParams(location.search).has('demo');
 async function demo() {
   const { DEMO } = await import('./couple-demo.js');
   const k = DEMO.consts;
-  types = k.types; cadeaux = k.cadeaux; humeurs = k.humeurs; besoins = k.besoins; suggestions = k.suggestions; idees = k.idees; jeuxDef = k.jeux; jalonsDef = k.jalons; prepaDef = k.prepa; etapesDef = k.etapes; motsDoux = k.mots_doux; motsPayants = k.mots_payants;
+  types = k.types; cadeaux = k.cadeaux; humeurs = k.humeurs; besoins = k.besoins; suggestions = k.suggestions; idees = k.idees; jeuxDef = k.jeux; jalonsDef = k.jalons; prepaDef = k.prepa; etapesDef = k.etapes; dorees = k.cartes_dorees || {}; jeuxDores = k.jeux_dores || []; motsDoux = k.mots_doux; motsPayants = k.mots_payants;
   const c = structuredClone(DEMO.couple), mode = new URLSearchParams(location.search).get('demo');
   if (mode === 'demande') { c.demande = { ...c.demande, statut: 'attente' }; c.jalons = {}; c.prepa = []; }
   if (mode === 'bouton') { c.demande = null; c.jalons = {}; c.prepa = []; }
   preparerImages();
-  zone.insertAdjacentHTML('beforebegin', '<p class="espace-test-mode"><span>Démo :</span> <a class="btn btn-line" href="?demo=1">Fiancés</a> <a class="btn btn-line" href="?demo=bouton">Le bouton</a> <a class="btn btn-line" href="?demo=demande">La demande</a></p>');
+  zone.insertAdjacentHTML('beforebegin', `<div class="couple-demo-bandeau"><p><strong>Découvre l’espace de Sara et Amine</strong> : un exemple, rien n’est envoyé.</p>
+    <p class="couple-demo-liens"><a class="btn btn-line" href="?demo=1">Fiancés</a> <a class="btn btn-line" href="?demo=bouton">Le bouton magique</a> <a class="btn btn-line" href="?demo=demande">La demande</a></p>
+    <p><a class="btn btn-ink" href="/mon-espace/?retour=${encodeURIComponent('/notre-couple/?inviter=1')}">Créer notre espace de couple 💞</a></p></div>`);
   vue(c);
 }
 
