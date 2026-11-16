@@ -86,7 +86,7 @@ test('mots doux : le mot part chez l’autre (notification) et s’affiche dans 
   const r = await lire(await actionCouple('couple_mot', { texte: 'Je pense à toi 💭' }, avec(SARA)));
   assert.deepEqual(pousses, [['u-amine', 'Je pense à toi 💭']]);
   assert.deepEqual(r.couple.mots.map((m) => [m.texte, m.de_moi]), [['Je pense à toi 💭', true]]);
-  assert.equal(r.couple.premium, false);
+  assert.equal(r.couple.niveau, null);
   assert.equal(r.couple.activites.length, 0);
 });
 

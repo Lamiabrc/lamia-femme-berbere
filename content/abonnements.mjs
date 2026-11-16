@@ -41,7 +41,12 @@ export const prixCoaching = (u, f) => (COACHINGS.includes(u.id) && f?.remiseCoac
 export const formule = (id) => FORMULES.find((f) => f.id === id) || null;
 // Abonnement « Couple » (Lamia, 16 nov. 2026) : pour l'espace Notre couple, à part des formules de rencontre.
 // Il débloque les mots doux les plus envoyés, avec leur petite animation, et le mot écrit soi-même. Un abonné suffit pour les deux.
-export const COUPLE = { id: 'couple', nom: 'Couple', mois: 1800, accroche: 'Pour vous deux',
-  avantages: ['« Je t’aime » et « Tu me manques », avec leur animation tendre', 'Les mots doux les plus envoyés', 'Ton mot doux écrit toi-même', 'Pour vous deux : un seul abonnement suffit'] };
+export const COUPLE = { id: 'couple', nom: 'Couple Amour', mois: 1800, accroche: 'Pour vous deux',
+  avantages: ['Tous les mots doux, avec leurs animations tendres', 'Ton mot doux écrit toi-même', 'Bientôt : le fil « Avec nos proches », 1 proche inclus', 'Bientôt : 5 € de points cadeau par mois, à offrir à l’autre', 'Pour vous deux : un seul abonnement suffit'] };
+// Couple Prestige (Lamia, 16 nov. 2026) : tout Couple Amour, plus Lamia dans votre fil une fois par mois, 10 € de points cadeau, un plus beau cadeau de mariage.
+export const COUPLE_PRESTIGE = { id: 'couple_prestige', nom: 'Couple Prestige', mois: 3800, accroche: 'Pour vous deux',
+  avantages: ['Tout Couple Amour', 'Bientôt : Lamia dans votre fil, une fois par mois', 'Bientôt : 10 € de points cadeau par mois', 'Un plus beau cadeau quand vous vous mariez', 'Pour vous deux : un seul abonnement suffit'] };
+export const FORMULES_COUPLE = [COUPLE, COUPLE_PRESTIGE];
+export const formuleCouple = (id) => FORMULES_COUPLE.find((f) => f.id === id) || null;
 export const unite = (id) => UNITES.find((u) => u.id === id) || null;
 export const euros = (c) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', minimumFractionDigits: c % 100 ? 2 : 0 }).format(c / 100);
