@@ -19,6 +19,12 @@ const message = (html) => { zone.innerHTML = `<div class="swipe-message">${html}
 
 // La fiche : l'essentiel en grand, dans un bijou rond (femme) ou triangulaire (homme). Le reste s'ouvre avec « Voir le profil ».
 const statut = (a) => (a.piece_identite ? 'Vérifié avec pièce d’identité' : a.attente_validation ? 'Annonce du live · en attente de validation du profil' : a.outil && !a.confirme ? 'En attente de confirmation' : 'Profil vérifié');
+// Ce que la personne recherche, en une ligne lisible (âge, religion, pratique, études, origine, et ce qu'elle accepte).
+function cherche(a) {
+  const c = a.cherche || {};
+  const ages = a.age_min || a.age_max ? `${a.age_min || 18} à ${a.age_max || 99} ans` : '';
+  return [ages, c.religion && lib(c.religion), c.pratique && lib(c.pratique).toLowerCase(), c.etudes && `études : ${lib(c.etudes)}`, c.kabyle ? 'kabyle uniquement' : (c.origines || []).length ? `origine : ${c.origines.map(lib).join(', ')}` : '', c.enfants && 'accepte les enfants', c.divorce && 'accepte un divorce', c.veuf && 'accepte un veuvage'].filter(Boolean);
+}
 function carte(a) {
   const femme = a.genre === 'femme';
   const mr = metierEtReligion(a);
@@ -41,6 +47,7 @@ function carte(a) {
       ${a.village ? `<p class="swipe-village">Originaire de ${esc(a.village)}</p>` : ''}
       ${mr.metier ? `<p class="swipe-metier">${esc(mr.metier)}</p>` : ''}
       ${mr.religion ? `<p class="swipe-religion">${esc(mr.religion)}</p>` : ''}
+      ${cherche(a).length ? `<p class="swipe-cherche"><b>Recherche :</b> ${esc(cherche(a).join(' · '))}</p>` : ''}
       <p class="swipe-statut${a.attente_validation ? ' is-attente' : ''}">${a.attente_validation ? '' : '<span aria-hidden="true">✓</span> '}${statut(a)}</p>
       <button type="button" class="swipe-voir" data-voir aria-expanded="false">Voir le profil</button>
     </div>
@@ -54,7 +61,7 @@ function carte(a) {
       ${secteur ? `<p class="annonce-lieu annonce-secteur"><svg class="ico" aria-hidden="true"><use href="/icones.svg#boussole"/></svg> Cherche en : <b>${esc(secteur)}</b></p>` : ''}
       ${tags.length ? `<p class="annonce-tags">${tags.map((t) => `<span>${esc(lib(t))}</span>`).join('')}</p>` : ''}
       ${a.profil ? `<h3>Qui je suis</h3><p data-membre>${esc(a.profil)}</p>` : ''}
-      ${a.recherche ? `<h3>Qui je cherche${ages}</h3><p data-membre>${esc(a.recherche)}</p>` : ''}
+      ${a.recherche || cherche(a).length ? `<h3>Qui je cherche${ages}</h3>${cherche(a).length ? `<p class="annonce-tags">${cherche(a).map((t) => `<span>${esc(t)}</span>`).join('')}</p>` : ''}${a.recherche ? `<p data-membre>${esc(a.recherche)}</p>` : ''}` : ''}
       ${foiEtVie(a).replace(/<h4>/g, '<h3>').replace(/<\/h4>/g, '</h3>')}
       <p class="profil-moderer"><button type="button" class="link-button" data-moderer="${a.ref}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#flag"/></svg> Bloquer et signaler</button></p>
     </div>
