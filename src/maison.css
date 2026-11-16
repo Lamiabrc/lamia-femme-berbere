@@ -4418,3 +4418,46 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .disc-inviter { margin: 8px 0; }
 .disc-inviter > p { margin: 0; }
 .disc-lamia-la { font-size: .9rem; color: #a0711f; margin: 8px 0; }
+/* Mots doux et petits cœurs (16 nov. 2026) */
+.couple .couple-tete { background: linear-gradient(135deg, #fff5f7, #f6effc); }
+.couple .couple-bat { display: inline-block; color: #d6496b; animation: couple-bat 1.6s ease-in-out infinite; }
+@keyframes couple-bat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.25); } 30% { transform: scale(1); } 45% { transform: scale(1.18); } }
+.couple .couple-mots { background: #fff8fa; border-color: #f3d6de; }
+.couple .couple-mots-boutons { display: flex; flex-wrap: wrap; gap: 8px; }
+.couple .couple-mot { padding: 9px 14px; border-radius: 999px; border: 1.5px solid #f0c3cf; background: #fff; color: #8d2d48; font: inherit; font-weight: 600; cursor: pointer; }
+.couple .couple-mot:active { transform: scale(.96); background: #fde8ee; }
+.couple .couple-mot-libre { display: flex; gap: 8px; margin-top: 12px; }
+.couple .couple-mot-libre input { flex: 1; min-width: 0; }
+.couple .couple-mot-libre .btn { padding: 0 18px; font-size: 1.1rem; }
+.couple .couple-fil { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 8px; }
+.couple .couple-fil li { justify-self: start; max-width: 85%; padding: 9px 14px; border-radius: 18px 18px 18px 4px; background: #fde8ee; display: flex; flex-direction: column; }
+.couple .couple-fil li.is-moi { justify-self: end; border-radius: 18px 18px 4px 18px; background: #4a3470; color: #fff; }
+.couple .couple-fil small { font-size: .75rem; opacity: .7; }
+.couple-coeur-vole { position: fixed; bottom: 80px; z-index: 90; pointer-events: none; color: #e0567a; animation: couple-vole 2.4s ease-out forwards; }
+@keyframes couple-vole { from { transform: translateY(0) scale(.6); opacity: 1; } to { transform: translateY(-70vh) scale(1.2); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .couple .couple-bat, .couple-coeur-vole { animation: none; } }
+/* Mots doux de l'abonnement Couple : cadenas et animations tendres (16 nov. 2026) */
+.couple .couple-mot.is-premium { border-color: #e7a9bb; background: linear-gradient(135deg, #fff, #fff0f4); }
+.couple .couple-cadenas { font-size: .8em; margin-left: 2px; }
+.couple .couple-abo { margin-top: 12px; padding: 14px; border-radius: 16px; background: #fff; border: 1.5px dashed #e7a9bb; }
+.couple .couple-fil li { position: relative; }
+.couple .couple-anim { position: relative; display: block; height: 54px; margin-bottom: 4px; }
+.couple .couple-anim i, .couple .couple-anim b { position: absolute; font-style: normal; font-weight: 400; }
+.couple .anim-coeur i { left: 50%; top: 4px; font-size: 38px; transform: translateX(-50%); animation: couple-bat 1.2s ease-in-out infinite; color: #e0435f; }
+.couple .anim-coeur b { font-size: 12px; color: #f2b84b; animation: couple-scintille 1.8s ease-in-out infinite; }
+.couple .anim-coeur b:nth-of-type(1) { left: 28%; top: 6px; } .couple .anim-coeur b:nth-of-type(2) { right: 26%; top: 2px; animation-delay: .6s; } .couple .anim-coeur b:nth-of-type(3) { right: 34%; bottom: 0; animation-delay: 1.2s; }
+@keyframes couple-scintille { 0%, 100% { opacity: 0; transform: scale(.5); } 50% { opacity: 1; transform: scale(1.2); } }
+.couple .anim-manque i { top: 10px; font-size: 28px; }
+.couple .anim-manque i:first-child { left: 10%; animation: couple-cherche-g 2.4s ease-in-out infinite; } .couple .anim-manque i:last-child { right: 10%; animation: couple-cherche-d 2.4s ease-in-out infinite; }
+@keyframes couple-cherche-g { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(60%); } }
+@keyframes couple-cherche-d { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-60%); } }
+.couple .anim-retrouver i { top: 10px; font-size: 28px; }
+.couple .anim-retrouver i:first-child { left: 0; animation: couple-rejoint-g 2.6s ease-in-out infinite; } .couple .anim-retrouver i:last-child { right: 0; animation: couple-rejoint-d 2.6s ease-in-out infinite; }
+@keyframes couple-rejoint-g { 0% { transform: translateX(0); } 50%, 70% { transform: translateX(calc(50px)); } 100% { transform: translateX(0); } }
+@keyframes couple-rejoint-d { 0% { transform: translateX(0); } 50%, 70% { transform: translateX(calc(-50px)); } 100% { transform: translateX(0); } }
+.couple .couple-fil li.is-moi .couple-anim i { filter: drop-shadow(0 0 4px rgba(255,255,255,.6)); }
+@media (prefers-reduced-motion: reduce) { .couple .couple-anim i, .couple .couple-anim b { animation: none; } }
+/* On s'est mariés (16 nov. 2026) */
+.couple .couple-mariage { background: linear-gradient(135deg, #fffaf0, #fdf1f4); border-color: #f0dcc0; }
+.couple .couple-mariage-form { display: grid; gap: 10px; margin-top: 12px; }
+.couple .couple-mariage-ok { margin: 8px 0 0; padding: 12px 14px; border-radius: 14px; background: #fff; font-weight: 600; color: #8d2d48; }

@@ -39,5 +39,9 @@ export const FONDS_COACHING = { coaching: ['prestige', 'Salle de coaching, formu
 export const COACHINGS = ['coaching', 'coaching_30', 'sauver_couple'];
 export const prixCoaching = (u, f) => (COACHINGS.includes(u.id) && f?.remiseCoaching ? Math.round((u.prix * (100 - f.remiseCoaching)) / 100) : u.prix);
 export const formule = (id) => FORMULES.find((f) => f.id === id) || null;
+// Abonnement « Couple » (Lamia, 16 nov. 2026) : pour l'espace Notre couple, à part des formules de rencontre.
+// Il débloque les mots doux les plus envoyés, avec leur petite animation, et le mot écrit soi-même. Un abonné suffit pour les deux.
+export const COUPLE = { id: 'couple', nom: 'Couple', mois: 1800, accroche: 'Pour vous deux',
+  avantages: ['« Je t’aime » et « Tu me manques », avec leur animation tendre', 'Les mots doux les plus envoyés', 'Ton mot doux écrit toi-même', 'Pour vous deux : un seul abonnement suffit'] };
 export const unite = (id) => UNITES.find((u) => u.id === id) || null;
 export const euros = (c) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', minimumFractionDigits: c % 100 ? 2 : 0 }).format(c / 100);
