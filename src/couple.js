@@ -78,6 +78,7 @@ async function charger() {
   try {
     const r = await appel({ action: 'couple_etat' });
     types = r.types || {}; cadeaux = r.cadeaux || {}; motsDoux = r.mots_doux || []; motsPayants = r.mots_payants || [];
+    try { localStorage.setItem('lfb-en-couple', JSON.stringify({ v: Boolean(r.couple), lu: Date.now() })); } catch { /* */ }
     if (r.couple) vue(r.couple); else accueil();
   } catch { zone.innerHTML = '<p class="aide">L’espace ne s’affiche pas pour le moment. Réessaie dans un instant.</p>'; }
 }

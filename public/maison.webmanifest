@@ -57,18 +57,6 @@
       ]
     },
     {
-      "name": "Notre couple",
-      "short_name": "Couple",
-      "description": "Votre espace à deux : mots doux, planning, cadeaux",
-      "url": "/notre-couple/?source=app",
-      "icons": [
-        {
-          "src": "/images/marque/tayri-icone-192.png",
-          "sizes": "192x192"
-        }
-      ]
-    },
-    {
       "name": "Speed dating",
       "url": "/speed-dating/?source=app",
       "icons": [
