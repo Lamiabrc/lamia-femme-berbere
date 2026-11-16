@@ -73,3 +73,29 @@ test('fin de discussion « en couple » des deux côtés : l’espace commun s�
   assert.equal(id, k.couple.id);
   assert.equal(db.couple_membres.filter((m) => m.couple_id === id).length, 2);
 });
+
+test('mots doux : le mot part chez l’autre (notification) et s’affiche dans le fil, pas dans le planning', async () => {
+  const { ctx } = monde();
+  const pousses = [];
+  const avec = (u) => ({ ...ctx(u), pousser: async (uid, m) => { pousses.push([uid, m.texte]); return 1; } });
+  const r0 = await lire(await actionCouple('couple_creer', {}, avec(AMINE)));
+  await actionCouple('couple_rejoindre', { code: r0.couple.code }, avec(SARA));
+  // « Je t'aime » et le mot libre viennent avec l'abonnement Couple ; « Je pense à toi » est gratuit.
+  assert.equal((await actionCouple('couple_mot', { texte: 'Je t’aime ❤️' }, avec(SARA))).status, 402);
+  assert.equal((await actionCouple('couple_mot', { texte: 'Mon soleil' }, avec(SARA))).status, 402);
+  const r = await lire(await actionCouple('couple_mot', { texte: 'Je pense à toi 💭' }, avec(SARA)));
+  assert.deepEqual(pousses, [['u-amine', 'Je pense à toi 💭']]);
+  assert.deepEqual(r.couple.mots.map((m) => [m.texte, m.de_moi]), [['Je pense à toi 💭', true]]);
+  assert.equal(r.couple.premium, false);
+  assert.equal(r.couple.activites.length, 0);
+});
+
+test('on s’est mariés : photo dans le stockage privé, adresse obligatoire, Lamia prévenue', async () => {
+  const { ctx, alertes } = monde();
+  const r0 = await lire(await actionCouple('couple_creer', {}, ctx(AMINE)));
+  await actionCouple('couple_rejoindre', { code: r0.couple.code }, ctx(SARA));
+  assert.equal((await actionCouple('couple_mariage', { path: 'mariages/autre/1.jpg', adresse: '12 rue des Lilas, 35000 Rennes' }, ctx(SARA))).status, 400);
+  assert.equal((await actionCouple('couple_mariage', { path: `mariages/${r0.couple.id}/1.jpg`, adresse: 'Rennes' }, ctx(SARA))).status, 400);
+  assert.equal((await actionCouple('couple_mariage', { path: `mariages/${r0.couple.id}/1.jpg`, adresse: '12 rue des Lilas, 35000 Rennes', date: '2027-06-12' }, ctx(SARA))).status, 200);
+  assert.ok(alertes.some((t) => t.includes('se sont mariés')));
+});
