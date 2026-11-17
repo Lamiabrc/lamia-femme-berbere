@@ -1055,7 +1055,7 @@ async function discussions(session) {
     const ecrire = d.ouverte && !d.dematch;
     return `<article class="disc${ecrire ? ' is-ouverte' : ''}" data-disc="${esc(d.id)}">
       ${ecrire ? '<p class="disc-ouverte-ligne">Votre discussion est ouverte : vous pouvez échanger</p>' : ''}
-      <header class="disc-tete"><strong>Avec ${esc(d.avec)}</strong><span>${d.ouverte ? `${esc(reste(d))}` : d.close_raison === 'signalee' ? 'fermée (signalée)' : d.close_raison ? 'fermée' : 'terminée'}</span></header>
+      <header class="disc-tete"><strong>Avec ${esc(d.avec)}${d.ancien_ref ? ` <small class="disc-ancien">(c’est le n° ${esc(String(d.ancien_ref))}, même personne)</small>` : ''}</strong><span>${d.ouverte ? `${esc(reste(d))}` : d.close_raison === 'signalee' ? 'fermée (signalée)' : d.close_raison ? 'fermée' : 'terminée'}</span></header>
       ${d.ses_autres_matchs > 0 ? `<p class="disc-honnete">Par honnêteté : ${esc(d.avec)} a aussi ${d.ses_autres_matchs} autre${d.ses_autres_matchs > 1 ? 's' : ''} match${d.ses_autres_matchs > 1 ? 's' : ''} en cours.</p>` : ''}
       ${d.mes_autres_matchs > 0 ? `<p class="disc-honnete">De ton côté, tu as ${d.mes_autres_matchs} autre${d.mes_autres_matchs > 1 ? 's' : ''} match${d.mes_autres_matchs > 1 ? 's' : ''} en cours : ${esc(d.avec)} le voit aussi.</p>` : ''}
       ${vueParcours(d)}
