@@ -2161,6 +2161,7 @@ page(
   '/application/',
   layout({
     title: 'TAYRI, l’application de Lamia : rencontre et couple',
+    ogImage: '/images/marque/tayri-partage-1200.jpg', ogImageAlt: 'TAYRI, le logo : un cœur bijou kabyle', ogImageWidth: 1200, ogImageHeight: 630,
     description: 'Installe TAYRI : profils kabyles vérifiés, swipe, live et speed dating pour te rencontrer, puis votre espace de couple virtuel jusqu’au mariage.',
     path: '/application/',
     room: roomBySlug.boutique,
