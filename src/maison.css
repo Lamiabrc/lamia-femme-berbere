@@ -4717,3 +4717,4 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .swipe-cherche { margin: 8px 0 0; padding: 6px 10px; border-radius: 12px; background: rgba(255, 255, 255, .7); font-size: .88rem; line-height: 1.35; color: #4a3470; }
 .swipe-cherche b { color: #8a2640; }
 .disc-photos-requises { margin: 0 0 12px; padding: 12px 14px; border-radius: 14px; background: #fdecee; border: 1px solid #f3b4c2; color: #8a2640; }
+.swipe-numero { margin: 0 0 2px; font-size: .8rem; font-weight: 700; letter-spacing: .04em; color: #8a7c95; text-align: center; }
