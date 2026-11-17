@@ -4842,3 +4842,6 @@ body:is(.tayri-homme, .tayri-femme) .tayri-celib .swipe-boutons .swipe-annuler:d
 .espace-avatar span { font-size: .85rem; opacity: .75; }
 .espace-matchs-liste li:has(.espace-match-avatar) { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 .espace-match-avatar { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; border: 2px solid #d9b46a; -webkit-user-drag: none; }
+/* L'en-tête de l'espace célibataire dans Mon espace */
+.tayri-espace-tete { margin: 0 auto 18px; max-width: 560px; border-radius: 28px; overflow: hidden; padding-bottom: 10px; background: var(--tc-fond); box-shadow: 0 14px 40px -20px rgba(0,0,0,.45); }
+.tayri-espace-tete .tayri-hero img { border-radius: 28px 28px 0 0; }

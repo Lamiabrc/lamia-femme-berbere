@@ -7,6 +7,18 @@ import { secteurLisible, origineLisible, phrasesDifference, criteresDeQuestion, 
 // Un petit « ? » à ouvrir au lieu d'un paragraphe d'explication (Lamia, 16 nov. 2026 : « trop de texte »).
 const aideQ = (texte) => `<details class="aide-q"><summary aria-label="Comprendre"><span aria-hidden="true">?</span></summary><p>${texte}</p></details>`;
 
+// L'en-tête « Mon espace célibataire » d'après les maquettes de Lamia (17 nov. 2026) : bleu nuit pour un homme, rose pour une femme.
+function themeCelib(genre, garder = true) {
+  if (!['homme', 'femme'].includes(genre)) return;
+  if (garder) try { localStorage.setItem('lfb-mon-genre', genre); } catch { /* */ }
+  document.body.classList.toggle('tayri-homme', genre === 'homme'); document.body.classList.toggle('tayri-femme', genre === 'femme');
+  const h = document.querySelector('[data-tayri-hero]'); if (h) h.src = `/images/celib/hero-${genre}.webp`;
+  document.querySelectorAll('[data-tayri-img]').forEach((im) => { im.src = `/images/celib/onglet-${im.dataset.tayriImg}-${genre}.webp`; });
+}
+{ let g = null; try { g = localStorage.getItem('lfb-mon-genre'); } catch { /* */ } themeCelib(g || 'femme', false);
+  // En couple : l'en-tête célibataire n'a pas lieu d'être.
+  try { if (JSON.parse(localStorage.getItem('lfb-en-couple') || '{}').v) document.querySelector('.tayri-espace-tete')?.remove(); } catch { /* */ } }
+
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc');
 const $ = (s, r = document) => r.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
@@ -465,6 +477,7 @@ async function monProfil(session) {
   if (!box) return;
   try {
     const { profil: p } = await appelProfil({ action: 'annonce_mon_profil' }, session);
+    if (p?.mon_genre) themeCelib(p.mon_genre);
     if (!p) { await sansProfil(box, session); return; }
     box.innerHTML = `<div class="espace-avatar" data-mon-avatar hidden></div>${p.test ? '<p class="espace-test"><svg class="ico" aria-hidden="true"><use href="/icones.svg#flask-conical"/></svg> <strong>Compte de test.</strong> Il sert uniquement à essayer l’application : il ne voit que les profils de test et ne contacte aucun vrai membre.</p><p class="espace-test-mode"><span>Voir l’espace :</span> <a class="btn btn-ink" href="/mon-espace/" aria-current="page">Célibataire</a> <a class="btn btn-line" href="/notre-couple/?test=1">En couple</a></p>' : ''}<article class="espace-achat"><div><p class="event-date">Profil n° ${esc(p.ref)}</p><h3>${esc(ETAT_PROFIL[p.status] || p.status)}${p.status === 'publiee' && p.piece_identite ? ' · avec pièce d’identité' : ''}</h3>
       ${p.live ? `<p><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg> Profil créé en live${p.live_retrouve ? '' : ' (ta fiche est en vérification)'}.</p>` : ''}

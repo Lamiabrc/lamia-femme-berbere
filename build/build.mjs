@@ -899,6 +899,7 @@ page(
   <div data-espace-in hidden>
     <p class="espace-sortie"><button class="btn btn-line" type="button" data-espace-logout>Se déconnecter</button></p>
     <p class="lfb-azul" lang="ber">ⴰⵣⵓⵍ</p>
+    <div class="tayri-celib tayri-espace-tete"><header class="swipe-tete"><p class="tayri-hero"><img data-tayri-hero src="/images/celib/hero-femme.webp" width="817" height="400" alt="TAYRI · Mon espace célibataire · Trouver la bonne personne, en douceur"></p><nav class="tayri-onglets" aria-label="Mon espace célibataire"><a href="/rencontres/swipe/"><img data-tayri-img="decouvrir" src="/images/celib/onglet-decouvrir-femme.webp" width="96" height="96" alt=""><span>Découvrir</span></a><a href="#interets"><img data-tayri-img="matchs" src="/images/celib/onglet-matchs-femme.webp" width="96" height="96" alt=""><span>Mes matchs</span></a><a href="#discussion"><img data-tayri-img="discussions" src="/images/celib/onglet-discussions-femme.webp" width="96" height="96" alt=""><span>Discussions</span></a><a href="/salon/"><img data-tayri-img="lives" src="/images/celib/onglet-lives-femme.webp" width="96" height="96" alt=""><span>Lives</span></a><a href="#mon-profil"><img data-tayri-img="profil" src="/images/celib/onglet-profil-femme.webp" width="96" height="96" alt=""><span>Mon profil</span></a></nav></header></div>
     <h1>Bonjour <span data-espace-nom></span></h1>
     ${RUBRIQUES}
 
