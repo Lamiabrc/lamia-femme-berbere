@@ -13,14 +13,15 @@ const zone = document.querySelector('[data-swipe]');
 const compteur = document.querySelector('[data-swipe-compteur]');
 let infosAbo = {}, creditsCoeur = 0;
 // L'espace célibataire d'après les maquettes de Lamia (17 nov. 2026) : bleu nuit pour un homme, rose pour une femme (le titulaire du compte).
-function theme(genre) {
+function theme(genre, garder = true) {
   if (!['homme', 'femme'].includes(genre)) return;
-  try { localStorage.setItem('lfb-mon-genre', genre); } catch { /* */ }
+  if (garder) try { localStorage.setItem('lfb-mon-genre', genre); } catch { /* */ }
   document.body.classList.toggle('tayri-homme', genre === 'homme'); document.body.classList.toggle('tayri-femme', genre === 'femme');
   const h = document.querySelector('[data-tayri-hero]'); if (h) h.src = `/images/celib/hero-${genre}.webp`;
   document.querySelectorAll('[data-tayri-img]').forEach((i) => { i.src = i.dataset.tayriImg === 'coeur' ? `/images/celib/coeur-${genre}.webp` : `/images/celib/onglet-${i.dataset.tayriImg}-${genre}.webp`; });
 }
-try { theme(localStorage.getItem('lfb-mon-genre')); } catch { /* */ }
+// Avant de connaître le genre (premier passage, compte sans profil comme celui de Lamia) : le rose, sans le retenir.
+{ let g = null; try { g = localStorage.getItem('lfb-mon-genre'); } catch { /* */ } theme(g || 'femme', false); }
 let tour = 1, tourAnnonce = false, dejaCharge = false, enRecharge = false, envoi = Promise.resolve(), tous = [], profils = [], token = null, occupe = false, quota = { limite: null, restants: null }, choisi = { nombre: 0, refs: [] }, matchs = { actifs: 0, limite: 1, formule: 'decouverte' }, coeurs = 0;
 const bandeau = document.querySelector('[data-swipe-infos]');
 
