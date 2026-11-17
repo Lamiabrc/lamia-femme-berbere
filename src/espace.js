@@ -1135,6 +1135,9 @@ async function discussions(session) {
         const texte = e.target.texte.value.trim();
         const r = await appelProfil({ action: 'annonce_discussion_envoyer', id, texte }, session);
         e.target.texte.value = '';
+        // Le message s'affiche tout de suite, même si le rechargement est lent (17 nov. 2026).
+        const disc = liste.find((x) => x.id === id);
+        if (disc) { disc.messages = [...(disc.messages || []), { moi: true, texte: r.texte || texte, le: new Date().toISOString() }]; afficher(); }
         if (r.masque) alert('Un numéro, un lien ou un email a été masqué dans ton message. Pour passer au téléphone, utilise « Échanger nos numéros ».');
       } else if (e.target.matches('[data-disc-numero]')) {
         await appelProfil({ action: 'annonce_discussion_numero', id, telephone: e.target.telephone.value }, session);
