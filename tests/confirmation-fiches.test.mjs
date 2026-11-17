@@ -161,3 +161,20 @@ test('liste publique : un profil du site est servi avec ses critères recherché
   assert.ok(a, 'le profil du site est dans la liste');
   assert.equal(a.cherche.religion, 'Islam');
 });
+
+test('liste publique : plus de 80 profils publiés, aucun ne disparaît (la lecture n’est pas coupée à 80)', async () => {
+  const { ctx } = monde();
+  const annonces = Array.from({ length: 120 }, (_, i) => ({ ref: i + 1, genre: i % 2 ? 'homme' : 'femme', birth_date: '1990-01-01', pays: 'France', situation: 'Célibataire', age_min: 25, age_max: 45, published_at: new Date(Date.UTC(2026, 9, 1) + i * 3600e3).toISOString(), profil: 'Sérieuse.', recherche: 'Sérieux.', matching: { religion: 'Musulmane', niveauEtudeCategorie: 'Bac+3' } }));
+  const lire = ctx.read;
+  ctx.read = async (u) => {
+    if (u.startsWith('/rest/v1/annonces?status=eq.publiee&visible_anonyme=eq.true&anonyme_ok=eq.true')) {
+      const lim = Number((u.match(/[?&]limit=(\d+)/) || [])[1] || Infinity);
+      return [...annonces].sort((a, b) => b.published_at.localeCompare(a.published_at)).slice(0, lim);
+    }
+    return lire(u);
+  };
+  const r = await (await handleAnnonces('annonces_publiques', {}, ctx)).json();
+  const site = r.annonces.filter((a) => a.ref < 5001).map((a) => a.ref);
+  assert.ok(site.includes(1), 'le profil le plus ancien est toujours là');
+  assert.equal(site.length, 120);
+});

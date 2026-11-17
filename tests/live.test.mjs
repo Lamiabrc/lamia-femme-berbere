@@ -254,3 +254,23 @@ test('le tableau de bord (Lamia connectée) fait les mêmes gestes sans la clé 
   assert.equal((await appel(be, { action: 'live_outil_membre_formule', ref: 173, formule: 'prestige' }, 'tl')).status, 200);
   assert.deepEqual(be.db.formules_offertes.map((f) => [f.formule, f.raison]), [['prestige', 'moderateur']]);
 });
+
+test('erreurs remontées sans compte : les prénoms des membres restent lus (pas de « null » dans la liste des comptes)', async () => {
+  const be = monde();
+  const urls = [];
+  const f = be.fetcher;
+  be.fetcher = async (u, init) => { urls.push(String(u)); return f(u, init); };
+  be.db.erreurs_appli = [
+    { id: 'e1', user_id: null, created_at: new Date().toISOString(), type: 'appel', message: 'envoi_impossible', page: '/mon-espace/', appel: '/api/confidences · annonce_lien_connexion', statut: 502, appareil: 'x', version: 'v', vue_at: null },
+    { id: 'e2', user_id: 'nadia', created_at: new Date().toISOString(), type: 'appel', message: 'temporary_failure', page: '/mon-espace/', appel: '/api/mes-achats', statut: 502, appareil: 'x', version: 'v', vue_at: null },
+  ];
+  const l = await appel(be, { action: 'live_outil_erreurs', cle: CLE });
+  assert.equal(l.status, 200);
+  const lectures = urls.filter((u) => decodeURIComponent(u).includes('user_id=in.('));
+  assert.ok(lectures.length >= 2, 'les comptes sont lus');
+  for (const u of lectures) {
+    const liste = decodeURIComponent(u).match(/user_id=in\.\(([^)]*)\)/)[1].split(',');
+    assert.deepEqual(liste, ['nadia'], `seulement de vrais comptes dans ${u}`);
+  }
+  assert.equal(l.body.erreurs.find((e) => e.connecte).prenom, 'Nadia');
+});
