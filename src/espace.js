@@ -1118,8 +1118,11 @@ async function discussions(session) {
   await charger();
   if (dematchOuvert && liste.length) box.querySelector(`[data-disc="${CSS.escape(dematchOuvert)}"] [data-disc-dematch-form]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   else if (location.hash === '#discussion' && liste.length) bloc.scrollIntoView({ behavior: 'smooth' });
-  // Les nouveaux messages arrivent toutes les 10 secondes tant que la page est ouverte.
-  if (liste.some((d) => d.ouverte)) minuterieDiscussions = setInterval(() => { if (!document.hidden && !dematchOuvert && !box.contains(document.activeElement)) charger(); }, 10000);
+  // Les nouveaux messages arrivent toutes les 20 secondes tant que la page est ouverte et regardée ;
+  // après 15 minutes sans geste, on arrête (le prochain geste relance). Économie de la base (17 nov. 2026).
+  let dernierGeste = Date.now();
+  ['pointerdown', 'keydown', 'scroll'].forEach((t) => window.addEventListener(t, () => { dernierGeste = Date.now(); }, { passive: true }));
+  if (liste.some((d) => d.ouverte)) minuterieDiscussions = setInterval(() => { if (!document.hidden && !dematchOuvert && !box.contains(document.activeElement) && Date.now() - dernierGeste < 15 * 60e3) charger(); }, 20000);
   ecouter(box, 'submit', async (e) => {
     e.preventDefault();
     const a = e.target.closest('[data-disc]'), id = a?.dataset.disc;
@@ -1135,6 +1138,9 @@ async function discussions(session) {
         const texte = e.target.texte.value.trim();
         const r = await appelProfil({ action: 'annonce_discussion_envoyer', id, texte }, session);
         e.target.texte.value = '';
+        // Le message s'affiche tout de suite, même si le rechargement est lent (17 nov. 2026).
+        const disc = liste.find((x) => x.id === id);
+        if (disc) { disc.messages = [...(disc.messages || []), { moi: true, texte: r.texte || texte, le: new Date().toISOString() }]; afficher(); }
         if (r.masque) alert('Un numéro, un lien ou un email a été masqué dans ton message. Pour passer au téléphone, utilise « Échanger nos numéros ».');
       } else if (e.target.matches('[data-disc-numero]')) {
         await appelProfil({ action: 'annonce_discussion_numero', id, telephone: e.target.telephone.value }, session);
