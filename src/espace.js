@@ -37,6 +37,8 @@ function ecouter(box, type, fn) {
   box.addEventListener(type, fn);
 }
 let minuterieDiscussions = null;
+// Photos des matchs (Passion, ou achetées), par numéro : affichées aussi en tête de la discussion (17 nov. 2026).
+const photosMatch = new Map();
 
 // Revenir là où on allait après la connexion (ex. l'invitation dans l'espace couple), même après le lien reçu par email.
 try { const r = new URLSearchParams(location.search).get('retour'); if (r && /^\/[a-z0-9-]/i.test(r)) localStorage.setItem('lfb-retour', r); } catch { /* */ }
@@ -576,6 +578,7 @@ async function monProfil(session) {
     });
     box.querySelectorAll('[data-voir-match]').forEach((b) => b.addEventListener('click', () => voirProfilMatch(Number(b.dataset.voirMatch), session)));
     // Arrivée depuis « C’est réciproque ! » (?voir=123) : le profil complet s’ouvre tout de suite.
+    photosMatch.clear(); for (const m of p.matchs_lies || []) if (m.url) photosMatch.set(Number(m.ref), m.url);
     { const v = Number(new URLSearchParams(location.search).get('voir')); if (v && (p.matchs_lies || []).some((m) => Number(m.ref) === v) && !voirProfilMatch.fait) { voirProfilMatch.fait = true; voirProfilMatch(v, session); } }
     // Mes photos : visibles par moi seul·e ici, pour vérifier qu'elles sont bien arrivées. Jamais publiées.
     { const z = box.querySelector('[data-mes-photos]');
@@ -1070,7 +1073,7 @@ async function discussions(session) {
     const ecrire = d.ouverte && !d.dematch;
     return `<article class="disc${ecrire ? ' is-ouverte' : ''}" data-disc="${esc(d.id)}">
       ${ecrire ? '<p class="disc-ouverte-ligne">Votre discussion est ouverte : vous pouvez échanger</p>' : ''}
-      <header class="disc-tete"><strong>Avec ${esc(d.avec)}${d.ancien_ref ? ` <small class="disc-ancien">(c’est le n° ${esc(String(d.ancien_ref))}, même personne)</small>` : ''}</strong><span>${d.ouverte ? `${esc(reste(d))}` : d.close_raison === 'signalee' ? 'fermée (signalée)' : d.close_raison ? 'fermée' : 'terminée'}</span></header>
+      <header class="disc-tete">${(() => { const u = photosMatch.get(Number(d.avec_ref)) || photosMatch.get(Number(d.ancien_ref)); return u && d.ouverte ? `<img class="disc-photo" src="${esc(u)}" alt="Photo de ton match" draggable="false">` : ''; })()}<strong>Avec ${esc(d.avec)}${d.ancien_ref ? ` <small class="disc-ancien">(c’est le n° ${esc(String(d.ancien_ref))}, même personne)</small>` : ''}</strong><span>${d.ouverte ? `${esc(reste(d))}` : d.close_raison === 'signalee' ? 'fermée (signalée)' : d.close_raison ? 'fermée' : 'terminée'}</span></header>
       ${d.ses_autres_matchs > 0 ? `<p class="disc-honnete">Par honnêteté : ${esc(d.avec)} a aussi ${d.ses_autres_matchs} autre${d.ses_autres_matchs > 1 ? 's' : ''} match${d.ses_autres_matchs > 1 ? 's' : ''} en cours.</p>` : ''}
       ${d.mes_autres_matchs > 0 ? `<p class="disc-honnete">De ton côté, tu as ${d.mes_autres_matchs} autre${d.mes_autres_matchs > 1 ? 's' : ''} match${d.mes_autres_matchs > 1 ? 's' : ''} en cours : ${esc(d.avec)} le voit aussi.</p>` : ''}
       ${vueParcours(d)}

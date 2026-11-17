@@ -4845,3 +4845,5 @@ body:is(.tayri-homme, .tayri-femme) .tayri-celib .swipe-boutons .swipe-annuler:d
 /* L'en-tête de l'espace célibataire dans Mon espace */
 .tayri-espace-tete { margin: 0 auto 18px; max-width: 560px; border-radius: 28px; overflow: hidden; padding-bottom: 10px; background: var(--tc-fond); box-shadow: 0 14px 40px -20px rgba(0,0,0,.45); }
 .tayri-espace-tete .tayri-hero img { border-radius: 28px 28px 0 0; }
+.disc-photo { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid #7A1F35; flex: none; margin-right: 10px; }
+.disc-tete:has(.disc-photo) { align-items: center; }
