@@ -58,3 +58,32 @@ test('liste publique : le membre connecté reçoit son genre (l\'appel « mon_ge
   assert.equal(r.status, 200);
   assert.equal((await r.json()).genre, 'femme');
 });
+
+test('console de Lamia : le nombre de messages d\'une discussion est juste au-delà de 1000 messages en tout', async () => {
+  const { discussionsPourLamia } = await import('../lib/discussions.mjs');
+  const d1 = { id: '11111111-1111-4111-8111-111111111111', a_ref: 1, b_ref: 2, ouverte_at: '2026-11-17T10:00:00Z' };
+  const d2 = { id: '22222222-2222-4222-8222-222222222222', a_ref: 3, b_ref: 4, ouverte_at: '2026-11-16T10:00:00Z' };
+  const msgs = [
+    ...Array.from({ length: 1100 }, (_, i) => ({ id: `a${String(i).padStart(5, '0')}`, discussion_id: d2.id })),
+    ...Array.from({ length: 7 }, (_, i) => ({ id: `b${i}`, discussion_id: d1.id })),
+  ];
+  const { read } = baseCoupee({ discussions: [d1, d2], discussion_messages: msgs });
+  const r = await discussionsPourLamia({ read });
+  const nb = (id) => (r.discussions || r.liste || []).find((x) => x.id === id)?.messages;
+  assert.equal(nb(d1.id), 7);
+  assert.equal(nb(d2.id), 1100);
+});
+
+test('carte d\'activité : un match ancien reste compté même avec plus de 1000 demandes plus récentes', async () => {
+  const A = { id: 'a-1', ref: 1, prenom: 'Amel', status: 'publiee', test: false, user_id: 'u-1', en_match: true, pause_at: null };
+  const recentes = Array.from({ length: 1200 }, (_, i) => ({ id: `r${String(i).padStart(5, '0')}`, cible_ref: 5000 + i, statut: 'pas_compatible', updated_at: `2026-11-17T12:${String(i % 60).padStart(2, '0')}:00Z`, annonces: { ref: 1, prenom: 'Amel', status: 'publiee' } }));
+  const ancien = { id: 'zz-match', cible_ref: 2, statut: 'mis_en_relation', updated_at: '2026-11-01T10:00:00Z', annonces: { ref: 1, prenom: 'Amel', status: 'publiee' } };
+  const db = { annonces: [A], profils_outil: [], annonce_interets: [...recentes, ancien], propositions: [], discussions: [], platform_settings: [] };
+  // Comme la base : les plus récentes d'abord.
+  db.annonce_interets.sort((x, y) => y.updated_at.localeCompare(x.updated_at));
+  const { read } = baseCoupee(db);
+  const call = async () => ({ ok: true, status: 200, json: async () => [] });
+  const r = await handleAnnonces('annonce_pilote', {}, { env: {}, call, read, insert: async () => ({}), patch: async () => ({ ok: true }), admin: true, user: { id: 'lamia', email: 'l@x.fr' }, now: () => new Date('2026-11-17T22:00:00Z'), formuleDe: async () => 'passion' });
+  assert.equal(r.status, 200);
+  assert.equal((await r.json()).chiffres.en_relation, 1);
+});
