@@ -254,3 +254,25 @@ test('le tableau de bord (Lamia connectée) fait les mêmes gestes sans la clé 
   assert.equal((await appel(be, { action: 'live_outil_membre_formule', ref: 173, formule: 'prestige' }, 'tl')).status, 200);
   assert.deepEqual(be.db.formules_offertes.map((f) => [f.formule, f.raison]), [['prestige', 'moderateur']]);
 });
+
+// 17 nov. 2026 : une erreur remontée sans compte (user_id vide) glissait « null » dans la liste des personnes ;
+// la base refusait toute la lecture (400, chaque minute) et la console n'affichait plus aucun prénom ni numéro.
+test('erreurs de l’appli : une erreur sans compte n’empêche pas d’afficher le prénom des autres', async () => {
+  const be = monde();
+  Object.assign(be.db, { erreurs_appli: [], annonces: [{ id: 'a1', ref: 41, prenom: 'Nadia', status: 'publiee', user_id: 'nadia' }] });
+  await appel(be, { action: 'live_erreur', type: 'appel', message: 'temporary_failure', statut: 502 }, 'tn');
+  await appel(be, { action: 'live_erreur', type: 'page', message: 'sans compte' });
+  const base = be.fetcher;
+  const fetcher = async (url, init) => {
+    const liste = /user_id=in\.\(([^)]*)\)/.exec(decodeURIComponent(String(url)))?.[1];
+    if (liste !== undefined && liste.split(',').some((x) => !x || x === 'null' || x === 'undefined')) {
+      return new Response(JSON.stringify({ code: '22P02', message: 'invalid input syntax for type uuid' }), { status: 400, headers: { 'content-type': 'application/json' } });
+    }
+    return base(url, init);
+  };
+  const r = await handleConfidences(req({ action: 'live_outil_erreurs', cle: CLE }), { env, fetcher });
+  const body = await r.json();
+  const deNadia = body.erreurs.find((e) => e.connecte);
+  assert.equal(deNadia.prenom, 'Nadia');
+  assert.equal(deNadia.ref, 41);
+});

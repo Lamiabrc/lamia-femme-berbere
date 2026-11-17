@@ -527,3 +527,38 @@ test('passage de l’heure : un « plus de place » périmé est levé, et l’a
   assert.equal(db.annonces[0].en_match, false);
   assert.equal((await handleAnnonces('annonce_matchs_cron', {}, ctx(NINA))).status, 403);
 });
+
+test('au revoir en cours puis nouveau match de la même paire : le passage ne défait pas le nouveau match (17 nov. 2026)', async () => {
+  const A = { id: 'a-101', ref: 101, user_id: 'u-a', email: 'a@example.com', status: 'publiee', prenom: 'A', genre: 'homme', en_match: true, test: false };
+  const B = { id: 'a-98', ref: 98, user_id: 'u-b', email: 'b@example.com', status: 'publiee', prenom: 'B', genre: 'femme', en_match: true, test: false };
+  const { db, ctx } = base({
+    annonces: [A, B],
+    annonce_interets: [
+      { id: 'i-ancien', demandeur_id: 'a-98', cible_ref: 101, statut: 'dematche', reciproque: true, created_at: '2026-11-10T00:00:00Z' },
+      { id: 'i-nouveau', demandeur_id: 'a-101', cible_ref: 98, statut: 'mis_en_relation', reciproque: true, created_at: '2026-11-02T00:00:00Z' },
+    ],
+    discussions: [
+      { id: 'd-ancienne', interet_id: 'i-ancien', a_user: 'u-b', b_user: 'u-a', a_ref: 98, b_ref: 101, ouverte_at: '2026-11-01T00:00:00Z', ferme_at: '2026-11-04T00:00:00Z', dematch_at: '2026-11-02T00:00:00Z', dematch_par: 'b', dematch_rappel_at: '2026-11-02T10:00:00Z', close_raison: null },
+      { id: 'd-nouvelle', interet_id: 'i-nouveau', a_user: 'u-a', b_user: 'u-b', a_ref: 101, b_ref: 98, ouverte_at: '2026-11-03T04:00:00Z', ferme_at: '2026-11-10T04:00:00Z', dematch_at: null, close_raison: null },
+    ],
+  });
+  const r = await handleAnnonces('annonce_matchs_cron', {}, { ...ctx(null), cron: true });
+  assert.equal(r.status, 200);
+  assert.equal(db.annonce_interets.find((i) => i.id === 'i-nouveau').statut, 'mis_en_relation', 'le nouveau match continue');
+  assert.equal(db.discussions.find((d) => d.id === 'd-nouvelle').close_raison, null, 'la nouvelle discussion reste ouverte');
+});
+
+test('au revoir en cours : une demande restée « en relation » sans nouvelle discussion est bien terminée', async () => {
+  const A = { id: 'a-101', ref: 101, user_id: 'u-a', email: 'a@example.com', status: 'publiee', prenom: 'A', genre: 'homme', en_match: true, test: false };
+  const B = { id: 'a-98', ref: 98, user_id: 'u-b', email: 'b@example.com', status: 'publiee', prenom: 'B', genre: 'femme', en_match: true, test: false };
+  const { db, ctx } = base({
+    annonces: [A, B],
+    annonce_interets: [
+      { id: 'i-1', demandeur_id: 'a-98', cible_ref: 101, statut: 'mis_en_relation', reciproque: true, created_at: '2026-11-01T00:00:00Z' },
+      { id: 'i-2', demandeur_id: 'a-101', cible_ref: 98, statut: 'mis_en_relation', reciproque: true, created_at: '2026-11-01T00:00:00Z' },
+    ],
+    discussions: [{ id: 'd-1', interet_id: 'i-1', a_user: 'u-b', b_user: 'u-a', a_ref: 98, b_ref: 101, ouverte_at: '2026-11-01T00:00:00Z', ferme_at: '2026-11-04T00:00:00Z', dematch_at: '2026-11-02T00:00:00Z', dematch_par: 'b', dematch_rappel_at: '2026-11-02T10:00:00Z', close_raison: null }],
+  });
+  await handleAnnonces('annonce_matchs_cron', {}, { ...ctx(null), cron: true });
+  assert.deepEqual(db.annonce_interets.map((i) => i.statut), ['dematche', 'dematche']);
+});
