@@ -513,3 +513,14 @@ test('formule prise pendant un match : pas d’autre match sans l’accord de la
   assert.equal(r.profil.matchs.choix_multiples, '24h');
   assert.equal(r.profil.matchs.limite, 1);
 });
+
+test('dématch en cours (48 h d’au revoir) : pas de nouveau match sans l’accord, même avec l’offre gratuite (17 nov. 2026)', async () => {
+  const { db, ctx } = base({ annonces: [annonceNina()] });
+  db.discussions = [{ id: 'd1', a_user: NINA.id, b_user: 'u-x', ouverte_at: '2026-11-10T10:00:00Z', ferme_at: '2099-01-01T00:00:00Z', dematch_at: '2026-11-16T10:00:00Z', close_raison: null }];
+  let { profil } = await lire(await handleAnnonces('annonce_mon_profil', {}, ctx(NINA)));
+  assert.equal(profil.matchs.places_en_attente, true);
+  assert.equal(profil.matchs.limite, 0);
+  await handleAnnonces('annonce_matchs_multiples', { choix: 'oui' }, ctx(NINA));
+  ({ profil } = await lire(await handleAnnonces('annonce_mon_profil', {}, ctx(NINA))));
+  assert.equal(profil.matchs.limite, 1);
+});
