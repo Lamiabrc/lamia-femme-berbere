@@ -6,12 +6,11 @@ const visage = (bouche, yeux = '<circle cx="20" cy="22" r="1.4" fill="#7A1F35" s
 
 const DESSINS = {
   // Humeurs
-  // Humeurs : la météo du cœur en pictogrammes au trait (orage → plein soleil), plus de visages dessinés (17 nov. 2026).
-  h1: ['or', '<path d="M15.5 31h16.5a5.5 5.5 0 0 0 .4-11 8 8 0 0 0-15.2 2.2A4.5 4.5 0 0 0 15.5 31z"/><path d="M24.5 31.5l-2.5 4.5h4l-2.5 4.5"/>'],
-  h2: ['or', '<path d="M15.5 31h16.5a5.5 5.5 0 0 0 .4-11 8 8 0 0 0-15.2 2.2A4.5 4.5 0 0 0 15.5 31z"/><path d="M19 34.5l-1 2.5M24 34.5l-1 2.5M29 34.5l-1 2.5"/>'],
-  h3: ['or', '<path d="M15.5 31h16.5a5.5 5.5 0 0 0 .4-11 8 8 0 0 0-15.2 2.2A4.5 4.5 0 0 0 15.5 31z"/>'],
-  h4: ['or', '<circle cx="19" cy="19" r="4.5"/><path d="M19 11.5v2M11.5 19h2M13.7 13.7l1.4 1.4M24.3 13.7l-1.4 1.4"/><path d="M18 33h15a5 5 0 0 0 .3-10 7 7 0 0 0-13.3 2A4 4 0 0 0 18 33z"/>'],
-  h5: ['or', '<circle cx="24" cy="24" r="6"/><path d="M24 12v3M24 33v3M12 24h3M33 24h3M15.5 15.5l2.1 2.1M30.4 30.4l2.1 2.1M15.5 32.5l2.1-2.1M30.4 17.6l2.1-2.1"/>'],
+  h1: ['lilas', visage('<path d="M19.5 31q4.5-3.5 9 0"/>', '<path d="M18.5 22.5l3-1.2M29.5 22.5l-3-1.2"/>')],
+  h2: ['lilas', visage('<path d="M20 30h8"/>')],
+  h3: ['menthe', visage('<path d="M19.5 28.5q4.5 2.5 9 0"/>')],
+  h4: ['or', visage('<path d="M19 27.5q5 5.5 10 0" fill="#fff"/>', '<path d="M18.5 22.5q1.5-2 3 0M26.5 22.5q1.5-2 3 0"/>')],
+  h5: ['rose', visage('<path d="M19 27.5q5 5.5 10 0" fill="#fff"/>', `${petitCoeur(20, 22, 0.28)}${petitCoeur(28, 22, 0.28)}`)],
   // Onglets et rubriques
   nous: ['rose', `<path transform="translate(-4 2) scale(.82) translate(5 5)" d="${COEUR}" fill="#fff"/><path transform="translate(7 -2) scale(.7) translate(10 10)" d="${COEUR}" fill="#F7B6C6"/>`],
   douceurs: ['rose', `<rect x="12" y="16" width="24" height="17" rx="3" fill="#fff"/><path d="M12.5 17.5l11.5 8.5 11.5-8.5"/>${petitCoeur(24, 29.5, 0.32)}`],
@@ -67,9 +66,7 @@ export function preparerImages() {
   document.body.insertAdjacentHTML('afterbegin', `<svg id="couple-degrades" width="0" height="0" style="position:absolute" aria-hidden="true"><defs>${defs}</defs></svg>`);
 }
 
-// Version chic (17 nov. 2026) : médaillon ivoire au filet doré, trait bordeaux fin, aucun aplat pastel ni remplissage.
 export function img(nom, classe = '') {
-  const [, trait] = DESSINS[nom] || DESSINS.cadeau;
-  const fin = trait.replace(/fill="#(?:fff|FFF|F7B6C6|E0567A)"/g, 'fill="none"').replace(/stroke="none"/g, 'stroke="#B8893E"');
-  return `<svg class="ci ${classe}" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle cx="24" cy="24" r="22.5" fill="#FBF7F1" stroke="#D9BF8C" stroke-width="1"/><g fill="none" stroke="#7A1F35" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${fin}</g></svg>`;
+  const [fond, trait] = DESSINS[nom] || DESSINS.cadeau;
+  return `<svg class="ci ${classe}" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle cx="24" cy="24" r="23" fill="url(#ci-${fond})"/><g fill="none" stroke="#7A1F35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${trait}</g></svg>`;
 }
