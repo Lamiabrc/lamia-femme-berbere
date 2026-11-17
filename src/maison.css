@@ -3299,11 +3299,13 @@ label.is-manquant { outline: 2px solid #6C5BA7; outline-offset: 3px; border-radi
 .disc-saisie { display: flex; gap: 8px; align-items: flex-end; }
 .disc-saisie textarea { flex: 1; min-height: 46px; border-radius: 14px; border: 1px solid #e0cdb5; padding: 10px 12px; font: inherit; font-size: 16px; resize: vertical; }
 .disc-saisie .btn, .disc-numeros .btn { min-height: 46px; }
-.disc.is-ouverte { border: 3px solid #2F2B3D; background: #fff; box-shadow: 0 8px 24px rgba(47, 43, 61, .18); }
-.disc-ouverte-ligne { margin: -12px -12px 0; padding: 12px 14px; background: #2F2B3D; color: #fff; font-weight: 600; border-radius: 14px 14px 0 0; }
-.disc.is-ouverte .disc-fil { background: #f4f0f8; border: 0; }
+.disc.is-ouverte { border: 3px solid var(--bordeaux-lfb, #7A1F35); background: #fff; box-shadow: 0 8px 24px rgba(122, 31, 53, .2); }
+.disc-ouverte-ligne { margin: -12px -12px 0; padding: 12px 14px; background: var(--bordeaux-velours, #7A1F35); color: #fff; font-weight: 600; border-radius: 14px 14px 0 0; }
+.disc.is-ouverte .disc-fil { background: #fbf1f3; border: 0; }
 .disc.is-ouverte .disc-vide { font-style: italic; }
-.disc.is-ouverte .disc-saisie textarea { border: 2px solid #2F2B3D; background: #fff; }
+.disc.is-ouverte .disc-saisie textarea { border: 2px solid var(--bordeaux-lfb, #7A1F35); background: #fff; }
+.disc.is-ouverte .disc-saisie .btn { background: var(--bordeaux-velours, #7A1F35); border-color: #7A1F35; color: #fff; }
+.disc.is-ouverte .disc-msg.is-moi span { background: #7A1F35; }
 .disc-aide { font-size: 13px; color: #8a7a6a; margin: 0; }
 .disc-msg.is-systeme { text-align: center; }
 .disc-msg.is-systeme span { display: inline-block; background: #E9E4F0; color: #2F2B3D; font-style: italic; }
