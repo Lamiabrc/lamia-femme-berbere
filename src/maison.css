@@ -4767,3 +4767,22 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .couple .couple-meteo > .couple-meteo-moi strong { display: none; }
 .couple .couple-cadenas { color: #c9a15a; font-style: normal; }
 .couple .couple-onglets button span { font-size: .7rem; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+
+/* Soirées à deux à distance (Lamia, 17 nov. 2026), dans le style de la maquette « Notre couple ». */
+.couple .couple-distance-q p { margin: 0 0 8px; }
+.couple .couple-soiree-une { display: grid; grid-template-columns: 120px 1fr; gap: 14px; align-items: center; margin-bottom: 12px; }
+.couple .couple-soiree-une img { width: 120px; height: 80px; object-fit: cover; border-radius: 14px; border: 1px solid rgba(201,162,90,.7); box-shadow: 0 4px 14px rgba(122,31,53,.18); }
+.couple .couple-soiree-une h2 { margin: 0 0 4px; }
+.couple .couple-soiree-une p { margin: 0; font-size: .92rem; }
+.couple .couple-soiree-liste li { align-items: center; }
+.couple .couple-soiree-vignette { width: 56px; height: 38px; object-fit: cover; border-radius: 10px; border: 1px solid rgba(201,162,90,.6); flex: none; }
+.couple .couple-themes { border: 0; padding: 0; margin: 0 0 12px; display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+.couple .couple-themes legend { font-weight: 600; margin-bottom: 8px; }
+.couple .couple-theme-choix { position: relative; display: flex; flex-direction: column; gap: 2px; padding: 6px; border-radius: 16px; background: rgba(255,255,255,.6); border: 1px solid rgba(201,162,90,.4); cursor: pointer; }
+.couple .couple-theme-choix input { position: absolute; opacity: 0; }
+.couple .couple-theme-choix img { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 12px; }
+.couple .couple-theme-choix strong { font-size: .9rem; color: #7a1f35; }
+.couple .couple-theme-choix small { font-size: .78rem; line-height: 1.3; }
+.couple .couple-theme-choix:has(input:checked) { border-color: #b8893e; box-shadow: 0 0 0 2px rgba(184,137,62,.45); background: #fff; }
+.couple .couple-programme { margin: 6px 0 12px; padding: 10px 12px; border-radius: 14px; background: rgba(255,255,255,.55); font-size: .88rem; }
+.couple .couple-programme p { margin: 0 0 6px; }

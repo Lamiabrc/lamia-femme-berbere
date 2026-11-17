@@ -209,3 +209,33 @@ test('jeux dorés : « Un peu piquant » et « Coquin » avec l’abonnement Cou
   const r = await lire(await actionCouple('couple_etat', {}, ctx(AMINE)));
   assert.deepEqual(r.jeux_dores, ['piquant', 'coquin']);
 });
+
+test('soirées à distance : réservée seule (achat décompté), rendue si annulée à temps, salle ouverte 15 min avant', async () => {
+  const { ctx } = monde();
+  const pousses = [], rendus = [];
+  let stock = 1;
+  const soiree = { vendue: true, consommer: async () => (stock-- > 0 ? 'achat-1' : null), rendre: async (id) => { rendus.push(id); }, salle: async (name, exp, nom) => `https://x.daily.co/${name}?t=jeton` };
+  const avec = (u, now = '2026-11-16T10:00:00Z') => ({ ...ctx(u), now: () => new Date(now), soiree, pousser: async (uid, m) => { pousses.push([uid, m.titre]); return 1; } });
+  const r0 = await lire(await actionCouple('couple_creer', {}, avec(AMINE)));
+  assert.equal((await actionCouple('couple_soiree_reserver', { quand: '2026-11-20T19:00:00Z', theme: 'mer' }, avec(AMINE))).status, 409); // seul
+  await actionCouple('couple_rejoindre', { code: r0.couple.code }, avec(SARA));
+  let r = await lire(await actionCouple('couple_distance', { oui: true }, avec(SARA)));
+  assert.equal(r.couple.distance, true);
+  assert.equal((await actionCouple('couple_soiree_reserver', { quand: '2026-11-20T19:00:00Z', theme: 'inconnu' }, avec(SARA))).status, 400);
+  r = await lire(await actionCouple('couple_soiree_reserver', { quand: '2026-11-20T19:00:00Z', theme: 'mer', semaine: 2 }, avec(SARA)));
+  assert.equal(r.couple.soirees.length, 1);
+  assert.equal(r.couple.soirees[0].theme_nom, 'Coucher de soleil sur la mer');
+  assert.equal(r.couple.soirees[0].programme_nom, 'Un dîner ensemble');
+  assert.equal(r.couple.soirees[0].paye, 'achat');
+  assert.equal(r.couple.activites.length, 0); // pas dans la liste des activités
+  assert.equal(pousses.length, 1);
+  // Plus de soirée achetée : il faut payer.
+  assert.equal((await actionCouple('couple_soiree_reserver', { quand: '2026-11-21T19:00:00Z', theme: 'mer' }, avec(SARA))).status, 402);
+  const id = r.couple.soirees[0].id;
+  assert.equal((await actionCouple('couple_soiree_entrer', { id }, avec(AMINE))).status, 409); // trop tôt
+  const e = await lire(await actionCouple('couple_soiree_entrer', { id }, avec(AMINE, '2026-11-20T18:50:00Z')));
+  assert.match(decodeURIComponent(e.url), /^\/salle-soiree\/#https:\/\/x\.daily\.co\/soiree-.*th=mer&s=2/);
+  r = await lire(await actionCouple('couple_soiree_annuler', { id }, avec(AMINE)));
+  assert.equal(r.couple.soirees.length, 0);
+  assert.deepEqual(rendus, ['achat-1']);
+});

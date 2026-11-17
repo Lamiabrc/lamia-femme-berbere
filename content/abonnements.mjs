@@ -22,6 +22,9 @@ export const UNITES = [
   { id: 'coaching', nom: 'Une visio de coaching avec Lamia', prix: 1500, texte: '15 minutes en visio avec Lamia, sans enregistrement. Tu choisis ton créneau dans Mon espace après l’achat. -20 % avec Prestige.' },
   { id: 'coaching_30', nom: 'Coaching de 30 minutes et match manuel', prix: 3900, texte: '30 minutes en visio avec Lamia, sans enregistrement. Vous faites le point sur ta recherche, puis elle cherche avec toi, en direct, les profils qui te correspondent et lance la mise en relation tout de suite. Tu choisis ton créneau dans Mon espace après l’achat. -20 % avec Prestige.' },
   { id: 'sauver_couple', nom: 'Sauver mon couple', prix: 8900, texte: 'Une séance de love coaching : 1 heure en visio avec Lamia, à deux ou seul·e, sans enregistrement. Un accompagnement, sans garantie de résultat et sans remplacer une thérapie. Tu choisis ton créneau dans Mon espace après l’achat. -20 % avec Prestige.' },
+  // Soirée à deux à distance (Lamia, 17 nov. 2026) : incluse dans les abonnements Couple, ou vendue seule.
+  // horsVente tant que la base n'accepte pas encore ce type d'achat (migration 20261117160000 à passer).
+  { id: 'soiree_distance', nom: 'Une soirée à deux à distance', prix: 990, horsVente: true, couple: true, texte: 'Votre salle virtuelle rien qu’à vous deux, pendant 2 heures, avec le fond de soirée que vous choisissez et le programme d’amour pour vous guider. Incluse avec l’abonnement Couple. Vous réservez dans Notre couple, onglet Moments.' },
   // Plus vendu depuis le 15 nov. 2026 (Lamia ne vend rien en live) ; gardé pour lire d'anciens achats.
   { id: 'live_priorite', nom: 'Passage en priorité en live', prix: 500, horsVente: true, texte: 'Lamia présente ton annonce en priorité à son prochain live.' },
   // S'achètent seulement depuis Mon espace : ils concernent un compte, un match ou une discussion.
@@ -42,10 +45,10 @@ export const formule = (id) => FORMULES.find((f) => f.id === id) || null;
 // Abonnement « Couple » (Lamia, 16 nov. 2026) : pour l'espace Notre couple, à part des formules de rencontre.
 // Il débloque les mots doux les plus envoyés, avec leur petite animation, et le mot écrit soi-même. Un abonné suffit pour les deux.
 export const COUPLE = { id: 'couple', nom: 'Couple Amour', mois: 1800, accroche: 'Pour vous deux',
-  avantages: ['Tous les mots doux, avec leurs animations tendres', 'Ton mot doux écrit toi-même', 'Bientôt : le fil « Avec nos proches », 1 proche inclus', 'Bientôt : 5 € de points cadeau par mois, à offrir à l’autre', 'Pour vous deux : un seul abonnement suffit'] };
+  avantages: ['Les soirées à deux à distance, dans votre salle virtuelle à thème, sans limite', 'Tous les mots doux, avec leurs animations tendres', 'Ton mot doux écrit toi-même', 'Bientôt : le fil « Avec nos proches », 1 proche inclus', 'Bientôt : 5 € de points cadeau par mois, à offrir à l’autre', 'Pour vous deux : un seul abonnement suffit'] };
 // Couple Prestige (Lamia, 16 nov. 2026) : tout Couple Amour, plus Lamia dans votre fil une fois par mois, 10 € de points cadeau, un plus beau cadeau de mariage.
 export const COUPLE_PRESTIGE = { id: 'couple_prestige', nom: 'Couple Prestige', mois: 3800, accroche: 'Pour vous deux',
-  avantages: ['Tout Couple Amour', 'Bientôt : Lamia dans votre fil, une fois par mois', 'Bientôt : 10 € de points cadeau par mois', 'Un plus beau cadeau quand vous vous mariez', 'Pour vous deux : un seul abonnement suffit'] };
+  avantages: ['Tout Couple Amour, avec les soirées à distance sans limite', 'Bientôt : Lamia dans votre fil, une fois par mois', 'Bientôt : 10 € de points cadeau par mois', 'Un plus beau cadeau quand vous vous mariez', 'Pour vous deux : un seul abonnement suffit'] };
 export const FORMULES_COUPLE = [COUPLE, COUPLE_PRESTIGE];
 export const formuleCouple = (id) => FORMULES_COUPLE.find((f) => f.id === id) || null;
 export const unite = (id) => UNITES.find((u) => u.id === id) || null;

@@ -8,6 +8,7 @@ const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', PUBLIC
 const zone = document.querySelector('[data-couple]');
 let token = null, types = {}, cadeaux = {}, motsDoux = [], motsPayants = [], moiInfo = {};
 // Plus riche, comme l'espace Famille de QVT Box (16 nov. 2026) : des onglets, la météo du cœur, la question du jour, un calendrier, le bocal à souvenirs.
+let themesSoiree = {}, programmeAmour = [], soireeVendue = false;
 let humeurs = {}, besoins = {}, suggestions = {}, idees = {}, jeuxDef = {}, dorees = {}, jeuxDores = [], jalonsDef = {}, prepaDef = {}, etapesDef = [], demandeMontree = false, dernier = null, moisVu = null, jourChoisi = null, tirage = null;
 let onglet = (() => { try { return localStorage.getItem('lfb-couple-onglet') || 'nous'; } catch { return 'nous'; } })();
 if (new URLSearchParams(location.search).get('onglet')) onglet = new URLSearchParams(location.search).get('onglet');
@@ -16,7 +17,7 @@ const cleJour = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2
 const aideQ = (texte) => `<details class="aide-q"><summary aria-label="Comprendre"><span aria-hidden="true">?</span></summary><p>${texte}</p></details>`;
 const jour = (iso) => new Date(iso).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' }) + (/T00:00/.test(iso) ? '' : ` · ${new Date(iso).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`);
 const appel = async (body) => { const { data: { session } } = await supabase.auth.getSession(); token = session?.access_token || token; return api(body, token); };
-const ERREURS = { couple_requis: 'Ça vient avec l’abonnement Couple.', code_invalide: 'Ce code ne marche pas (ou il a expiré). Demande-lui un nouveau code.', complet: 'Cet espace a déjà ses deux membres.', deja_en_couple: 'Tu as déjà un espace de couple.', titre_requis: 'Écris ce que vous allez faire.' };
+const ERREURS = { couple_requis: 'Ça vient avec l’abonnement Couple.', code_invalide: 'Ce code ne marche pas (ou il a expiré). Demande-lui un nouveau code.', complet: 'Cet espace a déjà ses deux membres.', deja_en_couple: 'Tu as déjà un espace de couple.', titre_requis: 'Écris ce que vous allez faire.', date_invalide: 'Choisis une date à venir.', trop_tot: 'La salle s’ouvre 15 minutes avant la soirée.', terminee: 'Cette soirée est terminée.', deja_commencee: 'La soirée a déjà commencé.', seul: 'Invite d’abord ton ou ta partenaire dans votre espace.', video_not_configured: 'La salle n’est pas encore disponible.', video_indisponible: 'La salle ne s’ouvre pas pour le moment. Réessaie dans un instant.' };
 
 const invitation = (code) => `Rejoins notre espace de couple 💞 chez Lamia Femme Berbère : ${location.origin}/notre-couple/?code=${code} (code : ${code})`;
 const AUTOUR = `<section class="couple-carte"><h2>Autour de vous</h2>
@@ -46,7 +47,8 @@ const joursAvant = (iso) => { const [a, m, j] = iso.split('-').map(Number), n = 
 function calendrier(c) {
   const auj = new Date(); if (!moisVu) moisVu = new Date(auj.getFullYear(), auj.getMonth(), 1);
   const parJour = {};
-  for (const a of c.activites) if (a.quand) (parJour[cleJour(new Date(a.quand))] ||= []).push(a);
+  const soireesCal = (c.soirees || []).map((x) => ({ id: x.id, titre: `Soirée à distance · ${x.theme_nom}`, type: 'rendez_vous', type_nom: x.programme_nom, quand: x.quand, fait: x.passee }));
+  for (const a of [...c.activites, ...soireesCal]) if (a.quand) (parJour[cleJour(new Date(a.quand))] ||= []).push(a);
   const jal = {}; for (const [k, d] of Object.entries(c.jalons || {})) jal[d] = k;
   const premier = new Date(moisVu), decalage = (premier.getDay() + 6) % 7, nb = new Date(premier.getFullYear(), premier.getMonth() + 1, 0).getDate();
   const cases = [];
@@ -61,6 +63,31 @@ function calendrier(c) {
     <div class="cal-grille">${['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((j) => `<span class="cal-nom">${j}</span>`).join('')}${cases.join('')}</div>
     ${jourChoisi ? `<div class="cal-detail"><p><strong>${esc(new Date(`${jourChoisi}T12:00:00`).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }))}</strong>${jal[jourChoisi] ? ` · ${esc(jalonsDef[jal[jourChoisi]] || '')} 💍` : ''}</p>${choisis.length ? `<ul class="couple-liste">${choisis.map((a) => `<li>${img(a.type, 'ci-s')}<span><strong>${esc(a.titre)}</strong><small>${esc(a.type_nom)}${a.fait ? ' · fait ♡' : ''}</small></span></li>`).join('')}</ul>` : '<p class="aide">Rien de prévu ce jour-là.</p>'}<p><button type="button" class="btn btn-line" data-cal-ajouter="${jourChoisi}">+ Ajouter ce jour-là</button></p></div>` : ''}
   </div>`;
+}
+
+// Soirées à deux à distance (Lamia, 17 nov. 2026) : proposées aux couples qui se disent à distance.
+// Le fond se choisit à la réservation ; le programme d'amour guide la soirée dans la salle.
+const quandTxt = (q) => new Date(q).toLocaleString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
+function carteSoirees(c) {
+  const lui = c.membres.find((m) => !m.moi);
+  if (!c.distance) return `<section class="couple-carte couple-distance-q"><p><strong>Vous vivez loin l’un de l’autre ?</strong> Retrouvez-vous dans votre salle virtuelle, avec un fond de soirée et un programme d’amour.</p><p><button type="button" class="btn btn-line" data-distance="1">Oui, nous sommes à distance</button></p></section>`;
+  const avenir = (c.soirees || []).filter((x) => !x.passee);
+  const themes = Object.entries(themesSoiree);
+  return `<section class="couple-carte couple-soirees">
+    <div class="couple-soiree-une"><img src="/images/couple/soiree/${esc(avenir[0]?.theme || 'chandelles')}.jpg" alt="" loading="lazy"><div><h2 class="couple-titre-chic">Nos soirées à deux</h2><p>Votre salle virtuelle rien qu’à vous deux, 2 heures, avec le fond de votre choix.</p></div></div>
+    ${avenir.length ? `<ul class="couple-liste couple-soiree-liste">${avenir.map((x) => `<li><img class="couple-soiree-vignette" src="/images/couple/soiree/${esc(x.theme)}.jpg" alt=""><span><strong>${esc(x.theme_nom)}</strong><small>${esc(quandTxt(x.quand))} · ${esc(x.programme_nom)}</small></span>${x.ouverte ? `<button type="button" class="btn btn-ink" data-soiree-entrer="${esc(x.id)}">Entrer dans la salle</button>` : `<button type="button" class="link-button" data-soiree-annuler="${esc(x.id)}">Annuler</button>`}</li>`).join('')}</ul><p class="aide">La salle s’ouvre 15 minutes avant. Jamais d’enregistrement.</p>` : ''}
+    ${lui ? `<details class="couple-ajout" data-soiree-boite${avenir.length ? '' : ' open'}><summary class="btn btn-ink">Réserver une soirée</summary>
+      <form data-soiree-form>
+        <fieldset class="couple-themes"><legend>Le fond de votre soirée</legend>${themes.map(([k, th], i) => `<label class="couple-theme-choix"><input type="radio" name="theme" value="${esc(k)}"${i === 0 ? ' checked' : ''}><img src="/images/couple/soiree/${esc(k)}.jpg" alt="" loading="lazy"><strong>${esc(th.nom)}</strong><small>${esc(th.texte)}</small></label>`).join('')}</fieldset>
+        <label>Le programme d’amour<select name="semaine">${programmeAmour.map((w) => `<option value="${w.semaine}">Soirée ${w.semaine} · ${esc(w.nom)}</option>`).join('')}<option value="0">Soirée libre, sans programme</option></select></label>
+        <div class="couple-programme">${programmeAmour.map((w) => `<p><strong>Soirée ${w.semaine} · ${esc(w.nom)}</strong> ${esc(w.texte)}</p>`).join('')}</div>
+        <label>Quand ?<input name="quand" type="datetime-local" required></label>
+        <p class="aide">${c.niveau ? 'Incluse dans votre abonnement Couple ✦' : `Incluse avec l’abonnement Couple${soireeVendue ? ', ou 9,90 € la soirée' : ''}.`}</p>
+        <button type="submit" class="btn btn-ink">Réserver</button>
+        <div data-soiree-payer hidden></div>
+      </form></details>` : `<p class="aide">Invite d’abord ${'ton ou ta partenaire'} dans votre espace pour réserver une soirée.</p>`}
+    <p><button type="button" class="link-button" data-distance="0">Nous ne sommes plus à distance</button></p>
+  </section>`;
 }
 
 function vue(c) {
@@ -160,7 +187,7 @@ function vue(c) {
       ${(c.jeux || []).filter((j) => j.de_moi || j.reponse).length ? `<section class="couple-carte">${titre('douceurs', 'Nos parties')}
         <ul class="couple-parties">${c.jeux.filter((j) => j.de_moi || j.reponse).map((j) => `<li>${img(j.jeu, 'ci-s')}<span><strong>${esc(j.carte)}</strong>${j.reponse ? `<em>${j.de_moi ? sonNom : 'Toi'} : « ${esc(j.reponse)} »</em>` : `<small>En attente de ${sonNom}…</small>`}</span></li>`).join('')}</ul></section>` : ''}`,
 
-    planning: `<section class="couple-carte">
+    planning: `${carteSoirees(c)}<section class="couple-carte">
       ${titre('planning', 'Le calendrier de nos moments à deux')}
       ${calendrier(c)}
       <h3 class="couple-sous">À venir</h3>
@@ -298,7 +325,7 @@ function laDemande(c) {
 async function charger() {
   try {
     const r = await appel({ action: 'couple_etat' });
-    types = r.types || {}; cadeaux = r.cadeaux || {}; humeurs = r.humeurs || {}; besoins = r.besoins || {}; suggestions = r.suggestions || {}; idees = r.idees || {}; jeuxDef = r.jeux || {}; jalonsDef = r.jalons || {}; prepaDef = r.prepa || {}; etapesDef = r.etapes || []; dorees = r.cartes_dorees || {}; jeuxDores = r.jeux_dores || []; motsDoux = r.mots_doux || []; motsPayants = r.mots_payants || [];
+    types = r.types || {}; cadeaux = r.cadeaux || {}; humeurs = r.humeurs || {}; besoins = r.besoins || {}; suggestions = r.suggestions || {}; idees = r.idees || {}; jeuxDef = r.jeux || {}; jalonsDef = r.jalons || {}; prepaDef = r.prepa || {}; etapesDef = r.etapes || []; dorees = r.cartes_dorees || {}; jeuxDores = r.jeux_dores || []; motsDoux = r.mots_doux || []; motsPayants = r.mots_payants || []; themesSoiree = r.themes_soiree || {}; programmeAmour = r.programme_amour || []; soireeVendue = Boolean(r.soiree_vendue);
     const q = new URLSearchParams(location.search);
     if (!r.couple && q.get('code')) return faire({ action: 'couple_rejoindre', code: q.get('code') });
     if (!r.couple && q.has('inviter')) return faire({ action: 'couple_creer' });
@@ -348,6 +375,23 @@ zone.addEventListener('click', async (e) => {
   if (e.target.closest('[data-demande-deja]')) { if (confirm('Vous êtes déjà fiancés ? Votre parcours s’ouvre pour vous deux.')) faire({ action: 'couple_demande', deja: true }, () => coeurs()); return; }
   if (e.target.closest('[data-piocher]')) { const l = dernier?.souvenirs || [], x = l[Math.floor(Math.random() * l.length)], p = zone.querySelector('[data-pioche]'); if (x && p) { p.hidden = false; p.textContent = `✨ ${x.texte}`; p.classList.remove('is-anim'); void p.offsetWidth; p.classList.add('is-anim'); } return; }
   if (e.target.closest('[data-couple-creer]')) return faire({ action: 'couple_creer' });
+  const dist = e.target.closest('[data-distance]');
+  if (dist) return faire({ action: 'couple_distance', oui: dist.dataset.distance === '1' }, () => bulle(dist.dataset.distance === '1' ? 'Vos soirées à deux sont là, juste ici ♡' : 'C’est noté ♡'));
+  const sAnn = e.target.closest('[data-soiree-annuler]');
+  if (sAnn) { if (!confirm('Annuler cette soirée ? Achetée seule, elle vous est rendue si vous annulez au moins 2 heures avant.')) return; return faire({ action: 'couple_soiree_annuler', id: sAnn.dataset.soireeAnnuler }, () => bulle('Soirée annulée')); }
+  const sEnt = e.target.closest('[data-soiree-entrer]');
+  if (sEnt) { sEnt.disabled = true; try { const r = await appel({ action: 'couple_soiree_entrer', id: sEnt.dataset.soireeEntrer }); location.href = r.url; } catch (err) { sEnt.disabled = false; statut(ERREURS[err.code] || 'La salle ne s’ouvre pas pour le moment. Réessaie dans un instant.'); } return; }
+  const sAch = e.target.closest('[data-soiree-acheter]');
+  if (sAch) {
+    if (!zone.querySelector('[data-soiree-cgv]')?.checked) { statut('Coche les conditions de vente pour continuer.'); return; }
+    sAch.disabled = true;
+    try {
+      const r = await fetch('/api/preorder', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'abonnement_payer', unite: 'soiree_distance', cgv_accepted: true, nom: moiInfo.nom || moiInfo.email, email: moiInfo.email }) });
+      const d = await r.json().catch(() => ({}));
+      if (r.ok && d.url) { location.href = d.url; return; }
+    } catch { /* */ }
+    statut('Le paiement n’a pas pu s’ouvrir. Réessaie dans un instant.'); sAch.disabled = false; return;
+  }
   if (e.target.closest('[data-jeu-abo]')) { onglet = 'douceurs'; try { localStorage.setItem('lfb-couple-onglet', onglet); } catch { /* */ } vue(dernier); const box = zone.querySelector('[data-couple-abo-box]'); if (box) { box.hidden = false; box.scrollIntoView({ behavior: 'smooth', block: 'center' }); } return; }
   if (e.target.closest('[data-couple-abo]')) { const box = zone.querySelector('[data-couple-abo-box]'); if (box) { box.hidden = false; box.scrollIntoView({ behavior: 'smooth', block: 'center' }); } return; }
   if (e.target.closest('[data-couple-payer]')) {
@@ -425,6 +469,23 @@ zone.addEventListener('submit', (e) => {
   if (f.matches('[data-souvenir]')) return faire({ action: 'couple_souvenir', texte: f.texte.value, quand: f.quand.value || null }, () => bulle('Dans le bocal ✨'));
   if (f.matches('[data-mot-libre]')) return faire({ action: 'couple_mot', texte: f.texte.value }, () => coeurs());
   if (f.matches('[data-couple-rejoindre]')) return faire({ action: 'couple_rejoindre', code: f.code.value });
+  if (f.matches('[data-soiree-form]')) {
+    if (!f.quand.value) return statut('Choisis le jour et l’heure de votre soirée.');
+    if (enDemo) { bulle('Démo : rien n’est envoyé 💞'); return; }
+    const corps = { action: 'couple_soiree_reserver', theme: f.theme.value, semaine: Number(f.semaine.value), quand: new Date(f.quand.value).toISOString() };
+    (async () => {
+      try { const r = await appel(corps); vue(r.couple); bulle('Soirée réservée : on a prévenu l’autre ♡'); }
+      catch (err) {
+        if (err.code !== 'soiree_a_payer') return statut(ERREURS[err.code] || 'Ça n’a pas fonctionné. Réessaie dans un instant.');
+        const box = f.querySelector('[data-soiree-payer]'); box.hidden = false;
+        box.innerHTML = `<p class="aide">Cette soirée est incluse avec l’abonnement Couple.${soireeVendue && !window.LFB_PLAY ? ' Tu peux aussi l’acheter seule : 9,90 €. Une fois payée, reviens ici pour la réserver.' : ''}</p>
+          <p><button type="button" class="btn btn-ink" data-jeu-abo>Voir l’abonnement Couple</button></p>
+          ${soireeVendue && !window.LFB_PLAY ? `<label class="annonce-case"><input type="checkbox" data-soiree-cgv> <span>J’accepte les <a class="text-link" href="/cgv/" target="_blank" rel="noopener">conditions de vente</a></span></label><p><button type="button" class="btn btn-line" data-soiree-acheter>Acheter une soirée · 9,90 €</button></p>` : ''}`;
+        box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    })();
+    return;
+  }
   if (f.matches('[data-act-ajouter]')) return faire({ action: 'couple_activite_ajouter', titre: f.titre.value, type: f.type.value, quand: f.quand.value ? new Date(f.quand.value).toISOString() : null, pour_nous: f.pour.value === 'nous' });
   if (f.matches('[data-cadeau-form]')) return faire({ action: 'couple_cadeau', type: f.type.value, note: f.note.value }, () => { f.hidden = true; zone.querySelectorAll('[data-cadeau]').forEach((x) => x.classList.remove('is-choisi')); f.reset(); f.insertAdjacentHTML('afterend', '<p class="form-status">C’est envoyé : Lamia s’en occupe et revient vers toi.</p>'); });
 });
@@ -435,7 +496,11 @@ async function demo() {
   const { DEMO } = await import('./couple-demo.js');
   const k = DEMO.consts;
   types = k.types; cadeaux = k.cadeaux; humeurs = k.humeurs; besoins = k.besoins; suggestions = k.suggestions; idees = k.idees; jeuxDef = k.jeux; jalonsDef = k.jalons; prepaDef = k.prepa; etapesDef = k.etapes; dorees = k.cartes_dorees || {}; jeuxDores = k.jeux_dores || []; motsDoux = k.mots_doux; motsPayants = k.mots_payants;
+  const { THEMES_DEMO, PROGRAMME_DEMO } = await import('./couple-soirees-demo.js');
+  themesSoiree = THEMES_DEMO; programmeAmour = PROGRAMME_DEMO; soireeVendue = true;
   const c = structuredClone(DEMO.couple), mode = new URLSearchParams(location.search).get('demo');
+  c.distance = true;
+  c.soirees = [{ id: 'sd1', quand: '2026-11-21T19:30:00Z', theme: 'chandelles', theme_nom: 'Dîner aux chandelles', semaine: 2, programme_nom: 'Un dîner ensemble', de_moi: true, paye: 'abonnement', ouverte: false, passee: false }];
   if (mode === 'demande') { c.demande = { ...c.demande, statut: 'attente' }; c.jalons = {}; c.prepa = []; }
   if (mode === 'bouton') { c.demande = null; c.jalons = {}; c.prepa = []; }
   preparerImages();
