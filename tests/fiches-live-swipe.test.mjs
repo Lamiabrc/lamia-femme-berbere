@@ -73,7 +73,7 @@ test('fiche confirmée : le swipe s’ouvre, sans refaire de profil, et sa propr
   assert.equal(r.status, 200);
   assert.deepEqual(r.profils.map((p) => p.ref), [100002]); // que des femmes, jamais la sienne
   const a = db.annonces[0];
-  assert.deepEqual([a.status, a.visible_anonyme, a.fiche_ref, a.outil_id, a.user_id, a.prenom], ['publiee', false, 100001, 'o-100001', 'u-rachid', 'Rachid']);
+  assert.deepEqual([a.status, a.visible_anonyme, a.fiche_ref, a.outil_id, a.user_id, a.prenom], ['a_verifier', false, 100001, 'o-100001', 'u-rachid', 'Rachid']); // validé seulement avec ses 2 photos
   await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID));
   assert.equal(db.annonces.length, 1); // pas de second profil
 });
@@ -149,7 +149,7 @@ test('blocage : bloquer sa fiche vaut aussi pour son profil, dans les deux sens'
 test('retirer sa fiche retire aussi son profil interne', async () => {
   const { db, ctx } = base({ profils_outil: [FICHE(100001, 'u-rachid', 'homme')] });
   await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID));
-  assert.equal(db.annonces[0].status, 'publiee');
+  assert.equal(db.annonces[0].status, 'a_verifier');
   await db; const { jetonAnnonce } = await import('../lib/annonces.mjs');
   const t = jetonAnnonce({ SUPABASE_SERVICE_ROLE_KEY: 'x' }, 'outil-100001', 'confirmer');
   await handleAnnonces('annonce_retirer_outil', { n: 100001, t }, ctx(RACHID));
