@@ -7,6 +7,8 @@ function base() {
   const db = { discussions: [], discussion_messages: [] }, pushes = [];
   const now = () => new Date('2026-11-01T10:00:00Z');
   const read = async (path) => {
+    if (path.includes('/annonces?')) return db.annonces || [];
+    if (path.includes('annonce_files')) return db.annonce_files || [];
     if (path.includes('discussion_messages')) return path.includes('auteur=eq.') ? [] : db.discussion_messages;
     if (path.includes('interet_id=eq.')) return db.discussions.filter((d) => path.includes(d.interet_id));
     return db.discussions;
@@ -121,6 +123,7 @@ test('dématch courtois : raison obligatoire, deux messages, l’autre prévenu,
   const { db, pushes, ctx } = base();
   await ouvrirDiscussion(ctx, { interetId: 'i1', a: { user_id: A, ref: 3, prenom: 'Melina' }, b: { user_id: B, ref: 27, prenom: 'Rachid' } });
   ctx.read = async (path) => {
+    if (path.includes('/annonces?') || path.includes('annonce_files')) return [];
     if (path.includes('discussion_messages')) return [...db.discussion_messages];
     return db.discussions;
   };
@@ -193,4 +196,16 @@ test('chaque jour, un au revoir encore ouvert rend les places (dématchs d’ava
   assert.deepEqual(liberes, [D]); assert.deepEqual(termines, []);
   await suiviDematchs({ ...base, now: () => new Date('2026-11-03T10:00:00Z') });
   assert.deepEqual(termines, [D]);
+});
+
+test('pas de message sans ses 2 photos : photos refusées ou absentes, on les ajoute d’abord', async () => {
+  const { db, ctx } = base();
+  await ouvrirDiscussion(ctx, { interetId: 'i9', a: { user_id: A, ref: 3, prenom: 'Melina' }, b: { user_id: B, ref: 27, prenom: 'Rachid' } });
+  db.annonces = [{ id: 'an1', test: false, photos_refusees_at: '2026-11-15T20:00:00Z' }];
+  let [s] = await json(await actionDiscussion('annonce_discussion_envoyer', { id: D, texte: 'Salam' }, { ...ctx, user: { id: A } }));
+  assert.equal(s, 403);
+  db.annonces = [{ id: 'an1', test: false, photos_refusees_at: null }];
+  db.annonce_files = [{ annonce_id: 'an1' }, { annonce_id: 'an1' }];
+  [s] = await json(await actionDiscussion('annonce_discussion_envoyer', { id: D, texte: 'Salam' }, { ...ctx, user: { id: A } }));
+  assert.equal(s, 200);
 });
