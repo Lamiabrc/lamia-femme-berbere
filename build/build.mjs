@@ -198,6 +198,7 @@ ${noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" hr
 <meta name="twitter:image" content="${esc(socialImage)}">
 <meta name="twitter:image:alt" content="${esc(socialImageAlt)}">
 <meta name="theme-color" content="#2F2B3D">
+<meta name="color-scheme" content="only light">
 <link rel="icon" href="/images/marque/tayri-icone-192.png" type="image/png">
 <link rel="manifest" href="/maison.webmanifest">
 <script src="/assets/lien-mot-de-passe.js"></script>
@@ -1438,6 +1439,7 @@ page(
 <title>Confidences · Lamia</title>
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#2F2B3D">
+<meta name="color-scheme" content="only light">
 <link rel="manifest" href="/confidences-lamia.webmanifest">
 <link rel="icon" href="/images/marque/confidences-icone-192.png" type="image/png">
 <link rel="apple-touch-icon" href="/images/marque/confidences-icone-180.png">
