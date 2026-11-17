@@ -251,7 +251,7 @@ function dessinerMembre() {
     m.compte ? (m.telephones ? 'Notifications activées sur son téléphone' : 'Notifications pas activées') : 'Pas de compte sur le site',
     m.erreurs.length ? `${m.erreurs.length} problème(s) rencontré(s) sur le site en 3 jours` : '',
   ].filter(Boolean);
-  const offre = (f) => `<button type="button" data-membre-offrir="${f}"${m.formule_offerte && m.formule === f ? ' class="is-on"' : ''}>${NOM_FORMULE[f]}</button>`;
+  const offre = (f) => [1, 2, 3].map((n) => `<button type="button" data-membre-offrir="${f}" data-mois="${n}"${m.formule_offerte && m.formule === f ? ' class="is-on"' : ''}>${NOM_FORMULE[f]} ${n} mois</button>`).join('');
   box.innerHTML = `<div class="tdb-membre-fiche">
     <h3>${esc(m.prenom || 'Sans prénom')} · <a class="fiche-ref" href="#profil-${esc(m.ref)}">n° ${esc(m.ref)}</a>${m.autre_ref ? ` <span class="aide">(aussi n° ${esc(m.autre_ref)} dans l’outil)</span>` : ''}</h3>
     <ul>${lignes.map((l) => `<li>${esc(l)}</li>`).join('')}</ul>
@@ -292,12 +292,12 @@ document.addEventListener('click', async (e) => {
       zone.value = '';
       ditMembre(`Envoyé à ${m.prenom || `n° ${m.ref}`}. ${d.telephones ? 'Notification envoyée sur son téléphone.' : 'Pas de notification sur son téléphone (elles ne sont pas activées) : il le verra dans sa conversation.'}`);
     } else {
-      const f = off.dataset.membreOffrir;
-      await conf({ action: 'live_outil_membre_formule', ref: m.ref, formule: f });
+      const f = off.dataset.membreOffrir, mois = Number(off.dataset.mois) || 1;
+      await conf({ action: 'live_outil_membre_formule', ref: m.ref, formule: f, mois });
       await voirMembre(m.ref);
-      ditMembre(f ? `Formule ${NOM_FORMULE[f]} offerte à ${m.prenom || `n° ${m.ref}`}. Il ne le sait pas encore : un message est prêt, à toi de l’envoyer.` : 'Formule offerte reprise.');
+      ditMembre(f ? `Formule ${NOM_FORMULE[f]} offerte à ${m.prenom || `n° ${m.ref}`} pour ${mois} mois. Il ne le sait pas encore : un message est prêt, à toi de l’envoyer.` : 'Formule offerte reprise.');
       const zone = $('[data-membre-texte]');
-      if (f && zone && !zone.value) zone.value = `Bonne nouvelle : je t’offre la formule ${NOM_FORMULE[f]}. Elle est déjà active sur ton compte.`;
+      if (f && zone && !zone.value) zone.value = `Bonne nouvelle : je t’offre la formule ${NOM_FORMULE[f]} pendant ${mois} mois. Elle est déjà active sur ton compte.`;
     }
   } catch (err) { erreurMembre(err); }
   b.disabled = false;
@@ -1024,7 +1024,7 @@ function rendreDetail(d) {
     <div class="tdb-carte"><h3 style="margin-top:0"><svg class="ico" aria-hidden="true"><use href="/icones.svg#gift"/></svg> Offrir</h3>
       <p class="aide">Reste à utiliser : ${d.credits.match} match(s), ${d.credits.speed_dating} soirée(s), ${d.credits.coaching} coaching(s). La personne est prévenue.</p>
       <form class="fiche-offrir" data-offrir>
-        <label>Quoi<select name="quoi"><option value="match">Match</option><option value="speed_dating">Speed dating</option><option value="coaching">Coaching</option><option value="produit">Produit</option>${(d.annonces || []).length ? `<option value="formule_passion">Formule Passion</option><option value="formule_prestige">Formule Prestige</option>${d.formule_offerte ? '<option value="formule_">Reprendre la formule offerte</option>' : ''}` : ''}</select></label>
+        <label>Quoi<select name="quoi"><option value="match">Match</option><option value="speed_dating">Speed dating</option><option value="coaching">Coaching</option><option value="produit">Produit</option>${(d.annonces || []).length ? `${[1, 2, 3].map((n) => `<option value="formule_passion_${n}">Passion · ${n} mois</option>`).join('')}${[1, 2, 3].map((n) => `<option value="formule_prestige_${n}">Prestige · ${n} mois</option>`).join('')}${d.formule_offerte ? '<option value="formule_">Reprendre la formule offerte</option>' : ''}` : ''}</select></label>
         <label data-offrir-nombre>Combien<select name="quantite">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => `<option>${n}</option>`).join('')}</select></label>
         <label data-offrir-produit hidden>Produit<select name="product_id">${(d.produits || []).map((p) => `<option value="${esc(p.id)}" data-numerique="${p.product_type === 'digital' ? '1' : ''}">${esc(p.name)}${Number.isInteger(p.stock_qty) ? ` (stock ${p.stock_qty})` : ''}</option>`).join('')}</select></label>
         <div data-offrir-adresse hidden><label>Adresse<input name="line1" maxlength="200"></label><label>Code postal<input name="postal_code" maxlength="20"></label><label>Ville<input name="city" maxlength="100"></label><label>Pays<input name="country" maxlength="60" value="France"></label></div>
@@ -1101,11 +1101,12 @@ $('[data-compte-detail]').addEventListener('submit', async (e) => {
   // Offrir une formule depuis la fiche (16 nov. 2026 : « dans la fiche, on ne peut pas donner des formules »).
   // Même chemin que la fiche membre de l'outil, puis la personne est prévenue par un message.
   if (quoi.startsWith('formule_')) {
-    const formule = quoi.slice(8), ref = detailCourant.annonces?.[0]?.ref, nom = { passion: 'Passion', prestige: 'Prestige' }[formule];
+    // Un cadeau dure 1, 2 ou 3 mois (Lamia, 17 nov. 2026 : « ce n'est pas à l'infini »).
+    const [formule = '', mois = '1'] = quoi.slice(8).split('_'), ref = detailCourant.annonces?.[0]?.ref, nom = { passion: 'Passion', prestige: 'Prestige' }[formule];
     try {
-      await conf({ action: 'live_outil_membre_formule', ref, formule });
-      if (formule) await conf({ action: 'live_outil_membre_ecrire', ref, texte: `Bonne nouvelle : je t’offre la formule ${nom}. Elle est déjà active sur ton compte. Lamia` }).catch(() => null);
-      message(formule ? `Formule ${nom} offerte, la personne est prévenue.` : 'Formule offerte reprise.');
+      await conf({ action: 'live_outil_membre_formule', ref, formule, mois: Number(mois) });
+      if (formule) await conf({ action: 'live_outil_membre_ecrire', ref, texte: `Bonne nouvelle : je t’offre la formule ${nom} pendant ${mois} mois. Elle est déjà active sur ton compte. Lamia` }).catch(() => null);
+      message(formule ? `Formule ${nom} offerte pour ${mois} mois, la personne est prévenue.` : 'Formule offerte reprise.');
       chargerDetail({ user_id: detailCourant.compte.id });
     } catch (err) { st.textContent = { injoignable: 'Cette personne n’a pas d’email : impossible de lui offrir une formule.', not_found: 'Profil introuvable.', offre_moderateur: 'C’est un modérateur : sa formule se gère dans « Modérateurs ».' }[err.code] || 'Ça n’a pas abouti. Réessaie dans un instant.'; }
     return;
