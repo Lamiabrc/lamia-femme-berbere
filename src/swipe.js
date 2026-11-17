@@ -254,8 +254,10 @@ function boutonAbo(formule, algerie) {
 // Plus de match disponible : le live, et les formules pour celles et ceux qui peuvent payer en ligne.
 function quotaAtteint({ algerie, formule } = {}) {
   vibrer(80);
-  if (algerie || window.LFB_PLAY) return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg></p><h2>Viens me voir en live</h2><p>Tu as utilisé ton match. Pour en avoir d’autres, <strong>viens soutenir le live de Lamia</strong>, du lundi au vendredi à 20 h : elle peut t’offrir un match, une fois toutes les 2 semaines.</p><p class="po-actions"><a class="po-btn-verre" href="/salon/">Voir le live</a></p>`);
-  return fenetre(`<p class="swipe-match-coeurs" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg></p><h2>Tes matchs disponibles sont utilisés</h2><p>Prends <strong>une place de match en plus à 5 €</strong>, viens au <strong>live de Lamia</strong>, du lundi au vendredi à 20 h (1 match offert toutes les 2 semaines), ou choisis une formule : 3 matchs en cours avec Passion, 10 avec Prestige.</p><p class="po-actions"><a class="po-btn-verre" href="/salon/">Voir le live</a><a class="po-btn-verre" href="/abonnement/">Voir les formules</a></p>`);
+  // Document de règles (17 nov. 2026) : matchs illimités, seul le nombre en même temps change ; plus de match offert en live.
+  const ico = '<p class="swipe-match-coeurs" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg></p>';
+  if (algerie || window.LFB_PLAY) return fenetre(`${ico}<h2>Ton match est en cours</h2><p>Un match à la fois. Dès qu’il se termine, un autre peut commencer.</p>`);
+  return fenetre(`${ico}<h2>Tes places de match sont prises</h2><p>Termine un match en cours, prends <strong>une place de match en plus à 5 €</strong>, ou passe à Passion (3 en même temps) ou Prestige (10).</p><p class="po-actions"><a class="po-btn-verre" href="/abonnement/">Voir les formules</a></p>`);
 }
 // Bloquer ou signaler le profil affiché. Bloquer le retire tout de suite, et la personne n'en sait rien.
 function moderer(ref) {

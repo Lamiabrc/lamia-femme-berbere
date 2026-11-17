@@ -3,7 +3,7 @@
 // le prix payé est toujours relu ici côté serveur, jamais repris du navigateur.
 export const FORMULES = [
   { id: 'decouverte', nom: 'Découverte', mois: 0, accroche: 'Pour commencer, sans rien payer',
-    avantages: ['Ton profil confié à Lamia, vérifié et affiché anonymement', 'Swipe sans limite, et tu peux revenir sur le dernier profil', 'Matchs gratuits, 1 à la fois : dès qu’il se termine, un autre peut commencer', '7 jours de discussion avec ton match, puis vous échangez vos numéros', 'Le nombre de personnes qui t’ont choisi·e'],
+    avantages: ['Ton profil vérifié et affiché anonymement', 'Swipe sans limite, et tu peux revenir sur le dernier profil', 'Matchs gratuits, 1 à la fois : dès qu’il se termine, un autre peut commencer', '7 jours de discussion avec ton match, puis vous échangez vos numéros', 'Le nombre de personnes qui t’ont choisi·e'],
     mises: 1, speedDatings: 0, swipesJour: null, matchs: 1, discussionJours: 7, retourSwipe: 1 },
   { id: 'passion', nom: 'Passion', mois: 900, accroche: 'Le choix des cœurs sérieux', vedette: true,
     avantages: ['Matchs illimités, 3 en cours en même temps', 'Seconde chance : après un cœur refusé, tu peux renvoyer ta demande, 2 fois par profil', 'Revenir en arrière dans le swipe, jusqu’à 10 profils', 'Qui t’a choisi·e : les profils qui t’ont swipé·e, en tête de ta pile', 'La photo de ton match, s’il ou elle l’accepte', '1 speed dating par mois inclus', '14 jours de discussion avec ton match, au lieu de 7', '1 cœur avec message chaque mois', 'Tout ce que contient Découverte'],
@@ -30,7 +30,7 @@ export const UNITES = [
   { id: 'qui_choisi', nom: 'Voir qui t’a choisi·e', prix: 200, heures: 24, depuisEspace: true, texte: 'Les numéros anonymes des profils qui t’ont choisi·e, en tête de ton swipe, pendant 24 heures.' },
   { id: 'coeur_message', nom: 'Cœur avec message', prix: 200, depuisEspace: true, lien: '/rencontres/swipe/', texte: 'Ton cœur arrive avec une phrase de toi : ton profil passe en tête de sa pile, ta phrase affichée. Anonyme, numéros et liens masqués. Depuis le swipe.' },
   // Inviter Lamia dans sa discussion de match, comme une wali (Lamia, 16 nov. 2026).
-  { id: 'inviter_lamia', nom: 'Inviter Lamia dans votre discussion', prix: 2000, depuisEspace: true, texte: 'Lamia rejoint votre discussion, comme une wali : elle vous lit et vous conseille, tous les deux. Depuis ta discussion, dans Mon espace.' },
+  { id: 'inviter_lamia', nom: 'Inviter Lamia dans votre discussion', prix: 2000, horsVente: true, depuisEspace: true, texte: 'Lamia rejoint votre discussion, comme une wali : elle vous lit et vous conseille, tous les deux. Depuis ta discussion, dans Mon espace.' },
   { id: 'photo_match', nom: 'La photo de ton match', prix: 300, heures: 1, depuisEspace: true, texte: 'Visible pendant 1 heure, si ton match accepte de la transmettre. Depuis Mon espace, pendant le match.' },
 ];
 // Visuel de chaque prestation de coaching.

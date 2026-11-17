@@ -254,20 +254,13 @@ test('Passion : 3 matchs en cours ; finir l’un garde les autres et libère une
   assert.equal(nina.en_match, false); // une place libre, les autres matchs continuent
   assert.deepEqual(db.annonce_interets.filter((i) => i.statut === 'mis_en_relation').map((i) => i.cible_ref).sort(), [100003, 100005]);
 });
-test('match offert en live : un seul toutes les 2 semaines', async () => {
+test('match offert en live : retiré (matchs illimités)', async () => {
   const { db, ctx } = base({ annonces: [annonceNina()] });
   const lamia = { ...ctx(NINA), admin: true };
-  const offrir = () => handleAnnonces('annonce_moderer', { annonce_id: UUID_NINA, decision: 'bonus_match' }, lamia);
   const a = db.annonces[0]; a.id = UUID_NINA;
-  assert.equal((await offrir()).status, 200);
-  assert.equal(a.matchs_bonus, 1);
-  const refus = await offrir();
-  assert.equal(refus.status, 409);
-  assert.equal((await refus.json()).error, 'match_live_trop_tot');
-  assert.equal(a.matchs_bonus, 1);
-  a.match_live_at = '2026-10-20T11:00:00Z'; // il y a plus de 14 jours
-  assert.equal((await offrir()).status, 200);
-  assert.equal(a.matchs_bonus, 2);
+  const r = await handleAnnonces('annonce_moderer', { annonce_id: UUID_NINA, decision: 'bonus_match' }, lamia);
+  assert.equal(r.status, 410);
+  assert.ok(!a.matchs_bonus);
 });
 
 test('swipe : les personnes qui ont un compte passent d’abord, même moins bien notées', async () => {
