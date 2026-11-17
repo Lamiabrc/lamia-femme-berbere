@@ -148,3 +148,16 @@ test('une personne choisie sans compte voit l’annonce anonyme de celle qui l�
   const faux = await handleAnnonces('annonce_fiche_outil', { n: '5020', t: 'faux' }, ctx);
   assert.equal(faux.status, 403);
 });
+
+test('liste publique : un profil du site est servi avec ses critères recherchés (panne du 17 nov. 2026)', async () => {
+  const { ctx } = monde();
+  const site = { ref: 216, genre: 'femme', birth_date: '1990-01-01', pays: 'France', situation: 'Célibataire', profil: 'Sérieuse.', recherche: 'Un homme sérieux.', age_min: 30, age_max: 45, published_at: '2026-11-10T10:00:00Z', matching: { religion: 'Islam', pratique: 'Pratiquante', niveauEtudeCategorie: 'Bac+3', religionRecherche: 'Islam', origineRechercheTags: ['Kabyle'] } };
+  const lire = ctx.read;
+  ctx.read = async (u) => (u.startsWith('/rest/v1/annonces?status=eq.publiee') ? [site] : lire(u));
+  const r = await handleAnnonces('annonces_publiques', {}, ctx);
+  assert.equal(r.status, 200);
+  const j = await r.json();
+  const a = j.annonces.find((x) => x.ref === 216);
+  assert.ok(a, 'le profil du site est dans la liste');
+  assert.equal(a.cherche.religion, 'Islam');
+});
