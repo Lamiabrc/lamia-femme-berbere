@@ -429,9 +429,9 @@ ${SWIPE_INVITE}
     <h2>Comment ça marche</h2>
     <ol>
       <li><strong>Tu crées ton profil</strong><span>En 5 minutes : qui tu es, qui tu cherches, 2 photos. Rien n’est publié avec ton nom.</span></li>
-      <li><strong>Lamia vérifie</strong><span>Les faux profils n’entrent pas. Avec ta pièce d’identité (facultative), ton profil gagne le badge « vérifié avec pièce d’identité ».</span></li>
-      <li><strong>Elle cherche pour toi</strong><span>Son outil de matching compare les profils, et Lamia choisit avec son regard.</span></li>
-      <li><strong>Elle vous présente</strong><span>Si vous êtes d’accord tous les deux, elle vous met en contact. C’est gratuit.</span></li>
+      <li><strong>Ton profil est vérifié</strong><span>Les faux profils n’entrent pas. Pièce d’identité facultative : elle donne le badge « vérifié ».</span></li>
+      <li><strong>Tu swipes</strong><span>Un cœur pour qui te plaît. Ceux qui te correspondent passent en premier.</span></li>
+      <li><strong>Deux oui, c’est un match</strong><span>Une discussion privée s’ouvre. C’est gratuit.</span></li>
     </ol>
     ${guideTroisBoutons()}
     <p class="po-actions"><a class="po-btn" data-cta-profil href="/rencontres/#confier"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> <span>Créer mon profil ou connexion</span></a></p>
@@ -772,7 +772,7 @@ page(
     <li><strong>Ton salon est confirmé</strong><span>Dès qu’il y a assez de femmes et d’hommes dans un secteur, Lamia fixe la date et tu es prévenu·e. Tu reçois aussi un rappel le jour même, une heure avant, puis au démarrage.</span></li>
     <li><strong>Tu entres dans le grand salon</strong><span>À l’heure dite, Lamia accueille tout le monde et ouvre la soirée.</span></li>
     <li><strong>Tu fais connaissance</strong><span>Des tête-à-tête de quelques minutes, au son d’une cloche. Les cavaliers rencontrés s’inscrivent dans ton carnet de bal.</span></li>
-    <li><strong>Tu choisis qui revoir</strong><span>En privé, dans ton carnet. Si le souhait est réciproque, Lamia vous présente.</span></li>
+    <li><strong>Tu choisis qui revoir</strong><span>En privé, dans ton carnet. Si le souhait est réciproque, vous êtes mis en relation.</span></li>
   </ol>
 </section>
 
@@ -1639,7 +1639,7 @@ page(
   '/rencontres/',
   layout({
     title: 'Profils kabyles vérifiés · Les Rencontres de Lamia',
-    description: 'Parcours les profils kabyles vérifiés par Lamia, de façon anonyme. France, Algérie, Maghreb, Canada, Europe. Tu choisis, elle vous présente.',
+    description: 'Parcours les profils kabyles vérifiés par Lamia, de façon anonyme. France, Algérie, Maghreb, Canada, Europe. Deux oui font un match.',
     path: '/rencontres/',
     room: roomBySlug.patio,
     scripts: ['/assets/annonces.js', '/assets/swipe-accueil.js'],
@@ -1651,7 +1651,7 @@ ${SWIPE_INVITE}
     <div class="po-hero-texte">
       <p class="po-eyebrow">Les Rencontres de Lamia</p>
       <h1 id="po-titre">Profils kabyles vérifiés : comment ça marche</h1>
-      <p class="po-sub">Tu crées ton profil, Lamia vérifie, cherche et vous présente.</p>
+      <p class="po-sub">Tu crées ton profil, tu swipes, et deux oui font un match.</p>
       <p class="po-actions"><button type="button" class="po-btn" data-annonce-ouvrir data-cta-profil aria-expanded="false"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> <span>Créer mon profil ou connexion</span></button><a class="po-btn-verre" href="#profils-anonymes">Voir les profils</a></p>
     </div>
     <figure class="po-lamia">
@@ -1667,9 +1667,9 @@ ${SWIPE_INVITE}
     <summary><h2>Comment ça marche</h2></summary>
     <ol>
       <li><strong>Tu crées ton profil</strong><span>En 5 minutes : qui tu es, qui tu cherches, 2 photos. Ton identité n’est jamais publiée.</span></li>
-      <li><strong>Lamia vérifie</strong><span>Elle vérifie ton profil. Son outil compare les profils, et c’est elle qui choisit. Ta pièce d’identité est facultative : si tu la donnes, ton profil porte le badge renforcé.</span></li>
-      <li><strong>Tu sais combien te correspondent</strong><span>Lamia te dit avec combien de personnes tu pourrais correspondre. Personne ne sait qui matche avec qui.</span></li>
-      <li><strong>Lamia vous présente</strong><span>Si vous êtes d’accord tous les deux, elle vous met en contact. Ton numéro reste chez elle jusque-là. C’est gratuit.</span></li>
+      <li><strong>Ton profil est vérifié</strong><span>Les faux profils n’entrent pas. Pièce d’identité facultative : elle donne le badge « vérifié ».</span></li>
+      <li><strong>Tu swipes</strong><span>Un cœur pour qui te plaît. Ceux qui te correspondent passent en premier. Personne ne sait qui matche avec qui.</span></li>
+      <li><strong>Deux oui, c’est un match</strong><span>Une discussion privée s’ouvre. Ton numéro reste caché jusqu’à ce que tu le donnes. C’est gratuit.</span></li>
     </ol>
     ${guideTroisBoutons()}
     <p class="po-actions"><button type="button" class="po-btn" data-annonce-ouvrir data-cta-profil aria-expanded="false"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> <span>Créer mon profil ou connexion</span></button></p>
@@ -1680,7 +1680,7 @@ ${SWIPE_INVITE}
       <li><strong>Mon nom est-il visible ?</strong><span>Non. Sur les profils, on ne voit ni prénom, ni photo, ni contact : seulement un numéro de profil.</span></li>
       <li><strong>Pourquoi 2 photos ?</strong><span>Lamia en a besoin pour vérifier ton profil et écarter les faux profils. Tes photos ne s’affichent pas sur les profils publics.</span></li>
       <li><strong>La pièce d’identité est-elle obligatoire ?</strong><span>Non, elle est facultative. Si tu la donnes, ton profil porte le badge renforcé.</span></li>
-      <li><strong>Que se passe-t-il quand nous sommes d’accord tous les deux ?</strong><span>Lamia vous présente, et une discussion privée de 7 jours s’ouvre dans votre espace. Vous échangez vos numéros ensuite.</span></li>
+      <li><strong>Que se passe-t-il quand nous sommes d’accord tous les deux ?</strong><span>C’est un match : une discussion privée de 7 jours s’ouvre dans votre espace. Vous échangez vos numéros ensuite.</span></li>
       <li><strong>Le site est-il réservé aux Kabyles ?</strong><span>Non. Lamia est marieuse kabyle, et les rencontres sont aussi ouvertes aux Chaouis, aux Touaregs, aux autres Amazighs et aux personnes d’autres origines. Chacun indique son origine sur son profil.</span></li>
       <li><strong>D’où viennent les profils ?</strong><span>De France, d’Algérie, du Canada, d’Europe et d’ailleurs. <a class="text-link" href="/rencontre-kabyle-canada/">Canada</a> · <a class="text-link" href="/rencontre-kabyle-algerie/">Algérie</a> · <a class="text-link" href="/rencontre-kabyle-europe/">Belgique et Europe</a></span></li>
       <li><strong>Combien ça coûte ?</strong><span>Rien : ton profil et tes matchs sont gratuits, 1 match à la fois. Pour aller plus vite, <a class="text-link" href="/abonnement/">prends une formule</a>.</span></li>
@@ -1788,7 +1788,7 @@ page(
   <div class="patio-etapes">
     <h2>Questions fréquentes</h2>
     <ol>
-      <li><strong>C’est quoi, un match ?</strong><span>Lamia te propose une personne qui te correspond vraiment. Si vous êtes d’accord tous les deux, elle vous met en contact. Ton numéro reste chez elle jusque-là.</span></li>
+      <li><strong>C’est quoi, un match ?</strong><span>Vous vous êtes choisis tous les deux. Une discussion privée s’ouvre ; ton numéro reste caché jusqu’à ce que tu le donnes.</span></li>
       <li><strong>Plusieurs matchs en même temps, ça veut dire quoi ?</strong><span>Tu peux avoir 1 match en cours avec Découverte, 3 avec Passion et 10 avec Prestige. Quand tu mets fin à un match, une place se libère.</span></li>
       <li><strong>Comment se passe le coaching ?</strong><span>Dans ton espace, tu choisis un créneau parmi ceux ouverts par Lamia : une visio de 15 minutes, non enregistrée, incluse chaque mois avec Prestige ou à 15 € à l’unité. Il existe aussi un coaching de 30 minutes à 39 €, avec une recherche de match faite en direct par Lamia, et « Sauver mon couple », 1 heure à deux ou seul·e, à 89 €. Tu peux annuler jusqu’à 24 heures avant et choisir un autre créneau.</span></li>
       <li><strong>Et les speed datings inclus ?</strong><span>Ta place aux soirées de speed dating en ligne de ton salon, dans la limite indiquée chaque mois. Lamia la note quand tu t’inscris.</span></li>
