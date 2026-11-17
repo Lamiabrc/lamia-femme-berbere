@@ -1825,8 +1825,9 @@ page(
     path: '/rencontres/swipe/',
     room: roomBySlug.patio,
     scripts: ['/assets/swipe.js'],
-    body: `<div class="po-app swipe-page"><header class="swipe-tete">
-  <h1><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Swipe</h1>
+    body: `<div class="po-app swipe-page tayri-celib"><header class="swipe-tete">
+  <h1 class="tayri-hero"><img data-tayri-hero src="/images/celib/hero-femme.webp" width="817" height="400" alt="TAYRI · Mon espace célibataire · Trouver la bonne personne, en douceur"></h1>
+  <nav class="tayri-onglets" aria-label="Mon espace célibataire"><a href="/rencontres/swipe/" aria-current="page"><img data-tayri-img="decouvrir" src="/images/celib/onglet-decouvrir-femme.webp" width="96" height="96" alt=""><span>Découvrir</span></a><a href="/mon-espace/#interets"><img data-tayri-img="matchs" src="/images/celib/onglet-matchs-femme.webp" width="96" height="96" alt=""><span>Mes matchs</span></a><a href="/mon-espace/#discussion"><img data-tayri-img="discussions" src="/images/celib/onglet-discussions-femme.webp" width="96" height="96" alt=""><span>Discussions</span></a><a href="/salon/"><img data-tayri-img="lives" src="/images/celib/onglet-lives-femme.webp" width="96" height="96" alt=""><span>Lives</span></a><a href="/mon-espace/#mon-profil"><img data-tayri-img="profil" src="/images/celib/onglet-profil-femme.webp" width="96" height="96" alt=""><span>Mon profil</span></a></nav>
   <details class="swipe-explique"><summary>Comment ça marche ?</summary><p>À droite (cœur) s’il t’intéresse, à gauche (croix) sinon, sans limite. Ton identité reste secrète : on ne voit que des numéros de profil. Si vous vous choisissez tous les deux, Lamia est prévenue et vous met en relation.</p></details>
 </header>
 <div class="swipe-app">
@@ -1840,6 +1841,8 @@ page(
   ${SWIPE_DEFS}
   <div class="swipe-pile" data-swipe><p class="annonce-vide">Les profils arrivent…</p></div>
   <div class="swipe-boutons" data-swipe-boutons hidden><button type="button" data-swipe-non aria-label="Pas pour moi"><svg class="ico" aria-hidden="true"><use href="/icones.svg#croix"/></svg></button><button type="button" class="swipe-annuler" data-swipe-annuler aria-label="Revenir au profil précédent" disabled><svg class="ico" aria-hidden="true"><use href="/icones.svg#retour"/></svg></button><button type="button" class="swipe-mot" data-swipe-mot aria-label="Envoyer un mot doux"><img class="tayri-coeur-bouton" src="/images/marque/tayri-coeur.webp" alt="" width="30" height="30"></button><button type="button" data-swipe-oui aria-label="Ce profil m’intéresse"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur-plein"/></svg></button></div>
+  <div class="tayri-matchs" data-tayri-matchs hidden></div>
+  <button type="button" class="tayri-offrir" data-tayri-offrir hidden><img data-tayri-img="coeur" src="/images/celib/coeur-femme.webp" width="118" height="102" alt=""><span data-tayri-offrir-texte>Un cœur à offrir ce mois-ci</span><b aria-hidden="true">›</b></button>
   <p class="swipe-aide">La flèche ronde te fait revenir sur ton dernier choix. Sur ordinateur : flèches ← et → du clavier. Ajoute le site à ton écran d’accueil pour l’avoir comme une application.</p>
 </div></div>`,
   })

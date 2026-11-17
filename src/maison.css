@@ -4786,3 +4786,59 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .couple .couple-theme-choix:has(input:checked) { border-color: #b8893e; box-shadow: 0 0 0 2px rgba(184,137,62,.45); background: #fff; }
 .couple .couple-programme { margin: 6px 0 12px; padding: 10px 12px; border-radius: 14px; background: rgba(255,255,255,.55); font-size: .88rem; }
 .couple .couple-programme p { margin: 0 0 6px; }
+
+/* ===== Espace célibataire, d'après les maquettes de Lamia (17 nov. 2026) : bleu nuit pour un homme, rose pour une femme ===== */
+body:is(.tayri-homme, .tayri-femme) { --tc-or: #d9b46a; --tc-or-clair: #f3dca2; }
+body.tayri-homme { --tc-fond: linear-gradient(180deg, #0b1838 0%, #13285a 45%, #0e1d42 100%); --tc-texte: #f6ead2; --tc-doux: #cfd8ec; --tc-verre: rgba(28, 50, 98, .55); --tc-verre-fort: rgba(20, 38, 80, .82); --tc-titre: #f3dca2; }
+body.tayri-femme { --tc-fond: linear-gradient(180deg, #fbe7f0 0%, #f4dcef 45%, #efe1f4 100%); --tc-texte: #6d1830; --tc-doux: #7b5a66; --tc-verre: rgba(255, 255, 255, .55); --tc-verre-fort: rgba(255, 250, 252, .86); --tc-titre: #7a1f35; }
+body:is(.tayri-homme, .tayri-femme) .swipe-page.tayri-celib { background: var(--tc-fond) !important; background-image: var(--tc-fond) !important; color: var(--tc-texte); padding-bottom: 24px; }
+body:is(.tayri-homme, .tayri-femme) main:has(.tayri-celib) { background: var(--tc-fond); }
+.tayri-celib .swipe-tete { display: block !important; max-width: 560px; padding: 0 0 4px !important; text-align: center; }
+.tayri-celib .tayri-hero { margin: 0 !important; line-height: 0; }
+.tayri-celib .tayri-hero img { width: 100%; height: auto; display: block; -webkit-mask-image: linear-gradient(180deg, #000 82%, transparent); mask-image: linear-gradient(180deg, #000 82%, transparent); }
+.tayri-celib .swipe-tete > nav.tayri-onglets { display: flex !important; justify-content: space-between; gap: 6px; padding: 0 10px; margin: -6px auto 10px; background: none !important; border: 0 !important; }
+.tayri-celib .tayri-onglets a { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 2px 8px; border-radius: 22px; text-decoration: none; background: var(--tc-verre) !important; border: 1px solid rgba(217, 180, 106, .45) !important; backdrop-filter: blur(6px); }
+.tayri-celib .tayri-onglets a[aria-current] { background: linear-gradient(180deg, #f6e2ae, #d9b46a) !important; border-color: #f3dca2 !important; box-shadow: 0 6px 18px rgba(217, 180, 106, .45); }
+.tayri-celib .tayri-onglets img { width: min(56px, 15vw); height: auto; aspect-ratio: 1; border-radius: 50%; object-fit: cover; border: 2px solid var(--tc-or); box-shadow: 0 4px 10px rgba(0, 0, 0, .25); }
+.tayri-celib .swipe-tete .tayri-onglets span { font-family: var(--serif, Georgia, serif); font-size: .72rem; line-height: 1.1; color: var(--tc-texte) !important; -webkit-text-fill-color: var(--tc-texte); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.tayri-celib .swipe-tete .tayri-onglets a[aria-current] span { color: #4a1022 !important; -webkit-text-fill-color: #4a1022; font-weight: 600; }
+.tayri-celib .swipe-tete > details { display: inline-block; margin: 0 auto; }
+body:is(.tayri-homme, .tayri-femme) .tayri-celib .swipe-tete > details > summary { background: var(--tc-verre) !important; border: 1px solid rgba(217, 180, 106, .5) !important; color: var(--tc-texte) !important; -webkit-text-fill-color: var(--tc-texte); padding: 6px 14px; font-size: .9rem; }
+body:is(.tayri-homme, .tayri-femme) .tayri-celib .swipe-tete > details p { color: var(--tc-texte) !important; -webkit-text-fill-color: var(--tc-texte); background: var(--tc-verre-fort) !important; border-radius: 14px; padding: 10px 12px; }
+/* Bandeaux et textes au-dessus de la pile */
+body:is(.tayri-homme, .tayri-femme) .tayri-celib :is(.swipe-antighost, .swipe-info) { background: var(--tc-verre) !important; border: 1px solid rgba(217, 180, 106, .4) !important; color: var(--tc-texte) !important; border-radius: 16px; backdrop-filter: blur(6px); }
+body:is(.tayri-homme, .tayri-femme) .tayri-celib :is(.swipe-antighost, .swipe-info) * { color: var(--tc-texte) !important; -webkit-text-fill-color: var(--tc-texte); }
+body:is(.tayri-homme, .tayri-femme) .tayri-celib :is(.swipe-compteur, .swipe-aide, .swipe-adresse) { color: var(--tc-doux) !important; -webkit-text-fill-color: var(--tc-doux); }
+/* La carte du profil : verre et liseré doré */
+body:is(.tayri-homme, .tayri-femme) .tayri-celib .swipe-carte { background: var(--tc-verre-fort) !important; border: 1.5px solid var(--tc-or) !important; border-radius: 24px !important; box-shadow: 0 0 0 1px rgba(243, 220, 162, .35) inset, 0 18px 40px -18px rgba(0, 0, 0, .55) !important; backdrop-filter: blur(10px); }
+body:is(.tayri-homme, .tayri-femme) .tayri-celib .swipe-resume :is(h2, .swipe-numero) { color: var(--tc-titre) !important; -webkit-text-fill-color: var(--tc-titre); font-family: var(--serif, Georgia, serif); }
+body:is(.tayri-homme, .tayri-femme) .tayri-celib .swipe-resume p:not(.swipe-numero) { color: var(--tc-texte) !important; -webkit-text-fill-color: var(--tc-texte); }
+body:is(.tayri-homme, .tayri-femme) .tayri-celib .swipe-voir { background: linear-gradient(180deg, #f6e2ae, #d9b46a) !important; color: #4a1022 !important; -webkit-text-fill-color: #4a1022; border: 0 !important; border-radius: 999px; }
+/* Les boutons ronds : croix et retour en verre ivoire, cœur bordeaux brillant au centre */
+body:is(.tayri-homme, .tayri-femme) .tayri-celib .swipe-boutons button { background: radial-gradient(circle at 35% 28%, #fffdf7, #efe3cf 70%, #d8c39b) !important; border: 2px solid var(--tc-or) !important; box-shadow: 0 8px 22px -8px rgba(0, 0, 0, .5), inset 0 2px 0 rgba(255, 255, 255, .8) !important; }
+body:is(.tayri-homme, .tayri-femme) .tayri-celib .swipe-boutons :is([data-swipe-non], .swipe-annuler) .ico { color: #8a6a3a !important; }
+body:is(.tayri-homme, .tayri-femme) .tayri-celib .swipe-boutons [data-swipe-oui] { width: 84px; height: 84px; background: radial-gradient(circle at 36% 26%, #e0566e 0, #a3263f 35%, #6e1428 80%, #4d0b1c 100%) !important; border: 3px solid var(--tc-or) !important; color: #f3dca2 !important; box-shadow: 0 10px 30px -6px rgba(110, 20, 40, .7), inset 0 3px 0 rgba(255, 255, 255, .35) !important; }
+/* Matchs en cours et cœur à offrir */
+.tayri-matchs, .tayri-offrir { display: flex; align-items: center; gap: 14px; width: 100%; box-sizing: border-box; margin: 16px 0 0; padding: 14px 16px; border-radius: 22px; background: var(--tc-verre, rgba(255,255,255,.6)); border: 1px solid rgba(217, 180, 106, .6); color: var(--tc-texte, #2F2B3D); backdrop-filter: blur(8px); box-shadow: 0 10px 24px -16px rgba(0, 0, 0, .5); }
+.tayri-matchs[hidden], .tayri-offrir[hidden] { display: none; }
+.tayri-matchs > div { flex: 1; min-width: 0; }
+.tayri-matchs p { margin: 0 0 8px; font-family: var(--serif, Georgia, serif); font-size: 1.05rem; color: var(--tc-texte, #2F2B3D); }
+.tayri-matchs .tayri-matchs-plein { font-family: inherit; font-size: .85rem; margin: 8px 0 0; color: var(--tc-doux, #555); }
+.tayri-matchs-coeurs { font-size: 1.4rem; letter-spacing: 2px; color: #b3203c; text-shadow: 0 0 6px rgba(243, 220, 162, .6); }
+.tayri-jauge { height: 12px; border-radius: 999px; background: rgba(255, 255, 255, .35); border: 1.5px solid var(--tc-or, #d9b46a); overflow: hidden; }
+.tayri-jauge i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(180deg, #d4405c, #8e1730); }
+.tayri-offrir { cursor: pointer; text-align: left; font: inherit; }
+.tayri-offrir img { width: 64px; height: auto; flex: none; }
+.tayri-offrir span { flex: 1; font-family: var(--serif, Georgia, serif); font-style: italic; font-size: 1.2rem; color: var(--tc-texte, #2F2B3D); border-left: 2px solid var(--tc-or, #d9b46a); padding-left: 14px; }
+.tayri-offrir b { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; flex: none; font-size: 1.3rem; background: linear-gradient(180deg, #a3263f, #6e1428); color: #fff; border: 1.5px solid var(--tc-or, #d9b46a); }
+body.tayri-homme .tayri-offrir b { background: rgba(20, 38, 80, .9); }
+body:is(.tayri-homme, .tayri-femme) .tayri-celib .swipe-resume p.swipe-statut { background: rgba(217, 180, 106, .18) !important; color: var(--tc-texte) !important; -webkit-text-fill-color: var(--tc-texte); border: 1px solid rgba(217, 180, 106, .5); }
+body:is(.tayri-homme, .tayri-femme) .tayri-celib .swipe-boutons .swipe-annuler:disabled { opacity: .45; }
+.tayri-offrir span { font-size: 1.08rem; }
+/* Mon espace : ma photo en haut de mon profil, et la photo de mon match quand elle m'est transmise (Lamia, 17 nov. 2026). */
+.espace-avatar { display: flex; align-items: center; gap: 12px; margin: 0 0 12px; }
+.espace-avatar[hidden] { display: none; }
+.espace-avatar img { width: 84px; height: 84px; border-radius: 50%; object-fit: cover; border: 3px solid #d9b46a; box-shadow: 0 6px 18px rgba(0,0,0,.18); -webkit-user-drag: none; }
+.espace-avatar span { font-size: .85rem; opacity: .75; }
+.espace-matchs-liste li:has(.espace-match-avatar) { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.espace-match-avatar { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; border: 2px solid #d9b46a; -webkit-user-drag: none; }

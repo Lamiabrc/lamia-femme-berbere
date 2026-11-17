@@ -12,6 +12,15 @@ const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', PUBLIC
 const zone = document.querySelector('[data-swipe]');
 const compteur = document.querySelector('[data-swipe-compteur]');
 let infosAbo = {}, creditsCoeur = 0;
+// L'espace célibataire d'après les maquettes de Lamia (17 nov. 2026) : bleu nuit pour un homme, rose pour une femme (le titulaire du compte).
+function theme(genre) {
+  if (!['homme', 'femme'].includes(genre)) return;
+  try { localStorage.setItem('lfb-mon-genre', genre); } catch { /* */ }
+  document.body.classList.toggle('tayri-homme', genre === 'homme'); document.body.classList.toggle('tayri-femme', genre === 'femme');
+  const h = document.querySelector('[data-tayri-hero]'); if (h) h.src = `/images/celib/hero-${genre}.webp`;
+  document.querySelectorAll('[data-tayri-img]').forEach((i) => { i.src = i.dataset.tayriImg === 'coeur' ? `/images/celib/coeur-${genre}.webp` : `/images/celib/onglet-${i.dataset.tayriImg}-${genre}.webp`; });
+}
+try { theme(localStorage.getItem('lfb-mon-genre')); } catch { /* */ }
 let tour = 1, tourAnnonce = false, dejaCharge = false, enRecharge = false, envoi = Promise.resolve(), tous = [], profils = [], token = null, occupe = false, quota = { limite: null, restants: null }, choisi = { nombre: 0, refs: [] }, matchs = { actifs: 0, limite: 1, formule: 'decouverte' }, coeurs = 0;
 const bandeau = document.querySelector('[data-swipe-infos]');
 
@@ -148,7 +157,11 @@ function infos() {
   if (choisi.nombre) lignes.push(choisi.refs.length
     ? `<p class="swipe-info is-choisi"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur-plein"/></svg> <strong>${choisi.nombre} personne${choisi.nombre > 1 ? 's t’ont' : ' t’a'} choisi·e</strong> : ${choisi.nombre > 1 ? 'elles sont' : 'elle est'} en tête de ta pile, marquée${choisi.nombre > 1 ? 's' : ''}.</p>`
     : `<p class="swipe-info is-choisi"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur-plein"/></svg> <strong>${choisi.nombre} personne${choisi.nombre > 1 ? 's t’ont' : ' t’a'} choisi·e</strong> <span class="swipe-flou" aria-hidden="true">n° ••• · n° •••</span><br><a href="/abonnement/?formule=passion">Découvre qui avec la formule Passion</a></p>`);
-  if (matchs.limite) lignes.push(`<p class="swipe-info${matchs.actifs >= matchs.limite ? ' is-plein' : ''}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur-plein"/></svg> Matchs en cours : <strong>${matchs.actifs} / ${matchs.limite}</strong>${matchs.actifs >= matchs.limite ? ' · tu peux continuer à découvrir les profils, mais plus en choisir pour l’instant' : ''}</p>`);
+  // Matchs en cours : la carte avec sa jauge dorée, comme sur la maquette.
+  const cm = document.querySelector('[data-tayri-matchs]');
+  if (cm) { cm.hidden = !matchs.limite; if (matchs.limite) { const pct = Math.min(100, Math.round((matchs.actifs / matchs.limite) * 100)); cm.innerHTML = `<span class="tayri-matchs-coeurs" aria-hidden="true">${'♥'.repeat(Math.min(matchs.actifs, 10)) || '♡'}</span><div><p>Mes matchs en cours : <strong>${matchs.actifs} sur ${matchs.limite}</strong></p><div class="tayri-jauge" role="progressbar" aria-label="Matchs en cours" aria-valuemin="0" aria-valuemax="${matchs.limite}" aria-valuenow="${matchs.actifs}"><i style="width:${pct}%"></i></div>${matchs.actifs >= matchs.limite ? '<p class="tayri-matchs-plein">Au complet : termine un match dans ton espace pour en commencer un autre.</p>' : ''}</div>`; } }
+  const co = document.querySelector('[data-tayri-offrir]');
+  if (co) { co.hidden = false; co.querySelector('[data-tayri-offrir-texte]').textContent = creditsCoeur > 1 ? `${creditsCoeur} cœurs à offrir ce mois-ci` : creditsCoeur === 1 ? 'Un cœur à offrir ce mois-ci' : 'Offrir un cœur avec message'; }
   if (quota.limite) lignes.push(`<p class="swipe-info">Il te reste <strong>${quota.restants}</strong> profil${quota.restants > 1 ? 's' : ''} à swiper aujourd’hui (${quota.limite} par jour avec ta formule). <a href="/abonnement/">Plus de profils</a></p>`);
   if (profilInvisible) lignes.unshift('<p class="swipe-info is-plein">Ton profil n’est pas terminé : personne ne peut encore te voir. <a href="/mon-espace/#a-completer">Voir ce qu’il manque</a></p>');
   if (tous.length ? !profils.some((x) => !x.revu) : chargeFait) lignes.unshift(`<p class="swipe-info"><strong>Tu as vu tous les profils qui te correspondent et qui te cherchent aussi.</strong> De nouveaux profils arrivent chaque jour. En attendant, tu revois ceux que tu avais passés ; tu peux aussi élargir ta recherche avec « Modifier mon profil ». <a href="/mon-espace/">Mon espace</a></p>`);
@@ -355,6 +368,7 @@ function glisser(el) {
 document.querySelector('[data-swipe-non]').addEventListener('click', () => choisir('non'));
 document.querySelector('[data-swipe-oui]').addEventListener('click', () => choisir('oui'));
 // Cœur avec message (2 €) : une phrase qui part avec le cœur. Sans crédit, on l'achète ; le brouillon est gardé sur ce téléphone.
+document.querySelector('[data-tayri-offrir]')?.addEventListener('click', () => document.querySelector('[data-swipe-mot]')?.click());
 document.querySelector('[data-swipe-mot]')?.addEventListener('click', () => {
   if (occupe || !profils.length) return;
   const ref = profils[0].ref;
@@ -427,6 +441,7 @@ addEventListener('keydown', (e) => { if (document.querySelector('.swipe-fenetre'
     chargeFait = true;
     if (!sincerite) setTimeout(demanderSincerite, 600); // obligatoire : demandée dès l'ouverture du swipe
     creditsCoeur = liste.coeurs_message || 0;
+    theme(liste.genre === 'femme' ? 'homme' : liste.genre === 'homme' ? 'femme' : null);
     retourMax = liste.retour === null ? 0 : (liste.retour || 1); // 0 = sans limite
     if (retourMax && historique.length > retourMax) { historique = historique.slice(-retourMax); garderDernier(); majAnnuler(); }
     boutonAbo(formule, algerie);
