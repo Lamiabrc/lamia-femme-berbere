@@ -236,6 +236,10 @@
     {
       "path": "/api/confidences/",
       "schedule": "0 17 * * *"
+    },
+    {
+      "path": "/api/confidences/?passage=matchs",
+      "schedule": "40 * * * *"
     }
   ]
 }
