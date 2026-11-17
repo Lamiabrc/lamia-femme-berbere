@@ -33,7 +33,7 @@
 [data-accent='rouge'] { --accent: var(--email-rouge); }
 
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; color-scheme: only light; } /* le mode sombre forcé des téléphones rendait les textes illisibles (17 nov. 2026) */
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { transition: none !important; animation: none !important; } }
 body { margin: 0; background: var(--blanc); color: var(--encre); font-family: var(--sans); font-size: 17px; line-height: 1.6; }
 img { max-width: 100%; height: auto; display: block; }
