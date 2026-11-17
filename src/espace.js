@@ -1032,7 +1032,7 @@ async function discussions(session) {
   const finBulle = (d) => {
     const f = d.fin || {};
     if (f.couple) return '<div class="disc-fin is-couple"><p><strong>Vous êtes en couple 💞</strong></p><p><a class="btn btn-ink" href="/notre-couple/">Notre espace de couple</a></p></div>';
-    if (d.dematch || d.close_raison === 'signalee') return '';
+    if (d.dematch || d.close_raison === 'signalee' || d.annulee || (!d.ouverte && d.vide)) return '';
     // On demande aussi à ceux qui ont échangé leurs numéros, et à ceux qui se parlent depuis plus d'une semaine
     // (Passion : 14 jours, Prestige : sans fin — la question vient au bout de 7 jours). Lamia, 16 nov. 2026.
     const bientot = d.ouverte && new Date(d.ferme_at) - Date.now() < 24 * 3600e3;
@@ -1045,7 +1045,7 @@ async function discussions(session) {
       ${f.son_couple ? `<p class="aide">${esc(d.avec)} a dit que vous êtes en couple.</p>` : ''}</div>`;
   };
   const vue = (d) => {
-    const msgs = d.messages.map((m) => `<p class="disc-msg ${m.moi ? 'is-moi' : ''}${m.par_lamia ? ' is-lamia' : m.lamia ? ' is-systeme' : ''}"><span>${m.par_lamia ? '<b class="disc-lamia">Lamia</b>' : ''}${esc(m.texte)}</span><small>${esc(heure(m.le))}</small></p>`).join('') || `<p class="disc-vide">${salut ? `${esc(salut)}, dis` : 'Dis'} bonjour à ${esc(d.avec)}</p>`;
+    const msgs = d.messages.map((m) => `<p class="disc-msg ${m.moi ? 'is-moi' : ''}${m.par_lamia ? ' is-lamia' : m.lamia ? ' is-systeme' : ''}"><span>${m.par_lamia ? '<b class="disc-lamia">Lamia</b>' : ''}${esc(m.texte)}</span><small>${esc(heure(m.le))}</small></p>`).join('') || (d.ouverte ? `<p class="disc-vide">${salut ? `${esc(salut)}, dis` : 'Dis'} bonjour à ${esc(d.avec)}</p>` : '');
     const numeros = d.echange
       ? `<div class="disc-numeros is-ok"><svg class="ico" aria-hidden="true"><use href="/icones.svg#phone"/></svg> Vous avez échangé vos numéros. Celui de ${esc(d.avec)} : <a href="tel:${esc(d.son_numero)}"><strong>${esc(d.son_numero)}</strong></a></div>`
       : d.mon_numero
@@ -1088,7 +1088,7 @@ async function discussions(session) {
     const enCours = liste.filter((d) => d.ouverte && !d.dematch), passes = liste.filter((d) => !d.ouverte || d.dematch);
     el.hidden = !liste.length;
     if (!liste.length) return;
-    const fin = (d) => d.dematch ? `dématché${d.dematch.raison ? ` · ${esc(d.dematch.raison)}` : ''}` : d.echange ? 'numéros échangés' : d.close_raison === 'signalee' ? 'fermé (signalé)' : 'terminé';
+    const fin = (d) => d.dematch ? `dématché${d.dematch.raison ? ` · ${esc(d.dematch.raison)}` : ''}` : d.echange ? 'numéros échangés' : d.close_raison === 'signalee' ? 'fermé (signalé)' : d.annulee ? 'annulé' : 'terminé';
     el.innerHTML = `<h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Mes matchs</h3>
       ${enCours.length ? `<ul class="mm-liste">${enCours.map((d) => `<li><span><strong>${esc(d.avec)}</strong><small>${esc(reste(d))}</small></span><span class="mm-actions"><button type="button" class="btn btn-ink" data-mm-voir="${esc(d.id)}">Voir la discussion</button><button type="button" class="btn btn-line" data-mm-dematcher="${esc(d.id)}">Dématcher</button></span></li>`).join('')}</ul>` : '<p>Aucun match en cours pour l’instant.</p>'}
       ${passes.length ? `<details class="mm-histo"><summary>Historique (${passes.length})</summary><ul>${passes.map((d) => `<li><strong>${esc(d.avec)}</strong> · ${fin(d)}${d.ferme_at ? ` · ${esc(new Date(d.ferme_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }))}` : ''} <button type="button" class="link-button" data-mm-voir="${esc(d.id)}">Relire</button></li>`).join('')}</ul></details>` : ''}`;
@@ -1107,7 +1107,7 @@ async function discussions(session) {
     resume();
     if (!liste.length) return;
     const brouillons = Object.fromEntries([...box.querySelectorAll('[data-disc]')].map((a) => [a.dataset.disc, a.querySelector('textarea')?.value || '']));
-    box.innerHTML = (photosRequises ? '<p class="disc-photos-requises"><strong>Ajoute tes 2 photos pour continuer.</strong> Sans photo validée, tu ne peux plus écrire dans tes discussions. <a class="text-link" href="#mon-profil">Modifier mon profil</a></p>' : '') + liste.map(vue).join('');
+    box.innerHTML = (photosRequises ? '<p class="disc-photos-requises"><strong>Ajoute tes 2 photos pour continuer.</strong> Sans photo validée, tu ne peux plus écrire dans tes discussions. <a class="text-link" href="#mon-profil">Modifier mon profil</a></p>' : '') + liste.filter((d) => d.ouverte || !(d.annulee || d.vide)).map(vue).join('');
     box.querySelectorAll('[data-disc]').forEach((a) => { const t = a.querySelector('textarea'); if (t && brouillons[a.dataset.disc]) t.value = brouillons[a.dataset.disc]; const f = a.querySelector('[data-disc-fil]'); f.scrollTop = f.scrollHeight; });
   };
   const charger = async () => { try { const r = await appelProfil({ action: 'annonce_discussions' }, session); liste = r.discussions || []; photosRequises = Boolean(r.photos_requises); if (document.documentElement.lang !== 'en') { salut = r.adresse || ''; e = r.accord ?? e; const h1 = $('[data-espace-nom]')?.closest('h1'); if (salut && h1) h1.textContent = salut; } afficher(); } catch { /* */ } };
