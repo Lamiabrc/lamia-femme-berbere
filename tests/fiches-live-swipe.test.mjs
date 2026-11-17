@@ -517,3 +517,13 @@ test('dématch en cours (48 h d’au revoir) : pas de nouveau match sans l’acc
   ({ profil } = await lire(await handleAnnonces('annonce_mon_profil', {}, ctx(NINA))));
   assert.equal(profil.matchs.limite, 1);
 });
+
+test('passage de l’heure : un « plus de place » périmé est levé, et l’action tourne sans erreur (17 nov. 2026)', async () => {
+  const { db, ctx } = base({ annonces: [{ ...annonceNina(), en_match: true }] });
+  const r = await handleAnnonces('annonce_matchs_cron', {}, { ...ctx(null), cron: true });
+  assert.equal(r.status, 200);
+  const j = await lire(r);
+  assert.equal(j.ok, true);
+  assert.equal(db.annonces[0].en_match, false);
+  assert.equal((await handleAnnonces('annonce_matchs_cron', {}, ctx(NINA))).status, 403);
+});
