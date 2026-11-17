@@ -591,7 +591,6 @@ async function suivi(el, p) {
   const etat = await etatAbo;
   const a = etat?.abonnement, q = a ? QUOTAS[a.formule] : null, u = etat?.unites || {};
   const s = p.suivi || { mises_total: 0, mises_mois: 0 };
-  const offertesRestantes = Math.max(0, (p.offertes || 1) - s.mises_total);
   // Formules du 15 nov. 2026 : matchs illimités, seul le nombre de matchs en même temps change. Court et à jour.
   const FORMULES = { decouverte: { nom: 'Découverte', prix: 'gratuite', jours: 7, sd: 0 }, passion: { nom: 'Passion', prix: '9 € par mois', jours: 14, sd: 1 }, prestige: { nom: 'Prestige', prix: 'abonnement', jours: null, sd: 2 }, coeur: { nom: 'Cœur', prix: 'ancienne formule', jours: 7, sd: 1 } };
   const cle = a?.formule && FORMULES[a.formule] ? a.formule : (p.matchs?.formule && FORMULES[p.matchs.formule] ? p.matchs.formule : 'decouverte');
@@ -1069,7 +1068,6 @@ async function discussions(session) {
         : '<p class="disc-prenom-lien"><button type="button" class="link-button" data-disc-prenom="partager"><svg class="ico" aria-hidden="true"><use href="/icones.svg#hand"/></svg> Partager mon prénom</button></p>') : ''}
       ${d.dematch ? '' : numeros}
       ${d.son_bloque_photos ? '<p class="disc-photos-requises"><strong>Votre match est bloqué.</strong> Ses photos ont été refusées (ou manquent) : nous attendons sa correction. La discussion reprend dès qu’elles sont validées.</p>' : ''}
-      ${d.ouverte && !d.dematch && !d.lamia_invitee && !window.LFB_PLAY ? `<div class="disc-inviter avec-aide">${boutonService('inviter_lamia', 'Inviter Lamia dans votre discussion', '20 €', 'Inviter Lamia · 20 €', d.id)}${aideQ('Comme une wali : Lamia rejoint votre discussion, vous lit tous les deux et vous conseille avec bienveillance. Ton match voit qu’elle a été invitée.')}</div>` : d.lamia_invitee ? '<p class="disc-lamia-la">Lamia est avec vous dans cette discussion.</p>' : ''}
       ${d.prolongeable && !window.LFB_PLAY && new Date(d.ferme_at) - Date.now() < 72 * 3600e3 ? `<div class="disc-prolonger">${d.ouverte ? '' : '<p>Votre discussion est terminée, mais vous pouvez la rouvrir.</p>'}${boutonService('prolonger_discussion', 'Prolonger la discussion de 7 jours', '3 €', '7 jours de plus · 3 €', d.id)}</div>` : ''}
       ${finBulle(d)}
       ${d.ouverte && !d.dematch ? (dematchOuvert === d.id ? `<form class="disc-dematch" data-disc-dematch-form>

@@ -89,7 +89,7 @@ function afficherFiche(d) {
   }
   if (d.confirme) {
     zone.innerHTML = `${fiche(f)}<div class="confirmer-etat"><p><strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#circle-check"/></svg> Merci, ta fiche est confirmée.</strong> Elle porte maintenant la mention « confirmé » dans les profils de Lamia, toujours anonyme : personne ne voit ton prénom, ton TikTok ni ton numéro.</p>
-      <p>C’est fait ! Tes <strong>3 premières mises en relation sont offertes</strong>.</p>
+      <p>C’est fait ! Tes matchs sont <strong>gratuits et illimités</strong>.</p>
       <p class="confirmer-actions"><button type="button" class="po-btn-verre" data-modifier>Modifier ma fiche</button><button type="button" class="po-btn-verre" data-retirer>Je ne veux plus apparaître</button></p>${formulaire(f)}${effacer}</div>${acces(d)}`;
     monterAcces(d);
     return;

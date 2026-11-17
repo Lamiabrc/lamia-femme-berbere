@@ -377,9 +377,16 @@ async function chargerAnnonces() {
       <p class="cl-statut" role="status" data-annonce-statut></p>
     </article>`;
     // Les profils à valider sont sortis de la liste et placés tout en haut de la page.
-    const aValider = annonces.filter((a) => a.status === 'a_verifier');
+    // Pas de photo, pas de compte (Lamia, 17 nov. 2026) : un profil sans ses 2 photos n'a rien à faire dans « à valider ».
+    // Il attend ses photos et se valide tout seul dès qu'elles arrivent.
+    const deuxPhotos = (a) => !a.photos_refusees_at && (a.medias || []).filter((m) => m.kind === 'photo').length >= 2;
+    const aValider = annonces.filter((a) => a.status === 'a_verifier' && deuxPhotos(a));
+    const attendentPhotos = annonces.filter((a) => a.status === 'a_verifier' && !deuxPhotos(a)).length;
     const haut = $('[data-annonces-a-valider]'), blocHaut = $('[data-a-valider-bloc]');
-    if (haut && blocHaut) { haut.innerHTML = aValider.map(carte).join(''); blocHaut.hidden = !aValider.length; $('[data-n-a-valider]').textContent = aValider.length ? `(${aValider.length})` : ''; }
+    if (haut && blocHaut) {
+      haut.innerHTML = aValider.map(carte).join('') + (attendentPhotos ? `<p class="cl-aide">${attendentPhotos} profil${attendentPhotos > 1 ? 's attendent' : ' attend'} encore ses 2 photos : rien à faire, ${attendentPhotos > 1 ? 'ils se valident' : 'il se valide'} tout seul dès l’envoi.</p>` : '');
+      blocHaut.hidden = !aValider.length && !attendentPhotos; $('[data-n-a-valider]').textContent = aValider.length ? `(${aValider.length})` : '';
+    }
     box.innerHTML = annonces.filter((a) => !(haut && a.status === 'a_verifier')).map(carte).join('');
     // Lien direct vers une annonce (depuis la fiche de l'outil).
     const h = location.hash.slice(1);
