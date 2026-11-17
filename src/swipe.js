@@ -41,6 +41,7 @@ function carte(a) {
     ${a.revu ? '<span class="swipe-ta-choisi">Tu l’as déjà passé : une seconde chance ?</span>' : a.hors_criteres ? '<span class="swipe-ta-choisi"><svg class="ico" aria-hidden="true"><use href="/icones.svg#globe"/></svg> Un peu hors de tes critères</span>' : ''}
     <div class="swipe-resume">
       <svg class="swipe-bijou" viewBox="0 -22 180 276" aria-hidden="true" focusable="false"><use href="#bijou-${femme ? 'femme' : 'homme'}"/></svg>
+      <p class="swipe-numero">Profil n° ${esc(a.ref)}</p>
       <h2>${femme ? 'Une femme' : 'Un homme'}, ${esc(a.age)} ans</h2>
       ${lieu ? `<p class="swipe-lieu">${esc(lieu)}</p>` : ''}
       ${origineLisible(a.origine) ? `<p class="swipe-origine">${esc(origineLisible(a.origine))}</p>` : ''}
