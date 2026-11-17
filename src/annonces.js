@@ -363,7 +363,9 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
       if (medias.length < 2) manque('2 photos de toi', $('[data-medias]', form).closest('label'));
     }
     if (sansReseau() && !telephoneNormal(f.telephone.value)) manque(f.telephone.value.trim() ? 'Ton numéro de téléphone n’est pas valide (mets l’indicatif si tu n’es pas en France)' : 'Ton numéro de téléphone (puisque tu n’as pas de réseau social)', f.telephone);
-    manques.push(...manquesEssentiels(form));
+    // Inscription courte : situation, études, religion et âge recherché sont cachés ici (« plus tard ») ; ils se complètent dans
+    // « Mon espace » avant le premier cœur. Les exiger ici bloquait toutes les inscriptions depuis le 15 nov. 2026.
+    manques.push(...manquesEssentiels(form).filter((x) => x.el && !x.el.closest('[hidden]')));
     if (!f.majeur.checked) manque('La case « J’ai 18 ans ou plus… »', f.majeur.closest('label'));
     if (!f.publication.checked) manque('La case « Je confie mon profil à Lamia… »', f.publication.closest('label'));
     if (identite.length && !f.identite_ok.checked) manque('La case d’accord pour ta pièce d’identité (ou retire la photo)', f.identite_ok.closest('label'));
