@@ -18,7 +18,7 @@ const jour = (iso) => new Date(iso).toLocaleDateString('fr-FR', { weekday: 'shor
 const appel = async (body) => { const { data: { session } } = await supabase.auth.getSession(); token = session?.access_token || token; return api(body, token); };
 const ERREURS = { couple_requis: 'Ça vient avec l’abonnement Couple.', code_invalide: 'Ce code ne marche pas (ou il a expiré). Demande-lui un nouveau code.', complet: 'Cet espace a déjà ses deux membres.', deja_en_couple: 'Tu as déjà un espace de couple.', titre_requis: 'Écris ce que vous allez faire.' };
 
-const invitation = (code) => `Rejoins notre espace de couple 💞 chez Lamia Femme Berbère : ${location.origin}/notre-couple/?code=${code} (code : ${code})`;
+const invitation = (code) => `Rejoins notre espace de couple chez Lamia Femme Berbère : ${location.origin}/notre-couple/?code=${code} (code : ${code})`;
 const AUTOUR = `<section class="couple-carte"><h2>Autour de vous</h2>
   <p class="espace-sans-liens"><a class="btn btn-ink" href="/abonnement/#unite-sauver_couple">Coaching de couple</a> <a class="btn btn-line" href="/salon/">Les lives</a> <a class="btn btn-line" href="/boutique/">La boutique</a> <a class="btn btn-line" href="/confidences/#conversation">Écrire à Lamia</a></p></section>`;
 
@@ -56,7 +56,7 @@ function calendrier(c) {
   return `<div class="cal">
     <div class="cal-tete"><button type="button" class="link-button" data-cal-mois="-1" aria-label="Mois précédent">‹</button><strong>${esc(premier.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }))}</strong><button type="button" class="link-button" data-cal-mois="1" aria-label="Mois suivant">›</button></div>
     <div class="cal-grille">${['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((j) => `<span class="cal-nom">${j}</span>`).join('')}${cases.join('')}</div>
-    ${jourChoisi ? `<div class="cal-detail"><p><strong>${esc(new Date(`${jourChoisi}T12:00:00`).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }))}</strong>${jal[jourChoisi] ? ` · ${esc(jalonsDef[jal[jourChoisi]] || '')} 💍` : ''}</p>${choisis.length ? `<ul class="couple-liste">${choisis.map((a) => `<li>${img(a.type, 'ci-s')}<span><strong>${esc(a.titre)}</strong><small>${esc(a.type_nom)}${a.fait ? ' · fait ♡' : ''}</small></span></li>`).join('')}</ul>` : '<p class="aide">Rien de prévu ce jour-là.</p>'}<p><button type="button" class="btn btn-line" data-cal-ajouter="${jourChoisi}">+ Ajouter ce jour-là</button></p></div>` : ''}
+    ${jourChoisi ? `<div class="cal-detail"><p><strong>${esc(new Date(`${jourChoisi}T12:00:00`).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }))}</strong>${jal[jourChoisi] ? ` · ${esc(jalonsDef[jal[jourChoisi]] || '')}` : ''}</p>${choisis.length ? `<ul class="couple-liste">${choisis.map((a) => `<li>${img(a.type, 'ci-s')}<span><strong>${esc(a.titre)}</strong><small>${esc(a.type_nom)}${a.fait ? ' · fait ♡' : ''}</small></span></li>`).join('')}</ul>` : '<p class="aide">Rien de prévu ce jour-là.</p>'}<p><button type="button" class="btn btn-line" data-cal-ajouter="${jourChoisi}">+ Ajouter ce jour-là</button></p></div>` : ''}
   </div>`;
 }
 
@@ -88,8 +88,8 @@ function vue(c) {
   const carteTiree = tirage && jeuxDef[tirage.jeu] ? `<div class="couple-carte-jeu is-${esc(tirage.jeu)}${doree ? ' is-doree' : ''}" data-tirage>
       <p class="couple-carte-jeu-nom">${img(tirage.jeu, 'ci-s')} ${esc(jeuxDef[tirage.jeu].nom)}${jeuxDores.includes(tirage.jeu) ? ` · <span class="couple-doree">${doree ? '✦ Jeu doré' : '✦ Carte offerte'}</span>` : ''}</p>
       <p class="couple-carte-jeu-texte${fermee ? ' is-floue' : ''}" ${fermee ? 'aria-hidden="true"' : ''}>${esc(jeuxDef[tirage.jeu].cartes[tirage.i])}</p>
-      ${fermee ? `<p class="couple-doree-cadenas">🔒 Les jeux « Un peu piquant » et « Coquin » viennent avec l’abonnement Couple${window.LFB_PLAY ? '.' : ' : 18 € par mois pour vous deux.'}</p>` : ''}
-      <p class="espace-sans-liens"><button type="button" class="btn btn-line" data-jeu-autre>Une autre carte</button> ${fermee ? (window.LFB_PLAY ? '' : '<button type="button" class="btn btn-ink" data-jeu-abo>Débloquer les jeux dorés ✦</button>') : lui ? `<button type="button" class="btn btn-ink" data-jeu-envoyer>L’envoyer à ${sonNom} 💌</button>` : ''}</p></div>` : '';
+      ${fermee ? `<p class="couple-doree-cadenas">Les jeux « Un peu piquant » et « Coquin » viennent avec l’abonnement Couple${window.LFB_PLAY ? '.' : ' : 18 € par mois pour vous deux.'}</p>` : ''}
+      <p class="espace-sans-liens"><button type="button" class="btn btn-line" data-jeu-autre>Une autre carte</button> ${fermee ? (window.LFB_PLAY ? '' : '<button type="button" class="btn btn-ink" data-jeu-abo>Débloquer les jeux dorés ✦</button>') : lui ? `<button type="button" class="btn btn-ink" data-jeu-envoyer>L’envoyer à ${sonNom}</button>` : ''}</p></div>` : '';
 
   const jalons = c.jalons || {}, faits = new Set(c.prepa || []), nbPrepa = Object.keys(prepaDef).length;
   const jourJ = jalons.mariage ? joursAvant(jalons.mariage) : null;
@@ -104,7 +104,7 @@ function vue(c) {
         ${titre('nous', `Et ${sonNom} ?`)}
         ${sienne ? `<p class="couple-meteo-moi">${img(`h${sienne.humeur}`, 'ci-xl')} <span><strong>${esc(sienne.mot)}</strong>${besoinDe(sienne)}${sienne.note ? `<em>« ${esc(sienne.note)} »</em>` : ''}</span></p>
           ${sienne.besoin && suggestions[sienne.besoin] ? `<p class="couple-sous">Ce qui lui ferait du bien</p><div class="couple-idees">${suggestions[sienne.besoin].map(([t, ty]) => ajout(t, ty)).join('')}</div>` : ''}`
-          : `<p class="aide">${sonNom} n’a pas encore partagé sa météo.</p><p><button type="button" class="couple-mot" data-mot="Je pense à toi 💭">Je pense à toi 💭</button></p>`}
+          : `<p class="aide">${sonNom} n’a pas encore partagé sa météo.</p><p><button type="button" class="couple-mot" data-mot="Je pense à toi">Je pense à toi</button></p>`}
       </section>
       <section class="couple-carte couple-semaine">${titre('planning', 'Notre semaine')}
         <div class="couple-semaine-grille">${(meteo.jours || []).map((j) => `<span class="cal-nom">${esc(new Date(`${j}T12:00:00`).toLocaleDateString('fr-FR', { weekday: 'narrow' }))}</span>`).join('')}
@@ -114,28 +114,28 @@ function vue(c) {
       <section class="couple-carte couple-question">${titre('question', 'La question du jour')}
         <p class="couple-q">${esc(q.texte || '')}</p>
         ${q.ma_reponse ? `<p class="couple-rep is-moi"><small>Toi</small>${esc(q.ma_reponse)}</p>${q.sa_reponse ? `<p class="couple-rep"><small>${sonNom}</small>${esc(q.sa_reponse)}</p>` : `<p class="aide">${sonNom} n’a pas encore répondu.</p>`}`
-          : `${q.a_repondu ? `<p class="couple-rep is-cache">🔒 ${sonNom} a répondu. Réponds pour découvrir sa réponse.</p>` : ''}<form class="couple-mot-libre" data-reponse><input name="texte" maxlength="400" required placeholder="Ta réponse…" aria-label="Ta réponse"><button type="submit" class="btn btn-ink">Répondre</button></form>`}
+          : `${q.a_repondu ? `<p class="couple-rep is-cache">${sonNom} a répondu. Réponds pour découvrir sa réponse.</p>` : ''}<form class="couple-mot-libre" data-reponse><input name="texte" maxlength="400" required placeholder="Ta réponse…" aria-label="Ta réponse"><button type="submit" class="btn btn-ink">Répondre</button></form>`}
       </section>
       <section class="couple-carte couple-defi">${titre('defi', 'Le défi de la semaine')}<p>${esc(c.defi || '')}</p>
         <p><button type="button" class="btn btn-line" data-ajout-titre="Défi : ${esc(c.defi || '')}" data-ajout-type="rituel">On le relève !</button></p></section>` : ''}`,
 
     douceurs: `<section class="couple-carte couple-mots">
       ${titre('douceurs', 'Nos mots doux')}
-      ${lui ? `<div class="couple-mots-boutons">${motsDoux.map((m) => { const payant = motsPayants.includes(m) && !Boolean(c.niveau); return `<button type="button" class="couple-mot${motsPayants.includes(m) ? ' is-premium' : ''}" ${payant ? 'data-couple-abo' : `data-mot="${esc(m)}"`}>${esc(m)}${payant ? ' <span class="couple-cadenas" aria-label="Avec l’abonnement Couple">🔒</span>' : ''}</button>`; }).join('')}</div>
-      ${Boolean(c.niveau) ? `<form class="couple-mot-libre" data-mot-libre><input name="texte" maxlength="200" placeholder="Ou écris le tien…" aria-label="Ton mot doux"><button type="submit" class="btn btn-ink" aria-label="Envoyer">❤</button></form>` : `<p class="couple-mot-libre"><button type="button" class="link-button" data-couple-abo>✍️ Écrire ton propre mot doux 🔒</button></p>`}
+      ${lui ? `<div class="couple-mots-boutons">${motsDoux.map((m) => { const payant = motsPayants.includes(m) && !Boolean(c.niveau); return `<button type="button" class="couple-mot${motsPayants.includes(m) ? ' is-premium' : ''}" ${payant ? 'data-couple-abo' : `data-mot="${esc(m)}"`}>${esc(m)}${payant ? ' <span class="couple-cadenas" aria-label="Avec l’abonnement Couple"></span>' : ''}</button>`; }).join('')}</div>
+      ${Boolean(c.niveau) ? `<form class="couple-mot-libre" data-mot-libre><input name="texte" maxlength="200" placeholder="Ou écris le tien…" aria-label="Ton mot doux"><button type="submit" class="btn btn-ink" aria-label="Envoyer"></button></form>` : `<p class="couple-mot-libre"><button type="button" class="link-button" data-couple-abo>Écrire ton propre mot doux</button></p>`}
       ${Boolean(c.niveau) ? '' : window.LFB_PLAY ? '<div class="couple-abo" data-couple-abo-box hidden><p class="aide">Ces mots doux viennent avec l’abonnement Couple, qui ne s’achète pas dans cette version de l’appli.</p></div>' : `<div class="couple-abo" data-couple-abo-box hidden>
         <div class="couple-offres">
           <label class="couple-offre"><input type="radio" name="offre" value="couple" checked><strong>Couple Amour</strong><span>18 € / mois pour vous deux</span><small>Tous les mots doux animés, ton mot à toi, et bientôt le fil avec vos proches (1 proche inclus) et 5 € de points cadeau par mois.</small></label>
           <label class="couple-offre"><input type="radio" name="offre" value="couple_prestige"><strong>Couple Prestige</strong><span>38 € / mois pour vous deux</span><small>Tout Couple Amour et un plus beau cadeau de mariage ; bientôt, Lamia dans votre fil une fois par mois et 10 € de points cadeau par mois.</small></label>
         </div>
         <label class="annonce-case"><input type="checkbox" data-couple-cgv> <span>J’accepte les <a class="text-link" href="/cgv/" target="_blank" rel="noopener">conditions de vente</a></span></label>
-        <p><button type="button" class="btn btn-ink" data-couple-payer>M’abonner pour nous deux 💞</button></p></div>`}` : '<p class="aide">Dès que ton ou ta partenaire vous rejoint, vous pourrez vous envoyer des mots doux.</p>'}
-      ${(c.mots || []).length ? `<ul class="couple-fil">${c.mots.map((m) => `<li class="${m.de_moi ? 'is-moi' : ''}">${m.animation ? `<span class="couple-anim anim-${esc(m.animation)}" aria-hidden="true">${{ coeur: '<i>❤</i><b>✦</b><b>✦</b><b>✦</b>', manque: '<i>💗</i><i>💗</i>', retrouver: '<i>🤍</i><i>❤</i>' }[m.animation] || ''}</span>` : ''}<span>${esc(m.texte)}</span><small>${m.de_moi ? 'Toi' : esc(lui?.prenom || '')} · ${esc(new Date(m.le).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }))}</small></li>`).join('')}</ul>` : ''}
+        <p><button type="button" class="btn btn-ink" data-couple-payer>M’abonner pour nous deux</button></p></div>`}` : '<p class="aide">Dès que ton ou ta partenaire vous rejoint, vous pourrez vous envoyer des mots doux.</p>'}
+      ${(c.mots || []).length ? `<ul class="couple-fil">${c.mots.map((m) => `<li class="${m.de_moi ? 'is-moi' : ''}">${m.animation ? `<span class="couple-anim anim-${esc(m.animation)}" aria-hidden="true">${{ coeur: '<i>♥</i><b>✦</b><b>✦</b><b>✦</b>', manque: '<i>♥</i><i>♥</i>', retrouver: '<i>♥</i><i>♥</i>' }[m.animation] || ''}</span>` : ''}<span>${esc(m.texte)}</span><small>${m.de_moi ? 'Toi' : esc(lui?.prenom || '')} · ${esc(new Date(m.le).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }))}</small></li>`).join('')}</ul>` : ''}
     </section>
     <section class="couple-carte couple-bocal">
       ${titre('bocal', 'Notre bocal à souvenirs')}
       <div class="avec-aide"><p class="aide">Un beau moment à garder ? Glissez-le dans le bocal.</p>${aideQ('Vos souvenirs restent ici, rien que pour vous deux. Un jour de doute, piochez-en un au hasard.')}</div>
-      <form class="couple-souvenir-form" data-souvenir><input name="texte" maxlength="300" required placeholder="Le thé chez ta grand-mère, notre première balade…" aria-label="Le souvenir"><input name="quand" type="date" aria-label="La date (facultatif)"><button type="submit" class="btn btn-ink">Dans le bocal ✨</button></form>
+      <form class="couple-souvenir-form" data-souvenir><input name="texte" maxlength="300" required placeholder="Le thé chez ta grand-mère, notre première balade…" aria-label="Le souvenir"><input name="quand" type="date" aria-label="La date (facultatif)"><button type="submit" class="btn btn-ink">Dans le bocal</button></form>
       ${(c.souvenirs || []).length ? `<p><button type="button" class="btn btn-line" data-piocher>Piocher un souvenir au hasard</button></p><p class="couple-pioche" data-pioche hidden></p>
         <ul class="couple-souvenirs">${c.souvenirs.map((x) => `<li><span>${esc(x.texte)}</span><small>${x.quand ? esc(new Date(x.quand).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })) : ''}${x.de_moi ? ` <button type="button" class="link-button" data-act-suppr="${esc(x.id)}" aria-label="Retirer">✕</button>` : ''}</small></li>`).join('')}</ul>` : ''}
     </section>
@@ -149,8 +149,8 @@ function vue(c) {
         ${aJouer.map((j) => `<div class="couple-carte-jeu is-${esc(j.jeu)}"><p class="couple-carte-jeu-nom">${img(j.jeu, 'ci-s')} ${esc(j.jeu_nom)} · de ${sonNom}</p><p class="couple-carte-jeu-texte">${esc(j.carte)}</p>
           <form class="couple-mot-libre" data-jeu-reponse="${esc(j.id)}"><input name="texte" maxlength="400" required placeholder="Ta réponse…" aria-label="Ta réponse"><button type="submit" class="btn btn-ink">Répondre</button></form></div>`).join('')}</section>` : ''}
       <section class="couple-carte couple-jeux">${titre('jeux', 'Jeux d’amour à distance')}
-        <p class="aide">Tire une carte et envoie-la à ${sonNom}. Simple, tendre, ou un peu piquant 🌶️ : ça reste entre vous deux.</p>
-        <div class="couple-paquets">${Object.entries(jeuxDef).map(([k, j]) => `<button type="button" class="couple-paquet is-${esc(k)}${jeuxDores.includes(k) ? ' is-dore' : ''}${tirage?.jeu === k ? ' is-choisi' : ''}" data-jeu="${esc(k)}">${jeuxDores.includes(k) ? `<span class="couple-paquet-badge">${c.niveau ? '✦ Couple' : '🔒 Couple'}</span>` : ''}${img(k, 'ci-l')}<strong>${esc(j.nom)}</strong><small>${esc(j.sous)}</small></button>`).join('')}</div>
+        <p class="aide">Tire une carte et envoie-la à ${sonNom}. Simple, tendre, ou un peu piquant : ça reste entre vous deux.</p>
+        <div class="couple-paquets">${Object.entries(jeuxDef).map(([k, j]) => `<button type="button" class="couple-paquet is-${esc(k)}${jeuxDores.includes(k) ? ' is-dore' : ''}${tirage?.jeu === k ? ' is-choisi' : ''}" data-jeu="${esc(k)}">${jeuxDores.includes(k) ? `<span class="couple-paquet-badge">${c.niveau ? '✦ Couple' : 'Couple'}</span>` : ''}${img(k, 'ci-l')}<strong>${esc(j.nom)}</strong><small>${esc(j.sous)}</small></button>`).join('')}</div>
         ${carteTiree}
         ${lui ? '' : '<p class="aide">Dès que ton ou ta partenaire vous rejoint, vous pourrez jouer à deux.</p>'}
       </section>
@@ -178,27 +178,27 @@ function vue(c) {
 
     mariage: (() => {
       const d = c.demande, ouvert = d?.statut === 'oui';
-      if (!lui) return `<section class="couple-carte couple-magie">${photo(PHOTOS.magie)}<h2>Et si on se mariait ?</h2><p class="aide">Dès que ton ou ta partenaire vous rejoint, ce bouton magique s’allume 💍</p></section>`;
+      if (!lui) return `<section class="couple-carte couple-magie">${photo(PHOTOS.magie)}<h2>Et si on se mariait ?</h2><p class="aide">Dès que ton ou ta partenaire vous rejoint, ce bouton magique s’allume</p></section>`;
       if (!ouvert) {
-        if (d && d.statut === 'attente' && d.de_moi) return `<section class="couple-carte couple-magie is-partie">${photo(PHOTOS.magie)}<p class="couple-etincelles" aria-hidden="true"><i>✦</i><i>✦</i><i>✦</i></p><h2>Ta demande est partie 💌</h2><p>${sonNom} va la découvrir en ouvrant votre espace. Garde ton téléphone près de ton cœur…</p></section>`;
-        if (d && d.statut === 'reflexion' && d.de_moi) return `<section class="couple-carte couple-magie">${photo(PHOTOS.magie)}<h2>${sonNom} prend le temps d’y réfléchir 🌙</h2><p class="aide">Ta demande est bien arrivée. Un grand oui se prépare parfois doucement.</p></section>`;
-        if (d && !d.de_moi) return `<section class="couple-carte couple-magie">${photo(PHOTOS.magie)}<h2>${sonNom} t’a posé une question…</h2><p><button type="button" class="couple-bouton-magique" data-demande-voir>Ouvrir sa demande 💍</button></p></section>`;
+        if (d && d.statut === 'attente' && d.de_moi) return `<section class="couple-carte couple-magie is-partie">${photo(PHOTOS.magie)}<p class="couple-etincelles" aria-hidden="true"><i>✦</i><i>✦</i><i>✦</i></p><h2>Ta demande est partie</h2><p>${sonNom} va la découvrir en ouvrant votre espace. Garde ton téléphone près de ton cœur…</p></section>`;
+        if (d && d.statut === 'reflexion' && d.de_moi) return `<section class="couple-carte couple-magie">${photo(PHOTOS.magie)}<h2>${sonNom} prend le temps d’y réfléchir</h2><p class="aide">Ta demande est bien arrivée. Un grand oui se prépare parfois doucement.</p></section>`;
+        if (d && !d.de_moi) return `<section class="couple-carte couple-magie">${photo(PHOTOS.magie)}<h2>${sonNom} t’a posé une question…</h2><p><button type="button" class="couple-bouton-magique" data-demande-voir>Ouvrir sa demande</button></p></section>`;
         return `<section class="couple-carte couple-magie">${photo(PHOTOS.magie)}
           <p class="couple-etincelles" aria-hidden="true"><i>✦</i><i>✦</i><i>✦</i></p>
           <h2>Et si on se mariait ?</h2>
           <p class="couple-kab-ligne"><span lang="kab">Asuter</span> · la demande, en kabyle</p>
           <p>Fais ta demande à ${sonNom}. S’il ou elle dit oui, votre parcours de fiançailles s’ouvre : les familles, la bague, le henné, la robe, le grand jour…</p>
-          <p><button type="button" class="couple-bouton-magique" data-demande-ouvrir>Et si on se mariait ? 💍</button></p>
+          <p><button type="button" class="couple-bouton-magique" data-demande-ouvrir>Et si on se mariait ?</button></p>
           <form class="couple-demande-form" data-demande-form hidden>
             <label>Tes mots pour ${sonNom} (facultatif)<textarea name="message" rows="4" maxlength="600" placeholder="Depuis que tu es entré·e dans ma vie…"></textarea></label>
-            <button type="submit" class="btn btn-ink">Faire ma demande 💍</button></form>
+            <button type="submit" class="btn btn-ink">Faire ma demande</button></form>
           <p class="couple-deja"><button type="button" class="link-button" data-demande-deja>Déjà fiancés ? Ouvrir notre parcours</button></p>
         </section>`;
       }
       return `<section class="couple-carte couple-jourj">
         ${photo(PHOTOS.fiances)}
-        ${jourJ !== null ? (jourJ > 0 ? `<p class="couple-jourj-chiffre">J-${jourJ}</p><p>avant le grand jour, le ${esc(new Date(`${jalons.mariage}T12:00:00`).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }))}</p>` : jourJ === 0 ? '<p class="couple-jourj-chiffre">C’est aujourd’hui !</p><p>Tous nos vœux de bonheur 💍</p>' : '<p class="couple-jourj-chiffre">Mariés ♡</p><p>Envoyez votre photo plus bas : Lamia vous offre un cadeau.</p>')
-          : '<p class="couple-jourj-chiffre">Fiancés 💍</p><p>Fixez la date du grand jour plus bas : le compte à rebours commence.</p>'}
+        ${jourJ !== null ? (jourJ > 0 ? `<p class="couple-jourj-chiffre">J-${jourJ}</p><p>avant le grand jour, le ${esc(new Date(`${jalons.mariage}T12:00:00`).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }))}</p>` : jourJ === 0 ? '<p class="couple-jourj-chiffre">C’est aujourd’hui !</p><p>Tous nos vœux de bonheur</p>' : '<p class="couple-jourj-chiffre">Mariés ♡</p><p>Envoyez votre photo plus bas : Lamia vous offre un cadeau.</p>')
+          : '<p class="couple-jourj-chiffre">Fiancés</p><p>Fixez la date du grand jour plus bas : le compte à rebours commence.</p>'}
         ${d.message ? `<p class="couple-demande-mots">« ${esc(d.message)} »</p>` : ''}
         <div class="couple-jauge" role="progressbar" aria-valuemin="0" aria-valuemax="${nbPrepa}" aria-valuenow="${faits.size}"><span style="width:${Math.round((faits.size / (nbPrepa || 1)) * 100)}%"></span></div>
         <p class="aide">${faits.size} sur ${nbPrepa} préparatifs · cochés par l’un, cochés pour les deux</p>
@@ -225,7 +225,7 @@ function vue(c) {
         <label>Une photo de votre mariage<input name="photo" type="file" accept="image/*" required></label>
         <label>La date du mariage<input name="date" type="date" value="${esc(jalons.mariage || '')}"></label>
         <label>Adresse pour recevoir le cadeau<textarea name="adresse" rows="3" maxlength="400" required placeholder="Prénom Nom, rue, code postal, ville, pays"></textarea></label>
-        <button type="submit" class="btn btn-ink">Envoyer à Lamia 🎁</button>
+        <button type="submit" class="btn btn-ink">Envoyer à Lamia</button>
       </form></section>`;
     })(),
 
@@ -246,10 +246,10 @@ function vue(c) {
       <span class="couple-tete-coeurs" aria-hidden="true"><i>♥</i><i>♥</i><i>♥</i><i>♥</i><i>♥</i></span>
       <p class="couple-azul" lang="kab">Azul !</p>
       <p class="couple-noms"><span>${esc(moi?.prenom || 'Moi')}</span> ${img('fiancailles', 'ci-l couple-bat')} <span>${lui ? esc(lui.prenom) : '<em>en attente</em>'}</span></p>
-      ${lui ? `${jourJ > 0 ? `<p class="couple-tete-meteo">💍 J-${jourJ} avant le grand jour</p>` : ''}${sienne?.aujourdhui ? `<p class="couple-tete-meteo">Aujourd’hui ${esc(lui.prenom)} : ${img(`h${sienne.humeur}`, 'ci-xs')} ${esc(sienne.mot.toLowerCase())}</p>` : ''}` : `<div class="couple-code"><p>Invite ton ou ta partenaire 💌</p><p class="couple-code-valeur">${c.code ? esc(c.code) : '—'}</p>${c.code ? (() => { const t = invitation(c.code); return `<p class="couple-envois"><a class="btn btn-ink" href="sms:?&body=${encodeURIComponent(t)}">Par SMS</a><a class="btn btn-ink" href="https://wa.me/?text=${encodeURIComponent(t)}" target="_blank" rel="noopener">WhatsApp</a><a class="btn btn-line" href="mailto:?subject=${encodeURIComponent('Rejoins notre espace de couple 💞')}&body=${encodeURIComponent(t)}">Par email</a>${navigator.share ? `<button type="button" class="btn btn-line" data-couple-partager="${esc(c.code)}">Autre…</button>` : ''}</p>`; })() : ''}<p><button type="button" class="link-button" data-couple-code>Nouveau code</button></p></div>`}
+      ${lui ? `${jourJ > 0 ? `<p class="couple-tete-meteo">J-${jourJ} avant le grand jour</p>` : ''}${sienne?.aujourdhui ? `<p class="couple-tete-meteo">Aujourd’hui ${esc(lui.prenom)} : ${img(`h${sienne.humeur}`, 'ci-xs')} ${esc(sienne.mot.toLowerCase())}</p>` : ''}` : `<div class="couple-code"><p>Invite ton ou ta partenaire</p><p class="couple-code-valeur">${c.code ? esc(c.code) : '—'}</p>${c.code ? (() => { const t = invitation(c.code); return `<p class="couple-envois"><a class="btn btn-ink" href="sms:?&body=${encodeURIComponent(t)}">Par SMS</a><a class="btn btn-ink" href="https://wa.me/?text=${encodeURIComponent(t)}" target="_blank" rel="noopener">WhatsApp</a><a class="btn btn-line" href="mailto:?subject=${encodeURIComponent('Rejoins notre espace de couple')}&body=${encodeURIComponent(t)}">Par email</a>${navigator.share ? `<button type="button" class="btn btn-line" data-couple-partager="${esc(c.code)}">Autre…</button>` : ''}</p>`; })() : ''}<p><button type="button" class="link-button" data-couple-code>Nouveau code</button></p></div>`}
     </section>
     ${c.conversion && !window.LFB_PLAY ? `<section class="couple-carte couple-conversion">
-      <h2>Ton abonnement devient « ${esc(c.conversion.vers)} » ? 💞</h2>
+      <h2>Ton abonnement devient « ${esc(c.conversion.vers)} » ?</h2>
       <p>Tu as la formule <strong>${c.conversion.formule === 'prestige' ? 'Prestige' : 'Passion'}</strong> pour les rencontres. Maintenant que vous êtes en couple, elle peut devenir <strong>${esc(c.conversion.vers)}</strong> : mots doux avec leurs animations et ton mot à toi, pour vous deux ; bientôt le fil avec vos proches et des points cadeau${c.conversion.formule === 'prestige' ? ', et Lamia dans votre fil une fois par mois' : ''}.</p>
       ${c.conversion.annuel ? '<p class="aide">Ton abonnement est à l’année : écris à Lamia pour le transformer.</p>' : `<p class="aide">${(c.conversion.vers_prix / 100).toLocaleString('fr-FR')} € par mois pour vous deux. <strong>Le premier mois reste au prix que tu paies aujourd’hui</strong>, rien à payer de plus maintenant. Ta formule de rencontre s’arrête à ta prochaine échéance. Sans engagement.</p>
       <p class="espace-sans-liens"><button type="button" class="btn btn-ink" data-conversion-oui>Oui, je passe en Couple</button> <button type="button" class="btn btn-line" data-conversion-non>Pas maintenant</button></p>`}
@@ -265,14 +265,14 @@ function laDemande(c) {
   document.querySelector('.couple-demande-ecran')?.remove();
   const e = document.createElement('div');
   e.className = 'couple-demande-ecran'; e.setAttribute('role', 'dialog'); e.setAttribute('aria-modal', 'true'); e.setAttribute('aria-label', 'Demande en mariage');
-  e.innerHTML = `<div class="couple-petales" aria-hidden="true">${Array.from({ length: 16 }, (_, i) => `<i style="left:${(i * 37) % 100}%;animation-delay:${(i % 8) * 0.6}s;animation-duration:${6 + (i % 5)}s">${['🌸', '❤', '✦', '🤍'][i % 4]}</i>`).join('')}</div>
+  e.innerHTML = `<div class="couple-petales" aria-hidden="true">${Array.from({ length: 16 }, (_, i) => `<i style="left:${(i * 37) % 100}%;animation-delay:${(i % 8) * 0.6}s;animation-duration:${6 + (i % 5)}s">${['', '', '✦', ''][i % 4]}</i>`).join('')}</div>
     <div class="couple-demande-boite">
       <button type="button" class="couple-demande-fermer" data-fermer aria-label="Fermer">✕</button>
       <img src="${PHOTOS.demande}" alt="">
       <p class="couple-demande-de">${esc(lui?.prenom || 'Ton amour')} a une question pour toi…</p>
       ${d.message ? `<p class="couple-demande-message">« ${esc(d.message)} »</p>` : ''}
       <p class="couple-demande-question">Et si on se mariait ?</p>
-      <p class="couple-demande-boutons"><button type="button" class="couple-bouton-magique" data-oui>Oui ! 💍</button><button type="button" class="btn btn-line" data-reflechir>Laisse-moi y réfléchir</button></p>
+      <p class="couple-demande-boutons"><button type="button" class="couple-bouton-magique" data-oui>Oui !</button><button type="button" class="btn btn-line" data-reflechir>Laisse-moi y réfléchir</button></p>
     </div>`;
   document.body.appendChild(e);
   e.querySelector('[data-oui]').focus();
@@ -284,10 +284,10 @@ function laDemande(c) {
     try {
       const r = enDemo ? { couple: { ...dernier, demande: { ...dernier.demande, statut: oui ? 'oui' : 'reflexion' }, jalons: { demande: new Date().toISOString().slice(0, 10) } } } : await appel({ action: 'couple_demande_repondre', oui: Boolean(oui) });
       if (oui) {
-        e.querySelector('.couple-demande-boite').innerHTML = '<p class="couple-demande-bravo">💍</p><p class="couple-demande-question">Vous êtes fiancés !</p><p>Votre parcours vers le grand jour s’ouvre…</p>';
+        e.querySelector('.couple-demande-boite').innerHTML = '<p class="couple-demande-bravo">♥</p><p class="couple-demande-question">Vous êtes fiancés !</p><p>Votre parcours vers le grand jour s’ouvre…</p>';
         coeurs(); setTimeout(coeurs, 700);
         setTimeout(() => { e.remove(); onglet = 'mariage'; if (r.couple) vue(r.couple); zone.querySelector('.couple-onglets')?.scrollIntoView({ behavior: 'smooth' }); }, 3200);
-      } else { e.remove(); if (r.couple) vue(r.couple); bulle('Prends ton temps 🌙 Tu pourras dire oui depuis l’onglet Mariage.'); }
+      } else { e.remove(); if (r.couple) vue(r.couple); bulle('Prends ton temps Tu pourras dire oui depuis l’onglet Mariage.'); }
     } catch { e.querySelectorAll('button').forEach((b) => { b.disabled = false; }); bulle('Ça n’a pas fonctionné. Réessaie dans un instant.'); }
   });
 }
@@ -307,7 +307,7 @@ async function charger() {
 function coeurs() {
   for (let i = 0; i < 14; i += 1) {
     const c = document.createElement('span');
-    c.className = 'couple-coeur-vole'; c.textContent = ['❤', '💕', '💖', '💗'][i % 4];
+    c.className = 'couple-coeur-vole'; c.textContent = '♥';
     c.style.left = `${10 + Math.random() * 80}vw`; c.style.animationDelay = `${Math.random() * .5}s`; c.style.fontSize = `${16 + Math.random() * 18}px`;
     document.body.appendChild(c); setTimeout(() => c.remove(), 2600);
   }
@@ -320,7 +320,7 @@ function bulle(t) {
 }
 const statut = (t) => { const s = zone.querySelector('[data-couple-statut]'); if (s) s.textContent = t; else bulle(t); };
 async function faire(body, apres) {
-  if (enDemo) { bulle('Démo : rien n’est envoyé 💞'); return; }
+  if (enDemo) { bulle('Démo : rien n’est envoyé'); return; }
   try { const r = await appel(body); if (r.couple !== undefined) { if (r.couple) vue(r.couple); else accueil(); } apres?.(r); }
   catch (err) { statut(ERREURS[err.code] || 'Ça n’a pas fonctionné. Réessaie dans un instant.'); }
 }
@@ -339,11 +339,11 @@ zone.addEventListener('click', async (e) => {
   const paquet = e.target.closest('[data-jeu]');
   if (paquet) { const j = jeuxDef[paquet.dataset.jeu], offerte = jeuxDores.includes(paquet.dataset.jeu) && !dernier?.niveau && tirage?.jeu !== paquet.dataset.jeu; tirage = { jeu: paquet.dataset.jeu, i: offerte ? 0 : Math.floor(Math.random() * j.cartes.length) }; vue(dernier); zone.querySelector('[data-tirage]')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
   if (e.target.closest('[data-jeu-autre]')) { const n = jeuxDef[tirage.jeu].cartes.length; tirage = { ...tirage, i: (tirage.i + 1 + Math.floor(Math.random() * (n - 1))) % n }; vue(dernier); return; }
-  if (e.target.closest('[data-jeu-envoyer]')) { const t = tirage; tirage = null; return faire({ action: 'couple_jeu', jeu: t.jeu, i: t.i }, () => { coeurs(); bulle('Carte envoyée 💌'); }); }
+  if (e.target.closest('[data-jeu-envoyer]')) { const t = tirage; tirage = null; return faire({ action: 'couple_jeu', jeu: t.jeu, i: t.i }, () => { coeurs(); bulle('Carte envoyée'); }); }
   if (e.target.closest('[data-demande-ouvrir]')) { const f = zone.querySelector('[data-demande-form]'); f.hidden = false; e.target.closest('[data-demande-ouvrir]').hidden = true; f.message.focus(); return; }
   if (e.target.closest('[data-demande-voir]')) { laDemande(dernier); return; }
   if (e.target.closest('[data-demande-deja]')) { if (confirm('Vous êtes déjà fiancés ? Votre parcours s’ouvre pour vous deux.')) faire({ action: 'couple_demande', deja: true }, () => coeurs()); return; }
-  if (e.target.closest('[data-piocher]')) { const l = dernier?.souvenirs || [], x = l[Math.floor(Math.random() * l.length)], p = zone.querySelector('[data-pioche]'); if (x && p) { p.hidden = false; p.textContent = `✨ ${x.texte}`; p.classList.remove('is-anim'); void p.offsetWidth; p.classList.add('is-anim'); } return; }
+  if (e.target.closest('[data-piocher]')) { const l = dernier?.souvenirs || [], x = l[Math.floor(Math.random() * l.length)], p = zone.querySelector('[data-pioche]'); if (x && p) { p.hidden = false; p.textContent = `${x.texte}`; p.classList.remove('is-anim'); void p.offsetWidth; p.classList.add('is-anim'); } return; }
   if (e.target.closest('[data-couple-creer]')) return faire({ action: 'couple_creer' });
   if (e.target.closest('[data-jeu-abo]')) { onglet = 'douceurs'; try { localStorage.setItem('lfb-couple-onglet', onglet); } catch { /* */ } vue(dernier); const box = zone.querySelector('[data-couple-abo-box]'); if (box) { box.hidden = false; box.scrollIntoView({ behavior: 'smooth', block: 'center' }); } return; }
   if (e.target.closest('[data-couple-abo]')) { const box = zone.querySelector('[data-couple-abo-box]'); if (box) { box.hidden = false; box.scrollIntoView({ behavior: 'smooth', block: 'center' }); } return; }
@@ -409,17 +409,17 @@ zone.addEventListener('submit', (e) => {
         const r = await fetch(upload.url, { method: 'PUT', headers: { apikey: PUBLIC_KEY, 'Content-Type': upload.type, 'x-upsert': 'false' }, body: fichier });
         if (!r.ok) throw new Error('envoi');
         await appel({ action: 'couple_mariage', path: upload.path, adresse: f.adresse.value, date: f.date.value });
-        f.outerHTML = '<p class="couple-mariage-ok">💍 Félicitations à vous deux ! Lamia a bien reçu votre photo : votre cadeau arrive.</p>';
+        f.outerHTML = '<p class="couple-mariage-ok">Félicitations à vous deux ! Lamia a bien reçu votre photo : votre cadeau arrive.</p>';
         coeurs();
       } catch (err) { btn.disabled = false; dire(err.code === 'adresse_requise' ? 'Écris l’adresse complète pour recevoir le cadeau.' : err.code === 'photo_invalide' ? 'Cette photo ne passe pas : choisis une image de moins de 15 Mo.' : 'L’envoi n’a pas marché. Réessaie dans un instant.'); }
     })();
     return;
   }
-  if (f.matches('[data-meteo]')) { if (!f.humeur.value) return bulle('Choisis comment tu te sens.'); return faire({ action: 'couple_humeur', humeur: Number(f.humeur.value), besoin: f.besoin?.value || null, note: f.note.value, partage: f.partage ? f.partage.checked : true }, () => bulle(f.partage && !f.partage.checked ? 'C’est noté, rien que pour toi.' : 'C’est partagé 💞')); }
+  if (f.matches('[data-meteo]')) { if (!f.humeur.value) return bulle('Choisis comment tu te sens.'); return faire({ action: 'couple_humeur', humeur: Number(f.humeur.value), besoin: f.besoin?.value || null, note: f.note.value, partage: f.partage ? f.partage.checked : true }, () => bulle(f.partage && !f.partage.checked ? 'C’est noté, rien que pour toi.' : 'C’est partagé')); }
   if (f.matches('[data-demande-form]')) { f.querySelector('[type=submit]').disabled = true; return faire({ action: 'couple_demande', message: f.message.value }, () => { coeurs(); setTimeout(coeurs, 600); }); }
-  if (f.matches('[data-jeu-reponse]')) return faire({ action: 'couple_jeu_repondre', id: f.dataset.jeuReponse, texte: f.texte.value }, () => { coeurs(); bulle('Réponse envoyée 💞'); });
+  if (f.matches('[data-jeu-reponse]')) return faire({ action: 'couple_jeu_repondre', id: f.dataset.jeuReponse, texte: f.texte.value }, () => { coeurs(); bulle('Réponse envoyée'); });
   if (f.matches('[data-reponse]')) return faire({ action: 'couple_reponse', texte: f.texte.value }, () => coeurs());
-  if (f.matches('[data-souvenir]')) return faire({ action: 'couple_souvenir', texte: f.texte.value, quand: f.quand.value || null }, () => bulle('Dans le bocal ✨'));
+  if (f.matches('[data-souvenir]')) return faire({ action: 'couple_souvenir', texte: f.texte.value, quand: f.quand.value || null }, () => bulle('Dans le bocal'));
   if (f.matches('[data-mot-libre]')) return faire({ action: 'couple_mot', texte: f.texte.value }, () => coeurs());
   if (f.matches('[data-couple-rejoindre]')) return faire({ action: 'couple_rejoindre', code: f.code.value });
   if (f.matches('[data-act-ajouter]')) return faire({ action: 'couple_activite_ajouter', titre: f.titre.value, type: f.type.value, quand: f.quand.value ? new Date(f.quand.value).toISOString() : null, pour_nous: f.pour.value === 'nous' });
@@ -438,14 +438,14 @@ async function demo() {
   preparerImages();
   zone.insertAdjacentHTML('beforebegin', `<div class="couple-demo-bandeau"><p><strong>Découvre l’espace de Sara et Amine</strong> : un exemple, rien n’est envoyé.</p>
     <p class="couple-demo-liens"><a class="btn btn-line" href="?demo=1">Fiancés</a> <a class="btn btn-line" href="?demo=bouton">Le bouton magique</a> <a class="btn btn-line" href="?demo=demande">La demande</a></p>
-    <p><a class="btn btn-ink" href="/mon-espace/?retour=${encodeURIComponent('/notre-couple/?inviter=1')}">Créer notre espace de couple 💞</a></p></div>`);
+    <p><a class="btn btn-ink" href="/mon-espace/?retour=${encodeURIComponent('/notre-couple/?inviter=1')}">Créer notre espace de couple</a></p></div>`);
   vue(c);
 }
 
 (async () => {
   if (enDemo) return demo();
   const { data: { session } } = await supabase.auth.getSession().catch(() => ({ data: {} }));
-  if (!session) { const code = new URLSearchParams(location.search).get('code'); zone.innerHTML = `<section class="couple-carte"><p>${code ? 'Ton ou ta partenaire t’invite dans votre espace de couple 💞 Crée ton compte ou connecte-toi, puis reviens sur ce lien.' : 'Connecte-toi pour ouvrir votre espace de couple.'}</p><p><a class="btn btn-ink" href="/mon-espace/?retour=${encodeURIComponent(location.pathname + location.search)}">Me connecter</a></p></section>${AUTOUR}`; return; }
+  if (!session) { const code = new URLSearchParams(location.search).get('code'); zone.innerHTML = `<section class="couple-carte"><p>${code ? 'Ton ou ta partenaire t’invite dans votre espace de couple Crée ton compte ou connecte-toi, puis reviens sur ce lien.' : 'Connecte-toi pour ouvrir votre espace de couple.'}</p><p><a class="btn btn-ink" href="/mon-espace/?retour=${encodeURIComponent(location.pathname + location.search)}">Me connecter</a></p></section>${AUTOUR}`; return; }
   token = session.access_token;
   preparerImages();
   moiInfo = { email: session.user?.email || '', nom: [session.user?.user_metadata?.first_name, session.user?.user_metadata?.last_name].filter(Boolean).join(' ') };

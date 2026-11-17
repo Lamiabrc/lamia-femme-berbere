@@ -84,8 +84,9 @@ test('mots doux : le mot part chez l’autre (notification) et s’affiche dans 
   assert.equal((await actionCouple('couple_mot', { texte: 'Je t’aime ❤️' }, avec(SARA))).status, 402);
   assert.equal((await actionCouple('couple_mot', { texte: 'Mon soleil' }, avec(SARA))).status, 402);
   const r = await lire(await actionCouple('couple_mot', { texte: 'Je pense à toi 💭' }, avec(SARA)));
-  assert.deepEqual(pousses, [['u-amine', 'Je pense à toi 💭']]);
-  assert.deepEqual(r.couple.mots.map((m) => [m.texte, m.de_moi]), [['Je pense à toi 💭', true]]);
+  // Les emojis envoyés par une ancienne version de l'appli sont retirés (espace chic, 17 nov. 2026).
+  assert.deepEqual(pousses, [['u-amine', 'Je pense à toi']]);
+  assert.deepEqual(r.couple.mots.map((m) => [m.texte, m.de_moi]), [['Je pense à toi', true]]);
   assert.equal(r.couple.niveau, null);
   assert.equal(r.couple.activites.length, 0);
 });
@@ -111,7 +112,7 @@ test('météo du cœur, question du jour, bocal à souvenirs : rien ne déborde 
   // Une seule météo par jour : la nouvelle remplace l'ancienne.
   let r = await lire(await actionCouple('couple_humeur', { humeur: 4, besoin: 'tendresse' }, avec(SARA)));
   assert.equal(db.couple_activites.filter((x) => x.type === 'humeur').length, 1);
-  assert.equal(r.couple.meteo.moi.derniere.emoji, '😊');
+  assert.equal(r.couple.meteo.moi.derniere.mot, 'Bien');
   assert.equal(r.couple.meteo.moi.semaine.at(-1), 4);
   r = await lire(await actionCouple('couple_etat', {}, avec(AMINE)));
   assert.equal(r.couple.meteo.lui.derniere.besoin, 'tendresse');
