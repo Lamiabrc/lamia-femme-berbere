@@ -836,9 +836,8 @@ page(
     noindex: true,
     scripts: ['/assets/couple.js'],
     body: `<section class="espace couple">
-  <p class="room-name"><span class="pip" aria-hidden="true"></span>Notre couple</p>
-  <h1>Notre couple</h1>
-  <p class="couple-devise">Votre jardin à deux, jusqu’au grand jour ♡ <span lang="kab">Tayri</span>, c’est l’amour en kabyle.</p>
+  <h1 class="couple-hero"><img src="/images/couple/hero.webp" width="808" height="355" alt="TAYRI · Notre couple · Votre jardin à deux, jusqu’au grand jour"></h1>
+  <p class="couple-devise"><span lang="kab">Tayri</span>, c’est l’amour en kabyle.</p>
   <div data-couple><p class="loading">Un instant…</p></div>
 </section>`,
   }),

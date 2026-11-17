@@ -4726,3 +4726,44 @@ a.lien-en-direct::after { content: ""; position: absolute; top: -3px; right: -9p
 .disc-photos-requises { margin: 0 0 12px; padding: 12px 14px; border-radius: 14px; background: #fdecee; border: 1px solid #f3b4c2; color: #8a2640; }
 .swipe-numero { margin: 0 0 2px; font-size: .8rem; font-weight: 700; letter-spacing: .04em; color: #8a7c95; text-align: center; }
 .disc-ancien { display: block; font-weight: 400; font-size: .85em; opacity: .8; }
+
+/* ===================================================================== Notre couple, d'après la maquette de Lamia (17 nov. 2026)
+   Pastels doux, verre dépoli, filets dorés, vraies photos (découpées de sa maquette), titres bordeaux en serif. */
+.espace.couple { background: radial-gradient(120% 60% at 50% 0%, #fbe9ef 0%, #f6eef8 45%, #f8f3ee 100%) !important; }
+.couple .couple-hero { margin: 0 -16px 6px; line-height: 0; }
+.couple .couple-hero img { display: block; width: 100%; height: auto; border-radius: 0 0 26px 26px; -webkit-mask-image: linear-gradient(#000 82%, transparent); mask-image: linear-gradient(#000 82%, transparent); }
+.couple .couple-devise { margin: 0 0 14px; text-align: center; font-size: .95rem; color: #8d2d48; }
+.couple .couple-tete-coeurs { display: none; }
+.couple .couple-carte { background: rgba(255, 255, 255, .62) !important; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border: 1px solid rgba(214, 178, 112, .45) !important; border-radius: 24px; box-shadow: 0 10px 30px rgba(122, 31, 53, .07), inset 0 1px 0 rgba(255, 255, 255, .8); }
+.couple .couple-carte h2, .couple .couple-titre-chic { font-family: var(--serif); font-weight: 500; color: #7A1F35; }
+.couple .couple-titre .ci { display: none; }
+/* Onglets : vignettes photo rondes dans des cartes de verre */
+.couple .couple-onglets { grid-template-columns: repeat(6, 1fr); gap: 6px; padding: 6px; background: rgba(255, 255, 255, .45); border: 1px solid rgba(214, 178, 112, .35); border-radius: 22px; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+.couple .couple-onglets button { padding: 6px 2px 8px; border-radius: 16px; background: rgba(255, 255, 255, .55) !important; border: 1px solid transparent; color: #5c3a44; font-family: var(--serif); font-size: .82rem; gap: 4px; }
+.couple .couple-onglets button[aria-current] { background: rgba(255, 255, 255, .9) !important; color: #7A1F35; border-color: #d6b270; box-shadow: inset 0 -3px 0 #c9a15a; }
+.couple .couple-onglet-photo { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 1.5px #fff, 0 0 0 2.5px rgba(214, 178, 112, .7); }
+/* Météo du cœur : la photo dans un anneau doré, le mot sur un coup de pinceau doré */
+.couple .couple-meteo-une { display: grid; grid-template-columns: 42% 1fr; gap: 14px; align-items: center; margin-bottom: 8px; text-align: center; }
+.couple .couple-meteo-photo { width: 100%; aspect-ratio: 1; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px #d6b270, 0 10px 24px rgba(122, 31, 53, .18); }
+.couple .couple-titre-chic { margin: 0; font-size: 1.35rem; line-height: 1.15; }
+.couple .couple-coeur-trait { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 4px 0 6px; color: #c9a15a; }
+.couple .couple-coeur-trait span { width: 34px; height: 1px; background: linear-gradient(90deg, transparent, #c9a15a, transparent); }
+.couple .couple-meteo-mot { margin: 0; padding: 6px 14px; display: inline-block; font-family: var(--serif); font-style: italic; font-size: 1.7rem; color: #7A1F35; background: radial-gradient(ellipse at center, rgba(233, 196, 120, .75), rgba(233, 196, 120, .15) 62%, transparent 72%); }
+.couple .couple-meteo .couple-meteo-moi .ci, .couple .couple-lui .couple-meteo-moi .ci, .couple .couple-tete-meteo .ci { display: none; }
+.couple .couple-humeurs .ci { display: none; }
+.couple .couple-humeurs small { font-size: .85rem; color: #7A1F35; font-family: var(--serif); font-style: italic; }
+/* Mots doux : galets pastel au filet doré, texte en italique */
+.couple .couple-mot { border-radius: 999px; border: 1px solid #d6b270 !important; font-family: var(--serif); font-style: italic; font-weight: 500; font-size: 1.05rem; color: #5c1f30; padding: 9px 18px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .8), 0 3px 10px rgba(122, 31, 53, .08); }
+.couple .couple-mots-boutons .couple-mot:nth-child(3n+1) { background: linear-gradient(135deg, #fde4ec, #f7c9d8) !important; }
+.couple .couple-mots-boutons .couple-mot:nth-child(3n+2) { background: linear-gradient(135deg, #efe6fb, #dccdf3) !important; }
+.couple .couple-mots-boutons .couple-mot:nth-child(3n) { background: linear-gradient(135deg, #e6f4ec, #cfe8da) !important; }
+/* Mariage : la photo henné et alliances, le bouton bordeaux brillant au filet doré */
+.couple .couple-magie .couple-photo { border-radius: 18px; }
+.couple .couple-magie h2 { font-size: 1.6rem; text-align: center; }
+.couple .couple-bouton-magique, .couple-demande-ecran .couple-bouton-magique { background: linear-gradient(180deg, #9b2a45, #6e1529) !important; color: #fff; border: 1.5px solid #d6b270 !important; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), 0 8px 20px rgba(110, 21, 41, .3) !important; font-family: var(--serif); letter-spacing: .02em; }
+.couple .couple-onglets { overflow-x: auto; scrollbar-width: none; }
+.couple .couple-onglets button { font-size: .72rem; min-width: 0; }
+.couple .couple-onglet-photo { width: 40px; height: 40px; }
+.couple .couple-meteo > .couple-meteo-moi strong { display: none; }
+.couple .couple-cadenas { color: #c9a15a; font-style: normal; }
+.couple .couple-onglets button span { font-size: .7rem; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
