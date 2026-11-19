@@ -12,7 +12,7 @@ import * as P from '../content/pages.mjs';
 import { legalPages, livraisonTexte, tvaTexte } from '../content/legal.mjs';
 import { reglagesPropres } from '../content/shipping.mjs';
 import { facade } from './facade.mjs';
-import { accueilTayri, navigationTayri, habillerPageStatique } from './tayri.mjs';
+import { accueilTayri, navigationTayri, habillerPageStatique, universTayri, entreeTayri } from './tayri.mjs';
 import { GUIDES } from '../content/guides.mjs';
 import { pageAnglaise, pageFrancaise, produitAnglais, enPath, FR_ONLY, STRINGS, MANQUANTS } from './english.mjs';
 import { LANGUES, PAGES_RENCONTRES, dictionnaire, motifs, pageTraduite, liensLangues } from './langues.mjs';
@@ -214,10 +214,11 @@ ${noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" hr
 <link rel="stylesheet" href="/assets/maison.css?v=${VERSION}">
 <link rel="stylesheet" href="/assets/tayri.css?v=${VERSION}">
 </head>
-<body class="tayri-shell" data-room="${esc(room?.slug || '')}" data-ambiance="${esc(ambianceDouce(ambiance || room?.slug || ''))}" data-accent="${esc(accent)}">
+<body class="tayri-shell" data-tayri-univers="${universTayri(path, room)}" data-room="${esc(room?.slug || '')}" data-ambiance="${esc(ambianceDouce(ambiance || room?.slug || ''))}" data-accent="${esc(accent)}">
 <a class="skip" href="#contenu">Aller au contenu</a>
 ${header(room, path)}
 <main id="contenu">
+${entreeTayri(path, room)}
 ${body}
 </main>
 ${footer()}
@@ -725,10 +726,10 @@ page(
     <h1>${esc(T('speed.titre', 'Le Boudoir des Rencontres', 'Titre en haut (ligne 1)', 'Le Boudoir'))} <span>${esc(T('speed.titre2', 'Le Boudoir des Rencontres', 'Titre en haut (ligne 2)', 'des Rencontres'))}</span></h1>
     <p class="bal-welcome">${esc(roomBySlug['speed-dating'].welcome)}</p>
     <p class="bal-lead">${esc(P.speedDating.intro)}</p>
+    <p class="bal-actions"><a class="btn btn-gold" href="/speed-dating/inscription/">M’inscrire à un salon</a><a class="btn bal-btn-line" href="/speed-dating/salle/">Tester ma caméra</a></p>
     <div class="bal-facts" aria-label="En bref">
       <span>En visio, depuis chez toi</span><span>Deux salons par âge</span><span>20 personnes max par salon</span><span>Lamia veille</span>
     </div>
-    <p class="bal-actions"><a class="btn btn-gold" href="/speed-dating/inscription/">M’inscrire à un salon</a><a class="btn bal-btn-line" href="/speed-dating/salle/">Tester ma caméra</a></p>
   </div>
 </section>
 
@@ -1637,7 +1638,6 @@ page(
     room: roomBySlug.patio,
     scripts: ['/assets/annonces.js', '/assets/swipe-accueil.js'],
     body: `<div class="po-app">
-${SWIPE_INVITE}
 <section class="po-hero" aria-labelledby="po-titre">
   <div class="po-fond" aria-hidden="true"></div>
   <div class="po-hero-grid">
@@ -1653,6 +1653,7 @@ ${SWIPE_INVITE}
     </figure>
   </div>
 </section>
+${SWIPE_INVITE}
 <section class="room-body patio-body po-corps">
   <div class="annonce-retrait" data-annonce-retrait hidden></div>
   <div class="annonce-box" id="confier" data-annonce-box hidden></div>

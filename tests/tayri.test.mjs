@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { navigationTayri, rubriqueTayri, habillerPageStatique } from '../build/tayri.mjs';
+import { navigationTayri, rubriqueTayri, habillerPageStatique, universTayri, entreeTayri } from '../build/tayri.mjs';
 
 test('Boutique reste le repère actif des trois rayons et des fiches, dans chaque langue', () => {
   for (const prefix of ['', '/en', '/ar', '/kab']) {
@@ -15,6 +15,22 @@ test('Boutique reste le repère actif des trois rayons et des fiches, dans chaqu
 
 test('Couple garde son propre repère dans la présentation comme dans l’espace privé', () => {
   for (const path of ['/espace-couple/', '/notre-couple/', '/en/notre-couple/']) assert.equal(rubriqueTayri(path), 'couple');
+});
+
+test('les ambiances suivent le parcours réel malgré les anciennes pièces réutilisées', () => {
+  assert.equal(universTayri('/espace-couple/', { slug: 'hall' }), 'couple');
+  assert.equal(universTayri('/ar/mon-espace/', { slug: 'patio' }), 'compte');
+  assert.equal(universTayri('/en/produit/livre/', { slug: 'bibliotheque' }), 'bibliotheque');
+  assert.equal(universTayri('/confidences/', { slug: 'patio' }), 'confidences');
+  assert.equal(entreeTayri('/'), '');
+});
+
+test('les trois rayons restent accessibles depuis chaque famille de fiche produit', () => {
+  for (const slug of ['ecrin', 'bibliotheque', 'grenier']) {
+    const nav = entreeTayri('/produit/une-piece/', { slug });
+    for (const href of ['/boutique/', '/ecrin/', '/bibliotheque/', '/grenier/']) assert.ok(nav.includes(`href="${href}"`));
+    assert.doesNotMatch(nav, /aria-current="page"/);
+  }
 });
 
 test('les commandes de compte et notifications restent disponibles dans la navigation mobile', () => {
