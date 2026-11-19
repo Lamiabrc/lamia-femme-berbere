@@ -2,6 +2,7 @@
 import { createClient } from '/vendor/supabase.mjs';
 import { creerCompte, api } from './confidences-commun.js';
 import { boutonsSociaux, completerPrenom } from './connexion-sociale.mjs';
+import { creerAppelProfil, creerEnvoisDiscussion, messageErreurMessagerie } from './messagerie-reseau.mjs';
 import { secteurLisible, origineLisible, phrasesDifference, criteresDeQuestion, lib, foiEtVie, badgesProfil, metierEtReligion } from './matching-options.mjs';
 
 // Un petit « ? » à ouvrir au lieu d'un paragraphe d'explication (Lamia, 16 nov. 2026 : « trop de texte »).
@@ -25,6 +26,11 @@ const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '
 const when = (iso) => new Date(iso).toLocaleString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
 const say = (el, msg, err = false) => { el.textContent = msg; el.classList.toggle('is-error', err); };
 let recovering = false;
+let membreAffiche = null;
+const appelProfil = creerAppelProfil({
+  getSession: async () => { const r = await supabase.auth.getSession(); if (r.error) throw r.error; return r.data.session; },
+  refreshSession: async () => { const r = await supabase.auth.refreshSession(); if (r.error) throw r.error; return r.data.session; },
+});
 
 // render() repasse à chaque événement de connexion (ouverture, retour sur l'onglet, jeton renouvelé) :
 // un écouteur ajouté à chaque passage enverrait tout en double ou en triple. Ici, le nouveau remplace l'ancien.
@@ -37,18 +43,31 @@ function ecouter(box, type, fn) {
   box.addEventListener(type, fn);
 }
 let minuterieDiscussions = null;
+let dernierGesteDiscussions = Date.now();
+['pointerdown', 'keydown', 'scroll'].forEach((type) => window.addEventListener(type, () => { dernierGesteDiscussions = Date.now(); }, { passive: true }));
 // Photos des matchs (Passion, ou achetées), par numéro : affichées aussi en tête de la discussion (17 nov. 2026).
 const photosMatch = new Map();
 
 // Revenir là où on allait après la connexion (ex. l'invitation dans l'espace couple), même après le lien reçu par email.
 try { const r = new URLSearchParams(location.search).get('retour'); if (r && /^\/[a-z0-9-]/i.test(r)) localStorage.setItem('lfb-retour', r); } catch { /* */ }
-async function render() {
+async function render(force = false) {
   const { data: { session } } = await supabase.auth.getSession();
   if (session && !recovering) { try { const r = localStorage.getItem('lfb-retour'); if (r) { localStorage.removeItem('lfb-retour'); location.replace(r); return; } } catch { /* */ } }
   $('[data-espace-newpass]').hidden = !recovering;
   $('[data-espace-out]').hidden = !!session || recovering;
   $('[data-espace-in]').hidden = !session || recovering;
-  if (!session || recovering) return;
+  if (!session || recovering) {
+    membreAffiche = null; appelProfil.annuler(); clearInterval(minuterieDiscussions);
+    photosMatch.clear();
+    for (const s of ['[data-espace-discussion]', '[data-espace-profil]']) { const z = $(s); if (z) z.replaceChildren(); }
+    return;
+  }
+  if (membreAffiche === session.user.id && !force) return;
+  if (membreAffiche !== session.user.id) {
+    appelProfil.annuler(); clearInterval(minuterieDiscussions); photosMatch.clear();
+    for (const s of ['[data-espace-discussion]', '[data-espace-profil]', '[data-mes-matchs]']) { const z = $(s); if (z) z.replaceChildren(); }
+  }
+  membreAffiche = session.user.id;
   const u = session.user;
   completerPrenom(supabase, u);
   // Le titre « Bonjour … » est remplacé par la salutation de la discussion (« Azul … ») : le prénom n'y est alors plus.
@@ -293,13 +312,6 @@ async function achats(session) {
 
 // Profil confié à Lamia : état, avantages, modification, fin d'un match en cours.
 const ETAT_PROFIL = { a_verifier: 'En cours de vérification', publiee: '✓ Vérifié', refusee: 'Non retenu pour le moment' };
-async function appelProfil(body, session) {
-  // 20 secondes au plus : si le site est saturé, on affiche « Réessaie » au lieu de rester sur « Un instant… ».
-  const r = await fetch('/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` }, body: JSON.stringify(body), signal: AbortSignal.timeout(20000) });
-  const d = await r.json().catch(() => ({}));
-  if (!r.ok || d.error) throw Object.assign(new Error(d.error || 'erreur'), { code: d.error });
-  return d;
-}
 // Mon salon de soirée : attente, place gratuite à valider, place à régler, place confirmée.
 async function monSpeedDating(session) {
   const box = $('[data-espace-salon]');
@@ -597,7 +609,11 @@ async function monProfil(session) {
       try { await appelProfil({ action: 'annonce_dematcher', ref: Number(bouton.dataset.profilDematcher) }, session); monProfil(session); }
       catch (err) { if (err.code === 'dematch_dans_discussion') { e.target.disabled = false; document.querySelector('[data-espace-discussion-bloc]')?.scrollIntoView({ behavior: 'smooth' }); alert('Vous avez une discussion ouverte : utilise le bouton « Dématcher » sous votre discussion, pour vous dire au revoir.'); return; } box.querySelector('[data-profil-statut]').textContent = 'Ça n’a pas fonctionné. Réessaie, ou écris à Lamia.'; e.target.disabled = false; }
     }));
-  } catch { box.innerHTML = '<p>Ton profil ne s’affiche pas pour le moment. Réessaie dans un instant.</p>'; }
+  } catch (err) {
+    if (err.code === 'session_changee') return;
+    box.innerHTML = `<p role="status">${esc(messageErreurMessagerie(err))}</p><button type="button" class="btn btn-line" data-profil-reessayer>Recharger mon profil</button>`;
+    box.querySelector('[data-profil-reessayer]')?.addEventListener('click', (e) => { e.target.disabled = true; monProfil(session); }, { once: true });
+  }
 }
 
 // Suivi : mises en relation offertes et du mois, speed datings inclus, demandes envoyées.
@@ -783,7 +799,7 @@ if (/[#&]error_code=otp_expired\b/.test(location.hash)) {
   st?.closest('form')?.scrollIntoView({ block: 'center' });
   history.replaceState(null, '', location.pathname);
 }
-supabase.auth.onAuthStateChange((event) => { if (event === 'PASSWORD_RECOVERY') recovering = true; render(); });
+supabase.auth.onAuthStateChange((event) => { if (event === 'PASSWORD_RECOVERY') recovering = true; render(event === 'USER_UPDATED'); });
 render();
 
 // Fiche créée en live avec Lamia, reliée à ce compte depuis le lien personnel.
@@ -1026,6 +1042,8 @@ async function discussions(session) {
   const bloc = document.querySelector('[data-espace-discussion-bloc]'), box = document.querySelector('[data-espace-discussion]');
   if (!bloc || !box) return;
   let liste = [], ouverte = null, salut = '', e = '·e';
+  const envois = creerEnvoisDiscussion(), statutsEnvoi = new Map();
+  let chargement = null, versionEnvoi = 0;
   clearInterval(minuterieDiscussions);
   const heure = (d) => new Date(d).toLocaleString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { weekday: 'short', hour: '2-digit', minute: '2-digit' });
   const reste = (d) => { const ms = new Date(d.ferme_at) - Date.now(); if (ms <= 0) return 'terminée'; if (ms > 365 * 86400e3) return 'sans limite de durée'; const j = Math.floor(ms / 86400e3), h = Math.floor((ms % 86400e3) / 3600e3); return j ? `encore ${j} jour${j > 1 ? 's' : ''}${h ? ` et ${h} h` : ''}` : `encore ${h} h`; };
@@ -1085,6 +1103,7 @@ async function discussions(session) {
         ${d.ouverte ? `<small>La discussion se ferme le ${esc(new Date(d.dematch.fin).toLocaleString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }))}.</small>` : ''}</div>` : ''}
       ${d.ouverte && (!d.dematch || d.dematch.restants) ? `<form class="disc-saisie" data-disc-envoi><textarea name="texte" rows="2" maxlength="1000" placeholder="Ton message…" required></textarea><button class="btn btn-ink" type="submit">Envoyer</button></form>
       <p class="disc-aide">Pour ta sécurité, les numéros, liens et emails écrits dans les messages sont masqués : utilise le bouton ci-dessous pour échanger vos numéros. Reste sur l’application tant que tu n’es pas sûr·e : ton numéro et tes réseaux restent protégés.</p>` : ''}
+      <p class="form-status" role="status" data-disc-statut-envoi>${esc(statutsEnvoi.get(d.id) || '')}</p>
       ${d.ouverte && !d.dematch && !d.prenom?.partage ? (d.prenom?.demander
         ? `<div class="disc-prenom"><p><svg class="ico" aria-hidden="true"><use href="/icones.svg#hand"/></svg> <strong>Veux-tu partager ton prénom${d.prenom.mien ? ` (${esc(d.prenom.mien)})` : ''} avec ton match ?</strong> Rien ne presse : tu peux aussi le faire plus tard, après vos premiers échanges.</p><p><button type="button" class="btn btn-ink" data-disc-prenom="partager">Oui, partager</button> <button type="button" class="btn btn-line" data-disc-prenom="plus_tard">Plus tard</button></p></div>`
         : '<p class="disc-prenom-lien"><button type="button" class="link-button" data-disc-prenom="partager"><svg class="ico" aria-hidden="true"><use href="/icones.svg#hand"/></svg> Partager mon prénom</button></p>') : ''}
@@ -1132,20 +1151,46 @@ async function discussions(session) {
     box.innerHTML = (photosRequises ? '<p class="disc-photos-requises"><strong>Ajoute tes 2 photos pour continuer.</strong> Sans photo validée, tu ne peux plus écrire dans tes discussions. <a class="text-link" href="#mon-profil">Modifier mon profil</a></p>' : '') + liste.filter((d) => d.ouverte || !d.vide).map(vue).join('');
     box.querySelectorAll('[data-disc]').forEach((a) => { const t = a.querySelector('textarea'); if (t && brouillons[a.dataset.disc]) t.value = brouillons[a.dataset.disc]; const f = a.querySelector('[data-disc-fil]'); f.scrollTop = f.scrollHeight; });
   };
-  const charger = async () => { try { const r = await appelProfil({ action: 'annonce_discussions' }, session); liste = r.discussions || []; photosRequises = Boolean(r.photos_requises); if (document.documentElement.lang !== 'en') { salut = r.adresse || ''; e = r.accord ?? e; const h1 = $('[data-espace-nom]')?.closest('h1'); if (salut && h1) h1.textContent = salut; } afficher(); } catch { /* */ } };
+  let etat = bloc.querySelector('[data-disc-chargement]'), reessayer = bloc.querySelector('[data-disc-reessayer]');
+  if (!etat) { etat = document.createElement('p'); etat.dataset.discChargement = ''; etat.className = 'form-status'; etat.setAttribute('role', 'status'); box.before(etat); }
+  if (!reessayer) { reessayer = document.createElement('button'); reessayer.dataset.discReessayer = ''; reessayer.className = 'btn btn-line'; reessayer.type = 'button'; reessayer.textContent = 'Réessayer'; reessayer.hidden = true; box.before(reessayer); }
+  const charger = (apresEnvoi = false) => {
+    if (chargement) return apresEnvoi === true ? chargement.then(() => charger()) : chargement;
+    const versionLecture = versionEnvoi;
+    reessayer.disabled = true;
+    chargement = (async () => {
+      try {
+        const r = await appelProfil({ action: 'annonce_discussions' }, session);
+        if (versionLecture !== versionEnvoi) return; // une ancienne réponse ne doit pas effacer un envoi confirmé
+        liste = r.discussions || []; photosRequises = Boolean(r.photos_requises);
+        if (document.documentElement.lang !== 'en') { salut = r.adresse || ''; e = r.accord ?? e; const h1 = $('[data-espace-nom]')?.closest('h1'); if (salut && h1) h1.textContent = salut; }
+        etat.hidden = true; reessayer.hidden = true; afficher();
+      } catch (err) {
+        if (err.code === 'session_changee' || versionLecture !== versionEnvoi) return;
+        bloc.hidden = false; etat.hidden = false;
+        etat.textContent = messageErreurMessagerie(err); reessayer.hidden = false;
+      } finally { chargement = null; reessayer.disabled = false; }
+    })();
+    return chargement;
+  };
+  ecouter(reessayer, 'click', () => charger());
   { const h = location.hash.match(/^#dematcher-(.+)$/); if (h) dematchOuvert = decodeURIComponent(h[1]); }
   await charger();
+  if (membreAffiche !== session.user.id) return;
   if (dematchOuvert && liste.length) box.querySelector(`[data-disc="${CSS.escape(dematchOuvert)}"] [data-disc-dematch-form]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   else if (location.hash === '#discussion' && liste.length) bloc.scrollIntoView({ behavior: 'smooth' });
   // Les nouveaux messages arrivent toutes les 20 secondes tant que la page est ouverte et regardée ;
   // après 15 minutes sans geste, on arrête (le prochain geste relance). Économie de la base (17 nov. 2026).
-  let dernierGeste = Date.now();
-  ['pointerdown', 'keydown', 'scroll'].forEach((t) => window.addEventListener(t, () => { dernierGeste = Date.now(); }, { passive: true }));
-  if (liste.some((d) => d.ouverte)) minuterieDiscussions = setInterval(() => { if (!document.hidden && !dematchOuvert && !box.contains(document.activeElement) && Date.now() - dernierGeste < 15 * 60e3) charger(); }, 20000);
+  minuterieDiscussions = setInterval(() => {
+    const edition = box.contains(document.activeElement) && document.activeElement.matches('textarea,input,select,[contenteditable="true"]');
+    if ((liste.some((d) => d.ouverte) || !reessayer.hidden) && !document.hidden && !dematchOuvert && !edition && !envois.occupe() && Date.now() - dernierGesteDiscussions < 15 * 60e3) charger();
+  }, 20000);
   ecouter(box, 'submit', async (e) => {
     e.preventDefault();
     const a = e.target.closest('[data-disc]'), id = a?.dataset.disc;
-    const bouton = e.target.querySelector('button'); bouton.disabled = true;
+    const bouton = e.target.querySelector('button');
+    if (bouton.disabled || (e.target.matches('[data-disc-envoi]') && envois.occupe(id))) return;
+    bouton.disabled = true;
     try {
       if (e.target.matches('[data-disc-dematch-form]')) {
         await appelProfil({ action: 'annonce_discussion_dematcher', id, raison: e.target.raison.value, etape: e.target.etape?.value }, session);
@@ -1155,20 +1200,29 @@ async function discussions(session) {
       }
       if (e.target.matches('[data-disc-envoi]')) {
         const texte = e.target.texte.value.trim();
-        const r = await appelProfil({ action: 'annonce_discussion_envoyer', id, texte }, session);
-        e.target.texte.value = '';
+        if (!texte) return;
+        statutsEnvoi.set(id, 'Envoi en cours…');
+        a.querySelector('[data-disc-statut-envoi]').textContent = 'Envoi en cours…';
+        const r = await envois.envoyer(id, texte, (body) => appelProfil(body, session));
+        versionEnvoi++;
+        if (e.target.texte.value.trim() === texte) e.target.texte.value = '';
+        statutsEnvoi.set(id, 'Message enregistré.');
         // Le message s'affiche tout de suite, même si le rechargement est lent (17 nov. 2026).
         const disc = liste.find((x) => x.id === id);
-        if (disc) { disc.messages = [...(disc.messages || []), { moi: true, texte: r.texte || texte, le: new Date().toISOString() }]; afficher(); }
+        if (disc) { if (!disc.messages?.some((m) => r.client_message_id && m.client_message_id === r.client_message_id)) disc.messages = [...(disc.messages || []), { moi: true, texte: r.texte || texte, le: r.le || new Date().toISOString(), client_message_id: r.client_message_id }]; afficher(); }
         if (r.masque) alert('Un numéro, un lien ou un email a été masqué dans ton message. Pour passer au téléphone, utilise « Échanger nos numéros ».');
       } else if (e.target.matches('[data-disc-numero]')) {
         await appelProfil({ action: 'annonce_discussion_numero', id, telephone: e.target.telephone.value }, session);
       }
-      await charger();
+      await charger(true);
     } catch (err) {
-      alert(err.code === 'telephone_invalide' ? 'Ce numéro ne semble pas valide. Exemple : 06 12 34 56 78 ou +213 5 12 34 56 78.' : err.code === 'au_revoir_fini' ? 'Tu as écrit tes deux messages d’au revoir.' : err.code === 'raison_requise' ? 'Choisis une raison.' : err.code === 'discussion_fermee' ? 'Cette discussion est terminée.' : err.code === 'photos_requises' ? 'Ajoute tes 2 photos (dans « Modifier mon profil ») pour continuer la discussion.' : err.code === 'rate_limited' ? 'Doucement Réessaie dans quelques minutes.' : 'Le message n’est pas parti. Réessaie.');
+      if (err.code === 'session_changee') return;
+      const message = err.code === 'telephone_invalide' ? 'Ce numéro ne semble pas valide. Exemple : 06 12 34 56 78 ou +213 5 12 34 56 78.' : err.code === 'au_revoir_fini' ? 'Tu as écrit tes deux messages d’au revoir.' : err.code === 'raison_requise' ? 'Choisis une raison.' : err.code === 'discussion_fermee' ? 'Cette discussion est terminée.' : err.code === 'not_found' ? 'Cette discussion n’est plus accessible.' : err.code === 'photos_requises' ? 'Ajoute tes 2 photos (dans « Modifier mon profil ») pour continuer la discussion.' : err.code === 'rate_limited' ? 'Doucement. Réessaie dans quelques minutes.' : messageErreurMessagerie(err);
+      statutsEnvoi.set(id, message + (e.target.matches('[data-disc-envoi]') ? ' Ton texte est conservé.' : ''));
+      const statut = a?.querySelector('[data-disc-statut-envoi]'); if (statut) statut.textContent = statutsEnvoi.get(id);
+    } finally {
+      bouton.disabled = false;
     }
-    bouton.disabled = false;
   });
   ecouter(box, 'change', (e) => {
     if (e.target.name !== 'raison') return;

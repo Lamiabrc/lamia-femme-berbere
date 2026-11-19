@@ -1,6 +1,7 @@
 import { handleConfidences } from '../lib/confidences.mjs';
 import { json } from '../lib/event-tickets.mjs';
 import { envoyerNouveautes } from '../lib/nouveautes.mjs';
+import { waitUntil } from '@vercel/functions';
 
 // L'outil de matching de Lamia tourne sur son ordinateur (http://127.0.0.1:18080) : il a le droit d'appeler cette API.
 const OUTIL = /^http:\/\/(127\.0\.0\.1|localhost):18080$/;
@@ -15,7 +16,7 @@ const cors = (request, res) => {
 
 // Les Confidences avec Lamia : confidences, conversations privées, espace de Lamia, notifications, profils.
 export async function POST(request) {
-  try { return cors(request, await handleConfidences(request)); }
+  try { return cors(request, await handleConfidences(request, process.env.VERCEL ? { apresReponse: waitUntil } : {})); }
   catch (e) { console.error('confidences failed', e?.message); return cors(request, json({ error: 'temporary_failure' }, 502)); }
 }
 export async function OPTIONS(request) {
