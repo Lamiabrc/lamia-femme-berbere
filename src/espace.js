@@ -3,6 +3,7 @@ import { createClient } from '/vendor/supabase.mjs';
 import { creerCompte, api } from './confidences-commun.js';
 import { boutonsSociaux, completerPrenom } from './connexion-sociale.mjs';
 import { secteurLisible, origineLisible, phrasesDifference, criteresDeQuestion, lib, foiEtVie, badgesProfil, metierEtReligion } from './matching-options.mjs';
+import { capaciteMatchs, libelleInteret, titreDiscussion } from './etat-matchs.mjs';
 
 // Un petit « ? » à ouvrir au lieu d'un paragraphe d'explication (Lamia, 16 nov. 2026 : « trop de texte »).
 const aideQ = (texte) => `<details class="aide-q"><summary aria-label="Comprendre"><span aria-hidden="true">?</span></summary><p>${texte}</p></details>`;
@@ -22,6 +23,15 @@ function themeCelib(genre, garder = true) {
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc');
 const $ = (s, r = document) => r.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
+const compteurMatchs = (m) => {
+  const cap = capaciteMatchs(m);
+  const plein = cap && m.actifs >= cap && !m.places_en_attente;
+  return `<p class="espace-match"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Matchs en cours : <strong>${esc(m.actifs)}</strong></p>
+    ${cap ? `<p class="espace-capacite">Ta capacité : ${esc(cap)} match${cap > 1 ? 's' : ''} en même temps.</p>` : ''}
+    ${m.au_revoir_nombre ? `<p class="espace-capacite">${esc(m.au_revoir_nombre)} échange${m.au_revoir_nombre > 1 ? 's' : ''} d’au revoir, à part de tes matchs en cours.</p>` : ''}
+    ${m.en_attente ? `<p class="espace-capacite">${esc(m.en_attente)} intérêt${m.en_attente > 1 ? 's' : ''} réciproque${m.en_attente > 1 ? 's' : ''} en attente de mise en relation.</p>` : ''}
+    ${plein ? `<p class="espace-capacite">Tes places sont occupées.${m.formule === 'prestige' ? '' : ' <a class="text-link" href="/abonnement/">Voir les formules</a>'}</p>` : ''}`;
+};
 const when = (iso) => new Date(iso).toLocaleString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
 const say = (el, msg, err = false) => { el.textContent = msg; el.classList.toggle('is-error', err); };
 let recovering = false;
@@ -485,12 +495,12 @@ async function monProfil(session) {
       ${p.live ? `<p><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg> Profil créé en live${p.live_retrouve ? '' : ' (ta fiche est en vérification)'}.</p>` : ''}
       ${p.nb_compatibles !== null && p.nb_compatibles !== undefined ? `<p>D’après notre algorithme, tu pourrais correspondre à ${esc(p.nb_compatibles)} personne(s).</p>` : ''}
       ${p.matchs?.places_en_attente && p.matchs.choix_multiples !== 'non' ? `<div class="espace-multiples" id="multiples" data-multiples>
-        ${p.matchs.au_revoir ? `<p><strong>Ta discussion se termine.</strong> Vous avez encore quelques heures pour vous dire au revoir. Un nouveau match peut t’attendre : veux-tu qu’il s’ouvre dès maintenant ?</p>
-        <p class="espace-sans-liens"><button type="button" class="btn btn-line" data-multiples-choix="non">J’attends la fin de ma discussion</button> <button type="button" class="btn btn-ink" data-multiples-choix="oui">Ouvrir un nouveau match</button></p>` : `<p><strong>Ta formule permet d’autres matchs.</strong> Tu es en ce moment en discussion avec ton match : s’il s’ouvre d’autres matchs, ton match le verra.</p>
+        ${p.matchs.au_revoir ? `<p><strong>Au revoir en cours.</strong> Le match est terminé. Tes derniers messages restent disponibles dans la discussion.</p><p>Souhaites-tu autoriser un nouveau match maintenant ?</p>
+        <p class="espace-sans-liens"><button type="button" class="btn btn-line" data-multiples-choix="non">Attendre la fin de l’au revoir</button> <button type="button" class="btn btn-ink" data-multiples-choix="oui">Autoriser un nouveau match</button></p>` : `<p><strong>Ta formule permet d’autres matchs.</strong> Tu es en ce moment en discussion avec ton match : s’il s’ouvre d’autres matchs, ton match le verra.</p>
         ${p.matchs.choix_multiples === '24h' ? '<p class="aide">C’est noté : d’autres matchs pourront s’ouvrir 24 h après le début de ta discussion.</p>' : ''}
         <p class="espace-sans-liens"><button type="button" class="btn btn-line" data-multiples-choix="non">Je reste avec mon match</button> <button type="button" class="btn btn-line" data-multiples-choix="24h">Pas pendant notre premier échange (24 h)</button> <button type="button" class="btn btn-ink" data-multiples-choix="oui">Ouvrir d’autres matchs</button></p>`}
       </div>` : ''}
-      ${p.matchs ? `<p class="espace-match"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Matchs en cours : <strong>${esc(p.matchs.actifs)} / ${esc(p.matchs.limite)}</strong>${p.matchs.limite > 0 && p.matchs.actifs >= p.matchs.limite ? (p.matchs.formule === 'prestige' ? ' · mets fin à un match pour en choisir un autre.' : ' · mets fin à un match pour en choisir un autre, ou <a class="text-link" href="/abonnement/">passe à une formule supérieure</a>.') : ''}</p>` : ''}</div>
+      ${p.matchs ? compteurMatchs(p.matchs) : ''}</div>
       <div class="espace-achat-droite">${!window.LFB_PLAY && p.matchs && p.matchs.formule !== 'prestige' ? (p.algerie ? '<a class="btn btn-line" href="/salon/">Plus de matchs au live</a> ' : `<a class="btn btn-ink espace-abo-btn" href="${p.matchs.formule === 'passion' ? '/abonnement/?formule=prestige">Passer à Prestige' : '/abonnement/">S’abonner'}</a> `) : ''}${p.fiche_live ? '<a class="btn btn-ink" href="#mes-fiches">Modifier mon profil</a>' : '<button class="btn btn-ink" type="button" data-profil-modifier>Modifier mon profil</button>'}</div></article>
       ${(p.matchs_lies || []).length ? `<ul class="espace-matchs-liste">${p.matchs_lies.map((m) => `<li>${m.url ? `<img class="espace-match-avatar" src="${esc(m.url)}" alt="Photo de ton match" loading="lazy" draggable="false">` : ''}<span><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Match avec le profil n° ${esc(m.ref)}</span><button class="btn btn-ink" type="button" data-voir-match="${esc(m.ref)}">Voir son profil complet</button> <button class="btn btn-line" type="button" data-profil-dematcher="${esc(m.ref)}">Mettre fin à ce match</button></li>`).join('')}</ul>` : ''}
       ${p.medias_ok === false ? `<section class="espace-photos" id="photos"><h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#camera"/></svg> Il manque tes photos</h3><p>Ajoute <strong>2 photos de toi, visage visible,</strong> pour swiper et répondre aux personnes intéressées. Elles restent privées : elles ne sont pas affichées dans les profils.</p><div data-profil-medias></div></section>` : ''}
@@ -614,8 +624,9 @@ async function suivi(el, p) {
   const cle = a?.formule && FORMULES[a.formule] ? a.formule : (p.matchs?.formule && FORMULES[p.matchs.formule] ? p.matchs.formule : 'decouverte');
   const f = FORMULES[cle];
   const lignes = [
-    p.matchs ? `<li><strong>Matchs en cours</strong> : ${esc(p.matchs.actifs)} sur ${esc(p.matchs.limite)} en même temps</li>` : '',
-    `<li><strong>Discussion avec ton match</strong> : ${f.jours ? `${f.jours} jours` : 'sans limite de durée'}</li>`,
+    p.matchs ? `<li><strong>Matchs en cours</strong> : ${esc(p.matchs.actifs)}${capaciteMatchs(p.matchs) ? ` · capacité de ${esc(capaciteMatchs(p.matchs))} en même temps` : ''}</li>` : '',
+    p.matchs?.au_revoir_nombre ? `<li><strong>Échanges d’au revoir</strong> : ${esc(p.matchs.au_revoir_nombre)} · les matchs correspondants sont terminés</li>` : '',
+    `<li><strong>Durée de discussion incluse</strong> : ${f.jours ? `${f.jours} jours` : 'sans limite de durée'}</li>`,
     f.sd ? `<li><strong>Speed dating</strong> : ${f.sd} inclus par mois</li>` : '',
     u.mise_en_relation || u.speed_dating ? `<li><strong>Achetés à l’unité</strong> : ${u.mise_en_relation || 0} place(s) de match · ${u.speed_dating || 0} place(s) de speed dating</li>` : '',
   ].filter(Boolean).join('');
@@ -877,9 +888,10 @@ async function propositions(session) {
 // Les fiches auxquelles on a déjà répondu : une ligne chacune, repliées sous le titre.
 const REPONDU = { proposition: { oui: 'Tu as dit oui', non: 'Tu as dit non' }, avis: { oui: 'Différence acceptée', non: 'Tu as dit non' }, interet: { oui: 'Tu as dit oui', non: 'Tu as dit non' } };
 function enDeuxTemps(liste, carte, type) {
-  const a = liste.filter((x) => !x.reponse), r = liste.filter((x) => x.reponse);
-  const court = (x) => `<li>n° ${esc(x.fiche.ref)} · <strong>${esc(REPONDU[type][x.reponse] || '')}</strong></li>`;
-  return `${a.map(carte).join('')}${r.length ? `<details class="espace-deja"><summary>Déjà répondu <span class="espace-nb">${r.length}</span></summary><ul>${r.map(court).join('')}</ul></details>` : ''}`;
+  const terminee = (x) => type === 'interet' && ['dematche', 'pas_compatible'].includes(x.statut);
+  const a = liste.filter((x) => !x.reponse && !terminee(x)), r = liste.filter((x) => x.reponse || terminee(x));
+  const court = (x) => `<li>n° ${esc(x.fiche.ref)} · <strong>${esc(type === 'interet' ? libelleInteret(x) : REPONDU[type][x.reponse] || '')}</strong></li>`;
+  return `${a.map(carte).join('')}${r.length ? `<details class="espace-deja"><summary>${type === 'interet' ? 'Historique de tes réponses' : 'Déjà répondu'} <span class="espace-nb">${r.length}</span></summary>${type === 'interet' ? '<p class="aide">Les réponses passées ne sont pas des matchs actifs.</p>' : ''}<ul>${r.map(court).join('')}</ul></details>` : ''}`;
 }
 
 // Une réponse refusée se dit toujours : sinon le bouton semble ne rien faire.
@@ -942,7 +954,7 @@ async function interetsRecus(session) {
     const f = i.fiche;
     const infos = [f.genre === 'femme' ? 'Une femme' : 'Un homme', f.age && `${f.age} ans`, f.ville, f.pays, f.situation].filter(Boolean);
     const ages = f.age_min || f.age_max ? ` · ${f.age_min || 18} à ${f.age_max || 99} ans` : '';
-    const rep = i.reponse === 'oui' ? '<p class="espace-match"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Tu as dit oui : c’est réciproque, vous êtes mis en relation très vite.</p>'
+    const rep = i.reponse === 'oui' ? `<p class="espace-match"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> ${esc(libelleInteret(i))}.</p>`
       : i.reponse === 'non' ? '<p>Tu as répondu : pas pour moi.</p>'
       : `<p class="interet-boutons"><button type="button" class="btn btn-ink" data-repondre="oui" data-id="${esc(i.id)}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Ça m’intéresse aussi</button><button type="button" class="btn btn-line" data-repondre="non" data-id="${esc(i.id)}">Pas pour moi</button></p>`;
     return `<article class="espace-achat interet-recu"><div><p class="event-date">Profil n° ${esc(f.ref)} · intéressé·e par ta fiche n° ${esc(i.pour)} · le ${esc(new Date(i.le).toLocaleDateString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { day: 'numeric', month: 'long' }))}</p>
@@ -961,7 +973,7 @@ async function interetsRecus(session) {
     const b = e.target.closest('[data-repondre]');
     if (!b) return;
     b.parentElement.querySelectorAll('button').forEach((x) => { x.disabled = true; });
-    try { await appelProfil({ action: 'annonce_repondre_interet', id: b.dataset.id, reponse: b.dataset.repondre }, session); liste = liste.map((x) => (x.id === b.dataset.id ? { ...x, reponse: b.dataset.repondre } : x)); afficher(); }
+    try { await appelProfil({ action: 'annonce_repondre_interet', id: b.dataset.id, reponse: b.dataset.repondre }, session); liste = liste.map((x) => (x.id === b.dataset.id ? { ...x, reponse: b.dataset.repondre } : x)); afficher(); await Promise.all([monProfil(session), interetsRecus(session)]); }
     catch (err) { b.parentElement.querySelectorAll('button').forEach((x) => { x.disabled = false; }); direErreurReponse(b.parentElement, err); }
   });
 }
@@ -1049,6 +1061,7 @@ async function discussions(session) {
   // Fin des 7 jours (Lamia, 16 nov. 2026) : une bulle « C'est fini ? ou on est en couple ? ».
   // Si les deux disent « en couple », leur espace commun s'ouvre et la discussion ne se termine plus.
   const finBulle = (d) => {
+    if (d.dematch) return ''; // un match terminé n'invite plus à se déclarer en couple
     const f = d.fin || {};
     if (f.couple) return '<div class="disc-fin is-couple"><p><strong>Vous êtes en couple 💞</strong></p><p><a class="btn btn-ink" href="/notre-couple/">Notre espace de couple</a></p></div>';
     if (d.dematch || d.close_raison === 'signalee' || d.annulee || (!d.ouverte && d.vide)) return '';
@@ -1074,17 +1087,17 @@ async function discussions(session) {
     const ecrire = d.ouverte && !d.dematch;
     return `<article class="disc${ecrire ? ' is-ouverte' : ''}" data-disc="${esc(d.id)}">
       ${ecrire ? '<p class="disc-ouverte-ligne">Votre discussion est ouverte : vous pouvez échanger</p>' : ''}
-      <header class="disc-tete">${(() => { const u = photosMatch.get(Number(d.avec_ref)) || photosMatch.get(Number(d.ancien_ref)); return u && d.ouverte ? `<img class="disc-photo" src="${esc(u)}" alt="Photo de ton match" draggable="false">` : ''; })()}<strong>Avec ${esc(d.avec)}${d.ancien_ref ? ` <small class="disc-ancien">(c’est le n° ${esc(String(d.ancien_ref))}, même personne)</small>` : ''}</strong><span>${d.ouverte ? `${esc(reste(d))}` : d.close_raison === 'signalee' ? 'fermée (signalée)' : d.close_raison ? 'fermée' : 'terminée'}</span></header>
+      <header class="disc-tete">${(() => { const u = photosMatch.get(Number(d.avec_ref)) || photosMatch.get(Number(d.ancien_ref)); return u && d.ouverte ? `<img class="disc-photo" src="${esc(u)}" alt="Photo de ton match" draggable="false">` : ''; })()}<strong>Avec ${esc(d.avec)}${d.ancien_ref ? ` <small class="disc-ancien">(c’est le n° ${esc(String(d.ancien_ref))}, même personne)</small>` : ''}</strong><span>${esc(titreDiscussion(d))}${d.ouverte ? ` · ${esc(reste(d))}` : ''}</span></header>
       ${d.ses_autres_matchs > 0 ? `<p class="disc-honnete">Par honnêteté : ${esc(d.avec)} a aussi ${d.ses_autres_matchs} autre${d.ses_autres_matchs > 1 ? 's' : ''} match${d.ses_autres_matchs > 1 ? 's' : ''} en cours.</p>` : ''}
       ${d.mes_autres_matchs > 0 ? `<p class="disc-honnete">De ton côté, tu as ${d.mes_autres_matchs} autre${d.mes_autres_matchs > 1 ? 's' : ''} match${d.mes_autres_matchs > 1 ? 's' : ''} en cours : ${esc(d.avec)} le voit aussi.</p>` : ''}
       ${vueParcours(d)}
       <div class="disc-fil" data-disc-fil>${msgs}</div>
       ${d.dematch ? `<div class="disc-dematch-etat">${d.dematch.par_moi
-        ? `<strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#handshake"/></svg> Tu as mis fin à ce match.</strong> ${d.dematch.restants ? `Il te reste <strong>${esc(d.dematch.restants)} message${d.dematch.restants > 1 ? 's' : ''}</strong> pour dire au revoir.` : `Merci d’être resté${e} courtois${e === 'e' ? 'e' : e ? '·e' : ''}.`}`
-        : `<strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> ${esc(d.avec)} a mis fin à ce match.</strong> Raison : ${esc(d.dematch.raison)}. ${d.dematch.restants ? `Tu peux répondre, il te reste ${esc(d.dematch.restants)} message${d.dematch.restants > 1 ? 's' : ''}.` : ''}`}
+        ? `<strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#handshake"/></svg> Tu as mis fin à ce match.</strong> ${d.ouverte && d.dematch.restants ? `Il te reste <strong>${esc(d.dematch.restants)} message${d.dematch.restants > 1 ? 's' : ''}</strong> pour dire au revoir.` : d.ouverte ? 'Tu as utilisé tes messages d’au revoir.' : 'Cet échange est terminé.'}`
+        : `<strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> ${esc(d.avec)} a mis fin à ce match.</strong> Raison : ${esc(d.dematch.raison)}. ${d.ouverte && d.dematch.restants ? `Tu peux répondre, il te reste ${esc(d.dematch.restants)} message${d.dematch.restants > 1 ? 's' : ''} pour dire au revoir.` : d.ouverte ? 'Tu as utilisé tes messages d’au revoir.' : 'Cet échange est terminé.'}`}
         ${d.ouverte ? `<small>La discussion se ferme le ${esc(new Date(d.dematch.fin).toLocaleString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }))}.</small>` : ''}</div>` : ''}
       ${d.ouverte && (!d.dematch || d.dematch.restants) ? `<form class="disc-saisie" data-disc-envoi><textarea name="texte" rows="2" maxlength="1000" placeholder="Ton message…" required></textarea><button class="btn btn-ink" type="submit">Envoyer</button></form>
-      <p class="disc-aide">Pour ta sécurité, les numéros, liens et emails écrits dans les messages sont masqués : utilise le bouton ci-dessous pour échanger vos numéros. Reste sur l’application tant que tu n’es pas sûr·e : ton numéro et tes réseaux restent protégés.</p>` : ''}
+      <p class="disc-aide">${d.dematch ? 'Ces derniers messages servent à vous dire au revoir. Les numéros, liens et emails restent masqués.' : 'Pour ta sécurité, les numéros, liens et emails écrits dans les messages sont masqués : utilise le bouton ci-dessous pour échanger vos numéros. Reste sur l’application tant que tu n’es pas sûr·e : ton numéro et tes réseaux restent protégés.'}</p>` : ''}
       ${d.ouverte && !d.dematch && !d.prenom?.partage ? (d.prenom?.demander
         ? `<div class="disc-prenom"><p><svg class="ico" aria-hidden="true"><use href="/icones.svg#hand"/></svg> <strong>Veux-tu partager ton prénom${d.prenom.mien ? ` (${esc(d.prenom.mien)})` : ''} avec ton match ?</strong> Rien ne presse : tu peux aussi le faire plus tard, après vos premiers échanges.</p><p><button type="button" class="btn btn-ink" data-disc-prenom="partager">Oui, partager</button> <button type="button" class="btn btn-line" data-disc-prenom="plus_tard">Plus tard</button></p></div>`
         : '<p class="disc-prenom-lien"><button type="button" class="link-button" data-disc-prenom="partager"><svg class="ico" aria-hidden="true"><use href="/icones.svg#hand"/></svg> Partager mon prénom</button></p>') : ''}
@@ -1150,6 +1163,7 @@ async function discussions(session) {
       if (e.target.matches('[data-disc-dematch-form]')) {
         await appelProfil({ action: 'annonce_discussion_dematcher', id, raison: e.target.raison.value, etape: e.target.etape?.value }, session);
         dematchOuvert = null;
+        await monProfil(session);
         await charger();
         return;
       }

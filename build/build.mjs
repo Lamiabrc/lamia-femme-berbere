@@ -920,8 +920,8 @@ page(
     </section>
 
     <section id="discussion" data-espace-discussion-bloc hidden>
-      <h2>Mes matchs en cours</h2>
-      <p>7 jours pour faire connaissance ici, en privé. Ensuite, échangez vos numéros.</p>
+      <h2>Mes discussions</h2>
+      <p>Retrouve vos échanges privés. L’état et le temps restant de chaque discussion sont indiqués ci-dessous.</p>
       <div class="espace-profil" id="moderateur" data-espace-moderateur hidden></div>
       <div class="espace-profil" id="beta" data-espace-beta hidden></div>
       <div class="espace-profil" data-espace-blocages hidden><h3>Profils bloqués</h3><ul data-blocages-liste></ul></div>
@@ -2310,6 +2310,7 @@ for (const f of ['lien-mot-de-passe.js', 'version-play.js', 'erreurs.js', 'abonn
 await cp(join(ROOT, 'content', 'shipping.mjs'), join(DIST, 'assets', 'shipping.mjs'));
 await cp(join(ROOT, 'content', 'rubriques.mjs'), join(DIST, 'assets', 'rubriques.mjs'));
 await cp(join(ROOT, 'content', 'matching-options.mjs'), join(DIST, 'assets', 'matching-options.mjs'));
+await cp(join(ROOT, 'content', 'etat-matchs.mjs'), join(DIST, 'assets', 'etat-matchs.mjs'));
 await cp(join(ROOT, 'content', 'signalement.mjs'), join(DIST, 'assets', 'signalement.mjs'));
 await cp(join(ROOT, 'src', 'i18n.js'), join(DIST, 'assets', 'i18n.js'));
 await cp(join(ROOT, 'src', 'tayri.css'), join(DIST, 'assets', 'tayri.css'));
