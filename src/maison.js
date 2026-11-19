@@ -586,7 +586,8 @@ renderSocials();
   // Barre du bas (téléphone) : l'onglet de la page en cours.
   const ici = location.pathname + location.hash;
   const liens = [...document.querySelectorAll('.barre-app a')];
-  const actif = liens.find((l) => l.getAttribute('href') === ici) || liens.filter((l) => !l.getAttribute('href').includes('#')).sort((x, y) => y.getAttribute('href').length - x.getAttribute('href').length).find((l) => location.pathname.startsWith(l.getAttribute('href')));
+  // Le gabarit connaît aussi les sous-pages (fiche produit → Boutique, espace privé → Couple).
+  const actif = liens.find((l) => l.getAttribute('aria-current') === 'page') || liens.find((l) => l.getAttribute('href') === ici) || liens.filter((l) => l.getAttribute('href') !== '/' && !l.getAttribute('href').includes('#')).sort((x, y) => y.getAttribute('href').length - x.getAttribute('href').length).find((l) => location.pathname.startsWith(l.getAttribute('href')));
   if (actif) actif.setAttribute('aria-current', 'page');
 })();
 

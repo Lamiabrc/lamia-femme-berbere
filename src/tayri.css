@@ -1,0 +1,159 @@
+/* Socle commun TAYRI : navigation, rythme et lisibilité. Les univers restent distincts. */
+.tayri-shell {
+  --ty-bordeaux: #7a1f35;
+  --ty-vert: #164f3d;
+  --ty-or: #bc9149;
+  --ty-ivoire: #fffaf3;
+  --ty-encre: #392b34;
+  --ty-doux: #74616a;
+  --ty-ligne: #e5d7cd;
+  --ty-rayon: 18px;
+  --ty-espace: clamp(16px, 3vw, 40px);
+  font-family: var(--sans, 'DM Sans', system-ui, sans-serif);
+  line-height: 1.6;
+  background-color: #fbf8f4;
+}
+.tayri-shell :is(main, section, article, form, nav, .espace, .po-app, .room-body, .product-page) { min-inline-size: 0; }
+.tayri-shell [hidden] { display: none !important; }
+.tayri-shell :is(input, select, textarea, button) { font-family: inherit; }
+.tayri-shell :is(input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='hidden']), select, textarea) { max-inline-size: 100%; font-size: 16px; border-radius: 12px; }
+.tayri-shell :is(input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='hidden']), select) { min-block-size: 44px; }
+.tayri-shell :is(.btn, .po-btn, .po-btn-verre, .link-button, .salle-btn) { min-block-size: 44px; max-inline-size: 100%; line-height: 1.4; text-align: center; white-space: normal; }
+.tayri-shell :is(.btn, .po-btn, .po-btn-verre) { border-radius: 14px; }
+.tayri-shell :is(a, button, input, select, textarea, summary):focus-visible { outline: 3px solid #9b702d; outline-offset: 3px; }
+.tayri-shell :is(.room-head h1, .product-info h1) { font-size: clamp(32px, 5vw, 58px); line-height: 1.15; max-inline-size: 25ch; }
+.tayri-shell :is(.room-head .lead, .prose-lead) { line-height: 1.6; }
+.tayri-shell :is(.espace-card, .couple-carte, .abo-carte, .live-card) { border-radius: var(--ty-rayon); }
+.tayri-shell :is(.espace-card, .couple-carte) { padding: clamp(18px, 3vw, 28px); }
+.tayri-shell .form-status { line-height: 1.55; overflow-wrap: anywhere; }
+.tayri-shell :is(.room-head, .room-body, .events, .room-shelf) { padding-inline: var(--ty-espace); }
+.tayri-shell :is(.room-head, .room-body, .events, .room-shelf) > p { max-inline-size: 68ch; }
+.tayri-shell .product-card { border-radius: 16px; overflow: hidden; }
+.tayri-shell .product-card :is(h3, .product-price) { line-height: 1.35; }
+.tayri-shell .product-grid { grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr)); gap: 24px; }
+
+/* Un seul cadre de navigation sur toutes les pages publiques et membres. */
+.tayri-shell .site-header.tayri-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  min-block-size: 78px;
+  padding: 10px max(20px, calc((100% - 1280px) / 2)) !important;
+  background: rgba(255, 250, 243, .98) !important;
+  color: var(--ty-bordeaux);
+  border-block-end: 1px solid #d7bc88;
+  box-shadow: none;
+  backdrop-filter: blur(12px);
+}
+.tayri-header .brand { display: flex; flex: 0 1 auto; min-inline-size: 0; gap: 9px; margin-inline-end: auto; }
+.tayri-header .brand img { inline-size: 44px; block-size: 44px; border-radius: 0; object-fit: contain; background: transparent !important; padding: 0; }
+.tayri-header .brand > span { display: block !important; font-family: var(--serif); line-height: 1.15; }
+.tayri-header .brand strong { display: block; font-size: 27px; font-weight: 600; letter-spacing: .045em; }
+.tayri-header .brand small { display: block; font-family: var(--sans); font-size: 11px; font-weight: 400; line-height: 1.4; white-space: normal; }
+.tayri-shell .tayri-header .site-nav { display: flex !important; align-items: center; gap: 4px; }
+.tayri-header .site-nav a { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-block-size: 44px; padding: 10px 12px; border: 1px solid transparent; border-radius: 999px; font: 500 14px/1.35 var(--sans); text-decoration: none; white-space: nowrap; }
+.tayri-header .site-nav .account-link { inline-size: auto; block-size: auto; background: transparent; color: inherit; box-shadow: none; }
+.tayri-header .site-nav .ico { inline-size: 17px; block-size: 17px; flex: none; }
+.tayri-header .site-nav a[aria-current='page'] { color: #fff; background: var(--ty-bordeaux); border-color: var(--ty-bordeaux); }
+.tayri-header .site-nav a:hover:not([aria-current='page']) { background: #f5e9e5; }
+.tayri-header .header-actions { flex: 0 0 auto; gap: 10px; }
+.tayri-header .header-actions > .lang-link { display: none; }
+.tayri-header .maison-menu > summary { display: inline-flex; align-items: center; gap: 6px; min-block-size: 44px; padding: 8px 12px; font-size: 14px; border: 1px solid var(--ty-ligne); border-radius: 12px; color: var(--ty-bordeaux); background: #fffdf9; }
+.tayri-header .cloche { display: inline-flex; align-items: center; justify-content: center; inline-size: 40px; block-size: 44px; padding: 8px; border: 0; color: var(--ty-bordeaux); background: transparent; }
+.tayri-header .maison-menu-panneau { background: #fffdf9; color: var(--ty-encre); border: 1px solid var(--ty-ligne); border-radius: 16px; box-shadow: 0 18px 48px -24px #49333c66; }
+.tayri-header .maison-menu-panneau a { line-height: 1.5; }
+.tayri-shell .site-footer { background: #f6efe8; color: var(--ty-encre); }
+.tayri-shell .site-footer .footer-sign img { inline-size: 48px; block-size: 48px; object-fit: contain; background: #fff; border-radius: 8px; }
+
+/* L'accueil illustré : le paysage est décoratif, le contenu reste du HTML. */
+.tayri-accueil { position: relative; isolation: isolate; padding: 36px 20px 28px; background: #fff5e9; color: var(--ty-bordeaux); }
+.tayri-paysage { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.tayri-paysage img { inline-size: 100%; block-size: 100%; object-fit: cover; object-position: center top; }
+.tayri-accueil-contenu { max-inline-size: 940px; margin-inline: auto; }
+.tayri-bienvenue { text-align: center; margin-block-end: 30px; }
+.tayri-embleme { inline-size: clamp(88px, 12vw, 132px); block-size: auto; margin: 0 auto 8px; }
+.tayri-bienvenue h1 { font-family: var(--serif); font-size: clamp(46px, 7vw, 76px); line-height: 1; font-weight: 600; letter-spacing: .055em; margin: 0 0 10px; }
+.tayri-bienvenue > p { font-family: var(--serif); font-size: clamp(21px, 3vw, 28px); line-height: 1.25; margin: 0; }
+.tayri-parcours { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.tayri-parcours-carte { display: flex; flex-direction: column; align-items: center; padding: 26px 28px 24px; text-align: center; border: 1px solid #c99a49; border-radius: 34px 34px 24px 24px; box-shadow: inset 0 0 0 3px #fffaf3c4, 0 8px 22px -18px #704834; }
+.tayri-parcours-rencontres { background: linear-gradient(145deg, #f9dfe3ed, #fff6e8f5); }
+.tayri-parcours-couple { background: linear-gradient(145deg, #e4ece2ed, #fff5e7f5); }
+.tayri-parcours-carte > .ico { inline-size: 44px; block-size: 44px; margin-block-end: 12px; stroke-width: 1.3; }
+.tayri-parcours-couple > .ico { color: var(--ty-vert); }
+.tayri-parcours-carte h2 { font-family: var(--serif); font-size: clamp(28px, 3.5vw, 36px); line-height: 1.05; font-weight: 600; margin: 0 0 14px; }
+.tayri-parcours-carte p { max-inline-size: 30ch; font-size: 16px; line-height: 1.55; color: #5b3440; margin: 0 0 24px; }
+.tayri-action { display: inline-flex; align-items: center; justify-content: center; gap: 12px; min-block-size: 48px; max-inline-size: 100%; padding: 12px 20px; border: 1px solid #d5ad69; border-radius: 999px; background: var(--ty-bordeaux); color: #fff; font: 600 15px/1.4 var(--sans); text-decoration: none; text-align: center; }
+.tayri-parcours-carte .tayri-action { margin-block-start: auto; inline-size: 100%; }
+.tayri-parcours-couple .tayri-action { background: var(--ty-vert); }
+.tayri-action:hover { filter: brightness(1.08); }
+.tayri-action-secondaire { background: #fffaf3; color: var(--ty-bordeaux); }
+.tayri-accueil-liens { display: flex; justify-content: center; gap: 12px 40px; flex-wrap: wrap; margin: 22px 0 26px; }
+.tayri-accueil-liens a { display: inline-flex; align-items: center; min-block-size: 44px; padding: 6px 0; font-size: 15px; font-weight: 500; text-underline-offset: 4px; }
+.tayri-accueil-boutique { display: flex; align-items: center; justify-content: space-between; gap: 16px 28px; flex-wrap: wrap; padding: 24px; background: #fffaf3ed; border: 1px solid #d8c3a0; border-radius: 18px; }
+.tayri-accueil-boutique h2 { font: 600 28px/1.2 var(--serif); margin: 0 0 4px; }
+.tayri-accueil-boutique p { margin: 0; font-size: 15px; color: var(--ty-doux); }
+.tayri-accueil-boutique nav { display: flex; flex-basis: 100%; gap: 8px 24px; flex-wrap: wrap; }
+.tayri-accueil-boutique nav a { display: inline-flex; align-items: center; min-block-size: 40px; font-size: 14px; text-underline-offset: 4px; }
+.tayri-shell .accueil-swipe { max-inline-size: 940px; padding: 32px 16px 12px; margin-inline: auto; }
+.tayri-shell .accueil-swipe .swipe-app { max-inline-size: 100%; }
+.tayri-shell .lfb-rubriques { max-inline-size: 1100px; margin-inline: auto; }
+.tayri-detail { max-inline-size: 1100px; margin: 24px auto; border-block: 1px solid var(--ty-ligne); }
+.tayri-detail > summary { padding: 18px 24px; cursor: pointer; color: var(--ty-bordeaux); font-weight: 500; }
+.tayri-detail > .accueil-hero { padding-block: 24px; }
+.tayri-detail #accueil-titre { font: 600 clamp(30px, 5vw, 50px)/1.15 var(--serif); }
+
+/* Le rose, le bleu et Couple gardent leur palette et leurs illustrations. */
+.tayri-shell .tayri-celib .swipe-tete .tayri-onglets { gap: 6px; }
+.tayri-shell .tayri-celib .swipe-tete .tayri-onglets span { white-space: normal !important; overflow: visible; text-overflow: clip; font-size: 13px; line-height: 1.3; }
+.tayri-shell .couple .couple-onglets button span { white-space: normal; overflow: visible; text-overflow: clip; font-size: 13px; line-height: 1.3; }
+.tayri-shell .couple .couple-onglets button { min-block-size: 68px; }
+.tayri-shell .espace-grid > *, .tayri-shell .two-col > * { min-inline-size: 0; }
+
+/* Les pages autonomes partagent les mêmes repères, sans décor derrière les outils. */
+.tayri-raccourcis-outil { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 24px; min-block-size: 56px; padding: 10px clamp(16px, 4vw, 40px); background: #fffaf3; color: #7a1f35; border-block-end: 1px solid #d7bc88; font: 500 14px/1.4 system-ui, sans-serif; }
+.tayri-raccourcis-outil > a { display: inline-flex; align-items: center; min-block-size: 40px; text-underline-offset: 4px; }
+.tayri-raccourcis-outil .tayri-marque-outil { gap: 8px; margin-inline-end: auto; text-decoration: none; font: 600 23px/1.2 Georgia, serif; }
+.tayri-raccourcis-outil img { inline-size: 32px; block-size: 32px; object-fit: contain; }
+.tayri-autonome :is(input, select, textarea, button) { font-size: 16px; }
+.tayri-autonome :is(h1, h2) { line-height: 1.2; }
+.tayri-autonome table { max-inline-size: 100%; }
+
+@media (min-width: 1101px) { .tayri-shell .barre-app.tayri-barre { display: none !important; } }
+@media (max-width: 1100px) {
+  .tayri-shell { padding-block-end: calc(72px + env(safe-area-inset-bottom)); }
+  .tayri-shell .tayri-header .site-nav { display: none !important; }
+  .tayri-shell .barre-app.tayri-barre { position: fixed; inset: auto 0 0; z-index: 45; display: grid !important; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; padding: 6px 6px calc(6px + env(safe-area-inset-bottom)); background: #fffaf3 !important; border-block-start: 1px solid #d8c3a0; box-shadow: 0 -6px 20px #392b3408; }
+  .tayri-shell .tayri-barre a { display: flex; flex-direction: column; justify-content: center; gap: 4px; min-inline-size: 0; min-block-size: 52px; padding: 5px 2px; color: #725460; font: 500 12px/1.3 var(--sans); white-space: normal; text-align: center; border-radius: 10px; }
+  .tayri-shell .tayri-barre :is(a span, a b) { min-inline-size: 0; font: inherit; white-space: normal; }
+  .tayri-shell .tayri-barre a[aria-current='page'] { background: #f3e5e1 !important; color: #7a1f35 !important; }
+  .tayri-shell .tayri-barre .ico { inline-size: 20px; block-size: 20px; color: inherit; }
+  .tayri-shell .tayri-barre a[aria-current='page']::after { display: none; }
+}
+@media (max-width: 680px) {
+  .tayri-shell .site-header.tayri-header { gap: 12px; padding: 10px 16px !important; min-block-size: 72px; }
+  .tayri-header .brand { gap: 7px; }
+  .tayri-header .brand img { inline-size: 38px; block-size: 38px; }
+  .tayri-header .brand strong { font-size: 24px; }
+  .tayri-header .brand small { font-size: 10px; max-inline-size: 112px; }
+  .tayri-header .header-actions { gap: 4px; }
+  .tayri-header .maison-menu > summary { padding: 8px; }
+  .tayri-header .cloche { inline-size: 32px; }
+  .tayri-header .maison-menu-panneau { inset-inline: 12px; inline-size: auto; max-block-size: calc(100dvh - 158px - env(safe-area-inset-bottom)); overflow-y: auto; }
+  .tayri-accueil { padding: 24px 16px; }
+  .tayri-paysage img { object-position: center top; }
+  .tayri-bienvenue { margin-block-end: 24px; }
+  .tayri-parcours { grid-template-columns: 1fr; gap: 16px; }
+  .tayri-parcours-carte { padding: 22px 20px; border-radius: 28px 28px 20px 20px; }
+  .tayri-parcours-carte > .ico { inline-size: 34px; block-size: 34px; margin-block-end: 8px; }
+  .tayri-parcours-carte h2 { font-size: 30px; }
+  .tayri-parcours-carte p { margin-block-end: 18px; }
+  .tayri-accueil-boutique { padding: 20px; }
+  .tayri-accueil-boutique .tayri-action { inline-size: 100%; }
+  .tayri-shell .espace-grid { grid-template-columns: 1fr; }
+  .tayri-shell .couple .couple-onglets { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .tayri-shell .couple .couple-onglets button { display: flex; flex-direction: row; justify-content: center; gap: 7px; min-block-size: 52px; padding: 8px 4px; }
+  .tayri-shell .couple .couple-onglet-photo { inline-size: 28px; block-size: 28px; flex: none; }
+  .tayri-shell .tayri-celib .tayri-onglets img { inline-size: min(42px, 12vw); }
+  .tayri-shell .room-head { padding-block: 32px 24px; }
+}
+@media (prefers-reduced-motion: reduce) { .tayri-shell { scroll-behavior: auto; } .tayri-shell .tayri-action { transition: none; } }
