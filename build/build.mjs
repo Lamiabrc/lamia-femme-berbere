@@ -726,10 +726,10 @@ page(
     <h1>${esc(T('speed.titre', 'Le Boudoir des Rencontres', 'Titre en haut (ligne 1)', 'Le Boudoir'))} <span>${esc(T('speed.titre2', 'Le Boudoir des Rencontres', 'Titre en haut (ligne 2)', 'des Rencontres'))}</span></h1>
     <p class="bal-welcome">${esc(roomBySlug['speed-dating'].welcome)}</p>
     <p class="bal-lead">${esc(P.speedDating.intro)}</p>
+    <p class="bal-actions"><a class="btn btn-gold" href="/speed-dating/inscription/">M’inscrire à un salon</a><a class="btn bal-btn-line" href="/speed-dating/salle/">Tester ma caméra</a></p>
     <div class="bal-facts" aria-label="En bref">
       <span>En visio, depuis chez toi</span><span>Deux salons par âge</span><span>20 personnes max par salon</span><span>Lamia veille</span>
     </div>
-    <p class="bal-actions"><a class="btn btn-gold" href="/speed-dating/inscription/">M’inscrire à un salon</a><a class="btn bal-btn-line" href="/speed-dating/salle/">Tester ma caméra</a></p>
   </div>
 </section>
 

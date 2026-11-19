@@ -64,6 +64,8 @@
 .tayri-shell[data-tayri-univers] .head-arch:not(.has-image) { display: none; }
 .tayri-shell[data-tayri-univers] :is(.head-arch.has-image, .head-illu) { inline-size: 230px; width: 230px !important; right: 48px !important; block-size: 260px; aspect-ratio: auto; opacity: 1; padding: 6px; border: 1px solid #d9c5a5 !important; border-radius: 100px 100px 20px 20px; background: #fffdf9 !important; box-shadow: none !important; }
 .tayri-shell[data-tayri-univers] .head-illu img { block-size: 100%; inline-size: 100%; object-fit: contain; }
+.tayri-shell[data-tayri-univers] .room-head .head-illu { position: absolute; top: 50%; bottom: auto; transform: translateY(-50%); }
+html[dir='rtl'] .tayri-shell[data-tayri-univers] :is(.head-arch.has-image, .head-illu) { right: auto !important; left: 48px !important; }
 .tayri-shell[data-tayri-univers] :is(.frise, .frise-fine) { height: 1px !important; margin-inline: auto; max-inline-size: 1152px; background: linear-gradient(90deg, transparent, #d0b078, transparent) !important; opacity: .65; box-shadow: none; }
 .tayri-shell[data-tayri-univers] :is(.frise, .frise-fine)::after { display: none; }
 
@@ -99,7 +101,7 @@
 .tayri-shell .boudoir-immersif { background: transparent; color: var(--ty-encre); clip-path: none; --or: #a77937; --or-clair: #725035; }
 .tayri-shell .boudoir-immersif :is(.boudoir-scene, .boudoir-rideau-fixe, .bal-paillettes, .hero-rideau) { display: none; }
 .tayri-shell .boudoir-immersif .bal-hero-rich { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, .7fr); min-height: 0; max-inline-size: 1152px; inline-size: calc(100% - 48px); margin: 16px auto 32px; padding: 48px !important; gap: 40px; text-align: start; justify-items: stretch; background: linear-gradient(115deg, #fffdf9 30%, #f6e8e9); border: 1px solid #dfcfb9; border-radius: 28px; }
-.tayri-shell .boudoir-immersif .bal-hero-copy { order: 0; }
+.tayri-shell .boudoir-immersif .bal-hero-copy { order: 0; text-align: start; }
 .tayri-shell .boudoir-immersif .bal-hero-poster { order: 1; margin: 0; max-inline-size: 280px; align-self: center; border: 1px solid #d9c5a5; border-radius: 24px; box-shadow: none; }
 .tayri-shell .boudoir-immersif .bal-hero-poster img { border-radius: 23px; }
 .tayri-shell .boudoir-immersif .bal-hero h1 { color: var(--ty-bordeaux); font-size: clamp(38px, 4.6vw, 62px); line-height: 1.08; text-shadow: none; margin-block: 14px 22px; }
@@ -146,7 +148,7 @@
 /* Couple et célibataires : les images validées restent, le cadre se calme. */
 .tayri-shell .espace.couple { margin-block: 18px; border: 1px solid #dfcfb9; border-radius: 28px; overflow: clip; }
 .tayri-shell .couple .couple-carte { background: #fffdf9 !important; border-color: #e5d7cd !important; box-shadow: none !important; }
-.tayri-shell .couple .couple-onglets { background: #fffaf3; border-radius: 18px; }
+.tayri-shell .couple .couple-onglets { background: #fffaf3; border-radius: 18px; top: 86px; }
 .tayri-shell .couple .couple-onglets button { box-shadow: none; }
 .tayri-shell .couple .couple-demo-bandeau { background: #edf2e9; border: 1px solid #cbd9c7; }
 .tayri-shell .couple-landing-grille { gap: 24px; margin-block: 32px; }
@@ -269,15 +271,25 @@
 .tayri-administration .tabs { flex-wrap: wrap; }
 .tayri-administration button { min-block-size: 44px; }
 
+/* Texte et image ont chacun leur colonne, y compris aux largeurs intermédiaires. */
+.tayri-shell[data-tayri-univers] .room-head.with-image { display: grid; grid-template-columns: minmax(0, 1fr) 230px; column-gap: 40px; align-content: center; }
+.tayri-shell[data-tayri-univers] .room-head.with-image > :not(figure) { grid-column: 1; }
+.tayri-shell[data-tayri-univers] .room-head.with-image > :is(.head-arch, .head-illu) { position: static; grid-column: 2; grid-row: 1 / span 5; align-self: center; transform: none; margin: 0; }
+.tayri-shell[data-tayri-univers] .room-head.with-image :is(h1, .lead) { max-inline-size: 100%; max-width: 100%; }
+@media (min-width: 681px) and (max-width: 1000px) {
+  .tayri-shell[data-tayri-univers] .room-head.with-image { grid-template-columns: minmax(0, 1fr) 160px; column-gap: 24px; }
+  .tayri-shell[data-tayri-univers] .room-head.with-image > :is(.head-arch, .head-illu) { width: 160px !important; inline-size: 160px; block-size: 210px; }
+}
+
 @media (min-width: 1101px) { .tayri-shell .barre-app.tayri-barre { display: none !important; } }
 @media (max-width: 1100px) {
   .tayri-shell { padding-block-end: calc(72px + env(safe-area-inset-bottom)); }
   .tayri-shell .tayri-header .site-nav { display: none !important; }
   .tayri-shell .barre-app.tayri-barre { position: fixed; inset: auto 0 0; z-index: 45; display: grid !important; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; padding: 6px 6px calc(6px + env(safe-area-inset-bottom)); background: #fffaf3 !important; border-block-start: 1px solid #d8c3a0; box-shadow: 0 -6px 20px #392b3408; }
-  .tayri-shell .tayri-barre a { display: flex; flex-direction: column; justify-content: center; gap: 4px; min-inline-size: 0; min-block-size: 52px; padding: 5px 2px; color: #725460; font: 500 12px/1.3 var(--sans); white-space: normal; text-align: center; border-radius: 10px; }
+  .tayri-shell .tayri-barre a { display: flex; flex-direction: column !important; align-items: center; justify-content: center; gap: 4px; min-inline-size: 0; min-block-size: 52px; padding: 5px 2px; color: #725460; font: 500 12px/1.3 var(--sans); white-space: normal; text-align: center; text-decoration: none; border-radius: 10px; }
   .tayri-shell .tayri-barre :is(a span, a b) { min-inline-size: 0; font: inherit; white-space: normal; }
   .tayri-shell .tayri-barre a[aria-current='page'] { background: #f3e5e1 !important; color: #7a1f35 !important; }
-  .tayri-shell .tayri-barre .ico { inline-size: 20px; block-size: 20px; color: inherit; }
+  .tayri-shell .tayri-barre .ico { inline-size: 20px; block-size: 20px; color: inherit !important; }
   .tayri-shell .tayri-barre a[aria-current='page']::after { display: none; }
 }
 @media (max-width: 680px) {
@@ -293,9 +305,13 @@
   .tayri-shell[data-tayri-univers] :is(.room-head, .po-hero) { margin-block: 12px 24px; border-radius: 22px; padding: 26px 22px !important; }
   .tayri-shell[data-tayri-univers] .room-head { inline-size: calc(100% - 32px); }
   .tayri-shell[data-tayri-univers] :is(.room-head.with-image, .room-head.with-illu) { min-height: 0 !important; }
+  .tayri-shell[data-tayri-univers] .room-head.with-image { grid-template-columns: 1fr; }
+  .tayri-shell[data-tayri-univers] .room-head.with-image > :is(.head-arch, .head-illu) { grid-column: 1; grid-row: auto; order: 3; justify-self: end; margin-block-start: 24px; }
   .tayri-shell[data-tayri-univers] :is(.room-head h1, .po-app .po-hero h1) { font-size: 37px !important; max-inline-size: 100%; }
   .tayri-shell[data-tayri-univers] :is(.room-head .lead, .po-hero .po-lead, .po-hero .po-sub) { font-size: 16px; margin-block-end: 18px; }
   .tayri-shell[data-tayri-univers] :is(.head-arch.has-image, .head-illu) { position: relative; inset: auto !important; transform: none; order: 3; width: 140px !important; inline-size: 140px; block-size: 160px; margin: 24px 0 0; align-self: flex-end; }
+  .tayri-shell[data-tayri-univers] .room-head .head-illu { position: relative; top: auto; transform: none; }
+  html[dir='rtl'] .tayri-shell[data-tayri-univers] :is(.head-arch.has-image, .head-illu) { left: auto !important; }
   .tayri-shell .po-hero-grid { grid-template-columns: 1fr; gap: 22px; }
   .tayri-shell .po-lamia { display: flex; align-items: center; gap: 14px; justify-self: start; }
   .tayri-shell .po-lamia img { inline-size: 64px; block-size: 64px; }
