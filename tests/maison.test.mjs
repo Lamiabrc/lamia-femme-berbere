@@ -4,9 +4,10 @@ import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { rooms } from '../content/rooms.mjs';
 
-const ROOT = new URL('..', import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const DIST = join(ROOT, 'dist');
 execFileSync(process.execPath, [join(ROOT, 'build/build.mjs')], { stdio: 'ignore' });
 
@@ -38,5 +39,29 @@ test('les pièces prévues ne proposent rien à acheter', () => {
   for (const r of rooms.filter((x) => x.status === 'soon')) {
     const html = readFileSync(join(DIST, r.path, 'index.html'), 'utf8');
     assert.doesNotMatch(html, /data-products=/);
+  }
+});
+
+test('toutes les pages HTML partagent le socle TAYRI, y compris produits et outils autonomes', () => {
+  for (const f of files(DIST).filter((x) => x.endsWith('.html'))) {
+    const html = readFileSync(f, 'utf8');
+    if (!/<html\b/i.test(html)) continue; // fichier de vérification Google, pas un écran
+    assert.match(html, /class="[^"]*\btayri-shell\b/, `cadre absent : ${f}`);
+    assert.match(html, /href="\/assets\/tayri\.css(?:\?[^\"]*)?"/, `style absent : ${f}`);
+  }
+});
+
+test('accueil TAYRI : accès directs, boutique complète et profils conservés sans porte à franchir', () => {
+  const html = readFileSync(join(DIST, 'index.html'), 'utf8');
+  assert.ok(html.indexOf('class="tayri-accueil"') < html.indexOf('data-swipe-accueil'));
+  for (const route of ['/rencontres/', '/espace-couple/', '/boutique/', '/ecrin/', '/bibliotheque/', '/grenier/', '/mon-espace/']) assert.ok(html.includes(`href="${route}"`), route);
+  assert.match(html, /src="\/images\/marque\/tayri-coeur.webp"/);
+  assert.doesNotMatch(html, /data-entree(?:\s|>)/);
+});
+
+test('les scripts des pages autonomes sont conservés à l’identique', () => {
+  const scripts = (html) => html.match(/<script\b[\s\S]*?<\/script>/gi) || [];
+  for (const file of ['admin.html', 'admin-bal.html', 'admin-soirees.html', 'pilotage.html', 'tableau-de-bord.html', 'salle-coaching.html', 'salle-soiree.html', 'securite-enfants/index.html']) {
+    assert.deepEqual(scripts(readFileSync(join(DIST, file), 'utf8')), scripts(readFileSync(join(ROOT, 'public', file), 'utf8')), file);
   }
 });

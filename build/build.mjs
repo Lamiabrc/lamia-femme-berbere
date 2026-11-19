@@ -12,6 +12,7 @@ import * as P from '../content/pages.mjs';
 import { legalPages, livraisonTexte, tvaTexte } from '../content/legal.mjs';
 import { reglagesPropres } from '../content/shipping.mjs';
 import { facade } from './facade.mjs';
+import { accueilTayri, navigationTayri, habillerPageStatique } from './tayri.mjs';
 import { GUIDES } from '../content/guides.mjs';
 import { pageAnglaise, pageFrancaise, produitAnglais, enPath, FR_ONLY, STRINGS, MANQUANTS } from './english.mjs';
 import { LANGUES, PAGES_RENCONTRES, dictionnaire, motifs, pageTraduite, liensLangues } from './langues.mjs';
@@ -211,10 +212,11 @@ ${noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" hr
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="stylesheet" href="/fonts/polices.css">
 <link rel="stylesheet" href="/assets/maison.css?v=${VERSION}">
+<link rel="stylesheet" href="/assets/tayri.css?v=${VERSION}">
 </head>
-<body data-room="${esc(room?.slug || '')}" data-ambiance="${esc(ambianceDouce(ambiance || room?.slug || ''))}" data-accent="${esc(accent)}">
+<body class="tayri-shell" data-room="${esc(room?.slug || '')}" data-ambiance="${esc(ambianceDouce(ambiance || room?.slug || ''))}" data-accent="${esc(accent)}">
 <a class="skip" href="#contenu">Aller au contenu</a>
-${header(room)}
+${header(room, path)}
 <main id="contenu">
 ${body}
 </main>
@@ -225,45 +227,31 @@ ${scripts.map((s) => `<script type="module" src="${s}?v=${VERSION}"></script>`).
 </html>`;
 }
 
-function header(room) {
-  const link = (href, label, slug) =>
-    `<a href="${href}"${room?.slug === slug ? ' aria-current="page"' : ''}>${label}</a>`;
-  return `<header class="site-header">
-  <a class="brand" href="/" aria-label="Lamia Femme Berbère, retour au Hall">
-    <img src="/images/marque/lamia-logo-net-160.webp" width="52" height="52" alt="">
-    <span><strong>Lamia</strong> Femme Berbère</span>
+function header(room, path) {
+  return `<header class="site-header tayri-header">
+  <a class="brand" href="/" aria-label="TAYRI, retour à l’accueil">
+    <img src="/images/marque/tayri-coeur.webp" width="52" height="52" alt="">
+    <span><strong>TAYRI</strong><small>par Lamia Femme Berbère</small></span>
   </a>
   <nav class="site-nav" aria-label="Navigation principale">
-    ${link('/rencontres/', 'Rencontres', 'patio')}
-    <a href="/rencontres/swipe/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Swipe</a>
-    ${link('/speed-dating/', 'Speed dating', 'speed-dating')}
-    ${link('/abonnement/', 'Formules', 'abonnement')}
-    ${link('/salon/', 'Lives', 'salon')}
-    ${link('/ecrin/', 'Bijoux kabyles', 'ecrin')}
-    ${link('/bibliotheque/', 'Livre', 'bibliotheque')}
+    ${navigationTayri(path)}
   </nav>
   <div class="header-actions">
     <details class="maison-menu" data-maison-menu>
       <summary>Menu <span aria-hidden="true">▾</span></summary>
       <div class="maison-menu-panneau">
         <div class="maison-menu-etage"><p>Rencontres</p><ul><li><a href="/rencontres/#profils-anonymes"><strong>Les profils</strong></a></li><li><a href="/rencontres/swipe/"><strong>Swiper les profils</strong></a></li><li><a href="/rencontres/#confier"><strong>Créer mon profil</strong></a></li><li><a href="/speed-dating/"><strong>Speed dating</strong></a></li><li><a href="/abonnement/"><strong>Les formules</strong></a></li><li><a href="/salon/"><strong>Le live</strong></a></li><li><a href="/confidences/"><strong>Écrire à Lamia</strong></a></li></ul></div>
-        <div class="maison-menu-etage"><p>L’univers de Lamia</p><ul><li><a href="/lamia-brechet/"><strong>Qui est Lamia</strong></a></li><li><a href="/ecrin/"><strong>Bijoux kabyles</strong></a></li><li><a href="/werdi-ouvre-les-yeux/"><strong>Le livre Werdi</strong></a></li><li><a href="/boutique/"><strong>La boutique</strong></a></li><li><a href="/galerie/"><strong>La galerie</strong></a></li></ul></div>
+        <div class="maison-menu-etage"><p>La boutique et la Maison</p><ul><li><a href="/boutique/"><strong>Toute la boutique</strong></a></li><li><a href="/ecrin/"><strong>L’Écrin · bijoux kabyles</strong></a></li><li><a href="/bibliotheque/"><strong>La Bibliothèque</strong></a></li><li><a href="/grenier/"><strong>Le Grenier</strong></a></li><li><a href="/werdi-ouvre-les-yeux/"><strong>Le livre Werdi</strong></a></li><li><a href="/lamia-brechet/"><strong>Qui est Lamia</strong></a></li><li><a href="/galerie/"><strong>La galerie</strong></a></li></ul></div>
         <div class="maison-menu-etage maison-menu-langues"><p>Langue</p><ul><li><a href="/" hreflang="fr" lang="fr"><strong>Français</strong></a></li><li><a href="/en/" hreflang="en" lang="en"><strong>English</strong></a></li><li><a href="/ar/" hreflang="ar" lang="ar" dir="rtl"><strong>العربية</strong></a></li><li><a href="/kab/" hreflang="kab" lang="kab"><strong>Taqbaylit</strong></a></li></ul></div>
         <div class="maison-menu-etage"><p>Mon compte</p><ul><li><a href="/mon-espace/"><strong>Mon espace</strong></a></li><li data-menu-couple hidden><a href="/notre-couple/">Notre couple</a></li><li><a href="/espace-couple/">TAYRI pour les couples</a></li><li><a href="/application/"><strong>L’application</strong></a></li></ul></div>
       </div>
     </details>
     <a class="cloche" href="/nouveautes/" aria-label="Les nouveautés"><svg class="ico" aria-hidden="true"><use href="/icones.svg#cloche"/></svg><b data-cloche-point hidden></b></a>
-    <a class="account-link" href="/mon-espace/" data-account-link aria-label="Se connecter ou ouvrir mon espace"><span class="account-icone" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#compte"/></svg></span><span data-account-texte>Se connecter</span></a>
-    <a class="cta-profil" href="/rencontres/#confier"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg><span>Créer mon profil</span></a>
   </div>
 </header>
 <div class="kabyle" aria-hidden="true"></div>
-<nav class="barre-app" aria-label="Raccourcis">
-  <a href="/rencontres/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#profils"/></svg>Profils</a>
-  <a href="/rencontres/swipe/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#coeur"/></svg>Swipe</a>
-  <a href="/mon-espace/#discussion" data-barre-messages><svg class="ico" aria-hidden="true"><use href="/icones.svg#bulle"/></svg>Messages<i data-barre-point hidden></i></a>
-  <a href="/salon/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#live"/></svg>Live</a>
-  <a href="/mon-espace/" data-barre-compte><svg class="ico" aria-hidden="true"><use href="/icones.svg#compte"/></svg><b>Moi</b></a>
+<nav class="barre-app tayri-barre" aria-label="Navigation principale mobile">
+  ${navigationTayri(path, { mobile: true })}
 </nav>`;
 }
 
@@ -271,7 +259,7 @@ function footer() {
   return `<div class="kabyle" aria-hidden="true"></div>
 <footer class="site-footer">
   <div class="footer-house">
-    <p class="footer-sign">ⵣ</p>
+    <p class="footer-sign"><img src="/images/marque/lamia-logo-net-160.webp" width="48" height="48" alt="Logo officiel Lamia Femme Berbère"></p>
     <p>Lamia Femme Berbère<br>Les rencontres sérieuses de Lamia, marieuse kabyle, au cœur de la culture amazighe.</p>
   </div>
   <nav aria-label="Rencontres">
@@ -399,15 +387,17 @@ page(
     room: roomBySlug.hall,
     scripts: ['/assets/annonces.js', '/assets/swipe-accueil.js'],
     body: `<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@graph': [{ '@type': 'Organization', '@id': SITE_URL + '/#organisation', name: 'Lamia Femme Berbère', url: SITE_URL + '/', logo: SITE_URL + '/images/lamia/lamia-portrait-tatouages-rond-480.webp', founder: { '@type': 'Person', name: 'Lamia Bréchet Ighil', url: SITE_URL + '/lamia-brechet/' }, sameAs: ['https://www.tiktok.com/@lamiafemmeberbere', 'https://www.facebook.com/femmeberberes/'] }, { '@type': 'WebSite', '@id': SITE_URL + '/#site', name: 'Lamia Femme Berbère', alternateName: 'TAYRI', url: SITE_URL + '/', publisher: { '@id': SITE_URL + '/#organisation' }, inLanguage: ['fr', 'en'] }, TAYRI_LD] })}</script>
+${accueilTayri()}
 <div class="po-app accueil">
 ${SWIPE_INVITE}
+<details class="tayri-detail"><summary>Être accompagné par Lamia</summary>
 <section class="po-hero accueil-hero" aria-labelledby="accueil-titre">
   <div class="po-fond" aria-hidden="true"></div>
   <div class="po-hero-grid">
     <div class="po-hero-texte">
       <p class="lfb-azul lfb-azul-hero" lang="ber">ⴰⵣⵓⵍ</p>
       <p class="po-eyebrow">${esc(T('accueil.surtitre', 'Accueil', 'Petite ligne au-dessus du titre', 'La marieuse kabyle · rencontres sérieuses'))}</p>
-      <h1 id="accueil-titre">${esc(T('accueil.titre', 'Accueil', 'Grand titre', 'Trouve ton âme sœur kabyle et amazigh'))}</h1>
+      <h2 id="accueil-titre">${esc(T('accueil.titre', 'Accueil', 'Grand titre', 'Trouve ton âme sœur kabyle et amazigh'))}</h2>
       <p class="po-sub">${esc(T('accueil.sous-titre', 'Accueil', 'Phrase sous le titre', 'Profils vérifiés. En vue du mariage.'))}</p>
       <p class="po-actions"><a class="po-btn" data-cta-profil href="/rencontres/#confier"><svg class="ico" aria-hidden="true"><use href="/icones.svg#lettre"/></svg> <span>Créer mon profil ou connexion</span></a><a class="po-btn-verre" href="/rencontres/#profils-anonymes">Voir les profils</a></p>
       <p class="accueil-couple"><a href="/espace-couple/"><strong>${esc(T('accueil.couple-titre', 'Accueil', 'Encadré couple : la question', 'Déjà en couple ? TAYRI continue avec vous'))}</strong><span>${esc(T('accueil.couple-action', 'Accueil', 'Encadré couple : le bouton', 'Votre espace à deux : jeux d’amour, mots doux, « Et si on se mariait ? »'))}</span><small><b>Gratuit à deux</b><i> · à découvrir sans compte</i></small></a></p>
@@ -425,6 +415,7 @@ ${SWIPE_INVITE}
   </div>
 </section>
 
+</details>
 <section class="po-corps accueil-corps">
   <div class="patio-etapes">
     <h2>Comment ça marche</h2>
@@ -2302,9 +2293,15 @@ await rm(DIST, { recursive: true, force: true });
 for (const p of pages) {
   const file = p.path.endsWith('.html') ? join(DIST, p.path) : join(DIST, p.path, 'index.html');
   await mkdir(dirname(file), { recursive: true });
-  await writeFile(file, p.html);
+  const html = /<body[^>]*class="[^"]*\btayri-shell\b/.test(p.html) ? p.html : habillerPageStatique(p.html, { version: VERSION });
+  await writeFile(file, html);
 }
 await cp(join(ROOT, 'public'), DIST, { recursive: true });
+// Les documents autonomes reçoivent le même socle, sans remplacer leurs scripts métier.
+for (const file of ['admin.html', 'admin-bal.html', 'admin-soirees.html', 'pilotage.html', 'tableau-de-bord.html', 'salle-coaching.html', 'salle-soiree.html', 'securite-enfants/index.html']) {
+  const target = join(DIST, file);
+  await writeFile(target, habillerPageStatique(await readFile(target, 'utf8'), { version: VERSION }));
+}
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await mkdir(join(DIST, 'assets'), { recursive: true });
 await writeFile(join(DIST, 'assets', 'editable.json'), JSON.stringify({ fields: [...EDITABLE, ...REGISTRE], defaults: DEFAULTS }));
@@ -2314,6 +2311,7 @@ await cp(join(ROOT, 'content', 'rubriques.mjs'), join(DIST, 'assets', 'rubriques
 await cp(join(ROOT, 'content', 'matching-options.mjs'), join(DIST, 'assets', 'matching-options.mjs'));
 await cp(join(ROOT, 'content', 'signalement.mjs'), join(DIST, 'assets', 'signalement.mjs'));
 await cp(join(ROOT, 'src', 'i18n.js'), join(DIST, 'assets', 'i18n.js'));
+await cp(join(ROOT, 'src', 'tayri.css'), join(DIST, 'assets', 'tayri.css'));
 await mkdir(join(DIST, 'assets', 'i18n'), { recursive: true });
 await cp(join(ROOT, 'content', 'en', 'products.json'), join(DIST, 'assets', 'i18n', 'products-en.json'));
 const MOTIFS_EN = JSON.parse(await readFile(join(ROOT, 'content', 'en', 'patterns.json'), 'utf8'));
