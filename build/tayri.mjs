@@ -16,6 +16,34 @@ export function rubriqueTayri(path) {
   return /^\/mon-espace(\/|$)/.test(p) ? 'compte' : null;
 }
 
+// L'univers dépend de l'adresse, pas de la pièce historique réutilisée par certains outils.
+export function universTayri(path, room) {
+  const p = String(path || '/').replace(/^\/(en|ar|kab)(?=\/)/, '') || '/';
+  if (p === '/') return 'accueil';
+  if (/^\/(notre-couple|espace-couple)(\/|$)/.test(p)) return 'couple';
+  if (/^\/speed-dating(\/|$)/.test(p)) return 'boudoir';
+  if (/^\/confidences(?:\/|$)/.test(p)) return 'confidences';
+  if (/^\/mon-espace(?:\/|$)/.test(p)) return 'compte';
+  if (/^\/(bibliotheque|werdi-ouvre-les-yeux)(\/|$)/.test(p)) return 'bibliotheque';
+  if (/^\/(ecrin|galerie)(\/|$)/.test(p)) return 'ecrin';
+  if (/^\/grenier(\/|$)/.test(p)) return 'grenier';
+  if (/^\/produit(\/|$)/.test(p)) return ({ bibliotheque: 'bibliotheque', ecrin: 'ecrin', grenier: 'grenier' })[room?.slug] || 'boutique';
+  if (/^\/boutique(\/|$)/.test(p)) return 'boutique';
+  if (/^\/(rencontres|abonnement|salon)(\/|$)/.test(p)) return 'rencontres';
+  return 'maison';
+}
+
+export function entreeTayri(path, room) {
+  const univers = universTayri(path, room);
+  if (univers === 'accueil') return '';
+  const p = String(path).replace(/^\/(en|ar|kab)(?=\/)/, '') || '/';
+  const labels = { couple: 'Notre couple', boudoir: 'Le Boudoir des Rencontres', confidences: 'Les Confidences avec Lamia', compte: 'Mon espace', bibliotheque: 'La Bibliothèque de Yemma', ecrin: 'L’Écrin', grenier: 'Le Grenier', boutique: 'La boutique de Lamia', rencontres: 'Les Rencontres', maison: 'La Maison' };
+  const boutique = ['boutique', 'bibliotheque', 'ecrin', 'grenier'].includes(univers);
+  const liens = boutique ? [['/boutique/', 'Toute la boutique'], ['/ecrin/', 'L’Écrin'], ['/bibliotheque/', 'La Bibliothèque'], ['/grenier/', 'Le Grenier']]
+    : ['rencontres', 'boudoir'].includes(univers) ? [['/rencontres/', 'Les Rencontres'], ['/rencontres/swipe/', 'Découvrir les profils'], ['/speed-dating/', 'Le Boudoir'], ['/abonnement/', 'Les formules'], ['/salon/', 'Les lives']] : [];
+  return `<div class="tayri-reperes"><nav class="tayri-fil" aria-label="Fil d’Ariane"><a href="/">La Maison</a><span aria-hidden="true">/</span><span>${labels[univers]}</span></nav>${liens.length ? `<nav class="tayri-rubriques" aria-label="${boutique ? 'Les rayons de la boutique' : 'Les parcours de rencontre'}">${liens.map(([href, label]) => `<a href="${href}"${href === p ? ' aria-current="page"' : ''}>${label}</a>`).join('')}</nav>` : ''}</div>`;
+}
+
 export function navigationTayri(path, { mobile = false } = {}) {
   const active = rubriqueTayri(path);
   return NAVIGATION_TAYRI.map(({ id, href, label, icon }) => {
@@ -68,7 +96,7 @@ export function habillerPageStatique(html, { version = '' } = {}) {
   const admin = /<title>[^<]*(Tableau de bord|Pilotage|Sécurité &|Maîtresse du bal|Soirées|Administration)/i.test(html);
   let result = html.replace(/<body([^>]*)>/i, (_, attrs) => {
     const classes = `tayri-shell tayri-autonome${admin ? ' tayri-administration' : ''}`;
-    return /\bclass="/.test(attrs) ? `<body${attrs.replace(/class="([^"]*)"/, (_m, old) => `class="${old} ${classes}"`)}>` : `<body class="${classes}"${attrs}>`;
+    return /\bclass="/.test(attrs) ? `<body data-tayri-univers="outil"${attrs.replace(/class="([^"]*)"/, (_m, old) => `class="${old} ${classes}"`)}>` : `<body data-tayri-univers="outil" class="${classes}"${attrs}>`;
   });
   const style = `<link rel="stylesheet" href="/assets/tayri.css${version ? `?v=${version}` : ''}">`;
   if (!result.includes('/assets/tayri.css')) result = result.replace(/<\/head>/i, `${style}\n</head>`);

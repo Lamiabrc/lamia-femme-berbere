@@ -4,6 +4,14 @@ L’accueil présente TAYRI avec le fichier original du cœur bleu, les deux par
 
 Le cadre commun définit la navigation, le rythme des titres, les boutons, les formulaires et les repères mobiles. Le rose, le bleu et Couple gardent leurs illustrations et leurs couleurs. Les pages autonomes reçoivent le même socle sans remplacement de leurs scripts.
 
+## Pages intérieures
+
+Le second lot reprend les compositions des en-têtes, les cartes, les formulaires, les fiches produit et le pied de page. Ivoire, bordeaux, filet doré et mêmes espacements forment le cadre. Les nuances par pièce restent discrètes : vert pour Couple et Confidences, sable pour la Bibliothèque et le Grenier. Les onglets existants et les illustrations validées des espaces célibataire et Couple restent disponibles.
+
+Les trois rayons sont accessibles depuis chaque fiche produit. Les Rencontres présentent le parcours avant les profils, dont les états vides n'occupent plus artificiellement tout l'écran. Ce lot reste séparé de la première publication demandée par Lamia le 19 novembre.
+
+Les visuels complémentaires demandés à ChatGPT sont des illustrations d'ambiance distinctes. Leur validation ne dispense pas de la recette des compositions et des contrastes. Le site doit rester lisible et cohérent avant leur intégration.
+
 ## Fond décoratif
 
 Le paysage a été généré avec l’outil intégré ChatGPT ImageGen, à partir de la référence d’interface fournie par Lamia le 19 novembre 2026. Il s’agit d’une illustration d’ambiance, pas d’une photographie documentaire ni d’une image de produit. Les logos sont les fichiers originaux et ne proviennent pas de cette génération.

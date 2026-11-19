@@ -1,4 +1,4 @@
-/* Socle commun TAYRI : navigation, rythme et lisibilité. Les univers restent distincts. */
+/* Direction commune TAYRI. Chargée après les anciens thèmes de chaque pièce. */
 .tayri-shell {
   --ty-bordeaux: #7a1f35;
   --ty-vert: #164f3d;
@@ -9,10 +9,113 @@
   --ty-ligne: #e5d7cd;
   --ty-rayon: 18px;
   --ty-espace: clamp(16px, 3vw, 40px);
+  --ty-accent: #7a1f35;
+  --ty-teinte: #f5e9e5;
+  --blanc: #fffdf9;
+  --chaux: #f8f2eb;
+  --encre: #392b34;
+  --gris: #74616a;
+  --ligne: #e5d7cd;
+  --rouge: #7a1f35;
+  --accent: var(--ty-accent);
   font-family: var(--sans, 'DM Sans', system-ui, sans-serif);
   line-height: 1.6;
-  background-color: #fbf8f4;
+  background: #fbf7f1;
+  color: var(--ty-encre);
 }
+.tayri-shell[data-tayri-univers='couple'] { --ty-accent: #164f3d; --ty-teinte: #eaf0e7; }
+.tayri-shell[data-tayri-univers='boudoir'] { --ty-accent: #7a1f35; --ty-teinte: #f6e8e9; }
+.tayri-shell[data-tayri-univers='confidences'] { --ty-accent: #305b50; --ty-teinte: #eaf0ea; }
+.tayri-shell[data-tayri-univers='bibliotheque'] { --ty-accent: #725035; --ty-teinte: #f2eadd; }
+.tayri-shell[data-tayri-univers='ecrin'] { --ty-accent: #285a58; --ty-teinte: #e8efec; }
+.tayri-shell[data-tayri-univers='grenier'] { --ty-accent: #805135; --ty-teinte: #f3e8dc; }
+.tayri-shell[data-tayri-univers='compte'] { --ty-accent: #45586c; --ty-teinte: #edf0f3; }
+.tayri-shell[data-tayri-univers] main { background: transparent !important; color: var(--ty-encre); padding-block-end: 40px; }
+.tayri-shell[data-tayri-univers] main::before, .tayri-shell[data-tayri-univers] main::after { display: none; }
+.tayri-shell .tayri-reperes { max-inline-size: 1200px; margin-inline: auto; padding: 22px 24px 10px; }
+.tayri-fil { display: flex; align-items: center; gap: 12px; color: var(--ty-doux); font-size: 13px; }
+.tayri-fil a { color: var(--ty-bordeaux); text-underline-offset: 4px; }
+.tayri-rubriques { display: flex; flex-wrap: wrap; gap: 8px; margin-block: 18px 10px; }
+.tayri-rubriques a { display: inline-flex; align-items: center; justify-content: center; min-block-size: 42px; padding: 8px 17px; background: #fffdf9; border: 1px solid var(--ty-ligne); border-radius: 999px; font-size: 14px; text-decoration: none; color: var(--ty-encre); }
+.tayri-rubriques a[aria-current] { background: var(--ty-accent); color: #fff; border-color: var(--ty-accent); }
+.tayri-rubriques a:hover:not([aria-current]) { background: var(--ty-teinte); border-color: #cbb6a6; }
+
+/* Une même composition d'entrée : panneau clair, filet doré, titre et actions lisibles. */
+.tayri-shell[data-tayri-univers] :is(.room-head, .po-hero) {
+  max-inline-size: 1152px; min-block-size: 0; margin: 16px auto 32px;
+  padding: clamp(28px, 5vw, 60px) !important; border: 1px solid #dfcfb9; border-radius: 28px;
+  background: linear-gradient(115deg, #fffdf9 30%, var(--ty-teinte)) !important;
+  color: var(--ty-encre); box-shadow: 0 12px 40px -28px #5d3b2f44;
+}
+.tayri-shell[data-tayri-univers] .room-head { inline-size: calc(100% - 48px); }
+.tayri-shell[data-tayri-univers] .room-head.with-image { min-height: 350px !important; }
+.tayri-shell[data-tayri-univers] :is(.room-head, .po-hero)::before,
+.tayri-shell[data-tayri-univers] :is(.room-head, .po-hero)::after,
+.tayri-shell .po-hero :is(.po-fond, .po-garland, .po-gcorner) { display: none !important; }
+.tayri-shell[data-tayri-univers] :is(.room-head h1, .po-app .po-hero h1) { max-inline-size: 21ch; margin-block: 0 20px; font: 600 clamp(36px, 4.6vw, 62px)/1.08 var(--serif); color: var(--ty-accent) !important; -webkit-text-fill-color: var(--ty-accent) !important; text-shadow: none; letter-spacing: -.015em; }
+.tayri-shell[data-tayri-univers] :is(.room-head .lead, .po-hero .po-lead, .po-hero .po-sub) { max-inline-size: 60ch; margin-block: 0 24px; color: var(--ty-encre) !important; -webkit-text-fill-color: var(--ty-encre); font: 400 17px/1.7 var(--sans); text-shadow: none; }
+.tayri-shell[data-tayri-univers] :is(.room-name, .po-hero .po-eyebrow) { color: var(--ty-accent) !important; -webkit-text-fill-color: var(--ty-accent); font: 600 12px/1.5 var(--sans); text-transform: uppercase; letter-spacing: .12em; text-shadow: none; margin-block: 0 16px; }
+.tayri-shell .po-hero-grid { gap: 40px; }
+.tayri-shell .po-lamia { margin: 0; padding: 0; align-self: center; }
+.tayri-shell .po-lamia img { inline-size: 180px; block-size: 180px; object-fit: cover; border: 4px solid #fffdf9; box-shadow: 0 0 0 1px #d9c5a5; }
+.tayri-shell .po-lamia figcaption { color: var(--ty-doux) !important; text-shadow: none; font-size: 13px; }
+.tayri-shell[data-tayri-univers] .head-arch:not(.has-image) { display: none; }
+.tayri-shell[data-tayri-univers] :is(.head-arch.has-image, .head-illu) { inline-size: 230px; width: 230px !important; right: 48px !important; block-size: 260px; aspect-ratio: auto; padding: 6px; border: 1px solid #d9c5a5 !important; border-radius: 100px 100px 20px 20px; background: #fffdf9 !important; box-shadow: none !important; }
+.tayri-shell[data-tayri-univers] .head-illu img { block-size: 100%; inline-size: 100%; object-fit: contain; }
+.tayri-shell[data-tayri-univers] :is(.frise, .frise-fine) { height: 1px !important; margin-inline: auto; max-inline-size: 1152px; background: linear-gradient(90deg, transparent, #d0b078, transparent) !important; opacity: .65; box-shadow: none; }
+.tayri-shell[data-tayri-univers] :is(.frise, .frise-fine)::after { display: none; }
+
+/* Le contenu, les cartes et les formulaires appartiennent à la même Maison. */
+.tayri-shell[data-tayri-univers] .po-app:not(.tayri-celib) { --po-title: var(--serif); --po-body: var(--sans); --po-fg: var(--ty-encre); --po-muted: var(--ty-doux); --po-border: var(--ty-ligne); background: transparent; color: var(--ty-encre); padding: 0 24px 32px; font-family: var(--sans); }
+.tayri-shell[data-tayri-univers] :is(.room-body, .room-shelf, .events, .book-feature, .gallery-feature, .next-rooms, .ecrin-portes, .couple-landing-grille, .conf-page) { max-inline-size: 1200px; margin-inline: auto; padding-inline: 24px !important; }
+.tayri-shell[data-tayri-univers] :is(.room-body, .room-shelf, .book-feature, .gallery-feature, .next-rooms) { background: transparent !important; box-shadow: none; color: var(--ty-encre); }
+.tayri-shell[data-tayri-univers] :is(.espace-card, .couple-carte, .couple-landing-bloc, .abo-carte, .event-card, .now-card, .live-card, .side-note, .po-panel, .annonce-form, .conf-carte) { background: #fffdf9; color: var(--ty-encre); border: 1px solid var(--ty-ligne); border-radius: 20px; box-shadow: 0 8px 28px -22px #573b3540; }
+.tayri-shell[data-tayri-univers] .po-app .po-panel { background: #fffdf9 !important; border-color: var(--ty-ligne) !important; box-shadow: none !important; }
+.tayri-shell[data-tayri-univers] :is(.room-body, .room-shelf, .next-rooms, .po-corps, .conf-page, .espace) h2 { color: var(--ty-accent); font-family: var(--serif); }
+.tayri-shell[data-tayri-univers] :is(.btn-ink, .btn-gold, .po-app .po-btn, .po-corps .po-btn, .annonce-form .btn) { background: var(--ty-accent) !important; color: #fffdf9 !important; -webkit-text-fill-color: #fffdf9; border: 1px solid var(--ty-accent); border-radius: 999px; box-shadow: none; }
+.tayri-shell[data-tayri-univers] :is(.btn-line, .po-app .po-btn-verre) { background: #fffdf9 !important; color: var(--ty-accent) !important; -webkit-text-fill-color: var(--ty-accent); border: 1px solid #cbb6a6; border-radius: 999px; box-shadow: none; }
+.tayri-shell :is(.po-btn, .btn-gold)::after { display: none; }
+.tayri-shell[data-tayri-univers] :is(.po-actions, .bal-actions) { display: flex; flex-wrap: wrap; gap: 12px; margin-block: 24px 0; }
+.tayri-shell[data-tayri-univers] :is(.po-actions, .bal-actions) > * { margin: 0; }
+.tayri-shell[data-tayri-univers] :is(.espace-card, .po-app .annonce-form, .conf-page) :is(input:not([type='checkbox']):not([type='radio']):not([type='hidden']), select, textarea) { background: #fff !important; border: 1px solid #d8c9be !important; color: var(--ty-encre) !important; padding: 12px 14px; }
+.tayri-shell[data-tayri-univers] .article { margin-block: 24px; padding: clamp(24px, 4vw, 48px); border: 1px solid var(--ty-ligne); border-radius: 24px; background: #fffdf9 !important; box-shadow: none; color: var(--ty-encre); }
+.tayri-shell[data-tayri-univers] .espace:not(.couple) { max-inline-size: 1152px; padding: 28px 24px 48px; }
+.tayri-shell[data-tayri-univers] .espace:not(.couple) > h1 { color: var(--ty-accent); font-size: clamp(36px, 5vw, 58px); }
+
+/* Le catalogue garde ses vraies photos ; les trois rayons ont la même présentation. */
+.tayri-shell[data-tayri-univers] .product-card { padding: 0 0 20px; border: 1px solid var(--ty-ligne); background: #fffdf9; color: var(--ty-encre); box-shadow: none; }
+.tayri-shell[data-tayri-univers] .product-card::after, .tayri-shell[data-tayri-univers] .product-card h3::before { display: none; }
+.tayri-shell[data-tayri-univers] .product-card .product-media { margin: 0 0 16px; border: 0; border-radius: 0; box-shadow: none; transform: none; }
+.tayri-shell[data-tayri-univers] .product-card :is(h3, p, span) { color: var(--ty-encre); }
+.tayri-shell[data-tayri-univers] .product-card h3 { display: block; padding: 0; margin: 0 18px 8px; background: none; font-size: 25px; }
+.tayri-shell[data-tayri-univers] .product-card > :is(p, span) { margin-inline: 18px; }
+.tayri-shell[data-tayri-univers] .product-page { max-inline-size: 1200px; margin: 20px auto; padding: 24px; background: #fffdf9; border: 1px solid var(--ty-ligne); border-radius: 24px; }
+.tayri-shell[data-tayri-univers] .product-page .gallery-main { border-radius: 18px; box-shadow: none; }
+
+/* Les profils ne laissent plus un écran vide avant les explications. */
+.tayri-shell[data-tayri-univers] .accueil-swipe { min-height: 0; background: #fffdf9; border: 1px solid var(--ty-ligne); border-radius: 24px; padding: 24px 16px; margin-block: 24px; }
+.tayri-shell .accueil-swipe .swipe-pile:has(> .swipe-message), .tayri-shell .accueil-swipe .swipe-pile:has(> .annonce-vide) { height: auto; min-height: 0; }
+.tayri-shell .accueil-swipe .swipe-message { padding: 24px 16px; background: var(--ty-ivoire); border-radius: 16px; box-shadow: none; }
+.tayri-shell .accueil-swipe .swipe-message h2 { font: 600 30px/1.15 var(--serif); }
+.tayri-shell .accueil-swipe .swipe-app { margin-block: 0; padding-block: 0; }
+.tayri-shell .lfb-rubriques { gap: 10px; padding: 12px 0; background: none; border: 0; }
+.tayri-shell .lfb-rubriques a { border: 1px solid var(--ty-ligne); border-radius: 16px; background: #fffdf9; box-shadow: none; color: var(--ty-bordeaux); }
+.tayri-shell .lfb-valeurs { background: transparent; border: 0; color: var(--ty-doux); }
+.tayri-shell .lfb-valeurs :is(p, summary) { color: var(--ty-doux); text-shadow: none; }
+
+/* Couple et célibataires : les images validées restent, le cadre se calme. */
+.tayri-shell .espace.couple { margin-block: 18px; border: 1px solid #dfcfb9; border-radius: 28px; overflow: clip; }
+.tayri-shell .couple .couple-carte { background: #fffdf9 !important; border-color: #e5d7cd !important; box-shadow: none !important; }
+.tayri-shell .couple .couple-onglets { background: #fffaf3; border-radius: 18px; }
+.tayri-shell .couple .couple-onglets button { box-shadow: none; }
+.tayri-shell .couple .couple-demo-bandeau { background: #edf2e9; border: 1px solid #cbd9c7; }
+.tayri-shell .couple-landing-grille { gap: 24px; margin-block: 32px; }
+.tayri-shell .couple-landing-bloc h2 { font-size: 27px; color: var(--ty-accent); margin: 22px 22px 10px; }
+.tayri-shell .couple-landing-bloc p { margin: 0 22px 24px; color: var(--ty-doux); }
+.tayri-shell .site-footer { border-block-start: 1px solid var(--ty-ligne); }
+.tayri-shell .site-footer :is(.footer-title, .footer-sign) { color: var(--ty-bordeaux); }
+.tayri-shell .site-footer :is(.footer-legal, small) { color: #74616a; }
+.tayri-shell .site-footer a:hover { color: var(--ty-bordeaux); }
 .tayri-shell :is(main, section, article, form, nav, .espace, .po-app, .room-body, .product-page) { min-inline-size: 0; }
 .tayri-shell [hidden] { display: none !important; }
 .tayri-shell :is(input, select, textarea, button) { font-family: inherit; }
@@ -67,8 +170,8 @@
 
 /* L'accueil illustré : le paysage est décoratif, le contenu reste du HTML. */
 .tayri-accueil { position: relative; isolation: isolate; padding: 36px 20px 28px; background: #fff5e9; color: var(--ty-bordeaux); }
-.tayri-paysage { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
-.tayri-paysage img { inline-size: 100%; block-size: 100%; object-fit: cover; object-position: center top; }
+.tayri-paysage { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; background: #fff5e9; }
+.tayri-paysage img { inline-size: 100%; block-size: clamp(260px, 45vw, 600px); object-fit: cover; object-position: center top; -webkit-mask-image: linear-gradient(#000 75%, transparent); mask-image: linear-gradient(#000 75%, transparent); }
 .tayri-accueil-contenu { max-inline-size: 940px; margin-inline: auto; }
 .tayri-bienvenue { text-align: center; margin-block-end: 30px; }
 .tayri-embleme { inline-size: clamp(88px, 12vw, 132px); block-size: auto; margin: 0 auto 8px; }
@@ -117,6 +220,14 @@
 .tayri-autonome :is(input, select, textarea, button) { font-size: 16px; }
 .tayri-autonome :is(h1, h2) { line-height: 1.2; }
 .tayri-autonome table { max-inline-size: 100%; }
+.tayri-administration { --red: #7a1f35; --ink: #392b34; --muted: #74616a; --line: #e5d7cd; --pink: #f6eeea; }
+.tayri-administration main { max-inline-size: 1200px; padding: 32px 24px 56px; }
+.tayri-administration h1 { font-size: clamp(34px, 5vw, 56px); line-height: 1.15; color: var(--ty-bordeaux); }
+.tayri-administration :is(.login, .card, .alert-card, .empty) { background: #fffdf9; border-color: var(--ty-ligne); border-radius: 20px; box-shadow: none; }
+.tayri-administration :is(.primary, .tabs button.active, .tabs button[aria-selected='true']) { background: var(--ty-bordeaux); color: #fff; }
+.tayri-administration .soft { background: #f3e8e4; color: var(--ty-bordeaux); }
+.tayri-administration .tabs { flex-wrap: wrap; }
+.tayri-administration button { min-block-size: 44px; }
 
 @media (min-width: 1101px) { .tayri-shell .barre-app.tayri-barre { display: none !important; } }
 @media (max-width: 1100px) {
@@ -130,6 +241,28 @@
   .tayri-shell .tayri-barre a[aria-current='page']::after { display: none; }
 }
 @media (max-width: 680px) {
+  .tayri-shell[data-tayri-univers] .tayri-reperes { padding: 16px 16px 4px; }
+  .tayri-fil { font-size: 12px; gap: 8px; }
+  .tayri-rubriques { gap: 7px; margin-block: 14px 8px; }
+  .tayri-rubriques a { font-size: 12px; padding: 8px 12px; }
+  .tayri-shell[data-tayri-univers] :is(.room-head, .po-hero) { margin-block: 12px 24px; border-radius: 22px; padding: 26px 22px !important; }
+  .tayri-shell[data-tayri-univers] .room-head { inline-size: calc(100% - 32px); }
+  .tayri-shell[data-tayri-univers] :is(.room-head.with-image, .room-head.with-illu) { min-height: 0 !important; }
+  .tayri-shell[data-tayri-univers] :is(.room-head h1, .po-app .po-hero h1) { font-size: 37px !important; max-inline-size: 100%; }
+  .tayri-shell[data-tayri-univers] :is(.room-head .lead, .po-hero .po-lead, .po-hero .po-sub) { font-size: 16px; margin-block-end: 18px; }
+  .tayri-shell[data-tayri-univers] :is(.head-arch.has-image, .head-illu) { position: relative; inset: auto !important; transform: none; order: 3; width: 140px !important; inline-size: 140px; block-size: 160px; margin: 24px 0 0; align-self: flex-end; }
+  .tayri-shell .po-hero-grid { grid-template-columns: 1fr; gap: 22px; }
+  .tayri-shell .po-lamia { display: flex; align-items: center; gap: 14px; justify-self: start; }
+  .tayri-shell .po-lamia img { inline-size: 64px; block-size: 64px; }
+  .tayri-shell .po-lamia figcaption { margin: 0; text-align: start; }
+  .tayri-shell[data-tayri-univers] .po-app:not(.tayri-celib) { padding-inline: 16px; }
+  .tayri-shell[data-tayri-univers] :is(.room-body, .room-shelf, .events, .book-feature, .gallery-feature, .next-rooms, .ecrin-portes, .couple-landing-grille, .conf-page) { padding-inline: 16px !important; }
+  .tayri-shell[data-tayri-univers] .po-app .room-body { padding-inline: 0 !important; }
+  .tayri-shell[data-tayri-univers] .product-grid { gap: 18px; }
+  .tayri-shell[data-tayri-univers] .product-page { margin: 12px 16px; padding: 16px; border-radius: 22px; }
+  .tayri-shell .espace.couple { border-radius: 22px; }
+  .tayri-shell .couple-landing-grille { grid-template-columns: 1fr; gap: 18px; }
+  .tayri-shell .couple-landing-bloc img { height: 190px; }
   .tayri-shell .site-header.tayri-header { gap: 12px; padding: 10px 16px !important; min-block-size: 72px; }
   .tayri-header .brand { gap: 7px; }
   .tayri-header .brand img { inline-size: 38px; block-size: 38px; }

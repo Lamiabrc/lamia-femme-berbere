@@ -48,6 +48,7 @@ test('toutes les pages HTML partagent le socle TAYRI, y compris produits et outi
     if (!/<html\b/i.test(html)) continue; // fichier de vérification Google, pas un écran
     assert.match(html, /class="[^"]*\btayri-shell\b/, `cadre absent : ${f}`);
     assert.match(html, /href="\/assets\/tayri\.css(?:\?[^\"]*)?"/, `style absent : ${f}`);
+    assert.match(html, /data-tayri-univers="[a-z]+"/, `univers absent : ${f}`);
   }
 });
 
@@ -57,6 +58,14 @@ test('accueil TAYRI : accès directs, boutique complète et profils conservés s
   for (const route of ['/rencontres/', '/espace-couple/', '/boutique/', '/ecrin/', '/bibliotheque/', '/grenier/', '/mon-espace/']) assert.ok(html.includes(`href="${route}"`), route);
   assert.match(html, /src="\/images\/marque\/tayri-coeur.webp"/);
   assert.doesNotMatch(html, /data-entree(?:\s|>)/);
+});
+
+test('les Rencontres présentent le parcours avant les profils et gardent le formulaire existant', () => {
+  const html = readFileSync(join(DIST, 'rencontres/index.html'), 'utf8');
+  assert.ok(html.indexOf('id="po-titre"') < html.indexOf('data-swipe-accueil'));
+  assert.match(html, /data-tayri-univers="rencontres"/);
+  assert.match(html, /id="confier" data-annonce-box hidden/);
+  assert.match(html, /data-annonce-ouvrir data-cta-profil/);
 });
 
 test('les scripts des pages autonomes sont conservés à l’identique', () => {
