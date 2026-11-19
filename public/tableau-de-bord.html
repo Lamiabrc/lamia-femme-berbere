@@ -21,6 +21,7 @@
     <details class="tdb-plus" data-menu-plus>
       <summary>Plus <span class="tdb-pastille" data-journal-pastille hidden></span></summary>
       <div>
+      <button type="button" data-tab="creer-profil"><svg class="ico" aria-hidden="true"><use href="/icones.svg#user"/></svg> Créer un profil</button>
       <button type="button" data-tab="rencontres"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Matchs à suivre</button>
       <button type="button" data-tab="application"><svg class="ico" aria-hidden="true"><use href="/icones.svg#smartphone"/></svg> Application <span class="tdb-pastille" data-journal-pastille hidden></span></button>
       <button type="button" data-tab="coaching"><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg> Coaching</button>
@@ -52,6 +53,7 @@
   <!-- ===================================================== Accueil -->
   <section data-panel="accueil" hidden>
     <h1 class="tdb-titre">Bonjour Lamia</h1>
+    <p><button type="button" class="btn btn-ink" data-go="creer-profil">Créer un profil et son annonce</button></p>
     <!-- Ce qui compte en premier (Lamia, 16 nov. 2026) : les abonnés et l'argent généré. Le reste n'est qu'un moyen. -->
     <div class="tdb-essentiel" aria-label="L’essentiel">
       <button type="button" class="tdb-gros" data-go="ventes"><span>Abonnés</span><strong data-k="abonnes">—</strong><small data-k="abonnes-detail"></small></button>
@@ -162,7 +164,7 @@
 
   <!-- ===================================================== Comptes -->
   <section data-panel="comptes" hidden>
-    <div class="tdb-entete"><h1 class="tdb-titre">Les membres</h1><button class="btn btn-line" type="button" data-comptes-maj>Actualiser</button></div>
+    <div class="tdb-entete"><h1 class="tdb-titre">Les membres</h1><div class="actions"><button class="btn btn-ink" type="button" data-go="creer-profil">Créer un profil</button> <button class="btn btn-line" type="button" data-comptes-maj>Actualiser</button></div></div>
     <div class="tdb-carte tdb-membre-num" id="membre">
       <h2>Un membre par son numéro</h2>
       <p class="aide">Lui écrire, lui offrir une formule, le mettre en relation avec qui tu veux. Les mêmes gestes que dans ton outil.</p>
@@ -496,6 +498,60 @@
       <div class="tdb-carte"><h2>À quelle heure ? <small class="aide">(heure de Paris)</small></h2><div class="barres heures" data-heures></div><h2 style="margin-top:18px">Appareils</h2><ol class="classement" data-top-appareils></ol></div>
     </div>
     <p class="aide">Visites comptées sans cookie et sans suivre personne : un visiteur = une personne différente dans la journée. La ville et le pays sont approximatifs (déduits du réseau internet, sans jamais enregistrer l’adresse IP). Astuce : ajoute <code>?utm_source=live</code> à la fin du lien que tu donnes en live pour savoir combien viennent du live.</p>
+  </section>
+  <section data-panel="creer-profil" hidden>
+    <div class="tdb-entete"><h1 class="tdb-titre">Créer un profil</h1><button class="btn btn-line" type="button" data-go="comptes">Les membres</button></div>
+    <p class="lead">Tu prépares sa fiche et son annonce. Tu lui envoies le lien, puis la personne vérifie ses informations et crée elle-même son accès.</p>
+    <ol class="fiche-etapes" aria-label="Le parcours"><li>Préparer la fiche</li><li>Copier son lien</li><li>La personne confirme</li></ol>
+    <div class="fiche-admin-resultat tdb-carte" data-fiche-resultat hidden aria-live="polite"></div>
+    <div class="fiche-admin-grille">
+      <form class="tdb-carte fiche-admin-form" data-fiche-admin>
+        <h2>Sa fiche</h2>
+        <div class="fiche-admin-champs">
+          <label>Genre du profil<select name="genre" aria-label="Genre du profil" required><option value="">Choisir</option><option value="femme">Femme</option><option value="homme">Homme</option></select></label>
+          <label>Âge<input name="age" type="number" min="18" max="99" required></label>
+          <label>Pays de résidence<select name="pays" data-fiche-choix="pays" required></select></label>
+          <label>Ville<input name="ville" maxlength="60" autocomplete="off"></label>
+          <label>Village ou ville d’origine<input name="village" maxlength="60" autocomplete="off"></label>
+          <label>Métier<input name="metier" maxlength="80" autocomplete="off"></label>
+          <label>Situation<select name="situation" data-fiche-choix="situation"></select></label>
+          <label>Enfants<select name="enfants" data-fiche-choix="enfants"></select></label>
+          <label>Études<select name="etudes" data-fiche-choix="etudes"></select></label>
+          <label>Origine<select name="origine" data-fiche-choix="origine"></select></label>
+        </div>
+        <details><summary>Religion et pratique, si précisées par la personne</summary><div class="fiche-admin-champs">
+          <label>Religion<select name="religion" data-fiche-choix="religion"></select></label>
+          <label>Pratique<select name="pratique" data-fiche-choix="pratique"></select></label>
+        </div></details>
+        <h2>Son annonce anonyme</h2>
+        <label>Qui je suis<textarea name="profil" rows="4" maxlength="700" required placeholder="Sa personnalité, ses valeurs, son quotidien…"></textarea></label>
+        <label>Qui je cherche<textarea name="recherche" rows="4" maxlength="700" required placeholder="La relation et la personne recherchées…"></textarea></label>
+        <div class="fiche-admin-champs">
+          <label>Âge recherché, de<input name="age_min" type="number" min="18" max="99"></label>
+          <label>À<input name="age_max" type="number" min="18" max="99"></label>
+        </div>
+        <label>Pays ou région recherchés<input name="secteur" maxlength="120"></label>
+        <p class="aide">Pas de prénom, de photo ni de contact dans l’annonce. Les numéros, liens et emails sont masqués automatiquement.</p>
+        <label class="fiche-admin-coche"><input type="checkbox" name="publier"> Afficher l’annonce anonymement dès maintenant</label>
+        <p class="aide">Sinon, elle reste invisible jusqu’à la confirmation de la personne.</p>
+        <button class="btn btn-ink" type="submit">Créer la fiche et obtenir son lien</button>
+        <p class="form-status" role="status" data-fiche-statut></p>
+      </form>
+      <aside class="tdb-carte fiche-admin-apercu" aria-label="Aperçu de l’annonce">
+        <p class="room-name">Aperçu de l’annonce</p><h2 data-fiche-apercu-titre>Son profil</h2>
+        <p class="aide" data-fiche-apercu-infos></p>
+        <h3>Qui je suis</h3><p data-fiche-apercu-profil>Son portrait apparaîtra ici.</p>
+        <h3>Qui je cherche</h3><p data-fiche-apercu-recherche>Sa recherche apparaîtra ici.</p>
+        <p class="aide">La fiche enregistrée applique le masquage des contacts. Le numéro est attribué à sa création.</p>
+      </aside>
+    </div>
+    <div class="tdb-carte">
+      <div class="tdb-entete"><h2>Les fiches créées ici</h2><button class="btn btn-line" type="button" data-fiches-actualiser>Actualiser</button></div>
+      <p class="aide">Retrouve leur lien personnel et suis leur confirmation.</p>
+      <form data-fiche-lien-chercher class="tdb-filtres-journal"><label>Retrouver une fiche par son numéro<input name="ref" type="number" min="5001" required></label><button type="submit" class="btn btn-line">Retrouver son lien</button></form>
+      <p role="status" data-fiches-statut></p><ul class="fiche-admin-liste" data-fiches-admin></ul>
+      <button type="button" class="btn btn-line" data-fiches-suite hidden>Afficher les suivantes</button>
+    </div>
   </section>
 </main>
 <script type="module" src="/tableau.js"></script>

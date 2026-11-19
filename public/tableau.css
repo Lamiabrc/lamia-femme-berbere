@@ -472,3 +472,27 @@
 .tdb-gros span { font-size: .95rem; opacity: .85; }
 .tdb-gros strong { font-size: clamp(1.9rem, 8vw, 2.6rem); line-height: 1.1; font-weight: 700; }
 .tdb-gros small { font-size: .85rem; opacity: .8; }
+
+/* Préparer une annonce et remettre son lien à la personne. */
+.fiche-etapes { display: flex; flex-wrap: wrap; gap: 12px 30px; padding: 18px 18px 18px 36px; background: #f8f1ec; border-radius: 14px; }
+.fiche-admin-grille { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); align-items: start; gap: 20px; }
+.fiche-admin-form { display: grid; gap: 16px; }
+.fiche-admin-form h2 { margin: 0; }
+.fiche-admin-champs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.fiche-admin-form label, .fiche-admin-resultat label { display: grid; gap: 5px; font-size: 14px; font-weight: 600; }
+.fiche-admin-form label.fiche-admin-coche { display: flex; align-items: start; gap: 10px; }
+.fiche-admin-coche input { width: 20px; min-height: 20px; flex: 0 0 20px; margin: 0; }
+.fiche-admin-form details summary { cursor: pointer; padding: 8px 0; }
+.fiche-admin-apercu { position: sticky; top: 90px; background: #fbf7f2; }
+.fiche-admin-apercu p { white-space: pre-wrap; overflow-wrap: anywhere; }
+.fiche-admin-resultat { border: 2px solid #32694c; background: #f4faf5; scroll-margin-top: 100px; }
+.fiche-admin-resultat .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+.fiche-admin-liste { list-style: none; padding: 0; }
+.fiche-admin-liste li { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; padding: 16px 0; border-top: 1px solid var(--qvt-sable); }
+.fiche-admin-liste li div { display: grid; gap: 3px; }
+.fiche-admin-liste small { color: var(--qvt-taupe); }
+@media (max-width: 760px) {
+  .fiche-admin-grille { grid-template-columns: minmax(0, 1fr); }
+  .fiche-admin-apercu { position: static; }
+  .fiche-admin-champs { grid-template-columns: minmax(0, 1fr); }
+}

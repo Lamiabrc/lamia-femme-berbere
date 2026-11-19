@@ -2101,19 +2101,19 @@ page(
   })
 );
 
-// Confirmation d'une fiche créée en live (lien personnel envoyé par Lamia)
+// Confirmation d'une fiche préparée par Lamia (lien personnel envoyé à la personne).
 page(
   '/rencontres/confirmer/',
   layout({
     title: 'Confirme ta fiche · Les Rencontres de Lamia',
-    description: 'Ta fiche créée en live avec Lamia : confirme-la pour qu’elle apparaisse, anonymement, dans les profils.',
+    description: 'Ta fiche préparée par Lamia : vérifie tes informations puis confirme ton annonce anonyme.',
     path: '/rencontres/confirmer/',
     room: roomBySlug.patio,
     noindex: true,
     scripts: ['/assets/confirmer.js'],
     body: `<div class="po-app"><section class="po-hero"><div class="po-fond" aria-hidden="true"></div>
   <p class="po-eyebrow">Les Rencontres de Lamia</p><h1>Ta fiche est prête</h1>
-  <p class="po-lead">Tu es passé·e en live avec Lamia : ta fiche est dans son outil de matching et apparaît sur le site, anonyme, en attente de ta confirmation.</p>
+  <p class="po-lead">Lamia a préparé ta fiche. Vérifie les informations, corrige-les si besoin puis confirme pour continuer.</p>
 </section>
 <section class="confirmer-app" data-confirmer><p class="annonce-vide">Ta fiche arrive…</p></section></div>`,
   })
