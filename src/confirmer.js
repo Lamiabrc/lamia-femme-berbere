@@ -51,7 +51,7 @@ const formulaire = (f) => `<form class="confirmer-modif" data-form-modif hidden>
   ${champ('secteur', 'Où tu cherches (pays, région)', f.secteur, 120)}
   <button type="submit" class="po-btn">Enregistrer ma fiche</button>
   <p class="confirmer-note">Ne mets ni numéro, ni TikTok, ni email : ils sont retirés automatiquement.</p></form>`;
-const effacer = `<p class="confirmer-note"><button type="button" class="confirmer-lien" data-effacer>Je ne veux plus du tout être dans l’outil de Lamia</button></p>`;
+const effacer = `<p class="confirmer-note"><button type="button" class="confirmer-lien" data-effacer>Demander l’effacement de mes informations</button></p>`;
 
 // Quelqu'un a choisi cette fiche : son annonce anonyme, et ce qu'il reste à faire pour répondre.
 function choisie(d) {
@@ -80,7 +80,7 @@ function afficher(d) {
 function afficherFiche(d) {
   const f = d.fiche;
   if (d.efface) {
-    zone.innerHTML = `<div class="confirmer-etat"><p><strong>C’est noté.</strong> Ta fiche est retirée du site et Lamia est prévenue : elle va l’effacer de son outil de matching.</p><p>Merci d’être passé·e en live, et belle route à toi.</p></div>`;
+    zone.innerHTML = `<div class="confirmer-etat"><p><strong>C’est noté.</strong> Ta fiche est retirée du site et Lamia est prévenue de ta demande d’effacement.</p><p>Merci de ta confiance, et belle route à toi.</p></div>`;
     return;
   }
   if (d.retire) {
@@ -109,9 +109,11 @@ async function monterSimple() {
   if (!z) return;
   const { data: { session } } = await supabase.auth.getSession();
   const finir = async (s, dire) => {
-    try { await api({ action: 'annonce_lier_fiche_outil', n, t }, s.access_token); }
+    try {
+      await api({ action: 'annonce_lier_fiche_outil', n, t }, s.access_token);
+      await api({ action: 'annonce_confirmer_outil', n, t }, s.access_token);
+    }
     catch (e) { dire(e.code === 'deja_liee' ? 'Cette fiche est déjà reliée à un autre compte. Écris à Lamia pour qu’elle t’aide.' : 'Ça n’a pas fonctionné. Réessaie dans un instant.'); return; }
-    await agir('annonce_confirmer_outil');
     // La fiche est confirmée : direction le swipe, qui guide vers les photos s'il en manque.
     location.assign('/rencontres/swipe/?bienvenue=1');
   };
@@ -184,7 +186,7 @@ async function monterAcces(d) {
 
 async function agir(action, extra = {}) {
   zone.querySelectorAll('button').forEach((b) => { b.disabled = true; });
-  try { afficher(await api({ action, n, t, ...extra })); }
+  try { const { data: { session } } = await supabase.auth.getSession(); afficher(await api({ action, n, t, ...extra }, session?.access_token)); }
   catch (e) { zone.innerHTML = `<p class="confirmer-erreur">${esc(ERREURS[e.code] || 'Un souci est survenu. Réessaie dans un instant.')}</p>`; }
 }
 
@@ -193,7 +195,7 @@ zone.addEventListener('click', (e) => {
   else if (e.target.closest('[data-confirmer-oui]')) agir('annonce_confirmer_outil');
   else if (e.target.closest('[data-retirer]') && confirm('Ta fiche ne sera plus visible sur le site. Tu confirmes ?')) agir('annonce_retirer_outil');
   else if (e.target.closest('[data-modifier]')) { const fm = zone.querySelector('[data-form-modif]'); fm.hidden = false; fm.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-  else if (e.target.closest('[data-effacer]') && confirm('Ta fiche sera retirée du site et Lamia l’effacera de son outil de matching. Tu confirmes ?')) agir('annonce_effacer_outil');
+  else if (e.target.closest('[data-effacer]') && confirm('Ta fiche sera retirée du site et ta demande d’effacement sera transmise à Lamia. Tu confirmes ?')) agir('annonce_effacer_outil');
 });
 zone.addEventListener('submit', (e) => {
   if (!e.target.closest('[data-form-modif]')) return;

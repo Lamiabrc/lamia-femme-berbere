@@ -1,6 +1,7 @@
 // Tableau de bord de Lamia : ventes, produits, soirées, alertes, textes du site, visites.
 import { FAMILLES } from '/assets/rubriques.mjs';
 import { createClient } from '/vendor/supabase.mjs';
+import { monterFichesAdmin } from '/fiches-admin.js';
 
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc');
 const $ = (s, r = document) => r.querySelector(s);
@@ -14,6 +15,12 @@ const GRAVITE = { red: 'Danger', orange: 'Inquiétant', yellow: 'À surveiller' 
 
 let comptes = null;
 let token = null, data = null, produits = [], categories = [], edition = null, aller = '';
+const fichesAdmin = monterFichesAdmin({ appel: async (body) => {
+  const { data: { session }, error } = await supabase.auth.getSession();
+  if (error || session?.user?.app_metadata?.role !== 'admin') throw Object.assign(new Error('forbidden'), {code:'forbidden'});
+  const r = await fetch('/api/confidences/', {method:'POST', headers:{'Content-Type':'application/json',Authorization:`Bearer ${session.access_token}`},body:JSON.stringify(body),signal:AbortSignal.timeout(20000)});
+  const d = await r.json(); if (!r.ok || !d.ok) throw Object.assign(new Error(d.error || 'erreur'), {code:d.error}); return d;
+} });
 
 function message(t, err = false) { const m = $('[data-message]'); m.textContent = t; m.classList.toggle('is-error', err); if (t && !err) setTimeout(() => { if (m.textContent === t) m.textContent = ''; }, 4000); }
 
@@ -45,6 +52,7 @@ function ouvrir(tab) {
   if (tab === 'activite') chargerActivite();
   if (tab === 'coaching') chargerCoaching();
   if (tab === 'comptes' && !comptes) chargerComptes();
+  if (tab === 'creer-profil') fichesAdmin.ouvrir();
   if (tab === 'rencontres') { const f = $('[data-rencontres]'); if (f && !f.src) f.src = `/confidences-lamia/?integre=1#${aller || 'annonces'}`; aller = ''; }
   scrollTo({ top: 0 });
 }
@@ -1266,7 +1274,7 @@ async function demarrer() {
   if (!admin) return;
   if (location.hash.startsWith('#profil-') || location.hash.startsWith('#compte-')) { aFaire(); pastilleJournal(); chargerCockpit(); await charger().catch(() => {}); suivreHashProfil(); return; }
   const tab = location.hash.slice(1);
-  ouvrir(['accueil', 'activite', 'rencontres', 'comptes', 'application', 'coaching', 'ventes', 'produits', 'soirees', 'bilan', 'alertes', 'textes', 'visites'].includes(tab) ? tab : 'accueil');
+  ouvrir(['accueil', 'activite', 'rencontres', 'comptes', 'creer-profil', 'application', 'coaching', 'ventes', 'produits', 'soirees', 'bilan', 'alertes', 'textes', 'visites'].includes(tab) ? tab : 'accueil');
   aFaire(); pastilleJournal(); chargerCockpit();
   await charger();
 }
