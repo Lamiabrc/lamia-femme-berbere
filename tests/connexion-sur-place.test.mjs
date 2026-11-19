@@ -25,17 +25,26 @@ const espion = () => {
   return { appels, fetcher };
 };
 
-test('jeton valide : utilisateur reconnu sans demander à Supabase qui est connecté', async () => {
+test('jeton signé : la vérification de l’adresse vient de Supabase, jamais des métadonnées', async () => {
   _viderClesPourTests();
   const { appels, fetcher } = espion();
   const u = await userFromRequest(demande(jeton()), { fetcher });
-  assert.equal(u.id, 'u-1');
-  assert.equal(u.email, 'nina@example.com');
-  assert.equal(u.app_metadata.role, 'admin');
+  assert.equal(u.id, 'u-reseau');
+  assert.equal(u.email, 'reseau@example.com');
+  assert.equal(u.app_metadata, undefined);
   assert.ok(u.email_confirmed_at);
   await userFromRequest(demande(jeton()), { fetcher });
-  assert.deepEqual(appels.filter((x) => x.endsWith('/auth/v1/user')), []);
-  assert.equal(appels.length, 1); // les clés ne sont lues qu'une fois
+  assert.equal(appels.filter((x) => x.endsWith('/auth/v1/user')).length, 2);
+  assert.equal(appels.filter((x) => x.endsWith('/jwks.json')).length, 1);
+});
+
+test('email_verified modifiable ne transforme pas une adresse non confirmée en adresse confirmée', async () => {
+  _viderClesPourTests();
+  const fetcher = async (u) => u.endsWith('/jwks.json')
+    ? Response.json({ keys: [jwk] })
+    : Response.json({ id: 'u-1', email: 'nina@example.com', email_confirmed_at: null, user_metadata: { email_verified: true } });
+  const u = await userFromRequest(demande(jeton()), { fetcher });
+  assert.equal(u.email_confirmed_at, null);
 });
 
 test('jeton expiré, mauvaise signature ou mauvais émetteur : refusé', async () => {

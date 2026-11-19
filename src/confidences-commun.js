@@ -23,9 +23,12 @@ export const ERREURS = {
 };
 export const erreur = (code) => ERREURS[code] || 'L’envoi n’a pas fonctionné. Réessaie dans un instant.';
 
-// Création de compte par le site (compte déjà confirmé, pas d'email à attendre). Erreurs : compte_existe, mot_de_passe, email_invalide, trop_de_demandes.
+// La confirmation est un état d'attente : aucune connexion par mot de passe avant la preuve d'adresse.
+export const CONFIRMATION_COMPTE = 'Un email de confirmation vient de partir. Ouvre-le pour confirmer ton adresse et continuer (regarde aussi les courriers indésirables). Si tu ne le retrouves pas, demande un lien de connexion dans Mon espace.';
 export async function creerCompte({ email, password, prenom = '', source = 'site' }) {
-  return api({ action: 'annonce_creer_compte', email, password, prenom, source });
+  const resultat = await api({ action: 'annonce_creer_compte', email, password, prenom, source, retour: location.pathname + location.search + location.hash });
+  if (resultat.confirmation_requise) throw Object.assign(new Error(CONFIRMATION_COMPTE), { code: 'confirmation_requise' });
+  return resultat;
 }
 
 export async function api(body, token) {

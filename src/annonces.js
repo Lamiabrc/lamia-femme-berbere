@@ -244,7 +244,7 @@ function porteCompte(box) {
       let session = null;
       if (mode === 'creer') {
         try { await creerCompte({ email, password: mdp, prenom: f.prenom.value.trim(), source: 'rencontres' }); }
-        catch (err) { if (err.code !== 'compte_existe') throw Object.assign(new Error(), { code: ['mot_de_passe', 'trop_de_demandes'].includes(err.code) ? err.code : err.code === 'email_invalide' ? 'invalid_email' : 'compte_impossible' }); }
+        catch (err) { if (err.code === 'confirmation_requise') throw err; if (err.code !== 'compte_existe') throw Object.assign(new Error(), { code: ['mot_de_passe', 'trop_de_demandes'].includes(err.code) ? err.code : err.code === 'email_invalide' ? 'invalid_email' : 'compte_impossible' }); }
       }
       if (!session) {
         const co = await supabase.auth.signInWithPassword({ email, password: mdp });
@@ -256,6 +256,7 @@ function porteCompte(box) {
       }
       monterFormulaire(box);
     } catch (err) {
+      if (err.code === 'confirmation_requise') { say(st, err.message); btn.disabled = false; return; }
       // La personne a déjà un compte mais était sur « Créer mon profil » : on la met sur « Me connecter », sans la gronder.
       if (err.code === 'compte_existant') $('[data-mode=connexion]', box)?.click();
       say(st, ERR[err.code] || 'Ça n’a pas fonctionné. Réessaie dans un instant.', err.code !== 'compte_existant'); btn.disabled = false;

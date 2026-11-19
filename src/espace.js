@@ -765,6 +765,7 @@ $('[data-espace-signup]').addEventListener('submit', async (e) => {
   say(st, 'Un instant…');
   try { await creerCompte({ email: String(f.get('email')).trim(), password: String(f.get('password')), prenom: String(f.get('first_name')).trim(), source: 'mon-espace' }); }
   catch (err) {
+    if (err.code === 'confirmation_requise') return say(st, err.message);
     return say(st, err.code === 'compte_existe' ? 'Un espace existe déjà avec cet email : connecte-toi, ou reçois un lien pour choisir ton mot de passe.' : err.code === 'trop_de_demandes' ? 'Plusieurs espaces viennent d’être créés depuis cette connexion. Réessaie dans une heure.' : err.code === 'mot_de_passe' ? 'Mot de passe trop court (8 caractères minimum).' : err.code === 'email_invalide' ? 'Vérifie ton adresse email.' : 'La création n’a pas fonctionné. Réessaie.', true);
   }
   const { error } = await supabase.auth.signInWithPassword({ email: String(f.get('email')).trim(), password: String(f.get('password')) });
