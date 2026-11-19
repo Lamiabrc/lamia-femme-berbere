@@ -2,6 +2,8 @@
 
 L’accueil présente TAYRI avec le fichier original du cœur bleu, les deux parcours relationnels et la boutique. La porte et le projet de zoom sont écartés conformément à la décision de Lamia. Les outils, profils et données gardent leurs parcours existants.
 
+Les deux pictogrammes des parcours sont remplacés par des images déjà présentes dans TAYRI : les deux avatars illustratifs des Rencontres et le visuel du couple face au coucher du soleil. Ces images sont décoratives, sans noms ni présentation comme membres réels. Aucun logo ou fichier image existant n’est modifié ; l’affichage utilise les WebP d’origine.
+
 Le cadre commun définit la navigation, le rythme des titres, les boutons, les formulaires et les repères mobiles. Le rose, le bleu et Couple gardent leurs illustrations et leurs couleurs. Les pages autonomes reçoivent le même socle sans remplacement de leurs scripts.
 
 ## Pages intérieures

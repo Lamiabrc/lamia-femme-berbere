@@ -68,13 +68,16 @@ export function accueilTayri() {
     </div>
     <div class="tayri-parcours">
       <article class="tayri-parcours-carte tayri-parcours-rencontres">
-        <svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg>
+        <div class="tayri-parcours-visuel tayri-parcours-portraits" aria-hidden="true">
+          <img src="/images/outil/avatar-femme.webp" width="200" height="200" alt="" decoding="async">
+          <img src="/images/outil/avatar-homme.webp" width="640" height="640" alt="" decoding="async">
+        </div>
         <h2>Faire une rencontre</h2>
         <p>Découvrir les profils et avancer vers une relation sérieuse, avec Lamia.</p>
         <a class="tayri-action" href="/rencontres/">Découvrir les Rencontres <span aria-hidden="true">›</span></a>
       </article>
       <article class="tayri-parcours-carte tayri-parcours-couple">
-        <svg class="ico" aria-hidden="true"><use href="/icones.svg#handshake"/></svg>
+        <div class="tayri-parcours-visuel" aria-hidden="true"><img src="/images/couple/meteo.webp" width="286" height="286" alt="" decoding="async"></div>
         <h2>Prendre soin de notre couple</h2>
         <p>Partager des attentions, jouer et créer de beaux moments à deux.</p>
         <a class="tayri-action" href="/espace-couple/">Retrouver Notre couple <span aria-hidden="true">›</span></a>
