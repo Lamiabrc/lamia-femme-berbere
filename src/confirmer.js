@@ -134,7 +134,7 @@ async function monterSimple() {
     bouton.disabled = true; msg.textContent = 'Un instant…';
     const email = f.email.value.trim(), mdp = f.mdp.value;
     try { await creerCompte({ email, password: mdp, prenom: f.prenom.value.trim(), source: 'fiche-live' }); }
-    catch (err) { if (err.code !== 'compte_existe') return dire(err.code === 'trop_de_demandes' ? 'Plusieurs comptes viennent d’être créés depuis cette connexion. Réessaie dans une heure.' : 'Le compte n’a pas pu être créé. Réessaie dans un instant.'); }
+    catch (err) { if (err.code === 'confirmation_requise') return dire(esc(err.message)); if (err.code !== 'compte_existe') return dire(err.code === 'trop_de_demandes' ? 'Plusieurs comptes viennent d’être créés depuis cette connexion. Réessaie dans une heure.' : 'Le compte n’a pas pu être créé. Réessaie dans un instant.'); }
     // Si l'email a déjà un compte, le mot de passe saisi suffit à s'y connecter.
     const co = await supabase.auth.signInWithPassword({ email, password: mdp });
     if (co.error) return dire('Cet email a déjà un compte, avec un autre mot de passe. Saisis le bon, ou <a href="/mon-espace/">choisis-en un nouveau</a>, puis reviens sur ce lien.');
@@ -174,7 +174,7 @@ async function monterAcces(d) {
     msg.textContent = 'Un instant…';
     if (mode === 'creer') {
       try { await creerCompte({ email, password: mdp, prenom: f.prenom.value.trim(), source: 'fiche-live' }); }
-      catch (err) { if (err.code !== 'compte_existe') { msg.textContent = err.code === 'trop_de_demandes' ? 'Plusieurs comptes viennent d’être créés depuis cette connexion. Réessaie dans une heure.' : 'Le compte n’a pas pu être créé. Vérifie ton email, et un mot de passe d’au moins 8 caractères.'; return; } }
+      catch (err) { if (err.code === 'confirmation_requise') { msg.textContent = err.message; return; } if (err.code !== 'compte_existe') { msg.textContent = err.code === 'trop_de_demandes' ? 'Plusieurs comptes viennent d’être créés depuis cette connexion. Réessaie dans une heure.' : 'Le compte n’a pas pu être créé. Vérifie ton email, et un mot de passe d’au moins 8 caractères.'; return; } }
     }
     const co = await supabase.auth.signInWithPassword({ email, password: mdp });
     if (co.error) { msg.textContent = mode === 'creer' ? 'Un compte existe déjà avec cet email : choisis « J’ai déjà un compte ».' : 'Email ou mot de passe incorrect.'; return; }

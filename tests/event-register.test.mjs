@@ -35,25 +35,26 @@ test('âge calculé au jour de la soirée', () => {
   assert.equal(ageOn('1990-10-31', '2026-10-31T20:00:00Z'), 36);
 });
 
-test('nouvelle personne : compte confirmé, profil, place', async () => {
+test('nouvelle personne : compte non confirmé, profil, place', async () => {
   const { fetcher, calls } = fake();
   const r = await registerForEvent(req(base), { env, fetcher, now });
   assert.equal(r.status, 200);
   assert.equal((await r.json()).status, 'registered');
   const user = calls.find((c) => c.url.endsWith('/admin/users'));
   assert.equal(user.body.email, 'nadia@exemple.fr');
-  assert.equal(user.body.email_confirm, true);
+  assert.equal(user.body.email_confirm, false);
   const prof = calls.find((c) => c.url.endsWith('/member_profiles') && c.method === 'POST');
   assert.equal(prof.body.gender, 'femme');
   const reg = calls.find((c) => c.url.includes('event_registrations?on_conflict'));
   assert.deepEqual([reg.body.user_id, reg.body.payment_status], [UID, 'waived']);
 });
 
-test('compte existant non confirmé : retrouvé et confirmé, profil non écrasé', async () => {
+test('compte existant non confirmé : retrouvé sans le confirmer, profil non écrasé', async () => {
   const { fetcher, calls } = fake({ exists: true, confirmed: false, profile: [{ user_id: UID, display_name: 'Nana', gender: 'femme' }] });
   const r = await registerForEvent(req(base), { env, fetcher, now });
   assert.equal(r.status, 200);
-  assert.ok(calls.some((c) => c.method === 'PUT' && c.body.email_confirm === true));
+  assert.ok(calls.some((c) => c.method === 'PUT'), 'les métadonnées peuvent être complétées');
+  assert.ok(!calls.some((c) => c.body?.email_confirm === true), 'la réservation ne prouve pas la propriété de l’adresse');
   const patch = calls.find((c) => c.url.includes('member_profiles?user_id') && c.method === 'PATCH');
   assert.equal(patch.body.display_name, undefined);
   assert.equal(patch.body.city, 'Lyon');
