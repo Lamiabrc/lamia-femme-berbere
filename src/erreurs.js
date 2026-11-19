@@ -66,9 +66,10 @@
       // Pas de réponse du tout : coupure de réseau. Rien à envoyer si on est hors ligne ; sinon on le note.
       // Quand on quitte une page, ses appels en cours sont coupés : ce n'est pas une panne. On attend donc un instant,
       // et on ne signale que si la personne est toujours sur la page, à l'écran.
-      if (suivi && navigator.onLine !== false && !(err && err.name === 'AbortError')) {
+      if (suivi && navigator.onLine !== false && !(err && (err.name === 'AbortError' || err.code === 'session_changee'))) {
         setTimeout(function () {
-          if (!partie && document.visibilityState === 'visible') signaler('reseau', 'pas de réponse du site', chemin + (action ? ' · ' + action : ''), 0);
+          var delai = err && (err.name === 'TimeoutError' || err.code === 'delai_depasse');
+          if (!partie && document.visibilityState === 'visible') signaler('reseau', delai ? 'délai de réponse dépassé' : 'pas de réponse du site', chemin + (action ? ' · ' + action : ''), 0);
         }, 1500);
       }
       throw err;

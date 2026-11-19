@@ -2313,6 +2313,7 @@ await cp(join(ROOT, 'content', 'matching-options.mjs'), join(DIST, 'assets', 'ma
 await cp(join(ROOT, 'content', 'signalement.mjs'), join(DIST, 'assets', 'signalement.mjs'));
 await cp(join(ROOT, 'src', 'i18n.js'), join(DIST, 'assets', 'i18n.js'));
 await cp(join(ROOT, 'src', 'tayri.css'), join(DIST, 'assets', 'tayri.css'));
+await cp(join(ROOT, 'src', 'messagerie-reseau.mjs'), join(DIST, 'assets', 'messagerie-reseau.mjs'));
 await mkdir(join(DIST, 'assets', 'i18n'), { recursive: true });
 await cp(join(ROOT, 'content', 'en', 'products.json'), join(DIST, 'assets', 'i18n', 'products-en.json'));
 const MOTIFS_EN = JSON.parse(await readFile(join(ROOT, 'content', 'en', 'patterns.json'), 'utf8'));
