@@ -108,16 +108,28 @@ const nbFiltres = () => ['age_min', 'age_max', 'religion', 'pratique', 'pays', '
 function appliquer() { profils = tous.filter(correspond); const b = document.querySelector('[data-filtres-ouvrir] b'); if (b) b.textContent = nbFiltres() ? `(${nbFiltres()})` : ''; afficher(); }
 // Recherche par numéro (« profil n° 123 » dit en live) : le profil passe en haut de la pile, prêt pour le cœur.
 const CLE_PROFIL = 'lfb-profil-cherche';
-function chercherProfil(valeur, { discret = false } = {}) {
+async function chercherProfil(valeur, { discret = false } = {}) {
   const st = document.querySelector('[data-cherche-statut]');
   const ref = Number.parseInt(String(valeur || '').replace(/\D/g, ''), 10);
   const dire = (t) => { if (st && !discret) st.textContent = t; };
   if (!ref) return dire('Écris le numéro du profil.');
-  const p = tous.find((x) => Number(x.ref) === ref);
-  if (!p) return dire(`Le profil n° ${ref} n’est pas dans tes profils : hors de tes critères, déjà choisi, ou retiré.`);
-  dire('');
+  let p = tous.find((x) => Number(x.ref) === ref);
+  if (!p) {
+    // Les références données en live sont consultables même hors filtres.
+    // Le serveur vérifie toujours visibilité, blocages et confidentialité.
+    try {
+      const resultat = await api({ action: 'annonce_swipe_chercher', ref }, token);
+      p = resultat.profil;
+    } catch (e) {
+      return dire(e.code === 'profil_indisponible'
+        ? `Le profil n° ${ref} est indisponible ou ne peut pas être affiché.`
+        : 'Recherche indisponible pour le moment. Réessaie.');
+    }
+  }
+  if (!p) return dire(`Le profil n° ${ref} est indisponible.`);
+  dire(p.hors_criteres ? 'Profil trouvé ! Il est hors de tes critères habituels ; tu peux le consulter.' : '');
   window.lfbEvent?.('recherche_profil');
-  profils = [p, ...profils.filter((x) => x !== p)];
+  profils = [p, ...profils.filter((x) => Number(x.ref) !== ref)];
   afficher();
   try { zone.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch { /* */ }
 }
