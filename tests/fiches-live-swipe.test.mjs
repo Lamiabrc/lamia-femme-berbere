@@ -513,9 +513,28 @@ test('dématch en cours (48 h d’au revoir) : pas de nouveau match sans l’acc
   let { profil } = await lire(await handleAnnonces('annonce_mon_profil', {}, ctx(NINA)));
   assert.equal(profil.matchs.places_en_attente, true);
   assert.equal(profil.matchs.limite, 0);
+  assert.equal(profil.matchs.capacite, 1); // l'offre reste à une place ; seul le consentement bloque l'ouverture
   await handleAnnonces('annonce_matchs_multiples', { choix: 'oui' }, ctx(NINA));
   ({ profil } = await lire(await handleAnnonces('annonce_mon_profil', {}, ctx(NINA))));
   assert.equal(profil.matchs.limite, 1);
+});
+
+test('affichage Passion : capacité trois, cinq intérêts en attente et un au revoir, sans changer la limite de consentement', async()=>{
+  const {ctx}=base({annonces:[annonceNina()],annonce_interets:Array.from({length:5},(_,i)=>({id:'p'+i,demandeur_id:'a-nina',cible_ref:100020+i,statut:'a_traiter',reciproque:true})),
+    discussions:[{id:'d1',interet_id:'ancien',a_user:NINA.id,b_user:'u-x',a_ref:11,b_ref:20,ouverte_at:'2026-11-01T00:00:00Z',ferme_at:'2026-11-05T00:00:00Z',dematch_at:'2026-11-03T00:00:00Z',close_raison:null}]});
+  const {profil}=await lire(await handleAnnonces('annonce_mon_profil',{}, {...ctx(NINA),formuleDe:async()=> 'passion'}));
+  assert.equal(profil.matchs.limite,0);assert.equal(profil.matchs.capacite,3);assert.equal(profil.matchs.actifs,0);assert.equal(profil.matchs.en_attente,5);assert.equal(profil.matchs.au_revoir_nombre,1);
+});
+
+test('qui t’a choisi ne repropose ni les réponses déjà données, ni les réciproques, ni les profils retirés', async()=>{
+  const autres=[30,31,32,33].map((ref)=>({...annonceNina(),id:'a-'+ref,ref,user_id:'u-'+ref,status:ref===33?'retiree':'publiee'}));
+  const {ctx}=base({annonces:[annonceNina(),...autres],annonce_interets:[
+    {id:'oui',demandeur_id:'a-30',cible_ref:11,statut:'a_traiter',reponse:'oui',reciproque:true},
+    {id:'reciproque',demandeur_id:'a-31',cible_ref:11,statut:'a_traiter',reponse:null,reciproque:true},
+    {id:'a-repondre',demandeur_id:'a-32',cible_ref:11,statut:'a_traiter',reponse:null,reciproque:false},
+    {id:'retiree',demandeur_id:'a-33',cible_ref:11,statut:'a_traiter',reponse:null,reciproque:false}]});
+  const {profil}=await lire(await handleAnnonces('annonce_mon_profil',{}, {...ctx(NINA),formuleDe:async()=> 'passion'}));
+  assert.deepEqual(profil.choisi_par.refs,[32]);assert.equal(profil.choisi_par.nombre,1);
 });
 
 test('passage de l’heure : un « plus de place » périmé est levé, et l’action tourne sans erreur (17 nov. 2026)', async () => {

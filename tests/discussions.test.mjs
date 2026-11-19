@@ -139,7 +139,8 @@ test('dématch courtois : raison obligatoire, deux messages, l’autre prévenu,
   assert.equal(s1, 200); assert.equal(r1.restants, 2);
   // Règle de Lamia (10 nov. 2026) : dès le dématch annoncé, les deux retrouvent une place, sans attendre la fin de l'au revoir.
   assert.deepEqual(liberes, [D]);
-  assert.match(db.discussion_messages.at(-1).texte, /matcher à nouveau dès maintenant/);
+  assert.match(db.discussion_messages.at(-1).texte, /choisis quand autoriser l’ouverture d’un nouveau match/);
+  assert.doesNotMatch(db.discussion_messages.at(-1).texte, /matcher à nouveau dès maintenant/);
   assert.match(pushes.at(-1)[1], /La personne met fin/);
   assert.equal(pushes.at(-1)[0], B);
   assert.equal(db.discussions[0].ferme_at, '2026-11-03T10:00:00.000Z');
