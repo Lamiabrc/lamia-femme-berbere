@@ -46,6 +46,7 @@ export function libelleInteret(i) {
   if (i.statut === 'mis_en_relation') return 'Match en cours';
   if (i.reponse === 'non') return 'Tu as dit non';
   if (i.reponse === 'oui' && i.statut === 'a_traiter') return 'Intérêt réciproque · en attente de mise en relation';
+  if (i.reponse === 'oui' && i.statut === 'en_reserve') return 'Intérêt réciproque · en attente de disponibilité';
   if (i.statut === 'pas_compatible') return 'Sans suite';
   return i.reponse === 'oui' ? 'Tu as dit oui' : 'Réponse attendue';
 }
