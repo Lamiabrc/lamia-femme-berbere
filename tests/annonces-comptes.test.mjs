@@ -8,6 +8,10 @@ function monde({ compte = true, tiktok = {} } = {}) {
   const db = { annonces: [], annonce_interets: [], annonce_files: [], annonce_passes: [] }, alertes = [];
   const json = async (x) => ({ ok: true, json: async () => x });
   const call = async (u, o = {}) => {
+    if (u.startsWith('/rest/v1/annonce_interets?on_conflict=') && o.method === 'POST') {
+      const row=JSON.parse(o.body);if(db.annonce_interets.some((i)=>i.demandeur_id===row.demandeur_id&&i.cible_ref===row.cible_ref))return json([]);
+      return json([await insert('annonce_interets',row)]);
+    }
     if (u.includes('/rpc/compte_existe')) return json(compte);
     if (u.startsWith('/storage/')) return json([]);
     return json([]);
@@ -27,7 +31,7 @@ function monde({ compte = true, tiktok = {} } = {}) {
     if (u.startsWith('/rest/v1/annonces?email=eq.')) return db.annonces.filter((a) => ['a_verifier', 'publiee'].includes(a.status) && u.includes(encodeURIComponent(a.email)));
     return [];
   };
-  const insert = async (t, row) => { const r = { id: `00000000-0000-0000-0000-00000000000${db[t].length + 1}`, ref: db[t].length + 1, status: 'brouillon', ...row }; db[t].push(r); return r; };
+  const insert = async (t, row) => { const r = { id: `00000000-0000-0000-0000-00000000000${db[t].length + 1}`, ref: db[t].length + 1, status: 'brouillon', ...(t==='annonce_interets'?{statut:'a_traiter',reciproque:false}:{}), ...row }; db[t].push(r); return r; };
   const patch = async (t, filtre, v) => { const [k, val] = filtre.split('&')[0].split('=eq.'); for (const r of db[t]) if (String(r[k]) === decodeURIComponent(val)) Object.assign(r, v); return { ok: true }; };
   const ctx = (user = null, formule = 'decouverte') => ({ formuleDe: async () => formule, env: { SUPABASE_SERVICE_ROLE_KEY: 'x' }, call, read, insert, patch, admin: false, user, ipHash: 'ip', now: () => new Date('2026-10-29T20:00:00Z'), email: async () => true, alerter: async (a) => alertes.push(a.titre) });
   return { db, alertes, ctx, sansMedias: () => { medias = false; } };

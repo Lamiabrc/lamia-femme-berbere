@@ -51,6 +51,10 @@ function base(initial = {}) {
   };
   const patch = async (t, f, v) => { for (const l of filtrer(t, f)) Object.assign(l, v); return { ok: true }; };
   const call = async (u, o = {}) => {
+    if (u.startsWith('/rest/v1/annonce_interets?on_conflict=') && o.method === 'POST') {
+      const row=JSON.parse(o.body);if(db.annonce_interets.some((i)=>i.demandeur_id===row.demandeur_id&&i.cible_ref===row.cible_ref))return Response.json([]);
+      return Response.json([await insert('annonce_interets',row)]);
+    }
     if (o.method === 'DELETE') { const [t, qs] = coupe(u); const sup = new Set(filtrer(t, qs)); db[t] = db[t].filter((l) => !sup.has(l)); return new Response('[]'); }
     if (u.includes('/auth/v1/admin/users/')) return new Response(JSON.stringify({ id: u.split('/').pop(), email: 'x@example.com', user_metadata: {} }));
     if (o.method === 'POST' && u.includes('/platform_settings?on_conflict=key')) { const row = JSON.parse(o.body); db.platform_settings = [...db.platform_settings.filter((x) => x.key !== row.key), row]; return new Response('[]'); }

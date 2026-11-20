@@ -3964,6 +3964,9 @@ html[dir="rtl"], html[dir="rtl"] body { overflow-x: clip; }
 
 /* Mon espace : plus court sur téléphone */
 .espace-nb { display: inline-block; min-width: 1.6em; padding: 0 7px; border-radius: 999px; background: #E9DFFA; color: #4A3B75; font-weight: 600; font-size: .9em; text-align: center; }
+.interet-notification { padding: 1rem; border: 1px solid #dfd1c0; border-radius: 14px; background: #fff8ec; line-height: 1.6; }
+#interets { scroll-margin-top: 100px; }
+.interet-recu[aria-current], .espace-deja li[aria-current] { outline: 2px solid #9b6b45; outline-offset: 4px; scroll-margin-top: 100px; }
 .espace-deja, .espace-demandes-finies { margin: 10px 0 4px; padding: 10px 14px; border-radius: 14px; background: rgba(233, 223, 250, .45); }
 .espace-deja summary, .espace-demandes-finies summary { cursor: pointer; font-weight: 600; }
 .espace-deja ul, .espace-demandes-finies ul { margin: 8px 0 0; padding-left: 18px; }

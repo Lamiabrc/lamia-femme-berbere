@@ -70,10 +70,10 @@ async function render() {
   $('[data-espace-admin]').hidden = u.app_metadata?.role !== 'admin';
   document.body.classList.toggle('espace-est-admin', u.app_metadata?.role === 'admin');
   achats(session);
-  monProfil(session);
+  const profilPret = monProfil(session);
   choixOuverture();
   mesFiches(session);
-  interetsRecus(session);
+  interetsRecus(session, profilPret);
   avisLamia(session);
   propositions(session);
   discussions(session);
@@ -899,11 +899,11 @@ async function propositions(session) {
 
 // Les fiches auxquelles on a déjà répondu : une ligne chacune, repliées sous le titre.
 const REPONDU = { proposition: { oui: 'Tu as dit oui', non: 'Tu as dit non' }, avis: { oui: 'Différence acceptée', non: 'Tu as dit non' }, interet: { oui: 'Tu as dit oui', non: 'Tu as dit non' } };
-function enDeuxTemps(liste, carte, type) {
+function enDeuxTemps(liste, carte, type, courant = null) {
   const terminee = (x) => type === 'interet' && ['dematche', 'pas_compatible'].includes(x.statut);
   const a = liste.filter((x) => !x.reponse && !terminee(x)), r = liste.filter((x) => x.reponse || terminee(x));
-  const court = (x) => `<li>n° ${esc(x.fiche.ref)} · <strong>${esc(type === 'interet' ? libelleInteret(x) : REPONDU[type][x.reponse] || '')}</strong></li>`;
-  return `${a.map(carte).join('')}${r.length ? `<details class="espace-deja"><summary>${type === 'interet' ? 'Historique de tes réponses' : 'Déjà répondu'} <span class="espace-nb">${r.length}</span></summary>${type === 'interet' ? '<p class="aide">Les réponses passées ne sont pas des matchs actifs.</p>' : ''}<ul>${r.map(court).join('')}</ul></details>` : ''}`;
+  const court = (x) => `<li ${type === 'interet' ? `id="interet-${esc(x.id)}"` : ''}${x.id === courant ? ' aria-current="true"' : ''}>n° ${esc(x.fiche.ref)} · <strong>${esc(type === 'interet' ? libelleInteret(x) : REPONDU[type][x.reponse] || '')}</strong></li>`;
+  return `${a.map(carte).join('')}${r.length ? `<details class="espace-deja" ${r.some((x)=>x.id === courant) ? 'open' : ''}><summary>${type === 'interet' ? 'Historique de tes réponses' : 'Déjà répondu'} <span class="espace-nb">${r.length}</span></summary>${type === 'interet' ? '<p class="aide">Les réponses passées ne sont pas des matchs actifs.</p>' : ''}<ul>${r.map(court).join('')}</ul></details>` : ''}`;
 }
 
 // Une réponse refusée se dit toujours : sinon le bouton semble ne rien faire.
@@ -915,6 +915,8 @@ function direErreurReponse(boutons, err) {
     ? '<strong>Ton annonce est en pause.</strong> Reprends-la pour dire oui : le bouton est dans ton profil, plus haut.'
     : err?.code === 'photos_requises'
     ? '<strong>Il te manque tes 2 photos</strong> pour dire oui. Elles restent privées. <a class="text-link" href="#photos">Ajouter mes photos</a>'
+    : err?.code === 'interet_termine'
+    ? 'Cet intérêt n’est plus actif. Actualise la page pour retrouver son état dans ton historique.'
     : 'Ta réponse n’est pas passée. Vérifie ta connexion et réessaie.';
   boutons.after(p);
 }
@@ -958,10 +960,11 @@ async function avisLamia(session) {
 }
 
 // Intérêts reçus : fiche anonyme de la personne intéressée, et réponse oui / non.
-async function interetsRecus(session) {
+async function interetsRecus(session, profilPret = null) {
   const box = document.querySelector('[data-espace-interets]');
   if (!box) return;
-  let liste = [];
+  let liste = [], notification = null;
+  const notificationId = new URLSearchParams(location.search).get('interet');
   const carte = (i) => {
     const f = i.fiche;
     const infos = [f.genre === 'femme' ? 'Une femme' : 'Un homme', f.age && `${f.age} ans`, f.ville, f.pays, f.situation].filter(Boolean);
@@ -969,7 +972,7 @@ async function interetsRecus(session) {
     const rep = i.reponse === 'oui' ? `<p class="espace-match"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> ${esc(libelleInteret(i))}.</p>`
       : i.reponse === 'non' ? '<p>Tu as répondu : pas pour moi.</p>'
       : `<p class="interet-boutons"><button type="button" class="btn btn-ink" data-repondre="oui" data-id="${esc(i.id)}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Ça m’intéresse aussi</button><button type="button" class="btn btn-line" data-repondre="non" data-id="${esc(i.id)}">Pas pour moi</button></p>`;
-    return `<article class="espace-achat interet-recu"><div><p class="event-date">Profil n° ${esc(f.ref)} · intéressé·e par ta fiche n° ${esc(i.pour)} · le ${esc(new Date(i.le).toLocaleDateString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { day: 'numeric', month: 'long' }))}</p>
+    return `<article class="espace-achat interet-recu" id="interet-${esc(i.id)}"${i.id === notificationId ? ' aria-current="true"' : ''}><div><p class="event-date">Profil n° ${esc(f.ref)} · intéressé·e par ta fiche n° ${esc(i.pour)} · le ${esc(new Date(i.le).toLocaleDateString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { day: 'numeric', month: 'long' }))}</p>
       <h3>${esc(infos.join(' · '))}</h3>
       ${ligneDifference(i.differences)}
       ${boutonVoirProfil(f, i.differences)}
@@ -978,14 +981,14 @@ async function interetsRecus(session) {
       ${secteurLisible(f.secteur) ? `<p><strong>Cherche en :</strong> ${esc(secteurLisible(f.secteur))}</p>` : ''}
       ${rep}${moderation(f.ref)}</div></article>`;
   };
-  const afficher = () => { box.innerHTML = liste.length ? enDeuxTemps(liste, carte, 'interet') : ''; const sec = box.closest('section'); if (sec) { sec.hidden = !liste.length; if (liste.length && !sec.dataset.montre && location.hash === `#${sec.id}`) { sec.dataset.montre = '1'; sec.scrollIntoView({ behavior: 'smooth' }); } } };
-  try { ({ interets: liste = [] } = await appelProfil({ action: 'annonce_interets_recus' }, session)); afficher(); }
-  catch { box.innerHTML = '<p>Les intérêts reçus ne s’affichent pas pour le moment. Réessaie dans un instant.</p>'; return; }
+  const afficher = () => { box.innerHTML = `${notification ? `<p class="interet-notification" role="status">${esc(notification.texte)}</p>` : ''}${liste.length ? enDeuxTemps(liste, carte, 'interet', notificationId) : '<p>Aucun nouvel intérêt à traiter pour le moment. Les intérêts terminés ou déjà traités ne créent pas de nouveau match.</p>'}`; const sec = box.closest('section'); if (sec) { sec.hidden = false; if (!sec.dataset.montre && location.hash === `#${sec.id}`) { sec.dataset.montre = '1'; sec.scrollIntoView({ behavior: 'smooth' }); } } };
+  try { ({ interets: liste = [], notification } = await appelProfil({ action: 'annonce_interets_recus', ...(notificationId ? {notification_id:notificationId} : {}) }, session)); await profilPret;afficher(); }
+  catch { await profilPret;const sec=box.closest('section');if(sec)sec.hidden=false;box.innerHTML = '<p role="status">Les intérêts reçus ne peuvent pas être chargés pour le moment. Cela ne signifie pas que ta liste est vide.</p><button type="button" class="btn btn-line" data-recharger-interets>Réessayer</button>';box.querySelector('[data-recharger-interets]').addEventListener('click',()=>interetsRecus(session));if(sec&&location.hash==='#interets')sec.scrollIntoView({block:'start'});return; }
   ecouter(box, 'click', async (e) => {
     const b = e.target.closest('[data-repondre]');
     if (!b) return;
     b.parentElement.querySelectorAll('button').forEach((x) => { x.disabled = true; });
-    try { await appelProfil({ action: 'annonce_repondre_interet', id: b.dataset.id, reponse: b.dataset.repondre }, session); liste = liste.map((x) => (x.id === b.dataset.id ? { ...x, reponse: b.dataset.repondre } : x)); afficher(); await Promise.all([monProfil(session), interetsRecus(session)]); }
+    try { const r = await appelProfil({ action: 'annonce_repondre_interet', id: b.dataset.id, reponse: b.dataset.repondre }, session); if(r.reponse)liste = liste.map((x) => (x.id === b.dataset.id ? { ...x, reponse: r.reponse } : x)); afficher(); await Promise.all([monProfil(session), interetsRecus(session)]); }
     catch (err) { b.parentElement.querySelectorAll('button').forEach((x) => { x.disabled = false; }); direErreurReponse(b.parentElement, err); }
   });
 }
