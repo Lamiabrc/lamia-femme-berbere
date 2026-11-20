@@ -2,6 +2,7 @@
 import { FAMILLES } from '/assets/rubriques.mjs';
 import { createClient } from '/vendor/supabase.mjs';
 import { monterFichesAdmin } from '/fiches-admin.js';
+import { rendreModerationPhotos, monterModerationPhotos } from '/moderation-photos.js';
 
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc');
 const $ = (s, r = document) => r.querySelector(s);
@@ -989,14 +990,12 @@ const lignesProfil = (paires) => paires.filter(([, v]) => v !== null && v !== un
   .map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(Array.isArray(v) ? v.join(' · ') : v === true ? 'Oui' : v === false ? 'Non' : v)}</dd></div>`).join('');
 function profilComplet(a) {
   const m = a.matching && typeof a.matching === 'object' ? a.matching : {};
-  const medias = (a.medias || []).map((x) => (x.kind === 'video'
-    ? `<video controls preload="none" src="${esc(x.url)}"></video>`
-    : `<a href="${esc(x.url)}" target="_blank" rel="noopener"><img src="${esc(x.url)}" alt="Photo du profil n° ${esc(a.ref)}" loading="lazy"></a>`)).join('');
+  const videos = (a.medias || []).filter((x) => x.kind === 'video').map((x) => `<video controls preload="none" src="${esc(x.url)}"></video>`).join('');
   const reponses = Object.entries(m).filter(([k]) => !CACHES.has(k)).map(([k, v]) => [LIBELLES[k] || k, v]);
   const badges = [a.identite_verifiee_at ? 'pièce d’identité validée' : '', a.recommande_at ? 'recommandé' : '', a.moderateur_at ? 'modérateur' : '', a.visible_anonyme === false ? 'masqué dans les profils' : '', a.outil_id || a.exportee_at ? 'importé dans l’outil' : 'pas encore importé dans l’outil'].filter(Boolean).join(' · ');
   return `<article class="profil-complet"><h4>Profil n° ${esc(a.ref)}</h4><p class="aide">${esc(badges)}</p>
-    ${medias ? `<div class="profil-medias">${medias}</div>` : '<p class="aide">Aucune photo ni vidéo.</p>'}
-    ${a.photos_refusees_at ? `<p class="fiche-bloque">Photos refusées le ${esc(date(a.photos_refusees_at, { day: 'numeric', month: 'long' }))} : compte suspendu jusqu’à l’envoi de 2 nouvelles photos.</p>` : a.test ? '' : `<p><button class="btn btn-line fiche-danger" type="button" data-photos-refuser="${esc(a.ref)}">${(a.medias || []).filter((m) => m.kind === 'photo').length >= 2 ? 'Photos non valides' : 'Photos manquantes'} : suspendre jusqu’à de nouvelles photos</button></p>`}
+    ${rendreModerationPhotos(a)}
+    ${videos ? `<div class="profil-medias">${videos}</div>` : ''}
     ${a.profil ? `<h5>Qui je suis</h5><p>${esc(a.profil)}</p>` : ''}${a.recherche ? `<h5>Qui je cherche${a.age_min || a.age_max ? ` · ${esc(a.age_min || 18)} à ${esc(a.age_max || 99)} ans` : ''}</h5><p>${esc(a.recherche)}</p>` : ''}
     <dl class="profil-champs">${lignesProfil([['Prénom', a.prenom], ['Âge', a.age], ['Genre', a.genre], ['Ville', a.ville], ['Pays', a.pays], ['Situation', a.situation], ['Email', a.email], ['Téléphone', a.phone], ...reponses, ['Ma note', a.note_lamia]])}</dl></article>`;
 }
@@ -1004,7 +1003,6 @@ function profilComplet(a) {
 function ficheComplete(f, photosSite) {
   return `<article class="profil-complet"><h4>Fiche de l’outil n° ${esc(f.ref)}</h4>
     <p class="aide">${photosSite ? `${photosSite} photo${photosSite > 1 ? 's' : ''} envoyée${photosSite > 1 ? 's' : ''} sur le site (voir son profil ci-dessus).` : 'Aucune photo sur le site.'} Les photos de ton outil, s’il y en a, ne sont jamais envoyées au site.</p>
-    ${photosSite < 2 ? `<p><button class="btn btn-line fiche-danger" type="button" data-photos-refuser="${esc(f.ref)}">Photos manquantes : suspendre jusqu’à 2 photos</button></p>` : ''}
     ${f.profil ? `<h5>Qui je suis</h5><p>${esc(f.profil)}</p>` : ''}${f.recherche ? `<h5>Qui je cherche${f.age_min || f.age_max ? ` · ${esc(f.age_min || 18)} à ${esc(f.age_max || 99)} ans` : ''}</h5><p>${esc(f.recherche)}</p>` : ''}
     <dl class="profil-champs">${lignesProfil([['Âge', f.age], ['Genre', f.genre], ['Ville', f.ville], ['Village', f.village], ['Pays', f.pays], ['Secteur', f.secteur], ['Situation', f.situation], ['Enfants', f.enfants], ['Études', f.etudes], ['Origine', f.origine], ['Religion', f.religion], ['Pratique', f.pratique], ['Mode de vie', f.mode_vie], ['Caractéristiques', f.caracteristiques], ['Modification demandée', f.modif_demandee]])}</dl></article>`;
 }
@@ -1216,14 +1214,7 @@ $('[data-comptes-filtres]').addEventListener('click', (e) => {
 });
 $('[data-comptes-maj]').addEventListener('click', chargerComptes);
 $('[data-compte-fermer]').addEventListener('click', fermerCompte);
-document.addEventListener('click', async (e) => {
-  const b = e.target.closest('[data-photos-refuser]');
-  if (!b) return;
-  if (!confirm(`Refuser les photos du profil n° ${b.dataset.photosRefuser} ?\n\nSes photos sont effacées et son compte est suspendu. La personne reçoit : « Transmets 2 photos valides (de toi, réelles et différentes) : ton compte est suspendu jusque-là. » Il est débloqué tout seul dès qu’elle les envoie.`)) return;
-  b.disabled = true;
-  try { await conf({ action: 'annonce_photos_refuser', ref: Number(b.dataset.photosRefuser) }); b.outerHTML = '<p class="fiche-bloque">Compte suspendu jusqu’à l’envoi de 2 photos. La personne est prévenue.</p>'; }
-  catch (err) { b.disabled = false; alert(err.code === 'sans_compte' ? 'Cette fiche n’a pas de compte sur le site : rien à suspendre ici, retire-la depuis ton outil.' : 'Ça n’a pas fonctionné. Réessaie.'); }
-});
+monterModerationPhotos({ appel: conf, apres: (ref) => chargerDetail({ ref }) });
 document.addEventListener('click', (e) => {
   const b = e.target.closest('[data-compte-suiv], [data-compte-prec]');
   if (!b) return;
