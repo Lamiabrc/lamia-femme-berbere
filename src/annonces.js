@@ -789,9 +789,9 @@ function monterEtapes(form, { calculerManques, afficherManques }) {
 }
 
 // Ajouter ses photos (espace membre, fiche du live) : 2 photos de soi. Elles restent privées.
-export async function monterAjoutMedias(box, { token, deja = 0, apres = () => {} }) {
+export async function monterAjoutMedias(box, { token, deja = 0, remplacement = false, apres = () => {} }) {
   const manque = Math.max(1, 2 - deja);
-  box.innerHTML = `<label class="annonce-depot">＋ ${deja ? 'Ajouter ma 2e photo' : 'Choisir mes 2 photos'}<input type="file" accept="image/*" multiple data-ajout-medias></label>
+  box.innerHTML = `<label class="annonce-depot">＋ ${remplacement ? (deja ? 'Choisir la photo de remplacement' : 'Choisir les 2 photos de remplacement') : deja ? 'Ajouter ma 2e photo' : 'Choisir mes 2 photos'}<input type="file" accept="image/*" multiple data-ajout-medias></label>
     <ul class="annonce-apercu" data-ajout-liste></ul>
     <button type="button" class="po-btn" data-ajout-envoyer disabled>Envoyer</button>
     <p class="form-status" role="status" data-ajout-statut></p>`;

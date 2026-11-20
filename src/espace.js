@@ -4,6 +4,7 @@ import { creerCompte, api } from './confidences-commun.js';
 import { boutonsSociaux, completerPrenom } from './connexion-sociale.mjs';
 import { secteurLisible, origineLisible, phrasesDifference, criteresDeQuestion, lib, foiEtVie, badgesProfil, metierEtReligion } from './matching-options.mjs';
 import { capaciteMatchs, libelleInteret, titreDiscussion } from './etat-matchs.mjs';
+import { rendreAvisPhotos, stylePhotos } from '/moderation-photos.js';
 
 // Un petit « ? » à ouvrir au lieu d'un paragraphe d'explication (Lamia, 16 nov. 2026 : « trop de texte »).
 const aideQ = (texte) => `<details class="aide-q"><summary aria-label="Comprendre"><span aria-hidden="true">?</span></summary><p>${texte}</p></details>`;
@@ -503,7 +504,8 @@ async function monProfil(session) {
       ${p.matchs ? compteurMatchs(p.matchs) : ''}</div>
       <div class="espace-achat-droite">${!window.LFB_PLAY && p.matchs && p.matchs.formule !== 'prestige' ? (p.algerie ? '<a class="btn btn-line" href="/salon/">Plus de matchs au live</a> ' : `<a class="btn btn-ink espace-abo-btn" href="${p.matchs.formule === 'passion' ? '/abonnement/?formule=prestige">Passer à Prestige' : '/abonnement/">S’abonner'}</a> `) : ''}${p.fiche_live ? '<a class="btn btn-ink" href="#mes-fiches">Modifier mon profil</a>' : '<button class="btn btn-ink" type="button" data-profil-modifier>Modifier mon profil</button>'}</div></article>
       ${(p.matchs_lies || []).length ? `<ul class="espace-matchs-liste">${p.matchs_lies.map((m) => `<li>${m.url ? `<img class="espace-match-avatar" src="${esc(m.url)}" alt="Photo de ton match" loading="lazy" draggable="false">` : ''}<span><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Match avec le profil n° ${esc(m.ref)}</span><button class="btn btn-ink" type="button" data-voir-match="${esc(m.ref)}">Voir son profil complet</button> <button class="btn btn-line" type="button" data-profil-dematcher="${esc(m.ref)}">Mettre fin à ce match</button></li>`).join('')}</ul>` : ''}
-      ${p.medias_ok === false ? `<section class="espace-photos" id="photos"><h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#camera"/></svg> Il manque tes photos</h3><p>Ajoute <strong>2 photos de toi, visage visible,</strong> pour swiper et répondre aux personnes intéressées. Elles restent privées : elles ne sont pas affichées dans les profils.</p><div data-profil-medias></div></section>` : ''}
+      ${rendreAvisPhotos(p.photos_moderation)}
+      ${p.medias_ok === false ? `<section class="espace-photos" ${p.photos_moderation ? '' : 'id="photos"'}><h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#camera"/></svg> ${p.photos_moderation ? 'Envoyer les photos de remplacement' : 'Il manque tes photos'}</h3><p>${p.photos_moderation ? 'Ajoute les photos manquantes. La photo conservée reste en place.' : 'Ajoute <strong>2 photos de toi, visage visible,</strong> pour swiper et répondre aux personnes intéressées.'} Elles restent privées.</p><div data-profil-medias></div></section>` : ''}
       ${p.demander_affichage ? `<section class="espace-photos" id="affichage" data-affichage><h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> Veux-tu que ton annonce soit visible ?</h3><p>Ton annonce n° ${esc(p.ref)} est validée. Si tu es d’accord, elle apparaît sur le site de façon anonyme : sans prénom, photo, ville ni contact.</p><p><button class="btn btn-ink" type="button" data-affichage-oui>Oui, je veux qu’elle soit visible</button> <button class="link-button" type="button" data-affichage-non>Non</button></p></section>` : ''}
       ${p.en_pause
         ? `<section class="espace-photos espace-pause"><h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#pause"/></svg> Tu as mis les rencontres en pause</h3><p>Personne ne voit ton profil et tu ne reçois plus de nouveau match. Rien n’est effacé, et tes discussions en cours continuent.</p>
@@ -511,7 +513,7 @@ async function monProfil(session) {
           <p><button class="btn btn-ink" type="button" data-annonce-pause="non"><svg class="ico" aria-hidden="true"><use href="/icones.svg#play"/></svg> Reprendre les rencontres</button></p></section>`
         : `<div class="espace-pause" data-pause-zone><div class="avec-aide"><button class="btn btn-line" type="button" data-pause-ouvrir><svg class="ico" aria-hidden="true"><use href="/icones.svg#pause"/></svg> Faire une pause dans les rencontres</button>${aideQ('Ton profil devient invisible, sans rien effacer. Tu gardes Lamia en poche : le live, le coaching de couple, la boutique, et tu peux lui écrire.')}</div>
           <div class="espace-pause-choix" data-pause-choix hidden><p><strong>Qu’est-ce qui se passe pour toi ?</strong></p><p class="espace-sans-liens"><button class="btn btn-ink" type="button" data-annonce-pause="oui" data-raison="pause">J’ai besoin de souffler</button> <button class="btn btn-ink" type="button" data-annonce-pause="oui" data-raison="couple">J’ai trouvé quelqu’un</button> <button class="link-button" type="button" data-pause-annuler>Annuler</button></p></div></div>`}
-      ${p.medias_ok === false ? '' : '<section class="espace-photos espace-mes-photos" data-mes-photos hidden></section>'}
+      <section class="espace-photos espace-mes-photos" data-mes-photos hidden></section>
       <div class="espace-suivi" data-profil-suivi></div>
       <label class="annonce-case espace-photo"><input type="checkbox" data-profil-photo${p.photo_partage ? ' checked' : ''}> <span>Si un match me convient, <strong>ma photo</strong> peut être transmise à la personne avec qui elle me met en relation (et à elle seule).</span></label>
       <p class="form-status" data-profil-statut></p><div data-profil-edition hidden></div>`;
@@ -523,8 +525,18 @@ async function monProfil(session) {
       try { await appelProfil({ action: 'annonce_pause', pause: b.dataset.annoncePause === 'oui', raison: b.dataset.raison || null }, session); if (b.dataset.raison === 'couple') { location.href = '/notre-couple/'; return; } await monProfil(session); }
       catch { b.disabled = false; if (st) st.textContent = 'Ça n’a pas marché. Réessaie dans un instant.'; }
     }));
+    if (p.photos_moderation) {
+      stylePhotos();
+      if (location.hash === '#photos') box.querySelector('#photos')?.scrollIntoView({block:'start'});
+      box.querySelectorAll('[data-photo-remplacer]').forEach((b) => b.addEventListener('click', async () => {
+        if (!confirm('Retirer cette photo signalée pour envoyer sa remplaçante ? Tes autres photos seront conservées.')) return;
+        b.disabled = true;
+        try { await appelProfil({ action: 'annonce_photo_retirer', photo_id: b.dataset.photoRemplacer }, session); await monProfil(session); }
+        catch { b.disabled = false; box.querySelector('[data-photo-remplacer-statut]').textContent = 'La photo n’a pas pu être retirée. Réessaie.'; }
+      }));
+    }
     { const zm = box.querySelector('[data-profil-medias]');
-      if (zm) { const { monterAjoutMedias } = await import('/assets/annonces.js'); await monterAjoutMedias(zm, { token: session.access_token, deja: p.photos || 0, apres: () => monProfil(session) }); if (location.hash === '#photos') zm.closest('section').scrollIntoView({ block: 'center' }); } }
+      if (zm) { const { monterAjoutMedias } = await import('/assets/annonces.js'); await monterAjoutMedias(zm, { token: session.access_token, deja: p.photos || 0, remplacement: Boolean(p.photos_moderation), apres: () => monProfil(session) }); if (location.hash === '#photos') zm.closest('section').scrollIntoView({ block: 'center' }); } }
     box.querySelector('[data-affichage]')?.addEventListener('click', async (e) => {
       const oui = e.target.closest('[data-affichage-oui]'), non = e.target.closest('[data-affichage-non]');
       if (!oui && !non) return;
