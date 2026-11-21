@@ -48,3 +48,12 @@ test('Lamia voit les cadeaux pas encore utilisés et peut relancer la personne',
   assert.equal((await go('annonce_cadeau_relancer', { id: l.cadeaux[0].id }, ctx)).ok, true);
   assert.equal(w.mails.length, 2); assert.match(w.db.alertes_membres[1].titre, /Lamia t’a offert une visio de coaching/);
 });
+
+test('pas plus d’un email par personne et par 24 h (quota Resend, 21 nov. 2026)', async () => {
+  const w = monde();
+  await go('annonce_offrir', { user_id: w.ID, quoi: 'coaching' }, w.ctx(true));
+  await go('annonce_offrir', { user_id: w.ID, quoi: 'coaching' }, w.ctx(true));
+  assert.equal(w.mails.length, 1);
+  assert.equal(w.db.alertes_membres.length, 2);
+  assert.equal(w.db.alertes_membres[1].email_envoye, false);
+});
