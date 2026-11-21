@@ -4895,3 +4895,21 @@ body:has(.espace) .tayri-fil { display: none; }
 .espace[data-vue] { padding-top: 20px; }
 .espace:not([data-vue]) { padding-top: 14px; }
 .espace:not([data-vue]) > [data-espace-in] > h1 { margin: 4px 0 16px; font-size: clamp(30px, 8vw, 40px); }
+
+/* Mon espace : couleurs du logo TAYRI, moins de beige (21 nov. 2026) */
+body:has(.espace) { background: #fff; }
+body:has(.espace) .site-header { background: linear-gradient(135deg, #091360, #16188A 60%, #2438B0); border-bottom: 3px solid #E0A03A; backdrop-filter: none; }
+body:has(.espace) .site-header, body:has(.espace) .site-header a, body:has(.espace) .site-header .brand * { color: #fff; }
+body:has(.espace) .site-header .brand img { background: transparent; }
+body:has(.espace) .site-header :is(button, summary, .menu-bouton) { color: #fff; border-color: rgba(255,255,255,.4); background: rgba(255,255,255,.1); }
+.espace h1[data-vue-home] { color: #16188A; }
+.app-ligne { background: #fff; border: 1px solid #ead7b0; box-shadow: 0 2px 0 #E0A03A33; }
+.app-ico { color: #fff !important; }
+.app-ico.is-rose { background: linear-gradient(135deg, #9a2a45, #7a1f35); }
+.app-ico.is-or { background: linear-gradient(135deg, #F0B450, #C97F1E); }
+.app-ico.is-vert { background: linear-gradient(135deg, #2E8A1C, #1f6b26); }
+.app-ico.is-bleu { background: linear-gradient(135deg, #2438B0, #16188A); }
+.app-ligne::after { color: #E0A03A; }
+.app-retour a { color: #16188A; border-color: #E0A03A; }
+body:has(.espace) .site-header.tayri-header, body:has(.espace) header.tayri-header { background: linear-gradient(135deg, #091360, #16188A 60%, #2438B0) !important; border-bottom: 3px solid #E0A03A !important; }
+.app-ico .ico, .app-ico svg { color: #fff !important; stroke: #fff !important; }
