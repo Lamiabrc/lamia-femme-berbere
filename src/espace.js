@@ -37,6 +37,51 @@ const when = (iso) => new Date(iso).toLocaleString(({ en: 'en-GB', ar: 'ar-DZ' }
 const say = (el, msg, err = false) => { el.textContent = msg; el.classList.toggle('is-error', err); };
 let recovering = false;
 
+// Mon espace en mode application : un accueil avec des lignes à toucher, puis un écran par sujet.
+// L'écran affiché vient de l'ancre de l'adresse (#discussion, #interets…), donc tous les anciens liens marchent encore.
+const VUES = { discussion: 'discussion', 'mon-profil': 'profil', 'a-completer': 'profil', sincerite: 'profil', photos: 'profil', 'mes-fiches': 'profil', propositions: 'coeurs', interets: 'coeurs', coaching: 'coaching', 'speed-dating': 'soirees', salons: 'soirees', demasquage: 'soirees', abonnement: 'abonnement', achats: 'achats', boutiques: 'boutiques', 'mon-compte': 'compte' };
+function vueDuHash() {
+  let h = '';
+  try { h = decodeURIComponent(location.hash.slice(1)); } catch { /* adresse illisible : accueil */ }
+  return /^dematcher-/.test(h) ? 'discussion' : (VUES[h] || '');
+}
+function majVue() {
+  const racine = $('.espace');
+  if (!racine) return;
+  const v = vueDuHash(), avant = racine.dataset.vue || '';
+  if (v) racine.dataset.vue = v; else delete racine.dataset.vue;
+  if (v) racine.querySelectorAll(`details[data-vue-de="${v}"]`).forEach((d) => { d.open = true; });
+  if (v && v !== avant) { window.scrollTo(0, 0); setTimeout(() => window.scrollTo(0, 0), 60); }
+}
+majVue();
+addEventListener('hashchange', majVue);
+// Arrivée directe sur un écran (lien #interets…) : le navigateur saute parfois à l'ancre ; on reste en haut tant que la personne n'a pas touché la page.
+{ const t0 = Date.now(); let touche = false;
+  ['pointerdown', 'wheel', 'touchstart', 'keydown'].forEach((e) => addEventListener(e, () => { touche = true; }, { once: true, passive: true }));
+  addEventListener('scroll', () => { if (!touche && Date.now() - t0 < 5000 && $('.espace')?.dataset.vue && scrollY > 0) window.scrollTo(0, 0); }, { passive: true }); }
+
+// Pastilles de l'accueil : comptées sur ce qui est déjà affiché plus bas, sans nouvel appel au serveur.
+function majPastilles() {
+  const compte = (sel) => document.querySelectorAll(sel).length;
+  const att = compte('#interets .interet-boutons, #propositions .interet-boutons');
+  const disc = compte('[data-espace-discussion] .disc');
+  const pose = (nom, n) => { const b = document.querySelector(`[data-app-badge="${nom}"]`); if (b) { b.textContent = String(n); b.hidden = !n; } };
+  pose('coeurs', att);
+  pose('discussion', disc);
+  const choix = $('[data-app-choix]');
+  if (choix) {
+    choix.hidden = !att;
+    const t = $('[data-app-choix-titre]');
+    if (t) t.textContent = att === 1 ? 'Une personne t’a choisi·e' : `${att} personnes t’ont choisi·e`;
+  }
+}
+{
+  let minuterie = null;
+  const lancer = () => { clearTimeout(minuterie); minuterie = setTimeout(majPastilles, 150); };
+  const zone = $('[data-espace-in]');
+  if (zone) new MutationObserver(lancer).observe(zone, { childList: true, subtree: true });
+}
+
 // render() repasse à chaque événement de connexion (ouverture, retour sur l'onglet, jeton renouvelé) :
 // un écouteur ajouté à chaque passage enverrait tout en double ou en triple. Ici, le nouveau remplace l'ancien.
 const ecouteurs = new WeakMap();

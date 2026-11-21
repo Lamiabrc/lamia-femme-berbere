@@ -890,13 +890,26 @@ page(
   </form>
 
   <div data-espace-in hidden>
-    <p class="espace-sortie"><button class="btn btn-line" type="button" data-espace-logout>Se déconnecter</button></p>
-    <p class="lfb-azul" lang="ber">ⴰⵣⵓⵍ</p>
-    <div class="tayri-celib tayri-espace-tete"><header class="swipe-tete"><p class="tayri-hero"><img data-tayri-hero src="/images/celib/hero-femme.webp" width="817" height="400" alt="TAYRI · Mon espace célibataire · Trouver la bonne personne, en douceur"></p><nav class="tayri-onglets" aria-label="Mon espace célibataire"><a href="/rencontres/swipe/"><img data-tayri-img="decouvrir" src="/images/celib/onglet-decouvrir-femme.webp" width="96" height="96" alt=""><span>Découvrir</span></a><a href="#interets"><img data-tayri-img="matchs" src="/images/celib/onglet-matchs-femme.webp" width="96" height="96" alt=""><span>Mes matchs</span></a><a href="#discussion"><img data-tayri-img="discussions" src="/images/celib/onglet-discussions-femme.webp" width="96" height="96" alt=""><span>Discussions</span></a><a href="/salon/"><img data-tayri-img="lives" src="/images/celib/onglet-lives-femme.webp" width="96" height="96" alt=""><span>Lives</span></a><a href="#mon-profil"><img data-tayri-img="profil" src="/images/celib/onglet-profil-femme.webp" width="96" height="96" alt=""><span>Mon profil</span></a></nav></header></div>
-    <h1>Bonjour <span data-espace-nom></span></h1>
-    ${RUBRIQUES}
+    <p class="app-retour" data-vue-sub><a href="#"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg> Mon espace</a></p>
+    <p class="espace-sortie" data-vue-home><button class="btn btn-line" type="button" data-espace-logout>Se déconnecter</button></p>
+    <p class="lfb-azul" lang="ber" data-vue-home>ⴰⵣⵓⵍ</p>
+    <div class="tayri-celib tayri-espace-tete" data-vue-home><header class="swipe-tete"><p class="tayri-hero"><img data-tayri-hero src="/images/celib/hero-femme.webp" width="817" height="400" alt="TAYRI · Mon espace célibataire · Trouver la bonne personne, en douceur"></p><nav class="tayri-onglets" aria-label="Mon espace célibataire"><a href="/rencontres/swipe/"><img data-tayri-img="decouvrir" src="/images/celib/onglet-decouvrir-femme.webp" width="96" height="96" alt=""><span>Découvrir</span></a><a href="#interets"><img data-tayri-img="matchs" src="/images/celib/onglet-matchs-femme.webp" width="96" height="96" alt=""><span>Mes matchs</span></a><a href="#discussion"><img data-tayri-img="discussions" src="/images/celib/onglet-discussions-femme.webp" width="96" height="96" alt=""><span>Discussions</span></a><a href="/salon/"><img data-tayri-img="lives" src="/images/celib/onglet-lives-femme.webp" width="96" height="96" alt=""><span>Lives</span></a><a href="#mon-profil"><img data-tayri-img="profil" src="/images/celib/onglet-profil-femme.webp" width="96" height="96" alt=""><span>Mon profil</span></a></nav></header></div>
+    <h1 data-vue-home>Bonjour <span data-espace-nom></span></h1>
+    <a class="app-choix" href="#interets" data-app-choix data-vue-home hidden><span class="app-choix-texte"><strong data-app-choix-titre></strong><small>Touche pour répondre</small></span><span class="app-choix-bouton">Voir et répondre</span></a>
+    <nav class="app-lignes" data-vue-home aria-label="Mon espace">
+      <a class="app-ligne" href="#discussion"><span class="app-ico is-rose"><svg class="ico" aria-hidden="true"><use href="/icones.svg#message-circle"/></svg></span><span class="app-ligne-texte"><strong>Mes discussions</strong><small>Écrire à mes matchs</small></span><span class="app-badge" data-app-badge="discussion" hidden></span></a>
+      <a class="app-ligne" href="#interets"><span class="app-ico is-or"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg></span><span class="app-ligne-texte"><strong>Mes cœurs</strong><small>Ceux qui m’ont choisi·e</small></span><span class="app-badge" data-app-badge="coeurs" hidden></span></a>
+      <a class="app-ligne" href="#mon-profil"><span class="app-ico is-vert"><svg class="ico" aria-hidden="true"><use href="/icones.svg#user"/></svg></span><span class="app-ligne-texte"><strong>Mon profil</strong><small>Mes infos et mes photos</small></span><span class="app-badge" data-app-badge="profil" hidden></span></a>
+      <a class="app-ligne" href="/rencontres/swipe/"><span class="app-ico is-bleu"><svg class="ico" aria-hidden="true"><use href="/icones.svg#compass"/></svg></span><span class="app-ligne-texte"><strong>Découvrir des profils</strong><small>Un par un</small></span></a>
+      <a class="app-ligne" href="#coaching"><span class="app-ico is-or"><svg class="ico" aria-hidden="true"><use href="/icones.svg#handshake"/></svg></span><span class="app-ligne-texte"><strong>Coaching avec Lamia</strong></span></a>
+      <a class="app-ligne" href="#speed-dating"><span class="app-ico is-rose"><svg class="ico" aria-hidden="true"><use href="/icones.svg#theater"/></svg></span><span class="app-ligne-texte"><strong>Speed dating</strong><small>Mes soirées</small></span></a>
+      <a class="app-ligne" href="#abonnement"><span class="app-ico is-bleu"><svg class="ico" aria-hidden="true"><use href="/icones.svg#star"/></svg></span><span class="app-ligne-texte"><strong>Mon abonnement</strong></span></a>
+      <a class="app-ligne" href="#achats"><span class="app-ico is-or"><svg class="ico" aria-hidden="true"><use href="/icones.svg#ticket"/></svg></span><span class="app-ligne-texte"><strong>Mes achats</strong></span></a>
+      <a class="app-ligne" href="#boutiques"><span class="app-ico is-vert"><svg class="ico" aria-hidden="true"><use href="/icones.svg#gem"/></svg></span><span class="app-ligne-texte"><strong>Les boutiques</strong></span></a>
+      <a class="app-ligne" href="#mon-compte"><span class="app-ico is-bleu"><svg class="ico" aria-hidden="true"><use href="/icones.svg#settings"/></svg></span><span class="app-ligne-texte"><strong>Mon compte</strong></span></a>
+    </nav>
 
-    <section class="espace-admin" data-espace-admin hidden>
+    <section class="espace-admin" data-espace-admin data-vue-home hidden>
       <h2>Espace administratrice</h2>
       <div class="espace-liens">
         <a href="/tableau-de-bord"><strong>Ma tour de contrôle</strong><span>Tout gérer : à faire, comptes, rencontres, ventes, textes</span></a>
@@ -907,7 +920,7 @@ page(
       <p class="espace-admin-note">Ce compte sert à gérer la Maison. Pour essayer l’application comme un membre, connecte-toi avec un compte de test.</p>
     </section>
 
-    <section id="mon-profil">
+    <section id="mon-profil" data-vue-de="profil">
       <h2>Mon profil âme sœur</h2>
       <div class="incomplet-bloc" id="a-completer" data-incomplet-bloc hidden></div>
       <div class="sincerite-bloc" id="sincerite" data-sincerite-bloc hidden></div>
@@ -919,7 +932,7 @@ page(
       <div class="espace-profil" id="mes-fiches" data-espace-fiches></div>
     </section>
 
-    <section id="discussion" data-espace-discussion-bloc hidden>
+    <section id="discussion" data-vue-de="discussion" data-espace-discussion-bloc hidden>
       <h2>Mes discussions</h2>
       <p>Retrouve vos échanges privés. L’état et le temps restant de chaque discussion sont indiqués ci-dessous.</p>
       <div class="espace-profil" id="moderateur" data-espace-moderateur hidden></div>
@@ -929,24 +942,24 @@ page(
       <div data-espace-discussion></div>
     </section>
 
-    <section id="propositions" hidden>
+    <section id="propositions" data-vue-de="coeurs" hidden>
       <h2>Profils proposés par Lamia</h2>
       <p>Dis oui ou non. <strong>Si vous dites oui tous les deux, c’est un match.</strong></p>
             <div class="espace-interets" data-espace-propositions><p class="loading">Un instant…</p></div>
     </section>
-    <section id="interets" hidden>
+    <section id="interets" data-vue-de="coeurs" hidden>
       <h2>Intérêts reçus</h2>
       <p>Ces personnes ont choisi ton profil. Dis oui si elles te plaisent aussi.</p>
       <div class="espace-interets" data-espace-interets><p class="loading">Un instant…</p></div>
     </section>
 
-    <section id="coaching" data-espace-coaching-bloc hidden>
+    <section id="coaching" data-vue-de="coaching" data-espace-coaching-bloc hidden>
       <h2>Mon coaching avec Lamia</h2>
       <p data-coaching-intro>Une visio de 15 minutes avec Lamia, pour ton profil et tes rencontres. Elle n’est jamais enregistrée.</p>
       <div class="espace-profil" data-espace-coaching></div>
     </section>
 
-    <details class="espace-pli" id="speed-dating" data-ouvre-si="[data-espace-soirees-bloc]">
+    <details class="espace-pli" id="speed-dating" data-vue-de="soirees" data-ouvre-si="[data-espace-soirees-bloc]">
       <summary><h2>Mon speed dating</h2></summary>      <div id="salons" data-espace-salon><p class="loading">Un instant…</p></div>
       <div data-espace-soirees-bloc hidden>
         <h3>Mes soirées réservées</h3>
@@ -964,16 +977,16 @@ page(
     </details>
 
 
-    <section>
+    <section id="abonnement" data-vue-de="abonnement">
       <h2>Mon abonnement âme sœur</h2>
       <div class="espace-achats" data-espace-abonnement><p class="loading">Un instant…</p></div>
     </section>
 
-    <details class="espace-pli">
+    <details class="espace-pli" id="achats" data-vue-de="achats">
       <summary><h2>Mes achats</h2></summary>      <div class="espace-achats" data-espace-achats><p class="loading">Un instant…</p></div>
     </details>
 
-    <details class="espace-pli">
+    <details class="espace-pli" id="boutiques" data-vue-de="boutiques">
       <summary><h2>Les boutiques de la Maison</h2></summary>      <div class="espace-liens is-light is-boutiques">
         <a href="/boutique/"><strong>La Boutique</strong><span>Tout ce que la Maison propose</span></a>
         <a href="/ecrin/"><strong>L’Écrin</strong><span>Les bijoux d’Ath Yenni</span></a>
@@ -982,13 +995,13 @@ page(
       </div>
     </details>
 
-    <section id="demasquage" data-espace-demasquage-section hidden>
+    <section id="demasquage" data-vue-de="soirees" data-espace-demasquage-section hidden>
       <h2><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Mes démasquages</h2>
       <p class="espace-note">Tu as choisi quelqu’un au bal, et cette personne t’a choisi·e aussi. Veux-tu te démasquer ? Ta réponse reste privée : si vous dites oui tous les deux, Lamia vous met en relation.</p>
       <div class="espace-soirees" data-espace-demasquage></div>
     </section>
 
-    <details class="espace-pli" id="mon-compte">
+    <details class="espace-pli" id="mon-compte" data-vue-de="compte">
       <summary><h2>Mon compte</h2></summary>
     <p class="espace-email">Connecté·e avec <strong data-espace-email></strong> </p>
     <p><button class="btn btn-line" type="button" data-espace-logout>Se déconnecter</button></p>
@@ -1012,7 +1025,7 @@ page(
     </details>
     </details>
 
-    <div class="espace-liens is-light">
+    <div class="espace-liens is-light" data-vue-home>
       <a href="/confidences/#conversation"><strong>Ma conversation avec Lamia</strong><span>Quand Lamia t’écrit, tu lui réponds ici</span></a>
     </div>
   </div>

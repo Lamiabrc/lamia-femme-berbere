@@ -4850,3 +4850,48 @@ body:is(.tayri-homme, .tayri-femme) .tayri-celib .swipe-boutons .swipe-annuler:d
 .tayri-espace-tete .tayri-hero img { border-radius: 28px 28px 0 0; }
 .disc-photo { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid #7A1F35; flex: none; margin-right: 10px; }
 .disc-tete:has(.disc-photo) { align-items: center; }
+
+/* ===== Mon espace en mode application (21 nov. 2026) ===== */
+.espace:not([data-vue]) [data-vue-de] { display: none !important; }
+.espace[data-vue] [data-vue-home] { display: none !important; }
+.espace:not([data-vue]) [data-vue-sub] { display: none; }
+.espace[data-vue="profil"] [data-vue-de]:not([data-vue-de="profil"]) { display: none !important; }
+.espace[data-vue="discussion"] [data-vue-de]:not([data-vue-de="discussion"]) { display: none !important; }
+.espace[data-vue="coeurs"] [data-vue-de]:not([data-vue-de="coeurs"]) { display: none !important; }
+.espace[data-vue="coaching"] [data-vue-de]:not([data-vue-de="coaching"]) { display: none !important; }
+.espace[data-vue="soirees"] [data-vue-de]:not([data-vue-de="soirees"]) { display: none !important; }
+.espace[data-vue="abonnement"] [data-vue-de]:not([data-vue-de="abonnement"]) { display: none !important; }
+.espace[data-vue="achats"] [data-vue-de]:not([data-vue-de="achats"]) { display: none !important; }
+.espace[data-vue="boutiques"] [data-vue-de]:not([data-vue-de="boutiques"]) { display: none !important; }
+.espace[data-vue="compte"] [data-vue-de]:not([data-vue-de="compte"]) { display: none !important; }
+.app-retour { margin: 0 0 14px; position: sticky; top: 8px; z-index: 20; }
+.app-retour a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 20px 0 12px; border-radius: 22px; background: #fffdf9; border: 1px solid var(--ligne, #e5d7cd); color: #16206E; font-weight: 700; font-size: 16px; text-decoration: none; }
+.app-retour .ico { width: 20px; height: 20px; }
+[dir="rtl"] .app-retour .ico { transform: scaleX(-1); }
+.app-choix { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin: 0 0 16px; padding: 18px 20px; border-radius: 24px; background: linear-gradient(135deg, #8a2340, #5e1428); color: #fff; text-decoration: none; box-shadow: 0 12px 28px -14px rgba(94, 20, 40, .7); }
+.app-choix[hidden] { display: none; }
+.app-choix-texte strong { display: block; font-family: var(--serif, Georgia, serif); font-size: 24px; line-height: 1.12; }
+.app-choix-texte small { display: block; margin-top: 4px; font-size: 14px; opacity: .88; }
+.app-choix-bouton { flex: none; padding: 12px 18px; border-radius: 26px; background: #fffaf3; color: #7a1f35; font-weight: 700; font-size: 15px; }
+.app-lignes { display: grid; gap: 10px; margin: 0 0 22px; }
+.app-ligne { display: flex; align-items: center; gap: 14px; min-height: 66px; padding: 12px 16px; border-radius: 20px; background: #fffdf9; border: 1px solid var(--ligne, #e5d7cd); color: #392b34; text-decoration: none; transition: transform .15s, border-color .15s; }
+.app-ligne:hover, .app-ligne:focus-visible { border-color: #d9962b; }
+.app-ligne:active { transform: scale(.98); }
+.app-ligne::after { content: "\203A"; flex: none; margin-inline-start: 2px; font-size: 28px; line-height: 1; color: #a89592; }
+[dir="rtl"] .app-ligne::after { transform: scaleX(-1); }
+.app-ico { flex: none; display: flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 15px; }
+.app-ico .ico { width: 23px; height: 23px; }
+.app-ico.is-rose { background: #f6e6e8; color: #7a1f35; }
+.app-ico.is-or { background: #f8e8c8; color: #a8680f; }
+.app-ico.is-vert { background: #e2eee1; color: #1f6b26; }
+.app-ico.is-bleu { background: #e2e7f8; color: #16206E; }
+.app-ligne-texte { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.app-ligne-texte strong { font-size: 17px; line-height: 1.2; }
+.app-ligne-texte small { font-size: 14px; color: #74616a; }
+.app-badge { flex: none; min-width: 28px; height: 28px; padding: 0 8px; box-sizing: border-box; border-radius: 14px; background: #c8452a; color: #fff; font-weight: 700; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; }
+.app-badge[hidden] { display: none; }
+.espace .room-name, .espace .lfb-azul, .espace .espace-sortie, .espace .tayri-espace-tete { display: none !important; }
+body:has(.espace) .tayri-fil { display: none; }
+.espace[data-vue] { padding-top: 20px; }
+.espace:not([data-vue]) { padding-top: 14px; }
+.espace:not([data-vue]) > [data-espace-in] > h1 { margin: 4px 0 16px; font-size: clamp(30px, 8vw, 40px); }
