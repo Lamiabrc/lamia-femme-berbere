@@ -4921,3 +4921,9 @@ body:has(.espace) .site-header.tayri-header, body:has(.espace) header.tayri-head
 .espace h1[data-vue-home] { color: #0B1038; font-weight: 800; }
 .app-ligne-texte strong { font-weight: 800; }
 .app-retour a { color: #0B1038; }
+
+/* Fiche : « En bref » (21 nov. 2026) */
+.annonce-bref { display: grid; gap: 6px; margin: 4px 0 14px; }
+.annonce-bref > div { display: flex; gap: 10px; align-items: baseline; }
+.annonce-bref dt { flex: none; min-width: 7.2em; font-size: 14px; font-weight: 700; color: #7a1f35; }
+.annonce-bref dd { margin: 0; font-size: 16px; }
