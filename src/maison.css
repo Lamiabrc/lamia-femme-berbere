@@ -4913,3 +4913,11 @@ body:has(.espace) .site-header :is(button, summary, .menu-bouton) { color: #fff;
 .app-retour a { color: #16188A; border-color: #E0A03A; }
 body:has(.espace) .site-header.tayri-header, body:has(.espace) header.tayri-header { background: linear-gradient(135deg, #091360, #16188A 60%, #2438B0) !important; border-bottom: 3px solid #E0A03A !important; }
 .app-ico .ico, .app-ico svg { color: #fff !important; stroke: #fff !important; }
+
+/* Mon espace : bleu nuit uni, police Nunito (Lamia, 21 nov. 2026) */
+body:has(.espace), body:has(.espace) :is(h1, h2, h3, .brand, .site-header, .site-header *, .app-ligne, .app-ligne *, button, input, select, textarea, .tayri-barre, .tayri-barre *) { font-family: 'Nunito', system-ui, sans-serif !important; }
+body:has(.espace) .site-header.tayri-header, body:has(.espace) header.tayri-header { background: #0B1038 !important; }
+.app-ico.is-bleu { background: #0B1038; }
+.espace h1[data-vue-home] { color: #0B1038; font-weight: 800; }
+.app-ligne-texte strong { font-weight: 800; }
+.app-retour a { color: #0B1038; }
