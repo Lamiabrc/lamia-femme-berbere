@@ -123,11 +123,12 @@ async function monterSimple() {
     return;
   }
   z.innerHTML = `<form class="confirmer-modif" data-simple-form>
-    <p><strong>Tu es d’accord pour apparaître dans les profils ?</strong> Choisis ton accès, puis ajoute 2 photos de toi (elles restent privées) :</p>
+    <p><strong>Tu es d’accord pour apparaître dans les profils ?</strong> Choisis ton accès :</p>
     <label>Ton prénom<input name="prenom" autocomplete="given-name" required></label>
     <label>Ton email<input name="email" type="email" autocomplete="email" required></label>
     <label>Un mot de passe (8 caractères minimum)<input name="mdp" type="password" minlength="8" autocomplete="new-password" required></label>
-    <button type="submit" class="po-btn" data-tout><svg class="ico" aria-hidden="true"><use href="/icones.svg#circle-check"/></svg> Je confirme ma fiche</button>
+    <button type="submit" class="po-btn" data-tout><svg class="ico" aria-hidden="true"><use href="/icones.svg#circle-check"/></svg> Confirmer</button>
+    <p class="confirmer-note">Après la confirmation de ton email, tu ajoutes ta photo (elle reste privée).</p>
     <p class="confirmer-note" data-simple-msg role="status"></p></form>`;
   const f = z.querySelector('form'), msg = f.querySelector('[data-simple-msg]'), bouton = f.querySelector('[data-tout]');
   f.addEventListener('submit', async (e) => {
@@ -136,7 +137,7 @@ async function monterSimple() {
     bouton.disabled = true; msg.textContent = 'Un instant…';
     const email = f.email.value.trim(), mdp = f.mdp.value;
     try { await creerCompte({ email, password: mdp, prenom: f.prenom.value.trim(), source: 'fiche-live' }); }
-    catch (err) { if (err.code === 'confirmation_requise') return dire(esc(err.message)); if (err.code !== 'compte_existe') return dire(err.code === 'trop_de_demandes' ? 'Plusieurs comptes viennent d’être créés depuis cette connexion. Réessaie dans une heure.' : 'Le compte n’a pas pu être créé. Réessaie dans un instant.'); }
+    catch (err) { if (err.code === 'confirmation_requise') { f.innerHTML = `<p class="confirmer-etat" role="status"><strong>Vérifie ton mail pour confirmation.</strong></p><p class="confirmer-note">Ouvre l’email que nous venons de t’envoyer (regarde aussi les courriers indésirables), puis reviens ajouter ta photo.</p>`; return; } if (err.code !== 'compte_existe') return dire(err.code === 'trop_de_demandes' ? 'Plusieurs comptes viennent d’être créés depuis cette connexion. Réessaie dans une heure.' : 'Le compte n’a pas pu être créé. Réessaie dans un instant.'); }
     // Si l'email a déjà un compte, le mot de passe saisi suffit à s'y connecter.
     const co = await supabase.auth.signInWithPassword({ email, password: mdp });
     if (co.error) return dire('Cet email a déjà un compte, avec un autre mot de passe. Saisis le bon, ou <a href="/mon-espace/">choisis-en un nouveau</a>, puis reviens sur ce lien.');
