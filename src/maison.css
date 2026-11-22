@@ -4947,3 +4947,7 @@ body:has(.espace) .site-header.tayri-header, body:has(.espace) header.tayri-head
   .tayri-shell .barre-app.tayri-barre { background: #fff !important; }
   body:has(.espace) .espace { padding-block-start: 6px; }
 }
+/* Frise kabyle sous l'en-tête, comme sur la maquette */
+@media (max-width: 1100px) {
+  .tayri-header + .kabyle { height: 22px !important; --kabyle-fil: #E0A03A; background: linear-gradient(120deg, #0B1038 0%, #1c1a4e 45%, #5e1428 100%) !important; }
+}
