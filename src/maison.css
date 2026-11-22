@@ -4972,3 +4972,7 @@ body:is(:has(.espace), :has(.swipe-page)) .tayri-header .site-nav a:not([aria-cu
 body:is(:has(.espace), :has(.swipe-page)) .tayri-header .site-nav a:not([aria-current]) :is(span, svg) { color: rgba(255,255,255,.92) !important; stroke: currentColor; }
 body:is(:has(.espace), :has(.swipe-page)) .tayri-header .site-nav a:not([aria-current]):hover { color: #E8C877 !important; }
 body:is(:has(.espace), :has(.swipe-page)) .tayri-header .header-actions > :is(.lang-link, a) { color: #fff !important; }
+
+/* Menu déroulant (fond clair) : toujours du texte foncé, même sous l'en-tête bleu nuit */
+body:has(.espace) .site-header .maison-menu-panneau, body:has(.swipe-page) .site-header .maison-menu-panneau { color: var(--encre); }
+body:has(.espace) .site-header .maison-menu-panneau a, body:has(.espace) .site-header .maison-menu-panneau strong, body:has(.swipe-page) .site-header .maison-menu-panneau a, body:has(.swipe-page) .site-header .maison-menu-panneau strong { color: var(--encre) !important; }
