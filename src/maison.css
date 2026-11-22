@@ -4966,3 +4966,9 @@ body:is(.tayri-homme, .tayri-femme) .swipe-page.tayri-celib, body:is(.tayri-homm
 body:has(.swipe-page) .site-header .alert-link svg, body:has(.swipe-page) .site-header .alert-link { color: #fff !important; stroke: #fff !important; }
 body:has(.swipe-page) .site-header .header-actions :is(a, button) { color: #fff !important; }
 body:has(.swipe-page) .site-header .header-actions svg, body:has(.swipe-page) .site-header .header-actions svg * { stroke: #fff !important; }
+
+/* En-tête bleu nuit : liens du menu lisibles (blanc) sur ordinateur aussi */
+body:is(:has(.espace), :has(.swipe-page)) .tayri-header .site-nav a:not([aria-current]) { color: rgba(255,255,255,.92) !important; }
+body:is(:has(.espace), :has(.swipe-page)) .tayri-header .site-nav a:not([aria-current]) :is(span, svg) { color: rgba(255,255,255,.92) !important; stroke: currentColor; }
+body:is(:has(.espace), :has(.swipe-page)) .tayri-header .site-nav a:not([aria-current]):hover { color: #E8C877 !important; }
+body:is(:has(.espace), :has(.swipe-page)) .tayri-header :is(.lang-link, .header-actions a) { color: #fff !important; }
