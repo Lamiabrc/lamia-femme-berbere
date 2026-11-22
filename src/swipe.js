@@ -40,7 +40,10 @@ function carte(a) {
   const mr = metierEtReligion(a);
   const tags = (a.caracteristiques || []).slice(0, 8);
   // Carte courte (Lamia, 15 nov.) : le pays seulement sans ville, pas de « Partout », origine et village sur une ligne.
-  const infos = [!a.ville && a.pays && lib(a.pays), a.situation && lib(a.situation), a.enfants === 'Oui' ? 'avec enfant(s)' : a.enfants === 'Non' ? 'sans enfant' : '', a.etudes && lib(a.etudes).toLowerCase()].filter(Boolean);
+  const infos = [!a.ville && a.pays && lib(a.pays), a.situation && lib(a.situation), a.enfants === 'Oui' ? 'avec enfant(s)' : a.enfants === 'Non' ? 'sans enfant' : ''].filter(Boolean);
+  // « En bref » (Lamia, 21 nov. 2026 : « ça manque d'info ») : ce que la fiche contient déjà, avec des intitulés clairs. « Pas important » n'est pas une information.
+  const utile = (v) => v && !/^pas important$/i.test(String(v).trim());
+  const bref = [['Profession', mr.metier], ['Études', utile(a.etudes) && lib(a.etudes)], ['Situation', a.situation && lib(a.situation)], ['Enfants', a.enfants === 'Oui' ? 'Oui' : a.enfants === 'Non' ? 'Non' : ''], ['Vit en', a.ville && a.pays && a.ville !== a.pays ? `${a.ville}, ${lib(a.pays)}` : (a.ville || (a.pays && lib(a.pays)))]].filter(([, v]) => v);
   const secteur = /^partout$/i.test(secteurLisible(a.secteur).trim()) ? '' : secteurLisible(a.secteur);
   const ages = a.age_min || a.age_max ? ` (${a.age_min || 18} à ${a.age_max || 99} ans)` : '';
   const lieu = a.ville || (a.pays && lib(a.pays)) || '';
@@ -71,6 +74,7 @@ function carte(a) {
       ${origineLisible(a.origine) || a.village ? `<p class="annonce-origine"><b>${esc([origineLisible(a.origine), a.village && `de ${a.village}`].filter(Boolean).join(' · '))}</b></p>` : ''}
       ${secteur ? `<p class="annonce-lieu annonce-secteur"><svg class="ico" aria-hidden="true"><use href="/icones.svg#boussole"/></svg> Cherche en : <b>${esc(secteur)}</b></p>` : ''}
       ${tags.length ? `<p class="annonce-tags">${tags.map((t) => `<span>${esc(lib(t))}</span>`).join('')}</p>` : ''}
+      ${bref.length ? `<h3>En bref</h3><dl class="annonce-bref">${bref.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>` : ''}
       ${a.profil ? `<h3>Qui je suis</h3><p data-membre>${esc(a.profil)}</p>` : ''}
       ${a.recherche || cherche(a).length ? `<h3>Qui je cherche${ages}</h3>${cherche(a).length ? `<p class="annonce-tags">${cherche(a).map((t) => `<span>${esc(t)}</span>`).join('')}</p>` : ''}${a.recherche ? `<p data-membre>${esc(a.recherche)}</p>` : ''}` : ''}
       ${foiEtVie(a).replace(/<h4>/g, '<h3>').replace(/<\/h4>/g, '</h3>')}
