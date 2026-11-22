@@ -1040,7 +1040,10 @@ function rendreDetail(d) {
     ${carte(`Ses choix (${d.choix.length}) et qui l’a choisi·e (${d.choisi_par.length})`, `<h4>Ses choix</h4>${liste(d.choix, (x) => `<li>${refBouton(x.ref)}<small>${esc(STATUT_DEMANDE[x.statut] || x.statut)} · ${esc(quand(x.le))}</small></li>`, 'Aucun choix.')}<h4>L’ont choisi·e</h4>${liste(d.choisi_par, (x) => `<li>${refBouton(x.ref)} ${esc(x.prenom || '')}<small>${esc(STATUT_DEMANDE[x.statut] || x.statut)} · ${esc(quand(x.le))}</small></li>`, 'Personne pour l’instant.')}`)}
     ${carte(`Blocages et signalements (${d.blocages.fait.length + d.blocages.subi.length + d.signalements.fait.length + d.signalements.subi.length})`, `<h4>A bloqué</h4>${liste(d.blocages.fait, (x) => `<li>${refBouton(x.ref)}<small>${esc(x.motif || 'Sans motif')} · ${esc(quand(x.le))}</small></li>`, 'Personne.')}<h4>Bloqué·e par</h4>${liste(d.blocages.subi, (x) => `<li>${refBouton(x.ref)}<small>${esc(x.motif || 'Sans motif')} · ${esc(quand(x.le))}</small></li>`, 'Personne.')}<h4>A signalé</h4>${liste(d.signalements.fait, (x) => `<li>${refBouton(x.ref)}<small>${esc(x.motif || 'Sans motif')} · ${esc(quand(x.le))}</small></li>`, 'Personne.')}<h4>Signalé·e par</h4>${liste(d.signalements.subi, (x) => `<li>${refBouton(x.ref)}<small>${esc(x.motif || 'Sans motif')} · ${esc(quand(x.le))}</small></li>`, 'Personne.')}`)}
     ${carte(`Ses discussions (${d.discussions.length})`, liste(d.discussions, (x) => `<li>Avec ${refBouton(x.avec)}<small>Ouverte ${esc(quand(x.ouverte))}${x.ferme ? ` · fermée ${esc(quand(x.ferme))}` : ''}</small></li>`, 'Aucune discussion.'))}
-    ${c.admin ? '' : `<p><button class="btn btn-line fiche-danger" type="button" data-bloquer-compte="${c.bloque ? 'non' : 'oui'}">${c.bloque ? 'Débloquer ce compte' : 'Bloquer ce compte'}</button></p>`}`;
+    ${c.admin ? '' : `<div class="tdb-carte"><h3 style="margin-top:0">Modérer</h3>
+      ${(d.annonces || []).filter((x) => x.ref && ['publiee', 'a_verifier'].includes(x.status)).map((x) => `<p><button class="btn btn-line" type="button" data-suspendre="${esc(x.ref)}" data-etat="${x.status === 'publiee' ? 'suspendre' : 'remettre'}">${x.status === 'publiee' ? `Suspendre le profil n° ${esc(x.ref)}` : `Remettre en ligne le profil n° ${esc(x.ref)}`}</button></p>`).join('')}
+      <p><button class="btn btn-line fiche-danger" type="button" data-bloquer-compte="${c.bloque ? 'non' : 'oui'}">${c.bloque ? 'Débloquer ce compte' : 'Bloquer ce compte'}</button></p>
+      <p><button class="btn btn-line fiche-danger" type="button" data-supprimer-compte>Supprimer ce compte</button></p></div>`}`;
 }
 let detailCourant = null;
 async function chargerDetail(cible) {
@@ -1080,6 +1083,24 @@ addEventListener('hashchange', () => { if (token) suivreHashProfil(); });
 $('[data-compte-detail]').addEventListener('click', async (e) => {
   const voir = e.target.closest('[data-voir-ref]');
   if (voir) return ouvrirParRef(voir.dataset.voirRef);
+  const su = e.target.closest('[data-suspendre]');
+  if (su) {
+    const suspendre = su.dataset.etat === 'suspendre';
+    let motif = '';
+    if (suspendre) { motif = prompt('Pourquoi ? (la personne le lira, tu peux laisser vide)', '') ; if (motif === null) return; }
+    su.disabled = true;
+    try { await conf({ action: 'annonce_profil_suspendre', ref: su.dataset.suspendre, suspendre, motif }); message(suspendre ? 'Profil suspendu, la personne est prévenue.' : 'Profil remis en ligne.'); chargerDetail({ user_id: detailCourant.compte.id }); }
+    catch (err) { message(err?.code === 'photos_manquantes' || err?.message === 'photos_manquantes' ? 'Il lui manque ses 2 photos : impossible de le remettre en ligne.' : 'Ça n’a pas abouti. Réessaie dans un instant.', true); su.disabled = false; }
+    return;
+  }
+  const sc = e.target.closest('[data-supprimer-compte]');
+  if (sc) {
+    if (prompt('Tu vas supprimer définitivement ce compte : profil, photos, demandes et discussions. Écris SUPPRIMER pour confirmer.') !== 'SUPPRIMER') return;
+    sc.disabled = true;
+    try { await conf({ action: 'annonce_compte_supprimer', user_id: detailCourant.compte.id, confirmation: 'SUPPRIMER' }); message('Compte supprimé.'); fermerCompte(); await chargerComptes(); }
+    catch (err) { message(err?.code === 'abonnement_actif' || err?.message === 'abonnement_actif' ? 'Cette personne a un abonnement payant en cours : résilie-le d’abord.' : 'Ça n’a pas abouti. Réessaie dans un instant.', true); sc.disabled = false; }
+    return;
+  }
   const bl = e.target.closest('[data-bloquer-compte]');
   if (!bl) return;
   const bloquer = bl.dataset.bloquerCompte === 'oui';
