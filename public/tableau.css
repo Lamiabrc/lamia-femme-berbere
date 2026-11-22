@@ -496,3 +496,12 @@
   .fiche-admin-apercu { position: static; }
   .fiche-admin-champs { grid-template-columns: minmax(0, 1fr); }
 }
+
+.mm{display:grid;gap:12px}
+.mm-centre{justify-self:center;text-align:center;background:#6b1030;color:#fff;border-radius:999px;padding:12px 26px;font-weight:800;font-size:1.1rem}
+.mm-centre small{display:block;font-weight:500;font-size:.78rem;opacity:.9}
+.mm-branches{list-style:none;margin:0;padding:0;display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.mm-branches>li{border:2px solid #c9a24a;border-radius:14px;padding:12px 14px;background:#fffdf7}
+.mm-branches>li>strong{display:block;margin-bottom:6px;color:#6b1030}
+.mm-branches ul{margin:0;padding-left:18px;font-size:.92rem}
+.mm-branches ul li{margin:3px 0}
