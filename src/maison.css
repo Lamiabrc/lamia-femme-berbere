@@ -4951,3 +4951,18 @@ body:has(.espace) .site-header.tayri-header, body:has(.espace) header.tayri-head
 @media (max-width: 1100px) {
   .tayri-header + .kabyle { height: 22px !important; --kabyle-fil: #E0A03A; background: linear-gradient(120deg, #0B1038 0%, #1c1a4e 45%, #5e1428 100%) !important; }
 }
+
+/* Appli : Découvrir (swipe) comme Mon espace — en-tête bleu nuit vers bordeaux, logo plus grand, fond ivoire (maquette cible, 22 nov. 2026) */
+body:has(.swipe-page), body:has(.swipe-page) :is(h1, h2, h3, .brand, .site-header, .site-header *, button, input, select, textarea, .tayri-barre, .tayri-barre *) { font-family: 'Nunito', system-ui, sans-serif !important; }
+body:has(.swipe-page) { background: #FBF6EA !important; }
+body:has(.swipe-page) .site-header.tayri-header, body:has(.swipe-page) header.tayri-header { background: linear-gradient(120deg, #0B1038 0%, #1c1a4e 45%, #5e1428 100%) !important; border-bottom: 3px solid #C9A24A !important; }
+body:has(.swipe-page) .tayri-celib, body:has(.swipe-page) .po-app { background: #FBF6EA !important; }
+body:has(.swipe-page) .site-header .brand, body:has(.swipe-page) .site-header .brand span { color: #fff !important; }
+body:has(.swipe-page) .site-header .menu-bouton, body:has(.swipe-page) .site-header summary, body:has(.swipe-page) .site-header .alert-link { color: #fff !important; border-color: rgba(255,255,255,.45) !important; background: transparent !important; }
+@media (max-width: 700px) {
+  body:has(.espace) .tayri-header .brand img, body:has(.swipe-page) .tayri-header .brand img, body:has(.espace) .tayri-header .tayri-logo img, body:has(.swipe-page) .tayri-header .tayri-logo img { block-size: 68px !important; inline-size: 68px !important; width: 68px !important; height: 68px !important; background: #FBF6EA !important; border-radius: 50% !important; padding: 3px; }
+}
+body:is(.tayri-homme, .tayri-femme) .swipe-page.tayri-celib, body:is(.tayri-homme, .tayri-femme) main:has(.tayri-celib) { --tc-fond: #FBF6EA; background: #FBF6EA !important; background-image: none !important; }
+body:has(.swipe-page) .site-header .alert-link svg, body:has(.swipe-page) .site-header .alert-link { color: #fff !important; stroke: #fff !important; }
+body:has(.swipe-page) .site-header .header-actions :is(a, button) { color: #fff !important; }
+body:has(.swipe-page) .site-header .header-actions svg, body:has(.swipe-page) .site-header .header-actions svg * { stroke: #fff !important; }
