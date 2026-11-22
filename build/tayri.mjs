@@ -44,7 +44,24 @@ export function entreeTayri(path, room) {
   return `<div class="tayri-reperes"><nav class="tayri-fil" aria-label="Fil d’Ariane"><a href="/">La Maison</a><span aria-hidden="true">/</span><span>${labels[univers]}</span></nav>${liens.length ? `<nav class="tayri-rubriques" aria-label="${boutique ? 'Les rayons de la boutique' : 'Les parcours de rencontre'}">${liens.map(([href, label]) => `<a href="${href}"${href === p ? ' aria-current="page"' : ''}>${label}</a>`).join('')}</nav>` : ''}</div>`;
 }
 
+// Barre du bas sur téléphone, comme sur la maquette de Lamia (22 nov. 2026) : 4 onglets d'application.
+// Boutique et Notre couple restent dans le menu du haut.
+const BARRE_APPLI = [
+  { id: 'accueil', href: '/', label: 'Accueil', icon: 'house' },
+  { id: 'messages', href: '/mon-espace/#discussion', label: 'Messages', icon: 'message-circle' },
+  { id: 'decouvrir', href: '/rencontres/swipe/', label: 'Découvrir', icon: 'compass' },
+  { id: 'compte', href: '/mon-espace/', label: 'Moi', icon: 'compte' },
+];
 export function navigationTayri(path, { mobile = false } = {}) {
+  if (mobile) {
+    const ici = String(path || '').replace(/\/+$/, '');
+    const actif = ici === '' || ici === '/index.html' ? 'accueil' : /^\/rencontres\/swipe/.test(ici) ? 'decouvrir' : /^\/mon-espace/.test(ici) ? 'compte' : '';
+    return BARRE_APPLI.map(({ id, href, label, icon }) => {
+      const compte = id === 'compte' ? ' data-barre-compte data-barre-messages' : '';
+      const point = id === 'compte' ? '<i data-barre-point hidden></i>' : '';
+      return `<a href="${href}"${compte}${id === actif ? ' aria-current="page"' : ''}><svg class="ico" aria-hidden="true"><use href="/icones.svg#${icon}"/></svg><b>${label}</b>${point}</a>`;
+    }).join('\n');
+  }
   const active = rubriqueTayri(path);
   return NAVIGATION_TAYRI.map(({ id, href, label, icon }) => {
     const current = id === active ? ' aria-current="page"' : '';

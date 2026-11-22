@@ -37,7 +37,7 @@ test('les commandes de compte et notifications restent disponibles dans la navig
   const nav = navigationTayri('/mon-espace/', { mobile: true });
   assert.match(nav, /data-barre-compte data-barre-messages aria-current="page"/);
   assert.match(nav, /data-barre-point hidden/);
-  assert.equal((nav.match(/<a /g) || []).length, 5);
+  assert.equal((nav.match(/<a /g) || []).length, 4);
 });
 
 test('l’habillage des outils conserve le formulaire et ses scripts, et ignore les fichiers de vérification', () => {

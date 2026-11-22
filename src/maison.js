@@ -583,12 +583,30 @@ renderSocials();
       if (location.pathname === '/' && (src === 'app' || src === 'play')) location.replace(`/rencontres/swipe/${src === 'play' ? '?source=play' : ''}`);
     }
   } catch { /* stockage indisponible */ }
+  // Membre connecté·e : « Accueil » ouvre son espace, « Moi » son profil.
+  try {
+    const t = JSON.parse(localStorage.getItem('sb-tybwvxinigahhntfeeur-auth-token') || 'null');
+    if (t?.access_token && t?.user?.app_metadata?.role !== 'admin') {
+      const acc = document.querySelector('.barre-app a[href="/"]'); if (acc) acc.setAttribute('href', '/mon-espace/');
+      const moi = document.querySelector('[data-barre-compte]'); if (moi) moi.setAttribute('href', '/mon-espace/#mon-profil');
+    }
+  } catch { /* */ }
   // Barre du bas (téléphone) : l'onglet de la page en cours.
   const ici = location.pathname + location.hash;
   const liens = [...document.querySelectorAll('.barre-app a')];
   // Le gabarit connaît aussi les sous-pages (fiche produit → Boutique, espace privé → Couple).
   const actif = liens.find((l) => l.getAttribute('aria-current') === 'page') || liens.find((l) => l.getAttribute('href') === ici) || liens.filter((l) => l.getAttribute('href') !== '/' && !l.getAttribute('href').includes('#')).sort((x, y) => y.getAttribute('href').length - x.getAttribute('href').length).find((l) => location.pathname.startsWith(l.getAttribute('href')));
-  if (actif) actif.setAttribute('aria-current', 'page');
+  if (actif) { liens.forEach((l) => l.removeAttribute('aria-current')); actif.setAttribute('aria-current', 'page'); }
+  // Dans Mon espace, l'onglet suit l'écran ouvert (accueil, messages, profil).
+  const surEspace = () => {
+    if (!/^\/mon-espace/.test(location.pathname)) return;
+    const h = location.hash.replace('#', '');
+    const cible = h === 'discussion' ? 'discussion' : /^(mon-profil|a-completer|sincerite|photos|mes-fiches|mon-compte|abonnement|achats|boutiques)$/.test(h) ? 'profil' : 'accueil';
+    liens.forEach((l) => l.removeAttribute('aria-current'));
+    const lien = cible === 'discussion' ? liens.find((l) => (l.getAttribute('href') || '').endsWith('#discussion')) : cible === 'profil' ? document.querySelector('[data-barre-compte]') : liens.find((l) => ['/', '/mon-espace/'].includes(l.getAttribute('href')));
+    (lien || document.querySelector('[data-barre-compte]'))?.setAttribute('aria-current', 'page');
+  };
+  surEspace(); addEventListener('hashchange', surEspace);
 })();
 
 // ---------------------------------------------------------------- compteur de visites anonyme (sans cookie)
