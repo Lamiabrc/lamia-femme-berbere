@@ -110,3 +110,14 @@ test('un signalement regardé par Lamia sort de la liste : l’action existe et 
   assert.match(tdb, /data-signalement-traite/);
   assert.match(tdb, /href=\\"#profil-\$\{esc\(s\.cible_ref\)\}\\"|href="#profil-\$\{esc\(s\.cible_ref\)\}"/);
 });
+
+test('les signalements de la page sécurité se traitent dans le tableau de bord, sans quitter le site', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const code = await readFile(new URL('../lib/annonces.mjs', import.meta.url), 'utf8');
+  assert.match(code, /action === 'annonce_securite_statut'/);
+  assert.match(code, /safety_reports\?id=eq\./);
+  const tdb = await readFile(new URL('../public/tableau.js', import.meta.url), 'utf8');
+  assert.match(tdb, /data-securite-statut/);
+  const html = await readFile(new URL('../public/tableau-de-bord.html', import.meta.url), 'utf8');
+  assert.doesNotMatch(html, /href="\/admin\.html"><strong>.*Signalements/);
+});
