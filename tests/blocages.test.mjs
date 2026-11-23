@@ -143,3 +143,10 @@ test('les réponses refusées (session expirée, demande disparue, trop d’essa
   const js = await readFile(new URL('../src/espace.js', import.meta.url), 'utf8');
   for (const c of ['login_required', 'not_found', 'rate_limited', 'sincerite_requise', 'photos_requises', 'annonce_en_pause', 'interet_termine']) assert.match(js, new RegExp(`err\\?\\.code === '${c}'`));
 });
+
+test('la liste des membres montre « Photos à corriger » ou « Photos suspendues » après un contrôle des photos', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const tdb = await readFile(new URL('../public/tableau.js', import.meta.url), 'utf8');
+  assert.match(tdb, /Photos suspendues/);
+  assert.match(tdb, /Photos à corriger/);
+});
