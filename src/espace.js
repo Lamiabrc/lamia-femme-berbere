@@ -964,6 +964,8 @@ function direErreurReponse(boutons, err) {
     ? '<strong>Ton annonce est en pause.</strong> Reprends-la pour dire oui : le bouton est dans ton profil, plus haut.'
     : err?.code === 'photos_requises'
     ? '<strong>Il te manque tes 2 photos</strong> pour dire oui. Elles restent privées. <a class="text-link" href="#photos">Ajouter mes photos</a>'
+    : err?.code === 'sincerite_requise'
+    ? '<strong>Un dernier petit pas avant de dire oui :</strong> signe ta déclaration de sincérité (une case à cocher). <a class="text-link" href="#sincerite">Je la signe</a>'
     : err?.code === 'interet_termine'
     ? 'Cet intérêt n’est plus actif. Actualise la page pour retrouver son état dans ton historique.'
     : 'Ta réponse n’est pas passée. Vérifie ta connexion et réessaie.';

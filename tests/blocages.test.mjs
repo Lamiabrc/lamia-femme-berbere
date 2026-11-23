@@ -121,3 +121,10 @@ test('les signalements de la page sécurité se traitent dans le tableau de bord
   const html = await readFile(new URL('../public/tableau-de-bord.html', import.meta.url), 'utf8');
   assert.doesNotMatch(html, /href="\/admin\.html"><strong>.*Signalements/);
 });
+
+test('dire oui sans déclaration de sincérité : le message dit la vraie raison, pas « vérifie ta connexion »', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const js = await readFile(new URL('../src/espace.js', import.meta.url), 'utf8');
+  assert.match(js, /err\?\.code === 'sincerite_requise'/);
+  assert.match(js, /href="#sincerite"/);
+});
