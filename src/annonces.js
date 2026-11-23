@@ -788,6 +788,58 @@ function monterEtapes(form, { calculerManques, afficherManques }) {
   };
 }
 
+// Dire pourquoi les photos n'arrivent pas (23 nov. 2026, Lamia) : jamais un message vague, toujours la cause et quoi faire.
+const PHOTOS_OK = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
+const nomFormat = (f) => (String(f.name || '').split('.').pop() || typeDe(f)).toUpperCase().slice(0, 5);
+export function problemePhoto(f) {
+  const t = typeDe(f);
+  if (t.startsWith('video/')) return 'Les vidéos ne sont pas acceptées : choisis des photos de toi.';
+  if (!PHOTOS_OK.includes(t)) return `Le format ${nomFormat(f)} n’est pas accepté. Choisis une photo JPG, PNG ou HEIC (une capture d’écran ou une photo prise avec ton téléphone convient).`;
+  if (f.size > 12 * 1024 * 1024) return `Cette photo pèse ${Math.round(f.size / 1048576)} Mo : le maximum est 12 Mo. Choisis-en une plus légère ou prends-la à nouveau.`;
+  if (!(f.size > 0)) return 'Ce fichier est vide. Choisis une autre photo.';
+  return '';
+}
+export function raisonEchecPhotos(e) {
+  const c = e?.code || (e instanceof TypeError ? 'upload_reseau' : /^http_5/.test(e?.message || '') ? 'upload_serveur' : /^http_401$/.test(e?.message || '') ? 'login_required' : '');
+  const m = {
+    login_required: 'Ta session a expiré. Reconnecte-toi, puis ajoute à nouveau tes photos.',
+    pas_de_profil: 'Ton profil n’est pas encore créé : termine-le d’abord, puis ajoute tes photos.',
+    profil_inactif: 'Ton profil est retiré ou bloqué : écris à Lamia pour comprendre.',
+    medias_trop: 'Il faut 2 photos exactement, pas plus.',
+    rate_limited: 'Trop d’essais d’un coup. Attends quelques minutes puis réessaie.',
+    trop_de_demandes: 'Trop d’essais d’un coup. Attends quelques minutes puis réessaie.',
+    upload_status_413: 'Une photo est trop lourde pour être envoyée. Choisis-en une plus légère.',
+    upload_status_401: 'Ta connexion a expiré pendant l’envoi. Recharge la page, reconnecte-toi, puis réessaie.',
+    upload_status_403: 'Ta connexion a expiré pendant l’envoi. Recharge la page, reconnecte-toi, puis réessaie.',
+    upload_status_415: 'Ce format de photo n’est pas accepté. Choisis une photo JPG, PNG ou HEIC.',
+    upload_reseau: 'Ta connexion internet a coupé pendant l’envoi. Vérifie le Wi-Fi ou la 4G/5G, puis appuie sur « Envoyer » : rien n’est perdu.',
+    upload_serveur: 'Notre serveur n’a pas pu recevoir la photo pour le moment. Réessaie dans quelques minutes : ce n’est pas ta faute.',
+    upload_incomplet: 'Les photos ne sont pas toutes arrivées. Appuie à nouveau sur « Envoyer » : on reprend là où ça s’est arrêté.',
+  }[c] || ERR[c];
+  if (m) return m;
+  return `L’envoi n’a pas abouti${c ? ` (code : ${c})` : ''}. Réessaie ; si ça recommence, écris-moi ce code et ta marque de téléphone, je regarde tout de suite.`;
+}
+// Le modèle du téléphone, pour que Lamia comprenne. Chrome Android le donne ; sinon, on garde le texte du navigateur.
+async function infosAppareil() {
+  let modele = '';
+  try { const h = await navigator.userAgentData?.getHighEntropyValues?.(['model', 'platformVersion']); modele = [h?.model, h?.platformVersion && `Android ${h.platformVersion}`].filter(Boolean).join(' · '); } catch { /* */ }
+  const ua = navigator.userAgent || '';
+  return { appareil: modele || (ua.match(/\(([^)]+)\)/)?.[1] || ''), navigateur: ua.slice(0, 160), ecran: `${screen.width}x${screen.height}` };
+}
+// Prévenir Lamia toute seule : elle voit la cause et le téléphone, la personne n'a rien à écrire.
+async function prevenirLamiaPhotos(e, choix, token) {
+  try { await api({ action: 'annonce_probleme_photos', code: e?.code || e?.message || '', etape: 'envoi', fichiers: choix.map((f) => ({ type: typeDe(f), size: f.size })), ...(await infosAppareil()) }, token); return true; }
+  catch { return false; }
+}
+// Un PUT de photo : on garde la vraie cause de l'échec.
+async function envoyerFichierPhoto(up, blob) {
+  let r;
+  try { r = await fetch(up.url, { method: 'PUT', headers: { apikey: PUBLIC_KEY, 'Content-Type': up.type, 'x-upsert': 'false' }, body: blob }); }
+  catch { throw Object.assign(new Error('upload_reseau'), { code: 'upload_reseau' }); }
+  if (r.ok || r.status === 409) return;
+  const code = r.status >= 500 ? 'upload_serveur' : `upload_status_${r.status}`;
+  throw Object.assign(new Error(code), { code });
+}
 // Ajouter ses photos (espace membre, fiche du live) : 2 photos de soi. Elles restent privées.
 export async function monterAjoutMedias(box, { token, deja = 0, remplacement = false, apres = () => {} }) {
   const manque = Math.max(1, 2 - deja);
@@ -804,22 +856,26 @@ export async function monterAjoutMedias(box, { token, deja = 0, remplacement = f
     if (!l.length) return;
     say(st, 'Préparation…');
     let nouveaux;
-    try { nouveaux = await copier(l, 1600); } catch { return say(st, 'Ce fichier ne peut pas être lu par ton téléphone. Choisis-en un autre.', true); }
-    const tous = [...choix, ...nouveaux], photos = tous.filter((f) => !typeDe(f).startsWith('video/'));
-    choix = photos.slice(-manque);
-    say(st, photos.length < tous.length ? 'Les vidéos ne sont pas acceptées : choisis des photos de toi.' : '', photos.length < tous.length); maj();
+    try { nouveaux = await copier(l, 1600); } catch { return say(st, 'Ce fichier ne peut pas être lu par ton téléphone (il est peut-être abîmé ou pas encore téléchargé). Choisis-en un autre, ou refais la photo.', true); }
+    // Chaque photo refusée est expliquée : format, poids ou vidéo.
+    const refus = nouveaux.map((f) => problemePhoto(f)).filter(Boolean);
+    const bonnes = nouveaux.filter((f) => !problemePhoto(f));
+    choix = [...choix, ...bonnes].slice(-manque);
+    say(st, refus[0] || '', Boolean(refus.length)); maj();
   });
   bouton.addEventListener('click', async () => {
     bouton.disabled = true; say(st, 'Envoi en cours…');
     try {
       const r = await api({ action: 'annonce_ajouter_medias', medias: choix.map((f) => ({ role: 'media', type: typeDe(f), size: f.size })) }, token);
       for (const [i, up] of (r.uploads || []).entries()) {
-        const u = await fetch(up.url, { method: 'PUT', headers: { apikey: PUBLIC_KEY, 'Content-Type': up.type, 'x-upsert': 'false' }, body: choix[i] });
-        if (!u.ok) throw Object.assign(new Error('upload_failed'), { code: 'upload_failed' });
+        await envoyerFichierPhoto(up, choix[i]);
       }
       const v = await api({ action: 'annonce_medias_verifier' }, token);
-      if (!v.medias_ok) throw Object.assign(new Error('upload_failed'), { code: 'upload_failed' });
+      if (!v.medias_ok) throw Object.assign(new Error('upload_incomplet'), { code: 'upload_incomplet' });
       say(st, '✓ Merci, c’est bon !'); apres();
-    } catch (e) { say(st, ERR[e.code] || 'L’envoi n’a pas abouti. Vérifie ta connexion et réessaie.', true); bouton.disabled = !pret(); }
+    } catch (e) {
+      say(st, raisonEchecPhotos(e), true); bouton.disabled = !pret();
+      if (await prevenirLamiaPhotos(e, choix, token)) say(st, `${raisonEchecPhotos(e)} Lamia a été prévenue automatiquement, avec le modèle de ton téléphone.`, true);
+    }
   });
 }

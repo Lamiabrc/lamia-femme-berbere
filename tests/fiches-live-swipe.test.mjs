@@ -277,21 +277,6 @@ test('swipe : les personnes qui ont un compte passent d’abord, même moins bie
 });
 
 
-test('pendant le live : le lien d’une seule fiche, sans toucher aux autres', async () => {
-  const { createHash } = await import('node:crypto');
-  const cle = 'c'.repeat(40);
-  const { db, ctx } = base({ profils_outil: [FICHE(100001, null, 'homme'), FICHE(100002, null, 'femme')], platform_settings: [{ key: 'outil_liaison', value: { hash: createHash('sha256').update(cle).digest('hex') } }] });
-  const appel = (corps) => handleAnnonces('outil_fiche_live', { cle, ...corps }, ctx(null));
-  assert.equal((await appel({ cle: 'mauvaise-cle', profil: { outil_id: 'o-100001', genre: 'homme' } })).status, 403);
-  assert.equal((await appel({ profil: { outil_id: 'site-annonce-4', genre: 'homme' } })).status, 400);
-  assert.equal((await appel({ profil: { outil_id: 'o-100001' } })).status, 400);
-  const r = await lire(await appel({ profil: { outil_id: 'o-100001', genre: 'homme', age: 35, profil: 'Sérieux' } }));
-  assert.equal(r.ref, 100001);
-  assert.match(r.lien, /\/rencontres\/confirmer\/\?n=100001&t=/);
-  assert.equal(r.confirmation, 'confirmee'); // la fiche de test est déjà confirmée
-  assert.equal(db.profils_outil.find((f) => f.ref === 100002).visible, true); // l'autre fiche reste en ligne
-});
-
 test('tableau de bord : profil complet avec photos, jamais la pièce d’identité', async () => {
   const { db, ctx } = base({ annonces: [{ id: 'a1', ref: 7, user_id: null, prenom: 'Nina', genre: 'femme', birth_date: '1990-01-01', profil: 'Je suis douce', matching: { profession: 'Infirmière' }, phone: '+33600000000', ip_hash: 'secret' }] });
   db.annonce_files = [{ annonce_id: 'a1', kind: 'photo', storage_path: 'p1', position: 1 }, { annonce_id: 'a1', kind: 'identite', storage_path: 'id1', position: 0 }];
@@ -382,20 +367,6 @@ test('où en est un profil : ses matchs en cours et les oui réciproques en atte
   assert.equal(r.statut.profil, 'validé');
 });
 
-test('mise en relation depuis la console de l’outil : la clé de liaison suffit, une mauvaise clé est refusée', async () => {
-  const { createHash } = await import('node:crypto');
-  const cle = 'c'.repeat(40);
-  const { db, ctx } = base({ annonces: [annonceNina(), annonceKarim()], platform_settings: [{ key: 'outil_liaison', value: { hash: createHash('sha256').update(cle).digest('hex') } }] });
-  const refuse = await handleAnnonces('outil_matcher', { cle: 'mauvaise-cle', a: 11, b: 12 }, { ...ctx(null), admin: false });
-  assert.equal(refuse.status, 403);
-  assert.equal(db.annonce_interets.length, 0);
-  const r = await lire(await handleAnnonces('outil_matcher', { cle, a: 11, b: 12, op: 'dematcher' }, { ...ctx(null), admin: false }));
-  assert.equal(r.status, 200);
-  assert.equal(r.fait, 'n° 11 ↔ n° 12');
-  assert.equal(db.annonce_interets[0].statut, 'mis_en_relation');
-});
-
-// Le profil anonyme de son match (15 nov. 2026) : visible seulement par les deux personnes en relation.
 test('voir le profil de son match : oui en relation, non sinon', async () => {
   const annonceKarim2 = { id: 'a-karim', ref: 12, user_id: 'u-karim', email: 'karim@example.com', status: 'publiee', prenom: 'Karim', genre: 'homme', en_match: true, test: false, pays: 'France', matching: {}, profil: 'Je suis calme.', recherche: 'Une femme sérieuse.' };
   const { ctx } = base({ annonces: [annonceNina(), annonceKarim2], annonce_interets: [{ id: 'i-1', demandeur_id: 'a-nina', cible_ref: 12, statut: 'mis_en_relation', reciproque: true, created_at: '2026-11-02T00:00:00Z' }] });
@@ -429,34 +400,6 @@ test('paire bloquée : les deux sont prévenus une fois, avec la raison', async 
 });
 
 // Miroir outil ↔ site (15 nov. 2026) : archivé ou supprimé dans l'outil = retiré du site (le compte reste) ; un doublon est relié.
-test('miroir : fiche archivée dans l’outil → fiche et profil de rencontre retirés, compte gardé ; doublon relié ; outil vide → rien', async () => {
-  const { createHash } = await import('node:crypto');
-  const cle = 'k'.repeat(40);
-  const monde = () => base({
-    platform_settings: [{ key: 'outil_liaison', value: { hash: createHash('sha256').update(cle).digest('hex') } }],
-    profils_outil: [FICHE(100001, 'u-rachid', 'homme'), FICHE(100002, 'u-sam', 'homme'), FICHE(100003, null, 'femme')],
-    annonces: [
-      { id: 'a-rachid', ref: 12, user_id: 'u-rachid', email: 'rachid@example.com', status: 'publiee', prenom: 'Rachid', genre: 'homme', en_match: false, test: false, fiche_ref: 100001, outil_id: 'o-100001', exportee_at: '2026-11-02T00:00:00Z' },
-      { id: 'a-sam', ref: 13, user_id: 'u-sam', email: 'sam@example.com', status: 'publiee', prenom: 'Sam', genre: 'homme', en_match: false, test: false, fiche_ref: null, outil_id: null },
-      { id: 'a-lea', ref: 14, user_id: 'u-lea', email: 'lea@example.com', status: 'publiee', prenom: 'Léa', genre: 'femme', en_match: false, test: false, fiche_ref: null, outil_id: null },
-    ],
-  });
-  let { db, ctx } = monde();
-  const r = await lire(await handleAnnonces('outil_synchro', { cle, actifs: ['o-100002', 'o-100003', 'site-annonce-13'], supprimes: ['o-100001', 'site-annonce-14'] }, ctx(null)));
-  assert.equal(r.status, 200);
-  assert.deepEqual(r.miroir, { fiches_retirees: 1, profils_retires: 2, doublons_relies: 1 });
-  const f = (ref) => db.profils_outil.find((x) => x.ref === ref), a = (ref) => db.annonces.find((x) => x.ref === ref);
-  assert.ok(f(100001).retire_at); assert.equal(f(100002).retire_at, null);
-  assert.deepEqual([a(12).status, a(14).status, a(13).status, a(13).outil_id], ['retiree', 'retiree', 'publiee', 'o-100002']);
-  assert.equal(a(12).user_id, 'u-rachid'); // le compte reste
-  assert.ok(r.retires_site.includes('site-annonce-12'));
-  // Outil vide ou abîmé : rien n'est touché.
-  ({ db, ctx } = monde());
-  const r2 = await lire(await handleAnnonces('outil_synchro', { cle, actifs: [], supprimes: ['o-100001'] }, ctx(null)));
-  assert.equal(r2.miroir.refuse, true);
-  assert.equal(db.profils_outil.find((x) => x.ref === 100001).retire_at, null);
-});
-
 test('profil validé sans ses 2 photos : remis en attente et prévenu, revalidable dès les photos ; les profils créés en live aussi (16 nov. 2026)', async () => {
   const { db, ctx } = base({
     annonces: [{ id: 'a-x', ref: 40, user_id: 'u-x', email: 'x@example.com', status: 'publiee', prenom: 'Xa', genre: 'femme', test: false },

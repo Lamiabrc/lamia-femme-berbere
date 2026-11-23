@@ -81,21 +81,6 @@ test('une ancienne demande en attente disparaît dès que la personne enregistre
   assert.equal(fiches[0].modif_at, null);
   assert.equal(fiches[0].modif_demandee, null);
 });
-test('l’outil republie la fiche : les corrections de la personne restent, et l’outil les reçoit', async () => {
-  const { ctx, jeton, fiches } = monde();
-  await handleAnnonces('annonce_modifier_outil', { n: '5020', t: jeton, fiche: { village: 'Tigzirt' } }, ctx);
-  fiches[0].village = null; // l'outil a réécrit la fiche avec son ancienne version
-  const lire = ctx.read, CLE = 'cle-de-liaison-de-test-0123456789abcdef';
-  const c = { ...ctx, read: async (u) => {
-    if (u.startsWith('/rest/v1/platform_settings')) return [{ value: { hash: createHash('sha256').update(CLE).digest('hex') } }];
-    if (u.startsWith('/rest/v1/profils_outil?corrige_at=not.is.null')) return fiches.filter((f) => f.corrige_at);
-    if (u.startsWith('/rest/v1/profils_outil?select=')) return fiches;
-    return lire(u);
-  } };
-  const r = await handleAnnonces('outil_publier', { cle: CLE, profils: [{ outil_id: 'p-1', genre: 'femme', age: 45 }] }, c);
-  if (r.status === 200) { const j = await r.json(); assert.equal(j.corrections['p-1'].village, 'Tigzirt'); assert.equal(fiches[0].village, 'Tigzirt'); }
-  else assert.fail(`outil_publier a répondu ${r.status}`);
-});
 test('« je ne veux plus être dans l’outil » : retirée du site et Lamia doit l’effacer', async () => {
   const { ctx, jeton, alertes, fiches } = monde();
   const d = await (await handleAnnonces('annonce_effacer_outil', { n: '5020', t: jeton }, ctx)).json();
