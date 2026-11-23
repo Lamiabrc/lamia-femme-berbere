@@ -4,6 +4,7 @@ if (new URLSearchParams(location.search).has('integre')) document.documentElemen
 import { createClient } from '/vendor/supabase.mjs';
 import { api, envoyer, erreur, esc, texteAvecLiens, taille, quand, piecesHtml, PUBLIC_KEY } from './confidences-commun.js';
 import { monterEnregistreur } from './enregistreur.js';
+import { rendreAjoutPhotos, monterAjoutPhotos } from '/moderation-photos.js';
 import { versOutil, lib } from './matching-options.mjs';
 
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', PUBLIC_KEY);
@@ -357,6 +358,7 @@ async function chargerAnnonces() {
       <p class="cl-badges">${[a.en_pause ? 'EN PAUSE (invisible, à sa demande)' : '',a.test ? 'PROFIL DE TEST (invisible du public)' : '',a.live_declare ? (a.outil_lie ? 'Créé en live · fiche retrouvée dans l’outil · 3 offertes' : 'Dit avoir été en live · fiche à retrouver · 3 offertes') : a.outil_lie ? 'Déjà dans ton outil (même lien)' : '', a.compte ? 'Compte lié' : '', a.photo_partage ? 'Photo transmissible au match' : 'Photo à ne pas transmettre', a.en_match ? 'Match en cours' : '', a.modifiee_at ? `Modifié le ${quand(a.modifiee_at)}` : ''].filter(Boolean).map((t) => `<span class="${pastelBadge(t)}">${esc(t)}</span>`).join('')}</p>
       <p class="cl-coord">Prénom : ${esc(a.prenom)} · ${esc(a.ville)}, ${esc(a.pays)}${a.situation ? ` · ${esc(a.situation)}` : ''} · né(e) le ${esc(a.birth_date)}<br>${esc(a.email)}${a.phone ? ` · ${esc(a.phone)}` : ''}</p>
       <div class="cl-annonce-medias">${a.medias.map((m) => !m.url ? '' : m.kind === 'video' ? `<video src="${esc(m.url)}" controls playsinline preload="none"></video>` : `<a href="${esc(m.url)}" target="_blank" rel="noopener"><img src="${esc(m.url)}" alt="Photo" loading="lazy" decoding="async" width="150" height="190"></a>`).join('')}</div>
+      ${rendreAjoutPhotos(a)}
       ${a.identite?.url ? `<div class="cl-annonce-id"><p><b>Pièce d’identité</b> (vérifie le prénom, l’âge et que le numéro est caché) :</p>${a.identite.mime === 'application/pdf' ? `<a class="cl-btn" href="${esc(a.identite.url)}" target="_blank" rel="noopener">Ouvrir le PDF</a>` : `<a href="${esc(a.identite.url)}" target="_blank" rel="noopener"><img src="${esc(a.identite.url)}" alt="Pièce d’identité" loading="lazy" decoding="async"></a>`}</div>` : a.identite_verifiee_at ? `<p class="cl-aide">✓ Identité vérifiée le ${quand(a.identite_verifiee_at)} (pièce supprimée).</p>` : ''}
       ${a.matching && Object.keys(a.matching).length ? `<p class="cl-coord">${[a.matching.situation, a.matching.enfants === 'Oui' ? `${a.matching.nbEnfants || ''} enfant(s)` : a.matching.enfants === 'Non' ? 'sans enfant' : '', a.matching.niveauEtudeDetail || a.matching.niveauEtudeCategorie, a.matching.profession, a.matching.religion, a.matching.pratique, ...(a.matching.origineTags || [])].filter(Boolean).map(lib).map(esc).join(' · ')}${a.matching.contactReseau ? `<br>Réseau : ${esc(a.matching.contactReseau)}` : ''}</p>` : ''}
       ${a.exportee_at ? `<p class="cl-aide">↪ Exportée vers l’outil de matching le ${quand(a.exportee_at)}</p>` : ''}
@@ -582,3 +584,6 @@ document.addEventListener('click', async (e) => {
   try { await api({ action: 'annonce_proposer', pour: b.dataset.proposer, cible: b.dataset.cible, score: b.dataset.score }, await jetonFrais()); b.textContent = 'Proposé'; }
   catch (err) { b.disabled = false; alert(err.code === 'pas_de_compte' ? 'Cette personne n’a pas encore de compte TAYRI.' : 'La proposition n’est pas partie. Réessaie.'); }
 });
+
+// Photos reçues par TikTok ou Facebook : Lamia les ajoute à la place de la personne depuis la carte du profil.
+monterAjoutPhotos({ appel: async (b) => api(b, await jetonFrais()), apres: () => chargerAnnonces(), cle: PUBLIC_KEY });
