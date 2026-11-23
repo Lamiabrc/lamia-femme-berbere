@@ -275,3 +275,30 @@ test('pause dans les rencontres : la personne garde Lamia en poche et peut lui �
   const r = await handleConfidences(req({ action: 'confidences_acces' }, 'P'), { env: { ...env, CONFIDENCES_OUVERTES: '' }, fetcher: be.fetcher, etat: async () => ({ abonnement: null }) });
   assert.equal((await r.json()).abonne, true);
 });
+
+test('parrainage : un compte neuf venu par le lien d’un membre est compté une fois, jamais un ancien compte ni soi-même', async () => {
+  const neuf = { id: 'neuf', email: 'neuf@exemple.fr', email_confirmed_at: '2026', created_at: new Date().toISOString(), app_metadata: {} };
+  const vieux = { id: 'vieux', email: 'vieux@exemple.fr', email_confirmed_at: '2026', created_at: '2026-01-01T00:00:00Z', app_metadata: {} };
+  const be = backend({ users: { N: neuf, V: vieux } });
+  be.db.annonces.push({ ref: 42, user_id: 'parrain', email: 'p@exemple.fr' }, { ref: 7, user_id: 'neuf', email: 'neuf@exemple.fr' });
+  assert.equal((await call(be, { action: 'parrainage_noter', code: '42' })).status, 401);
+  assert.equal((await call(be, { action: 'parrainage_noter', code: '42' }, 'V')).body.raison, 'ancien_compte');
+  assert.equal((await call(be, { action: 'parrainage_noter', code: '7' }, 'N')).body.raison, 'code');
+  assert.equal((await call(be, { action: 'parrainage_noter', code: '42' }, 'N')).body.ok, true);
+  await call(be, { action: 'parrainage_noter', code: '42' }, 'N');
+  assert.deepEqual(be.db.parrainages.map((p) => [p.filleul_user_id, p.parrain_user_id]), [['neuf', 'parrain']]);
+});
+
+test('mois sans soirée : les abonnés reçoivent 1 cœur et 3 jours de mise en avant, une seule fois', async () => {
+  const be = backend();
+  be.db.abonnements.push({ email: 'a@exemple.fr', statut: 'actif', formule: 'prestige' });
+  be.db.annonces.push({ user_id: 'ua', email: 'a@exemple.fr', avant_jusqu_a: null });
+  const cron = async (d) => (await handleConfidences(req({ action: 'compensation_soirees_cron' }), { env, fetcher: be.fetcher, cron: true, now: () => new Date(d) })).json();
+  assert.equal((await cron('2026-12-10T12:00:00Z')).rien, 'pas_le_moment');
+  const r = await cron('2026-12-02T12:00:00Z');
+  assert.deepEqual([r.mois, r.soirees, r.abonnes], ['2026-11', false, 1]);
+  assert.deepEqual(be.db.achats_unite.map((x) => x.type).sort(), ['coeur_message', 'profil_avant']);
+  assert.ok(be.db.annonces[0].avant_jusqu_a);
+  assert.equal((await cron('2026-12-03T12:00:00Z')).rien, 'deja_fait');
+  assert.equal(be.db.achats_unite.length, 2);
+});

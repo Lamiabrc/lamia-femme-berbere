@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 
 // Faux Supabase en mémoire : tables PostgREST, stockage, connexion, emails et services de notification.
 export function backend({ users = {} } = {}) {
-  const db = { confidence_threads: [], confidence_messages: [], confidence_files: [], push_subscriptions: [], platform_settings: [], testeurs_play: [], annonces: [], profils_outil: [] };
+  const db = { confidence_threads: [], confidence_messages: [], confidence_files: [], push_subscriptions: [], platform_settings: [], testeurs_play: [], annonces: [], profils_outil: [], parrainages: [], salon_editions: [], abonnements: [], achats_unite: [] };
   const storage = new Set();
   const mails = [], pushes = [];
   const match = (row, url) => {
@@ -36,6 +36,7 @@ export function backend({ users = {} } = {}) {
       if (method === 'PUT') u.app_metadata = { ...(u.app_metadata || {}), ...(body.app_metadata || {}) };
       return ok(u);
     }
+    if (url.pathname.startsWith('/auth/v1/admin/users/')) { const id = url.pathname.split('/').pop(); const u = Object.values(users).find((x) => x.id === id); return u ? ok(u) : ok({}, 404); }
     if (url.hostname === 'api.resend.com') { mails.push(body); return ok({ id: 'm' }); }
     if (url.hostname === 'push.example') { pushes.push({ url: u, headers: init.headers }); return ok({}, 201); }
     if (url.pathname.startsWith('/storage/v1/object/upload/sign/confidences/')) {
@@ -52,7 +53,7 @@ export function backend({ users = {} } = {}) {
       const list = Array.isArray(body) ? body : [body];
       const out = [];
       for (const r of list) {
-        const key = table === 'platform_settings' ? 'key' : table === 'push_subscriptions' ? 'endpoint' : null;
+        const key = table === 'platform_settings' ? 'key' : table === 'push_subscriptions' ? 'endpoint' : table === 'parrainages' ? 'filleul_user_id' : null;
         const existing = key && rows.find((x) => x[key] === r[key]);
         if (existing) { Object.assign(existing, r); out.push(existing); continue; }
         const row = { id: randomUUID(), created_at: new Date().toISOString(), ...(table === 'confidence_threads' ? { status: 'a_lire', unread_lamia: 0, unread_visitor: 0 } : {}), ...(table === 'confidence_messages' ? { ready: false } : {}), ...r };
