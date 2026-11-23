@@ -23,7 +23,7 @@ test('premier avertissement : retirer une seule photo préserve l’autre, la vi
   const files=await b.read(`/rest/v1/annonce_files?annonce_id=eq.${b.id}`);
   assert.deepEqual(new Set(files.map((f)=>f.id)),new Set([b.p2,b.identite,b.video]));assert.equal(b.objets.size,3);
   assert.equal(await photosOk(b.read,MEMBRE.id),true);
-  assert.match(b.notifications[0][1].texte,/Visage masqué/);assert.match(b.notifications[0][1].texte,/prochain contrôle/);
+  assert.match(b.notifications[0][1].texte,/Visage masqué/);assert.match(b.notifications[0][1].texte,/24 h/);
 });
 test('deux photos peuvent être commentées ensemble sans les supprimer',async(t)=>{
   const b=await recette(t);await b.envoyer(b.commande({photos:[{id:b.p1,commentaire:'Photo trop sombre'},{id:b.p2,commentaire:'Photo identique'}]}));

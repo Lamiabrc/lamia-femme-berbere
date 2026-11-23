@@ -163,6 +163,7 @@ async function aFaire() {
     dernierAFaire = f;
     peindreCarte(f);
     peindreSignalements(f.signalements || [], f.securite || []);
+    chargerPhotosAValider();
   } catch { box.innerHTML = '<p class="aide">La carte ne s’affiche pas pour le moment.</p>'; }
 }
 // La liste des signalements à traiter, sous la carte, ouverte par « Traiter ».
@@ -180,6 +181,35 @@ function peindreSignalements(liste, securite = []) {
   box.innerHTML = liste.length || securite.length ? `<h2>Signalements à traiter</h2><ul class="fiche-liste">${securite.map(carteSecurite).join('')}${liste.map((s) => `<li data-signalement><span>${VOIR(s.cible_ref)} signalé par ${VOIR(s.auteur_ref)}${s.created_at ? ` le ${esc(new Date(s.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }))}` : ''} · ${s.motif ? `« ${esc(s.motif)} »` : '<em>raison non demandée à l’époque (signalement d’avant le 12 nov.)</em>'}</span> <span><a class="btn btn-line" href="#profil-${esc(s.cible_ref)}">Ouvrir</a> <button type="button" class="btn btn-line" data-signalement-traite="${esc(s.id)}">C’est traité</button></span></li>`).join('')}</ul>` : '<p class="aide">Aucun signalement à traiter.</p>';
   if (!liste.length && !securite.length) box.hidden = true;
 }
+// Photos à valider (23 nov. 2026) : le membre swipe déjà, Lamia regarde ses 2 photos puis « Photos OK » ou « À corriger ».
+async function chargerPhotosAValider() {
+  const box = $('[data-carte-photos]');
+  if (!box) return;
+  try { const d = await conf({ action: 'annonce_photos_a_valider' }); peindrePhotosAValider(d.profils || []); }
+  catch { box.hidden = true; }
+}
+function peindrePhotosAValider(profils) {
+  const box = $('[data-carte-photos]');
+  if (!box) return;
+  if (!profils.length) { box.hidden = true; box.innerHTML = ''; return; }
+  box.hidden = false;
+  box.innerHTML = `<h2>Photos à valider (${profils.length})</h2><p class="aide">Le membre peut déjà swiper. Si tu corriges une photo, il a 24 h pour la remplacer, sinon son profil est masqué.</p>
+    <ul class="photos-valider">${profils.map((p) => `<li data-photos-valider="${esc(p.ref)}"><div class="photos-valider-tete"><strong>n° ${esc(p.ref)}${p.prenom ? ` · ${esc(p.prenom)}` : ''}</strong><span>${esc([p.genre, p.ville].filter(Boolean).join(' · '))}</span></div>
+      <div class="photos-valider-vues">${p.photos.map((f) => `<a href="${esc(f.url)}" target="_blank" rel="noopener"><img src="${esc(f.url)}" alt="Photo ${esc(f.position)} du profil n° ${esc(p.ref)}" loading="lazy"></a>`).join('')}</div>
+      <div class="photos-valider-actions"><button class="btn btn-ink" type="button" data-photos-ok="${esc(p.ref)}">Photos OK</button><a class="btn btn-line" href="#profil-${esc(p.ref)}">À corriger</a></div><p role="status" data-photos-valider-statut></p></li>`).join('')}</ul>`;
+}
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-photos-ok]');
+  if (!b || b.disabled) return;
+  const li = b.closest('[data-photos-valider]'), st = li.querySelector('[data-photos-valider-statut]');
+  b.disabled = true; st.textContent = 'Validation…';
+  try {
+    await conf({ action: 'annonce_photos_valider', ref: Number(b.dataset.photosOk) });
+    li.remove(); comptes = null;
+    const reste = document.querySelectorAll('[data-photos-valider]').length, box = $('[data-carte-photos]');
+    if (!reste) { box.hidden = true; box.innerHTML = ''; } else box.querySelector('h2').textContent = `Photos à valider (${reste})`;
+  } catch { st.textContent = 'Pas validé. Réessaie.'; b.disabled = false; }
+});
 function peindreCarte(f) {
   const box = $('[data-carte-actions]');
   if (!box) return;
