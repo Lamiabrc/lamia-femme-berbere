@@ -27,3 +27,10 @@ test('chaque cause d’échec a sa phrase', () => {
 test('cause inconnue : un code à transmettre, jamais un message muet', () => {
   assert.match(raisonEchecPhotos({ code: 'zzz' }), /code : zzz/);
 });
+
+test('rapport automatique à Lamia : action serveur, catégorie propre, téléphone et fichiers (sans photo ni nom)', () => {
+  const s = readFileSync(new URL('../lib/annonces.mjs', import.meta.url), 'utf8');
+  assert.match(s, /annonce_probleme_photos[\s\S]{0,900}categorie: 'probleme'[\s\S]{0,500}Téléphone/);
+  assert.match(readFileSync(new URL('../lib/alerte-lamia.mjs', import.meta.url), 'utf8'), /probleme:/);
+  assert.match(src, /prevenirLamiaPhotos\(e, choix, token\)/);
+});

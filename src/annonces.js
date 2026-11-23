@@ -819,6 +819,18 @@ export function raisonEchecPhotos(e) {
   if (m) return m;
   return `L’envoi n’a pas abouti${c ? ` (code : ${c})` : ''}. Réessaie ; si ça recommence, écris-moi ce code et ta marque de téléphone, je regarde tout de suite.`;
 }
+// Le modèle du téléphone, pour que Lamia comprenne. Chrome Android le donne ; sinon, on garde le texte du navigateur.
+async function infosAppareil() {
+  let modele = '';
+  try { const h = await navigator.userAgentData?.getHighEntropyValues?.(['model', 'platformVersion']); modele = [h?.model, h?.platformVersion && `Android ${h.platformVersion}`].filter(Boolean).join(' · '); } catch { /* */ }
+  const ua = navigator.userAgent || '';
+  return { appareil: modele || (ua.match(/\(([^)]+)\)/)?.[1] || ''), navigateur: ua.slice(0, 160), ecran: `${screen.width}x${screen.height}` };
+}
+// Prévenir Lamia toute seule : elle voit la cause et le téléphone, la personne n'a rien à écrire.
+async function prevenirLamiaPhotos(e, choix, token) {
+  try { await api({ action: 'annonce_probleme_photos', code: e?.code || e?.message || '', etape: 'envoi', fichiers: choix.map((f) => ({ type: typeDe(f), size: f.size })), ...(await infosAppareil()) }, token); return true; }
+  catch { return false; }
+}
 // Un PUT de photo : on garde la vraie cause de l'échec.
 async function envoyerFichierPhoto(up, blob) {
   let r;
@@ -861,6 +873,9 @@ export async function monterAjoutMedias(box, { token, deja = 0, remplacement = f
       const v = await api({ action: 'annonce_medias_verifier' }, token);
       if (!v.medias_ok) throw Object.assign(new Error('upload_incomplet'), { code: 'upload_incomplet' });
       say(st, '✓ Merci, c’est bon !'); apres();
-    } catch (e) { say(st, raisonEchecPhotos(e), true); bouton.disabled = !pret(); }
+    } catch (e) {
+      say(st, raisonEchecPhotos(e), true); bouton.disabled = !pret();
+      if (await prevenirLamiaPhotos(e, choix, token)) say(st, `${raisonEchecPhotos(e)} Lamia a été prévenue automatiquement, avec le modèle de ton téléphone.`, true);
+    }
   });
 }
