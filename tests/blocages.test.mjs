@@ -121,3 +121,19 @@ test('les signalements de la page sécurité se traitent dans le tableau de bord
   const html = await readFile(new URL('../public/tableau-de-bord.html', import.meta.url), 'utf8');
   assert.doesNotMatch(html, /href="\/admin\.html"><strong>.*Signalements/);
 });
+
+test('dire oui sans déclaration de sincérité : le message dit la vraie raison, pas « vérifie ta connexion »', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const js = await readFile(new URL('../src/espace.js', import.meta.url), 'utf8');
+  assert.match(js, /err\?\.code === 'sincerite_requise'/);
+  assert.match(js, /href="#sincerite"/);
+});
+
+test('invitation à signer la déclaration de sincérité : une par semaine, seulement à qui a des demandes en attente', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const code = await readFile(new URL('../lib/annonces.mjs', import.meta.url), 'utf8');
+  assert.match(code, /async function inviterSincerite/);
+  assert.match(code, /declarations_sincerite\?select=user_id/);
+  assert.match(code, /titre=ilike\.\*déclaration de sincérité\*/);
+  assert.match(code, /envoyes >= 40/);
+});
