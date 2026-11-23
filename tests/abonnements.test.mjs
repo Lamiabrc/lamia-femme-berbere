@@ -97,7 +97,7 @@ test('retour de paiement : la session est relue chez Stripe puis enregistrée', 
 });
 
 test('prix à l’unité et matchs en cours choisis par Lamia', () => {
-  assert.deepEqual(FORMULES.map((f) => f.matchs), [1, 3, 10]);
+  assert.deepEqual(FORMULES.map((f) => f.matchs), [1, 3, 6]);
   assert.equal(unite('mise_en_relation').prix, 500);
   assert.equal(unite('speed_dating').prix, 1200);
   assert.equal(unite('photo_match').prix, 300);
