@@ -30,3 +30,25 @@ export function demanderSignalement(titre, intro) {
     });
   });
 }
+
+// Dans une discussion : « Bloquer et signaler » ferme tout de suite, sans au revoir. Avant ça, on demande si la personne veut simplement arrêter
+// (au revoir et raison, comme le dématch courtois) ou signaler un comportement. Rend 'polie', 'signaler', ou null si la personne renonce.
+export function proposerFinPolie() {
+  return new Promise((fin) => {
+    document.querySelector('.signaler-fenetre')?.remove();
+    const d = document.createElement('div');
+    d.className = 'swipe-fenetre signaler-fenetre'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true');
+    d.innerHTML = `<div class="swipe-fenetre-boite"><h2>Tu veux juste arrêter cette discussion ?</h2>
+      <p>Si c’est simplement que ça ne colle pas, termine poliment : l’autre personne reçoit un au revoir et ta raison, et ça lui évite de se sentir ignorée.</p>
+      <p>Signale seulement un comportement qui te dérange : la discussion est alors fermée tout de suite, sans message, et Lamia lit ton signalement.</p>
+      <p class="po-actions"><button type="button" class="po-btn" data-fin-polie>Terminer poliment</button><button type="button" class="po-btn-verre" data-fin-signaler>Signaler un comportement</button></p>
+      <p class="po-actions"><button type="button" class="link-button" data-fin-annuler>Annuler</button></p></div>`;
+    document.body.appendChild(d);
+    const fermer = (v) => { d.remove(); fin(v); };
+    d.addEventListener('click', (e) => {
+      if (e.target === d || e.target.closest('[data-fin-annuler]')) return fermer(null);
+      if (e.target.closest('[data-fin-polie]')) return fermer('polie');
+      if (e.target.closest('[data-fin-signaler]')) return fermer('signaler');
+    });
+  });
+}
