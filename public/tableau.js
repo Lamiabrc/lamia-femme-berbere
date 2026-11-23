@@ -162,22 +162,29 @@ async function aFaire() {
     const { a_faire: f } = await r.json();
     dernierAFaire = f;
     peindreCarte(f);
-    peindreSignalements(f.signalements || []);
+    peindreSignalements(f.signalements || [], f.securite || []);
   } catch { box.innerHTML = '<p class="aide">La carte ne s’affiche pas pour le moment.</p>'; }
 }
 // La liste des signalements à traiter, sous la carte, ouverte par « Traiter ».
-function peindreSignalements(liste) {
+const SECU_GRAVITE = { red: 'Urgent', orange: 'À regarder', yellow: 'Léger' };
+// Un signalement envoyé depuis la page « sécurité » : Lamia le lit ici, sans quitter le tableau de bord.
+function carteSecurite(r) {
+  const ref = r.reported_label ? `<a class="fiche-ref" href="#profil-${esc(r.reported_label)}">n° ${esc(r.reported_label)}</a>` : 'Personne non précisée';
+  const etat = r.status === 'reviewing' ? ' · <em>je regarde</em>' : r.status === 'watch' ? ' · <em>à surveiller</em>' : '';
+  return `<li data-securite="${esc(r.id)}"><span><strong>${esc(SECU_GRAVITE[r.severity] || '')}</strong> · ${ref} signalé le ${esc(new Date(r.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }))}${etat}<br>${r.reason ? `« ${esc(r.reason)} »` : ''}${r.written_details ? `<br>${esc(r.written_details)}` : ''}</span> <span>${r.status === 'reviewing' ? '' : `<button type="button" class="btn btn-line" data-securite-statut="reviewing" data-id="${esc(r.id)}">Je regarde</button> `}<button type="button" class="btn btn-ink" data-securite-statut="resolved" data-id="${esc(r.id)}">C’est traité</button></span></li>`;
+}
+function peindreSignalements(liste, securite = []) {
   const box = $('[data-carte-signalements]');
   if (!box) return;
   const VOIR = (r) => (r ? `<a class="fiche-ref" href="#profil-${esc(r)}">n° ${esc(r)}</a>` : 'n° ?');
-  box.innerHTML = liste.length ? `<h2>Signalements à traiter</h2><ul class="fiche-liste">${liste.map((s) => `<li data-signalement><span>${VOIR(s.cible_ref)} signalé par ${VOIR(s.auteur_ref)}${s.created_at ? ` le ${esc(new Date(s.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }))}` : ''} · ${s.motif ? `« ${esc(s.motif)} »` : '<em>raison non demandée à l’époque (signalement d’avant le 12 nov.)</em>'}</span> <span><a class="btn btn-line" href="#profil-${esc(s.cible_ref)}">Ouvrir</a> <button type="button" class="btn btn-line" data-signalement-traite="${esc(s.id)}">C’est traité</button></span></li>`).join('')}</ul>` : '<p class="aide">Aucun signalement à traiter.</p>';
-  if (!liste.length) box.hidden = true;
+  box.innerHTML = liste.length || securite.length ? `<h2>Signalements à traiter</h2><ul class="fiche-liste">${securite.map(carteSecurite).join('')}${liste.map((s) => `<li data-signalement><span>${VOIR(s.cible_ref)} signalé par ${VOIR(s.auteur_ref)}${s.created_at ? ` le ${esc(new Date(s.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }))}` : ''} · ${s.motif ? `« ${esc(s.motif)} »` : '<em>raison non demandée à l’époque (signalement d’avant le 12 nov.)</em>'}</span> <span><a class="btn btn-line" href="#profil-${esc(s.cible_ref)}">Ouvrir</a> <button type="button" class="btn btn-line" data-signalement-traite="${esc(s.id)}">C’est traité</button></span></li>`).join('')}</ul>` : '<p class="aide">Aucun signalement à traiter.</p>';
+  if (!liste.length && !securite.length) box.hidden = true;
 }
 function peindreCarte(f) {
   const box = $('[data-carte-actions]');
   if (!box) return;
   const s = (n) => (n > 1 ? 's' : '');
-  const sig = (f.signalements || []).length, conf = f.confidences || 0, mc = f.matchs_en_cours || 0, sf = f.sous_formule || 0;
+  const sig = (f.signalements || []).length + (f.securite || []).length, conf = f.confidences || 0, mc = f.matchs_en_cours || 0, sf = f.sous_formule || 0;
   const nbMembres = comptes ? comptes.comptes.length : null;
   const d = f.sous_formule_detail || {};
   const branches = [
@@ -194,6 +201,7 @@ function peindreCarte(f) {
   if (nbMembres === null) (comptes ? Promise.resolve() : chargerComptes()).then(() => { if (dernierAFaire) peindreCarte(dernierAFaire); }).catch(() => {});
 }
 document.addEventListener('click', (e) => {
+  if (e.target.closest('[data-ouvrir-signalements]')) { e.preventDefault(); ouvrir('accueil'); setTimeout(() => { const b = $('[data-carte-signalements]'); if (b) { b.hidden = false; b.scrollIntoView({ behavior: 'smooth', block: 'start' }); } }, 300); return; }
   if (e.target.closest('[data-carte-signalements-ouvrir]')) { const b = $('[data-carte-signalements]'); if (b) { b.hidden = false; b.scrollIntoView({ behavior: 'smooth', block: 'start' }); } }
 });
 document.addEventListener('click', (e) => {
@@ -451,6 +459,8 @@ document.addEventListener('click', async (e) => {
   if (f) { filtreJournal = f.dataset.filtreJournal; chargerJournal(); return; }
   const o = e.target.closest('[data-journal-ouvrir]');
   if (o) { const l = o.dataset.journalOuvrir; if (/^\/confidences-lamia\/#(annonces|testeurs)/.test(l)) { aller = l.split('#')[1].startsWith('testeurs') ? 'testeurs' : 'annonces'; const fr = $('[data-rencontres]'); if (fr) fr.removeAttribute('src'); ouvrir('rencontres'); } else if (/^\/tableau-de-bord\/?#/.test(l)) { const h = l.slice(l.indexOf('#')); if (location.hash === h) suivreHashProfil(); else location.hash = h; } else window.open(l, '_blank', 'noopener'); return; }
+  const sec = e.target.closest('[data-securite-statut]');
+  if (sec) { sec.disabled = true; try { await conf({ action: 'annonce_securite_statut', id: sec.dataset.id, statut: sec.dataset.securiteStatut }); message(sec.dataset.securiteStatut === 'resolved' ? 'Signalement noté comme traité.' : 'Noté : tu regardes ce signalement.'); aFaire(); } catch { sec.disabled = false; message('Le changement n’a pas pu être noté.', true); } return; }
   const st = e.target.closest('[data-signalement-traite]');
   if (st) { const ligne = st.closest('[data-signalement]'); st.disabled = true; try { await conf({ action: 'annonce_signalement_traite', id: st.dataset.signalementTraite }); if (ligne) ligne.remove(); message('Signalement noté comme traité.'); aFaire(); } catch { st.disabled = false; message('Le signalement n’a pas pu être noté.', true); } return; }
   const ef = e.target.closest('[data-effacement-fait]');
