@@ -64,7 +64,11 @@ addEventListener('hashchange', majVue);
 function majPastilles() {
   const compte = (sel) => document.querySelectorAll(sel).length;
   const att = compte('#interets .interet-boutons, #propositions .interet-boutons');
-  const disc = compte('[data-espace-discussion] .disc');
+  // Seulement les discussions ouvertes où le dernier message vient de l'autre personne (à lire / à répondre).
+  const disc = [...document.querySelectorAll('[data-espace-discussion] .disc.is-ouverte')].filter((d) => {
+    const dernier = [...d.querySelectorAll('.disc-msg')].pop();
+    return dernier && !dernier.classList.contains('is-moi') && !dernier.classList.contains('is-systeme');
+  }).length;
   const pose = (nom, n) => { const b = document.querySelector(`[data-app-badge="${nom}"]`); if (b) { b.textContent = String(n); b.hidden = !n; } };
   pose('coeurs', att);
   pose('discussion', disc);
