@@ -29,7 +29,7 @@ export function rendreModerationPhotos(a) {
 // Photos reçues par TikTok ou Facebook : Lamia les ajoute à la place de la personne, jusqu'à ses deux photos.
 const TYPES_PHOTO = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp', heic: 'image/heic', heif: 'image/heif' };
 const typePhoto = (f) => (f.type && f.type !== 'application/octet-stream' ? f.type : TYPES_PHOTO[String(f.name || '').split('.').pop().toLowerCase()] || '');
-function rendreAjoutPhotos(a) {
+export function rendreAjoutPhotos(a) {
   const manque = 2 - (a.medias || []).filter((p) => p.kind === 'photo').length;
   if (manque <= 0 || a.status === 'retiree' || a.bloque_at) return '';
   return `<form class="photos-controle photos-ajout" data-photos-ajout="${esc(a.ref)}" data-manque="${manque}">
@@ -42,6 +42,11 @@ function rendreAjoutPhotos(a) {
   </form>`;
 }
 export function monterModerationPhotos({ appel, apres, cle = '', racine = document }) {
+  stylePhotos();
+  monterAjoutPhotos({ appel, apres, cle, racine });
+  monterControlePhotos({ appel, apres, racine });
+}
+export function monterAjoutPhotos({ appel, apres, cle = '', racine = document }) {
   stylePhotos();
   racine.addEventListener('change', (e) => {
     const f = e.target.closest('[data-photos-ajout]'); if (!f || e.target.name !== 'photos') return;
@@ -73,6 +78,8 @@ export function monterModerationPhotos({ appel, apres, cle = '', racine = docume
       st.textContent = messages[err.code] || 'L’envoi n’a pas abouti. Réessaie : rien n’est ajouté tant que les photos ne sont pas toutes reçues.';
     } finally { delete f.dataset.occupe; f.querySelectorAll('button,input').forEach((x) => { x.disabled = false; }); }
   });
+}
+function monterControlePhotos({ appel, apres, racine = document }) {
   const tentatives = new WeakMap();
   racine.addEventListener('click', (e) => {
     const b = e.target.closest('[data-photo-direction]'); if (!b) return;
