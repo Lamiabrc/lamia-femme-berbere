@@ -137,3 +137,15 @@ test('un seul état clair par compte : validé, en cours ou en attente d’une a
   assert.equal(avec({ status: 'a_verifier' }, 2), 'en_cours');
   assert.equal(avec({ ...pub, bloque_at: 'x' }, 2), 'retire');
 });
+
+import { COULEUR_ETAT, ETATS_COMPTE } from '../lib/comptes.mjs';
+test('chaque état de compte a une couleur : vert, jaune, bleu, rouge ou gris ; une photo récente non validée est « à valider »', () => {
+  for (const code of Object.keys(ETATS_COMPTE)) assert.ok(['vert', 'jaune', 'bleu', 'rouge', 'gris'].includes(COULEUR_ETAT[code]), code);
+  assert.equal(COULEUR_ETAT.valide, 'vert');
+  assert.equal(COULEUR_ETAT.photos_a_valider, 'jaune');
+  assert.equal(COULEUR_ETAT.suspendu_photos, 'rouge');
+  const base = { admin: false, emailConfirme: true, vraies: [{}], src: { status: 'publiee' }, ann: [], fiche: {}, nbPhotos: 2 };
+  assert.equal(etatCompte({ ...base, photosAValider: true }), 'photos_a_valider');
+  assert.equal(etatCompte({ ...base, photosAValider: false }), 'valide');
+  assert.equal(etatCompte({ ...base, nbPhotos: 1, photosAValider: true }), 'att_photos');
+});
