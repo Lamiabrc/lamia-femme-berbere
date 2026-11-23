@@ -1146,6 +1146,7 @@ async function discussions(session) {
       ? `<div class="disc-numeros is-ok"><svg class="ico" aria-hidden="true"><use href="/icones.svg#phone"/></svg> Vous avez échangé vos numéros. Celui de ${esc(d.avec)} : <a href="tel:${esc(d.son_numero)}"><strong>${esc(d.son_numero)}</strong></a></div>`
       : d.mon_numero
         ? `<div class="disc-numeros"><svg class="ico" aria-hidden="true"><use href="/icones.svg#phone"/></svg> Tu as donné ton numéro. ${esc(d.avec)} le verra dès qu’il ou elle aura donné le sien${d.il_a_partage ? '' : ' (on l’a prévenu·e)'}.</div>`
+        : d.ouverte && numeroBloque ? `<div class="disc-numeros"><svg class="ico" aria-hidden="true"><use href="/icones.svg#phone"/></svg> ${d.il_a_partage ? `<strong>${esc(d.avec)} a donné son numéro.</strong> ` : ''}L’échange de numéros est inclus dans Passion et Prestige.${window.LFB_PLAY ? '' : ' <a class="btn btn-ink" href="/abonnement/">Voir les formules</a>'}</div>`
         : d.ouverte ? `<form class="disc-numeros" data-disc-numero><label><svg class="ico" aria-hidden="true"><use href="/icones.svg#phone"/></svg> ${d.il_a_partage ? `<strong>${esc(d.avec)} a donné son numéro</strong> : donne le tien pour le voir` : `${salut ? `${esc(salut)}, prêt${e}` : `Prêt${e}`} à passer au téléphone ? Donne ton numéro`} <input name="telephone" type="tel" autocomplete="tel" placeholder="06 12 34 56 78" required></label><button class="btn btn-ink" type="submit">Échanger nos numéros</button><small>Ton numéro n’est montré que quand vous l’avez donné tous les deux.</small></form>` : '';
     // Discussion ouverte bien encadrée (Lamia, 17 nov. 2026 : « sinon c'est fondu dans le fond »).
     const ecrire = d.ouverte && !d.dematch;
@@ -1200,7 +1201,7 @@ async function discussions(session) {
     const art = box.querySelector(`[data-disc="${CSS.escape(id)}"]`);
     (dem ? art?.querySelector('[data-disc-dematch-form]') : art)?.scrollIntoView({ behavior: 'smooth', block: dem ? 'center' : 'start' });
   });
-  let photosRequises = false;
+  let photosRequises = false, numeroBloque = false;
   const afficher = () => {
     bloc.hidden = !liste.length;
     resume();
@@ -1209,7 +1210,7 @@ async function discussions(session) {
     box.innerHTML = (photosRequises ? '<p class="disc-photos-requises"><strong>Ajoute tes 2 photos pour continuer.</strong> Sans photo validée, tu ne peux plus écrire dans tes discussions. <a class="text-link" href="#mon-profil">Modifier mon profil</a></p>' : '') + liste.filter((d) => d.ouverte || !d.vide).map(vue).join('');
     box.querySelectorAll('[data-disc]').forEach((a) => { const t = a.querySelector('textarea'); if (t && brouillons[a.dataset.disc]) t.value = brouillons[a.dataset.disc]; const f = a.querySelector('[data-disc-fil]'); f.scrollTop = f.scrollHeight; });
   };
-  const charger = async () => { try { const r = await appelProfil({ action: 'annonce_discussions' }, session); liste = r.discussions || []; photosRequises = Boolean(r.photos_requises); if (document.documentElement.lang !== 'en') { salut = r.adresse || ''; e = r.accord ?? e; const h1 = $('[data-espace-nom]')?.closest('h1'); if (salut && h1) h1.textContent = salut; } afficher(); } catch { /* */ } };
+  const charger = async () => { try { const r = await appelProfil({ action: 'annonce_discussions' }, session); liste = r.discussions || []; photosRequises = Boolean(r.photos_requises); numeroBloque = r.numero_ok === false; if (document.documentElement.lang !== 'en') { salut = r.adresse || ''; e = r.accord ?? e; const h1 = $('[data-espace-nom]')?.closest('h1'); if (salut && h1) h1.textContent = salut; } afficher(); } catch { /* */ } };
   { const h = location.hash.match(/^#dematcher-(.+)$/); if (h) dematchOuvert = decodeURIComponent(h[1]); }
   await charger();
   if (dematchOuvert && liste.length) box.querySelector(`[data-disc="${CSS.escape(dematchOuvert)}"] [data-disc-dematch-form]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1244,7 +1245,7 @@ async function discussions(session) {
       }
       await charger();
     } catch (err) {
-      alert(err.code === 'telephone_invalide' ? 'Ce numéro ne semble pas valide. Exemple : 06 12 34 56 78 ou +213 5 12 34 56 78.' : err.code === 'au_revoir_fini' ? 'Tu as écrit tes deux messages d’au revoir.' : err.code === 'raison_requise' ? 'Choisis une raison.' : err.code === 'discussion_fermee' ? 'Cette discussion est terminée.' : err.code === 'photos_requises' ? 'Ajoute tes 2 photos (dans « Modifier mon profil ») pour continuer la discussion.' : err.code === 'rate_limited' ? 'Doucement Réessaie dans quelques minutes.' : 'Le message n’est pas parti. Réessaie.');
+      alert(err.code === 'telephone_invalide' ? 'Ce numéro ne semble pas valide. Exemple : 06 12 34 56 78 ou +213 5 12 34 56 78.' : err.code === 'au_revoir_fini' ? 'Tu as écrit tes deux messages d’au revoir.' : err.code === 'raison_requise' ? 'Choisis une raison.' : err.code === 'discussion_fermee' ? 'Cette discussion est terminée.' : err.code === 'photos_requises' ? 'Ajoute tes 2 photos (dans « Modifier mon profil ») pour continuer la discussion.' : err.code === 'numero_formule' ? 'L’échange de numéros est inclus dans Passion et Prestige.' : err.code === 'rate_limited' ? 'Doucement Réessaie dans quelques minutes.' : 'Le message n’est pas parti. Réessaie.');
     }
     bouton.disabled = false;
   });
