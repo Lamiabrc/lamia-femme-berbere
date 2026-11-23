@@ -505,3 +505,18 @@
 .mm-branches>li>strong{display:block;margin-bottom:6px;color:#6b1030}
 .mm-branches ul{margin:0;padding-left:18px;font-size:.92rem}
 .mm-branches ul li{margin:3px 0}
+
+/* Code couleur des cartes de la liste des membres (Lamia, 23 nov. 2026) */
+.membre-carte { border-left: 6px solid var(--carte-c, #c9c2b6); background: var(--carte-fond, #fff); }
+.membre-carte.couleur-vert { --carte-c: #2e8b57; --carte-fond: #f0f8f3; }
+.membre-carte.couleur-jaune { --carte-c: #e0a800; --carte-fond: #fff8e0; }
+.membre-carte.couleur-bleu { --carte-c: #3b7dd8; --carte-fond: #eef4fd; }
+.membre-carte.couleur-rouge { --carte-c: #c0392b; --carte-fond: #fdeeee; }
+.membre-carte.couleur-gris { --carte-c: #9a948a; --carte-fond: #f4f2ee; }
+.membre-legende { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; font-size: .85rem; }
+.membre-legende span { padding: 4px 10px; border-radius: 999px; border-left: 6px solid var(--carte-c, #c9c2b6); background: var(--carte-fond, #fff); color: #2b2530; }
+.membre-legende .couleur-vert { --carte-c: #2e8b57; --carte-fond: #f0f8f3; }
+.membre-legende .couleur-jaune { --carte-c: #e0a800; --carte-fond: #fff8e0; }
+.membre-legende .couleur-bleu { --carte-c: #3b7dd8; --carte-fond: #eef4fd; }
+.membre-legende .couleur-rouge { --carte-c: #c0392b; --carte-fond: #fdeeee; }
+.membre-legende .couleur-gris { --carte-c: #9a948a; --carte-fond: #f4f2ee; }

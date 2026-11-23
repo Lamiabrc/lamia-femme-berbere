@@ -873,8 +873,10 @@ const GENRE = { femme: 'Femme', homme: 'Homme' };
 const PRESENCE = { registered: 'inscrit·e', checked_in: 'arrivé·e', attended: 'venu·e', no_show: 'absent·e', cancelled: 'annulée' };
 const ANNONCE = { brouillon: 'brouillon', a_verifier: 'à vérifier', publiee: 'publiée', retiree: 'retirée' };
 // Un seul état par compte (calculé par le serveur) : validé, en cours, ou en attente d'une action précise du membre.
-const LIBELLE_ETAT = { valide: 'Validé', att_email: 'Attend : confirmer son e-mail', att_profil: 'Attend : créer son profil', att_photos: 'Attend : ses 2 photos', att_fiche: 'Attend : confirmer sa fiche du live', att_corriger_photos: 'Attend : corriger ses photos', suspendu_photos: 'Suspendu (photos)', en_cours: 'En cours : profil à vérifier', pause: 'En pause', retire: 'Retiré ou bloqué', admin: 'Toi (admin)' };
-const GROUPES_ETAT = { 'e:valide': (c) => c.etat === 'valide', 'e:attente': (c) => /^att_/.test(c.etat), 'e:suspendu': (c) => c.etat === 'suspendu_photos', 'e:encours': (c) => c.etat === 'en_cours', 'e:autre': (c) => ['pause', 'retire'].includes(c.etat) };
+const LIBELLE_ETAT = { valide: 'Validé', photos_a_valider: 'Photo à valider par toi', att_email: 'Attend : confirmer son e-mail', att_profil: 'Attend : créer son profil', att_photos: 'Attend : ses 2 photos', att_fiche: 'Attend : confirmer sa fiche du live', att_corriger_photos: 'Attend : corriger ses photos', suspendu_photos: 'Suspendu (photos)', en_cours: 'En cours : profil à vérifier', pause: 'En pause', retire: 'Retiré ou bloqué', admin: 'Toi (admin)' };
+// Couleur de la carte : vert tout est bon, jaune photo à valider (la personne peut swiper), bleu attend le membre, rouge suspendu ou bloqué, gris en pause.
+const COULEUR_ETAT = { valide: 'vert', photos_a_valider: 'jaune', att_email: 'bleu', att_profil: 'bleu', att_photos: 'bleu', att_fiche: 'bleu', att_corriger_photos: 'bleu', en_cours: 'bleu', suspendu_photos: 'rouge', retire: 'rouge', pause: 'gris', admin: 'gris' };
+const GROUPES_ETAT = { 'e:valide': (c) => c.etat === 'valide', 'e:avalider': (c) => c.etat === 'photos_a_valider', 'e:attente': (c) => /^att_/.test(c.etat), 'e:suspendu': (c) => c.etat === 'suspendu_photos', 'e:encours': (c) => c.etat === 'en_cours', 'e:autre': (c) => ['pause', 'retire'].includes(c.etat) };
 let filtreComptes = 'tous', compteOuvert = null, limiteComptes = 24;
 
 const ageDe = (birth) => {
@@ -936,10 +938,10 @@ function listeComptes() {
     const age = ageDe(c.profil?.birth_date) ?? c.age_fiche ?? null;
     const vraie = c.annonces.find((a) => !a.test && a.status === 'publiee') || c.annonces.find((a) => !a.test && ETAT[a.status]);
     const num = vraie?.ref || c.fiches[0]?.ref || null;
-    const etat = [LIBELLE_ETAT[c.etat] || '—', c.etat === 'valide' ? 'is-ok' : /^(att_|suspendu|en_cours)/.test(c.etat) ? 'is-alerte' : ''];
+    const etat = [LIBELLE_ETAT[c.etat] || '—', c.etat === 'valide' ? 'is-ok' : /^(att_|suspendu|en_cours|photos_a|retire)/.test(c.etat) ? 'is-alerte' : ''];
     const qui = [c.profil?.gender ? GENRE[c.profil.gender] : '', age != null ? `${age} ans` : '', c.profil?.city || ''].filter(Boolean).join(' · ');
     const soirees = c.inscriptions.filter((i) => i.statut !== 'cancelled').length;
-    return `<article class="membre-carte" data-compte="${esc(c.id)}" tabindex="0" role="button">
+    return `<article class="membre-carte couleur-${COULEUR_ETAT[c.etat] || 'gris'}" data-compte="${esc(c.id)}" tabindex="0" role="button">
       <header><strong>${esc(nomDe(c))}</strong>${num ? `<span class="membre-num">n° ${esc(num)}</span>` : ''}</header>
       <p class="membre-qui">${esc(qui) || '<span class="compte-badge is-alerte">genre et âge ?</span>'}</p>
       <p class="membre-badges"><span class="compte-badge ${etat[1]}">${etat[0]}</span>${soirees ? `<span class="compte-badge is-bal">${soirees} soirée${soirees > 1 ? 's' : ''}</span>` : ''}${c.admin ? '<span class="compte-badge">toi (admin)</span>' : ''}${c.testeur_play ? '<span class="compte-badge is-bal">Testeur Play</span>' : ''}${c.sans_profil && c.relance_le ? `<span class="compte-badge is-alerte">Relancé·e le ${esc(date(c.relance_le, { day: 'numeric', month: 'short' }))}</span>` : ''}</p>
