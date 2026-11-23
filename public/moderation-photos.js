@@ -23,10 +23,56 @@ export function rendreModerationPhotos(a) {
     ${m?.etat === 'avertissement' ? '<button class="btn btn-line" type="submit" value="suspendre">Second contrôle : suspendre les rencontres</button>' : ''}</div>
     ${a.photos_refusees_at && !active ? '<p>Ancien refus de photos : le déblocage reste automatique après réception de nouvelles photos.</p>' : ''}
     <p role="status" data-photo-statut></p>
+  </form>${rendreAjoutPhotos(a)}`;
+}
+
+// Photos reçues par TikTok ou Facebook : Lamia les ajoute à la place de la personne, jusqu'à ses deux photos.
+const TYPES_PHOTO = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp', heic: 'image/heic', heif: 'image/heif' };
+const typePhoto = (f) => (f.type && f.type !== 'application/octet-stream' ? f.type : TYPES_PHOTO[String(f.name || '').split('.').pop().toLowerCase()] || '');
+function rendreAjoutPhotos(a) {
+  const manque = 2 - (a.medias || []).filter((p) => p.kind === 'photo').length;
+  if (manque <= 0 || a.status === 'retiree' || a.bloque_at) return '';
+  return `<form class="photos-controle photos-ajout" data-photos-ajout="${esc(a.ref)}" data-manque="${manque}">
+    <h5>Ajouter ${manque > 1 ? 'les 2 photos' : 'la photo manquante'} à sa place</h5>
+    <p>La personne n’arrive pas à les envoyer ? Choisis ${manque > 1 ? 'ses 2 photos' : 'sa photo'}, reçue${manque > 1 ? 's' : ''} sur TikTok ou Facebook : elles seront ajoutées à son profil n° ${esc(a.ref)}.</p>
+    <label>${manque > 1 ? 'Choisir 2 photos' : 'Choisir la photo'}<input type="file" name="photos" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" ${manque > 1 ? 'multiple' : ''}></label>
+    <p class="aide" data-ajout-choix></p>
+    <div class="photos-actions"><button class="btn btn-ink" type="submit">Ajouter ${manque > 1 ? 'ces photos' : 'cette photo'} au profil</button></div>
+    <p role="status" data-ajout-statut></p>
   </form>`;
 }
-export function monterModerationPhotos({ appel, apres, racine = document }) {
+export function monterModerationPhotos({ appel, apres, cle = '', racine = document }) {
   stylePhotos();
+  racine.addEventListener('change', (e) => {
+    const f = e.target.closest('[data-photos-ajout]'); if (!f || e.target.name !== 'photos') return;
+    const l = [...e.target.files];
+    f.querySelector('[data-ajout-choix]').textContent = l.length ? `${l.length} photo${l.length > 1 ? 's' : ''} choisie${l.length > 1 ? 's' : ''} : ${l.map((x) => x.name).join(', ')}` : '';
+  });
+  racine.addEventListener('submit', async (e) => {
+    const f = e.target.closest('[data-photos-ajout]'); if (!f) return;
+    e.preventDefault();
+    if (f.dataset.occupe) return;
+    const st = f.querySelector('[data-ajout-statut]'), manque = Number(f.dataset.manque), ref = Number(f.dataset.photosAjout);
+    const choix = [...f.elements.photos.files];
+    if (choix.length !== manque) { st.textContent = manque > 1 ? 'Choisis exactement 2 photos : il en faut deux au total sur le profil.' : 'Choisis la photo à ajouter.'; return; }
+    if (choix.some((x) => !typePhoto(x))) { st.textContent = 'Ce format n’est pas accepté. Choisis des photos JPG, PNG, WebP ou HEIC.'; return; }
+    if (choix.some((x) => x.size > 12 * 1024 * 1024)) { st.textContent = 'Une photo dépasse 12 Mo. Choisis-en une plus légère.'; return; }
+    f.dataset.occupe = '1'; f.querySelectorAll('button,input').forEach((x) => { x.disabled = true; }); st.textContent = 'Envoi des photos…';
+    try {
+      const r = await appel({ action: 'annonce_admin_ajouter_medias', ref, medias: choix.map((x) => ({ role: 'media', type: typePhoto(x), size: x.size })) });
+      if (r.deja) { st.textContent = 'Ce profil a déjà ses 2 photos.'; await apres(ref); return; }
+      for (const [i, up] of (r.uploads || []).entries()) {
+        const u = await fetch(up.url, { method: 'PUT', headers: { apikey: cle, 'Content-Type': up.type, 'x-upsert': 'false' }, body: choix[i] });
+        if (!u.ok) throw Object.assign(new Error('upload_failed'), { code: 'upload_failed' });
+      }
+      const v = await appel({ action: 'annonce_admin_medias_verifier', ref });
+      if (!v.medias_ok) throw Object.assign(new Error('upload_failed'), { code: 'upload_failed' });
+      st.textContent = '✓ Photos ajoutées au profil.'; await apres(ref);
+    } catch (err) {
+      const messages = { pas_de_profil: 'Profil introuvable.', profil_inactif: 'Ce profil est retiré ou bloqué.', file_type: 'Ce format n’est pas accepté.', file_size: 'Une photo est trop lourde.', medias_requis: 'Il faut 2 photos au total sur ce profil.', forbidden: 'Action réservée à l’administratrice.' };
+      st.textContent = messages[err.code] || 'L’envoi n’a pas abouti. Réessaie : rien n’est ajouté tant que les photos ne sont pas toutes reçues.';
+    } finally { delete f.dataset.occupe; f.querySelectorAll('button,input').forEach((x) => { x.disabled = false; }); }
+  });
   const tentatives = new WeakMap();
   racine.addEventListener('click', (e) => {
     const b = e.target.closest('[data-photo-direction]'); if (!b) return;

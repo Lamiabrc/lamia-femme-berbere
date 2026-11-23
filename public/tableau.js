@@ -1245,7 +1245,7 @@ $('[data-comptes-filtres]').addEventListener('click', (e) => {
 });
 $('[data-comptes-maj]').addEventListener('click', chargerComptes);
 $('[data-compte-fermer]').addEventListener('click', fermerCompte);
-monterModerationPhotos({ appel: conf, apres: (ref) => chargerDetail({ ref }) });
+monterModerationPhotos({ appel: conf, apres: (ref) => chargerDetail({ ref }), cle: 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc' });
 document.addEventListener('click', (e) => {
   const b = e.target.closest('[data-compte-suiv], [data-compte-prec]');
   if (!b) return;
