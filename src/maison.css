@@ -4976,3 +4976,5 @@ body:is(:has(.espace), :has(.swipe-page)) .tayri-header .header-actions > :is(.l
 /* Menu déroulant (fond clair) : toujours du texte foncé, même sous l'en-tête bleu nuit */
 body:has(.espace) .site-header .maison-menu-panneau, body:has(.swipe-page) .site-header .maison-menu-panneau { color: var(--encre); }
 body:has(.espace) .site-header .maison-menu-panneau a, body:has(.espace) .site-header .maison-menu-panneau strong, body:has(.swipe-page) .site-header .maison-menu-panneau a, body:has(.swipe-page) .site-header .maison-menu-panneau strong { color: var(--encre) !important; }
+
+.photo-illisible { display: block; width: 180px; padding: 10px; border: 1px dashed #c9a58f; border-radius: 14px; background: #fff7f0; font-size: 14px; line-height: 1.35; }

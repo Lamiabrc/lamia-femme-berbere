@@ -653,13 +653,26 @@ async function monProfil(session) {
     { const v = Number(new URLSearchParams(location.search).get('voir')); if (v && (p.matchs_lies || []).some((m) => Number(m.ref) === v) && !voirProfilMatch.fait) { voirProfilMatch.fait = true; voirProfilMatch(v, session); } }
     // Mes photos : visibles par moi seul·e ici, pour vérifier qu'elles sont bien arrivées. Jamais publiées.
     { const z = box.querySelector('[data-mes-photos]');
-      if (z) appelProfil({ action: 'annonce_mes_photos' }, session).then(({ photos = [], partage }) => {
+      if (z) appelProfil({ action: 'annonce_mes_photos' }, session).then(({ photos = [], medias = [], partage }) => {
         if (!photos.length) return;
+        // Une photo iPhone (HEIC) arrive bien, mais beaucoup de téléphones ne savent pas l'afficher : on le dit et on propose de la remplacer.
+        const format = new Map(medias.map((m) => [m.url, m.mime]));
+        const illisible = (u) => /hei[cf]/i.test(format.get(u) || '');
+        const lisibles = photos.filter((u) => !illisible(u));
         // Ma photo, directement en haut de mon profil (Lamia, 17 nov. 2026). Visible par moi seul·e.
-        const av = box.querySelector('[data-mon-avatar]'); if (av) { av.innerHTML = `<img src="${esc(photos[0])}" alt="Ma photo" draggable="false"><span>Ma photo · visible par moi seul·e</span>`; av.hidden = false; }
+        const av = box.querySelector('[data-mon-avatar]'); if (av && lisibles[0]) { av.innerHTML = `<img src="${esc(lisibles[0])}" alt="Ma photo" draggable="false"><span>Ma photo · visible par moi seul·e</span>`; av.hidden = false; }
         z.innerHTML = `<h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#camera"/></svg> Mes photos</h3>
-          <p class="espace-mes-photos-grille">${photos.map((u) => `<img src="${esc(u)}" alt="Ma photo" loading="lazy">`).join('')}</p>
-          <p class="aide"><svg class="ico" aria-hidden="true"><use href="/icones.svg#shield"/></svg> Elles sont privées : personne ne les voit dans le swipe ni sur le site. Seule la modération les voit pour vérifier ton profil${partage ? ', et ton match si vous êtes en relation et que tu as accepté de la transmettre' : ''}.</p>`;
+          <p class="espace-mes-photos-grille">${medias.length ? medias.map((m) => (illisible(m.url) ? `<span class="photo-illisible"><strong>Photo bien reçue</strong> mais ton téléphone ne sait pas l’afficher (format iPhone). <button class="link-button" type="button" data-photo-illisible="${esc(m.id)}">La remplacer</button></span>` : `<img src="${esc(m.url)}" alt="Ma photo" loading="lazy" data-photo-img="${esc(m.id)}">`)).join('') : photos.map((u) => `<img src="${esc(u)}" alt="Ma photo" loading="lazy">`).join('')}</p>
+          <p class="aide"><svg class="ico" aria-hidden="true"><use href="/icones.svg#shield"/></svg> Elles sont privées : personne ne les voit dans le swipe ni sur le site. Seule la modération les voit pour vérifier ton profil${partage ? ', et ton match si vous êtes en relation et que tu as accepté de la transmettre' : ''}.</p><p role="status" data-photo-illisible-statut></p>`;
+        // Image qui ne s'affiche pas (lien de 10 minutes expiré, format, réseau) : une phrase claire au lieu d'une image cassée.
+        z.querySelectorAll('[data-photo-img]').forEach((img) => img.addEventListener('error', () => { const id = img.dataset.photoImg; img.outerHTML = `<span class="photo-illisible"><strong>Photo reçue</strong> mais elle ne s’affiche pas. Recharge la page ; sinon <button class="link-button" type="button" data-photo-illisible="${esc(id)}">remplace-la</button>.</span>`; }));
+        z.addEventListener('click', async (e) => {
+          const b = e.target.closest('[data-photo-illisible]'); if (!b || b.disabled) return;
+          if (!confirm('Retirer cette photo pour en envoyer une autre ? Ton autre photo est conservée.')) return;
+          b.disabled = true;
+          try { await appelProfil({ action: 'annonce_photo_illisible', photo_id: b.dataset.photoIllisible }, session); await monProfil(session); }
+          catch { b.disabled = false; z.querySelector('[data-photo-illisible-statut]').textContent = 'La photo n’a pas pu être retirée. Réessaie dans un instant.'; }
+        });
         z.hidden = false;
       }).catch(() => {}); }
     box.querySelectorAll('[data-profil-dematcher]').forEach((bouton) => bouton.addEventListener('click', async (e) => {
