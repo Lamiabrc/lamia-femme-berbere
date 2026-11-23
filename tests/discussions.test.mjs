@@ -210,3 +210,16 @@ test('pas de message sans ses 2 photos : photos refusées ou absentes, on les aj
   [s] = await json(await actionDiscussion('annonce_discussion_envoyer', { id: D, texte: 'Salam' }, { ...ctx, user: { id: A } }));
   assert.equal(s, 200);
 });
+
+test('échange de numéros : inclus dans Passion et Prestige, refusé en Découverte (23 nov. 2026)', async () => {
+  const { db, ctx } = base();
+  await ouvrirDiscussion(ctx, { interetId: 'i1', a: { user_id: A, ref: 3, prenom: 'Melina' }, b: { user_id: B, ref: 27, prenom: 'Rachid' } });
+  const droit = (ok, algerie = false) => async () => ({ ok, algerie });
+  const [s, r] = await json(await actionDiscussion('annonce_discussion_numero', { id: D, telephone: '06 12 34 56 78' }, { ...ctx, user: { id: A }, droitNumero: droit(false) }));
+  assert.equal(s, 402); assert.equal(r.error, 'numero_formule');
+  assert.equal(db.discussions[0].a_numero, undefined);
+  const [, l] = await json(await actionDiscussion('annonce_discussions', {}, { ...ctx, user: { id: A }, droitNumero: droit(false) }));
+  assert.equal(l.numero_ok, false);
+  const [s2] = await json(await actionDiscussion('annonce_discussion_numero', { id: D, telephone: '06 12 34 56 78' }, { ...ctx, user: { id: A }, droitNumero: droit(true) }));
+  assert.equal(s2, 200);
+});
