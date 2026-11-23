@@ -64,3 +64,10 @@ test('branchement : actions, passage de l’heure et tableau de bord', () => {
   const t = readFileSync(new URL('../public/tableau.js', import.meta.url), 'utf8');
   assert.match(t, /data-photos-ok/); assert.match(t, /Photos à valider/);
 });
+
+test('photos HEIC : la file « Photos à valider » et la fiche l’expliquent au lieu d’une image cassée', () => {
+  const t = readFileSync(new URL('../public/tableau.js', import.meta.url), 'utf8');
+  assert.match(t, /Photo iPhone \(HEIC\)/); assert.match(t, /hei\[cf\]/); assert.match(t, /data-photo-casse/);
+  assert.match(readFileSync(new URL('../public/moderation-photos.js', import.meta.url), 'utf8'), /Photo non affichable ici/);
+  assert.match(readFileSync(new URL('../lib/annonces.mjs', import.meta.url), 'utf8'), /mime: f\.mime \|\| ''/);
+});

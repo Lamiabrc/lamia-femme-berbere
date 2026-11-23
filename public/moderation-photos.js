@@ -43,6 +43,8 @@ export function rendreAjoutPhotos(a) {
 }
 export function monterModerationPhotos({ appel, apres, cle = '', racine = document }) {
   stylePhotos();
+  // Photo qui ne s'affiche pas (format iPhone HEIC, lien expiré) : une phrase, pas une image cassée.
+  racine.addEventListener('error', (e) => { const i = e.target; if (i?.tagName === 'IMG' && i.closest?.('.photo-controle')) i.replaceWith(Object.assign(document.createElement('small'), { textContent: 'Photo non affichable ici (format iPhone HEIC ?) : touche le lien pour l’ouvrir.' })); }, true);
   monterAjoutPhotos({ appel, apres, cle, racine });
   monterControlePhotos({ appel, apres, racine });
 }

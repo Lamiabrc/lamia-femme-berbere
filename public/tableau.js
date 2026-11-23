@@ -188,6 +188,9 @@ async function chargerPhotosAValider() {
   try { const d = await conf({ action: 'annonce_photos_a_valider' }); peindrePhotosAValider(d.profils || []); }
   catch { box.hidden = true; }
 }
+// Photo iPhone (HEIC) ou image qui ne s'affiche pas : un message clair et le lien pour l'ouvrir, jamais une image cassée.
+const photoNonAffichable = (url) => `<span class="photo-illisible"><strong>Photo iPhone (HEIC)</strong><br>Ton navigateur ne peut pas l’afficher ici.<br><a href="${esc(url)}" target="_blank" rel="noopener">Ouvrir / télécharger</a><br><small>Si tu la juges bonne, « Photos OK ». Sinon « À corriger » pour qu’elle en envoie une autre.</small></span>`;
+document.addEventListener('error', (e) => { const img = e.target; if (img?.tagName === 'IMG' && img.dataset?.photoCasse) img.closest('a').outerHTML = photoNonAffichable(img.dataset.photoCasse); }, true);
 function peindrePhotosAValider(profils) {
   const box = $('[data-carte-photos]');
   if (!box) return;
@@ -195,7 +198,7 @@ function peindrePhotosAValider(profils) {
   box.hidden = false;
   box.innerHTML = `<h2>Photos à valider (${profils.length})</h2><p class="aide">Le membre peut déjà swiper. Si tu corriges une photo, il a 24 h pour la remplacer, sinon son profil est masqué.</p>
     <ul class="photos-valider">${profils.map((p) => `<li data-photos-valider="${esc(p.ref)}"><div class="photos-valider-tete"><strong>n° ${esc(p.ref)}${p.prenom ? ` · ${esc(p.prenom)}` : ''}</strong><span>${esc([p.genre, p.ville].filter(Boolean).join(' · '))}</span></div>
-      <div class="photos-valider-vues">${p.photos.map((f) => `<a href="${esc(f.url)}" target="_blank" rel="noopener"><img src="${esc(f.url)}" alt="Photo ${esc(f.position)} du profil n° ${esc(p.ref)}" loading="lazy"></a>`).join('')}</div>
+      <div class="photos-valider-vues">${p.photos.map((f) => (/hei[cf]/i.test(f.mime || '') ? photoNonAffichable(f.url) : `<a href="${esc(f.url)}" target="_blank" rel="noopener"><img src="${esc(f.url)}" alt="Photo ${esc(f.position)} du profil n° ${esc(p.ref)}" loading="lazy" data-photo-casse="${esc(f.url)}"></a>`)).join('')}</div>
       <div class="photos-valider-actions"><button class="btn btn-ink" type="button" data-photos-ok="${esc(p.ref)}">Photos OK</button><a class="btn btn-line" href="#profil-${esc(p.ref)}">À corriger</a></div><p role="status" data-photos-valider-statut></p></li>`).join('')}</ul>`;
 }
 document.addEventListener('click', async (e) => {
