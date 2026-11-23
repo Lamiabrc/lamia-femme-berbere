@@ -1301,7 +1301,10 @@ async function discussions(session) {
     }
     if (!e.target.closest('[data-disc-signaler]')) return;
     const id = e.target.closest('[data-disc]').dataset.disc;
-    const { demanderSignalement } = await import('/assets/signaler.js');
+    const { demanderSignalement, proposerFinPolie } = await import('/assets/signaler.js');
+    const choix = await proposerFinPolie();
+    if (!choix) return;
+    if (choix === 'polie') { dematchOuvert = id; afficher(); box.querySelector(`[data-disc="${CSS.escape(id)}"] [data-disc-dematch-form]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
     const sig = await demanderSignalement('Bloquer et signaler', 'La discussion sera fermée, vous ne vous reverrez plus, et la modération la lira.');
     if (!sig) return;
     try {

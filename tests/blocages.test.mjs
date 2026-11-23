@@ -143,3 +143,13 @@ test('les réponses refusées (session expirée, demande disparue, trop d’essa
   const js = await readFile(new URL('../src/espace.js', import.meta.url), 'utf8');
   for (const c of ['login_required', 'not_found', 'rate_limited', 'sincerite_requise', 'photos_requises', 'annonce_en_pause', 'interet_termine']) assert.match(js, new RegExp(`err\\?\\.code === '${c}'`));
 });
+
+test('« Bloquer et signaler » dans une discussion propose d’abord de terminer poliment', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const js = await readFile(new URL('../src/espace.js', import.meta.url), 'utf8');
+  const sg = await readFile(new URL('../src/signaler.js', import.meta.url), 'utf8');
+  assert.match(sg, /export function proposerFinPolie/);
+  assert.match(sg, /Terminer poliment/);
+  assert.match(js, /await proposerFinPolie\(\)/);
+  assert.match(js, /choix === 'polie'/);
+});
