@@ -872,6 +872,9 @@ $('[data-textes-publier]').addEventListener('click', async () => {
 const GENRE = { femme: 'Femme', homme: 'Homme' };
 const PRESENCE = { registered: 'inscrit·e', checked_in: 'arrivé·e', attended: 'venu·e', no_show: 'absent·e', cancelled: 'annulée' };
 const ANNONCE = { brouillon: 'brouillon', a_verifier: 'à vérifier', publiee: 'publiée', retiree: 'retirée' };
+// Un seul état par compte (calculé par le serveur) : validé, en cours, ou en attente d'une action précise du membre.
+const LIBELLE_ETAT = { valide: 'Validé', att_email: 'Attend : confirmer son e-mail', att_profil: 'Attend : créer son profil', att_photos: 'Attend : ses 2 photos', att_fiche: 'Attend : confirmer sa fiche du live', att_corriger_photos: 'Attend : corriger ses photos', suspendu_photos: 'Suspendu (photos)', en_cours: 'En cours : profil à vérifier', pause: 'En pause', retire: 'Retiré ou bloqué', admin: 'Toi (admin)' };
+const GROUPES_ETAT = { 'e:valide': (c) => c.etat === 'valide', 'e:attente': (c) => /^att_/.test(c.etat), 'e:suspendu': (c) => c.etat === 'suspendu_photos', 'e:encours': (c) => c.etat === 'en_cours', 'e:autre': (c) => ['pause', 'retire'].includes(c.etat) };
 let filtreComptes = 'tous', compteOuvert = null, limiteComptes = 24;
 
 const ageDe = (birth) => {
@@ -898,6 +901,7 @@ async function chargerComptes() {
     kpi('Testeurs Google Play', l.filter((c) => c.testeur_play).length, `${l.filter((c) => c.testeur_play && !c.testeur_play.ajoute_at).length} à ajouter à la liste`),
     kpi('Sans profil', l.filter((c) => c.sans_profil).length, 'à relancer ou à supprimer'),
   ].join('');
+  for (const [k, f] of Object.entries(GROUPES_ETAT)) { const b = $(`[data-filtre="${k}"]`); if (b) b.dataset.n = String(l.filter(f).length); if (b) b.textContent = `${b.dataset.nom || b.textContent.replace(/ \(\d+\)$/, '')} (${b.dataset.n})`; }
   encartSansProfil();
   listeComptes();
   if (compteOuvert) ouvrirCompte(compteOuvert);
@@ -916,6 +920,7 @@ function listeComptes() {
   const q = $('[data-comptes-cherche]').value.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
   const garde = {
     tous: () => true,
+    ...GROUPES_ETAT,
     soiree: (c) => c.inscriptions.some((i) => i.statut !== 'cancelled'),
     annonce: (c) => c.annonces.length,
     fiche: (c) => c.fiches.length,
@@ -931,7 +936,7 @@ function listeComptes() {
     const age = ageDe(c.profil?.birth_date) ?? c.age_fiche ?? null;
     const vraie = c.annonces.find((a) => !a.test && a.status === 'publiee') || c.annonces.find((a) => !a.test && ETAT[a.status]);
     const num = vraie?.ref || c.fiches[0]?.ref || null;
-    const etat = vraie ? ETAT[vraie.status] : c.fiches.length ? ['Fiche du live', 'is-ok'] : ['Sans profil', ''];
+    const etat = [LIBELLE_ETAT[c.etat] || '—', c.etat === 'valide' ? 'is-ok' : /^(att_|suspendu|en_cours)/.test(c.etat) ? 'is-alerte' : ''];
     const qui = [c.profil?.gender ? GENRE[c.profil.gender] : '', age != null ? `${age} ans` : '', c.profil?.city || ''].filter(Boolean).join(' · ');
     const soirees = c.inscriptions.filter((i) => i.statut !== 'cancelled').length;
     return `<article class="membre-carte" data-compte="${esc(c.id)}" tabindex="0" role="button">

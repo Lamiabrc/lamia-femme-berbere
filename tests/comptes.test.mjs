@@ -117,3 +117,23 @@ test('une fiche du live donne le genre et l’âge au tableau ; ce que le compte
   assert.equal(c.age_fiche, 41);
   assert.equal(c.profil.profile_status, 'draft');
 });
+
+import { etatCompte } from '../lib/comptes.mjs';
+test('un seul état clair par compte : validé, en cours ou en attente d’une action précise', () => {
+  const pub = { status: 'publiee', id: 'a1' };
+  const base = { admin: false, emailConfirme: true, vraies: [], src: null, ann: [], fiche: {}, nbPhotos: 0 };
+  assert.equal(etatCompte({ ...base, admin: true }), 'admin');
+  assert.equal(etatCompte({ ...base, emailConfirme: false }), 'att_email');
+  assert.equal(etatCompte(base), 'att_profil');
+  assert.equal(etatCompte({ ...base, fiche: { ref: 5001 } }), 'att_fiche');
+  assert.equal(etatCompte({ ...base, fiche: { ref: 5001, confirme_at: 'x' } }), 'valide');
+  assert.equal(etatCompte({ ...base, ann: [{ status: 'retiree' }] }), 'retire');
+  const avec = (src, nbPhotos) => etatCompte({ ...base, vraies: [src], src, ann: [src], nbPhotos });
+  assert.equal(avec(pub, 2), 'valide');
+  assert.equal(avec(pub, 1), 'att_photos');
+  assert.equal(avec({ ...pub, photos_moderation: { etat: 'avertissement' } }, 2), 'att_corriger_photos');
+  assert.equal(avec({ ...pub, photos_refusees_at: 'x' }, 2), 'suspendu_photos');
+  assert.equal(avec({ ...pub, pause_at: 'x' }, 2), 'pause');
+  assert.equal(avec({ status: 'a_verifier' }, 2), 'en_cours');
+  assert.equal(avec({ ...pub, bloque_at: 'x' }, 2), 'retire');
+});
