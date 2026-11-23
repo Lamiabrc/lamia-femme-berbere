@@ -966,6 +966,12 @@ function direErreurReponse(boutons, err) {
     ? '<strong>Il te manque tes 2 photos</strong> pour dire oui. Elles restent privées. <a class="text-link" href="#photos">Ajouter mes photos</a>'
     : err?.code === 'sincerite_requise'
     ? '<strong>Un dernier petit pas avant de dire oui :</strong> signe ta déclaration de sincérité (une case à cocher). <a class="text-link" href="#sincerite">Je la signe</a>'
+    : err?.code === 'login_required'
+    ? '<strong>Ta session a expiré.</strong> Reconnecte-toi, puis réponds de nouveau.'
+    : err?.code === 'not_found'
+    ? 'Cette demande n’existe plus. Actualise la page pour voir où elle en est.'
+    : err?.code === 'rate_limited' || err?.code === 'trop_de_demandes'
+    ? 'Trop d’essais d’un coup. Attends une minute puis réessaie.'
     : err?.code === 'interet_termine'
     ? 'Cet intérêt n’est plus actif. Actualise la page pour retrouver son état dans ton historique.'
     : 'Ta réponse n’est pas passée. Vérifie ta connexion et réessaie.';
