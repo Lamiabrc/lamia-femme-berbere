@@ -137,3 +137,9 @@ test('invitation à signer la déclaration de sincérité : une par semaine, seu
   assert.match(code, /titre=ilike\.\*déclaration de sincérité\*/);
   assert.match(code, /envoyes >= 40/);
 });
+
+test('les réponses refusées (session expirée, demande disparue, trop d’essais) disent la vraie raison', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const js = await readFile(new URL('../src/espace.js', import.meta.url), 'utf8');
+  for (const c of ['login_required', 'not_found', 'rate_limited', 'sincerite_requise', 'photos_requises', 'annonce_en_pause', 'interet_termine']) assert.match(js, new RegExp(`err\\?\\.code === '${c}'`));
+});
