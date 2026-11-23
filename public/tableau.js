@@ -915,7 +915,7 @@ function listeComptes() {
   if (!comptes) return;
   const q = $('[data-comptes-cherche]').value.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
   const garde = {
-    tous: () => true,
+    tous: (c) => !c.sans_profil || c.admin || q, // Lamia (23 nov. 2026) : les comptes sans profil ne servent à rien, ils ne s'affichent plus (filtre « Sans profil » ou recherche pour les retrouver)
     soiree: (c) => c.inscriptions.some((i) => i.statut !== 'cancelled'),
     annonce: (c) => c.annonces.length,
     fiche: (c) => c.fiches.length,
