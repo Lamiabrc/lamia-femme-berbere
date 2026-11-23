@@ -972,6 +972,20 @@ renderSocials();
   } catch { /* */ }
 })();
 
+// Parrainage (23 nov. 2026) : un lien ?invite=<n° de profil> est gardé sur l'appareil ; une fois le compte créé, il est envoyé une seule fois.
+(function parrainage() {
+  try {
+    const code = new URLSearchParams(location.search).get('invite');
+    if (code && /^\d{1,7}$/.test(code) && !localStorage.getItem('lfb-invite-envoye')) localStorage.setItem('lfb-invite', code);
+    const garde = localStorage.getItem('lfb-invite');
+    if (!garde || localStorage.getItem('lfb-invite-envoye')) return;
+    const jeton = JSON.parse(localStorage.getItem('sb-tybwvxinigahhntfeeur-auth-token') || 'null')?.access_token;
+    if (!jeton) return;
+    fetch('/api/confidences', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jeton}` }, body: JSON.stringify({ action: 'parrainage_noter', code: garde }) })
+      .then((r) => { if (r.ok) { localStorage.setItem('lfb-invite-envoye', '1'); localStorage.removeItem('lfb-invite'); } }).catch(() => {});
+  } catch { /* */ }
+})();
+
 // « Notre couple » dans le menu : seulement pour les membres en couple (Lamia, 16 nov. : sinon c'est déprimant).
 // Réponse gardée 6 heures sur l'appareil pour ne pas interroger le serveur à chaque page.
 (function menuCouple() {
