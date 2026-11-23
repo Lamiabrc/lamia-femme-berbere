@@ -172,7 +172,7 @@ export function formulaireHtml() {
 // qui peut disparaître pendant qu'on remplit le formulaire (l'envoi échouait alors sans bruit). Les photos sont aussi réduites.
 async function enMemoire(f, max = 1600) {
   const type = typeDe(f), nom = f.name || 'fichier';
-  if (type.startsWith('image/') && !/heic|heif|gif/.test(type)) {
+  if (type.startsWith('image/') && !/gif/.test(type)) {
     try {
       const img = await createImageBitmap(f);
       const k = Math.min(1, max / Math.max(img.width, img.height));
