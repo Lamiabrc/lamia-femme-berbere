@@ -15,12 +15,12 @@ export function rendreModerationPhotos(a) {
       <label><input type="checkbox" data-photo-supprimer> Supprimer cette photo</label>
     </fieldset>`).join('') || '<p>Aucune photo disponible sur le site.</p>'}</div>
     ${photos.length > 1 ? '<p class="photos-navigation"><button type="button" class="btn btn-line" data-photo-direction="-1">Photo précédente</button><button type="button" class="btn btn-line" data-photo-direction="1">Photo suivante</button></p>' : ''}
-    ${active ? `<div class="photos-avis"><strong>${m.etat === 'suspendu' ? 'Rencontres suspendues après ton contrôle' : 'Avertissement envoyé · aucune suspension'}</strong><p>${esc(m.commentaire)}</p><ul>${(m.photos || []).map((p) => `<li>Photo ${esc(p.position)} : ${esc(p.commentaire || 'à remplacer')}${p.retiree ? ' · retirée' : ''}</li>`).join('')}</ul><p>Le remplacement des photos signalées et la réception de deux photos lèvent automatiquement cette restriction.</p></div>` : ''}
+    ${active ? `<div class="photos-avis"><strong>${m.etat === 'suspendu' ? 'Profil masqué (suspension partielle)' : 'Avertissement envoyé · aucune suspension'}</strong><p>${esc(m.commentaire)}</p><ul>${(m.photos || []).map((p) => `<li>Photo ${esc(p.position)} : ${esc(p.commentaire || 'à remplacer')}${p.retiree ? ' · retirée' : ''}</li>`).join('')}</ul><p>Le remplacement des photos signalées et la réception de deux photos lèvent automatiquement cette restriction.</p></div>` : ''}
     ${m?.etat === 'corrige' ? '<p class="photos-avis">Les photos signalées ont été remplacées. Tu peux les vérifier à nouveau.</p>' : ''}
     <label>Ton commentaire sur l’ensemble des photos<textarea data-photo-commentaire maxlength="600" rows="3" placeholder="Explique ce qui doit être corrigé…"></textarea></label>
-    <p class="aide">Premier contrôle : le profil reste actif, même si tu retires une photo. La suspension se décide manuellement au contrôle suivant.</p>
-    <div class="photos-actions">${!a.photos_refusees_at || active ? `<button class="btn btn-ink" type="submit" value="avertir">${m?.etat === 'suspendu' ? 'Envoyer le commentaire' : 'Envoyer la demande de correction'}</button>` : ''}
-    ${m?.etat === 'avertissement' ? '<button class="btn btn-line" type="submit" value="suspendre">Second contrôle : suspendre les rencontres</button>' : ''}</div>
+    <p class="aide">Si tu demandes une correction, le profil reste actif et la personne a 24 h pour remplacer. Passé ce délai, son profil est masqué automatiquement jusqu’au remplacement.</p>
+    <div class="photos-actions">${!active && !a.photos_refusees_at ? '<button class="btn btn-ink" type="button" data-photo-ok>Photos OK</button>' : ''}${!a.photos_refusees_at || active ? `<button class="btn btn-ink" type="submit" value="avertir">${m?.etat === 'suspendu' ? 'Envoyer le commentaire' : 'Envoyer la demande de correction'}</button>` : ''}
+    ${m?.etat === 'avertissement' ? '<button class="btn btn-line" type="submit" value="suspendre">Suspendre maintenant, sans attendre les 24 h</button>' : ''}${!a.photos_refusees_at && m?.etat !== 'avertissement' ? '<button class="btn btn-line" type="submit" value="immediat">Photo choquante : suspendre tout de suite</button>' : ''}</div>
     ${a.photos_refusees_at && !active ? '<p>Ancien refus de photos : le déblocage reste automatique après réception de nouvelles photos.</p>' : ''}
     <p role="status" data-photo-statut></p>
   </form>${rendreAjoutPhotos(a)}`;
@@ -43,6 +43,8 @@ export function rendreAjoutPhotos(a) {
 }
 export function monterModerationPhotos({ appel, apres, cle = '', racine = document }) {
   stylePhotos();
+  // Photo qui ne s'affiche pas (format iPhone HEIC, lien expiré) : une phrase, pas une image cassée.
+  racine.addEventListener('error', (e) => { const i = e.target; if (i?.tagName === 'IMG' && i.closest?.('.photo-controle')) i.replaceWith(Object.assign(document.createElement('small'), { textContent: 'Photo non affichable ici (format iPhone HEIC ?) : touche le lien pour l’ouvrir.' })); }, true);
   monterAjoutPhotos({ appel, apres, cle, racine });
   monterControlePhotos({ appel, apres, racine });
 }
@@ -86,6 +88,15 @@ function monterControlePhotos({ appel, apres, racine = document }) {
     const g = b.closest('form').querySelector('.photos-glisseur');
     g.scrollBy({left: Number(b.dataset.photoDirection) * g.clientWidth, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'});
   });
+  racine.addEventListener('click', async (e) => {
+    const ok = e.target.closest('[data-photo-ok]'); if (!ok) return;
+    const f = ok.closest('[data-photo-controle]'), st = f.querySelector('[data-photo-statut]');
+    if (f.dataset.occupe) return;
+    f.dataset.occupe = '1'; ok.disabled = true; st.textContent = 'Validation…';
+    try { await appel({ action: 'annonce_photos_valider', ref: Number(f.dataset.photoControle) }); st.textContent = '✓ Photos validées.'; await apres(Number(f.dataset.photoControle)); }
+    catch { st.textContent = 'Pas validé. Réessaie.'; ok.disabled = false; }
+    finally { delete f.dataset.occupe; }
+  });
   racine.addEventListener('submit', async (e) => {
     const f = e.target.closest('[data-photo-controle]'); if (!f) return;
     e.preventDefault();
@@ -95,7 +106,7 @@ function monterControlePhotos({ appel, apres, racine = document }) {
     if (!b) {
       const cartes = [...f.querySelectorAll('[data-photo-id]')];
       if (cartes.some((c) => c.querySelector('[data-photo-supprimer]').checked && !c.querySelector('[data-photo-selection]').checked)) { st.textContent = 'Coche aussi « À corriger » pour chaque photo à supprimer.'; return; }
-      b = {action:'annonce_photos_moderer',ref:Number(f.dataset.photoControle),revision:f.dataset.revision || null,requete_id:crypto.randomUUID(),operation:e.submitter?.value || 'avertir',commentaire:f.querySelector('[data-photo-commentaire]').value,
+      b = {action:'annonce_photos_moderer',ref:Number(f.dataset.photoControle),revision:f.dataset.revision || null,requete_id:crypto.randomUUID(),operation:e.submitter?.value === 'immediat' ? 'suspendre' : e.submitter?.value || 'avertir',immediat:e.submitter?.value === 'immediat',commentaire:f.querySelector('[data-photo-commentaire]').value,
         photos:cartes.filter((c) => c.querySelector('[data-photo-selection]').checked).map((c) => ({id:c.dataset.photoId,commentaire:c.querySelector('[data-photo-note]').value,supprimer:c.querySelector('[data-photo-supprimer]').checked}))};
       if (!b.commentaire.trim() && !b.photos.some((p) => p.commentaire.trim())) { st.textContent = 'Ajoute un commentaire pour expliquer la correction attendue.'; return; }
       if (!b.photos.length && !f.dataset.revision) { st.textContent = 'Choisis au moins une photo à corriger.'; return; }
@@ -117,5 +128,5 @@ export function rendreAvisPhotos(m) {
   if (!m) return '';
   return `<section class="espace-photos photos-avis" id="photos" aria-labelledby="titre-avis-photos"><h3 id="titre-avis-photos">${m.etat === 'suspendu' ? 'Tes photos restent à corriger' : 'Un mot de Lamia sur tes photos'}</h3>
     <p>${esc(m.commentaire)}</p><ul>${m.photos.map((p) => `<li><strong>Photo ${esc(p.position)}</strong> : ${esc(p.commentaire || 'à remplacer')}${p.presente ? ` <button class="link-button" type="button" data-photo-remplacer="${esc(p.id)}">Remplacer cette photo</button>` : ' · à ajouter ci-dessous'}</li>`).join('')}</ul>
-    <p>${m.etat === 'suspendu' ? 'Après ce second contrôle, tes rencontres sont suspendues. Elles seront débloquées automatiquement lorsque les photos signalées auront été remplacées et que tes deux photos seront bien reçues.' : 'Merci de corriger les photos signalées. Ton profil reste actif pour le moment. Si elles ne sont pas corrigées, il pourra être suspendu au prochain contrôle de Lamia.'}</p><p role="status" data-photo-remplacer-statut></p></section>`;
+    <p>${m.etat === 'suspendu' ? 'Ton profil n’est plus montré aux autres et tu ne peux plus répondre. Tout revient automatiquement dès que les photos signalées sont remplacées et que tes deux photos sont bien reçues.' : 'Merci de remplacer les photos signalées dans les 24 h. Ton profil reste actif pendant ce temps, puis il est masqué jusqu’au remplacement.'}</p><p role="status" data-photo-remplacer-statut></p></section>`;
 }
