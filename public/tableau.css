@@ -530,3 +530,20 @@
 .photos-valider-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
 
 .photo-illisible { display: block; padding: 10px; border: 1px dashed #c9a58f; border-radius: 10px; background: #fff7f0; font-size: 13px; line-height: 1.35; }
+
+/* Match en direct */
+.md-recherche { display: grid; gap: 10px; }
+.md-recherche input[type="search"] { box-sizing: border-box; width: 100%; font-size: 16px; padding: 12px; }
+.md-filtres { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.md-recherche input, .md-filtres select, .md-filtres input { box-sizing: border-box; width: 100%; font-size: 15px; padding: 10px; min-width: 0; }
+.md-case { grid-column: 1 / -1; display: flex; gap: 8px; align-items: center; font-size: 14px; }
+.md-resultat { border: 2px solid #32694c; background: #f4faf5; scroll-margin-top: 100px; margin-top: 12px; }
+.md-liste, .md-ul { display: grid; gap: 8px; margin: 10px 0; padding: 0; list-style: none; }
+.md-carte, .md-match { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px; border: 1px solid #e4d8cf; border-radius: 12px; background: #fff; }
+.md-carte .btn, .md-match .btn { flex: none; min-height: 44px; }
+.md-payant { border-color: #b8860b; background: #fffaf0; }
+.md-badge { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 99px; background: #b8860b; color: #fff; vertical-align: middle; }
+.md-live { background: #7a2e5a; }
+.md-score { font-weight: 800; color: #32694c; }
+.md-oui { color: #32694c; }
+.md-non { color: #a3402a; }
