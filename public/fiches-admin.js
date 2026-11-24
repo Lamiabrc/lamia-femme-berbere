@@ -13,7 +13,8 @@ export function monterFichesAdmin({ appel }) {
     const liste = s.dataset.ficheChoix === 'etudes' ? [...O.etudeCategorie, ...Object.values(O.etudeDetail).flat()] : O[s.dataset.ficheChoix];
     s.innerHTML = '<option value="">Choisir</option>' + liste.map((x) => `<option value="${esc(x)}">${esc(lib(x))}</option>`).join('');
   });
-  const corps = () => { const f = new FormData(form), p = Object.fromEntries(f); p.origine = f.get('origine') ? [f.get('origine')] : []; delete p.publier; return { profil: p, publier: f.get('publier') === 'on' }; };
+  panel.querySelectorAll('[data-fiche-cases]').forEach((c) => { c.className = 'cp-cases'; c.innerHTML = O[c.dataset.ficheCases].map((x) => `<label><input type="checkbox" name="${c.dataset.ficheCases}" value="${esc(x)}"> ${esc(lib(x))}</label>`).join(''); });
+  const corps = () => { const f = new FormData(form), p = Object.fromEntries(f); p.origine = f.get('origine') ? [f.get('origine')] : []; p.caracteristiques = f.getAll('caracteristiques'); delete p.publier; return { profil: p, publier: f.get('publier') === 'on' }; };
   const apercu = () => {
     const p = corps().profil;
     $('[data-fiche-apercu-titre]').textContent = ({femme:'Une femme',homme:'Un homme'}[p.genre] || 'Son profil') + (p.age ? ` · ${p.age} ans` : '');
