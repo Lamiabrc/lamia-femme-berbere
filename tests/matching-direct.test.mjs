@@ -39,3 +39,11 @@ test('une fiche en match est exclue', async () => {
   const r = await compatiblesDe(h, [h, f]);
   assert.equal(r.compatibles.length, 0);
 });
+
+test('des champs de fiche en liste, nombre ou vides ne font pas planter le calcul', async () => {
+  const h = await profilDepuisAnnonce(annonce(20, 'homme', 33, 'Lyon'));
+  const f = await profilDepuisFiche({ ref: 5300, genre: 'femme', age: 29, ville: null, pays: 'France', origine: ['Kabyle (Algerie)'], etudes: 3, situation: null, profil: ['a', 'b'], recherche: 12, metier: ['x'], religion: ['Islam'], caracteristiques: null, mode_vie: ['Fumeur: non'], village: 7 });
+  const g = await profilDepuisAnnonce(annonce(21, 'femme', 30, 'Lyon', { matching: { origineTags: 'Kabyle', caracteristiques: 'calme', hygieneVie: 3 }, profil: ['texte'], recherche: 5, ville: 8 }));
+  const r = await compatiblesDe(h, [h, f, g]);
+  assert.ok(Array.isArray(r.compatibles));
+});
