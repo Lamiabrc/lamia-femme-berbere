@@ -46,6 +46,8 @@ test('des champs de fiche en liste, nombre ou vides ne font pas planter le calcu
   const g = await profilDepuisAnnonce(annonce(21, 'femme', 30, 'Lyon', { matching: { origineTags: 'Kabyle', caracteristiques: 'calme', hygieneVie: 3 }, profil: ['texte'], recherche: 5, ville: 8 }));
   const r = await compatiblesDe(h, [h, f, g]);
   assert.ok(Array.isArray(r.compatibles));
+});
+
 import { choixPropres } from '../content/matching-options.mjs';
 
 test('les champs facultatifs du formulaire passent jusqu’au moteur', async () => {
