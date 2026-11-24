@@ -209,10 +209,24 @@ function afficher() {
 
 // ---------------------------------------------------------------- effets : cœurs, vibration, encouragements, match
 const vibrer = (m) => { try { navigator.vibrate?.(m); } catch { /* */ } };
-function eclat(x, y, emojis = ['', '', '', ''], n = 14) {
+// « Réduire les animations » du téléphone : pas d'éclats ni de sceau, la carte part simplement (24 nov. 2026).
+const calme = () => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch { return false; } };
+const COEUR = 'M12 21s-7.5-4.6-9.6-9.2C.9 8.6 2.8 4.8 6.4 4.5c2.1-.2 3.9 1 5.6 3 1.7-2 3.5-3.2 5.6-3 3.6.3 5.5 4.1 4 7.3C19.5 16.4 12 21 12 21z';
+const svgCoeur = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${COEUR}" fill="currentColor"/></svg>`;
+const svgCroix = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" fill="none"/></svg>';
+const COULEURS_ECLAT = ['#c0392b', '#7a1f35', '#bc9149', '#e06a4e'];
+// Un grand cœur s'épanouit sur la carte (ou une croix douce quand on passe).
+function sceau(choix) {
+  if (calme() || !zone) return;
+  const s = document.createElement('span'); s.className = `swipe-sceau is-${choix}`; s.setAttribute('aria-hidden', 'true');
+  s.innerHTML = choix === 'oui' ? svgCoeur : svgCroix;
+  zone.appendChild(s); setTimeout(() => s.remove(), 800);
+}
+function eclat(x, y, couleurs = COULEURS_ECLAT, n = 14) {
+  if (calme()) return;
   for (let i = 0; i < n; i += 1) {
     const s = document.createElement('span');
-    s.className = 'swipe-eclat'; s.textContent = emojis[i % emojis.length];
+    s.className = 'swipe-eclat'; s.innerHTML = svgCoeur; s.style.color = couleurs[i % couleurs.length];
     const ang = Math.random() * Math.PI * 2, dist = 70 + Math.random() * 120;
     s.style.left = `${x}px`; s.style.top = `${y}px`;
     s.style.setProperty('--dx', `${Math.cos(ang) * dist}px`); s.style.setProperty('--dy', `${Math.sin(ang) * dist - 60}px`);
@@ -249,9 +263,11 @@ function bienvenue() {
 }
 function celebrerMatch(ref) {
   vibrer([40, 60, 40, 60, 120]);
-  const d = fenetre(`<p class="swipe-match-coeurs" aria-hidden="true"><img class="tayri-coeur-match" src="/images/marque/tayri-coeur.webp" alt="" width="84" height="84"></p><h2>C’est réciproque !</h2><p>Le profil <strong>n° ${esc(ref)}</strong> t’a choisi·e aussi. Vous êtes mis en relation très vite : ta discussion s’ouvre dans ton espace.</p>`, 'is-match');
+  // « Vous vous êtes choisis » : deux cœurs qui se rejoignent, quelques étincelles ocre, sans confettis (brainstorming du 22 nov.).
+  const etincelles = Array.from({ length: 8 }, (_, k) => { const a = (k / 8) * Math.PI * 2; return `<i class="etincelle" style="--x:${Math.round(Math.cos(a) * 70)}px;--y:${Math.round(Math.sin(a) * 46)}px"></i>`; }).join('');
+  const d = fenetre(`<div class="swipe-choisis" aria-hidden="true"><span class="c g">${svgCoeur}</span><span class="c d">${svgCoeur}</span>${etincelles}</div><h2 class="swipe-choisis-titre">Vous vous êtes choisis !</h2><p>Le profil <strong>n° ${esc(ref)}</strong> t’a choisi·e aussi. Votre discussion s’ouvre dans ton espace : un bouton « Jeu » t’attend pour briser la glace.</p>`, 'is-match', '<p class="po-actions"><a class="po-btn" href="/mon-espace/#discussion">Lui écrire</a><button type="button" class="po-btn-verre" data-fermer>Continuer à swiper</button></p>');
   const r = d.querySelector('.swipe-fenetre-boite').getBoundingClientRect();
-  for (let k = 0; k < 3; k += 1) setTimeout(() => eclat(r.left + r.width / 2, r.top + 60, ['', '', '', '', ''], 22), k * 280);
+  setTimeout(() => eclat(r.left + r.width / 2, r.top + 70, ['#bc9149', '#7a1f35', '#c0392b'], 16), 800);
 }
 // Matchs au complet : avec qui, l'invitation à dématcher (raisons ouvertes dans l'espace) et l'abonnement pour plusieurs matchs.
 // Déclaration de bonne foi : demandée une fois, avant le premier cœur.
@@ -339,6 +355,7 @@ async function choisir(choix, message) {
   const profil = profils[0];
   if (choix === 'oui' && !sincerite) { if (el) { el.style.transform = ''; el.style.opacity = ''; el.classList.remove('vers-oui', 'vers-non'); el.classList.add('is-refus'); setTimeout(() => el.classList.remove('is-refus'), 500); } occupe = false; return demanderSincerite(); }
   if (choix === 'oui' && matchs.limite && matchs.actifs >= matchs.limite) { if (el) { el.style.transform = ''; el.style.opacity = ''; el.classList.remove('vers-oui', 'vers-non'); el.classList.add('is-refus'); setTimeout(() => el.classList.remove('is-refus'), 500); } occupe = false; return limiteAtteinte(); }
+  sceau(choix);
   if (choix === 'oui') {
     const btn = document.querySelector('[data-swipe-oui]').getBoundingClientRect(); eclat(btn.left + btn.width / 2, btn.top + btn.height / 2); vibrer(18);
     coeurs += 1; if (PALIERS[coeurs]) setTimeout(() => toast(PALIERS[coeurs]), 350);

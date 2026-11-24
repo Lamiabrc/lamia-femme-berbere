@@ -2325,6 +2325,7 @@ await cp(join(ROOT, 'content', 'rubriques.mjs'), join(DIST, 'assets', 'rubriques
 await cp(join(ROOT, 'content', 'matching-options.mjs'), join(DIST, 'assets', 'matching-options.mjs'));
 await cp(join(ROOT, 'content', 'etat-matchs.mjs'), join(DIST, 'assets', 'etat-matchs.mjs'));
 await cp(join(ROOT, 'content', 'signalement.mjs'), join(DIST, 'assets', 'signalement.mjs'));
+await cp(join(ROOT, 'content', 'jeux-discussion.mjs'), join(DIST, 'assets', 'jeux-discussion.mjs'));
 await cp(join(ROOT, 'src', 'i18n.js'), join(DIST, 'assets', 'i18n.js'));
 await cp(join(ROOT, 'src', 'tayri.css'), join(DIST, 'assets', 'tayri.css'));
 await mkdir(join(DIST, 'assets', 'i18n'), { recursive: true });
