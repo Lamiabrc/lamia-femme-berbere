@@ -979,7 +979,7 @@ function listeComptes() {
     incomplet,
     sansprofil: (c) => c.sans_profil,
   }[filtreComptes];
-  const l = comptes.comptes.filter(garde).filter((c) => !q || [nomDe(c), c.email, c.profil?.city, c.profil?.display_name, ...c.annonces.map((a) => a.ref), ...c.fiches.map((f) => f.ref)].join(' ').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes(q));
+  const l = comptes.comptes.filter(garde).filter((c) => !q || [nomDe(c), c.email, c.profil?.city, c.profil?.display_name, ...c.annonces.map((a) => a.ref), ...c.annonces.map((a) => a.prenom), ...c.fiches.map((f) => f.ref), ...c.fiches.map((f) => f.pseudo)].join(' ').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes(q));
   ordreComptes = l.map((c) => c.id);
   // Des cartes, pas une liste sans fin : 24 à la fois, puis « Afficher plus ».
   const ETAT = { publiee: ['Profil validé', 'is-ok'], a_verifier: ['À vérifier', 'is-alerte'], brouillon: ['Profil pas terminé', 'is-alerte'] };
@@ -991,7 +991,7 @@ function listeComptes() {
     const qui = [c.profil?.gender ? GENRE[c.profil.gender] : '', age != null ? `${age} ans` : '', c.profil?.city || ''].filter(Boolean).join(' · ');
     const soirees = c.inscriptions.filter((i) => i.statut !== 'cancelled').length;
     return `<article class="membre-carte couleur-${COULEUR_ETAT[c.etat] || 'gris'}" data-compte="${esc(c.id)}" tabindex="0" role="button">
-      <header><strong>${esc(nomDe(c))}</strong>${num ? `<span class="membre-num">n° ${esc(num)}</span>` : ''}</header>
+      <header><strong>${esc(nomDe(c))}</strong>${(() => { const autre = [...c.annonces.map((a) => a.prenom), ...c.fiches.map((f) => f.pseudo)].find((x) => x && x.toLowerCase() !== String(nomDe(c)).toLowerCase()); return autre ? ` <small class="membre-autre">(annonce : ${esc(autre)})</small>` : ''; })()}${num ? `<span class="membre-num">n° ${esc(num)}</span>` : ''}</header>
       <p class="membre-qui">${esc(qui) || '<span class="compte-badge is-alerte">genre et âge ?</span>'}</p>
       <p class="membre-badges"><span class="compte-badge ${etat[1]}">${etat[0]}</span>${soirees ? `<span class="compte-badge is-bal">${soirees} soirée${soirees > 1 ? 's' : ''}</span>` : ''}${c.admin ? '<span class="compte-badge">toi (admin)</span>' : ''}${c.testeur_play ? '<span class="compte-badge is-bal">Testeur Play</span>' : ''}${c.sans_profil && c.relance_le ? `<span class="compte-badge is-alerte">Relancé·e le ${esc(date(c.relance_le, { day: 'numeric', month: 'short' }))}</span>` : ''}</p>
       <small>${c.vu_le ? `Vu·e le ${esc(date(c.vu_le, { day: 'numeric', month: 'short' }))}` : 'Jamais reconnecté·e'} · inscrit·e le ${esc(date(c.cree_le, { day: 'numeric', month: 'short' }))}</small>
