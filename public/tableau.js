@@ -63,6 +63,8 @@ function ouvrir(tab) {
 document.addEventListener('click', (e) => {
   const md = e.target.closest('[data-md-depuis]');
   if (md) { e.preventDefault(); matchDirect.recharger(); aller = md.dataset.mdDepuis; ouvrir('match-direct'); return; }
+  const vr = e.target.closest('[data-voir-ref]');
+  if (vr && !vr.closest('[data-compte-detail]')) { e.preventDefault(); ouvrirParRef(vr.dataset.voirRef); return; }
   const t = e.target.closest('[data-tab],[data-go]');
   if (!t) return;
   e.preventDefault();
@@ -1068,7 +1070,7 @@ function ficheComplete(f, photosSite) {
   return `<article class="profil-complet"><h4>Fiche de l’outil n° ${esc(f.ref)}</h4>
     <p class="aide">${photosSite ? `${photosSite} photo${photosSite > 1 ? 's' : ''} envoyée${photosSite > 1 ? 's' : ''} sur le site (voir son profil ci-dessus).` : 'Aucune photo sur le site.'} Les photos de ton outil, s’il y en a, ne sont jamais envoyées au site.</p>
     ${f.profil ? `<h5>Qui je suis</h5><p>${esc(f.profil)}</p>` : ''}${f.recherche ? `<h5>Qui je cherche${f.age_min || f.age_max ? ` · ${esc(f.age_min || 18)} à ${esc(f.age_max || 99)} ans` : ''}</h5><p>${esc(f.recherche)}</p>` : ''}
-    <dl class="profil-champs">${lignesProfil([['Âge', f.age], ['Genre', f.genre], ['Ville', f.ville], ['Village', f.village], ['Pays', f.pays], ['Secteur', f.secteur], ['Situation', f.situation], ['Enfants', f.enfants], ['Études', f.etudes], ['Origine', f.origine], ['Religion', f.religion], ['Pratique', f.pratique], ['Mode de vie', f.mode_vie], ['Caractéristiques', f.caracteristiques], ['Modification demandée', f.modif_demandee]])}</dl></article>`;
+    <dl class="profil-champs">${lignesProfil([['Âge', f.age], ['Genre', f.genre], ['Ville', f.ville], ['Village', f.village], ['Pays', f.pays], ['Secteur', f.secteur], ['Situation', f.situation], ['Enfants', f.enfants], ['Études', f.etudes], ['Origine', f.origine], ['Religion', f.religion], ['Pratique', f.pratique], ['Mode de vie', f.mode_vie], ['Caractéristiques', f.caracteristiques], ['Pseudo (privé)', f.pseudo], ['Lien réseau (privé)', f.lien_reseau], ['Modification demandée', f.modif_demandee]])}</dl></article>`;
 }
 function rendreDetail(d) {
   const box = $('[data-compte-detail]'), c = d.compte;
@@ -1079,7 +1081,7 @@ function rendreDetail(d) {
   const complet = [...(d.annonces || []).map(profilComplet), ...(d.fiches || []).map((f) => ficheComplete(f, (d.annonces || []).reduce((n, a) => n + (a.medias || []).filter((m) => m.kind === 'photo').length, 0)))].join('');
   const blocComplet = complet ? `<div class="tdb-carte"><h3 style="margin-top:0">Son profil complet</h3>${complet}</div>` : '';
   if (d.sans_compte) {
-    box.innerHTML = `${pourquoi}<div class="tdb-carte"><h3 style="margin-top:0">À qui est ce profil</h3><ul class="fiche-liste">${qui}</ul><p class="aide">Cette personne n’a pas de compte. Son prénom et ses contacts sont dans ton outil de live (cherche ce n° dans « Le site »).</p></div>${blocComplet}${(d.choisi_par || []).length ? `<div class="tdb-carte"><h3 style="margin-top:0">Choisie par</h3><ul class="fiche-liste">${d.choisi_par.map((x) => `<li>${refBouton(x.ref)} ${esc(x.prenom || '')}<small>${esc(STATUT_DEMANDE[x.statut] || x.statut)} · ${esc(quand(x.le))}</small></li>`).join('')}</ul></div>` : ''}${cartesCompleter(d)}`;
+    box.innerHTML = `${pourquoi}${cartesCompleter(d)}<div class="tdb-carte"><h3 style="margin-top:0">À qui est ce profil</h3><ul class="fiche-liste">${qui}</ul><p class="aide">Cette personne n’a pas de compte.${(d.fiches || []).some((f) => f.pseudo || f.lien_reseau) ? ` Pseudo : ${esc((d.fiches || []).map((f) => f.pseudo).filter(Boolean).join(', ') || '—')} · Lien réseau : ${esc((d.fiches || []).map((f) => f.lien_reseau).filter(Boolean).join(', ') || '—')}.` : ' Son prénom et ses contacts sont dans ton outil de live (cherche ce n° dans « Le site »).'}</p></div>${blocComplet}${(d.choisi_par || []).length ? `<div class="tdb-carte"><h3 style="margin-top:0">Choisie par</h3><ul class="fiche-liste">${d.choisi_par.map((x) => `<li>${refBouton(x.ref)} ${esc(x.prenom || '')}<small>${esc(STATUT_DEMANDE[x.statut] || x.statut)} · ${esc(quand(x.le))}</small></li>`).join('')}</ul></div>` : ''}`;
     return;
   }
   const a = d.activite;
