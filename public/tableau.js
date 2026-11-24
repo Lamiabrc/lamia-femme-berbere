@@ -292,7 +292,7 @@ document.addEventListener('submit', async (e) => {
 
 // ---------------------------------------------------------------- Application : journal « qui fait quoi », retraits, notifications
 let filtreJournal = '';
-const matchDirect = monterMatchDirect({ appel: (body) => conf(body) });
+const matchDirect = monterMatchDirect({ appel: (body) => conf(body), voirProfil: (ref) => { ouvrir('comptes'); ouvrirParRef(ref); } });
 const conf = async (body) => { const r = await fetch('/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(body) }); const d = await r.json().catch(() => ({})); if (!r.ok) throw Object.assign(new Error(d.error || 'erreur'), { code: d.error, texte: d.message }); return d; };
 async function pastilleJournal() {
   try { const d = await conf({ action: 'annonce_journal', categorie: 'aucune' }); $$('[data-journal-pastille]').forEach((p) => { p.textContent = d.non_lus; p.hidden = !d.non_lus; }); } catch { /* */ }
