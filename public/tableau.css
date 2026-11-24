@@ -547,3 +547,6 @@
 .md-score { font-weight: 800; color: #32694c; }
 .md-oui { color: #32694c; }
 .md-non { color: #a3402a; }
+
+.md-actions { display: flex; flex-direction: column; gap: 6px; flex: none; }
+.md-actions .btn { min-height: 40px; }
