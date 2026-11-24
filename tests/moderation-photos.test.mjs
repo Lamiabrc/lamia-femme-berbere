@@ -109,3 +109,10 @@ test('les deux anciennes routes ne peuvent plus supprimer toutes les photos ni s
   for(const [action,body] of [['annonce_photos_refuser',{ref:42}],['annonce_moderer',{annonce_id:b.id,decision:'photos_refuser'}]])assert.equal((await b.action(action,body,ADMIN)).error,'selection_requise');
   assert.equal(b.objets.size,4);assert.equal((await b.a()).photos_refusees_at,null);
 });
+
+test('une photo refusée reste marquée « Refusée » après l’envoi', async () => {
+  const { writeFileSync, readFileSync } = await import('node:fs');
+  const src = readFileSync(new URL('../public/moderation-photos.js', import.meta.url), 'utf8');
+  assert.match(src, /refusees\.has\(Number\(p\.position\)\)/);
+  assert.match(src, /value="non" data-photo-selection\$\{refusees\.has/);
+});

@@ -6,11 +6,13 @@ export function stylePhotos() {
 export function rendreModerationPhotos(a) {
   const m = a.photos_moderation, photos = (a.medias || []).filter((p) => p.kind === 'photo');
   const active = ['avertissement','suspendu'].includes(m?.etat);
+  // Photos déjà refusées : elles restent affichées « Refusée » après l'envoi (sinon tout repasse en vert).
+  const refusees = new Set(active ? (m.photos || []).map((x) => Number(x.position)) : []);
   return `<form class="photos-controle" data-photo-controle="${esc(a.ref)}" data-revision="${esc(m?.revision || '')}" data-actif="${active ? 1 : 0}">
     <h5>Photos du profil</h5><p>Fais glisser les photos : pour chacune, « Acceptée » ou « Refusée ». Le profil reste actif pendant que la personne remplace.</p>
     <div class="photos-glisseur" tabindex="0" aria-label="Photos privées du profil n° ${esc(a.ref)}">${photos.map((p) => `<fieldset class="photo-controle" data-photo-id="${esc(p.id)}">
       <legend>Photo ${esc(p.position)}</legend><a href="${esc(p.url)}" target="_blank" rel="noopener"><img src="${esc(p.url)}" alt="Photo ${esc(p.position)} du profil n° ${esc(a.ref)}" loading="lazy"></a>
-      <div class="photo-choix"><label><input type="radio" name="choix-${esc(p.id)}" value="ok" checked> ✓ Acceptée</label><label><input type="radio" name="choix-${esc(p.id)}" value="non" data-photo-selection> ✗ Refusée</label></div>
+      <div class="photo-choix"><label><input type="radio" name="choix-${esc(p.id)}" value="ok"${refusees.has(Number(p.position)) ? '' : ' checked'}> ✓ Acceptée</label><label><input type="radio" name="choix-${esc(p.id)}" value="non" data-photo-selection${refusees.has(Number(p.position)) ? ' checked' : ''}> ✗ Refusée</label></div>
     </fieldset>`).join('') || '<p>Aucune photo disponible sur le site.</p>'}</div>
     ${photos.length > 1 ? '<p class="photos-navigation"><button type="button" class="btn btn-line" data-photo-direction="-1">Photo précédente</button><button type="button" class="btn btn-line" data-photo-direction="1">Photo suivante</button></p>' : ''}
     ${active ? `<div class="photos-avis"><strong>${m.etat === 'suspendu' ? 'Profil masqué (suspension partielle)' : 'Avertissement envoyé · aucune suspension'}</strong><p>${esc(m.commentaire)}</p><ul>${(m.photos || []).map((p) => `<li>Photo ${esc(p.position)} : ${esc(p.commentaire || 'à remplacer')}${p.retiree ? ' · retirée' : ''}</li>`).join('')}</ul><p>Le remplacement des photos signalées et la réception de deux photos lèvent automatiquement cette restriction.</p></div>` : ''}
