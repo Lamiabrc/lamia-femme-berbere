@@ -47,3 +47,24 @@ test('des champs de fiche en liste, nombre ou vides ne font pas planter le calcu
   const r = await compatiblesDe(h, [h, f, g]);
   assert.ok(Array.isArray(r.compatibles));
 });
+
+import { choixPropres } from '../content/matching-options.mjs';
+
+test('les champs facultatifs du formulaire passent jusqu’au moteur', async () => {
+  const m = choixPropres({ religion: 'Islam', situationAdministrative: 'RAS', rapportReseaux: ['Pas de réseaux sociaux', 'inconnu'], belleFamille: 'Proche de ma famille', fumeurRecherche: 'Fumeur: non', tailleMinRechercheCm: '170' });
+  assert.deepEqual(m.rapportReseaux, ['Pas de réseaux sociaux']);
+  assert.equal(m.tailleMinRechercheCm, 170);
+  const p = await profilDepuisAnnonce(annonce(10, 'femme', 29, 'Lyon', { matching: m }));
+  assert.equal(p.situationAdministrative, 'OK');
+  assert.equal(p.belleFamille, 'Proche de ma famille');
+  assert.deepEqual(p.hygieneVieRecherche, ['Fumeur: non']);
+  const dn = await profilDepuisAnnonce(annonce(11, 'homme', 33, 'Lyon', { matching: choixPropres({ situationAdministrative: 'Double nationalité' }) }));
+  assert.equal(dn.situationAdministrative, 'Double nationalité');
+});
+
+test('un fumeur est bloqué si la personne veut un non-fumeur (mode de vie recherché)', async () => {
+  const elle = await profilDepuisAnnonce(annonce(12, 'femme', 29, 'Lyon', { matching: choixPropres({ religion: 'Islam', fumeurRecherche: 'Fumeur: non' }) }));
+  const lui = await profilDepuisAnnonce(annonce(13, 'homme', 32, 'Lyon', { matching: choixPropres({ religion: 'Islam', fumeur: 'Fumeur: oui' }) }));
+  const r = await compatiblesDe(elle, [elle, lui]);
+  assert.equal(r.compatibles.length, 0);
+});

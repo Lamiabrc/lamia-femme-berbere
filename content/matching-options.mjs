@@ -33,6 +33,13 @@ export const O = {
   pratiqueRecherche: ['Pas important', 'Pratiquant(e)', 'Pratique moderee', 'Non pratiquant(e)'],
   etudesRecherche: ['Pas important', 'Bac', 'Bac+', 'Bac+5', 'Plus de Bac+5'],
   hidjab: ['Pas important', 'Oui', 'Non'],
+  // Champs facultatifs ajoutés au formulaire du site (même vocabulaire que l'outil de Lamia).
+  situationAdministrative: ['RAS', 'OK', 'Double nationalité'],
+  proprietaire: ['Oui', 'Non'],
+  rapportReseaux: ['Discret(e) sur les réseaux', 'Actif(ve) sur les réseaux', 'Je partage ma vie privée en ligne', 'Je ne partage pas ma vie privée', 'Pas de réseaux sociaux'],
+  gestionEmotionnelle: ['Je garde mon calme', 'Je parle de ce qui ne va pas', 'J’ai besoin de temps seul(e)', 'Je m’emporte vite', 'Je suis très sensible'],
+  belleFamille: ['Proche de ma famille', 'Je souhaite mon indépendance', 'Famille présente mais respectueuse', 'À clarifier ensemble'],
+  impressionEchange: ['Fluide et naturel', 'Réservé(e) au début', 'Plutôt bavard(e)', 'Je préfère écrire que parler'],
 };
 
 // Libellés affichés sur le site (avec accents), la valeur envoyée reste celle de l'outil.
@@ -48,7 +55,7 @@ export const LIBELLE = {
   'Oui - France': 'Oui, en France', 'Oui - region': 'Oui, dans ma région', 'Oui - international': 'Oui, à l’international', 'A discuter': 'À discuter',
   'Homme: femme ne travaille pas': 'Je préfère que ma femme ne travaille pas', 'Homme: femme travaille pour son epanouissement': 'Ma femme travaille pour son épanouissement', 'Homme: femme travaille pour aider': 'Ma femme travaille pour aider le foyer', 'Homme: femme travaille en 50/50': 'On partage les charges à 50/50',
   'Femme: ne veut pas travailler': 'Je ne souhaite pas travailler', 'Femme: veut travailler obligatoirement': 'Je veux absolument travailler', 'Femme: veut travailler si necessaire': 'Je travaillerai si nécessaire', 'Femme: veut travailler pour mon epanouissement': 'Je travaille pour mon épanouissement',
-  'Fumeur: non': 'Non-fumeur', 'Fumeur: occasionnel': 'Fumeur occasionnel', 'Fumeur: oui': 'Fumeur', 'Sport: oui': 'Sport régulier', 'Sport: occasionnel': 'Sport de temps en temps', 'Sport: non': 'Pas de sport', 'Alcool: non': 'Pas d’alcool', 'Alcool: occasionnel': 'Alcool occasionnel', 'Alcool: oui': 'Alcool', 'Chemma: non': 'Sans chique (chemma)', 'Chemma: oui': 'Chique (chemma)',
+  'Alcool: non': 'Pas d’alcool', 'Alcool: occasionnel': 'Alcool occasionnel', 'Alcool: oui': 'Alcool', 'Chemma: non': 'Pas de chemma', 'Chemma: oui': 'Chemma', 'Fumeur: non': 'Non-fumeur', 'Fumeur: occasionnel': 'Fumeur occasionnel', 'Fumeur: oui': 'Fumeur', 'Sport: oui': 'Sport régulier', 'Sport: occasionnel': 'Sport de temps en temps', 'Sport: non': 'Pas de sport', 'Alcool: non': 'Pas d’alcool', 'Alcool: occasionnel': 'Alcool occasionnel', 'Alcool: oui': 'Alcool', 'Chemma: non': 'Sans chique (chemma)', 'Chemma: oui': 'Chique (chemma)',
 };
 export const lib = (v) => LIBELLE[v] || v;
 // Secteur recherché, lisible : « Algerie · Tizi ouzou » → « Algérie · Tizi Ouzou », doublons et valeurs vides retirés.
@@ -109,7 +116,17 @@ export function choixPropres(m = {}) {
     accepteDivorce: m.accepteDivorce === true,
     accepteVeuf: m.accepteVeuf === true,
     accepteEnfants: m.accepteEnfants === true,
+    acceptePlusieursEnfants: m.acceptePlusieursEnfants === true,
     kabyleUniquement: m.kabyleUniquement === true,
+    situationAdministrative: un(m.situationAdministrative, O.situationAdministrative),
+    proprietaire: un(m.proprietaire, O.proprietaire),
+    rapportReseaux: plusieurs(m.rapportReseaux, O.rapportReseaux, 5),
+    gestionEmotionnelle: plusieurs(m.gestionEmotionnelle, O.gestionEmotionnelle, 5),
+    belleFamille: un(m.belleFamille, O.belleFamille),
+    impressionEchange: un(m.impressionEchange, O.impressionEchange),
+    tailleMinRechercheCm: int(m.tailleMinRechercheCm, 120, 230),
+    hygieneVieRecherche: [un(m.fumeurRecherche, O.fumeur), un(m.sportRecherche, O.sport), un(m.alcoolRecherche, O.alcool), un(m.chemmaRecherche, O.chemma)].filter(Boolean),
+    fumeurRecherche: un(m.fumeurRecherche, O.fumeur), sportRecherche: un(m.sportRecherche, O.sport), alcoolRecherche: un(m.alcoolRecherche, O.alcool), chemmaRecherche: un(m.chemmaRecherche, O.chemma),
     contactReseau: txt(m.contactReseau, 200),
   };
 }
@@ -165,6 +182,16 @@ export function versOutil(a, { photoDataUrl = '', aujourdHui = new Date() } = {}
     etudesRecherche: m.etudesRecherche || '',
     rechercheFemmeHidjabiste: m.rechercheFemmeHidjabiste || '',
     caracteristiquesRecherche: m.caracteristiquesRecherche || [],
+    // Papiers : « RAS » et « OK » = rien de particulier pour l'outil ; seule la double nationalité est mise en avant.
+    situationAdministrative: m.situationAdministrative === 'Double nationalité' ? 'Double nationalité' : m.situationAdministrative ? 'OK' : '',
+    proprietaire: m.proprietaire || '',
+    rapportReseaux: m.rapportReseaux || [],
+    gestionEmotionnelle: m.gestionEmotionnelle || [],
+    belleFamille: m.belleFamille || '',
+    impressionEchange: m.impressionEchange || '',
+    tailleMinRechercheCm: m.tailleMinRechercheCm ?? null,
+    hygieneVieRecherche: (m.hygieneVieRecherche || []).map((x) => x),
+    acceptePlusieursEnfants: Boolean(m.acceptePlusieursEnfants),
     accepteDivorce: Boolean(m.accepteDivorce),
     accepteVeuf: Boolean(m.accepteVeuf),
     accepteEnfants: Boolean(m.accepteEnfants),

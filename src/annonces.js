@@ -106,9 +106,15 @@ export function formulaireHtml() {
       <label>Sport<select name="sport">${opts(O.sport)}</select></label>
       <label>Alcool<select name="alcool">${opts(O.alcool)}</select></label>
       <label>Chique (chemma)<select name="chemma">${opts(O.chemma)}</select></label>
+      <label>Ta situation administrative <small>(facultatif)</small><select name="situationAdministrative">${opts(O.situationAdministrative, 'Je préfère ne pas dire')}</select></label>
+      <label>Propriétaire de ton logement ? <small>(facultatif)</small><select name="proprietaire">${opts(O.proprietaire, 'Je préfère ne pas dire')}</select></label>
+      <label>La belle-famille <small>(facultatif)</small><select name="belleFamille">${opts(O.belleFamille, 'Je préfère ne pas dire')}</select></label>
+      <label>Quand tu échanges <small>(facultatif)</small><select name="impressionEchange">${opts(O.impressionEchange, 'Je préfère ne pas dire')}</select></label>
       <label class="annonce-large">Autre chose sur ton mode de vie <small>(facultatif : habitudes, alimentation, sorties…)</small><textarea name="autresModeVie" rows="2" maxlength="300"></textarea></label>
     </div>
     <p class="annonce-sous">Ce qui te ressemble <small>(jusqu’à 6)</small></p>${puces('caracteristiques', O.caracteristiques)}
+    <p class="annonce-sous">Face aux émotions <small>(facultatif)</small></p>${puces('gestionEmotionnelle', O.gestionEmotionnelle)}
+    <p class="annonce-sous">Les réseaux sociaux <small>(facultatif)</small></p>${puces('rapportReseaux', O.rapportReseaux)}
     <label>Parle-nous de toi avec ton cœur <small>(ton caractère, tes valeurs, ce que tu aimes)</small><textarea name="profil" rows="5" maxlength="1500" placeholder="Écris comme si tu te présentais à une amie de Lamia."></textarea></label>
   </div>
   <div class="annonce-etape" data-optionnel-live data-plus-tard>
@@ -119,6 +125,11 @@ export function formulaireHtml() {
       <label>Sa religion<select name="religionRecherche">${opts(O.religionRecherche)}</select></label>
       <label>Sa pratique<select name="pratiqueRecherche">${opts(O.pratiqueRecherche)}</select></label>
       <label>Son niveau d’études<select name="etudesRecherche">${opts(O.etudesRecherche)}</select></label>
+      <label>Sa taille minimum <small>(cm, facultatif)</small><input name="tailleMinRechercheCm" type="number" min="120" max="230" inputmode="numeric" placeholder="170"></label>
+      <label>Son tabac <small>(facultatif)</small><select name="fumeurRecherche">${opts(O.fumeur, 'Peu importe')}</select></label>
+      <label>Son alcool <small>(facultatif)</small><select name="alcoolRecherche">${opts(O.alcool, 'Peu importe')}</select></label>
+      <label>Son sport <small>(facultatif)</small><select name="sportRecherche">${opts(O.sport, 'Peu importe')}</select></label>
+      <label>Sa chemma <small>(facultatif)</small><select name="chemmaRecherche">${opts(O.chemma, 'Peu importe')}</select></label>
       <label data-hidjab hidden>Qu’elle porte le hijab ?<select name="rechercheFemmeHidjabiste">${opts(O.hidjab)}</select></label>
     </div>
     <p class="annonce-sous">Ses origines <small>(laisse vide si peu importe)</small></p>${puces('origineRechercheTags', O.origine)}
@@ -127,6 +138,7 @@ export function formulaireHtml() {
       <label><input type="checkbox" name="accepteDivorce"><span>J’accepte une personne divorcée</span></label>
       <label><input type="checkbox" name="accepteVeuf"><span>J’accepte une personne veuve</span></label>
       <label><input type="checkbox" name="accepteEnfants"><span>J’accepte une personne qui a des enfants</span></label>
+      <label><input type="checkbox" name="acceptePlusieursEnfants"><span>… même plusieurs enfants</span></label>
     </div>
     <p class="annonce-sous">Son caractère <small>(jusqu’à 6)</small></p>${puces('caracteristiquesRecherche', O.caracteristiques)}
     <label>Dis-nous qui tu aimerais rencontrer <small>(vos projets, ce qui compte pour toi)</small><textarea name="recherche" rows="4" maxlength="1500" placeholder="Mariage, valeurs, région… dis ce qui est important pour toi."></textarea></label>
@@ -443,9 +455,9 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
   });
 }
 
-const CHAMPS = ['villageOrigine', 'langue', 'situation', 'enfants', 'nbEnfants', 'ageEnfants', 'desirEnfants', 'niveauEtudeCategorie', 'niveauEtudeDetail', 'etudesPaysObtention', 'profession', 'tailleCm', 'religion', 'pratique', 'mobiliteGeographique', 'visionFinanciere', 'fumeur', 'sport', 'alcool', 'chemma', 'religionTexte', 'autresModeVie', 'zoneGeo', 'religionRecherche', 'pratiqueRecherche', 'etudesRecherche', 'rechercheFemmeHidjabiste', 'contactReseau'];
-const LISTES = ['origineTags', 'caracteristiques', 'origineRechercheTags', 'caracteristiquesRecherche'];
-const CASES = ['kabyleUniquement', 'accepteDivorce', 'accepteVeuf', 'accepteEnfants'];
+const CHAMPS = ['villageOrigine', 'langue', 'situation', 'enfants', 'nbEnfants', 'ageEnfants', 'desirEnfants', 'niveauEtudeCategorie', 'niveauEtudeDetail', 'etudesPaysObtention', 'profession', 'tailleCm', 'religion', 'pratique', 'mobiliteGeographique', 'visionFinanciere', 'fumeur', 'sport', 'alcool', 'chemma', 'religionTexte', 'autresModeVie', 'zoneGeo', 'religionRecherche', 'pratiqueRecherche', 'etudesRecherche', 'rechercheFemmeHidjabiste', 'contactReseau', 'situationAdministrative', 'proprietaire', 'belleFamille', 'impressionEchange', 'tailleMinRechercheCm', 'fumeurRecherche', 'alcoolRecherche', 'sportRecherche', 'chemmaRecherche'];
+const LISTES = ['origineTags', 'caracteristiques', 'origineRechercheTags', 'caracteristiquesRecherche', 'gestionEmotionnelle', 'rapportReseaux'];
+const CASES = ['kabyleUniquement', 'accepteDivorce', 'accepteVeuf', 'accepteEnfants', 'acceptePlusieursEnfants'];
 function lireMatching(form) {
   const f = form.elements, m = {};
   for (const n of CHAMPS) m[n] = f[n]?.value || '';
