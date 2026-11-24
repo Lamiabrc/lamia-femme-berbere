@@ -20,10 +20,10 @@ const CHERCHE = [
 const CHERCHE_LISTES = [['origineRechercheTags', 'Origine recherchée', 'origine'], ['caracteristiquesRecherche', 'Caractère recherché', 'caracteristiques']];
 const CASES = [['kabyleUniquement', 'Kabyle uniquement'], ['accepteDivorce', 'Accepte une personne divorcée'], ['accepteVeuf', 'Accepte une personne veuve'], ['accepteEnfants', 'Accepte des enfants'], ['acceptePlusieursEnfants', 'Accepte plusieurs enfants']];
 // Une fiche de l'outil n'a que ces colonnes : le reste demande un « ok base » (nouvelle colonne).
-const FICHE = new Set(['ville', 'pays', 'villageOrigine', 'profession', 'situation', 'enfants', 'religion', 'pratique', 'age_min', 'age_max', 'zoneGeo', 'religionRecherche', 'pratiqueRecherche', 'origineTags', 'caracteristiques']);
+const FICHE_ANCIEN = new Set(['ville', 'pays', 'villageOrigine', 'profession', 'situation', 'enfants', 'religion', 'pratique', 'age_min', 'age_max', 'zoneGeo', 'religionRecherche', 'pratiqueRecherche', 'origineTags', 'caracteristiques']);
 
 const valeursAnnonce = (a) => ({ ...(a.matching || {}), ville: a.ville, pays: a.pays, age_min: a.age_min, age_max: a.age_max, situation: a.matching?.situation || a.situation });
-const valeursFiche = (f) => ({ ville: f.ville, pays: f.pays, villageOrigine: f.village, profession: f.metier, situation: f.situation, enfants: f.enfants, religion: f.religion, pratique: f.pratique, age_min: f.age_min, age_max: f.age_max,
+const valeursFiche = (f) => ({ ...(f.matching || {}), pseudo: f.pseudo, lien_reseau: f.lien_reseau, ville: f.ville, pays: f.pays, villageOrigine: f.village, profession: f.metier, situation: f.situation, enfants: f.enfants, religion: f.religion, pratique: f.pratique, age_min: f.age_min, age_max: f.age_max,
   zoneGeo: f.secteur, religionRecherche: f.religion_recherche, pratiqueRecherche: f.pratique_recherche, origineTags: f.origine || [], caracteristiques: f.caracteristiques || [] });
 const vide = (v) => v == null || v === '' || (Array.isArray(v) && !v.length);
 
@@ -43,17 +43,17 @@ function liste([n, titre, type], v, ouvrable) {
 }
 
 function formulaire(ref, v, fiche) {
-  const ok = fiche ? (n) => FICHE.has(n) : () => true;
+  const ok = () => true;
   const tous = [...LUI, ...CHERCHE].filter((c) => ok(c[0]));
   const manquants = tous.filter((c) => c[3] && vide(v[c[0]])).map((c) => c[1]);
   return `<details class="tdb-repli cp" ${manquants.length ? 'open' : ''}><summary>${fiche ? 'Fiche' : 'Profil'} n° ${esc(ref)} · compléter pour le matching${manquants.length ? ` <span class="cp-alerte">${manquants.length} info${manquants.length > 1 ? 's' : ''} manquante${manquants.length > 1 ? 's' : ''}</span>` : ''}</summary>
     <form class="reglages" data-completer data-ref="${esc(ref)}" data-fiche="${fiche ? 1 : 0}">
       ${manquants.length ? `<p class="cp-aide"><b>Manquant :</b> ${esc(manquants.join(', '))}. Sans ces infos, l’outil prend une valeur par défaut (« pas de contrainte ») et peut proposer un mauvais match.</p>` : ''}
+      ${fiche ? `<h4>Privé (jamais dans l’annonce)</h4><div class="champs"><label>Pseudo<input name="pseudo" maxlength="40" value="${esc(v.pseudo ?? '')}"></label><label>Lien réseau (TikTok, Instagram, Facebook)<input name="lien_reseau" maxlength="200" value="${esc(v.lien_reseau ?? '')}"></label></div>` : ''}
       <h4>Elle/il</h4><div class="champs">${LUI.map((c) => champ(c, v, ok)).join('')}</div>${LUI_LISTES.map((c) => liste(c, v, ok)).join('')}
       <h4>Ce qu’elle/il cherche</h4><div class="champs">${CHERCHE.map((c) => champ(c, v, ok)).join('')}</div>${CHERCHE_LISTES.map((c) => liste(c, v, ok)).join('')}
-      ${fiche ? '' : `<div class="cp-cases">${CASES.map(([n, t]) => `<label><input type="checkbox" name="${n}"${v[n] ? ' checked' : ''}> ${esc(t)}</label>`).join('')}</div>
-      <div class="champs"><label>Date de naissance (seulement si manquante ou fausse)<input name="birth_date" type="date"></label></div>`}
-      ${fiche ? '<p class="cp-aide">Une fiche de l’outil ne garde que ces champs. Pour y ajouter aussi belle-famille, émotions, réseaux, mode de vie…, il faut une nouvelle colonne : dis-moi « ok base ».</p>' : ''}
+      ${`<div class="cp-cases">${CASES.map(([n, t]) => `<label><input type="checkbox" name="${n}"${v[n] ? ' checked' : ''}> ${esc(t)}</label>`).join('')}</div>
+      ${fiche ? '' : '<div class="champs"><label>Date de naissance (seulement si manquante ou fausse)<input name="birth_date" type="date"></label></div>'}`}
       <p class="actions"><button class="btn btn-ink" type="submit">Enregistrer</button> <span class="aide" data-completer-statut role="status"></span></p>
     </form></details>`;
 }
@@ -78,10 +78,29 @@ export function monterCompleter({ appel, recharger }) {
       if (['ville', 'pays', 'age_min', 'age_max'].includes(n)) corps[n] = val; else matching[n] = type === 'nombre' ? val : val;
     }
     for (const [n] of [...LUI_LISTES, ...CHERCHE_LISTES]) if (els[n]) matching[n] = [...f.querySelectorAll(`[name="${n}"]:checked`)].map((x) => x.value);
-    if (!fiche) { for (const [n] of CASES) if (els[n]) matching[n] = els[n].checked; if (els.birth_date?.value) corps.birth_date = els.birth_date.value; }
+    for (const [n] of CASES) if (els[n]) matching[n] = els[n].checked;
+    if (!fiche && els.birth_date?.value) corps.birth_date = els.birth_date.value;
+    if (fiche) { corps.pseudo = els.pseudo.value; corps.lien_reseau = els.lien_reseau.value; }
     btn.disabled = true; st.textContent = 'Enregistrement…';
     try { await appel(corps); st.textContent = 'Enregistré ✓'; recharger?.(Number(f.dataset.ref)); }
     catch (err) { st.textContent = ({ ages_recherches: 'L’âge minimum dépasse l’âge maximum.', missing_lieu: 'Choisis un pays de la liste.', invalid_birth_date: 'Date de naissance invalide (18 ans minimum).' })[err.code] || 'L’enregistrement n’a pas abouti. Réessaie.'; }
     finally { btn.disabled = false; }
   });
+}
+
+// Pour « Créer un profil » : les champs de matching qui ne sont pas déjà dans le formulaire de fiche.
+const DEJA = new Set(['ville', 'pays', 'villageOrigine', 'profession', 'situation', 'enfants', 'religion', 'pratique', 'age_min', 'age_max', 'zoneGeo', 'religionRecherche', 'pratiqueRecherche', 'origineTags', 'caracteristiques']);
+export function champsCreation() {
+  const ok = (n) => !DEJA.has(n), v = {};
+  return `<h3>Plus d’infos pour le matching <small>(facultatif)</small></h3>
+    <div class="fiche-admin-champs">${[...LUI, ...CHERCHE].filter((c) => ok(c[0])).map((c) => champ([`m_${c[0]}`, c[1], c[2], false], v, () => true)).join('')}</div>
+    ${[...LUI_LISTES, ...CHERCHE_LISTES].filter((c) => ok(c[0])).map((c) => liste([`m_${c[0]}`, c[1], c[2]], v, () => true)).join('')}
+    <div class="cp-cases">${CASES.map(([n, t]) => `<label><input type="checkbox" name="m_${n}"> ${esc(t)}</label>`).join('')}</div>`;
+}
+export function lireCreation(form) {
+  const m = {}, els = form.elements;
+  for (const c of [...LUI, ...CHERCHE]) if (!DEJA.has(c[0]) && els[`m_${c[0]}`]) m[c[0]] = els[`m_${c[0]}`].value;
+  for (const [n] of [...LUI_LISTES, ...CHERCHE_LISTES]) if (!DEJA.has(n)) m[n] = [...form.querySelectorAll(`[name="m_${n}"]:checked`)].map((x) => x.value);
+  for (const [n] of CASES) if (els[`m_${n}`]) m[n] = els[`m_${n}`].checked;
+  return m;
 }

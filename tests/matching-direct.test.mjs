@@ -96,3 +96,14 @@ test('contrôles stricts : âge à ±2 ans, secteur, infos manquantes', () => {
   assert.equal(controlesPaire(a, { age: 33, ageMin: null, ageMax: null, zoneGeo: '', pays: 'France' }).age.etat, 'inconnu');
   assert.ok(manquesProfil({ age: 30 }).includes('secteur recherché'));
 });
+
+test('fiche : pseudo, lien réseau privé et matching complet alimentent le moteur', async () => {
+  const p = await profilDepuisFiche({ ref: 5200, genre: 'femme', age: 31, pays: 'France', ville: 'Paris', pseudo: 'Tala', lien_reseau: 'https://www.tiktok.com/@tala.live', matching: { belleFamille: 'Je préfère ne pas dire', tailleMinRechercheCm: 175, kabyleUniquement: true } });
+  assert.equal(p.prenom, 'Tala');
+  assert.equal(p.tiktokAccountId, 'tala.live');
+  assert.equal(p.kabyleUniquement, true);
+  assert.equal(p.tailleMinRechercheCm, 175);
+  const sans = await profilDepuisFiche({ ref: 5201, genre: 'homme', age: 40, pays: 'France' });
+  assert.equal(sans.prenom, 'Fiche 5201');
+  assert.ok(sans.contactAutre);
+});

@@ -513,6 +513,9 @@
     <div class="fiche-admin-grille">
       <form class="tdb-carte fiche-admin-form" data-fiche-admin>
         <h2>Sa fiche</h2>
+        <div class="fiche-admin-champs fiche-admin-prive"><p class="aide" style="grid-column:1/-1;margin:0"><b>Privé : visible par toi seule, jamais dans l’annonce.</b> La personne ajoutera son prénom à sa confirmation.</p>
+          <label>Pseudo<input name="pseudo" maxlength="40" autocomplete="off"></label>
+          <label>Lien réseau (TikTok, Instagram, Facebook)<input name="lien_reseau" maxlength="200" autocomplete="off" placeholder="https://www.tiktok.com/@…"></label></div>
         <div class="fiche-admin-champs">
           <label>Genre du profil<select name="genre" aria-label="Genre du profil" required><option value="">Choisir</option><option value="femme">Femme</option><option value="homme">Homme</option></select></label>
           <label>Âge<input name="age" type="number" min="18" max="99" required></label>
@@ -542,6 +545,7 @@
           <label>Religion recherchée<select name="religion_recherche" data-fiche-choix="religionRecherche"></select></label>
           <label>Pratique recherchée<select name="pratique_recherche" data-fiche-choix="pratiqueRecherche"></select></label>
         </div>
+        <div data-fiche-plus></div>
         <p class="aide">Pas de prénom, de photo ni de contact dans l’annonce. Les numéros, liens et emails sont masqués automatiquement.</p>
         <label class="fiche-admin-coche"><input type="checkbox" name="publier"> Afficher l’annonce anonymement dès maintenant</label>
         <p class="aide">Sinon, elle reste invisible jusqu’à la confirmation de la personne.</p>
