@@ -6,7 +6,7 @@ import { handleConfidences, verifierFichiers, jeton, jetonValide, enSilence, reg
 import { b64u } from '../lib/webpush.mjs';
 
 // Les Confidences sont fermées depuis le 15 nov. 2026 ; ces tests vérifient leur fonctionnement quand elles sont rouvertes.
-const env = { SUPABASE_SERVICE_ROLE_KEY: 'sb_secret_fixture', RESEND_API_KEY: 're_test', CONFIDENCES_OUVERTES: 'true' };
+const env = { SUPABASE_SERVICE_ROLE_KEY: 'sb_secret_fixture', RESEND_API_KEY: 're_test', CONFIDENCES_OUVERTES: 'true', EMAILS_TOUS: '1' };
 
 const req = (b, token, ip = '1.2.3.4') => new Request('https://x/api/confidences', { method: 'POST', headers: { 'content-type': 'application/json', 'x-forwarded-for': ip, ...(token ? { authorization: `Bearer ${token}` } : {}) }, body: JSON.stringify(b) });
 const call = async (be, b, token, ip) => { const r = await handleConfidences(req(b, token, ip), { env, fetcher: be.fetcher, etat: async (m) => ({ abonnement: m.startsWith('gratuit') ? null : { formule: 'passion' } }) }); return { status: r.status, body: await r.json() }; };
