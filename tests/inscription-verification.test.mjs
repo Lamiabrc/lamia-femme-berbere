@@ -57,11 +57,14 @@ test('sans quota lisible ou sans journalisation, aucune création et aucun email
   }
 });
 
-test('un échec de livraison ou un lien manquant ne prétend pas avoir envoyé une confirmation', async () => {
+test('email impossible (quota) : le compte est validé et marqué à reconfirmer ; lien manquant : erreur', async () => {
   const s = serveur({ delivered: false });
   const r = await s.send();
-  assert.equal(r.status, 502);
-  assert.deepEqual(await r.json(), { error: 'envoi_impossible' });
+  assert.equal(r.status, 200);
+  assert.deepEqual(await r.json(), { ok: true, a_reconfirmer: true });
+  const maj = s.calls.find((c) => c.path === '/auth/v1/admin/users/u-test');
+  assert.equal(maj.body.email_confirm, true);
+  assert.equal(maj.body.user_metadata.a_reconfirmer, true);
   const missing = serveur({ link: null });
   assert.equal((await missing.send()).status, 502);
   assert.equal(missing.mails.length, 0);
