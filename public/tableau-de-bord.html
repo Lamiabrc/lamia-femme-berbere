@@ -21,6 +21,7 @@
     <details class="tdb-plus" data-menu-plus>
       <summary>Plus <span class="tdb-pastille" data-journal-pastille hidden></span></summary>
       <div>
+      <button type="button" data-tab="match-direct"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Match en direct</button>
       <button type="button" data-tab="creer-profil"><svg class="ico" aria-hidden="true"><use href="/icones.svg#user"/></svg> Créer un profil</button>
       <button type="button" data-tab="rencontres"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Matchs à suivre</button>
       <button type="button" data-tab="application"><svg class="ico" aria-hidden="true"><use href="/icones.svg#smartphone"/></svg> Application <span class="tdb-pastille" data-journal-pastille hidden></span></button>
@@ -518,6 +519,25 @@
       <div class="tdb-carte"><h2>À quelle heure ? <small class="aide">(heure de Paris)</small></h2><div class="barres heures" data-heures></div><h2 style="margin-top:18px">Appareils</h2><ol class="classement" data-top-appareils></ol></div>
     </div>
     <p class="aide">Visites comptées sans cookie et sans suivre personne : un visiteur = une personne différente dans la journée. La ville et le pays sont approximatifs (déduits du réseau internet, sans jamais enregistrer l’adresse IP). Astuce : ajoute <code>?utm_source=live</code> à la fin du lien que tu donnes en live pour savoir combien viennent du live.</p>
+  </section>
+  <section data-panel="match-direct" hidden>
+    <div class="tdb-entete"><h1 class="tdb-titre">Match en direct</h1><button class="btn btn-line" type="button" data-go="creer-profil">Créer un profil</button></div>
+    <p class="lead">Choisis un profil : le moteur de ton outil Quick Pair Pro te donne ses compatibles, les abonnés en premier.</p>
+    <div class="tdb-carte md-recherche">
+      <input type="search" data-md-q placeholder="Prénom, ville, pays ou n°" aria-label="Rechercher un profil" autocomplete="off">
+      <div class="md-filtres">
+        <select data-md-sexe aria-label="Genre"><option value="">Femmes et hommes</option><option value="Femme">Femmes</option><option value="Homme">Hommes</option></select>
+        <input type="number" data-md-age-min min="18" max="99" placeholder="Âge min" aria-label="Âge minimum">
+        <input type="number" data-md-age-max min="18" max="99" placeholder="Âge max" aria-label="Âge maximum">
+        <select data-md-pays aria-label="Pays"><option value="">Tous pays</option></select>
+        <select data-md-religion aria-label="Religion"><option value="">Toutes religions</option></select>
+        <select data-md-enfants aria-label="Enfants"><option value="">Enfants : peu importe</option><option value="Non">Sans enfant</option><option value="Oui">Avec enfant(s)</option></select>
+        <label class="md-case"><input type="checkbox" data-md-payants> Abonnés seulement</label>
+      </div>
+    </div>
+    <div class="tdb-carte md-resultat" data-md-resultat hidden aria-live="polite"></div>
+    <p class="aide" data-md-etat>Chargement des profils…</p>
+    <div class="md-liste" data-md-liste></div>
   </section>
   <section data-panel="creer-profil" hidden>
     <div class="tdb-entete"><h1 class="tdb-titre">Créer un profil</h1><button class="btn btn-line" type="button" data-go="comptes">Les membres</button></div>

@@ -2,6 +2,7 @@
 import { FAMILLES } from '/assets/rubriques.mjs';
 import { createClient } from '/vendor/supabase.mjs';
 import { monterFichesAdmin } from '/fiches-admin.js';
+import { monterMatchDirect } from '/match-direct.js';
 import { rendreModerationPhotos, monterModerationPhotos } from '/moderation-photos.js';
 
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc');
@@ -54,10 +55,13 @@ function ouvrir(tab) {
   if (tab === 'coaching') chargerCoaching();
   if (tab === 'comptes' && !comptes) chargerComptes();
   if (tab === 'creer-profil') fichesAdmin.ouvrir();
+  if (tab === 'match-direct') { matchDirect.ouvrir(aller); aller = ''; }
   if (tab === 'rencontres') { const f = $('[data-rencontres]'); if (f && !f.src) f.src = `/confidences-lamia/?integre=1#${aller || 'annonces'}`; aller = ''; }
   scrollTo({ top: 0 });
 }
 document.addEventListener('click', (e) => {
+  const md = e.target.closest('[data-md-depuis]');
+  if (md) { e.preventDefault(); matchDirect.recharger(); aller = md.dataset.mdDepuis; ouvrir('match-direct'); return; }
   const t = e.target.closest('[data-tab],[data-go]');
   if (!t) return;
   e.preventDefault();
@@ -288,6 +292,7 @@ document.addEventListener('submit', async (e) => {
 
 // ---------------------------------------------------------------- Application : journal « qui fait quoi », retraits, notifications
 let filtreJournal = '';
+const matchDirect = monterMatchDirect({ appel: (body) => conf(body) });
 const conf = async (body) => { const r = await fetch('/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(body) }); const d = await r.json().catch(() => ({})); if (!r.ok) throw Object.assign(new Error(d.error || 'erreur'), { code: d.error, texte: d.message }); return d; };
 async function pastilleJournal() {
   try { const d = await conf({ action: 'annonce_journal', categorie: 'aucune' }); $$('[data-journal-pastille]').forEach((p) => { p.textContent = d.non_lus; p.hidden = !d.non_lus; }); } catch { /* */ }
