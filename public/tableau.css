@@ -550,3 +550,7 @@
 
 .md-actions { display: flex; flex-direction: column; gap: 6px; flex: none; }
 .md-actions .btn { min-height: 40px; }
+
+.md-rouge { background: #b3261e; } .md-gris { background: #6b6560; } .md-vert { background: #2e7d4f; }
+.md-envoi { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0; } .md-envoi .btn { min-height: 40px; font-size: 14px; }
+.md-demande-carte { margin: 10px 0; } .md-demande-carte summary { cursor: pointer; font-weight: 600; }

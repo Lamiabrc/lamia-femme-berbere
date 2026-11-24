@@ -942,6 +942,11 @@ page(
       <div data-espace-discussion></div>
     </section>
 
+    <section id="match-live" data-vue-de="coeurs" hidden>
+      <h2>Match en direct</h2>
+      <p>Pendant son live, Lamia peut te proposer une personne compatible, même si tu es déjà en match. Veux-tu être prévenu(e) ?</p>
+      <div data-espace-matchlive><p class="loading">Un instant…</p></div>
+    </section>
     <section id="propositions" data-vue-de="coeurs" hidden>
       <h2>Profils proposés par Lamia</h2>
       <p>Dis oui ou non. <strong>Si vous dites oui tous les deux, c’est un match.</strong></p>
