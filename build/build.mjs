@@ -1642,6 +1642,7 @@ page(
   </section>
 </main>
 <script type="module" src="/assets/confidences-lamia.js?v=${VERSION}"></script>
+<script defer src="/menu-admin.js"></script>
 </body>
 </html>`
 );

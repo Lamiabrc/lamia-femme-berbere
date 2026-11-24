@@ -129,5 +129,6 @@ $('#logout').addEventListener('click', async () => { try { await Promise.race([s
 $('#copy').addEventListener('click', async () => { try { await navigator.clipboard.writeText($('#emails').value); say('Adresses copiées.'); } catch { $('#emails').select(); say('Sélectionne et copie les adresses.'); } });
 boot();
 </script>
+<script defer src="/menu-admin.js"></script>
 </body>
 </html>
