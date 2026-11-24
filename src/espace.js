@@ -353,7 +353,25 @@ async function achats(session) {
 
 // Profil confié à Lamia : état, avantages, modification, fin d'un match en cours.
 const ETAT_PROFIL = { a_verifier: 'En cours de vérification', publiee: '✓ Vérifié', refusee: 'Non retenu pour le moment' };
+// Ouverture de l'espace : les lectures arrivent en une seule demande, puis chaque bloc prend sa réponse (une seule fois ; ensuite, vrais appels).
+const LECTURES_GROUPEES = new Set(['annonce_coaching', 'annonce_beta_moi', 'annonce_mes_blocages', 'annonce_mes_fiches_outil', 'annonce_propositions', 'annonce_avis_lamia', 'annonce_interets_recus', 'annonce_discussions', 'annonce_mes_photos']);
+let groupe = null;
+function lancerGroupe(session) {
+  if (groupe && Date.now() - groupe.t < 30000) return groupe;
+  const g = { t: Date.now(), pret: null };
+  g.pret = fetch('/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` }, body: JSON.stringify({ action: 'annonce_espace' }), signal: AbortSignal.timeout(20000) })
+    .then((r) => r.json()).then((d) => d.reponses || {}).catch(() => ({}));
+  return (groupe = g);
+}
 async function appelProfil(body, session) {
+  if (body.action === 'annonce_mon_profil') lancerGroupe(session); // part en même temps que le profil
+  if (LECTURES_GROUPEES.has(body.action) && Object.keys(body).length === 1 && groupe && Date.now() - groupe.t < 30000) {
+    const r = (await groupe.pret)[body.action];
+    if (r) { delete (await groupe.pret)[body.action]; if (r.status === 200 && !r.body?.error) return r.body; }
+  }
+  return appelProfilDirect(body, session);
+}
+async function appelProfilDirect(body, session) {
   // 20 secondes au plus : si le site est saturé, on affiche « Réessaie » au lieu de rester sur « Un instant… ».
   const r = await fetch('/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` }, body: JSON.stringify(body), signal: AbortSignal.timeout(20000) });
   const d = await r.json().catch(() => ({}));
