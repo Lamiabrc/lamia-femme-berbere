@@ -86,3 +86,13 @@ test('une femme qui veut vivre en France n’est pas compatible avec un homme au
   assert.equal(r.compatibles.length, 0);
   assert.equal(r.unCritere.length, 1);
 });
+
+import { controlesPaire, manques as manquesProfil } from '../lib/matching-direct.mjs';
+test('contrôles stricts : âge à ±2 ans, secteur, infos manquantes', () => {
+  const a = { age: 30, ageMin: 28, ageMax: 35, zoneGeo: 'France', pays: 'France' };
+  assert.equal(controlesPaire(a, { age: 37, ageMin: 25, ageMax: 40, zoneGeo: 'France', pays: 'France' }).age.etat, 'ok');
+  assert.equal(controlesPaire(a, { age: 38, ageMin: 25, ageMax: 40, zoneGeo: 'France', pays: 'France' }).age.etat, 'hors');
+  assert.equal(controlesPaire(a, { age: 33, ageMin: 25, ageMax: 40, zoneGeo: 'France', pays: 'Algerie' }).secteur.etat, 'hors');
+  assert.equal(controlesPaire(a, { age: 33, ageMin: null, ageMax: null, zoneGeo: '', pays: 'France' }).age.etat, 'inconnu');
+  assert.ok(manquesProfil({ age: 30 }).includes('secteur recherché'));
+});
