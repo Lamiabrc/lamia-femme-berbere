@@ -90,12 +90,12 @@ export function monterCompleter({ appel, recharger }) {
 
 // Pour « Créer un profil » : les champs de matching qui ne sont pas déjà dans le formulaire de fiche.
 const DEJA = new Set(['ville', 'pays', 'villageOrigine', 'profession', 'situation', 'enfants', 'religion', 'pratique', 'age_min', 'age_max', 'zoneGeo', 'religionRecherche', 'pratiqueRecherche', 'origineTags', 'caracteristiques']);
-export function champsCreation() {
+export function champsCreation(partie) {
   const ok = (n) => !DEJA.has(n), v = {};
-  return `<h3>Plus d’infos pour le matching <small>(facultatif)</small></h3>
-    <div class="fiche-admin-champs">${[...LUI, ...CHERCHE].filter((c) => ok(c[0])).map((c) => champ([`m_${c[0]}`, c[1], c[2], false], v, () => true)).join('')}</div>
-    ${[...LUI_LISTES, ...CHERCHE_LISTES].filter((c) => ok(c[0])).map((c) => liste([`m_${c[0]}`, c[1], c[2]], v, () => true)).join('')}
-    <div class="cp-cases">${CASES.map(([n, t]) => `<label><input type="checkbox" name="m_${n}"> ${esc(t)}</label>`).join('')}</div>`;
+  const ch = (l) => l.filter((c) => ok(c[0])).map((c) => champ([`m_${c[0]}`, c[1], c[2], false], v, () => true)).join('');
+  const li = (l) => l.filter((c) => ok(c[0])).map((c) => liste([`m_${c[0]}`, c[1], c[2]], v, () => true)).join('');
+  if (partie === 'cherche') return `<div class="fiche-admin-champs">${ch(CHERCHE)}</div>${li(CHERCHE_LISTES)}<div class="cp-cases">${CASES.map(([n, t]) => `<label><input type="checkbox" name="m_${n}"> ${esc(t)}</label>`).join('')}</div>`;
+  return `<h3>Plus d’infos sur elle/lui <small>(facultatif)</small></h3><div class="fiche-admin-champs">${ch(LUI)}</div>${li(LUI_LISTES)}`;
 }
 export function lireCreation(form) {
   const m = {}, els = form.elements;

@@ -529,6 +529,7 @@
           <label>Origine<select name="origine" data-fiche-choix="origine"></select></label>
         </div>
         <fieldset class="fiche-admin-liste-cases"><legend>Son caractère (plusieurs choix possibles)</legend><div data-fiche-cases="caracteristiques"></div></fieldset>
+        <div data-fiche-plus></div>
         <details open><summary>Religion et pratique, si précisées par la personne</summary><div class="fiche-admin-champs">
           <label>Religion<select name="religion" data-fiche-choix="religion"></select></label>
           <label>Pratique<select name="pratique" data-fiche-choix="pratique"></select></label>
@@ -536,6 +537,8 @@
         <h2>Son annonce anonyme</h2>
         <label>Qui je suis<textarea name="profil" rows="4" maxlength="700" required placeholder="Sa personnalité, ses valeurs, son quotidien…"></textarea></label>
         <label>Qui je cherche<textarea name="recherche" rows="4" maxlength="700" required placeholder="La relation et la personne recherchées…"></textarea></label>
+        <h2>Le profil recherché</h2>
+        <p class="aide">Ce que la personne cherche chez l’autre : le matching s’en sert pour écarter ce qui ne convient pas.</p>
         <div class="fiche-admin-champs">
           <label>Âge recherché, de<input name="age_min" type="number" min="18" max="99"></label>
           <label>À<input name="age_max" type="number" min="18" max="99"></label>
@@ -545,7 +548,7 @@
           <label>Religion recherchée<select name="religion_recherche" data-fiche-choix="religionRecherche"></select></label>
           <label>Pratique recherchée<select name="pratique_recherche" data-fiche-choix="pratiqueRecherche"></select></label>
         </div>
-        <div data-fiche-plus></div>
+        <div data-fiche-plus-cherche></div>
         <p class="aide">Pas de prénom, de photo ni de contact dans l’annonce. Les numéros, liens et emails sont masqués automatiquement.</p>
         <label class="fiche-admin-coche"><input type="checkbox" name="publier"> Afficher l’annonce anonymement dès maintenant</label>
         <p class="aide">Sinon, elle reste invisible jusqu’à la confirmation de la personne.</p>

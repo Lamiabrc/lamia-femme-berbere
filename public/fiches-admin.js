@@ -15,7 +15,7 @@ export function monterFichesAdmin({ appel }) {
     s.innerHTML = '<option value="">Choisir</option>' + liste.map((x) => `<option value="${esc(x)}">${esc(lib(x))}</option>`).join('');
   });
   panel.querySelectorAll('[data-fiche-cases]').forEach((c) => { c.className = 'cp-cases'; c.innerHTML = O[c.dataset.ficheCases].map((x) => `<label><input type="checkbox" name="${c.dataset.ficheCases}" value="${esc(x)}"> ${esc(lib(x))}</label>`).join(''); });
-  { const z = panel.querySelector('[data-fiche-plus]'); if (z) z.innerHTML = champsCreation(); }
+  { const z = panel.querySelector('[data-fiche-plus]'), c = panel.querySelector('[data-fiche-plus-cherche]'); if (z) z.innerHTML = champsCreation('lui'); if (c) c.innerHTML = champsCreation('cherche'); }
   const corps = () => { const f = new FormData(form), p = Object.fromEntries(f); for (const k of Object.keys(p)) if (k.startsWith('m_')) delete p[k]; p.matching = lireCreation(form); p.origine = f.get('origine') ? [f.get('origine')] : []; p.caracteristiques = f.getAll('caracteristiques'); delete p.publier; return { profil: p, publier: f.get('publier') === 'on' }; };
   const apercu = () => {
     const p = corps().profil;
