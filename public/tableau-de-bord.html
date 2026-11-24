@@ -525,7 +525,8 @@
           <label>Études<select name="etudes" data-fiche-choix="etudes"></select></label>
           <label>Origine<select name="origine" data-fiche-choix="origine"></select></label>
         </div>
-        <details><summary>Religion et pratique, si précisées par la personne</summary><div class="fiche-admin-champs">
+        <fieldset class="fiche-admin-liste-cases"><legend>Son caractère (plusieurs choix possibles)</legend><div data-fiche-cases="caracteristiques"></div></fieldset>
+        <details open><summary>Religion et pratique, si précisées par la personne</summary><div class="fiche-admin-champs">
           <label>Religion<select name="religion" data-fiche-choix="religion"></select></label>
           <label>Pratique<select name="pratique" data-fiche-choix="pratique"></select></label>
         </div></details>
@@ -536,7 +537,11 @@
           <label>Âge recherché, de<input name="age_min" type="number" min="18" max="99"></label>
           <label>À<input name="age_max" type="number" min="18" max="99"></label>
         </div>
-        <label>Pays ou région recherchés<input name="secteur" maxlength="120"></label>
+        <div class="fiche-admin-champs">
+          <label>Secteur recherché<select name="secteur" data-fiche-choix="zoneGeo"></select></label>
+          <label>Religion recherchée<select name="religion_recherche" data-fiche-choix="religionRecherche"></select></label>
+          <label>Pratique recherchée<select name="pratique_recherche" data-fiche-choix="pratiqueRecherche"></select></label>
+        </div>
         <p class="aide">Pas de prénom, de photo ni de contact dans l’annonce. Les numéros, liens et emails sont masqués automatiquement.</p>
         <label class="fiche-admin-coche"><input type="checkbox" name="publier"> Afficher l’annonce anonymement dès maintenant</label>
         <p class="aide">Sinon, elle reste invisible jusqu’à la confirmation de la personne.</p>

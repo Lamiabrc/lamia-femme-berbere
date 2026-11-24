@@ -571,3 +571,4 @@
 .cp label.cp-manque input,.cp label.cp-manque select{border-color:#e8890c}
 .cp h4{margin:14px 0 6px}.cp fieldset{border:1px solid var(--qvt-sable);border-radius:10px;margin:10px 0;padding:8px 10px}
 .cp .cp-cases{display:flex;flex-wrap:wrap;gap:6px 14px}.cp .cp-cases label{display:flex;gap:6px;align-items:center;font-weight:400}
+.fiche-admin-form .cp-cases{display:flex;flex-wrap:wrap;gap:6px 14px}.fiche-admin-form .cp-cases label{display:flex;gap:6px;align-items:center;font-weight:400}
