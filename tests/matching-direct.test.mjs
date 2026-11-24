@@ -96,3 +96,27 @@ test('contrôles stricts : âge à ±2 ans, secteur, infos manquantes', () => {
   assert.equal(controlesPaire(a, { age: 33, ageMin: null, ageMax: null, zoneGeo: '', pays: 'France' }).age.etat, 'inconnu');
   assert.ok(manquesProfil({ age: 30 }).includes('secteur recherché'));
 });
+
+test('fiche : pseudo, lien réseau privé et matching complet alimentent le moteur', async () => {
+  const p = await profilDepuisFiche({ ref: 5200, genre: 'femme', age: 31, pays: 'France', ville: 'Paris', pseudo: 'Tala', lien_reseau: 'https://www.tiktok.com/@tala.live', matching: { belleFamille: 'Je préfère ne pas dire', tailleMinRechercheCm: 175, kabyleUniquement: true } });
+  assert.equal(p.prenom, 'Tala');
+  assert.equal(p.tiktokAccountId, 'tala.live');
+  assert.equal(p.kabyleUniquement, true);
+  assert.equal(p.tailleMinRechercheCm, 175);
+  const sans = await profilDepuisFiche({ ref: 5201, genre: 'homme', age: 40, pays: 'France' });
+  assert.equal(sans.prenom, 'Fiche 5201');
+  assert.ok(sans.contactAutre);
+});
+
+import { choixPropres as choixTest, versOutil as versTest } from '../content/matching-options.mjs';
+test('exigences absolues et refus comme dans l’outil : gardés, nettoyés, transmis au moteur', async () => {
+  const c = choixTest({ hardPreferences: ['age', 'location', 'inconnu'], refuseDivorce: true, accepteVeuf: true, refuseVeuf: true, religionsAcceptees: ['Islam', 'zzz'] });
+  assert.deepEqual(c.hardPreferences, ['age', 'location']);
+  assert.equal(c.refuseDivorce, true);
+  assert.equal(c.refuseVeuf, false); // accepte et refuse ensemble : « accepte » l'emporte
+  assert.deepEqual(c.religionsAcceptees, ['Islam']);
+  const v = versTest({ ref: 1, matching: c, medias: [] });
+  assert.deepEqual(v.hardPreferences, ['age', 'location']);
+  const p = await profilDepuisFiche({ ref: 5300, genre: 'femme', age: 30, pays: 'France', matching: { hardPreferences: ['age'] } });
+  assert.deepEqual(p.hardPreferences, ['age']);
+});

@@ -1,4 +1,5 @@
 import { O, lib } from '/assets/matching-options.mjs';
+import { champsCreation, lireCreation } from '/completer-profil.js';
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (x) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));
 const ETATS = { en_attente: 'En attente de confirmation', confirmee: 'Confirmée', retiree: 'Retirée' };
 const ERREURS = { forbidden: 'Connecte-toi avec ton compte administratrice.', genre_requis: 'Choisis femme ou homme.', age_invalide: 'Indique un âge entre 18 et 99 ans.', ages_recherches: 'Vérifie les âges recherchés : de 18 à 99 ans, du plus petit au plus grand.', annonce_incomplete: 'Complète le pays et les deux textes de l’annonce.', requete_deja_utilisee: 'Cette tentative a déjà créé une fiche avec un autre texte. Actualise la liste pour la retrouver.', not_found: 'Aucune fiche avec ce numéro.', not_configured: 'L’environnement de test n’est pas encore configuré.' };
@@ -14,7 +15,8 @@ export function monterFichesAdmin({ appel }) {
     s.innerHTML = '<option value="">Choisir</option>' + liste.map((x) => `<option value="${esc(x)}">${esc(lib(x))}</option>`).join('');
   });
   panel.querySelectorAll('[data-fiche-cases]').forEach((c) => { c.className = 'cp-cases'; c.innerHTML = O[c.dataset.ficheCases].map((x) => `<label><input type="checkbox" name="${c.dataset.ficheCases}" value="${esc(x)}"> ${esc(lib(x))}</label>`).join(''); });
-  const corps = () => { const f = new FormData(form), p = Object.fromEntries(f); p.origine = f.get('origine') ? [f.get('origine')] : []; p.caracteristiques = f.getAll('caracteristiques'); delete p.publier; return { profil: p, publier: f.get('publier') === 'on' }; };
+  { const z = panel.querySelector('[data-fiche-plus]'), c = panel.querySelector('[data-fiche-plus-cherche]'); if (z) z.innerHTML = champsCreation('lui'); if (c) c.innerHTML = champsCreation('cherche'); }
+  const corps = () => { const f = new FormData(form), p = Object.fromEntries(f); for (const k of Object.keys(p)) if (k.startsWith('m_')) delete p[k]; p.matching = lireCreation(form); p.origine = f.get('origine') ? [f.get('origine')] : []; p.caracteristiques = f.getAll('caracteristiques'); delete p.publier; return { profil: p, publier: f.get('publier') === 'on' }; };
   const apercu = () => {
     const p = corps().profil;
     $('[data-fiche-apercu-titre]').textContent = ({femme:'Une femme',homme:'Un homme'}[p.genre] || 'Son profil') + (p.age ? ` · ${p.age} ans` : '');
@@ -35,7 +37,7 @@ export function monterFichesAdmin({ appel }) {
     try { await navigator.clipboard.writeText(texte); statut.textContent = b.hasAttribute('data-fiche-message') ? 'Message copié. Tu peux l’envoyer à la personne.' : 'Lien copié.'; }
     catch { input.focus(); input.select(); statut.textContent = 'Sélectionne et copie le lien ci-dessus.'; }
   });
-  const ligne = (f) => `<li><div><strong>n° ${esc(f.ref)} · ${f.genre === 'femme' ? 'Femme' : 'Homme'}, ${esc(f.age)} ans</strong><span>${esc([f.ville, f.pays && lib(f.pays)].filter(Boolean).join(' · '))}</span><small>${esc(ETATS[f.confirmation])}${f.visible ? ' · annonce visible' : ' · annonce masquée'}${f.compte ? ' · compte créé' : ''}</small></div><button type="button" class="btn btn-line" data-fiche-retrouver="${esc(f.ref)}">${f.lien ? 'Voir le lien' : 'Voir l’état'}</button></li>`;
+  const ligne = (f) => `<li><div><strong>n° ${esc(f.ref)} · ${f.genre === 'femme' ? 'Femme' : 'Homme'}, ${esc(f.age)} ans</strong><span>${esc([f.ville, f.pays && lib(f.pays)].filter(Boolean).join(' · '))}</span><small>${f.pseudo ? 'Pseudo : ' + esc(f.pseudo) + ' · ' : ''}${esc(ETATS[f.confirmation])}${f.visible ? ' · annonce visible' : ' · annonce masquée'}${f.compte ? ' · compte créé' : ''}</small></div><button type="button" class="btn btn-line" data-fiche-retrouver="${esc(f.ref)}">${f.lien ? 'Voir le lien' : 'Voir l’état'}</button></li>`;
   async function charger(plus = false) {
     if (chargement) return; chargement = true; $('[data-fiches-actualiser]').disabled = true; $('[data-fiches-suite]').disabled = true;
     try {
