@@ -827,7 +827,7 @@ $('[data-espace-reset]').addEventListener('submit', async (e) => {
   say(st, 'Un instant…');
   let rep;
   try { rep = await api({ action: 'annonce_lien_connexion', email: String(f.get('email')).trim(), retour: 'espace', langue: document.documentElement.lang, en: document.documentElement.lang === 'en' }); }
-  catch (err) { return say(st, err.code === 'trop_de_demandes' ? 'Plusieurs liens sont déjà partis pour cette adresse. Regarde dans tes emails (et les courriers indésirables), ou réessaie dans une heure.' : err.code === 'email_invalide' ? 'Vérifie ton adresse email.' : 'L’envoi n’a pas fonctionné. Réessaie dans un instant.', true); }
+  catch (err) { return say(st, err.code === 'trop_de_demandes' ? 'Plusieurs liens sont déjà partis pour cette adresse. Regarde dans tes emails (et les courriers indésirables), ou réessaie dans une heure.' : err.code === 'email_invalide' ? 'Vérifie ton adresse email.' : err.code === 'envoi_impossible' ? 'Nos emails sont retardés pour le moment. Ton inscription est bien enregistrée : réessaie de demander ton lien plus tard (ce soir ou demain) ou écris à Lamia sur ses réseaux.' : 'L’envoi n’a pas fonctionné. Réessaie dans un instant.', true); }
   if (rep && rep.existe === false) return say(st, 'Aucun espace n’existe avec cet email. Crée-le juste en dessous, c’est rapide.', true);
   say(st, 'C’est parti ! Ouvre l’email que tu viens de recevoir et clique sur le lien (pense aux courriers indésirables).');
 });

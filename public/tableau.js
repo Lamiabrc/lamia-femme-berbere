@@ -933,6 +933,7 @@ async function chargerComptes() {
     kpi('Comptes', l.length, `${l.filter((c) => c.profil?.gender === 'femme').length} femmes · ${l.filter((c) => c.profil?.gender === 'homme').length} hommes`),
     kpi('Inscrits à une soirée', l.filter((c) => c.inscriptions.some((i) => i.statut !== 'cancelled')).length),
     kpi('Avec annonce', l.filter((c) => c.annonces.length).length),
+    kpi('Email non confirmé', l.filter((c) => c.etat === 'att_email').length, 'à relancer quand les emails repartent'),
     kpi('Testeurs Google Play', l.filter((c) => c.testeur_play).length, `${l.filter((c) => c.testeur_play && !c.testeur_play.ajoute_at).length} à ajouter à la liste`),
     kpi('Sans profil', l.filter((c) => c.sans_profil).length, 'à relancer ou à supprimer'),
   ].join('');
