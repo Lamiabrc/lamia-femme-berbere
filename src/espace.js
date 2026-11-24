@@ -4,6 +4,7 @@ import { creerCompte, api } from './confidences-commun.js';
 import { boutonsSociaux, completerPrenom } from './connexion-sociale.mjs';
 import { secteurLisible, origineLisible, phrasesDifference, criteresDeQuestion, lib, foiEtVie, badgesProfil, metierEtReligion } from './matching-options.mjs';
 import { capaciteMatchs, libelleInteret, titreDiscussion } from './etat-matchs.mjs';
+import { JEUX, PREMIERS_MOTS, texteCarte } from './jeux-discussion.mjs';
 import { rendreAvisPhotos, stylePhotos } from '/moderation-photos.js';
 
 // Un petit « ? » à ouvrir au lieu d'un paragraphe d'explication (Lamia, 16 nov. 2026 : « trop de texte »).
@@ -89,10 +90,11 @@ function majPastilles() {
 // render() repasse à chaque événement de connexion (ouverture, retour sur l'onglet, jeton renouvelé) :
 // un écouteur ajouté à chaque passage enverrait tout en double ou en triple. Ici, le nouveau remplace l'ancien.
 const ecouteurs = new WeakMap();
-function ecouter(box, type, fn) {
+// Un seul écouteur par élément et par type (ou par clé, quand un élément en a besoin de plusieurs).
+function ecouter(box, type, fn, cle = type) {
   const m = ecouteurs.get(box) || {};
-  if (m[type]) box.removeEventListener(type, m[type]);
-  m[type] = fn;
+  if (m[cle]) box.removeEventListener(type, m[cle]);
+  m[cle] = fn;
   ecouteurs.set(box, m);
   box.addEventListener(type, fn);
 }
@@ -1140,7 +1142,8 @@ async function interetsRecus(session, profilPret = null) {
 async function discussions(session) {
   const bloc = document.querySelector('[data-espace-discussion-bloc]'), box = document.querySelector('[data-espace-discussion]');
   if (!bloc || !box) return;
-  let liste = [], ouverte = null, salut = '', e = '·e';
+  let liste = [], ouverte = null, salut = '', e = '·e', jeuOuvert = null, tirage = null, premierRendu = true;
+  const vus = new Set();
   clearInterval(minuterieDiscussions);
   const heure = (d) => new Date(d).toLocaleString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { weekday: 'short', hour: '2-digit', minute: '2-digit' });
   const reste = (d) => { const ms = new Date(d.ferme_at) - Date.now(); if (ms <= 0) return 'terminée'; if (ms > 365 * 86400e3) return 'sans limite de durée'; const j = Math.floor(ms / 86400e3), h = Math.floor((ms % 86400e3) / 3600e3); return j ? `encore ${j} jour${j > 1 ? 's' : ''}${h ? ` et ${h} h` : ''}` : `encore ${h} h`; };
@@ -1179,8 +1182,47 @@ async function discussions(session) {
       <p class="espace-sans-liens"><button type="button" class="btn btn-ink" data-disc-fin="couple">On est en couple 💞</button> <button type="button" class="btn btn-line" data-disc-fin="fini">C’est fini</button></p>
       ${f.son_couple ? `<p class="aide">${esc(d.avec)} a dit que vous êtes en couple.</p>` : ''}</div>`;
   };
+  // Jeux dans la bulle (24 nov. 2026) : une carte, les deux répondent, les réponses se dévoilent ensemble.
+  // Les animations ne jouent que pour ce qui vient d'arriver (le fil est redessiné toutes les 20 s).
+  const nouveau = (cle) => { if (vus.has(cle)) return false; vus.add(cle); return !premierRendu; };
+  const carteJeu = (d, m) => {
+    const j = m.jeu, ecrire = d.ouverte && !d.dematch;
+    const anim = nouveau(`${d.id}|c|${j.cle}`) ? ' is-nouvelle' : '';
+    const revele = j.ma_reponse != null && j.sa_reponse != null;
+    const animRev = revele && nouveau(`${d.id}|r|${j.cle}`) ? ' is-revelation' : '';
+    const meme = revele && j.ma_reponse.trim().toLowerCase() === j.sa_reponse.trim().toLowerCase();
+    let corps;
+    if (j.ma_reponse == null) {
+      corps = (j.a_repondu ? `<p class="jeu-attente"><span class="jeu-flou" aria-hidden="true">••••••</span> ${esc(d.avec)} a répondu : réponds pour découvrir sa réponse.</p>` : '')
+        + (!ecrire ? '' : j.choix
+          ? `<p class="jeu-choix">${j.choix.map((c) => `<button type="button" class="jeu-choix-btn" data-jeu-rep-choix="${esc(c)}" data-jeu-cle="${esc(j.cle)}">${esc(c)}</button>`).join('')}</p>`
+          : `<form class="jeu-repondre" data-jeu-rep="${esc(j.cle)}"><input name="texte" maxlength="300" required placeholder="Ta réponse…" aria-label="Ta réponse"><button class="btn btn-ink" type="submit">Répondre</button></form>`);
+    } else {
+      corps = `<div class="jeu-reponses${animRev}"><p class="jeu-rep is-moi"><small>Toi</small><span>${esc(j.ma_reponse)}</span></p>${j.sa_reponse != null
+        ? `<p class="jeu-rep"><small>${esc(d.avec)}</small><span>${esc(j.sa_reponse)}</span></p>`
+        : `<p class="jeu-rep is-attente"><small>${esc(d.avec)}</small><span>Ta réponse reste secrète jusqu’à la sienne…</span></p>`}</div>${meme ? '<p class="jeu-meme">Même réponse !</p>' : ''}`;
+    }
+    return `<div class="disc-jeu${m.moi ? ' is-moi' : ''}${anim}" data-jeu-carte="${esc(j.cle)}"><p class="jeu-nom"><svg class="ico" aria-hidden="true"><use href="/icones.svg#star"/></svg> ${esc(j.nom)}<small>${m.moi ? 'Tu as proposé' : `${esc(d.avec)} te propose`} · ${esc(heure(m.le))}</small></p><p class="jeu-question">${esc(j.carte)}</p>${corps}</div>`;
+  };
+  const bulle = (d, m, k) => m.jeu ? carteJeu(d, m) : `<p class="disc-msg ${m.moi ? 'is-moi' : ''}${m.par_lamia ? ' is-lamia' : m.lamia ? ' is-systeme' : ''}${nouveau(`${d.id}|m|${k}|${m.le}`) ? ' is-nouveau' : ''}"><span>${m.par_lamia ? '<b class="disc-lamia">Lamia</b>' : ''}${esc(m.texte)}</span><small>${esc(heure(m.le))}</small></p>`;
+  // Le bouton « Jeu » près de la saisie : on choisit un jeu, une carte est tirée, on l'envoie ou on en tire une autre.
+  const dejaJouees = (d) => new Set(d.messages.filter((m) => m.jeu).map((m) => m.jeu.cle));
+  const tirer = (d, jeu) => { const pris = dejaJouees(d); const libres = JEUX[jeu].cartes.map((_, i) => i).filter((i) => !pris.has(`${jeu}:${i}`) && i !== tirage?.i); const l = libres.length ? libres : JEUX[jeu].cartes.map((_, i) => i).filter((i) => !pris.has(`${jeu}:${i}`)); return l.length ? { d: d.id, jeu, i: l[Math.floor(Math.random() * l.length)] } : null; };
+  const panneauJeux = (d) => {
+    if (jeuOuvert !== d.id) return '';
+    const t = tirage?.d === d.id ? tirage : null;
+    return `<div class="jeu-panneau" data-jeu-panneau><p class="jeu-panneau-titre">Choisis un jeu <button type="button" class="link-button" data-jeu-fermer aria-label="Fermer les jeux">Fermer</button></p>
+      <div class="jeu-paquets">${Object.entries(JEUX).map(([k, j]) => `<button type="button" class="jeu-paquet${t?.jeu === k ? ' is-choisi' : ''}" data-jeu-paquet="${esc(k)}"><strong>${esc(j.nom)}</strong><small>${esc(j.sous)}</small></button>`).join('')}</div>
+      ${t ? `<div class="jeu-tirage is-nouvelle"><p class="jeu-nom">${esc(JEUX[t.jeu].nom)}</p><p class="jeu-question">${esc(texteCarte(t.jeu, t.i))}</p><p class="jeu-tirage-actions"><button type="button" class="btn btn-line" data-jeu-autre>Une autre carte</button> <button type="button" class="btn btn-ink" data-jeu-envoyer>Envoyer à ${esc(d.avec)}</button></p></div>` : ''}</div>`;
+  };
+  const premiersMots = (d) => {
+    if (!d.ouverte || d.dematch || d.messages.some((m) => m.moi)) return '';
+    const debut = Math.abs([...d.id].reduce((a, c) => a + c.charCodeAt(0), 0)) % PREMIERS_MOTS.length;
+    const trois = [0, 1, 2].map((k) => PREMIERS_MOTS[(debut + k * 2) % PREMIERS_MOTS.length]);
+    return `<div class="disc-premiers-mots"><small>Pour commencer, touche une phrase :</small>${trois.map((t) => `<button type="button" class="disc-premier-mot" data-premier-mot="${esc(t)}">${esc(t)}</button>`).join('')}</div>`;
+  };
   const vue = (d) => {
-    const msgs = d.messages.map((m) => `<p class="disc-msg ${m.moi ? 'is-moi' : ''}${m.par_lamia ? ' is-lamia' : m.lamia ? ' is-systeme' : ''}"><span>${m.par_lamia ? '<b class="disc-lamia">Lamia</b>' : ''}${esc(m.texte)}</span><small>${esc(heure(m.le))}</small></p>`).join('') || (d.ouverte ? `<p class="disc-vide">${salut ? `${esc(salut)}, dis` : 'Dis'} bonjour à ${esc(d.avec)}</p>` : '');
+    const msgs = d.messages.map((m, k) => bulle(d, m, k)).join('') || (d.ouverte ? `<p class="disc-vide">${salut ? `${esc(salut)}, dis` : 'Dis'} bonjour à ${esc(d.avec)}</p>` : '');
     const numeros = d.echange
       ? `<div class="disc-numeros is-ok"><svg class="ico" aria-hidden="true"><use href="/icones.svg#phone"/></svg> Vous avez échangé vos numéros. Celui de ${esc(d.avec)} : <a href="tel:${esc(d.son_numero)}"><strong>${esc(d.son_numero)}</strong></a></div>`
       : d.mon_numero
@@ -1200,7 +1242,8 @@ async function discussions(session) {
         ? `<strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#handshake"/></svg> Tu as mis fin à ce match.</strong> ${d.ouverte && d.dematch.restants ? `Il te reste <strong>${esc(d.dematch.restants)} message${d.dematch.restants > 1 ? 's' : ''}</strong> pour dire au revoir.` : d.ouverte ? 'Tu as utilisé tes messages d’au revoir.' : 'Cet échange est terminé.'}`
         : `<strong><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> ${esc(d.avec)} a mis fin à ce match.</strong> Raison : ${esc(d.dematch.raison)}. ${d.ouverte && d.dematch.restants ? `Tu peux répondre, il te reste ${esc(d.dematch.restants)} message${d.dematch.restants > 1 ? 's' : ''} pour dire au revoir.` : d.ouverte ? 'Tu as utilisé tes messages d’au revoir.' : 'Cet échange est terminé.'}`}
         ${d.ouverte ? `<small>La discussion se ferme le ${esc(new Date(d.dematch.fin).toLocaleString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }))}.</small>` : ''}</div>` : ''}
-      ${d.ouverte && (!d.dematch || d.dematch.restants) ? `<form class="disc-saisie" data-disc-envoi><textarea name="texte" rows="2" maxlength="1000" placeholder="Ton message…" required></textarea><button class="btn btn-ink" type="submit">Envoyer</button></form>
+      ${d.ouverte && !d.dematch ? `${premiersMots(d)}${panneauJeux(d)}` : ''}
+      ${d.ouverte && (!d.dematch || d.dematch.restants) ? `<form class="disc-saisie" data-disc-envoi>${d.dematch ? '' : `<button type="button" class="disc-jeu-btn${jeuOuvert === d.id ? ' is-actif' : ''}" data-jeu-ouvrir aria-expanded="${jeuOuvert === d.id}" aria-label="Proposer un jeu"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.6" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.6" fill="currentColor"/><circle cx="8.5" cy="15.5" r="1.6" fill="currentColor"/></svg><span>Jeu</span></button>`}<textarea name="texte" rows="2" maxlength="1000" placeholder="Ton message…" required></textarea><button class="btn btn-ink" type="submit">Envoyer</button></form>
       <p class="disc-aide">${d.dematch ? 'Ces derniers messages servent à vous dire au revoir. Les numéros, liens et emails restent masqués.' : 'Pour ta sécurité, les numéros, liens et emails écrits dans les messages sont masqués : utilise le bouton ci-dessous pour échanger vos numéros. Reste sur l’application tant que tu n’es pas sûr·e : ton numéro et tes réseaux restent protégés.'}</p>` : ''}
       ${d.ouverte && !d.dematch && !d.prenom?.partage ? (d.prenom?.demander
         ? `<div class="disc-prenom"><p><svg class="ico" aria-hidden="true"><use href="/icones.svg#hand"/></svg> <strong>Veux-tu partager ton prénom${d.prenom.mien ? ` (${esc(d.prenom.mien)})` : ''} avec ton match ?</strong> Rien ne presse : tu peux aussi le faire plus tard, après vos premiers échanges.</p><p><button type="button" class="btn btn-ink" data-disc-prenom="partager">Oui, partager</button> <button type="button" class="btn btn-line" data-disc-prenom="plus_tard">Plus tard</button></p></div>`
@@ -1248,6 +1291,7 @@ async function discussions(session) {
     const brouillons = Object.fromEntries([...box.querySelectorAll('[data-disc]')].map((a) => [a.dataset.disc, a.querySelector('textarea')?.value || '']));
     box.innerHTML = (photosRequises ? '<p class="disc-photos-requises"><strong>Ajoute tes 2 photos pour continuer.</strong> Sans photo validée, tu ne peux plus écrire dans tes discussions. <a class="text-link" href="#mon-profil">Modifier mon profil</a></p>' : '') + liste.filter((d) => d.ouverte || !d.vide).map(vue).join('');
     box.querySelectorAll('[data-disc]').forEach((a) => { const t = a.querySelector('textarea'); if (t && brouillons[a.dataset.disc]) t.value = brouillons[a.dataset.disc]; const f = a.querySelector('[data-disc-fil]'); f.scrollTop = f.scrollHeight; });
+    premierRendu = false;
   };
   const charger = async () => { try { const r = await appelProfil({ action: 'annonce_discussions' }, session); liste = r.discussions || []; photosRequises = Boolean(r.photos_requises); numeroBloque = r.numero_ok === false; parrainage = r.parrainage || null; if (document.documentElement.lang !== 'en') { salut = r.adresse || ''; e = r.accord ?? e; const h1 = $('[data-espace-nom]')?.closest('h1'); if (salut && h1) h1.textContent = salut; } afficher(); } catch { /* */ } };
   { const h = location.hash.match(/^#dematcher-(.+)$/); if (h) dematchOuvert = decodeURIComponent(h[1]); }
@@ -1262,8 +1306,14 @@ async function discussions(session) {
   ecouter(box, 'submit', async (e) => {
     e.preventDefault();
     const a = e.target.closest('[data-disc]'), id = a?.dataset.disc;
-    const bouton = e.target.querySelector('button'); bouton.disabled = true;
+    const bouton = e.target.querySelector('button[type="submit"]') || e.target.querySelector('button'); bouton.disabled = true;
     try {
+      if (e.target.matches('[data-jeu-rep]')) {
+        const [jeu, i] = e.target.dataset.jeuRep.split(':');
+        await appelProfil({ action: 'annonce_discussion_jeu_rep', id, jeu, i: Number(i), texte: e.target.texte.value.trim() }, session);
+        await charger();
+        return;
+      }
       if (e.target.matches('[data-disc-dematch-form]')) {
         await appelProfil({ action: 'annonce_discussion_dematcher', id, raison: e.target.raison.value, etape: e.target.etape?.value }, session);
         dematchOuvert = null;
@@ -1284,10 +1334,43 @@ async function discussions(session) {
       }
       await charger();
     } catch (err) {
-      alert(err.code === 'telephone_invalide' ? 'Ce numéro ne semble pas valide. Exemple : 06 12 34 56 78 ou +213 5 12 34 56 78.' : err.code === 'au_revoir_fini' ? 'Tu as écrit tes deux messages d’au revoir.' : err.code === 'raison_requise' ? 'Choisis une raison.' : err.code === 'discussion_fermee' ? 'Cette discussion est terminée.' : err.code === 'photos_requises' ? 'Ajoute tes 2 photos (dans « Modifier mon profil ») pour continuer la discussion.' : err.code === 'numero_formule' ? 'L’échange de numéros est inclus dans Passion et Prestige.' : err.code === 'rate_limited' ? 'Doucement Réessaie dans quelques minutes.' : 'Le message n’est pas parti. Réessaie.');
+      alert(err.code === 'telephone_invalide' ? 'Ce numéro ne semble pas valide. Exemple : 06 12 34 56 78 ou +213 5 12 34 56 78.' : err.code === 'au_revoir_fini' ? 'Tu as écrit tes deux messages d’au revoir.' : err.code === 'raison_requise' ? 'Choisis une raison.' : err.code === 'discussion_fermee' ? 'Cette discussion est terminée.' : err.code === 'photos_requises' ? 'Ajoute tes 2 photos (dans « Modifier mon profil ») pour continuer la discussion.' : err.code === 'numero_formule' ? 'L’échange de numéros est inclus dans Passion et Prestige.' : err.code === 'rate_limited' ? 'Doucement Réessaie dans quelques minutes.' : err.code === 'deja_repondu' ? 'Tu as déjà répondu à cette carte.' : 'Le message n’est pas parti. Réessaie.');
     }
     bouton.disabled = false;
   });
+  // Jeux et premiers mots.
+  ecouter(box, 'click', async (ev) => {
+    const art = ev.target.closest('[data-disc]'); if (!art) return;
+    const id = art.dataset.disc, d = liste.find((x) => x.id === id); if (!d) return;
+    const mot = ev.target.closest('[data-premier-mot]');
+    if (mot) { const t = art.querySelector('[data-disc-envoi] textarea'); if (t) { t.value = mot.dataset.premierMot; t.focus(); } return; }
+    if (ev.target.closest('[data-jeu-ouvrir]')) { jeuOuvert = jeuOuvert === id ? null : id; tirage = null; afficher(); box.querySelector(`[data-disc="${CSS.escape(id)}"] [data-jeu-panneau]`)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); return; }
+    if (ev.target.closest('[data-jeu-fermer]')) { jeuOuvert = null; tirage = null; afficher(); return; }
+    const paquet = ev.target.closest('[data-jeu-paquet]');
+    if (paquet || ev.target.closest('[data-jeu-autre]')) {
+      const jeu = paquet ? paquet.dataset.jeuPaquet : tirage?.jeu;
+      const t = jeu ? tirer(d, jeu) : null;
+      if (!t) { alert('Vous avez joué toutes les cartes de ce jeu : choisis-en un autre.'); return; }
+      tirage = t; afficher(); return;
+    }
+    const choix = ev.target.closest('[data-jeu-rep-choix]');
+    const envoyer = ev.target.closest('[data-jeu-envoyer]');
+    if (!choix && !envoyer) return;
+    const bouton = choix || envoyer; bouton.disabled = true;
+    try {
+      if (envoyer && tirage?.d === id) {
+        await appelProfil({ action: 'annonce_discussion_jeu', id, jeu: tirage.jeu, i: tirage.i }, session);
+        jeuOuvert = null; tirage = null;
+      } else if (choix) {
+        const [jeu, i] = choix.dataset.jeuCle.split(':');
+        await appelProfil({ action: 'annonce_discussion_jeu_rep', id, jeu, i: Number(i), texte: choix.dataset.jeuRepChoix }, session);
+      }
+      await charger();
+    } catch (err) {
+      bouton.disabled = false;
+      alert(err.code === 'deja_jouee' ? 'Cette carte a déjà été jouée : tire une autre carte.' : err.code === 'deja_repondu' ? 'Tu as déjà répondu à cette carte.' : err.code === 'photos_requises' ? 'Ajoute tes 2 photos (dans « Modifier mon profil ») pour jouer.' : err.code === 'discussion_fermee' ? 'Cette discussion est terminée.' : 'Ça n’a pas fonctionné. Réessaie.');
+    }
+  }, 'click-jeux');
   ecouter(box, 'click', async (e) => {
     const b = e.target.closest('[data-inviter]');
     if (!b) return;

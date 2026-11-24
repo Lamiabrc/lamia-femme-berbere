@@ -4978,3 +4978,77 @@ body:has(.espace) .site-header .maison-menu-panneau, body:has(.swipe-page) .site
 body:has(.espace) .site-header .maison-menu-panneau a, body:has(.espace) .site-header .maison-menu-panneau strong, body:has(.swipe-page) .site-header .maison-menu-panneau a, body:has(.swipe-page) .site-header .maison-menu-panneau strong { color: var(--encre) !important; }
 
 .photo-illisible { display: block; width: 180px; padding: 10px; border: 1px dashed #c9a58f; border-radius: 14px; background: #fff7f0; font-size: 14px; line-height: 1.35; }
+
+/* Jeux dans la bulle de chat (24 nov. 2026) : carte qui se retourne, réponses dévoilées ensemble */
+.disc-msg.is-nouveau { animation: disc-arrivee .32s cubic-bezier(.2,1.3,.4,1); }
+@keyframes disc-arrivee { from { opacity: 0; transform: translateY(10px) scale(.96); } }
+.disc-jeu { align-self: center; width: min(100%, 340px); margin: 6px 0; padding: 14px 14px 12px; border-radius: 18px; background: linear-gradient(160deg, #fffaf3, #f8ecdf); border: 2px solid #bc9149; box-shadow: 0 10px 24px -16px rgba(58, 30, 20, .55); color: #392b34; text-align: center; }
+.disc-jeu.is-nouvelle, .jeu-tirage.is-nouvelle { animation: jeu-retourne .6s cubic-bezier(.3,1.2,.4,1); transform-origin: 50% 50%; }
+@keyframes jeu-retourne { 0% { opacity: 0; transform: perspective(700px) rotateY(-90deg) scale(.9); } 60% { opacity: 1; transform: perspective(700px) rotateY(10deg); } 100% { transform: perspective(700px) rotateY(0); } }
+.jeu-nom { margin: 0 0 6px; font-weight: 800; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; color: #7a1f35; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.jeu-nom .ico { width: 16px; height: 16px; color: #bc9149; }
+.jeu-nom small { font-weight: 500; text-transform: none; letter-spacing: 0; color: #74616a; font-size: 12px; }
+.jeu-question { margin: 0 0 10px; font-size: 1.05rem; font-weight: 700; line-height: 1.35; color: #392b34; }
+.jeu-choix { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 0; }
+.jeu-choix-btn { min-height: 44px; padding: 8px 16px; border-radius: 999px; border: 2px solid #7a1f35; background: #fff; color: #7a1f35; font: 700 15px inherit; font-family: inherit; cursor: pointer; transition: transform .15s ease, background .15s ease, color .15s ease; }
+.jeu-choix-btn:hover, .jeu-choix-btn:focus-visible { background: #7a1f35; color: #fff; }
+.jeu-choix-btn:active { transform: scale(.94); }
+.jeu-repondre { display: flex; gap: 6px; }
+.jeu-repondre input { flex: 1; min-width: 0; min-height: 44px; border-radius: 12px; border: 1px solid #e0cdb5; padding: 8px 10px; font: inherit; font-size: 16px; }
+.jeu-attente { margin: 0 0 8px; font-size: 14px; color: #74616a; }
+.jeu-flou { display: inline-block; padding: 2px 8px; border-radius: 8px; background: #ead9c8; color: transparent; text-shadow: 0 0 6px rgba(122, 31, 53, .55); letter-spacing: .1em; }
+.jeu-reponses { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.jeu-rep { margin: 0; display: grid; gap: 2px; padding: 8px; border-radius: 12px; background: #fff; border: 1px solid #ead9c8; }
+.jeu-rep small { font-size: 12px; color: #74616a; }
+.jeu-rep span { font-weight: 700; overflow-wrap: anywhere; }
+.jeu-rep.is-moi { background: #f5e9e5; }
+.jeu-rep.is-attente span { font-weight: 500; font-style: italic; color: #74616a; font-size: 14px; }
+.jeu-reponses.is-revelation .jeu-rep { animation: jeu-revele .55s cubic-bezier(.2,1.4,.4,1) both; }
+.jeu-reponses.is-revelation .jeu-rep + .jeu-rep { animation-delay: .12s; }
+@keyframes jeu-revele { from { opacity: 0; transform: scale(.6) rotate(-4deg); filter: blur(6px); } }
+.jeu-meme { margin: 8px 0 0; font-weight: 800; color: #164f3d; animation: jeu-revele .5s .25s cubic-bezier(.2,1.4,.4,1) both; }
+.disc-saisie .disc-jeu-btn { flex: none; display: grid; place-items: center; gap: 0; width: 52px; min-height: 46px; padding: 4px; border-radius: 14px; border: 2px solid #bc9149; background: #fffaf3; color: #7a1f35; cursor: pointer; font: 700 11px inherit; font-family: inherit; }
+.disc-jeu-btn svg { width: 22px; height: 22px; }
+.disc-jeu-btn.is-actif { background: #7a1f35; color: #fff; border-color: #7a1f35; }
+.disc-jeu-btn:not(.is-actif) svg { animation: jeu-de 3.2s ease-in-out 1s 2; }
+@keyframes jeu-de { 0%, 80%, 100% { transform: rotate(0); } 85% { transform: rotate(-18deg); } 90% { transform: rotate(14deg); } 95% { transform: rotate(-6deg); } }
+.jeu-panneau { margin: 8px 0; padding: 12px; border-radius: 16px; background: #fffaf3; border: 1px solid #e5d7cd; animation: disc-arrivee .25s ease; }
+.jeu-panneau-titre { display: flex; justify-content: space-between; align-items: center; margin: 0 0 8px; font-weight: 800; color: #392b34; }
+.jeu-paquets { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.jeu-paquet { display: grid; gap: 2px; min-height: 56px; padding: 10px; border-radius: 14px; border: 1px solid #e5d7cd; background: #fff; color: #392b34; text-align: left; cursor: pointer; font: inherit; transition: transform .15s ease, border-color .15s ease; }
+.jeu-paquet small { color: #74616a; font-size: 12px; }
+.jeu-paquet:hover { transform: translateY(-2px); border-color: #bc9149; }
+.jeu-paquet.is-choisi { border: 2px solid #7a1f35; background: #f5e9e5; }
+.jeu-tirage { margin-top: 10px; padding: 14px; border-radius: 16px; border: 2px dashed #bc9149; background: #fff; text-align: center; }
+.jeu-tirage-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 0; }
+.disc-premiers-mots { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 8px 0; }
+.disc-premiers-mots small { width: 100%; color: #74616a; }
+.disc-premier-mot { min-height: 40px; padding: 6px 12px; border-radius: 999px; border: 1px solid #bc9149; background: #fffaf3; color: #392b34; font: inherit; font-size: 14px; cursor: pointer; text-align: left; }
+.disc-premier-mot:hover { background: #f5e9e5; }
+
+/* Swipe vivant (24 nov. 2026) : cœur qui s'épanouit sur la carte, croix douce, « Vous vous êtes choisis » */
+.swipe-eclat { line-height: 0; }
+.swipe-eclat svg { width: 1em; height: 1em; display: block; }
+.swipe-sceau { position: absolute; left: 50%; top: 42%; z-index: 5; pointer-events: none; transform: translate(-50%, -50%); }
+.swipe-sceau svg { width: 140px; height: 140px; display: block; filter: drop-shadow(0 10px 18px rgba(122, 31, 53, .35)); }
+.swipe-sceau.is-oui { color: #c0392b; animation: sceau-oui .75s cubic-bezier(.2,1.4,.4,1) forwards; }
+.swipe-sceau.is-non { color: #74616a; animation: sceau-non .5s ease forwards; }
+.swipe-sceau.is-non svg { width: 96px; height: 96px; }
+@keyframes sceau-oui { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.2); } 45% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); } 70% { transform: translate(-50%, -50%) scale(.95); } 100% { opacity: 0; transform: translate(-50%, -60%) scale(1.25); } }
+@keyframes sceau-non { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.6) rotate(-20deg); } 40% { opacity: .9; transform: translate(-50%, -50%) scale(1) rotate(0); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(.9); } }
+.swipe-choisis { position: relative; height: 96px; margin: 0 auto 4px; width: 200px; }
+.swipe-choisis .c { position: absolute; top: 14px; width: 68px; height: 68px; }
+.swipe-choisis .c svg { width: 100%; height: 100%; display: block; }
+.swipe-choisis .c.g { left: 0; color: #7a1f35; animation: choisis-g .9s cubic-bezier(.3,1.3,.4,1) forwards; }
+.swipe-choisis .c.d { right: 0; color: #bc9149; animation: choisis-d .9s cubic-bezier(.3,1.3,.4,1) forwards; }
+@keyframes choisis-g { 0% { transform: translateX(-40px) rotate(-25deg); opacity: 0; } 100% { transform: translateX(44px) rotate(-12deg); opacity: 1; } }
+@keyframes choisis-d { 0% { transform: translateX(40px) rotate(25deg); opacity: 0; } 100% { transform: translateX(-44px) rotate(12deg); opacity: 1; } }
+.swipe-choisis .etincelle { position: absolute; left: 50%; top: 46px; width: 10px; height: 10px; margin: -5px; border-radius: 2px; background: #bc9149; opacity: 0; transform: rotate(45deg); animation: etincelle .9s .75s ease-out forwards; }
+@keyframes etincelle { 0% { opacity: 0; transform: rotate(45deg) translate(0, 0) scale(.4); } 30% { opacity: 1; } 100% { opacity: 0; transform: rotate(45deg) translate(var(--x), var(--y)) scale(1); } }
+.swipe-choisis-titre { color: #7a1f35 !important; }
+@media (prefers-reduced-motion: reduce) {
+  .disc-jeu, .jeu-tirage, .jeu-reponses .jeu-rep, .jeu-meme, .disc-msg.is-nouveau, .disc-jeu-btn svg { animation: none !important; }
+  .swipe-sceau { display: none; }
+  .swipe-choisis .c.g { transform: translateX(44px) rotate(-12deg); opacity: 1; }
+  .swipe-choisis .c.d { transform: translateX(-44px) rotate(12deg); opacity: 1; }
+}
