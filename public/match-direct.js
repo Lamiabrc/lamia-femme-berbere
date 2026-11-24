@@ -94,7 +94,7 @@ export function monterMatchDirect({ appel, voirProfil }) {
   });
 
   async function ouvrir(ref) {
-    if (!charge) {
+    {
       try {
         const d = await appel({ action: 'match_direct_liste' }); profils = d.profils; charge = true;
         remplir($('[data-md-pays]'), uniques('pays')); remplir($('[data-md-religion]'), uniques('religion'));
