@@ -201,6 +201,14 @@ function peindrePhotosAValider(profils) {
       <div class="photos-valider-vues">${p.photos.map((f) => (/hei[cf]/i.test(f.mime || '') ? photoNonAffichable(f.url) : `<a href="${esc(f.url)}" target="_blank" rel="noopener"><img src="${esc(f.url)}" alt="Photo ${esc(f.position)} du profil n° ${esc(p.ref)}" loading="lazy" data-photo-casse="${esc(f.url)}"></a>`)).join('')}</div>
       <div class="photos-valider-actions"><button class="btn btn-ink" type="button" data-photos-ok="${esc(p.ref)}">Photos OK</button><a class="btn btn-line" href="#profil-${esc(p.ref)}">À corriger</a></div><p role="status" data-photos-valider-statut></p></li>`).join('')}</ul>`;
 }
+// Photos validées depuis une fiche : la carte « Photos à valider » et la liste des membres se mettent à jour tout de suite.
+function retirerPhotosAValider(ref) {
+  document.querySelector(`[data-photos-valider="${ref}"]`)?.remove();
+  const reste = document.querySelectorAll('[data-photos-valider]').length, box = $('[data-carte-photos]');
+  if (box && !reste) { box.hidden = true; box.innerHTML = ''; } else if (box) box.querySelector('h2').textContent = `Photos à valider (${reste})`;
+  comptes = null;
+  chargerComptes().catch(() => {});
+}
 document.addEventListener('click', async (e) => {
   const b = e.target.closest('[data-photos-ok]');
   if (!b || b.disabled) return;
@@ -208,9 +216,7 @@ document.addEventListener('click', async (e) => {
   b.disabled = true; st.textContent = 'Validation…';
   try {
     await conf({ action: 'annonce_photos_valider', ref: Number(b.dataset.photosOk) });
-    li.remove(); comptes = null;
-    const reste = document.querySelectorAll('[data-photos-valider]').length, box = $('[data-carte-photos]');
-    if (!reste) { box.hidden = true; box.innerHTML = ''; } else box.querySelector('h2').textContent = `Photos à valider (${reste})`;
+    retirerPhotosAValider(b.dataset.photosOk);
   } catch { st.textContent = 'Pas validé. Réessaie.'; b.disabled = false; }
 });
 function peindreCarte(f) {
@@ -1286,7 +1292,7 @@ $('[data-comptes-filtres]').addEventListener('click', (e) => {
 });
 $('[data-comptes-maj]').addEventListener('click', chargerComptes);
 $('[data-compte-fermer]').addEventListener('click', fermerCompte);
-monterModerationPhotos({ appel: conf, apres: (ref) => chargerDetail({ ref }), cle: 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc' });
+monterModerationPhotos({ appel: conf, apres: (ref) => { retirerPhotosAValider(ref); return chargerDetail({ ref }); }, cle: 'sb_publishable_hhPNMz5NsJJQW5OVEXG19A_ApmOIAzc' });
 document.addEventListener('click', (e) => {
   const b = e.target.closest('[data-compte-suiv], [data-compte-prec]');
   if (!b) return;
