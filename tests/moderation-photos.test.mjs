@@ -37,10 +37,11 @@ test('refus des photos d’autrui, de la pièce d’identité et des chemins cor
   await b.db.query('update annonce_files set storage_path=$1 where id=$2',[`${b.id}/../identite.jpg`,b.p1]);
   assert.equal((await b.envoyer(b.commande())).status,400);assert.equal((await b.a()).photos_moderation,null);assert.equal(b.objets.size,4);
 });
-test('commentaire et sélection obligatoires au premier contrôle',async(t)=>{
+test('sélection obligatoire ; sans commentaire, un message automatique est utilisé',async(t)=>{
   const b=await recette(t);
   assert.equal((await b.envoyer(b.commande({photos:[]}))).error,'selection_requise');
-  assert.equal((await b.envoyer(b.commande({commentaire:' ',photos:[{id:b.p1}]}))).error,'commentaire_requis');
+  const r=await b.envoyer(b.commande({commentaire:' ',photos:[{id:b.p1}]}));assert.ok(r.ok);
+  const m=(await b.a()).photos_moderation;assert.match(m.commentaire,/pas acceptée/);assert.match(m.photos[0].commentaire,/visage visible/);
 });
 test('double clic concurrent et réponse perdue : un seul avertissement, aucun passage automatique à la suspension',async(t)=>{
   const b=await recette(t),c=b.commande();const r=await Promise.all([b.envoyer(c),b.envoyer(c)]);assert.ok(r.some((x)=>x.ok));

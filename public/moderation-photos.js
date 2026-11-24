@@ -6,20 +6,17 @@ export function stylePhotos() {
 export function rendreModerationPhotos(a) {
   const m = a.photos_moderation, photos = (a.medias || []).filter((p) => p.kind === 'photo');
   const active = ['avertissement','suspendu'].includes(m?.etat);
-  return `<form class="photos-controle" data-photo-controle="${esc(a.ref)}" data-revision="${esc(m?.revision || '')}">
-    <h5>Photos du profil</h5><p>Fais glisser les photos, puis coche celle ou celles qui sont à corriger.</p>
+  return `<form class="photos-controle" data-photo-controle="${esc(a.ref)}" data-revision="${esc(m?.revision || '')}" data-actif="${active ? 1 : 0}">
+    <h5>Photos du profil</h5><p>Fais glisser les photos : pour chacune, « Acceptée » ou « Refusée ». Le profil reste actif pendant que la personne remplace.</p>
     <div class="photos-glisseur" tabindex="0" aria-label="Photos privées du profil n° ${esc(a.ref)}">${photos.map((p) => `<fieldset class="photo-controle" data-photo-id="${esc(p.id)}">
       <legend>Photo ${esc(p.position)}</legend><a href="${esc(p.url)}" target="_blank" rel="noopener"><img src="${esc(p.url)}" alt="Photo ${esc(p.position)} du profil n° ${esc(a.ref)}" loading="lazy"></a>
-      <label><input type="checkbox" data-photo-selection> À corriger</label>
-      <label>Commentaire sur cette photo<textarea data-photo-note maxlength="600" rows="2"></textarea></label>
-      <label><input type="checkbox" data-photo-supprimer> Supprimer cette photo</label>
+      <div class="photo-choix"><label><input type="radio" name="choix-${esc(p.id)}" value="ok" checked> ✓ Acceptée</label><label><input type="radio" name="choix-${esc(p.id)}" value="non" data-photo-selection> ✗ Refusée</label></div>
     </fieldset>`).join('') || '<p>Aucune photo disponible sur le site.</p>'}</div>
     ${photos.length > 1 ? '<p class="photos-navigation"><button type="button" class="btn btn-line" data-photo-direction="-1">Photo précédente</button><button type="button" class="btn btn-line" data-photo-direction="1">Photo suivante</button></p>' : ''}
     ${active ? `<div class="photos-avis"><strong>${m.etat === 'suspendu' ? 'Profil masqué (suspension partielle)' : 'Avertissement envoyé · aucune suspension'}</strong><p>${esc(m.commentaire)}</p><ul>${(m.photos || []).map((p) => `<li>Photo ${esc(p.position)} : ${esc(p.commentaire || 'à remplacer')}${p.retiree ? ' · retirée' : ''}</li>`).join('')}</ul><p>Le remplacement des photos signalées et la réception de deux photos lèvent automatiquement cette restriction.</p></div>` : ''}
     ${m?.etat === 'corrige' ? '<p class="photos-avis">Les photos signalées ont été remplacées. Tu peux les vérifier à nouveau.</p>' : ''}
-    <label>Ton commentaire sur l’ensemble des photos<textarea data-photo-commentaire maxlength="600" rows="3" placeholder="Explique ce qui doit être corrigé…"></textarea></label>
-    <p class="aide">Si tu demandes une correction, le profil reste actif et la personne a 24 h pour remplacer. Passé ce délai, son profil est masqué automatiquement jusqu’au remplacement.</p>
-    <div class="photos-actions">${m?.etat === 'valide' ? `<p class="photos-avis">✓ Photos validées${m.valide_at ? ` le ${new Date(m.valide_at).toLocaleDateString('fr-FR')}` : ''}.</p>` : !active && !a.photos_refusees_at ? '<button class="btn btn-ink" type="button" data-photo-ok>Photos OK</button>' : ''}${!a.photos_refusees_at || active ? `<button class="btn btn-ink" type="submit" value="avertir">${m?.etat === 'suspendu' ? 'Envoyer le commentaire' : 'Envoyer la demande de correction'}</button>` : ''}
+    <p class="aide">Si tu refuses une photo, la personne reçoit un message automatique et a 24 h pour la remplacer. Passé ce délai, son profil est masqué jusqu’au remplacement.</p>
+    <div class="photos-actions">${m?.etat === 'valide' ? `<p class="photos-avis">✓ Photos validées${m.valide_at ? ` le ${new Date(m.valide_at).toLocaleDateString('fr-FR')}` : ''}. Pour en refuser une, marque-la « Refusée » puis envoie.</p>` : ''}${!a.photos_refusees_at || active ? '<button class="btn btn-ink" type="submit" value="avertir">Envoyer</button>' : ''}
     ${m?.etat === 'avertissement' ? '<button class="btn btn-line" type="submit" value="suspendre">Suspendre maintenant, sans attendre les 24 h</button>' : ''}${!a.photos_refusees_at && m?.etat !== 'avertissement' ? '<button class="btn btn-line" type="submit" value="immediat">Photo choquante : suspendre tout de suite</button>' : ''}</div>
     ${a.photos_refusees_at && !active ? '<p>Ancien refus de photos : le déblocage reste automatique après réception de nouvelles photos.</p>' : ''}
     <p role="status" data-photo-statut></p>
@@ -105,12 +102,19 @@ function monterControlePhotos({ appel, apres, racine = document }) {
     let b = tentatives.get(f);
     if (!b) {
       const cartes = [...f.querySelectorAll('[data-photo-id]')];
-      if (cartes.some((c) => c.querySelector('[data-photo-supprimer]').checked && !c.querySelector('[data-photo-selection]').checked)) { st.textContent = 'Coche aussi « À corriger » pour chaque photo à supprimer.'; return; }
-      b = {action:'annonce_photos_moderer',ref:Number(f.dataset.photoControle),revision:f.dataset.revision || null,requete_id:crypto.randomUUID(),operation:e.submitter?.value === 'immediat' ? 'suspendre' : e.submitter?.value || 'avertir',immediat:e.submitter?.value === 'immediat',commentaire:f.querySelector('[data-photo-commentaire]').value,
-        photos:cartes.filter((c) => c.querySelector('[data-photo-selection]').checked).map((c) => ({id:c.dataset.photoId,commentaire:c.querySelector('[data-photo-note]').value,supprimer:c.querySelector('[data-photo-supprimer]').checked}))};
-      if (!b.commentaire.trim() && !b.photos.some((p) => p.commentaire.trim())) { st.textContent = 'Ajoute un commentaire pour expliquer la correction attendue.'; return; }
-      if (!b.photos.length && !f.dataset.revision) { st.textContent = 'Choisis au moins une photo à corriger.'; return; }
-      if ((b.photos.some((p) => p.supprimer) || b.operation === 'suspendre') && !confirm(b.operation === 'suspendre' ? 'Confirmer la suspension après ce second contrôle ? Le remplacement des photos signalées débloquera automatiquement les rencontres.' : 'Supprimer définitivement uniquement les photos cochées ? Le profil restera actif et recevra ta demande de correction.')) return;
+      const refusees = cartes.filter((c) => c.querySelector('[data-photo-selection]').checked);
+      // Tout est accepté : c'est une validation (la carte « Photos à valider » disparaît).
+      if (!refusees.length && e.submitter?.value === 'avertir' && f.dataset.actif !== '1') {
+        f.dataset.occupe = '1'; f.querySelectorAll('button').forEach((x) => { x.disabled = true; }); st.textContent = 'Validation…';
+        try { await appel({ action: 'annonce_photos_valider', ref: Number(f.dataset.photoControle) }); st.textContent = '✓ Photos validées.'; await apres(Number(f.dataset.photoControle)); }
+        catch { st.textContent = 'Pas validé. Réessaie.'; }
+        finally { delete f.dataset.occupe; f.querySelectorAll('button').forEach((x) => { x.disabled = false; }); }
+        return;
+      }
+      b = {action:'annonce_photos_moderer',ref:Number(f.dataset.photoControle),revision:f.dataset.revision || null,requete_id:crypto.randomUUID(),operation:e.submitter?.value === 'immediat' ? 'suspendre' : e.submitter?.value || 'avertir',immediat:e.submitter?.value === 'immediat',commentaire:'',
+        photos:refusees.map((c) => ({id:c.dataset.photoId,commentaire:'',supprimer:false}))};
+      if (!b.photos.length && b.operation === 'avertir') { st.textContent = 'Marque au moins une photo « Refusée ».'; return; }
+      if (b.operation === 'suspendre' && !confirm('Confirmer la suspension ? Le remplacement des photos refusées débloquera automatiquement les rencontres.')) return;
       tentatives.set(f, b);
     }
     f.dataset.occupe = '1'; f.querySelectorAll('button').forEach((x) => { x.disabled = true; }); st.textContent = 'Enregistrement du contrôle…';
