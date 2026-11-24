@@ -11,3 +11,9 @@
 .photos-avis li{margin:.6rem 0}.photos-avis ul{padding-left:1.3rem}.photos-avis .link-button{display:block;min-height:44px;color:#851632;text-align:left}
 .photos-glisseur:focus-visible,.photos-controle :focus-visible{outline:3px solid #9b6b45;outline-offset:3px}
 @media(max-width:480px){.photos-controle{padding:.8rem}.photos-actions button{width:100%}.photo-controle img{height:230px}}
+
+/* Acceptée / Refusée : deux gros boutons par photo, faciles à toucher sur téléphone. */
+.photo-choix { display: flex; gap: 8px; margin: 8px 0; }
+.photo-choix label { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; border: 2px solid #cfc4b2; border-radius: 12px; font-weight: 600; cursor: pointer; }
+.photo-choix label:has(input:checked) { border-color: #2e7d4f; background: #e6f4ea; }
+.photo-choix label:has(input[value="non"]:checked) { border-color: #b3261e; background: #fbe9e7; }
