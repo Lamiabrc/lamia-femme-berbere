@@ -107,3 +107,16 @@ test('fiche : pseudo, lien réseau privé et matching complet alimentent le mote
   assert.equal(sans.prenom, 'Fiche 5201');
   assert.ok(sans.contactAutre);
 });
+
+import { choixPropres as choixTest, versOutil as versTest } from '../content/matching-options.mjs';
+test('exigences absolues et refus comme dans l’outil : gardés, nettoyés, transmis au moteur', async () => {
+  const c = choixTest({ hardPreferences: ['age', 'location', 'inconnu'], refuseDivorce: true, accepteVeuf: true, refuseVeuf: true, religionsAcceptees: ['Islam', 'zzz'] });
+  assert.deepEqual(c.hardPreferences, ['age', 'location']);
+  assert.equal(c.refuseDivorce, true);
+  assert.equal(c.refuseVeuf, false); // accepte et refuse ensemble : « accepte » l'emporte
+  assert.deepEqual(c.religionsAcceptees, ['Islam']);
+  const v = versTest({ ref: 1, matching: c, medias: [] });
+  assert.deepEqual(v.hardPreferences, ['age', 'location']);
+  const p = await profilDepuisFiche({ ref: 5300, genre: 'femme', age: 30, pays: 'France', matching: { hardPreferences: ['age'] } });
+  assert.deepEqual(p.hardPreferences, ['age']);
+});

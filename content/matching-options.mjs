@@ -128,6 +128,17 @@ export function choixPropres(m = {}) {
     hygieneVieRecherche: [un(m.fumeurRecherche, O.fumeur), un(m.sportRecherche, O.sport), un(m.alcoolRecherche, O.alcool), un(m.chemmaRecherche, O.chemma)].filter(Boolean),
     fumeurRecherche: un(m.fumeurRecherche, O.fumeur), sportRecherche: un(m.sportRecherche, O.sport), alcoolRecherche: un(m.alcoolRecherche, O.alcool), chemmaRecherche: un(m.chemmaRecherche, O.chemma),
     contactReseau: txt(m.contactReseau, 200),
+    // Comme dans l'outil : exigences absolues, précisions, refus.
+    hardPreferences: plusieurs(m.hardPreferences, ['age', 'location', 'origin', 'height', 'money'], 5),
+    refuseDivorce: m.refuseDivorce === true && m.accepteDivorce !== true,
+    refuseVeuf: m.refuseVeuf === true && m.accepteVeuf !== true,
+    accepteUnEnfant: m.accepteUnEnfant === true,
+    fermeDifferencePratique: un(m.fermeDifferencePratique, ['Oui', 'Non']),
+    religionsAcceptees: plusieurs(m.religionsAcceptees, O.religion, 6),
+    paysRechercheDetail: txt(m.paysRechercheDetail, 80),
+    regionRechercheDetail: txt(m.regionRechercheDetail, 80),
+    religionAutre: txt(m.religionAutre, 80),
+    religionRechercheAutre: txt(m.religionRechercheAutre, 80),
   };
 }
 
@@ -196,6 +207,16 @@ export function versOutil(a, { photoDataUrl = '', aujourdHui = new Date() } = {}
     accepteVeuf: Boolean(m.accepteVeuf),
     accepteEnfants: Boolean(m.accepteEnfants),
     kabyleUniquement: Boolean(m.kabyleUniquement),
+    hardPreferences: m.hardPreferences || [],
+    refuseDivorce: Boolean(m.refuseDivorce),
+    refuseVeuf: Boolean(m.refuseVeuf),
+    accepteUnEnfant: Boolean(m.accepteUnEnfant),
+    fermeDifferencePratique: m.fermeDifferencePratique || '',
+    religionsAcceptees: m.religionsAcceptees || [],
+    paysRechercheDetail: m.paysRechercheDetail || '',
+    regionRechercheDetail: m.regionRechercheDetail || '',
+    religionAutre: m.religionAutre || '',
+    religionRechercheAutre: m.religionRechercheAutre || '',
     autresInfos: a.profil || '',
     criteresRechercheAutre: a.recherche || '',
     // Profil validé par Lamia sur le site = vérifié ; la pièce d'identité (facultative) est notée à part.
