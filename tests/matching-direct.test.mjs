@@ -68,3 +68,21 @@ test('un fumeur est bloqué si la personne veut un non-fumeur (mode de vie reche
   const r = await compatiblesDe(elle, [elle, lui]);
   assert.equal(r.compatibles.length, 0);
 });
+
+test('Match en direct : ni la vérification de l’outil, ni « n’importe où », ni les places pleines ne bloquent', async () => {
+  const lui = await profilDepuisAnnonce(annonce(30, 'homme', 38, 'Paris', { en_match: true, matching: { religion: 'Islam', zoneGeo: "N'importe ou", origineTags: ['Kabyle (Algerie)'] } }));
+  const fiche = await profilDepuisFiche({ ref: 5400, genre: 'femme', age: 33, ville: 'Lyon', pays: 'France', secteur: 'France', religion: 'Islam', origine: ['Kabyle (Algerie)'], age_min: 30, age_max: 45 });
+  assert.equal(lui.statut, 'Nouveau');
+  assert.equal(lui.placesPleines, true);
+  const r = await compatiblesDe(lui, [lui, fiche]);
+  assert.equal(r.compatibles.length, 1);
+  assert.equal(r.compatibles[0].ref, 5400);
+});
+
+test('une femme qui veut vivre en France n’est pas compatible avec un homme au Canada, mais il reste « à un critère près »', async () => {
+  const lui = await profilDepuisAnnonce(annonce(31, 'homme', 38, 'Windsor', { pays: 'Canada', matching: { religion: 'Islam', zoneGeo: "N'importe ou" } }));
+  const fiche = await profilDepuisFiche({ ref: 5401, genre: 'femme', age: 33, ville: 'Lyon', pays: 'France', secteur: 'France', religion: 'Islam', age_min: 30, age_max: 45 });
+  const r = await compatiblesDe(lui, [lui, fiche]);
+  assert.equal(r.compatibles.length, 0);
+  assert.equal(r.unCritere.length, 1);
+});
