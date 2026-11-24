@@ -573,3 +573,6 @@
 .cp .cp-cases{display:flex;flex-wrap:wrap;gap:6px 14px}.cp .cp-cases label{display:flex;gap:6px;align-items:center;font-weight:400}
 .fiche-admin-form .cp-cases{display:flex;flex-wrap:wrap;gap:6px 14px}.fiche-admin-form .cp-cases label{display:flex;gap:6px;align-items:center;font-weight:400}
 .fiche-admin-prive{background:#f3ecfa;padding:10px;border-radius:10px;margin-bottom:10px}
+
+[data-fiches-sans-compte] .membre-carte{display:block;text-align:left;padding:12px 14px;border:1px solid var(--qvt-sable);border-radius:14px;background:#f3ecfa;border-left:4px solid #7f68b8;cursor:pointer;font:inherit}
+[data-fiches-sans-compte] .membre-carte strong{font-size:17px}[data-fiches-sans-compte] .membre-carte span{float:right;color:var(--qvt-taupe)}
