@@ -125,6 +125,7 @@ async function render() {
   interetsRecus(session, profilPret);
   avisLamia(session);
   propositions(session);
+  matchLive(session);
   discussions(session);
   monSpeedDating(session);
   monCoaching(session);
@@ -943,6 +944,29 @@ function ouvrirProfil(ref) {
 }
 document.addEventListener('click', (e) => { const b = e.target.closest('[data-voir-profil]'); if (b) ouvrirProfil(b.dataset.voirProfil); });
 
+// Match en direct : la personne en match dit si elle veut être prévenue quand Lamia lui trouve quelqu'un en live.
+async function matchLive(session) {
+  const box = document.querySelector('[data-espace-matchlive]');
+  if (!box) return;
+  const sec = box.closest('section');
+  let etat;
+  try { etat = await appelProfil({ action: 'annonce_match_live_etat' }, session); } catch { return; }
+  if (!etat?.demande) return;
+  const afficher = () => {
+    sec.hidden = false;
+    box.innerHTML = `<p class="interet-boutons"><button type="button" class="btn ${etat.choix === true ? 'btn-ink' : 'btn-line'}" data-matchlive="oui">Oui, prévenez-moi</button><button type="button" class="btn ${etat.choix === false ? 'btn-ink' : 'btn-line'}" data-matchlive="non">Non, pas pendant mon match</button></p>
+      <p class="aide">${etat.choix === true ? 'C’est noté : tu seras prévenu(e) si Lamia te trouve quelqu’un en live.' : etat.choix === false ? 'C’est noté : Lamia ne te proposera personne tant que tu es en match. Tu peux changer d’avis quand tu veux.' : 'Tu peux changer d’avis quand tu veux.'}</p>`;
+  };
+  afficher();
+  ecouter(box, 'click', async (e) => {
+    const b = e.target.closest('[data-matchlive]');
+    if (!b) return;
+    box.querySelectorAll('button').forEach((x) => { x.disabled = true; });
+    try { const r = await appelProfil({ action: 'annonce_match_live_choix', choix: b.dataset.matchlive }, session); etat = { ...etat, choix: r.choix }; afficher(); }
+    catch (err) { box.querySelectorAll('button').forEach((x) => { x.disabled = false; }); direErreurReponse(box, err); }
+  });
+}
+
 async function propositions(session) {
   const box = document.querySelector('[data-espace-propositions]');
   if (!box) return;
@@ -953,7 +977,8 @@ async function propositions(session) {
     const ages = f.age_min || f.age_max ? ` · ${f.age_min || 18} à ${f.age_max || 99} ans` : '';
     const rep = x.reponse === 'oui' ? '<p class="espace-match">Tu as dit oui ! Si l’autre personne dit oui aussi, vous êtes mis en relation tout de suite et une discussion s’ouvre ici.</p>'
       : x.reponse === 'non' ? '<p>Tu as répondu : pas pour moi.</p>'
-      : `<p class="interet-boutons"><button type="button" class="btn btn-ink" data-proposition="oui" data-id="${esc(x.id)}">Ce profil m’intéresse</button><button type="button" class="btn btn-line" data-proposition="non" data-id="${esc(x.id)}">Pas pour moi</button></p>`;
+      : x.reponse === 'temps' ? '<p class="espace-match">Tu as dit que ce profil te plaît et que tu as besoin de temps pour dématcher. La discussion est ouverte : écris-lui dès que tu es prêt(e).</p>'
+      : `<p class="interet-boutons"><button type="button" class="btn btn-ink" data-proposition="oui" data-id="${esc(x.id)}">Ce profil m’intéresse</button>${x.live ? `<button type="button" class="btn btn-line" data-proposition="temps" data-id="${esc(x.id)}">Il me plaît, laisse-moi le temps de dématcher</button>` : ''}<button type="button" class="btn btn-line" data-proposition="non" data-id="${esc(x.id)}">Pas pour moi</button></p>${x.live ? '<p class="aide">Proposé par Lamia pendant son live. Si tu dis oui, une discussion s’ouvre tout de suite, même si tu es déjà en match.</p>' : ''}`;
     return `<article class="espace-achat interet-recu proposition"><div><p class="event-date">Proposé pour toi · profil n° ${esc(f.ref)} · le ${esc(new Date(x.le).toLocaleDateString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { day: 'numeric', month: 'long' }))}</p>
       <h3>${esc(infos.join(' · '))}</h3>
       ${ligneDifference(x.differences)}
@@ -978,7 +1003,7 @@ async function propositions(session) {
 }
 
 // Les fiches auxquelles on a déjà répondu : une ligne chacune, repliées sous le titre.
-const REPONDU = { proposition: { oui: 'Tu as dit oui', non: 'Tu as dit non' }, avis: { oui: 'Différence acceptée', non: 'Tu as dit non' }, interet: { oui: 'Tu as dit oui', non: 'Tu as dit non' } };
+const REPONDU = { proposition: { oui: 'Tu as dit oui', non: 'Tu as dit non', temps: 'Tu as demandé du temps' }, avis: { oui: 'Différence acceptée', non: 'Tu as dit non' }, interet: { oui: 'Tu as dit oui', non: 'Tu as dit non' } };
 function enDeuxTemps(liste, carte, type, courant = null) {
   const terminee = (x) => type === 'interet' && ['dematche', 'pas_compatible'].includes(x.statut);
   const a = liste.filter((x) => !x.reponse && !terminee(x)), r = liste.filter((x) => x.reponse || terminee(x));
