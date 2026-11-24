@@ -18,6 +18,8 @@
     <button type="button" data-tab="accueil" aria-current="true"><svg class="ico" aria-hidden="true"><use href="/icones.svg#house"/></svg> Aujourd’hui</button>
     <button type="button" data-tab="activite"><svg class="ico" aria-hidden="true"><use href="/icones.svg#map"/></svg> Activité</button>
     <button type="button" data-tab="comptes"><svg class="ico" aria-hidden="true"><use href="/icones.svg#user"/></svg> Membres</button>
+    <a class="tdb-lien" href="/confidences-lamia/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#message-circle"/></svg> Confidences</a>
+    <a class="tdb-lien" href="/confidences-lamia/#annonces"><svg class="ico" aria-hidden="true"><use href="/icones.svg#mail"/></svg> Profils et matchs</a>
     <details class="tdb-plus" data-menu-plus>
       <summary>Plus <span class="tdb-pastille" data-journal-pastille hidden></span></summary>
       <div>
@@ -210,46 +212,6 @@
     <div class="membres-grille" data-comptes><p class="aide">Chargement…</p></div>
     <p class="actions membres-plus"><button class="btn btn-line" type="button" data-comptes-plus hidden>Afficher plus</button></p>
 
-    <div class="compte-fond" data-compte-fond hidden></div>
-    <aside class="compte-fiche" data-compte-fiche hidden aria-label="Fiche du compte">
-      <div class="compte-tete"><div><p class="compte-kicker" data-compte-email></p><h2 data-compte-nom></h2><p class="aide" data-compte-infos></p></div><div class="compte-nav"><button type="button" class="btn btn-line" data-compte-prec hidden>← Précédent</button><button type="button" class="btn btn-ink" data-compte-suiv hidden>Suivant →</button><button type="button" class="btn btn-line" data-compte-fermer>Fermer</button></div></div>
-      <p class="fiche-actions"><button class="btn btn-ink" type="button" data-fiche-aller="modifier">Modifier</button><button class="btn btn-ink" type="button" data-fiche-aller="contacter">Contacter</button><button class="btn btn-line" type="button" data-fiche-aller="bloquer">Bloquer</button><button class="btn btn-ink" type="button" data-sp-un="relancer" hidden>Lui demander de créer son profil</button><button class="btn btn-line fiche-danger" type="button" data-sp-un="supprimer" hidden>Supprimer ce compte</button> <span class="aide" data-sp-un-statut role="status"></span></p>
-      <div class="fiche-corps">
-      <div data-compte-detail></div>
-      <div>
-      <details class="tdb-repli" data-compte-contacter><summary>Lui écrire</summary>
-      <form class="tdb-carte" data-compte-ecrire>
-        <label>Ton message<textarea name="body" rows="4" maxlength="4000" required></textarea></label>
-        <p class="actions"><button class="btn btn-ink" type="submit">Envoyer</button> <span class="aide" data-compte-ecrire-statut role="status"></span></p>
-      </form>
-      </details>
-      <details class="tdb-repli" data-compte-modifier><summary>Corriger ses informations</summary>
-      <form class="tdb-carte reglages" data-compte-form>
-        <h3 style="margin-top:0">Profil</h3>
-        <div class="champs">
-          <label>Prénom<input name="real_first_name" maxlength="60"></label>
-          <label>Nom affiché<input name="display_name" maxlength="60"></label>
-          <label>Genre<select name="gender"><option value="">Non renseigné</option><option value="femme">Femme</option><option value="homme">Homme</option></select></label>
-          <label>Date de naissance<input name="birth_date" type="date"></label>
-          <label>Ville<input name="city" maxlength="80"></label>
-          <label>Pays<input name="country" maxlength="80"></label>
-          <label>Statut du profil<select name="profile_status"><option value="active">Actif</option><option value="draft">Brouillon</option><option value="paused">En pause</option><option value="suspended">Suspendu</option></select></label>
-        </div>
-        <p class="actions"><button class="btn btn-ink" type="submit">Enregistrer le profil</button> <span class="aide" data-compte-statut></span></p>
-      </form>
-      </details>
-      <div class="tdb-carte">
-        <h3 style="margin-top:0">Soirées</h3>
-        <ul class="compte-liste" data-compte-soirees></ul>
-        <div class="compte-ajout"><label>Inscrire à une soirée<select data-compte-soiree></select></label><button class="btn btn-line" type="button" data-compte-inscrire>Inscrire</button></div>
-      </div>
-      <div class="tdb-carte">
-        <h3 style="margin-top:0">Annonces et fiches de l’outil</h3>
-        <ul class="compte-liste" data-compte-liens></ul>
-      </div>
-      </div>
-      </div>
-    </aside>
   </section>
 
   <section data-panel="application" hidden>
@@ -597,6 +559,48 @@
       <button type="button" class="btn btn-line" data-fiches-suite hidden>Afficher les suivantes</button>
     </div>
   </section>
+
+  <!-- La fiche d’une personne : s’ouvre à droite depuis toutes les rubriques -->
+    <div class="compte-fond" data-compte-fond hidden></div>
+    <aside class="compte-fiche" data-compte-fiche hidden aria-label="Fiche du compte">
+      <div class="compte-tete"><div><p class="compte-kicker" data-compte-email></p><h2 data-compte-nom></h2><p class="aide" data-compte-infos></p></div><div class="compte-nav"><button type="button" class="btn btn-line" data-compte-prec hidden>← Précédent</button><button type="button" class="btn btn-ink" data-compte-suiv hidden>Suivant →</button><button type="button" class="btn btn-line" data-compte-fermer>Fermer</button></div></div>
+      <p class="fiche-actions"><button class="btn btn-ink" type="button" data-fiche-aller="modifier">Modifier</button><button class="btn btn-ink" type="button" data-fiche-aller="contacter">Contacter</button><button class="btn btn-line" type="button" data-fiche-aller="bloquer">Bloquer</button><button class="btn btn-ink" type="button" data-sp-un="relancer" hidden>Lui demander de créer son profil</button><button class="btn btn-line fiche-danger" type="button" data-sp-un="supprimer" hidden>Supprimer ce compte</button> <span class="aide" data-sp-un-statut role="status"></span></p>
+      <div class="fiche-corps">
+      <div data-compte-detail></div>
+      <div>
+      <details class="tdb-repli" data-compte-contacter><summary>Lui écrire</summary>
+      <form class="tdb-carte" data-compte-ecrire>
+        <label>Ton message<textarea name="body" rows="4" maxlength="4000" required></textarea></label>
+        <p class="actions"><button class="btn btn-ink" type="submit">Envoyer</button> <span class="aide" data-compte-ecrire-statut role="status"></span></p>
+      </form>
+      </details>
+      <details class="tdb-repli" data-compte-modifier><summary>Corriger ses informations</summary>
+      <form class="tdb-carte reglages" data-compte-form>
+        <h3 style="margin-top:0">Profil</h3>
+        <div class="champs">
+          <label>Prénom<input name="real_first_name" maxlength="60"></label>
+          <label>Nom affiché<input name="display_name" maxlength="60"></label>
+          <label>Genre<select name="gender"><option value="">Non renseigné</option><option value="femme">Femme</option><option value="homme">Homme</option></select></label>
+          <label>Date de naissance<input name="birth_date" type="date"></label>
+          <label>Ville<input name="city" maxlength="80"></label>
+          <label>Pays<input name="country" maxlength="80"></label>
+          <label>Statut du profil<select name="profile_status"><option value="active">Actif</option><option value="draft">Brouillon</option><option value="paused">En pause</option><option value="suspended">Suspendu</option></select></label>
+        </div>
+        <p class="actions"><button class="btn btn-ink" type="submit">Enregistrer le profil</button> <span class="aide" data-compte-statut></span></p>
+      </form>
+      </details>
+      <div class="tdb-carte">
+        <h3 style="margin-top:0">Soirées</h3>
+        <ul class="compte-liste" data-compte-soirees></ul>
+        <div class="compte-ajout"><label>Inscrire à une soirée<select data-compte-soiree></select></label><button class="btn btn-line" type="button" data-compte-inscrire>Inscrire</button></div>
+      </div>
+      <div class="tdb-carte">
+        <h3 style="margin-top:0">Annonces et fiches de l’outil</h3>
+        <ul class="compte-liste" data-compte-liens></ul>
+      </div>
+      </div>
+      </div>
+    </aside>
 </main>
 <script type="module" src="/tableau.js"></script>
 </body>
