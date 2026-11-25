@@ -132,3 +132,14 @@ test('valider à la main : réservé à l’administratrice, demande confirmatio
   assert.equal(a.photos_refusees_at, null);
   assert.equal(a.photos_moderation.dispense, true);
 });
+
+test('prévenir un membre : réservé à l’administratrice, lien interne seulement', async (t) => {
+  const b = await recette(t);
+  const corps = { ref: 42, titre: 'Veux-tu terminer ton match ?', texte: 'Appuie ici pour être libre.', lien: '/mon-espace/#discussion' };
+  for (const u of [null, MEMBRE]) assert.equal((await b.action('annonce_admin_prevenir', corps, u)).status, 403);
+  assert.equal((await admin(b, 'annonce_admin_prevenir', { ...corps, lien: 'https://exemple.com' })).error, 'lien_invalide');
+  assert.equal((await admin(b, 'annonce_admin_prevenir', { ...corps, lien: '//exemple.com' })).error, 'lien_invalide');
+  assert.equal((await admin(b, 'annonce_admin_prevenir', { ...corps, texte: '' })).error, 'bad_request');
+  assert.equal((await admin(b, 'annonce_admin_prevenir', { ...corps, ref: 9999 })).error, 'pas_de_profil');
+  assert.equal((await admin(b, 'annonce_admin_prevenir', corps)).ok, true);
+});

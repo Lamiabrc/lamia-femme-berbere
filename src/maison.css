@@ -4988,3 +4988,6 @@ body:has(.espace) .site-header .maison-menu-panneau a, body:has(.espace) .site-h
 .annonce-menu { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 8px; }
 .annonce-menu button { padding: 8px 12px; border-radius: 999px; border: 2px solid var(--cc); background: #fff; color: #2F2B3D; font: 600 13px var(--sans, sans-serif); cursor: pointer; }
 .annonce-menu button.annonce-menu-on { background: var(--cc); color: #fff; }
+.annonce-deroule > summary { cursor: pointer; padding: 10px 14px; border: 1px solid #d9c7a8; border-radius: 10px; background: #fffaf2; color: #3d3034; font-size: 15px; list-style: none; }
+.annonce-deroule > summary::after { content: ' ▾'; }
+.annonce-deroule[open] > summary { margin-bottom: 8px; }

@@ -13,7 +13,7 @@ const ETAPES = [
     ['l', 'origineTags', 'Communauté amazighe / origine', 'origine']]],
   ['2 · Situation de vie', 'Les éléments concrets qui influencent le projet de mariage.', [
     ['c', 'situation', 'Situation matrimoniale', 'situation', true], ['c', 'enfants', 'Enfants', 'enfants', true], ['c', 'desirEnfants', 'Désir d’enfant', 'desirEnfants'],
-    ['c', 'niveauEtudeCategorie', 'Niveau d’étude', 'etudeCategorie'], ['c', 'profession', 'Profession', 'texte'], ['c', 'tailleCm', 'Taille du profil (cm)', 'nombre'],
+    ['c', 'niveauEtudeCategorie', 'Niveau d’étude', 'etudeCategorie'], ['c', 'domaineEtudes', 'Domaine d’études', 'domaineEtudes'], ['c', 'profession', 'Profession', 'texte'], ['c', 'tailleCm', 'Taille du profil (cm)', 'nombre'],
     ['c', 'situationAdministrative', 'Situation administrative', 'situationAdministrative'], ['c', 'proprietaire', 'Propriétaire', 'proprietaire']]],
   ['3 · Couple et cadre pratique', 'Famille, mobilité, argent et hygiène de vie.', [
     ['c', 'mobiliteGeographique', 'Mobilité géographique', 'mobilite'], ['c', 'belleFamille', 'Belle-famille', 'belleFamille'], ['c', 'impressionEchange', 'Impression d’échange', 'impressionEchange'],
@@ -30,7 +30,7 @@ const ETAPES = [
     ['c', 'rechercheFemmeHidjabiste', 'Hidjab chez la femme recherchée', 'hidjab'],
     ['c', 'sportRecherche', 'Sport recherché', 'sport'], ['c', 'fumeurRecherche', 'Fumeur recherché', 'fumeur'], ['c', 'alcoolRecherche', 'Alcool recherché', 'alcool'], ['c', 'chemmaRecherche', 'Chemma recherchée', 'chemma'],
     ['l', 'origineRechercheTags', 'Origines / communautés acceptées', 'origine'],
-    ['b', 'kabyleUniquement', 'Kabyle uniquement'], ['b', 'accepteDivorce', 'Accepte divorcé(e)'], ['b', 'refuseDivorce', 'Refuse divorcé(e)'], ['b', 'accepteVeuf', 'Accepte veuf/veuve'], ['b', 'refuseVeuf', 'Refuse veuf/veuve'],
+    ['b', 'accepteDivorce', 'Accepte divorcé(e)'], ['b', 'refuseDivorce', 'Refuse divorcé(e)'], ['b', 'accepteVeuf', 'Accepte veuf/veuve'], ['b', 'refuseVeuf', 'Refuse veuf/veuve'],
     ['b', 'accepteEnfants', 'Accepte enfants'], ['b', 'accepteUnEnfant', 'Accepte 1 enfant'], ['b', 'acceptePlusieursEnfants', 'Accepte plusieurs enfants'],
     ['c', 'tailleMinRechercheCm', 'Exigence physique : taille minimum', 'nombre'], ['l', 'caracteristiquesRecherche', 'Rédhibitoire / points bloquants', 'caracteristiques']]],
   ['6 · Exigences absolues du profil', 'Sans sélection, ces critères restent des préférences souples qui influencent le score. Coché = bloquant (Âge : 0 an de marge ; Localisation : secteur strict).', [
@@ -43,11 +43,11 @@ const PAR_CLE = new Map(ITEMS.map((i) => [i[1], i]));
 export const CARTES = [
   { id: 'debut', titre: 'Pour commencer', couleur: '#d9822b', aide: 'Âge du profil et âge recherché.', cles: ['age_min', 'age_max'], plus: true },
   { id: 'statut', titre: 'Statut et enfants', couleur: '#c2495b', aide: 'Le thème qui pèse le plus : situation, enfants, ce qui est accepté.', cles: ['situation', 'enfants', 'desirEnfants', 'accepteDivorce', 'refuseDivorce', 'accepteVeuf', 'refuseVeuf', 'accepteEnfants', 'accepteUnEnfant', 'acceptePlusieursEnfants'] },
-  { id: 'lieu', titre: 'Secteur géographique', couleur: '#2f8f83', aide: 'Résidence, origine et zone recherchée.', cles: ['ville', 'pays', 'villageOrigine', 'mobiliteGeographique', 'zoneGeo', 'paysRechercheDetail', 'regionRechercheDetail'] },
+  { id: 'lieu', titre: 'Secteur géographique', couleur: '#2f8f83', aide: 'Résidence, origine et zone recherchée.', cles: ['ville', 'pays', 'villageOrigine', 'mobiliteGeographique', 'situationAdministrative', 'proprietaire', 'zoneGeo', 'paysRechercheDetail', 'regionRechercheDetail'] },
   { id: 'valeurs', titre: 'Valeurs et religion', couleur: '#6c5ba7', aide: 'Religion, pratique, et ce qui est cherché chez l’autre.', cles: ['religion', 'religionAutre', 'pratique', 'fermeDifferencePratique', 'religionsAcceptees', 'religionRecherche', 'pratiqueRecherche', 'rechercheFemmeHidjabiste'] },
-  { id: 'pro', titre: 'Professionnel', couleur: '#3a6fb0', aide: 'Études et profession.', cles: ['niveauEtudeCategorie', 'profession', 'etudesRecherche'] },
-  { id: 'vie', titre: 'Hygiène de vie et personnalité', couleur: '#d4577a', aide: 'Mode de vie, caractère, vie à deux.', cles: ['fumeur', 'alcool', 'sport', 'chemma', 'fumeurRecherche', 'alcoolRecherche', 'sportRecherche', 'chemmaRecherche', 'gestionEmotionnelle', 'rapportReseaux', 'belleFamille', 'impressionEchange', 'caracteristiques', 'caracteristiquesRecherche', 'tailleCm', 'tailleMinRechercheCm', 'situationAdministrative', 'proprietaire'] },
-  { id: 'origines', titre: 'Mes origines', couleur: '#b8872b', aide: 'Communauté, origines acceptées.', cles: ['origineTags', 'origineRechercheTags', 'kabyleUniquement'] },
+  { id: 'pro', titre: 'Professionnel', couleur: '#3a6fb0', aide: 'Études et profession.', cles: ['niveauEtudeCategorie', 'domaineEtudes', 'profession', 'etudesRecherche'] },
+  { id: 'vie', titre: 'Hygiène de vie et personnalité', couleur: '#d4577a', aide: 'Mode de vie, caractère, vie à deux.', cles: ['fumeur', 'alcool', 'sport', 'chemma', 'fumeurRecherche', 'alcoolRecherche', 'sportRecherche', 'chemmaRecherche', 'gestionEmotionnelle', 'rapportReseaux', 'belleFamille', 'impressionEchange', 'caracteristiques', 'caracteristiquesRecherche', 'tailleCm', 'tailleMinRechercheCm'] },
+  { id: 'origines', titre: 'Mes origines', couleur: '#b8872b', aide: 'Communauté, origines acceptées.', cles: ['origineTags', 'origineRechercheTags'] },
   { id: 'bloquants', titre: 'Exigences bloquantes', couleur: '#5e5a66', aide: 'Sans sélection, ce sont des préférences souples. Coché = bloquant.', cles: ['hardPreferences'] },
 ].map((c) => ({ ...c, items: c.cles.map((k) => PAR_CLE.get(k)).filter(Boolean) }));
 const carteOuverte = new Map(); // ref -> carte ouverte, pour la retrouver après « Enregistrer »
@@ -63,7 +63,7 @@ function rendre(it, v, pre = '') {
   const [genre, n, titre, type, cle] = it, nom = pre + n;
   if (genre === 'b') return `<label class="cp-case"><input type="checkbox" name="${nom}"${v[n] ? ' checked' : ''}> ${esc(titre)}</label>`;
   if (genre === 'h') return `<div class="cp-cases">${Object.entries(HARD).map(([k, t]) => `<label><input type="checkbox" name="${nom}" value="${k}"${(v[n] || []).includes(k) ? ' checked' : ''}> ${esc(t)}</label>`).join('')}</div>`;
-  if (genre === 'l') return `<fieldset><legend>${esc(titre)}</legend><div class="cp-cases">${liste_de(type).map((x) => `<label><input type="checkbox" name="${nom}" value="${esc(x)}"${(Array.isArray(v[n]) ? v[n] : []).includes(x) ? ' checked' : ''}> ${esc(lib(x))}</label>`).join('')}</div></fieldset>`;
+  if (genre === 'l') return `<fieldset><legend>${esc(titre)}</legend><details class="annonce-deroule"><summary>Choisir dans la liste</summary><div class="cp-cases">${liste_de(type).map((x) => `<label><input type="checkbox" name="${nom}" value="${esc(x)}"${(Array.isArray(v[n]) ? v[n] : []).includes(x) ? ' checked' : ''}> ${esc(lib(x))}</label>`).join('')}</div></details></fieldset>`;
   const manque = cle && vide(v[n]);
   const entete = `<label class="${manque ? 'cp-manque' : ''}">${esc(titre)}${manque ? ' <em>à compléter</em>' : ''}`;
   if (type === 'texte') return `${entete}<input name="${nom}" maxlength="80" value="${esc(v[n] ?? '')}"></label>`;
@@ -112,6 +112,22 @@ export function carteValider(d) {
   return l.map((a) => `<div class="tdb-carte cp-valider"><h3 style="margin-top:0">Profil n° ${esc(a.ref)} : ${a.status === 'publiee' ? 'bloqué' : 'pas encore validé'}</h3><p class="aide">${a.status === 'publiee' ? 'Il est publié mais bloqué (photos).' : 'Il ne peut pas swiper tant qu’il n’est pas validé.'} Tu peux le valider tout de suite, même s’il manque des photos ou des infos.</p><button class="btn btn-ink" type="button" data-valider-profil="${esc(a.ref)}">✓ Valider ce profil</button> <span class="aide" role="status" data-valider-statut></span></div>`).join('');
 }
 
+// Prévenir un membre par notification (Lamia, 26 nov. 2026) : un message tout fait ou le sien, avec un lien direct.
+const MODELES = {
+  dematcher: { titre: '{A}, veux-tu terminer ton match ?', texte: 'Tu es en match et tu veux peut-être rencontrer d’autres personnes. Appuie ici pour terminer ce match : tu seras libre tout de suite.', bouton: 'Terminer mon match', lien: '/mon-espace/#discussion' },
+  completer: { titre: '{A}, complète ton profil', texte: 'Quelques informations manquent à ton profil pour te proposer les meilleures rencontres. Appuie ici, ça prend deux minutes.', bouton: 'Compléter mon profil', lien: '/mon-espace/' },
+  photos: { titre: '{A}, ajoute tes photos', texte: 'Il te faut 2 photos pour pouvoir swiper et recevoir des matchs. Appuie ici pour les ajouter.', bouton: 'Ajouter mes photos', lien: '/mon-espace/' },
+  libre: { titre: '', texte: '', bouton: 'Voir mon espace', lien: '/mon-espace/' },
+};
+export function cartePrevenir(d) {
+  const l = (d.annonces || []).filter((a) => a.ref && !a.test && a.status !== 'retiree' && a.status !== 'refusee' && (a.user_id || a.email));
+  return l.map((a) => `<form class="tdb-carte cp-prevenir" data-prevenir="${esc(a.ref)}"><h3 style="margin-top:0">Prévenir le profil n° ${esc(a.ref)}</h3><p class="aide">Une notification sur son téléphone, et un email seulement si la notification n’arrive pas.</p>
+    <label>Message<select name="modele"><option value="dematcher">Veux-tu terminer ton match ?</option><option value="completer">Complète ton profil</option><option value="photos">Ajoute tes photos</option><option value="libre">Message libre</option></select></label>
+    <label class="cp-libre" hidden>Titre<input name="titre" maxlength="120"></label>
+    <label>Texte<textarea name="texte" rows="3" maxlength="600">${esc(MODELES.dematcher.texte)}</textarea></label>
+    <button class="btn btn-ink" type="submit">Envoyer la notification</button> <span class="aide" role="status" data-prevenir-statut></span></form>`).join('');
+}
+
 // Lecture d'un formulaire (préfixe « m_ » dans « Créer un profil »).
 function lire(form, pre, garde) {
   const m = {}, top = {}, els = form.elements;
@@ -128,6 +144,22 @@ function lire(form, pre, garde) {
 }
 
 export function monterCompleter({ appel, recharger }) {
+  document.addEventListener('change', (e) => {
+    const f = e.target.closest('[data-prevenir]'); if (!f || e.target.name !== 'modele') return;
+    const m = MODELES[e.target.value]; f.querySelector('.cp-libre').hidden = e.target.value !== 'libre';
+    f.elements.texte.value = m.texte; f.elements.titre.value = m.titre;
+  });
+  document.addEventListener('submit', async (e) => {
+    const f = e.target.closest('[data-prevenir]'); if (!f) return;
+    e.preventDefault();
+    const m = MODELES[f.elements.modele.value], st = f.querySelector('[data-prevenir-statut]'), btn = f.querySelector('[type=submit]');
+    const titre = f.elements.modele.value === 'libre' ? f.elements.titre.value : m.titre;
+    if (!window.confirm('Envoyer ce message au profil n° ' + f.dataset.prevenir + ' ?')) return;
+    btn.disabled = true; st.textContent = 'Envoi…';
+    try { await appel({ action: 'annonce_admin_prevenir', ref: Number(f.dataset.prevenir), titre, texte: f.elements.texte.value, bouton: m.bouton, lien: m.lien }); st.textContent = 'Envoyé ✓'; }
+    catch (err) { st.textContent = ({ sans_compte: 'Ce profil n’a pas de compte.', bad_request: 'Écris un titre et un texte.' })[err.code] || 'Pas envoyé. Réessaie.'; }
+    btn.disabled = false;
+  });
   document.addEventListener('click', (e) => {
     const t = e.target.closest('[data-cp-carte]'); if (!t) return;
     const f = t.closest('[data-completer]'), id = t.dataset.cpCarte, deja = t.classList.contains('cp-tuile-on');
