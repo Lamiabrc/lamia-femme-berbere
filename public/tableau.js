@@ -1140,10 +1140,10 @@ async function ouvrirParRef(ref) {
   if (c) return ouvrirCompte(c.id);
   compteOuvert = null;
   $('[data-compte-email]').textContent = `Profil n° ${ref}`;
-  $('[data-compte-nom]').textContent = 'Sans compte';
+  $('[data-compte-nom]').textContent = 'Fiche créée par toi (pas de compte)';
   $('[data-compte-infos]').textContent = '';
   $('[data-compte-form]').hidden = true;
-  $('[data-compte-soirees]').innerHTML = '<li>Pas de compte.</li>';
+  $('[data-compte-soirees]').innerHTML = '<li>Fiche sans compte : pas d’inscription aux soirées.</li>';
   $('[data-compte-liens]').innerHTML = '';
   $('[data-compte-fiche]').hidden = false; $('[data-compte-fond]').hidden = false;
   boutonsSuivant();
