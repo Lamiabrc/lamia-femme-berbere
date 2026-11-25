@@ -1241,9 +1241,12 @@ async function discussions(session) {
       ${finBulle(d)}
       ${d.ouverte && !d.dematch ? (dematchOuvert === d.id ? `<form class="disc-dematch" data-disc-dematch-form>
         <h4><svg class="ico" aria-hidden="true"><use href="/icones.svg#handshake"/></svg> Tu peux dématcher, avec élégance</h4>
-        <p>Tu as encore <strong>deux messages</strong> à écrire pour rester ${e === '' ? 'courtois et gentleman' : e === 'e' ? 'courtoise et élégante' : 'courtois·e et élégant·e'}. Si tu confirmes, ton match sera informé de ton dématch et attendra un au revoir, voire une raison.</p>
+        <p>Ton match sera informé de ton dématch, avec ta raison. Choisis ci-dessous quand tu veux être libre pour d’autres rencontres.</p>
         <fieldset><legend>Pourquoi tu dématches ?</legend>${raisonsDematch}</fieldset>
         <label class="disc-dematch-etape" data-dematch-etape hidden>Quelle étape ? <select name="etape">${(d.parcours?.etapes || []).map((x) => `<option value="${esc(x.id)}">${esc(x.mot)}</option>`).join('')}</select></label>
+        <fieldset><legend>Et ensuite ?</legend>
+          <label><input type="radio" name="fin" value="maintenant" checked> Terminer maintenant : je suis libre tout de suite</label>
+          <label><input type="radio" name="fin" value="48h"> Garder la discussion ouverte 48 h pour se dire au revoir (je reste occupé·e jusque-là)</label></fieldset>
         <p class="disc-dematch-actions"><button class="btn btn-ink" type="submit">Confirmer le dématch</button> <button type="button" class="link-button" data-disc-dematch-annuler>Je reste</button></p></form>`
         : `<p class="disc-dematch-lien"><button type="button" class="btn btn-line" data-disc-dematch>Dématcher</button></p>`) : ''}
       ${d.ouverte ? `<p><button type="button" class="link-button" data-disc-signaler><svg class="ico" aria-hidden="true"><use href="/icones.svg#flag"/></svg> Bloquer et signaler</button></p>` : ''}
@@ -1295,7 +1298,7 @@ async function discussions(session) {
     const bouton = e.target.querySelector('button'); bouton.disabled = true;
     try {
       if (e.target.matches('[data-disc-dematch-form]')) {
-        await appelProfil({ action: 'annonce_discussion_dematcher', id, raison: e.target.raison.value, etape: e.target.etape?.value }, session);
+        await appelProfil({ action: 'annonce_discussion_dematcher', id, raison: e.target.raison.value, etape: e.target.etape?.value, immediat: e.target.fin?.value !== '48h' }, session);
         dematchOuvert = null;
         await monProfil(session);
         await charger();

@@ -153,6 +153,19 @@ test('dématch courtois : raison obligatoire, deux messages, l’autre prévenu,
   assert.equal((await actionDiscussion('annonce_discussion_envoyer', { id: D, texte: 'Encore' }, moi)).status, 409);
 });
 
+test('dématch immédiat : la discussion se ferme tout de suite, l’autre est prévenu, sans temps d’au revoir', async () => {
+  const { db, pushes, ctx } = base();
+  await ouvrirDiscussion(ctx, { interetId: 'i1', a: { user_id: A, ref: 3, prenom: 'Melina' }, b: { user_id: B, ref: 27, prenom: 'Rachid' } });
+  ctx.read = async (path) => (path.includes('/annonces?') || path.includes('annonce_files') ? [] : path.includes('discussion_messages') ? [...db.discussion_messages] : db.discussions);
+  const termines = [], liberes = [];
+  const moi = { ...ctx, user: { id: A }, terminerDematch: async (d) => { termines.push(d.id); }, libererMatch: async (d) => { liberes.push(d.id); } };
+  const [s, r] = await json(await actionDiscussion('annonce_discussion_dematcher', { id: D, raison: 'parcours', etape: 'valeurs', immediat: true }, moi));
+  assert.equal(s, 200); assert.equal(r.termine, true);
+  assert.deepEqual(liberes, [D]); assert.deepEqual(termines, [D]);
+  assert.equal(pushes.at(-1)[0], B); assert.match(pushes.at(-1)[1], /met fin à votre match/);
+  assert.equal(db.discussion_messages.length, 0);
+});
+
 test('dématch courtois : après 48 heures le match se termine, un rappel à qui n’a rien écrit', async () => {
   const { pushes, ctx } = base();
   const d = { id: D, dematch_par: 'a', a_user: A, b_user: B, dematch_at: '2026-11-01T09:00:00Z', ferme_at: '2026-11-03T09:00:00Z', close_raison: null };
