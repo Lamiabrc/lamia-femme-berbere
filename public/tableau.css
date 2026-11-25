@@ -583,3 +583,6 @@
 .cp .cp-tuile-on{background:var(--cp-c);color:#fff}.cp .cp-tuile-manque small{font-weight:700}
 .cp .cp-carte{border-left:6px solid var(--cp-c);padding:4px 0 4px 12px;margin:8px 0}
 @media(min-width:720px){.cp .cp-menu{grid-template-columns:repeat(4,1fr)}}
+.annonce-deroule > summary { cursor: pointer; padding: 10px 14px; border: 1px solid #d9c7a8; border-radius: 10px; background: #fffaf2; color: #3d3034; font-size: 15px; list-style: none; }
+.annonce-deroule > summary::after { content: ' ▾'; }
+.annonce-deroule[open] > summary { margin-bottom: 8px; }

@@ -52,7 +52,7 @@ const ERR = {
   en_match: 'Tu as atteint le nombre de matchs en cours de ta formule : mets fin à l’un d’eux dans « Mon espace » pour en découvrir d’autres.',
 };
 const opts = (list, vide = 'Choisis…') => `<option value="">${vide}</option>${list.map((v) => `<option value="${esc(v)}">${esc(lib(v))}</option>`).join('')}`;
-const puces = (name, list) => `<div class="annonce-puces">${list.map((v) => `<label><input type="checkbox" name="${name}" value="${esc(v)}"><span>${esc(lib(v))}</span></label>`).join('')}</div>`;
+const puces = (name, list) => `<details class="annonce-deroule"><summary>Choisir dans la liste</summary><div class="annonce-puces">${list.map((v) => `<label><input type="checkbox" name="${name}" value="${esc(v)}"><span>${esc(lib(v))}</span></label>`).join('')}</div></details>`;
 const PAR_EXT = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp', heic: 'image/heic', heif: 'image/heif', mp4: 'video/mp4', mov: 'video/quicktime', webm: 'video/webm', pdf: 'application/pdf' };
 const typeDe = (f) => (f.type && f.type !== 'application/octet-stream' ? f.type : PAR_EXT[String(f.name || '').split('.').pop().toLowerCase()] || 'application/octet-stream');
 const maxNaissance = () => { const d = new Date(); d.setFullYear(d.getFullYear() - 18); return d.toISOString().slice(0, 10); };
@@ -127,7 +127,6 @@ export function formulaireHtml() {
     <div class="annonce-grille">
       <label>Ta religion<select name="religion">${opts(O.religion)}</select></label>
       <label>Ta pratique <small>(facultatif)</small><select name="pratique">${opts(O.pratique, 'Je préfère ne pas dire')}</select></label>
-      <label class="annonce-large">Ta foi et ta pratique en quelques mots <small>(facultatif : prière, ramadan, ce qui compte pour toi…)</small><textarea name="religionTexte" rows="2" maxlength="300"></textarea></label>
     </div>
     <p class="annonce-sous annonce-cherche">Je cherche</p>
     <div class="annonce-grille">
@@ -190,13 +189,10 @@ export function formulaireHtml() {
   <div class="annonce-etape" style="--cc:#b8872b">
     <h3><span>0</span> Mes origines</h3>
     <p class="annonce-sous annonce-moi">Moi</p>
-    <p class="annonce-sous" id="ton-origine">Ton origine <small>(affichée sur ton profil, 3 au maximum)</small></p>${puces('origineTags', O.origine)}
+    <div class="annonce-grille"><label id="ton-origine">Ton origine <small>(affichée sur ton profil)</small><select name="origineTags">${opts(O.origine)}</select></label></div>
     <p class="annonce-sous annonce-cherche">Je cherche</p>
     <div data-plus-tard>
-    <p class="annonce-sous">Ses origines <small>(laisse vide si peu importe)</small></p>${puces('origineRechercheTags', O.origine)}
-    <div class="annonce-puces annonce-accepte">
-      <label><input type="checkbox" name="kabyleUniquement"><span>Uniquement kabyle</span></label>
-    </div>
+    <div class="annonce-grille"><label>Son origine <small>(« Kabyle » = uniquement kabyle)</small><select name="origineRechercheTags">${opts(O.origine, 'Peu importe')}</select></label></div>
     <label class="annonce-case annonce-bloquant"><input type="checkbox" name="hardPreferences" value="origin"> <span>C’est bloquant pour moi : je ne veux voir que les origines que j’ai cochées.</span></label>
     </div>
   </div>
@@ -431,7 +427,7 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
     const ans = Number.parseInt(f.age.value, 10);
     if (!f.age.value.trim()) manque('Ton âge', f.age);
     else if (!(ans >= 18 && ans <= 99)) manque('Ton âge : il faut avoir 18 ans ou plus', f.age);
-    if (!form.querySelector('[name=origineTags]:checked')) manque('Ton origine', form.querySelector('[name=origineTags]')?.closest('.annonce-puces'));
+    if (!form.elements.origineTags?.value) manque('Ton origine', form.elements.origineTags);
     if (live && !f.tiktok_live.value.trim()) manque('Ton pseudo ou lien TikTok du live', f.tiktok_live);
     if (!live) {
       if (!f.ville.value.trim()) manque('Ta ville', f.ville);
@@ -518,13 +514,17 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
   });
 }
 
-const CHAMPS = ['villageOrigine', 'langue', 'situation', 'enfants', 'nbEnfants', 'ageEnfants', 'desirEnfants', 'niveauEtudeCategorie', 'niveauEtudeDetail', 'domaineEtudes', 'etudesPaysObtention', 'profession', 'tailleCm', 'religion', 'pratique', 'mobiliteGeographique', 'visionFinanciere', 'fumeur', 'sport', 'alcool', 'chemma', 'religionTexte', 'autresModeVie', 'zoneGeo', 'religionRecherche', 'pratiqueRecherche', 'etudesRecherche', 'rechercheFemmeHidjabiste', 'contactReseau', 'situationAdministrative', 'proprietaire', 'belleFamille', 'impressionEchange', 'tailleMinRechercheCm', 'fumeurRecherche', 'alcoolRecherche', 'sportRecherche', 'chemmaRecherche'];
-const LISTES = ['origineTags', 'caracteristiques', 'origineRechercheTags', 'caracteristiquesRecherche', 'gestionEmotionnelle', 'rapportReseaux', 'hardPreferences'];
-const CASES = ['kabyleUniquement', 'accepteDivorce', 'accepteVeuf', 'accepteEnfants', 'acceptePlusieursEnfants'];
+const CHAMPS = ['villageOrigine', 'langue', 'situation', 'enfants', 'nbEnfants', 'ageEnfants', 'desirEnfants', 'niveauEtudeCategorie', 'niveauEtudeDetail', 'domaineEtudes', 'etudesPaysObtention', 'profession', 'tailleCm', 'religion', 'pratique', 'mobiliteGeographique', 'visionFinanciere', 'fumeur', 'sport', 'alcool', 'chemma', 'autresModeVie', 'zoneGeo', 'religionRecherche', 'pratiqueRecherche', 'etudesRecherche', 'rechercheFemmeHidjabiste', 'contactReseau', 'situationAdministrative', 'proprietaire', 'belleFamille', 'impressionEchange', 'tailleMinRechercheCm', 'fumeurRecherche', 'alcoolRecherche', 'sportRecherche', 'chemmaRecherche'];
+const UNE = ['origineTags', 'origineRechercheTags'];
+const LISTES = ['caracteristiques', 'caracteristiquesRecherche', 'gestionEmotionnelle', 'rapportReseaux', 'hardPreferences'];
+const CASES = ['accepteDivorce', 'accepteVeuf', 'accepteEnfants', 'acceptePlusieursEnfants'];
 function lireMatching(form) {
   const f = form.elements, m = {};
   for (const n of CHAMPS) m[n] = f[n]?.value || '';
   for (const n of LISTES) m[n] = $$(`[name=${n}]:checked`, form).map((x) => x.value);
+  // Menu déroulant : une seule valeur ; si le profil en avait plusieurs et qu'on n'a pas changé la première, on les garde.
+  for (const n of UNE) { const v = f[n]?.value || '', avant = form._avant?.[n] || []; m[n] = v ? (avant[0] === v ? avant : [v]) : []; }
+  m.kabyleUniquement = m.origineRechercheTags.length === 1 && /^Kabyle/.test(m.origineRechercheTags[0]);
   for (const n of CASES) m[n] = f[n].checked;
   return m;
 }
@@ -584,6 +584,9 @@ function monterEdition(form, st, p, token) {
   poser('niveauEtudeCategorie', m.niveauEtudeCategorie);
   for (const n of CHAMPS) if (n !== 'niveauEtudeCategorie') poser(n, m[n]);
   for (const n of LISTES) for (const v of m[n] || []) { const c = form.querySelector(`[name=${n}][value="${CSS.escape(v)}"]`); if (c) c.checked = true; }
+  form._avant = { origineTags: m.origineTags || [], origineRechercheTags: m.origineRechercheTags || [] };
+  poser('origineTags', (m.origineTags || [])[0] || '');
+  poser('origineRechercheTags', (m.origineRechercheTags || [])[0] || (m.kabyleUniquement ? O.origine[0] : ''));
   for (const n of CASES) F[n].checked = Boolean(m[n]);
   F.anonyme_ok.checked = Boolean(p.anonyme_ok);
   F.telephone.value = p.telephone || '';
@@ -596,7 +599,7 @@ function monterEdition(form, st, p, token) {
     const manques = [];
     const m = (texte, el) => manques.push({ texte, el });
     if (!F.birth_date.value || F.birth_date.value > maxNaissance()) m('Ta date de naissance (18 ans ou plus)', F.birth_date);
-    if (!form.querySelector('[name=origineTags]:checked')) m('Ton origine (kabyle, chaouie, touarègue, amazighe ou autre)', form.querySelector('[name=origineTags]')?.closest('.annonce-puces') || form.querySelector('#ton-origine'));
+    if (!form.elements.origineTags?.value) m('Ton origine (kabyle, chaouie, touarègue, amazighe ou autre)', form.elements.origineTags);
     manques.push(...manquesEssentiels(form));
     for (const [t, nom] of [[F.profil, 'Ta présentation'], [F.recherche, 'Qui tu cherches']]) {
       if (t.value.trim() && t.value.trim().length < 20) m(`${nom} : quelques phrases de plus (20 caractères au moins)`, t);
@@ -964,3 +967,10 @@ export async function monterAjoutMedias(box, { token, deja = 0, remplacement = f
     }
   });
 }
+
+// Listes à choix multiples repliées : le résumé indique combien de choix sont faits.
+if (typeof document !== 'undefined') document.addEventListener('change', (e) => {
+  const d = e.target.closest?.('details.annonce-deroule'); if (!d) return;
+  const n = d.querySelectorAll('input:checked').length;
+  d.querySelector('summary').textContent = n ? `${n} choisi${n > 1 ? 's' : ''} · modifier` : 'Choisir dans la liste';
+});

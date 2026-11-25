@@ -30,7 +30,7 @@ const ETAPES = [
     ['c', 'rechercheFemmeHidjabiste', 'Hidjab chez la femme recherchée', 'hidjab'],
     ['c', 'sportRecherche', 'Sport recherché', 'sport'], ['c', 'fumeurRecherche', 'Fumeur recherché', 'fumeur'], ['c', 'alcoolRecherche', 'Alcool recherché', 'alcool'], ['c', 'chemmaRecherche', 'Chemma recherchée', 'chemma'],
     ['l', 'origineRechercheTags', 'Origines / communautés acceptées', 'origine'],
-    ['b', 'kabyleUniquement', 'Kabyle uniquement'], ['b', 'accepteDivorce', 'Accepte divorcé(e)'], ['b', 'refuseDivorce', 'Refuse divorcé(e)'], ['b', 'accepteVeuf', 'Accepte veuf/veuve'], ['b', 'refuseVeuf', 'Refuse veuf/veuve'],
+    ['b', 'accepteDivorce', 'Accepte divorcé(e)'], ['b', 'refuseDivorce', 'Refuse divorcé(e)'], ['b', 'accepteVeuf', 'Accepte veuf/veuve'], ['b', 'refuseVeuf', 'Refuse veuf/veuve'],
     ['b', 'accepteEnfants', 'Accepte enfants'], ['b', 'accepteUnEnfant', 'Accepte 1 enfant'], ['b', 'acceptePlusieursEnfants', 'Accepte plusieurs enfants'],
     ['c', 'tailleMinRechercheCm', 'Exigence physique : taille minimum', 'nombre'], ['l', 'caracteristiquesRecherche', 'Rédhibitoire / points bloquants', 'caracteristiques']]],
   ['6 · Exigences absolues du profil', 'Sans sélection, ces critères restent des préférences souples qui influencent le score. Coché = bloquant (Âge : 0 an de marge ; Localisation : secteur strict).', [
@@ -47,7 +47,7 @@ export const CARTES = [
   { id: 'valeurs', titre: 'Valeurs et religion', couleur: '#6c5ba7', aide: 'Religion, pratique, et ce qui est cherché chez l’autre.', cles: ['religion', 'religionAutre', 'pratique', 'fermeDifferencePratique', 'religionsAcceptees', 'religionRecherche', 'pratiqueRecherche', 'rechercheFemmeHidjabiste'] },
   { id: 'pro', titre: 'Professionnel', couleur: '#3a6fb0', aide: 'Études et profession.', cles: ['niveauEtudeCategorie', 'domaineEtudes', 'profession', 'etudesRecherche'] },
   { id: 'vie', titre: 'Hygiène de vie et personnalité', couleur: '#d4577a', aide: 'Mode de vie, caractère, vie à deux.', cles: ['fumeur', 'alcool', 'sport', 'chemma', 'fumeurRecherche', 'alcoolRecherche', 'sportRecherche', 'chemmaRecherche', 'gestionEmotionnelle', 'rapportReseaux', 'belleFamille', 'impressionEchange', 'caracteristiques', 'caracteristiquesRecherche', 'tailleCm', 'tailleMinRechercheCm'] },
-  { id: 'origines', titre: 'Mes origines', couleur: '#b8872b', aide: 'Communauté, origines acceptées.', cles: ['origineTags', 'origineRechercheTags', 'kabyleUniquement'] },
+  { id: 'origines', titre: 'Mes origines', couleur: '#b8872b', aide: 'Communauté, origines acceptées.', cles: ['origineTags', 'origineRechercheTags'] },
   { id: 'bloquants', titre: 'Exigences bloquantes', couleur: '#5e5a66', aide: 'Sans sélection, ce sont des préférences souples. Coché = bloquant.', cles: ['hardPreferences'] },
 ].map((c) => ({ ...c, items: c.cles.map((k) => PAR_CLE.get(k)).filter(Boolean) }));
 const carteOuverte = new Map(); // ref -> carte ouverte, pour la retrouver après « Enregistrer »
@@ -63,7 +63,7 @@ function rendre(it, v, pre = '') {
   const [genre, n, titre, type, cle] = it, nom = pre + n;
   if (genre === 'b') return `<label class="cp-case"><input type="checkbox" name="${nom}"${v[n] ? ' checked' : ''}> ${esc(titre)}</label>`;
   if (genre === 'h') return `<div class="cp-cases">${Object.entries(HARD).map(([k, t]) => `<label><input type="checkbox" name="${nom}" value="${k}"${(v[n] || []).includes(k) ? ' checked' : ''}> ${esc(t)}</label>`).join('')}</div>`;
-  if (genre === 'l') return `<fieldset><legend>${esc(titre)}</legend><div class="cp-cases">${liste_de(type).map((x) => `<label><input type="checkbox" name="${nom}" value="${esc(x)}"${(Array.isArray(v[n]) ? v[n] : []).includes(x) ? ' checked' : ''}> ${esc(lib(x))}</label>`).join('')}</div></fieldset>`;
+  if (genre === 'l') return `<fieldset><legend>${esc(titre)}</legend><details class="annonce-deroule"><summary>Choisir dans la liste</summary><div class="cp-cases">${liste_de(type).map((x) => `<label><input type="checkbox" name="${nom}" value="${esc(x)}"${(Array.isArray(v[n]) ? v[n] : []).includes(x) ? ' checked' : ''}> ${esc(lib(x))}</label>`).join('')}</div></details></fieldset>`;
   const manque = cle && vide(v[n]);
   const entete = `<label class="${manque ? 'cp-manque' : ''}">${esc(titre)}${manque ? ' <em>à compléter</em>' : ''}`;
   if (type === 'texte') return `${entete}<input name="${nom}" maxlength="80" value="${esc(v[n] ?? '')}"></label>`;

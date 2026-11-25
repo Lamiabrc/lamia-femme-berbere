@@ -119,7 +119,7 @@ export function choixPropres(m = {}) {
     accepteVeuf: m.accepteVeuf === true,
     accepteEnfants: m.accepteEnfants === true,
     acceptePlusieursEnfants: m.acceptePlusieursEnfants === true,
-    kabyleUniquement: m.kabyleUniquement === true,
+    kabyleUniquement: m.kabyleUniquement === true || (Array.isArray(m.origineRechercheTags) && m.origineRechercheTags.length === 1 && /^Kabyle/.test(m.origineRechercheTags[0])),
     situationAdministrative: un(m.situationAdministrative, O.situationAdministrative),
     proprietaire: un(m.proprietaire, O.proprietaire),
     rapportReseaux: plusieurs(m.rapportReseaux, O.rapportReseaux, 5),
