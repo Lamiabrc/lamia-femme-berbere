@@ -183,7 +183,7 @@ function infos() {
   if (profilInvisible) {
     const QUOI = { photos: 'ajoute tes 2 photos', photos_refusees: 'envoie 2 photos valides', contact: 'indique un contact valable', email: 'corrige ton adresse email', essentiel: 'complète ton profil (religion, études, situation, âge recherché)', textes: 'écris ta présentation' };
     const m = aCompleterSwipe.map((k) => QUOI[k]).filter(Boolean);
-    lignes.unshift(`<p class="swipe-info swipe-alerte" role="alert">${m.length ? `⚠ Ton profil n’est pas validé : ${m.join(', ')}.` : '⚠ Ton profil n’est pas encore validé : Lamia le regarde.'} Tant que ce n’est pas fait, personne ne te voit et tu ne peux pas swiper. <a href="/mon-espace/#a-completer">Voir ce qu’il manque</a></p>`);
+    lignes.unshift(`<p class="swipe-info swipe-alerte" role="alert">${m.length ? `⚠ Ton profil n’est pas validé : ${m.join(', ')}.` : '⚠ Ton profil n’est pas encore validé : il est en cours de vérification.'} Tant que ce n’est pas fait, personne ne te voit et tu ne peux pas swiper. <a href="/mon-espace/#a-completer">Voir ce qu’il manque</a></p>`);
   }
   if (tous.length ? !profils.some((x) => !x.revu) : chargeFait) lignes.unshift(`<p class="swipe-info"><strong>Tu as vu tous les profils qui te correspondent et qui te cherchent aussi.</strong> De nouveaux profils arrivent chaque jour. En attendant, tu revois ceux que tu avais passés ; tu peux aussi élargir ta recherche avec « Modifier mon profil ». <a href="/mon-espace/">Mon espace</a></p>`);
   bandeau.innerHTML = lignes.join('');
