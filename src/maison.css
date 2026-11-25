@@ -4980,3 +4980,11 @@ body:has(.espace) .site-header .maison-menu-panneau a, body:has(.espace) .site-h
 .photo-illisible { display: block; width: 180px; padding: 10px; border: 1px dashed #c9a58f; border-radius: 14px; background: #fff7f0; font-size: 14px; line-height: 1.35; }
 .swipe-info.swipe-alerte{background:#fbe9e7;border:2px solid #b3261e;color:#7a1410;font-weight:700}.swipe-info.swipe-alerte a{color:#7a1410;text-decoration:underline}
 .incomplet-alerte{margin:0 0 .6rem;padding:10px 14px;border:2px solid #b3261e;border-radius:12px;background:#fbe9e7;color:#7a1410;font-weight:700}
+
+/* Parcours en cartes : une couleur par thème (26 nov. 2026) */
+.annonce-form .annonce-etape[style*="--cc"] { border-left: 6px solid var(--cc); padding-left: 12px; }
+.annonce-form .annonce-etape[style*="--cc"] h3 span { background: var(--cc) !important; color: #fff !important; box-shadow: none !important; }
+.annonce-sous.annonce-moi, .annonce-sous.annonce-cherche { margin: 6px 0 0; font-weight: 700; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--cc, #2F2B3D); }
+.annonce-menu { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 8px; }
+.annonce-menu button { padding: 8px 12px; border-radius: 999px; border: 2px solid var(--cc); background: #fff; color: #2F2B3D; font: 600 13px var(--sans, sans-serif); cursor: pointer; }
+.annonce-menu button.annonce-menu-on { background: var(--cc); color: #fff; }
