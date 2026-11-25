@@ -3,5 +3,5 @@ import { json } from '../lib/event-tickets.mjs';
 
 export async function GET(request) {
   try { return await myOrders(request); }
-  catch { console.error('mes-achats failed'); return json({ error: 'temporary_failure' }, 502); }
+  catch (err) { console.error(`mes-achats failed ${String(err?.message || err).slice(0, 160)}`); return json({ error: 'temporary_failure' }, 502); }
 }
