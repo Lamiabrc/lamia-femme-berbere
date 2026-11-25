@@ -59,88 +59,144 @@ const maxNaissance = () => { const d = new Date(); d.setFullYear(d.getFullYear()
 
 export function formulaireHtml() {
   return `<form class="annonce-form" data-annonce-form novalidate>
-  <div class="annonce-etape">
-    <h3><span>1</span> Qui es-tu ?</h3>
+  <div class="annonce-etape" style="--cc:#d9822b">
+    <h3><span>0</span> Pour commencer</h3>
+    <p class="annonce-sous annonce-moi">Moi</p>
     <div class="annonce-grille">
       <label>Ton prénom <small>(ou un petit nom)</small><input name="prenom" maxlength="60" autocomplete="given-name" required></label>
       <fieldset class="annonce-choix"><legend>Tu es</legend>
-        <label><input type="radio" name="genre" value="femme"> Femme</label>
-        <label><input type="radio" name="genre" value="homme"> Homme</label>
+      <label><input type="radio" name="genre" value="femme"> Femme</label>
+      <label><input type="radio" name="genre" value="homme"> Homme</label>
       </fieldset>
       <label data-age>Ton âge<input name="age" type="number" min="18" max="99" inputmode="numeric" required></label>
       <label data-naissance hidden>Ta date de naissance <small>(seul ton âge sera affiché)</small><input name="birth_date" type="date" max="${maxNaissance()}"></label>
-      <label>Ta ville<input name="ville" maxlength="80" autocomplete="address-level2" required></label>
-      <label>Ton pays de résidence<select name="pays">${opts(O.pays)}</select></label>
-      <label data-plus-tard>Ton village ou ta région d’origine <small>(facultatif)</small><input name="villageOrigine" maxlength="80"></label>
       <label data-plus-tard>Les langues que tu parles<input name="langue" maxlength="80" placeholder="Kabyle, tamazight, français…"></label>
     </div>
-    <p class="annonce-sous" id="ton-origine">Ton origine <small>(affichée sur ton profil, 3 au maximum)</small></p>${puces('origineTags', O.origine)}
+    <div data-plus-tard>
+    <p class="annonce-sous annonce-cherche">Je cherche</p>
+      <div class="annonce-ages"><label>Âge de</label><input name="age_min" type="number" min="18" max="99" inputmode="numeric" aria-label="Âge minimum" placeholder="25"><label>à</label><input name="age_max" type="number" min="18" max="99" inputmode="numeric" aria-label="Âge maximum" placeholder="40"><span>ans</span></div>
+    </div>
     <div class="annonce-live" data-bloc-live>
-      <fieldset class="annonce-choix"><legend>As-tu déjà créé ton profil en live avec Lamia ?</legend>
-        <label><input type="checkbox" name="live" value="oui"> Oui</label>
-      </fieldset>
-      <div data-si-live hidden>
-        <label>Ton pseudo ou ton lien TikTok de l’époque<input name="tiktok_live" maxlength="200" placeholder="@tonpseudo"></label>
-      </div>
+    <fieldset class="annonce-choix"><legend>As-tu déjà créé ton profil en live avec Lamia ?</legend>
+    <label><input type="checkbox" name="live" value="oui"> Oui</label>
+    </fieldset>
+    <div data-si-live hidden>
+    <label>Ton pseudo ou ton lien TikTok de l’époque<input name="tiktok_live" maxlength="200" placeholder="@tonpseudo"></label>
+    </div>
     </div>
   </div>
-  <div class="annonce-etape" data-optionnel-live data-plus-tard>
-    <h3><span>2</span> Ta vie aujourd’hui</h3>
+  <div class="annonce-etape" style="--cc:#c2495b" data-plus-tard>
+    <h3><span>0</span> Statut et enfants</h3>
+    <p class="annonce-sous annonce-moi">Moi</p>
     <div class="annonce-grille">
       <label>Ta situation<select name="situation">${opts(O.situation)}</select></label>
       <label>As-tu des enfants ?<select name="enfants">${opts(O.enfants)}</select></label>
       <label data-si-enfants hidden>Combien ?<input name="nbEnfants" type="number" min="0" max="15" inputmode="numeric"></label>
       <label data-si-enfants hidden>Leurs âges<input name="ageEnfants" maxlength="60" placeholder="3 et 7 ans"></label>
       <label>Souhaites-tu des enfants ?<select name="desirEnfants">${opts(O.desirEnfants)}</select></label>
-      <label>Ton niveau d’études<select name="niveauEtudeCategorie">${opts(O.etudeCategorie)}</select></label>
-      <label>Ton diplôme<select name="niveauEtudeDetail"><option value="">Choisis d’abord ton niveau</option></select></label>
-      <label>Diplôme obtenu en<select name="etudesPaysObtention">${opts(O.etudesPaysObtention)}</select></label>
-      <label>Ta profession<input name="profession" maxlength="80"></label>
-      <label>Ta taille <small>(en cm, facultatif)</small><input name="tailleCm" type="number" min="120" max="230" inputmode="numeric" placeholder="170"></label>
-      <label>Ta religion<select name="religion">${opts(O.religion)}</select></label>
-      <label>Ta pratique <small>(facultatif)</small><select name="pratique">${opts(O.pratique, 'Je préfère ne pas dire')}</select></label>
-      <label class="annonce-large">Ta foi et ta pratique en quelques mots <small>(facultatif : prière, ramadan, ce qui compte pour toi…)</small><textarea name="religionTexte" rows="2" maxlength="300"></textarea></label>
-      <label>Bouger pour l’amour ?<select name="mobiliteGeographique">${opts(O.mobilite)}</select></label>
-      <label data-vision>Le travail dans le couple<select name="visionFinanciere"><option value="">Choisis d’abord femme ou homme</option></select></label>
-      <label>Tabac<select name="fumeur">${opts(O.fumeur)}</select></label>
-      <label>Sport<select name="sport">${opts(O.sport)}</select></label>
-      <label>Alcool<select name="alcool">${opts(O.alcool)}</select></label>
-      <label>Chique (chemma)<select name="chemma">${opts(O.chemma)}</select></label>
-      <label>Ta situation administrative <small>(facultatif)</small><select name="situationAdministrative">${opts(O.situationAdministrative, 'Je préfère ne pas dire')}</select></label>
-      <label>Propriétaire de ton logement ? <small>(facultatif)</small><select name="proprietaire">${opts(O.proprietaire, 'Je préfère ne pas dire')}</select></label>
-      <label>La belle-famille <small>(facultatif)</small><select name="belleFamille">${opts(O.belleFamille, 'Je préfère ne pas dire')}</select></label>
-      <label>Quand tu échanges <small>(facultatif)</small><select name="impressionEchange">${opts(O.impressionEchange, 'Je préfère ne pas dire')}</select></label>
-      <label class="annonce-large">Autre chose sur ton mode de vie <small>(facultatif : habitudes, alimentation, sorties…)</small><textarea name="autresModeVie" rows="2" maxlength="300"></textarea></label>
     </div>
-    <p class="annonce-sous">Ce qui te ressemble <small>(jusqu’à 6)</small></p>${puces('caracteristiques', O.caracteristiques)}
-    <p class="annonce-sous">Face aux émotions <small>(facultatif)</small></p>${puces('gestionEmotionnelle', O.gestionEmotionnelle)}
-    <p class="annonce-sous">Les réseaux sociaux <small>(facultatif)</small></p>${puces('rapportReseaux', O.rapportReseaux)}
-    <label>Parle-nous de toi avec ton cœur <small>(ton caractère, tes valeurs, ce que tu aimes)</small><textarea name="profil" rows="5" maxlength="1500" placeholder="Écris comme si tu te présentais à une amie de Lamia."></textarea></label>
-  </div>
-  <div class="annonce-etape" data-optionnel-live data-plus-tard>
-    <h3><span>3</span> La personne que tu cherches</h3>
-    <div class="annonce-grille">
-      <div class="annonce-ages"><label>Âge de</label><input name="age_min" type="number" min="18" max="99" inputmode="numeric" aria-label="Âge minimum" placeholder="25"><label>à</label><input name="age_max" type="number" min="18" max="99" inputmode="numeric" aria-label="Âge maximum" placeholder="40"><span>ans</span></div>
-      <label>Où doit-elle vivre ?<select name="zoneGeo">${opts(O.zoneGeo)}</select></label>
-      <label>Sa religion<select name="religionRecherche">${opts(O.religionRecherche)}</select></label>
-      <label>Sa pratique<select name="pratiqueRecherche">${opts(O.pratiqueRecherche)}</select></label>
-      <label>Son niveau d’études<select name="etudesRecherche">${opts(O.etudesRecherche)}</select></label>
-      <label>Sa taille minimum <small>(cm, facultatif)</small><input name="tailleMinRechercheCm" type="number" min="120" max="230" inputmode="numeric" placeholder="170"></label>
-      <label>Son tabac <small>(facultatif)</small><select name="fumeurRecherche">${opts(O.fumeur, 'Peu importe')}</select></label>
-      <label>Son alcool <small>(facultatif)</small><select name="alcoolRecherche">${opts(O.alcool, 'Peu importe')}</select></label>
-      <label>Son sport <small>(facultatif)</small><select name="sportRecherche">${opts(O.sport, 'Peu importe')}</select></label>
-      <label>Sa chemma <small>(facultatif)</small><select name="chemmaRecherche">${opts(O.chemma, 'Peu importe')}</select></label>
-      <label data-hidjab hidden>Qu’elle porte le hijab ?<select name="rechercheFemmeHidjabiste">${opts(O.hidjab)}</select></label>
-    </div>
-    <p class="annonce-sous">Ses origines <small>(laisse vide si peu importe)</small></p>${puces('origineRechercheTags', O.origine)}
+    <p class="annonce-sous annonce-cherche">Je cherche</p>
     <div class="annonce-puces annonce-accepte">
-      <label><input type="checkbox" name="kabyleUniquement"><span>Uniquement kabyle</span></label>
       <label><input type="checkbox" name="accepteDivorce"><span>J’accepte une personne divorcée</span></label>
       <label><input type="checkbox" name="accepteVeuf"><span>J’accepte une personne veuve</span></label>
       <label><input type="checkbox" name="accepteEnfants"><span>J’accepte une personne qui a des enfants</span></label>
       <label><input type="checkbox" name="acceptePlusieursEnfants"><span>… même plusieurs enfants</span></label>
     </div>
+  </div>
+  <div class="annonce-etape" style="--cc:#2f8f83">
+    <h3><span>0</span> Secteur géographique</h3>
+    <p class="annonce-sous annonce-moi">Moi</p>
+    <div class="annonce-grille">
+      <label>Ta ville<input name="ville" maxlength="80" autocomplete="address-level2" required></label>
+      <label>Ton pays de résidence<select name="pays">${opts(O.pays)}</select></label>
+      <label data-plus-tard>Ton village ou ta région d’origine <small>(facultatif)</small><input name="villageOrigine" maxlength="80"></label>
+      <label data-plus-tard>Bouger pour l’amour ?<select name="mobiliteGeographique">${opts(O.mobilite)}</select></label>
+    </div>
+    <p class="annonce-sous annonce-cherche">Je cherche</p>
+    <div class="annonce-grille">
+      <label data-plus-tard>Où doit-elle vivre ?<select name="zoneGeo">${opts(O.zoneGeo)}</select></label>
+    </div>
+  </div>
+  <div class="annonce-etape" style="--cc:#6c5ba7" data-plus-tard>
+    <h3><span>0</span> Valeurs et religion</h3>
+    <p class="annonce-sous annonce-moi">Moi</p>
+    <div class="annonce-grille">
+      <label>Ta religion<select name="religion">${opts(O.religion)}</select></label>
+      <label>Ta pratique <small>(facultatif)</small><select name="pratique">${opts(O.pratique, 'Je préfère ne pas dire')}</select></label>
+      <label class="annonce-large">Ta foi et ta pratique en quelques mots <small>(facultatif : prière, ramadan, ce qui compte pour toi…)</small><textarea name="religionTexte" rows="2" maxlength="300"></textarea></label>
+    </div>
+    <p class="annonce-sous annonce-cherche">Je cherche</p>
+    <div class="annonce-grille">
+      <label>Sa religion<select name="religionRecherche">${opts(O.religionRecherche)}</select></label>
+      <label>Sa pratique<select name="pratiqueRecherche">${opts(O.pratiqueRecherche)}</select></label>
+      <label data-hidjab hidden>Qu’elle porte le hijab ?<select name="rechercheFemmeHidjabiste">${opts(O.hidjab)}</select></label>
+    </div>
+  </div>
+  <div class="annonce-etape" style="--cc:#3a6fb0" data-plus-tard>
+    <h3><span>0</span> Professionnel</h3>
+    <p class="annonce-sous annonce-moi">Moi</p>
+    <div class="annonce-grille">
+      <label>Ton niveau d’études<select name="niveauEtudeCategorie">${opts(O.etudeCategorie)}</select></label>
+      <label>Ton diplôme<select name="niveauEtudeDetail"><option value="">Choisis d’abord ton niveau</option></select></label>
+      <label>Diplôme obtenu en<select name="etudesPaysObtention">${opts(O.etudesPaysObtention)}</select></label>
+      <label>Ta profession<input name="profession" maxlength="80"></label>
+      <label data-vision>Le travail dans le couple<select name="visionFinanciere"><option value="">Choisis d’abord femme ou homme</option></select></label>
+    </div>
+    <p class="annonce-sous annonce-cherche">Je cherche</p>
+    <div class="annonce-grille">
+      <label>Son niveau d’études<select name="etudesRecherche">${opts(O.etudesRecherche)}</select></label>
+    </div>
+  </div>
+  <div class="annonce-etape" style="--cc:#d4577a" data-plus-tard>
+    <h3><span>0</span> Hygiène de vie</h3>
+    <p class="annonce-sous annonce-moi">Moi</p>
+    <div class="annonce-grille">
+      <label>Tabac<select name="fumeur">${opts(O.fumeur)}</select></label>
+      <label>Sport<select name="sport">${opts(O.sport)}</select></label>
+      <label>Alcool<select name="alcool">${opts(O.alcool)}</select></label>
+      <label>Chique (chemma)<select name="chemma">${opts(O.chemma)}</select></label>
+      <label>Ta taille <small>(en cm, facultatif)</small><input name="tailleCm" type="number" min="120" max="230" inputmode="numeric" placeholder="170"></label>
+      <label>Ta situation administrative <small>(facultatif)</small><select name="situationAdministrative">${opts(O.situationAdministrative, 'Je préfère ne pas dire')}</select></label>
+      <label>Propriétaire de ton logement ? <small>(facultatif)</small><select name="proprietaire">${opts(O.proprietaire, 'Je préfère ne pas dire')}</select></label>
+    </div>
+    <p class="annonce-sous annonce-cherche">Je cherche</p>
+    <div class="annonce-grille">
+      <label>Son tabac <small>(facultatif)</small><select name="fumeurRecherche">${opts(O.fumeur, 'Peu importe')}</select></label>
+      <label>Son alcool <small>(facultatif)</small><select name="alcoolRecherche">${opts(O.alcool, 'Peu importe')}</select></label>
+      <label>Son sport <small>(facultatif)</small><select name="sportRecherche">${opts(O.sport, 'Peu importe')}</select></label>
+      <label>Sa chemma <small>(facultatif)</small><select name="chemmaRecherche">${opts(O.chemma, 'Peu importe')}</select></label>
+      <label>Sa taille minimum <small>(cm, facultatif)</small><input name="tailleMinRechercheCm" type="number" min="120" max="230" inputmode="numeric" placeholder="170"></label>
+    </div>
+  </div>
+  <div class="annonce-etape" style="--cc:#a8486f" data-plus-tard>
+    <h3><span>0</span> Personnalité</h3>
+    <p class="annonce-sous annonce-moi">Moi</p>
+    <p class="annonce-sous">Ce qui te ressemble <small>(jusqu’à 6)</small></p>${puces('caracteristiques', O.caracteristiques)}
+    <p class="annonce-sous">Face aux émotions <small>(facultatif)</small></p>${puces('gestionEmotionnelle', O.gestionEmotionnelle)}
+    <p class="annonce-sous">Les réseaux sociaux <small>(facultatif)</small></p>${puces('rapportReseaux', O.rapportReseaux)}
+    <div class="annonce-grille">
+      <label>La belle-famille <small>(facultatif)</small><select name="belleFamille">${opts(O.belleFamille, 'Je préfère ne pas dire')}</select></label>
+      <label>Quand tu échanges <small>(facultatif)</small><select name="impressionEchange">${opts(O.impressionEchange, 'Je préfère ne pas dire')}</select></label>
+      <label class="annonce-large">Autre chose sur ton mode de vie <small>(facultatif : habitudes, alimentation, sorties…)</small><textarea name="autresModeVie" rows="2" maxlength="300"></textarea></label>
+    </div>
+    <p class="annonce-sous annonce-cherche">Je cherche</p>
     <p class="annonce-sous">Son caractère <small>(jusqu’à 6)</small></p>${puces('caracteristiquesRecherche', O.caracteristiques)}
+  </div>
+  <div class="annonce-etape" style="--cc:#b8872b">
+    <h3><span>0</span> Mes origines</h3>
+    <p class="annonce-sous annonce-moi">Moi</p>
+    <p class="annonce-sous" id="ton-origine">Ton origine <small>(affichée sur ton profil, 3 au maximum)</small></p>${puces('origineTags', O.origine)}
+    <p class="annonce-sous annonce-cherche">Je cherche</p>
+    <div data-plus-tard>
+    <p class="annonce-sous">Ses origines <small>(laisse vide si peu importe)</small></p>${puces('origineRechercheTags', O.origine)}
+    <div class="annonce-puces annonce-accepte">
+      <label><input type="checkbox" name="kabyleUniquement"><span>Uniquement kabyle</span></label>
+    </div>
+    </div>
+  </div>
+  <div class="annonce-etape" style="--cc:#8a6d3b" data-plus-tard>
+    <h3><span>0</span> Mon histoire</h3>
+    <label>Parle-nous de toi avec ton cœur <small>(ton caractère, tes valeurs, ce que tu aimes)</small><textarea name="profil" rows="5" maxlength="1500" placeholder="Écris comme si tu te présentais à une amie de Lamia."></textarea></label>
     <label>Dis-nous qui tu aimerais rencontrer <small>(vos projets, ce qui compte pour toi)</small><textarea name="recherche" rows="4" maxlength="1500" placeholder="Mariage, valeurs, région… dis ce qui est important pour toi."></textarea></label>
   </div>
   <div class="annonce-etape" data-etape-medias>
@@ -525,6 +581,7 @@ function monterEdition(form, st, p, token) {
   F.anonyme_ok.checked = Boolean(p.anonyme_ok);
   if (p.sans_reseau) { F.sans_reseau.checked = true; F.telephone.value = p.telephone || ''; F.sans_reseau.dispatchEvent(new Event('change')); }
   F.photo_partage.checked = Boolean(p.photo_partage);
+  const etapes = monterEtapes(form, { calculerManques: () => [], afficherManques: () => false, edition: true });
   const btn = $('.annonce-envoyer', form); btn.textContent = 'Enregistrer mes modifications';
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -538,7 +595,7 @@ function monterEdition(form, st, p, token) {
       else if (!texteCredible(t.value)) m(`${nom} : écris avec de vrais mots`, t);
     }
     if (F.sans_reseau.checked && !telephoneNormal(F.telephone.value)) m('Ton numéro de téléphone (avec l’indicatif si tu n’es pas en France)', F.telephone);
-    if (manques.length) { say(st, `Il manque ${manques.length > 1 ? `${manques.length} informations` : 'une information'} : regarde les champs entourés.`, true); return fenetreManques(manques, form); }
+    if (manques.length) { say(st, `Il manque ${manques.length > 1 ? `${manques.length} informations` : 'une information'} : regarde les champs entourés.`, true); return fenetreManques(manques, form, { allerA: (el) => etapes?.allerA(el) }); }
     btn.disabled = true; say(st, 'Enregistrement…');
     try {
       await api({ action: 'annonce_modifier', genre: form.querySelector('[name=genre]:checked')?.value, prenom: F.prenom.value, birth_date: F.birth_date.value, ville: F.ville.value, pays: F.pays.value, profil: F.profil.value, recherche: F.recherche.value, age_min: F.age_min.value, age_max: F.age_max.value, anonyme_ok: F.anonyme_ok.checked, photo_partage: F.photo_partage.checked, sans_reseau: F.sans_reseau.checked, telephone: F.sans_reseau.checked ? F.telephone.value : '', matching: lireMatching(form) }, token);
@@ -720,7 +777,7 @@ addEventListener('hashchange', viaAncre);
 
 // ---------------------------------------------------------------- formulaire en étapes (création de profil)
 const BROUILLON = 'lfb-brouillon-profil';
-function monterEtapes(form, { calculerManques, afficherManques }) {
+function monterEtapes(form, { calculerManques, afficherManques, edition = false }) {
   // La fin du formulaire (accords + bouton d'envoi) devient la dernière étape.
   const enfants = [...form.children];
   const derniere = enfants.filter((x) => x.classList.contains('annonce-etape')).pop();
@@ -739,6 +796,13 @@ function monterEtapes(form, { calculerManques, afficherManques }) {
   nav.className = 'annonce-nav';
   nav.innerHTML = '<button type="button" class="btn btn-line" data-etape-prec>← Retour</button><button type="button" class="btn btn-ink" data-etape-suiv>Continuer →</button>';
   form.append(nav);
+  // Menu des cartes (Lamia, 26 nov. 2026) : en modification, on saute directement à la carte voulue.
+  const menu = document.createElement('div');
+  menu.className = 'annonce-menu';
+  if (edition) {
+    toutes().forEach((x, k) => { if (x.classList.contains('annonce-etape-fin')) return; const b = document.createElement('button'); b.type = 'button'; b.dataset.menuCarte = String(k); b.style.setProperty('--cc', x.style.getPropertyValue('--cc') || '#2F2B3D'); b.textContent = x.querySelector(':scope > h3')?.textContent.replace(/^\s*\S+\s/, '') || `Carte ${k + 1}`; b.addEventListener('click', () => montrer(k)); menu.append(b); });
+    progres.after(menu);
+  }
   let i = 0;
   const montrer = (n, defiler = true) => {
     const l = toutes(); i = Math.max(0, Math.min(n, l.length - 1));
@@ -748,7 +812,8 @@ function monterEtapes(form, { calculerManques, afficherManques }) {
     $('p', progres).textContent = `Étape ${i + 1} sur ${l.length}`;
     $('[data-etape-prec]', nav).hidden = i === 0;
     $('[data-etape-suiv]', nav).hidden = i === l.length - 1;
-    sauver();
+    if (!edition) sauver();
+    $$('[data-menu-carte]', menu).forEach((x, k) => { x.classList.toggle('annonce-menu-on', k === i); x.setAttribute('aria-current', k === i ? 'step' : 'false'); });
     if (defiler) try { progres.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch { /* */ }
   };
   $('[data-etape-prec]', nav).addEventListener('click', () => montrer(i - 1));
@@ -772,7 +837,7 @@ function monterEtapes(form, { calculerManques, afficherManques }) {
     } catch { /* stockage indisponible */ }
   };
   let brouillon = null;
-  try { brouillon = JSON.parse(localStorage.getItem(BROUILLON) || 'null'); } catch { /* */ }
+  if (!edition) try { brouillon = JSON.parse(localStorage.getItem(BROUILLON) || 'null'); } catch { /* */ }
   if (brouillon) {
     const remplir = () => {
       for (const el of form.elements) {
@@ -792,7 +857,7 @@ function monterEtapes(form, { calculerManques, afficherManques }) {
     $('button', note).addEventListener('click', () => { try { localStorage.removeItem(BROUILLON); } catch { /* */ } location.reload(); });
     progres.after(note);
   }
-  form.addEventListener('input', sauver); form.addEventListener('change', sauver);
+  if (!edition) { form.addEventListener('input', sauver); form.addEventListener('change', sauver); }
   montrer(brouillon?._etape || 0, false);
   return {
     courante: () => toutes()[i],
