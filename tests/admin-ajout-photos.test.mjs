@@ -98,3 +98,25 @@ test('l’envoi par le membre lui-même fonctionne toujours comme avant', async 
   assert.equal(r.uploads.length, 2);
   assert.equal((await b.action('annonce_ajouter_medias', { medias: [jpeg, jpeg] }, null)).status, 401);
 });
+
+test('Lamia remplace une photo refusée : l’ancienne n’est retirée qu’une fois la nouvelle arrivée', async (t) => {
+  const b = await recette(t, { sansPhotos: false });
+  assert.equal((await b.action('annonce_admin_remplacer_photo', { ref: 42, photo_id: b.p1, ...{ type: 'image/jpeg', size: 2000 } }, MEMBRE)).status, 403);
+  const r = await admin(b, 'annonce_admin_remplacer_photo', { ref: 42, photo_id: b.p1, type: 'image/jpeg', size: 2000 });
+  assert.equal(r.status, 200);
+  assert.ok(r.upload.path.startsWith(`${b.id}/`));
+  // Envoi pas arrivé : l'ancienne reste, la ligne vide disparaît.
+  const rate = await admin(b, 'annonce_admin_remplacer_photo_finir', { ref: 42, photo_id: b.p1 });
+  assert.equal(rate.status, 502);
+  assert.ok((await photos(b)).some((f) => f.id === b.p1));
+  const r2 = await admin(b, 'annonce_admin_remplacer_photo', { ref: 42, photo_id: b.p1, type: 'image/png', size: 2000 });
+  b.objets.add(r2.upload.path);
+  const fin = await admin(b, 'annonce_admin_remplacer_photo_finir', { ref: 42, photo_id: b.p1 });
+  assert.equal(fin.status, 200);
+  const l = await photos(b);
+  assert.equal(l.length, 2);
+  assert.ok(!l.some((f) => f.id === b.p1));
+  assert.equal(l.find((f) => f.position === 1).storage_path, r2.upload.path);
+  const mauvais = await admin(b, 'annonce_admin_remplacer_photo', { ref: 42, photo_id: '00000000-0000-4000-8000-000000000000', type: 'image/jpeg', size: 10 });
+  assert.equal(mauvais.status, 400);
+});
