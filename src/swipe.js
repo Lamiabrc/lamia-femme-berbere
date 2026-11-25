@@ -180,7 +180,11 @@ function infos() {
   const co = document.querySelector('[data-tayri-offrir]');
   if (co) { co.hidden = false; co.querySelector('[data-tayri-offrir-texte]').textContent = creditsCoeur > 1 ? `${creditsCoeur} cœurs à offrir ce mois-ci` : creditsCoeur === 1 ? 'Un cœur à offrir ce mois-ci' : 'Offrir un cœur avec message'; }
   if (quota.limite) lignes.push(`<p class="swipe-info">Il te reste <strong>${quota.restants}</strong> profil${quota.restants > 1 ? 's' : ''} à swiper aujourd’hui (${quota.limite} par jour avec ta formule). <a href="/abonnement/">Plus de profils</a></p>`);
-  if (profilInvisible) lignes.unshift('<p class="swipe-info is-plein">Ton profil n’est pas terminé : personne ne peut encore te voir. <a href="/mon-espace/#a-completer">Voir ce qu’il manque</a></p>');
+  if (profilInvisible) {
+    const QUOI = { photos: 'ajoute tes 2 photos', photos_refusees: 'envoie 2 photos valides', contact: 'indique un contact valable', email: 'corrige ton adresse email', essentiel: 'complète ton profil (religion, études, situation, âge recherché)', textes: 'écris ta présentation' };
+    const m = aCompleterSwipe.map((k) => QUOI[k]).filter(Boolean);
+    lignes.unshift(`<p class="swipe-info swipe-alerte" role="alert">${m.length ? `⚠ Ton profil n’est pas validé : ${m.join(', ')}.` : '⚠ Ton profil n’est pas encore validé : Lamia le regarde.'} Tant que ce n’est pas fait, personne ne te voit et tu ne peux pas swiper. <a href="/mon-espace/#a-completer">Voir ce qu’il manque</a></p>`);
+  }
   if (tous.length ? !profils.some((x) => !x.revu) : chargeFait) lignes.unshift(`<p class="swipe-info"><strong>Tu as vu tous les profils qui te correspondent et qui te cherchent aussi.</strong> De nouveaux profils arrivent chaque jour. En attendant, tu revois ceux que tu avais passés ; tu peux aussi élargir ta recherche avec « Modifier mon profil ». <a href="/mon-espace/">Mon espace</a></p>`);
   bandeau.innerHTML = lignes.join('');
 }
@@ -256,6 +260,7 @@ function celebrerMatch(ref) {
 // Matchs au complet : avec qui, l'invitation à dématcher (raisons ouvertes dans l'espace) et l'abonnement pour plusieurs matchs.
 // Déclaration de bonne foi : demandée une fois, avant le premier cœur.
 let sincerite = true;
+let aCompleterSwipe = [];
 let profilInvisible = false; // profil pas encore validé : personne ne le voit
 let chargeFait = false; // la pile a été chargée au moins une fois (pour distinguer « vide » de « pas encore là »)
 function demanderSincerite() {
@@ -454,7 +459,7 @@ addEventListener('keydown', (e) => { if (document.querySelector('.swipe-fenetre'
     let liste;
     ({ profils: tous, quota, choisi, matchs = matchs, adresse, formule, algerie } = liste = await api({ action: 'annonce_swipe_liste' }, token));
     sincerite = liste.sincerite !== false; try { if (sincerite) localStorage.setItem('lfb-charte', '1'); } catch {}
-    profilInvisible = Boolean(liste.invisible);
+    profilInvisible = Boolean(liste.invisible); aCompleterSwipe = liste.a_completer || [];
     chargeFait = true;
     if (!sincerite) setTimeout(demanderSincerite, 600); // obligatoire : demandée dès l'ouverture du swipe
     creditsCoeur = liste.coeurs_message || 0;

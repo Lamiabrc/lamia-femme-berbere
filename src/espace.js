@@ -635,7 +635,8 @@ async function monProfil(session) {
       if (bloc) {
         bloc.hidden = !manques.length;
         if (manques.length) {
-          bloc.innerHTML = `<h2>Ton profil n’est pas terminé</h2><p>${p.invisible ? 'Pour l’instant, personne ne peut te voir. ' : ''}Voici ce qu’il reste à faire :</p><ol class="incomplet-liste">${manques.map((k) => `<li><strong>${QUOI[k][0]}</strong><span>${QUOI[k][1]}</span><button type="button" class="btn btn-ink" data-completer="${QUOI[k][3]}">${QUOI[k][2]}</button></li>`).join('')}</ol>`;
+          const COURT = { photos: 'ajoute tes 2 photos', photos_refusees: 'envoie 2 photos valides', contact: 'indique un contact valable', email: 'corrige ton adresse email', essentiel: 'complète ton profil', textes: 'écris ta présentation' };
+          bloc.innerHTML = `<p class="incomplet-alerte" role="alert">⚠ ${p.invisible ? 'Ton profil n’est pas validé : ' : 'À faire : '}${manques.map((k) => COURT[k]).filter(Boolean).join(', ')}.</p><h2>Ton profil n’est pas terminé</h2><p>${p.invisible ? 'Pour l’instant, personne ne peut te voir. ' : ''}Voici ce qu’il reste à faire :</p><ol class="incomplet-liste">${manques.map((k) => `<li><strong>${QUOI[k][0]}</strong><span>${QUOI[k][1]}</span><button type="button" class="btn btn-ink" data-completer="${QUOI[k][3]}">${QUOI[k][2]}</button></li>`).join('')}</ol>`;
           bloc.querySelectorAll('[data-completer]').forEach((b) => b.addEventListener('click', () => {
             if (b.dataset.completer === 'photos') { const z = document.querySelector('[data-profil-medias]'); if (z) { z.scrollIntoView({ behavior: 'smooth', block: 'center' }); z.classList.add('is-vise'); setTimeout(() => z.classList.remove('is-vise'), 2500); return; } }
             document.querySelector('[data-profil-modifier-haut] button')?.click();
