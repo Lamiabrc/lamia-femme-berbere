@@ -12,6 +12,7 @@ export function rendreModerationPhotos(a) {
     <h5>Photos du profil</h5><p>Fais glisser les photos : pour chacune, « Acceptée » ou « Refusée ». Le profil reste actif pendant que la personne remplace.</p>
     <div class="photos-glisseur" tabindex="0" aria-label="Photos privées du profil n° ${esc(a.ref)}">${photos.map((p) => `<fieldset class="photo-controle" data-photo-id="${esc(p.id)}">
       <legend>Photo ${esc(p.position)}</legend><a href="${esc(p.url)}" target="_blank" rel="noopener"><img src="${esc(p.url)}" alt="Photo ${esc(p.position)} du profil n° ${esc(a.ref)}" loading="lazy"></a>
+      <div class="photo-remplacer"><label class="btn btn-line">Remplacer cette photo<input type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" data-photo-remplacer-fichier="${esc(p.id)}" hidden></label><small data-photo-remplacer-etat></small></div>
       <div class="photo-choix"><label><input type="radio" name="choix-${esc(p.id)}" value="ok"${refusees.has(Number(p.position)) ? '' : ' checked'}> ✓ Acceptée</label><label><input type="radio" name="choix-${esc(p.id)}" value="non" data-photo-selection${refusees.has(Number(p.position)) ? ' checked' : ''}> ✗ Refusée</label></div>
     </fieldset>`).join('') || '<p>Aucune photo disponible sur le site.</p>'}</div>
     ${photos.length > 1 ? '<p class="photos-navigation"><button type="button" class="btn btn-line" data-photo-direction="-1">Photo précédente</button><button type="button" class="btn btn-line" data-photo-direction="1">Photo suivante</button></p>' : ''}
@@ -53,6 +54,26 @@ export function monterAjoutPhotos({ appel, apres, cle = '', racine = document })
     const f = e.target.closest('[data-photos-ajout]'); if (!f || e.target.name !== 'photos') return;
     const l = [...e.target.files];
     f.querySelector('[data-ajout-choix]').textContent = l.length ? `${l.length} photo${l.length > 1 ? 's' : ''} choisie${l.length > 1 ? 's' : ''} : ${l.map((x) => x.name).join(', ')}` : '';
+  });
+  racine.addEventListener('change', async (e) => {
+    const inp = e.target.closest('[data-photo-remplacer-fichier]'); if (!inp) return;
+    const carte = inp.closest('[data-photo-id]'), etat = carte.querySelector('[data-photo-remplacer-etat]'), form = inp.closest('[data-photo-controle]');
+    const fichier = inp.files[0]; if (!fichier) return;
+    const ref = Number(form.dataset.photoControle), photo_id = inp.dataset.photoRemplacerFichier;
+    if (!typePhoto(fichier)) { etat.textContent = 'Format non accepté (JPG, PNG, WebP ou HEIC).'; return; }
+    if (fichier.size > 12 * 1024 * 1024) { etat.textContent = 'Photo trop lourde (12 Mo maximum).'; return; }
+    form.querySelectorAll('button,input').forEach((x) => { x.disabled = true; }); etat.textContent = 'Envoi de la nouvelle photo…';
+    try {
+      const r = await appel({ action: 'annonce_admin_remplacer_photo', ref, photo_id, type: typePhoto(fichier), size: fichier.size });
+      const u = await fetch(r.upload.url, { method: 'PUT', headers: { apikey: cle, 'Content-Type': r.upload.type, 'x-upsert': 'false' }, body: fichier });
+      if (!u.ok) throw Object.assign(new Error('upload_failed'), { code: 'upload_failed' });
+      await appel({ action: 'annonce_admin_remplacer_photo_finir', ref, photo_id });
+      await appel({ action: 'annonce_admin_medias_verifier', ref });
+      etat.textContent = '✓ Photo remplacée.'; await apres(ref);
+    } catch (err) {
+      etat.textContent = err.code === 'file_type' ? 'Format non accepté.' : 'Le remplacement n’a pas abouti : l’ancienne photo est conservée. Réessaie.';
+      form.querySelectorAll('button,input').forEach((x) => { x.disabled = false; });
+    }
   });
   racine.addEventListener('submit', async (e) => {
     const f = e.target.closest('[data-photos-ajout]'); if (!f) return;
