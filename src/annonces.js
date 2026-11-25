@@ -75,6 +75,7 @@ export function formulaireHtml() {
     <div data-plus-tard>
     <p class="annonce-sous annonce-cherche">Je cherche</p>
       <div class="annonce-ages"><label>Âge de</label><input name="age_min" type="number" min="18" max="99" inputmode="numeric" aria-label="Âge minimum" placeholder="25"><label>à</label><input name="age_max" type="number" min="18" max="99" inputmode="numeric" aria-label="Âge maximum" placeholder="40"><span>ans</span></div>
+    <label class="annonce-case annonce-bloquant"><input type="checkbox" name="hardPreferences" value="age"> <span>C’est bloquant pour moi : je ne veux voir aucun profil hors de cette tranche d’âge.</span></label>
     </div>
     <div class="annonce-live" data-bloc-live>
     <fieldset class="annonce-choix"><legend>As-tu déjà créé ton profil en live avec Lamia ?</legend>
@@ -111,11 +112,14 @@ export function formulaireHtml() {
       <label>Ton pays de résidence<select name="pays">${opts(O.pays)}</select></label>
       <label data-plus-tard>Ton village ou ta région d’origine <small>(facultatif)</small><input name="villageOrigine" maxlength="80"></label>
       <label data-plus-tard>Bouger pour l’amour ?<select name="mobiliteGeographique">${opts(O.mobilite)}</select></label>
+      <label data-plus-tard>Ta situation administrative <small>(facultatif)</small><select name="situationAdministrative">${opts(O.situationAdministrative, 'Je préfère ne pas dire')}</select></label>
+      <label data-plus-tard>Propriétaire de ton logement ? <small>(facultatif)</small><select name="proprietaire">${opts(O.proprietaire, 'Je préfère ne pas dire')}</select></label>
     </div>
     <p class="annonce-sous annonce-cherche">Je cherche</p>
     <div class="annonce-grille">
-      <label data-plus-tard>Où doit-elle vivre ?<select name="zoneGeo">${opts(O.zoneGeo)}</select></label>
+      <label data-plus-tard>Où doit vivre la personne ?<select name="zoneGeo">${opts(O.zoneGeo)}</select></label>
     </div>
+    <label class="annonce-case annonce-bloquant" data-plus-tard><input type="checkbox" name="hardPreferences" value="location"> <span>C’est bloquant pour moi : je ne veux voir que des profils de cette zone.</span></label>
   </div>
   <div class="annonce-etape" style="--cc:#6c5ba7" data-plus-tard>
     <h3><span>0</span> Valeurs et religion</h3>
@@ -139,6 +143,7 @@ export function formulaireHtml() {
       <label>Ton niveau d’études<select name="niveauEtudeCategorie">${opts(O.etudeCategorie)}</select></label>
       <label>Ton diplôme<select name="niveauEtudeDetail"><option value="">Choisis d’abord ton niveau</option></select></label>
       <label>Diplôme obtenu en<select name="etudesPaysObtention">${opts(O.etudesPaysObtention)}</select></label>
+      <label>Ton domaine d’études<select name="domaineEtudes">${opts(O.domaineEtudes)}</select></label>
       <label>Ta profession<input name="profession" maxlength="80"></label>
       <label data-vision>Le travail dans le couple<select name="visionFinanciere"><option value="">Choisis d’abord femme ou homme</option></select></label>
     </div>
@@ -146,6 +151,7 @@ export function formulaireHtml() {
     <div class="annonce-grille">
       <label>Son niveau d’études<select name="etudesRecherche">${opts(O.etudesRecherche)}</select></label>
     </div>
+    <label class="annonce-case annonce-bloquant"><input type="checkbox" name="hardPreferences" value="money"> <span>C’est bloquant pour moi : la vision du travail dans le couple doit correspondre.</span></label>
   </div>
   <div class="annonce-etape" style="--cc:#d4577a" data-plus-tard>
     <h3><span>0</span> Hygiène de vie</h3>
@@ -156,8 +162,6 @@ export function formulaireHtml() {
       <label>Alcool<select name="alcool">${opts(O.alcool)}</select></label>
       <label>Chique (chemma)<select name="chemma">${opts(O.chemma)}</select></label>
       <label>Ta taille <small>(en cm, facultatif)</small><input name="tailleCm" type="number" min="120" max="230" inputmode="numeric" placeholder="170"></label>
-      <label>Ta situation administrative <small>(facultatif)</small><select name="situationAdministrative">${opts(O.situationAdministrative, 'Je préfère ne pas dire')}</select></label>
-      <label>Propriétaire de ton logement ? <small>(facultatif)</small><select name="proprietaire">${opts(O.proprietaire, 'Je préfère ne pas dire')}</select></label>
     </div>
     <p class="annonce-sous annonce-cherche">Je cherche</p>
     <div class="annonce-grille">
@@ -167,6 +171,7 @@ export function formulaireHtml() {
       <label>Sa chemma <small>(facultatif)</small><select name="chemmaRecherche">${opts(O.chemma, 'Peu importe')}</select></label>
       <label>Sa taille minimum <small>(cm, facultatif)</small><input name="tailleMinRechercheCm" type="number" min="120" max="230" inputmode="numeric" placeholder="170"></label>
     </div>
+    <label class="annonce-case annonce-bloquant"><input type="checkbox" name="hardPreferences" value="height"> <span>C’est bloquant pour moi : la taille minimum est une condition.</span></label>
   </div>
   <div class="annonce-etape" style="--cc:#a8486f" data-plus-tard>
     <h3><span>0</span> Personnalité</h3>
@@ -192,6 +197,7 @@ export function formulaireHtml() {
     <div class="annonce-puces annonce-accepte">
       <label><input type="checkbox" name="kabyleUniquement"><span>Uniquement kabyle</span></label>
     </div>
+    <label class="annonce-case annonce-bloquant"><input type="checkbox" name="hardPreferences" value="origin"> <span>C’est bloquant pour moi : je ne veux voir que les origines que j’ai cochées.</span></label>
     </div>
   </div>
   <div class="annonce-etape" style="--cc:#8a6d3b" data-plus-tard>
@@ -220,7 +226,8 @@ export function formulaireHtml() {
       <label data-reseau>Ton lien TikTok, Instagram ou Facebook <small>(facultatif)</small><input name="contactReseau" maxlength="200" placeholder="https://www.tiktok.com/@tonpseudo"></label>
     </div>
     <label class="annonce-case"><input type="checkbox" name="sans_reseau"> <span>Je n’ai aucun profil sur les réseaux sociaux : je donne mon numéro de téléphone à la place.</span></label>
-    <label data-tel hidden>Ton numéro de téléphone <small>(obligatoire si tu n’as pas de réseau ; avec l’indicatif si tu n’es pas en France, par ex. +213…)</small><input name="telephone" type="tel" autocomplete="tel" maxlength="25" placeholder="06 12 34 56 78"></label>
+    <label data-tel>Ton numéro de téléphone <small>(facultatif, obligatoire si tu n’as pas de réseau ; avec l’indicatif si tu n’es pas en France, par ex. +213…)</small><input name="telephone" type="tel" autocomplete="tel" maxlength="25" placeholder="06 12 34 56 78"></label>
+    <p class="annonce-aide">Ton numéro n’est jamais affiché. Il n’est montré à l’autre personne que si tu choisis « Échanger nos numéros ».</p>
     <p class="annonce-aide">Tes coordonnées ne sont jamais affichées ni transmises : c’est Lamia qui te contacte pour une mise en relation.</p>
   </div>
   <label class="annonce-case" data-consent-depot><input type="checkbox" name="majeur"> <span>J’ai 18 ans ou plus et cette annonce est sincère : je cherche une vraie rencontre.</span></label>
@@ -360,7 +367,7 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
   const form = $('[data-annonce-form]', box), st = $('[data-annonce-statut]', form);
   const estLive = () => form.querySelector('[name=live]:checked')?.value === 'oui';
   const sansReseau = () => form.elements.sans_reseau.checked;
-  form.elements.sans_reseau.addEventListener('change', () => { $('[data-tel]', form).hidden = !sansReseau(); $('[data-reseau]', form).hidden = sansReseau(); });
+  form.elements.sans_reseau.addEventListener('change', () => { $('[data-reseau]', form).hidden = sansReseau(); });
   form.addEventListener('change', (e) => {
     if (e.target.name !== 'live') return;
     $('[data-si-live]', form).hidden = !estLive();
@@ -431,7 +438,7 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
       if (!f.pays.value) manque('Ton pays', f.pays);
       if (medias.length < 2) manque('2 photos de toi', $('[data-medias]', form).closest('label'));
     }
-    if (sansReseau() && !telephoneNormal(f.telephone.value)) manque(f.telephone.value.trim() ? 'Ton numéro de téléphone n’est pas valide (mets l’indicatif si tu n’es pas en France)' : 'Ton numéro de téléphone (puisque tu n’as pas de réseau social)', f.telephone);
+    if ((sansReseau() || f.telephone.value.trim()) && !telephoneNormal(f.telephone.value)) manque(f.telephone.value.trim() ? 'Ton numéro de téléphone n’est pas valide (mets l’indicatif si tu n’es pas en France)' : 'Ton numéro de téléphone (puisque tu n’as pas de réseau social)', f.telephone);
     // Inscription courte : situation, études, religion et âge recherché sont cachés ici (« plus tard ») ; ils se complètent dans
     // « Mon espace » avant le premier cœur. Les exiger ici bloquait toutes les inscriptions depuis le 15 nov. 2026.
     manques.push(...manquesEssentiels(form).filter((x) => x.el && !x.el.closest('[hidden]')));
@@ -478,7 +485,7 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
         action: 'annonce_deposer', prenom: f.prenom.value, genre: form.querySelector('[name=genre]:checked').value, age: f.age.value,
         ville: f.ville.value, pays: f.pays.value, profil: f.profil.value, recherche: f.recherche.value,
         matching: lireMatching(form),
-        age_min: f.age_min.value, age_max: f.age_max.value, email: session.user.email, sans_reseau: sansReseau(), telephone: sansReseau() ? f.telephone.value : '',
+        age_min: f.age_min.value, age_max: f.age_max.value, email: session.user.email, sans_reseau: sansReseau(), telephone: f.telephone.value,
         majeur: true, publication: true, identite_ok: Boolean(identite.length && f.identite_ok.checked), website: f.zz_site.value, anonyme_ok: f.anonyme_ok.checked, photo_partage: f.photo_partage.checked, interet_ref: f.interet_ref.value,
         medias: fichiers.map((x) => ({ role: x.role, type: typeDe(x.blob), size: x.blob.size })),
       }, session?.access_token);
@@ -511,8 +518,8 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
   });
 }
 
-const CHAMPS = ['villageOrigine', 'langue', 'situation', 'enfants', 'nbEnfants', 'ageEnfants', 'desirEnfants', 'niveauEtudeCategorie', 'niveauEtudeDetail', 'etudesPaysObtention', 'profession', 'tailleCm', 'religion', 'pratique', 'mobiliteGeographique', 'visionFinanciere', 'fumeur', 'sport', 'alcool', 'chemma', 'religionTexte', 'autresModeVie', 'zoneGeo', 'religionRecherche', 'pratiqueRecherche', 'etudesRecherche', 'rechercheFemmeHidjabiste', 'contactReseau', 'situationAdministrative', 'proprietaire', 'belleFamille', 'impressionEchange', 'tailleMinRechercheCm', 'fumeurRecherche', 'alcoolRecherche', 'sportRecherche', 'chemmaRecherche'];
-const LISTES = ['origineTags', 'caracteristiques', 'origineRechercheTags', 'caracteristiquesRecherche', 'gestionEmotionnelle', 'rapportReseaux'];
+const CHAMPS = ['villageOrigine', 'langue', 'situation', 'enfants', 'nbEnfants', 'ageEnfants', 'desirEnfants', 'niveauEtudeCategorie', 'niveauEtudeDetail', 'domaineEtudes', 'etudesPaysObtention', 'profession', 'tailleCm', 'religion', 'pratique', 'mobiliteGeographique', 'visionFinanciere', 'fumeur', 'sport', 'alcool', 'chemma', 'religionTexte', 'autresModeVie', 'zoneGeo', 'religionRecherche', 'pratiqueRecherche', 'etudesRecherche', 'rechercheFemmeHidjabiste', 'contactReseau', 'situationAdministrative', 'proprietaire', 'belleFamille', 'impressionEchange', 'tailleMinRechercheCm', 'fumeurRecherche', 'alcoolRecherche', 'sportRecherche', 'chemmaRecherche'];
+const LISTES = ['origineTags', 'caracteristiques', 'origineRechercheTags', 'caracteristiquesRecherche', 'gestionEmotionnelle', 'rapportReseaux', 'hardPreferences'];
 const CASES = ['kabyleUniquement', 'accepteDivorce', 'accepteVeuf', 'accepteEnfants', 'acceptePlusieursEnfants'];
 function lireMatching(form) {
   const f = form.elements, m = {};
@@ -579,7 +586,8 @@ function monterEdition(form, st, p, token) {
   for (const n of LISTES) for (const v of m[n] || []) { const c = form.querySelector(`[name=${n}][value="${CSS.escape(v)}"]`); if (c) c.checked = true; }
   for (const n of CASES) F[n].checked = Boolean(m[n]);
   F.anonyme_ok.checked = Boolean(p.anonyme_ok);
-  if (p.sans_reseau) { F.sans_reseau.checked = true; F.telephone.value = p.telephone || ''; F.sans_reseau.dispatchEvent(new Event('change')); }
+  F.telephone.value = p.telephone || '';
+  if (p.sans_reseau) { F.sans_reseau.checked = true; F.sans_reseau.dispatchEvent(new Event('change')); }
   F.photo_partage.checked = Boolean(p.photo_partage);
   const etapes = monterEtapes(form, { calculerManques: () => [], afficherManques: () => false, edition: true });
   const btn = $('.annonce-envoyer', form); btn.textContent = 'Enregistrer mes modifications';
@@ -594,11 +602,11 @@ function monterEdition(form, st, p, token) {
       if (t.value.trim() && t.value.trim().length < 20) m(`${nom} : quelques phrases de plus (20 caractères au moins)`, t);
       else if (!texteCredible(t.value)) m(`${nom} : écris avec de vrais mots`, t);
     }
-    if (F.sans_reseau.checked && !telephoneNormal(F.telephone.value)) m('Ton numéro de téléphone (avec l’indicatif si tu n’es pas en France)', F.telephone);
+    if ((F.sans_reseau.checked || F.telephone.value.trim()) && !telephoneNormal(F.telephone.value)) m('Ton numéro de téléphone (avec l’indicatif si tu n’es pas en France)', F.telephone);
     if (manques.length) { say(st, `Il manque ${manques.length > 1 ? `${manques.length} informations` : 'une information'} : regarde les champs entourés.`, true); return fenetreManques(manques, form, { allerA: (el) => etapes?.allerA(el) }); }
     btn.disabled = true; say(st, 'Enregistrement…');
     try {
-      await api({ action: 'annonce_modifier', genre: form.querySelector('[name=genre]:checked')?.value, prenom: F.prenom.value, birth_date: F.birth_date.value, ville: F.ville.value, pays: F.pays.value, profil: F.profil.value, recherche: F.recherche.value, age_min: F.age_min.value, age_max: F.age_max.value, anonyme_ok: F.anonyme_ok.checked, photo_partage: F.photo_partage.checked, sans_reseau: F.sans_reseau.checked, telephone: F.sans_reseau.checked ? F.telephone.value : '', matching: lireMatching(form) }, token);
+      await api({ action: 'annonce_modifier', genre: form.querySelector('[name=genre]:checked')?.value, prenom: F.prenom.value, birth_date: F.birth_date.value, ville: F.ville.value, pays: F.pays.value, profil: F.profil.value, recherche: F.recherche.value, age_min: F.age_min.value, age_max: F.age_max.value, anonyme_ok: F.anonyme_ok.checked, photo_partage: F.photo_partage.checked, sans_reseau: F.sans_reseau.checked, telephone: F.telephone.value, matching: lireMatching(form) }, token);
       say(st, '✓ Ton profil est à jour. Lamia est prévenue.');
     } catch (err) {
       const champ = { missing_lieu: F.pays, telephone_invalide: F.telephone, invalid_birth_date: F.birth_date, mineur: F.birth_date, textes_courts: F.profil, textes_illisibles: F.profil }[err.code];

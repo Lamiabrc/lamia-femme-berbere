@@ -10,6 +10,7 @@ export const O = {
   enfants: ['Non', 'Oui'],
   desirEnfants: ['Oui, important', 'Oui, mais a discuter', 'Peut-etre', 'Non', 'Pas important'],
   etudeCategorie: ['Primaire', 'College', 'Lycee', 'Universitaire'],
+  domaineEtudes: ['Santé', 'Droit et sciences politiques', 'Sciences et technologies', 'Informatique', 'Commerce et gestion', 'Lettres et langues', 'Éducation et enseignement', 'Arts et design', 'Métiers techniques et manuels', 'Autre'],
   etudeDetail: {
     Primaire: ['Primaire non termine', 'Primaire termine'],
     College: ['College non termine', 'College termine', 'Brevet'],
@@ -95,6 +96,7 @@ export function choixPropres(m = {}) {
     niveauEtudeCategorie: cat,
     niveauEtudeDetail: cat ? un(m.niveauEtudeDetail, O.etudeDetail[cat]) : '',
     etudesPaysObtention: un(m.etudesPaysObtention, O.etudesPaysObtention),
+    domaineEtudes: un(m.domaineEtudes, O.domaineEtudes),
     profession: txt(m.profession, 80),
     tailleCm: int(m.tailleCm, 120, 230),
     religion: un(m.religion, O.religion),
