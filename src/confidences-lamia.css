@@ -201,3 +201,4 @@ legend { font-size: 14px; font-weight: 600; padding: 0 4px; }
 .cl-match-en-cours { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; justify-content: space-between; padding: 10px 0; border-top: 1px solid var(--poudre-fonce); }
 .cl-match-en-cours p { margin: 0; }
 .cl-match-en-cours .cl-coord { flex: 1 1 100%; order: 3; }
+.cl-alerte-photos{margin:8px 0;padding:10px 12px;border:2px solid #b3261e;border-radius:12px;background:#fbe9e7;color:#7a1410;font-weight:600}.cl-alerte-photos a{color:#7a1410;text-decoration:underline}.cl-badge-photos{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:#fbe9e7;border:1px solid #b3261e;color:#7a1410;font-size:.72rem;font-weight:700;white-space:nowrap}
