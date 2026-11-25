@@ -55,6 +55,7 @@ function ouvrir(tab) {
   if (tab === 'activite') chargerActivite();
   if (tab === 'coaching') chargerCoaching();
   if (tab === 'comptes' && !comptes) chargerComptes();
+  if (tab === 'comptes') chargerFichesSansCompte();
   if (tab === 'creer-profil') fichesAdmin.ouvrir();
   if (tab === 'match-direct') { matchDirect.ouvrir(aller); aller = ''; }
   if (tab === 'rencontres') { const f = $('[data-rencontres]'); if (f && !f.src) f.src = `/confidences-lamia/?integre=1#${aller || 'annonces'}`; aller = ''; }
@@ -298,6 +299,20 @@ let filtreJournal = '';
 monterCompleter({ appel: (body) => conf(body), recharger: (ref) => ouvrirParRef(ref) });
 const matchDirect = monterMatchDirect({ appel: (body) => conf(body), voirProfil: (ref) => ouvrirParRef(ref) });
 const conf = async (body) => { const r = await fetch('/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(body) }); const d = await r.json().catch(() => ({})); if (!r.ok) throw Object.assign(new Error(d.error || 'erreur'), { code: d.error, texte: d.message }); return d; };
+
+// Les fiches créées par Lamia (« Créer un profil ») n'ont pas de compte : elles sont listées ici pour les retrouver.
+const ETAT_FICHE = { en_attente: 'attend sa confirmation', confirmee: 'confirmée', retiree: 'retirée' };
+async function chargerFichesSansCompte() {
+  const zone = $('[data-fiches-sans-compte]'); if (!zone) return;
+  try {
+    const r = await conf({ action: 'annonce_fiches_admin' });
+    const l = (r.fiches || []).filter((f) => f.confirmation !== 'retiree' && !f.compte);
+    if (!l.length) { zone.hidden = true; return; }
+    zone.hidden = false;
+    zone.innerHTML = `<h2 style="margin-top:0">Fiches créées par toi, sans compte (${l.length}${r.suivant ? '+' : ''})</h2><p class="aide">Clique sur une fiche pour l’ouvrir : compléter ses infos, la matcher.</p>
+      <div class="membres-grille">${l.map((f) => `<button type="button" class="membre-carte" data-voir-ref="${esc(f.ref)}"><strong>${esc(f.pseudo || `Fiche ${f.ref}`)}</strong> <span>n° ${esc(f.ref)}</span><br><small>${esc(f.genre === 'femme' ? 'Femme' : 'Homme')} · ${esc(f.age ?? '?')} ans · ${esc([f.ville, f.pays].filter(Boolean).join(', '))}</small><br><small>${esc(ETAT_FICHE[f.confirmation] || '')}</small></button>`).join('')}</div>`;
+  } catch { zone.hidden = true; }
+}
 async function pastilleJournal() {
   try { const d = await conf({ action: 'annonce_journal', categorie: 'aucune' }); $$('[data-journal-pastille]').forEach((p) => { p.textContent = d.non_lus; p.hidden = !d.non_lus; }); } catch { /* */ }
 }
