@@ -286,7 +286,7 @@ test('la personne choisie est prévenue par email (sans savoir qui), au plus une
   assert.deepEqual(mails.map((m) => m[0]).sort(), ['nina@example.com', 'sam@example.com']);
   assert.ok(mails.every((m) => /réciproque/.test(m[1])));
 });
-test('création de compte : confirmation privée par email et cinq tentatives maximum par heure', async () => {
+test('création de compte : validation automatique sans email et cinq tentatives maximum par heure', async () => {
   const appels = [];
   const ctx = { env: { SUPABASE_SERVICE_ROLE_KEY: 'x' }, admin: false, user: null, ipHash: 'ip', now: () => new Date('2026-10-31T00:00:00Z'), email: async () => true, alerter: async () => {},
     call: async (u, o = {}) => { appels.push([u, o.body && JSON.parse(o.body)]); return { ok: true, status: 200, json: async () => ({ user: { id: 'u' }, action_link: 'https://auth.example/verify?token=secret' }) }; },
@@ -295,7 +295,7 @@ test('création de compte : confirmation privée par email et cinq tentatives ma
   assert.equal(r.status, 400);
   r = await handleAnnonces('annonce_creer_compte', { email: 'Nina@Example.com', password: '12345678', prenom: 'Nina' }, ctx);
   assert.equal(r.status, 200);
-  assert.deepEqual(await r.json(), { ok: true, confirmation_requise: true });
+  assert.deepEqual(await r.json(), { ok: true, a_reconfirmer: true });
   assert.equal(appels[0][0], '/auth/v1/admin/generate_link');
   assert.equal(appels[0][1].type, 'signup');
   assert.equal(appels[0][1].email_confirm, undefined);

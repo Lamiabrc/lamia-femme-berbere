@@ -13,7 +13,8 @@ function serveur(env) {
     const url = new URL(u);
     const rep = (data, status = 200) => ({ ok: status < 300, status, json: async () => data, text: async () => JSON.stringify(data) });
     if (url.pathname === '/rest/v1/rpc/compte_existe') return rep(true);
-    if (url.pathname === '/auth/v1/admin/generate_link') return rep({ action_link: 'https://x/verify?token=t', user_metadata: {} });
+    if (url.pathname === '/auth/v1/admin/generate_link') return rep({ action_link: 'https://x/verify?token=t', user_metadata: {}, user: { id: 'u-1' } });
+    if (url.pathname.startsWith('/auth/v1/admin/users/')) return rep({});
     return be.fetcher(u, init);
   };
   return { be, appeler: async (body) => {
@@ -29,9 +30,10 @@ test('mode économie : le lien de connexion part toujours', async () => {
   assert.equal(s.be.mails.length, 1);
 });
 
-test('mode économie : la confirmation de compte part toujours', async () => {
+test('compte créé : validé automatiquement, sans email, et Lamia est prévenue', async () => {
   const s = serveur(base);
   const r = await s.appeler({ action: 'annonce_creer_compte', email: 'nadia@exemple.fr', password: 'Motdepasse12', prenom: 'Nadia', source: 'site' });
-  assert.equal(r.body.confirmation_requise, true, JSON.stringify(r));
-  assert.equal(s.be.mails.length, 1);
+  assert.equal(r.body.a_reconfirmer, true, JSON.stringify(r));
+  assert.equal(r.body.confirmation_requise, undefined);
+  assert.equal(s.be.mails.length, 0);
 });
