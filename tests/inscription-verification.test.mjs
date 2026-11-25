@@ -22,22 +22,20 @@ function serveur({ delivered = true, link = SIGNUP_LINK, failure = null } = {}) 
   return { calls, mails, attempts, send: (body = credentials) => handleAnnonces('annonce_creer_compte', body, ctx) };
 }
 
-test('la preuve d’adresse part uniquement dans un email et conserve la destination du parcours', async () => {
+test('compte créé : validé automatiquement, mot de passe et lien jamais envoyés par email', async () => {
   const s = serveur();
   const r = await s.send();
   assert.equal(r.status, 200);
-  assert.deepEqual(await r.json(), { ok: true, confirmation_requise: true });
+  assert.deepEqual(await r.json(), { ok: true, a_reconfirmer: true });
   assert.equal(s.calls[0].body.redirect_to, 'https://lamia-femme-berbere.com/confirmer/?n=12&t=fiche#suite');
   assert.equal(s.calls[0].body.type, 'signup');
   assert.equal(s.calls[0].body.password, credentials.password);
   assert.equal(s.calls[0].body.data.first_name, '<Nina>');
   assert.equal(s.attempts.length, 1);
-  assert.equal(s.mails.length, 1);
-  assert.equal(s.mails[0][0], 'nina@example.com');
-  assert.ok(s.mails[0][2].includes(SIGNUP_LINK));
-  assert.ok(s.mails[0][3].includes(SIGNUP_LINK));
-  assert.ok(!s.mails[0][2].includes(credentials.password));
-  assert.ok(!s.mails[0][3].includes(credentials.password));
+  assert.equal(s.mails.length, 0);
+  const maj = s.calls.find((c) => c.path.startsWith('/auth/v1/admin/users/'));
+  assert.equal(maj.body.email_confirm, true);
+  assert.equal(maj.body.user_metadata.a_reconfirmer, true);
 });
 
 test('une destination externe ne devient jamais la destination de confirmation', async () => {
