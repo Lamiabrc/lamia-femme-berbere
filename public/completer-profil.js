@@ -37,6 +37,20 @@ const ETAPES = [
     ['h', 'hardPreferences', 'Exigences absolues']]],
 ];
 const ITEMS = ETAPES.flatMap((e) => e[2]);
+const PAR_CLE = new Map(ITEMS.map((i) => [i[1], i]));
+// Menu du profil (Lamia, 26 nov. 2026) : une tuile colorée par thème, dans l'ordre d'importance pour l'algorithme.
+// Chaque champ n'est dans qu'une seule carte ; la définition du champ reste celle des étapes ci-dessus.
+export const CARTES = [
+  { id: 'debut', titre: 'Pour commencer', couleur: '#d9822b', aide: 'Âge du profil et âge recherché.', cles: ['age_min', 'age_max'], plus: true },
+  { id: 'statut', titre: 'Statut et enfants', couleur: '#c2495b', aide: 'Le thème qui pèse le plus : situation, enfants, ce qui est accepté.', cles: ['situation', 'enfants', 'desirEnfants', 'accepteDivorce', 'refuseDivorce', 'accepteVeuf', 'refuseVeuf', 'accepteEnfants', 'accepteUnEnfant', 'acceptePlusieursEnfants'] },
+  { id: 'lieu', titre: 'Secteur géographique', couleur: '#2f8f83', aide: 'Résidence, origine et zone recherchée.', cles: ['ville', 'pays', 'villageOrigine', 'mobiliteGeographique', 'zoneGeo', 'paysRechercheDetail', 'regionRechercheDetail'] },
+  { id: 'valeurs', titre: 'Valeurs et religion', couleur: '#6c5ba7', aide: 'Religion, pratique, et ce qui est cherché chez l’autre.', cles: ['religion', 'religionAutre', 'pratique', 'fermeDifferencePratique', 'religionsAcceptees', 'religionRecherche', 'pratiqueRecherche', 'rechercheFemmeHidjabiste'] },
+  { id: 'pro', titre: 'Professionnel', couleur: '#3a6fb0', aide: 'Études et profession.', cles: ['niveauEtudeCategorie', 'profession', 'etudesRecherche'] },
+  { id: 'vie', titre: 'Hygiène de vie et personnalité', couleur: '#d4577a', aide: 'Mode de vie, caractère, vie à deux.', cles: ['fumeur', 'alcool', 'sport', 'chemma', 'fumeurRecherche', 'alcoolRecherche', 'sportRecherche', 'chemmaRecherche', 'gestionEmotionnelle', 'rapportReseaux', 'belleFamille', 'impressionEchange', 'caracteristiques', 'caracteristiquesRecherche', 'tailleCm', 'tailleMinRechercheCm', 'situationAdministrative', 'proprietaire'] },
+  { id: 'origines', titre: 'Mes origines', couleur: '#b8872b', aide: 'Communauté, origines acceptées.', cles: ['origineTags', 'origineRechercheTags', 'kabyleUniquement'] },
+  { id: 'bloquants', titre: 'Exigences bloquantes', couleur: '#5e5a66', aide: 'Sans sélection, ce sont des préférences souples. Coché = bloquant.', cles: ['hardPreferences'] },
+].map((c) => ({ ...c, items: c.cles.map((k) => PAR_CLE.get(k)).filter(Boolean) }));
+const carteOuverte = new Map(); // ref -> carte ouverte, pour la retrouver après « Enregistrer »
 const CHAMPS_TOP = new Set(['ville', 'pays', 'age_min', 'age_max']);
 // Une fiche de l'outil garde ces infos dans des colonnes ; le reste va dans « matching » (privé).
 const valeursAnnonce = (a) => ({ ...(a.matching || {}), ville: a.ville, pays: a.pays, age_min: a.age_min, age_max: a.age_max, situation: a.matching?.situation || a.situation });
@@ -64,14 +78,22 @@ function etape(titre, aide, items, v, pre, garde) {
   return `<h4>${esc(titre)}</h4>${aide ? `<p class="aide">${esc(aide)}</p>` : ''}${champs.length ? `<div class="champs">${champs.map((i) => rendre(i, v, pre)).join('')}</div>` : ''}${listes.map((i) => rendre(i, v, pre)).join('')}${autres.length ? `<div class="cp-cases">${autres.map((i) => rendre(i, v, pre)).join('')}</div>` : ''}`;
 }
 
+const rempli = (it, v) => !vide(v[it[1]]);
+function etatCarte(c, v) {
+  const cles = c.items.filter((i) => i[4]), tous = c.items.filter((i) => i[0] !== 'b' && i[0] !== 'h');
+  const manque = cles.filter((i) => !rempli(i, v)).length, faits = tous.filter((i) => rempli(i, v)).length;
+  return { manque, faits, total: tous.length };
+}
 function formulaire(ref, v, fiche) {
   const manquants = ITEMS.filter((c) => c[0] === 'c' && c[4] && vide(v[c[1]])).map((c) => c[2]);
-  return `<details class="tdb-repli cp" ${manquants.length ? 'open' : ''}><summary>${fiche ? 'Fiche' : 'Profil'} n° ${esc(ref)} · compléter pour le matching${manquants.length ? ` <span class="cp-alerte">${manquants.length} info${manquants.length > 1 ? 's' : ''} manquante${manquants.length > 1 ? 's' : ''}</span>` : ''}</summary>
+  const ouverte = carteOuverte.get(String(ref)) || '';
+  const tuiles = CARTES.map((c) => { const e = etatCarte(c, v); return `<button type="button" class="cp-tuile${ouverte === c.id ? ' cp-tuile-on' : ''}${e.manque ? ' cp-tuile-manque' : ''}" style="--cp-c:${c.couleur}" data-cp-carte="${c.id}" aria-pressed="${ouverte === c.id}"><strong>${esc(c.titre)}</strong><small>${e.manque ? `${e.manque} à compléter` : e.faits ? `✓ ${e.faits}/${e.total}` : 'vide'}</small></button>`; }).join('');
+  const sections = CARTES.map((c) => `<section class="cp-carte" data-cp-section="${c.id}" style="--cp-c:${c.couleur}"${ouverte === c.id ? '' : ' hidden'}>${c.plus ? (fiche ? `<h4>Privé (jamais dans l’annonce)</h4><div class="champs"><label>Pseudo<input name="pseudo" maxlength="40" value="${esc(v.pseudo ?? '')}"></label><label>Lien réseau (TikTok, Instagram, Facebook)<input name="lien_reseau" maxlength="200" value="${esc(v.lien_reseau ?? '')}"></label></div>` : '<div class="champs"><label>Date de naissance (seulement si manquante ou fausse)<input name="birth_date" type="date"></label></div>') : ''}${etape(c.titre, c.aide, c.items, v, '', () => true)}</section>`).join('');
+  return `<details class="tdb-repli cp" ${manquants.length || ouverte ? 'open' : ''}><summary>${fiche ? 'Fiche' : 'Profil'} n° ${esc(ref)} · menu du profil${manquants.length ? ` <span class="cp-alerte">${manquants.length} info${manquants.length > 1 ? 's' : ''} manquante${manquants.length > 1 ? 's' : ''}</span>` : ''}</summary>
     <form class="reglages" data-completer data-ref="${esc(ref)}" data-fiche="${fiche ? 1 : 0}">
       ${manquants.length ? `<p class="cp-aide"><b>Manquant :</b> ${esc(manquants.join(', '))}. Sans ces infos, l’outil prend une valeur par défaut (« pas de contrainte ») et peut proposer un mauvais match.</p>` : ''}
-      ${fiche ? `<h4>Privé (jamais dans l’annonce)</h4><div class="champs"><label>Pseudo<input name="pseudo" maxlength="40" value="${esc(v.pseudo ?? '')}"></label><label>Lien réseau (TikTok, Instagram, Facebook)<input name="lien_reseau" maxlength="200" value="${esc(v.lien_reseau ?? '')}"></label></div>` : ''}
-      ${ETAPES.map((e) => etape(e[0], e[1], e[2], v, '', () => true)).join('')}
-      ${fiche ? '' : '<div class="champs"><label>Date de naissance (seulement si manquante ou fausse)<input name="birth_date" type="date"></label></div>'}
+      <div class="cp-menu">${tuiles}</div>
+      ${sections}
       <p class="actions"><button class="btn btn-ink" type="submit">Enregistrer</button> <span class="aide" data-completer-statut role="status"></span></p>
     </form></details>`;
 }
@@ -106,6 +128,14 @@ function lire(form, pre, garde) {
 }
 
 export function monterCompleter({ appel, recharger }) {
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('[data-cp-carte]'); if (!t) return;
+    const f = t.closest('[data-completer]'), id = t.dataset.cpCarte, deja = t.classList.contains('cp-tuile-on');
+    f.querySelectorAll('[data-cp-carte]').forEach((x) => { const on = !deja && x === t; x.classList.toggle('cp-tuile-on', on); x.setAttribute('aria-pressed', String(on)); });
+    f.querySelectorAll('[data-cp-section]').forEach((x) => { x.hidden = deja || x.dataset.cpSection !== id; });
+    carteOuverte.set(f.dataset.ref, deja ? '' : id);
+    if (!deja) f.querySelector(`[data-cp-section="${id}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
   document.addEventListener('click', async (e) => {
     const b = e.target.closest('[data-valider-profil]'); if (!b || b.disabled) return;
     const ref = Number(b.dataset.validerProfil), st = b.parentElement.querySelector('[data-valider-statut]');
@@ -128,7 +158,7 @@ export function monterCompleter({ appel, recharger }) {
     const { m, top } = lire(f, '', () => true);
     const corps = { action: 'annonce_admin_completer', ref: Number(f.dataset.ref), matching: m, ...top };
     if (!fiche && f.elements.birth_date?.value) corps.birth_date = f.elements.birth_date.value;
-    if (fiche) { corps.pseudo = f.elements.pseudo.value; corps.lien_reseau = f.elements.lien_reseau.value; }
+    if (fiche && f.elements.pseudo) { corps.pseudo = f.elements.pseudo.value; corps.lien_reseau = f.elements.lien_reseau.value; }
     btn.disabled = true; st.textContent = 'Enregistrement…';
     try { await appel(corps); st.textContent = 'Enregistré ✓'; recharger?.(Number(f.dataset.ref)); }
     catch (err) { st.textContent = ({ ages_recherches: 'L’âge minimum dépasse l’âge maximum.', missing_lieu: 'Choisis un pays de la liste.', invalid_birth_date: 'Date de naissance invalide (18 ans minimum).' })[err.code] || 'L’enregistrement n’a pas abouti. Réessaie.'; }
