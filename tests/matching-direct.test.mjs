@@ -120,3 +120,10 @@ test('exigences absolues et refus comme dans l’outil : gardés, nettoyés, tra
   const p = await profilDepuisFiche({ ref: 5300, genre: 'femme', age: 30, pays: 'France', matching: { hardPreferences: ['age'] } });
   assert.deepEqual(p.hardPreferences, ['age']);
 });
+
+test('le moteur ne plante pas sur une valeur qui n’est pas du texte (text.normalize)', async () => {
+  const { computeMatch, emptyProfile, DEFAULT_WEIGHTS } = await import('../lib/vendor/quickpair-engine.mjs');
+  const a = { ...emptyProfile(), gender: 'Femme', situation: null, desirEnfants: undefined, etudesRecherche: null, zoneGeo: undefined };
+  const b = { ...emptyProfile(), gender: 'Homme', religion: 'Islam' };
+  assert.doesNotThrow(() => computeMatch(a, b, DEFAULT_WEIGHTS));
+});

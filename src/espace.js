@@ -337,7 +337,11 @@ let aboPret; const etatAbo = new Promise((r) => { aboPret = r; });
 async function achats(session) {
   const box = $('[data-espace-achats]');
   try {
-    const r = await fetch('/api/mes-achats', { headers: { Authorization: `Bearer ${session.access_token}` } });
+    // Serveur lent : on réessaie une fois, et on n'affiche jamais « pas d'achat » sur une erreur (ça faisait croire à une commande perdue).
+    const charger = () => fetch('/api/mes-achats', { headers: { Authorization: `Bearer ${session.access_token}` } });
+    let r = await charger().catch(() => null);
+    if (!r?.ok) { await new Promise((ok) => setTimeout(ok, 1500)); r = await charger(); }
+    if (!r.ok) throw new Error('achats_indisponibles');
     const { orders = [], abonnement = null } = await r.json();
     aboPret(abonnement);
     monAbonnement(abonnement, session);
