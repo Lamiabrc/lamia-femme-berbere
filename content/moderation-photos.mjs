@@ -1,6 +1,7 @@
 // État réservé au serveur : un avertissement ne suspend pas les rencontres.
 export const correctionPhotosEnCours = (a) => ['avertissement', 'suspendu'].includes(a?.photos_moderation?.etat);
-export const gracePhotos = (a) => !a?.photos_refusees_at && a?.photos_moderation?.etat === 'avertissement';
+// « dispense » : Lamia a validé le profil à la main malgré des photos manquantes.
+export const gracePhotos = (a) => !a?.photos_refusees_at && (a?.photos_moderation?.etat === 'avertissement' || a?.photos_moderation?.dispense === true);
 export function avisPhotos(a, fichiers = []) {
   const m = a?.photos_moderation;
   if (!m || !correctionPhotosEnCours(a)) return null;

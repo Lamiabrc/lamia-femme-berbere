@@ -120,3 +120,15 @@ test('Lamia remplace une photo refusée : l’ancienne n’est retirée qu’une
   const mauvais = await admin(b, 'annonce_admin_remplacer_photo', { ref: 42, photo_id: '00000000-0000-4000-8000-000000000000', type: 'image/jpeg', size: 10 });
   assert.equal(mauvais.status, 400);
 });
+
+test('valider à la main : réservé à l’administratrice, demande confirmation s’il manque des choses, puis publie', async (t) => {
+  const b = await recette(t);
+  await b.db.query("update annonces set status='a_verifier', photos_refusees_at=now() where id=$1", [b.id]);
+  for (const u of [null, MEMBRE]) assert.equal((await b.action('annonce_admin_valider', { ref: 42 }, u)).status, 403);
+  const ok = await admin(b, 'annonce_admin_valider', { ref: 42, forcer: true });
+  assert.equal(ok.ok, true);
+  const [a] = (await b.db.query('select status, photos_refusees_at, photos_moderation from annonces where id=$1', [b.id])).rows;
+  assert.equal(a.status, 'publiee');
+  assert.equal(a.photos_refusees_at, null);
+  assert.equal(a.photos_moderation.dispense, true);
+});
