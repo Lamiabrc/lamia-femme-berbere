@@ -8,7 +8,7 @@ export const ADMIN = {id:randomUUID(),app_metadata:{role:'admin'}}, MEMBRE = {id
 export async function basePhotos() {
   const db = new PGlite();
   await db.exec(`create role anon; create role authenticated;
-    create table annonces(id uuid primary key,ref integer unique,user_id uuid,status text,test boolean default false,email text,prenom text,genre text,photos_refusees_at timestamptz,bloque_at text,pause_at text,visible_anonyme boolean default true);
+    create table annonces(id uuid primary key,ref integer unique,user_id uuid,status text,test boolean default false,email text,prenom text,genre text,photos_refusees_at timestamptz,bloque_at text,pause_at text,visible_anonyme boolean default true,published_at timestamptz,identite_verifiee_at timestamptz,note_lamia text);
     create table annonce_files(id uuid primary key default gen_random_uuid(),annonce_id uuid,kind text,storage_path text,position integer,mime text,size_bytes integer);`);
   const migration = await readFile(new URL('../../supabase/migrations/20261120101829_moderation_photos_progressive.sql',import.meta.url),'utf8');
   await db.exec(migration);

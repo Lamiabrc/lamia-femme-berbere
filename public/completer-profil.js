@@ -84,6 +84,12 @@ export function cartesCompleter(d) {
   return html ? `<div class="tdb-carte"><h3 style="margin-top:0">Compléter pour le matching</h3><p class="aide">Même découpage que ton outil. Ajoute les infos qui manquent : le matching en direct s’en sert tout de suite.</p>${html}</div>` : '';
 }
 
+// Valider un profil à la main, même s'il manque des photos ou des infos.
+export function carteValider(d) {
+  const l = (d.annonces || []).filter((a) => a.ref && !a.test && a.status !== 'retiree' && a.status !== 'refusee' && (a.status !== 'publiee' || a.photos_refusees_at || ['suspendu', 'avertissement'].includes(a.photos_moderation?.etat) || (a.medias || []).filter((m) => m.kind === 'photo').length < 2));
+  return l.map((a) => `<div class="tdb-carte cp-valider"><h3 style="margin-top:0">Profil n° ${esc(a.ref)} : ${a.status === 'publiee' ? 'bloqué' : 'pas encore validé'}</h3><p class="aide">${a.status === 'publiee' ? 'Il est publié mais bloqué (photos).' : 'Il ne peut pas swiper tant qu’il n’est pas validé.'} Tu peux le valider tout de suite, même s’il manque des photos ou des infos.</p><button class="btn btn-ink" type="button" data-valider-profil="${esc(a.ref)}">✓ Valider ce profil</button> <span class="aide" role="status" data-valider-statut></span></div>`).join('');
+}
+
 // Lecture d'un formulaire (préfixe « m_ » dans « Créer un profil »).
 function lire(form, pre, garde) {
   const m = {}, top = {}, els = form.elements;
@@ -100,6 +106,21 @@ function lire(form, pre, garde) {
 }
 
 export function monterCompleter({ appel, recharger }) {
+  document.addEventListener('click', async (e) => {
+    const b = e.target.closest('[data-valider-profil]'); if (!b || b.disabled) return;
+    const ref = Number(b.dataset.validerProfil), st = b.parentElement.querySelector('[data-valider-statut]');
+    b.disabled = true; st.textContent = 'Validation…';
+    const lancer = (forcer) => appel({ action: 'annonce_admin_valider', ref, forcer });
+    try {
+      try { await lancer(false); }
+      catch (err) {
+        if (err.code !== 'manques') throw err;
+        if (!window.confirm('Il manque : ' + ((err.manques || err.donnees?.manques || []).join(', ') || 'des éléments') + '. Valider quand même ?')) { st.textContent = 'Pas validé.'; b.disabled = false; return; }
+        await lancer(true);
+      }
+      st.textContent = 'Validé ✓ : il peut swiper.'; recharger?.(ref);
+    } catch (err) { st.textContent = ({ profil_inactif: 'Ce profil est retiré ou bloqué.', forbidden: 'Reconnecte-toi.' }[err.code]) || 'Pas validé. Réessaie.'; b.disabled = false; }
+  });
   document.addEventListener('submit', async (e) => {
     const f = e.target.closest('[data-completer]'); if (!f) return;
     e.preventDefault();

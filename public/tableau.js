@@ -1,5 +1,5 @@
 // Tableau de bord de Lamia : ventes, produits, soirées, alertes, textes du site, visites.
-import { cartesCompleter, monterCompleter } from '/completer-profil.js';
+import { cartesCompleter, carteValider, monterCompleter } from '/completer-profil.js';
 import { FAMILLES } from '/assets/rubriques.mjs';
 import { createClient } from '/vendor/supabase.mjs';
 import { monterFichesAdmin } from '/fiches-admin.js';
@@ -298,7 +298,7 @@ document.addEventListener('submit', async (e) => {
 let filtreJournal = '';
 monterCompleter({ appel: (body) => conf(body), recharger: (ref) => ouvrirParRef(ref) });
 const matchDirect = monterMatchDirect({ appel: (body) => conf(body), voirProfil: (ref) => ouvrirParRef(ref) });
-const conf = async (body) => { const r = await fetch('/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(body) }); const d = await r.json().catch(() => ({})); if (!r.ok) throw Object.assign(new Error(d.error || 'erreur'), { code: d.error, texte: d.message }); return d; };
+const conf = async (body) => { const r = await fetch('/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(body) }); const d = await r.json().catch(() => ({})); if (!r.ok) throw Object.assign(new Error(d.error || 'erreur'), { code: d.error, texte: d.message, manques: d.manques }); return d; };
 
 // Les fiches créées par Lamia (« Créer un profil ») n'ont pas de compte : elles sont listées ici pour les retrouver.
 const ETAT_FICHE = { en_attente: 'attend sa confirmation', confirmee: 'confirmée', retiree: 'retirée' };
@@ -1096,7 +1096,7 @@ function rendreDetail(d) {
   const complet = [...(d.annonces || []).map(profilComplet), ...(d.fiches || []).map((f) => ficheComplete(f, (d.annonces || []).reduce((n, a) => n + (a.medias || []).filter((m) => m.kind === 'photo').length, 0)))].join('');
   const blocComplet = complet ? `<div class="tdb-carte"><h3 style="margin-top:0">Son profil complet</h3>${complet}</div>` : '';
   if (d.sans_compte) {
-    box.innerHTML = `${pourquoi}${cartesCompleter(d)}<div class="tdb-carte"><h3 style="margin-top:0">À qui est ce profil</h3><ul class="fiche-liste">${qui}</ul><p class="aide">Cette personne n’a pas de compte.${(d.fiches || []).some((f) => f.pseudo || f.lien_reseau) ? ` Pseudo : ${esc((d.fiches || []).map((f) => f.pseudo).filter(Boolean).join(', ') || '—')} · Lien réseau : ${esc((d.fiches || []).map((f) => f.lien_reseau).filter(Boolean).join(', ') || '—')}.` : ' Son prénom et ses contacts sont dans ton outil de live (cherche ce n° dans « Le site »).'}</p></div>${blocComplet}${(d.choisi_par || []).length ? `<div class="tdb-carte"><h3 style="margin-top:0">Choisie par</h3><ul class="fiche-liste">${d.choisi_par.map((x) => `<li>${refBouton(x.ref)} ${esc(x.prenom || '')}<small>${esc(STATUT_DEMANDE[x.statut] || x.statut)} · ${esc(quand(x.le))}</small></li>`).join('')}</ul></div>` : ''}`;
+    box.innerHTML = `${pourquoi}${carteValider(d)}${cartesCompleter(d)}<div class="tdb-carte"><h3 style="margin-top:0">À qui est ce profil</h3><ul class="fiche-liste">${qui}</ul><p class="aide">Cette personne n’a pas de compte.${(d.fiches || []).some((f) => f.pseudo || f.lien_reseau) ? ` Pseudo : ${esc((d.fiches || []).map((f) => f.pseudo).filter(Boolean).join(', ') || '—')} · Lien réseau : ${esc((d.fiches || []).map((f) => f.lien_reseau).filter(Boolean).join(', ') || '—')}.` : ' Son prénom et ses contacts sont dans ton outil de live (cherche ce n° dans « Le site »).'}</p></div>${blocComplet}${(d.choisi_par || []).length ? `<div class="tdb-carte"><h3 style="margin-top:0">Choisie par</h3><ul class="fiche-liste">${d.choisi_par.map((x) => `<li>${refBouton(x.ref)} ${esc(x.prenom || '')}<small>${esc(STATUT_DEMANDE[x.statut] || x.statut)} · ${esc(quand(x.le))}</small></li>`).join('')}</ul></div>` : ''}`;
     return;
   }
   const a = d.activite;
@@ -1104,7 +1104,7 @@ function rendreDetail(d) {
   box.innerHTML = `${c.bloque ? '<p class="fiche-bloque"><svg class="ico" aria-hidden="true"><use href="/icones.svg#ban"/></svg> Ce compte est bloqué.</p>' : ''}${pourquoi}
     <div class="tdb-carte"><h3 style="margin-top:0">À qui est ce profil</h3><ul class="fiche-liste">${qui || '<li>Compte sans profil.</li>'}</ul>
       <p class="aide">Formule : ${esc({ decouverte: 'Découverte', passion: 'Passion', prestige: 'Prestige', couple: 'Couple Amour', couple_prestige: 'Couple Prestige' }[d.formule] || d.formule)}${d.formule_offerte ? ' (offerte)' : ''} · Dernière activité : ${esc(quand(c.derniere_action) || 'aucune')}</p></div>
-    ${cartesCompleter(d)}${blocComplet}
+    ${carteValider(d)}${cartesCompleter(d)}${blocComplet}
     <div class="tdb-carte"><h3 style="margin-top:0">Son activité</h3><div class="fiche-chiffres">
       ${[['Swipes oui', a.swipes_oui], ['Swipes non', a.swipes_non], ['Demandes', a.demandes], ['Choisi·e par', a.recus], ['Matchs en cours', a.en_cours.length], ['Dématchs', a.dematchs], ['Messages', a.messages], ['Photos', a.photos]].map(([n, v]) => `<div><b>${esc(v)}</b><span>${esc(n)}</span></div>`).join('')}</div>
       ${a.en_cours.length ? `<p>En match avec : ${a.en_cours.map(refBouton).join(', ')}</p>` : ''}</div>
