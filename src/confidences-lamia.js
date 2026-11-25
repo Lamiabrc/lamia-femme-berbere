@@ -194,7 +194,7 @@ function router() {
   const h = location.hash.slice(1);
   if (h === 'reglages') { courant = null; vue('reglages'); chargerReglages(); return; }
   if (h === 'testeurs') { courant = null; vue('testeurs'); chargerTesteurs(); return; }
-  if (h === 'annonces' || /^annonce-\d+$/.test(h)) { courant = null; vue('annonces'); chargerAnnonces(); chargerSansPhotos(); chargerSincerite(); chargerDemandes(); chargerAbonnes(); chargerNouveautes(); return; }
+  if (h === 'annonces' || /^annonce-\d+$/.test(h)) { courant = null; vue('annonces'); chargerAnnonces(); chargerASuspendre(); chargerSansPhotos(); chargerSincerite(); chargerDemandes(); chargerAbonnes(); chargerNouveautes(); return; }
   if (/^[0-9a-f-]{36}$/i.test(h)) return ouvrirFil(h);
   courant = null; vue('liste'); rendreListe();
 }
@@ -466,6 +466,29 @@ $('[data-relance-sincerite]')?.addEventListener('click', async (e) => {
   chargerSincerite();
 });
 // Profils sans photos : le compte, et la notification envoyée à la demande de Lamia, par lots.
+// Profils validés sans leurs 2 photos : les suspendre d'un coup, avec notification + email à chacun.
+let aSuspendre = [];
+async function chargerASuspendre() {
+  const b = $('[data-suspendre-sans-photos]'), liste = $('[data-suspendre-liste]');
+  if (!b) return;
+  try {
+    const r = await api({ action: 'annonce_suspendre_sans_photos' }, await jetonFrais());
+    aSuspendre = r.profils || [];
+    b.hidden = !aSuspendre.length;
+    liste.textContent = aSuspendre.length ? `Validés sans photos, pas encore suspendus : ${aSuspendre.map((p) => `n° ${p.ref}${p.prenom ? ` ${p.prenom}` : ''}`).join(', ')}.` : 'Aucun profil validé sans photos.';
+    b.textContent = `Suspendre ces ${aSuspendre.length} profil${aSuspendre.length > 1 ? 's' : ''} et les prévenir`;
+  } catch { /* */ }
+}
+$('[data-suspendre-sans-photos]')?.addEventListener('click', async (e) => {
+  if (!aSuspendre.length) return;
+  if (!confirm(`Suspendre ces ${aSuspendre.length} profils (${aSuspendre.map((p) => `n° ${p.ref}`).join(', ')}) ?\n\nChacun reçoit une notification et un email : « envoie 2 photos ». Personne ne voit leur profil et ils ne peuvent ni swiper ni répondre. La suspension se lève toute seule dès que 2 photos arrivent.`)) return;
+  const st = $('[data-suspendre-statut]'); e.target.disabled = true; let total = 0;
+  try {
+    for (let i = 0; i < 20; i += 1) { const r = await api({ action: 'annonce_suspendre_sans_photos', op: 'suspendre' }, await jetonFrais()); total += r.traites; st.textContent = `${total} profil(s) suspendu(s) et prévenu(s)…`; if (!r.reste || !r.traites) break; }
+    st.textContent = `C’est fait : ${total} profil(s) suspendu(s) et prévenu(s) par notification et email.`;
+  } catch { st.textContent = 'La suspension s’est arrêtée. Clique à nouveau : ceux déjà suspendus ne seront pas prévenus une deuxième fois.'; }
+  e.target.disabled = false; chargerASuspendre(); chargerSansPhotos();
+});
 async function chargerSansPhotos() {
   try { const r = await api({ action: 'annonce_relance_medias' }, await jetonFrais()); $('[data-n-sans-photos]').textContent = `(${r.manquent})`; const b = $('[data-relance-medias]'); b.disabled = !r.a_prevenir; b.textContent = r.a_prevenir ? `Envoyer la notification à ${r.a_prevenir} profil${r.a_prevenir > 1 ? 's' : ''}` : 'Tous ont été notifiés'; } catch { /* */ }
 }
