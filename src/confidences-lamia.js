@@ -66,7 +66,7 @@ function rendreListe() {
   const list = filtre === 'tous' ? threads : threads.filter((t) => t.status === filtre);
   $('[data-liste]').innerHTML = list.length ? list.map((t) => `<li><a class="cl-ligne${t.unread_lamia ? ' is-nonlu' : ''}" href="#${t.id}">
       <span class="cl-canal" aria-hidden="true">${CANAL[t.channel] || '✎'}</span>
-      <span class="cl-ligne-texte"><strong>${esc(t.name)}</strong><small>${t.apercu?.author === 'lamia' ? 'Toi : ' : ''}${esc(t.apercu?.extrait || (t.channel === 'vocal' ? 'Message vocal' : 'Pièce jointe'))}</small></span>
+      <span class="cl-ligne-texte"><strong>${esc(t.name)}${t.sans_photos ? ' <span class="cl-badge-photos" title="Il lui manque ses photos">📷 photos manquantes</span>' : ''}</strong><small>${t.apercu?.author === 'lamia' ? 'Toi : ' : ''}${esc(t.apercu?.extrait || (t.channel === 'vocal' ? 'Message vocal' : 'Pièce jointe'))}</small></span>
       <span class="cl-ligne-droite"><time>${esc(quand(t.last_message_at))}</time>${t.unread_lamia ? `<b class="cl-pastille">${t.unread_lamia}</b>` : ''}</span></a></li>`).join('')
     : `<li class="cl-vide">${filtre === 'a_lire' ? 'Rien à lire pour le moment.' : 'Aucune conversation ici.'}</li>`;
 }
@@ -150,6 +150,10 @@ function rendreFil(t) {
     $('[data-fil-coord]').insertAdjacentHTML('beforeend', cible
       ? ` <a class="cl-btn cl-fil-profil" href="/tableau-de-bord${cible}" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="/icones.svg#user"/></svg> Ouvrir son profil${t.profil.ref ? ` n° ${t.profil.ref}` : ''}</a>`
       : ' <small class="cl-fil-profil">Aucun profil avec cet email.</small>');
+  }
+  $('[data-fil-alerte]')?.remove();
+  if (t.profil?.ref && t.profil.photos != null && t.profil.photos < 2) {
+    $('[data-fil-coord]').insertAdjacentHTML('afterend', `<p class="cl-alerte-photos" data-fil-alerte role="alert">⚠ Il lui manque ${t.profil.photos === 0 ? 'ses 2 photos' : 'une photo'} (${t.profil.photos}/2) : la personne ne peut pas swiper. <a href="/tableau-de-bord#profil-${t.profil.ref}" target="_blank" rel="noopener">Ajouter ses photos sur sa fiche</a></p>`);
   }
   $('[data-fil-statut]').value = t.status;
   const box = $('[data-messages]');
