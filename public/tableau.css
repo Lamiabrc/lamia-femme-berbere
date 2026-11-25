@@ -576,3 +576,10 @@
 
 [data-fiches-sans-compte] .membre-carte{display:block;text-align:left;padding:12px 14px;border:1px solid var(--qvt-sable);border-radius:14px;background:#f3ecfa;border-left:4px solid #7f68b8;cursor:pointer;font:inherit}
 [data-fiches-sans-compte] .membre-carte strong{font-size:17px}[data-fiches-sans-compte] .membre-carte span{float:right;color:var(--qvt-taupe)}
+
+.cp .cp-menu{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:10px 0}
+.cp .cp-tuile{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:12px;border:2px solid var(--cp-c);border-radius:14px;background:#fff;color:var(--qvt-encre);font:inherit;cursor:pointer;min-height:64px}
+.cp .cp-tuile strong{font-size:14px;line-height:1.2}.cp .cp-tuile small{font-size:12px;opacity:.8}
+.cp .cp-tuile-on{background:var(--cp-c);color:#fff}.cp .cp-tuile-manque small{font-weight:700}
+.cp .cp-carte{border-left:6px solid var(--cp-c);padding:4px 0 4px 12px;margin:8px 0}
+@media(min-width:720px){.cp .cp-menu{grid-template-columns:repeat(4,1fr)}}
