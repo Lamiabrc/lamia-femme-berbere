@@ -616,3 +616,9 @@
   .fe-champs { grid-template-columns: 1fr; }
   .fe-nav { flex-direction: column-reverse; }
 }
+
+.tdb-ecrire { display: grid; gap: 10px; list-style: none; }
+.tdb-ecrire .btn { min-height: 48px; white-space: normal; }
+.tdb-ecrire-zone { display: grid; gap: 10px; }
+.tdb-ecrire-zone label { display: grid; gap: 6px; font-weight: 600; }
+.tdb-ecrire-zone textarea { font-size: 16px; width: 100%; }

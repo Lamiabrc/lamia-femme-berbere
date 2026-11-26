@@ -1144,7 +1144,7 @@ async function ouvrirParRef(ref) {
   $('[data-compte-infos]').textContent = '';
   $('[data-compte-form]').hidden = true;
   $('[data-compte-soirees]').innerHTML = '<li>Fiche sans compte : pas d’inscription aux soirées.</li>';
-  $('[data-compte-liens]').innerHTML = '';
+  $('[data-compte-liens]').innerHTML = `<li class="tdb-ecrire"><button class="btn btn-ink" type="button" data-tdb-ecrire="${esc(ref)}">Écrire sur TikTok · demander email et 2 photos</button></li>`;
   $('[data-compte-fiche]').hidden = false; $('[data-compte-fond]').hidden = false;
   boutonsSuivant();
   chargerDetail({ ref });
@@ -1537,3 +1537,37 @@ document.addEventListener('click', (e) => { const b = e.target.closest('[data-ta
 
 // Un numéro de profil déjà ouvert une fois se rouvre au clic (l'adresse ne change pas, donc pas de « hashchange »).
 document.addEventListener('click', (e) => { const a = e.target.closest('a[href^="#profil-"]'); if (a && token && location.hash === a.getAttribute('href')) { e.preventDefault(); suivreHashProfil(); } });
+
+// Fiche sans compte (créée en live) : écrire à la personne sur son réseau (Lamia, 26 nov. 2026).
+// Le message est préparé par le serveur, modifiable ; « Copier et ouvrir » copie le texte puis ouvre son TikTok.
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-tdb-ecrire]');
+  if (!b) return;
+  const zone = b.closest('li');
+  const deja = zone.querySelector('[data-tdb-ecrire-zone]');
+  if (deja) { deja.remove(); return; }
+  b.disabled = true;
+  const p = document.createElement('div'); p.className = 'tdb-ecrire-zone'; p.dataset.tdbEcrireZone = '';
+  try {
+    const r = await conf({ action: 'annonce_contact_preparer', ref: b.dataset.tdbEcrire });
+    const quand = r.dernier_at ? new Date(r.dernier_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }) : '';
+    p.innerHTML = `${quand ? `<p class="aide"><b>Déjà contactée le ${esc(quand)}.</b></p>` : ''}
+      <label>Message préparé (tu peux le changer)<textarea rows="7" data-tdb-ecrire-texte>${esc(r.message)}</textarea></label>
+      ${r.lien ? `<p><a class="btn btn-ink" href="${esc(r.lien)}" target="_blank" rel="noopener" data-tdb-ecrire-ouvrir="${esc(r.ref)}">Copier et ouvrir ${esc(r.reseau)}</a></p>
+      <p class="aide" role="status" data-tdb-ecrire-statut>Dans ${esc(r.reseau)} : touche Message, colle, envoie.</p>`
+      : '<p class="aide" role="status">Je n’ai pas son réseau sur le site : écris-lui depuis ton outil.</p>'}`;
+  } catch (err) {
+    p.innerHTML = `<p class="aide">${err?.code === 'fiche_retiree' || err?.message === 'fiche_retiree' ? 'Cette personne a retiré sa fiche : pas de message.' : 'Le message n’a pas pu être préparé. Réessaie dans un instant.'}</p>`;
+  }
+  b.disabled = false; zone.append(p);
+});
+document.addEventListener('click', (e) => {
+  const o = e.target.closest('[data-tdb-ecrire-ouvrir]');
+  if (!o) return;
+  const z = o.closest('[data-tdb-ecrire-zone]'), t = z.querySelector('[data-tdb-ecrire-texte]'), st = z.querySelector('[data-tdb-ecrire-statut]');
+  // Copié pendant le toucher, avant de quitter la page : sinon l'iPhone refuse.
+  const secours = () => { t.select(); try { return document.execCommand('copy'); } catch { return false; } };
+  if (navigator.clipboard?.writeText) navigator.clipboard.writeText(t.value).catch(secours); else secours();
+  if (st) st.textContent = 'Message copié. Colle-le dans TikTok et envoie.';
+  conf({ action: 'annonce_contact_note', ref: o.dataset.tdbEcrireOuvrir }).catch(() => {});
+});
