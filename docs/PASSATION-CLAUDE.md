@@ -16,9 +16,9 @@ Inscription en trois cartes, six informations sur la première avec le prénom, 
 
 ## Secours email
 
-`lib/email-transactionnel.mjs` centralise les anciens appels directs à Resend : Confidences, liens de connexion, Bal, ventes, livres numériques. Resend reste principal ; Brevo intervient après refus certain de quota ou de clé, jamais après réponse perdue/5xx ambigu. Reprises sur le même fournisseur avec idempotence. Pas d’outbox durable ni de garantie exactement une fois entre fournisseurs.
+`lib/email-transactionnel.mjs` centralise les anciens appels directs à Resend : Confidences, liens de connexion, Bal, ventes, livres numériques. Resend reste principal ; Brevo intervient après refus certain de quota ou de clé, jamais après réponse perdue/5xx ambigu. Reprises sur le même fournisseur avec idempotence. Pas d’outbox durable ni de garantie exactement une fois entre fournisseurs. Le complément demandé par Lamia limite les notifications facultatives à une réservation par adresse sur 24 heures et 80 par jour de Paris, partagées entre tous les serveurs/fournisseurs ; voir `docs/notifications-economes.md`.
 
-Lamia a créé et branché Brevo. `BREVO_API_KEY` sensible présente en production, valeur jamais lue. Au dernier contrôle `BREVO_FROM` manquait ; l’adresse validée est demandée à Lamia. Configurer ce champ serveur avec cette adresse vérifiée, vérifier domaine et délivrabilité. `EMAILS_TOUS=1` réactive les notifications hors mode économie après recette. Aucun rattrapage massif ni email réel de test n’a été envoyé dans ce lot. Offre gratuite limitée à 300/jour, aucune promesse d’envoi illimité.
+Lamia a créé et branché Brevo. `BREVO_API_KEY` sensible présente en production, valeur jamais lue. `BREVO_FROM` est maintenant configuré avec l’adresse vérifiée fournie dans sa capture, puis redéployé. Un unique lien de connexion réel a été envoyé à cette adresse avec accord explicite ; réception confirmée hors des spams après rectification de Lamia. Aucun autre email de test ni campagne de rattrapage envoyé. L’expéditeur Gmail reste transitoire ; authentifier le domaine de TAYRI pour la délivrabilité durable. `EMAILS_TOUS=1` ne doit être rétabli qu’avec le lot de limites partagées, selon la demande de Lamia. Contrôler son état dans Vercel et le dernier compte rendu de publication. Offre gratuite limitée à 300/jour, aucune promesse d’envoi illimité.
 
 ## Paiements et santé
 
@@ -28,7 +28,7 @@ Il reste des délais Supabase intermittents observés avant publication : trois 
 
 ## Validation et continuité
 
-Avant : 478 tests sur le SHA de départ. Résultat du lot : **501 tests réussis, aucun échec ; 383 pages générées**. Commandes : `npm test`, `npm run build`. Les tests doivent rester isolés de la production ; ne pas injecter de secrets de production. Recette locale : `node tests/serve-inscription.mjs`, puis http://127.0.0.1:4181/rencontres/#confier. Données fictives et API locales uniquement. Maquettes : `/docs/phase1-maquettes.html` sur ce serveur.
+Avant : 478 tests sur le SHA de départ. Phase 1 : **501 tests réussis, aucun échec ; 383 pages générées**. Avec le complément de limites email : **504 tests réussis, aucun échec**, dont les réservations concurrentes exécutées sur PostgreSQL local. Commandes : `npm test`, `npm run build`. Les tests doivent rester isolés de la production ; ne pas injecter de secrets de production. Recette locale : `node tests/serve-inscription.mjs`, puis http://127.0.0.1:4181/rencontres/#confier. Données fictives et API locales uniquement. Maquettes : `/docs/phase1-maquettes.html` sur ce serveur.
 
 Tests dédiés : `email-secours`, `inscription-phase1`, `inscription-verification`, `payment-status`. Recette navigateur réalisée en 375 px et sur ordinateur : étapes, validations, deux images fictives, reprise sans mot de passe, dépôt en attente de Lamia. Le temps inférieur à deux minutes reste à mesurer avec les personnes de recette. Des avertissements de traductions manquantes existaient déjà au build.
 

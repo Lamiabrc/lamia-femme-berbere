@@ -9,13 +9,17 @@ export function backend({ users = {} } = {}) {
     for (const [k, v] of url.searchParams) {
       if (['select', 'order', 'limit', 'on_conflict'].includes(k)) continue;
       const [op, ...rest] = v.split('.'); const val = rest.join('.');
-      const cell = row[k];
+      const [column,property]=k.split('->>');
+      const cell = property ? row[column]?.[property] : row[k];
       if (op === 'eq' && String(cell) !== val) return false;
       if (op === 'is' && val === 'null' && cell != null) return false;
       if (op === 'not' && val === 'is.null' && cell == null) return false;
       if (op === 'neq' && String(cell) === val) return false;
       if (op === 'ilike' && String(cell ?? '').toLowerCase() !== val.toLowerCase()) return false;
       if (op === 'gte' && !(String(cell) >= val)) return false;
+      if (op === 'lte' && !(String(cell) <= val)) return false;
+      if (op === 'lt' && !(String(cell) < val)) return false;
+      if (op === 'gt' && !(String(cell) > val)) return false;
       if (op === 'in' && !val.slice(1, -1).split(',').map((x) => x.replace(/^"|"$/g, '')).includes(String(cell))) return false;
     }
     return true;
@@ -55,13 +59,13 @@ export function backend({ users = {} } = {}) {
       for (const r of list) {
         const key = table === 'platform_settings' ? 'key' : table === 'push_subscriptions' ? 'endpoint' : table === 'parrainages' ? 'filleul_user_id' : null;
         const existing = key && rows.find((x) => x[key] === r[key]);
-        if (existing) { Object.assign(existing, r); out.push(existing); continue; }
+        if (existing) { if(!String(init.headers?.Prefer||'').includes('resolution=ignore-duplicates')){Object.assign(existing, r); out.push(existing);} continue; }
         const row = { id: randomUUID(), created_at: new Date().toISOString(), ...(table === 'confidence_threads' ? { status: 'a_lire', unread_lamia: 0, unread_visitor: 0 } : {}), ...(table === 'confidence_messages' ? { ready: false } : {}), ...r };
         rows.push(row); out.push(row);
       }
       return ok(out, 201);
     }
-    if (method === 'PATCH') { rows.filter((r) => match(r, url)).forEach((r) => Object.assign(r, body)); return ok([], 204); }
+    if (method === 'PATCH') { const changed=rows.filter((r) => match(r, url));changed.forEach((r) => Object.assign(r, body));return String(init.headers?.Prefer||'').includes('return=representation')?ok(changed):ok([],204); }
     if (method === 'DELETE') {
       const del = rows.filter((r) => match(r, url));
       db[table] = rows.filter((r) => !del.includes(r));
