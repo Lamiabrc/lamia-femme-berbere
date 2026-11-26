@@ -2330,6 +2330,7 @@ await cp(join(ROOT, 'content', 'shipping.mjs'), join(DIST, 'assets', 'shipping.m
 await cp(join(ROOT, 'content', 'rubriques.mjs'), join(DIST, 'assets', 'rubriques.mjs'));
 await cp(join(ROOT, 'content', 'matching-options.mjs'), join(DIST, 'assets', 'matching-options.mjs'));
 await cp(join(ROOT, 'content', 'etat-matchs.mjs'), join(DIST, 'assets', 'etat-matchs.mjs'));
+await cp(join(ROOT, 'content', 'liens-tiktok.mjs'), join(DIST, 'assets', 'liens-tiktok.mjs'));
 await cp(join(ROOT, 'content', 'signalement.mjs'), join(DIST, 'assets', 'signalement.mjs'));
 await cp(join(ROOT, 'src', 'i18n.js'), join(DIST, 'assets', 'i18n.js'));
 await writeFile(join(DIST, 'assets', 'tayri.css'), `${await readFile(join(ROOT, 'src', 'tayri.css'), 'utf8')}\n${await readFile(join(ROOT, 'src', 'tayri-phase1.css'), 'utf8')}`);

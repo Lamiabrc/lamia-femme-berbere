@@ -56,7 +56,7 @@ function ouvrir(tab) {
   if (tab === 'coaching') chargerCoaching();
   if (tab === 'comptes' && !comptes) chargerComptes();
   if (tab === 'comptes') chargerFichesSansCompte();
-  if (tab === 'creer-profil') fichesAdmin.ouvrir();
+  if (tab === 'fiches') fichesAdmin.ouvrir();
   if (tab === 'match-direct') { matchDirect.ouvrir(aller); aller = ''; }
   if (tab === 'rencontres') { const f = $('[data-rencontres]'); if (f && !f.src) f.src = `/confidences-lamia/?integre=1#${aller || 'annonces'}`; aller = ''; }
   scrollTo({ top: 0 });
@@ -300,18 +300,18 @@ monterCompleter({ appel: (body) => conf(body), recharger: (ref) => ouvrirParRef(
 const matchDirect = monterMatchDirect({ appel: (body) => conf(body), voirProfil: (ref) => ouvrirParRef(ref) });
 const conf = async (body) => { const r = await fetch('/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(body) }); const d = await r.json().catch(() => ({})); if (!r.ok) throw Object.assign(new Error(d.error || 'erreur'), { code: d.error, texte: d.message, manques: d.manques }); return d; };
 
-// Les fiches créées par Lamia (« Créer un profil ») n'ont pas de compte : elles sont listées ici pour les retrouver.
+// Dernières fiches sans compte, quel que soit leur outil d'origine.
 const ETAT_FICHE = { en_attente: 'attend sa confirmation', confirmee: 'confirmée', retiree: 'retirée' };
 async function chargerFichesSansCompte() {
   const zone = $('[data-fiches-sans-compte]'); if (!zone) return;
   try {
-    const r = await conf({ action: 'annonce_fiches_admin' });
+    const r = await conf({ action: 'annonce_fiches_admin',sans_compte:true,actives_seulement:true });
     const l = (r.fiches || []).filter((f) => f.confirmation !== 'retiree' && !f.compte);
     if (!l.length) { zone.hidden = true; return; }
     zone.hidden = false;
-    zone.innerHTML = `<h2 style="margin-top:0">Fiches créées par toi, sans compte (${l.length}${r.suivant ? '+' : ''})</h2><p class="aide">Clique sur une fiche pour l’ouvrir : compléter ses infos, la matcher.</p>
+    zone.innerHTML = `<h2 style="margin-top:0">Dernières fiches sans compte</h2><p class="aide">${l.length} fiche${l.length>1?'s':''} affichée${l.length>1?'s':''}. Les fiches des lives sont incluses.</p><p><button type="button" class="btn btn-line" data-go="fiches">Voir toutes les fiches</button></p>
       <div class="membres-grille">${l.map((f) => `<button type="button" class="membre-carte" data-voir-ref="${esc(f.ref)}"><strong>${esc(f.pseudo || `Fiche ${f.ref}`)}</strong> <span>n° ${esc(f.ref)}</span><br><small>${esc(f.genre === 'femme' ? 'Femme' : 'Homme')} · ${esc(f.age ?? '?')} ans · ${esc([f.ville, f.pays].filter(Boolean).join(', '))}</small><br><small>${esc(ETAT_FICHE[f.confirmation] || '')}</small></button>`).join('')}</div>`;
-  } catch { zone.hidden = true; }
+  } catch { zone.hidden=false;zone.innerHTML='<h2>Fiches sans compte</h2><p class="aide">La liste n’a pas pu être chargée.</p><button type="button" class="btn btn-line" data-go="fiches">Retrouver les fiches</button>'; }
 }
 async function pastilleJournal() {
   try { const d = await conf({ action: 'annonce_journal', categorie: 'aucune' }); $$('[data-journal-pastille]').forEach((p) => { p.textContent = d.non_lus; p.hidden = !d.non_lus; }); } catch { /* */ }
@@ -1370,7 +1370,7 @@ async function demarrer() {
   if (!admin) return;
   if (location.hash.startsWith('#profil-') || location.hash.startsWith('#compte-')) { aFaire(); pastilleJournal(); chargerCockpit(); await charger().catch(() => {}); suivreHashProfil(); return; }
   const tab = location.hash.slice(1);
-  ouvrir(['accueil', 'activite', 'rencontres', 'comptes', 'match-direct', 'creer-profil', 'application', 'coaching', 'ventes', 'produits', 'soirees', 'bilan', 'alertes', 'textes', 'visites'].includes(tab) ? tab : 'accueil');
+  ouvrir(['accueil', 'activite', 'rencontres', 'comptes', 'match-direct', 'creer-profil', 'fiches', 'application', 'coaching', 'ventes', 'produits', 'soirees', 'bilan', 'alertes', 'textes', 'visites'].includes(tab) ? tab : 'accueil');
   aFaire(); pastilleJournal(); chargerCockpit();
   await charger();
 }
