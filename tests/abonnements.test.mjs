@@ -257,3 +257,24 @@ test('Passion → abonnement Couple : seulement avec l’accord, prix Couple à 
   assert.equal(appels.at(-2).coupon.amount_off, 1600);
   assert.ok(ecrits.some(([u, body]) => u.includes('abonnements?id=eq.a1') && body.includes('"formule":"couple"')));
 });
+test('demander à Lamia une mise en relation : 8 €, payé par celui qui demande, profil en ligne des deux côtés', async () => {
+  assert.equal(unite('match_lamia').prix, 800);
+  const s = fauxStripe();
+  const auth = new Request('https://lamia-femme-berbere.com/api/preorder', { method: 'POST', headers: { Authorization: 'Bearer t' } });
+  const monde = ({ moi = [{ ref: 5 }], cible = [{ ref: 12 }] } = {}) => async (u) => {
+    const url = String(u);
+    if (url.includes('/auth/v1/user')) return { ok: true, status: 200, json: async () => ({ id: '00000000-0000-0000-0000-000000000001', email: 'nina@example.com' }) };
+    if (url.includes('annonces?user_id')) return { ok: true, json: async () => moi };
+    if (url.includes('annonces?ref=eq.12')) return { ok: true, json: async () => cible };
+    return { ok: true, json: async () => [] };
+  };
+  const payer = (fetcher, ref = 12) => actionAbonnement({ action: 'abonnement_payer', cgv_accepted: true, unite: 'match_lamia', ref }, auth, { env, fetcher, stripe: s });
+  assert.equal((await payer(monde({ moi: [] }))).status, 409); // pas de profil en ligne
+  assert.equal((await payer(monde({ cible: [] }))).status, 409); // profil choisi indisponible
+  assert.equal((await payer(monde(), 5)).status, 400); // soi-même
+  assert.equal(s.appels.length, 0);
+  assert.equal((await payer(monde())).status, 200);
+  assert.equal(s.appels[0].line_items[0].price_data.unit_amount, 800);
+  assert.equal(s.appels[0].metadata.cible, '12');
+  assert.equal(s.appels[0].metadata.demandeur_ref, '5');
+});
