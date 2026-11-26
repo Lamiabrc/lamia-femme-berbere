@@ -1,5 +1,11 @@
 /* Tableau de bord de Lamia — palette de la Maison (crème, champagne, encre) */
-.tdb { background: var(--qvt-creme); color: var(--qvt-encre); }
+.tdb { /* Charte du 26 nov. : bleu du logo vers violet, fond clair, une seule police (DM Sans). */
+  --qvt-creme:#f5f8fc; --qvt-ivoire:#fff; --qvt-sable:#d8e1ef; --qvt-sable-fonce:#e6edfa;
+  --qvt-champagne:#e6edfa; --qvt-champagne-clair:#edf2fb; --qvt-bronze:#6b43a8;
+  --qvt-encre:#23304b; --qvt-nuit:#273b80; --qvt-taupe:#52627d; --rouge:#273b80;
+  --encre:#23304b; --gris:#52627d; --serif:var(--sans);
+  background: var(--qvt-creme); color: var(--qvt-encre); font-family: var(--sans); }
+.tdb :is(h1,h2,h3,h4) { font-family: var(--sans); font-weight: 700; letter-spacing: 0; }
 .tdb [hidden] { display: none !important; }
 .tdb-top { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; padding: 10px var(--gouttiere); background: var(--qvt-nuit); color: var(--qvt-sable-fonce); }
 .tdb-marque { display: flex; align-items: center; gap: 10px; color: #fff; text-decoration: none; font-family: var(--serif); font-size: 20px; }
@@ -39,7 +45,7 @@
 
 .barres { position: relative; display: flex; align-items: flex-end; gap: 3px; height: 160px; padding-bottom: 22px; }
 .barre { flex: 1; height: 100%; display: flex; align-items: flex-end; }
-.barre i { display: block; width: 100%; height: max(2px, var(--h)); border-radius: 4px 4px 0 0; background: linear-gradient(180deg, #d9c19a, var(--qvt-bronze)); }
+.barre i { display: block; width: 100%; height: max(2px, var(--h)); border-radius: 4px 4px 0 0; background: linear-gradient(180deg, #9baec8, var(--qvt-bronze)); }
 .barre:hover i { background: var(--rouge); }
 .barres-legende { position: absolute; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-between; font-size: 12px; color: var(--qvt-taupe); }
 
@@ -87,7 +93,7 @@
 .classement li { position: relative; display: flex; justify-content: space-between; gap: 10px; padding: 6px 10px; font-size: 14px; }
 .classement li i { position: absolute; left: 0; top: 0; bottom: 0; width: var(--w); background: var(--qvt-champagne-clair); border-radius: 8px; z-index: 0; }
 .classement li span, .classement li b { position: relative; z-index: 1; }
-.alerte { border-left: 5px solid #d9c19a; }
+.alerte { border-left: 5px solid #9baec8; }
 .alerte.is-red { border-left-color: var(--rouge); }
 .alerte.is-orange { border-left-color: #C9BCE8; }
 .alerte p { margin: 0 0 4px; }
@@ -104,7 +110,7 @@
   .tdb tr { background: #fff; border: 1px solid var(--qvt-sable); border-radius: 14px; margin-bottom: 10px; padding: 6px 4px; }
   .tdb td { border: 0; padding: 4px 12px; }
 }
-.mot { margin: 0 0 10px; padding: 10px 14px; border-left: 3px solid #d9c19a; background: var(--qvt-creme); border-radius: 0 10px 10px 0; font-family: var(--serif); font-style: italic; }
+.mot { margin: 0 0 10px; padding: 10px 14px; border-left: 3px solid #9baec8; background: var(--qvt-creme); border-radius: 0 10px 10px 0; font-family: var(--serif); font-style: italic; }
 .reglages .champs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 12px; }
 .reglages label { display: grid; gap: 6px; font-weight: 600; font-size: 14px; }
 .reglages .large { grid-column: 1 / -1; }
@@ -121,7 +127,7 @@
 .entonnoir em { font-style: normal; font-size: 12px; color: var(--qvt-bronze); min-width: 40px; text-align: right; }
 .barres.heures { height: 110px; }
 .classement small { font-weight: 400; color: var(--qvt-taupe); }
-.tdb-onglet-lien { margin-left: auto; padding: 8px 14px; border-radius: 999px; background: #7d1530; border: 1px solid #E9DFFA; color: #fff6e6; font: 700 14px var(--sans); text-decoration: none; }
+.tdb-onglet-lien { margin-left: auto; padding: 8px 14px; border-radius: 999px; background: #273b80; border: 1px solid #E9DFFA; color: #fff; font: 700 14px var(--sans); text-decoration: none; }
 .tdb-onglet-lien:hover { background: #5c0f22; }
 
 /* Aujourd'hui : la liste des choses à faire */
@@ -134,14 +140,14 @@
 
 /* Application : journal, retraits, notifications */
 .tdb-plus[open] > summary .tdb-pastille { display: none; }
-.tdb-pastille { display: inline-block; min-width: 18px; padding: 0 5px; border-radius: 999px; background: #8a1024; color: #fff; font-size: 11px; line-height: 18px; text-align: center; }
+.tdb-pastille { display: inline-block; min-width: 18px; padding: 0 5px; border-radius: 999px; background: #273b80; color: #fff; font-size: 11px; line-height: 18px; text-align: center; }
 .tdb-grille-app { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 18px; align-items: start; }
 .tdb-grille-app > div > .tdb-carte + .tdb-carte { margin-top: 18px; }
 @media (max-width: 900px) { .tdb-grille-app { grid-template-columns: 1fr; } }
 .tdb-filtres-journal { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 12px; }
 .tdb-filtres-journal button { border: 1px solid #e6d6c0; background: #fff; border-radius: 999px; padding: 5px 11px; font: inherit; font-size: 13px; cursor: pointer; color: #2b2118; }
 .tdb-filtres-journal button.is-on { background: #2b2118; color: #fff; border-color: #2b2118; }
-.tdb-filtres-journal b { color: #8a1024; }
+.tdb-filtres-journal b { color: #273b80; }
 .tdb-filtres-journal button.is-on b { color: #ffd6a0; }
 .tdb-journal, .tdb-retraits { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; max-height: 70vh; overflow: auto; }
 .tdb-jour { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: #8a7a6a; margin-top: 8px; }
@@ -163,7 +169,7 @@
 /* Activité des matchs (pilote automatique) */
 .tdb-chiffres { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin: 12px 0 18px; }
 .tdb-chiffre { background: #fff; border: 1px solid #ead9c4; border-radius: 14px; padding: 12px; display: grid; gap: 2px; }
-.tdb-chiffre b { font-size: 26px; color: #8a1024; }
+.tdb-chiffre b { font-size: 26px; color: #273b80; }
 .tdb-chiffre span { font-size: 13px; color: #5e4b50; }
 .tdb-liste-activite { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; max-height: 420px; overflow-y: auto; }
 .tdb-liste-activite li { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 10px; background: #faf5ee; font-size: 14px; }
@@ -173,7 +179,7 @@
 .tdb-form-pilote input[type=number] { min-height: 40px; padding: 6px 10px; border-radius: 10px; border: 1px solid #d9c7b0; width: 120px; }
 .tdb-coche { display: flex !important; align-items: center; gap: 8px; }
 
-.tdb-plusieurs { font-style: normal; font-size: 12px; font-weight: 700; color: #8a1024; background: #fbecee; border-radius: 999px; padding: 1px 8px; white-space: nowrap; }
+.tdb-plusieurs { font-style: normal; font-size: 12px; font-weight: 700; color: #273b80; background: #e6edfa; border-radius: 999px; padding: 1px 8px; white-space: nowrap; }
 .tdb-actions-activite { display: flex; flex-wrap: wrap; gap: 8px; }
 
 /* ---------------------------------------------------------------- Comptes */
@@ -358,7 +364,7 @@
 .tdb-outils > a:nth-child(4n+2), .tuile:nth-child(4n+2) { background: #F2ECFB; border-color: #E2D8F5; }
 .tdb-outils > a:nth-child(4n+3), .tuile:nth-child(4n+3) { background: #FBF3E2; border-color: #F0E2C4; }
 .tdb-outils > a:nth-child(4n), .tuile:nth-child(4n) { background: #FFF3E8; border-color: #F7E2CE; }
-.tdb-onglets button[aria-current="true"], .tdb-plus.is-actif > summary, .tdb-plus[open] > summary { background: #E9DFFA !important; color: #2F2B3D !important; }
+.tdb-onglets button[aria-current="true"], .tdb-plus.is-actif > summary, .tdb-plus[open] > summary { background: #e6edfa !important; color: #273b80 !important; }
 
 /* Carreaux ajustés au texte */
 .tdb-outils { align-items: start; gap: 8px; }
@@ -369,7 +375,7 @@
 .tuile strong { font-size: 24px; }
 
 /* Le rouge à lèvres, visible mais petit */
-.tdb-onglets button[aria-current="true"] .ico, .tdb-plus.is-actif > summary .ico { color: #D1173A !important; }
+.tdb-onglets button[aria-current="true"] .ico, .tdb-plus.is-actif > summary .ico { color: #6b43a8 !important; }
 .tdb-titre::after { content: ''; display: block; width: 30px; height: 3px; margin-top: 7px; border-radius: 2px; background: #D1173A; }
 .tdb-pastille { background: #D1173A !important; }
 
@@ -497,14 +503,6 @@
   .fiche-admin-champs { grid-template-columns: minmax(0, 1fr); }
 }
 
-.mm{display:grid;gap:12px}
-.mm-centre{justify-self:center;text-align:center;background:#6b1030;color:#fff;border-radius:999px;padding:12px 26px;font-weight:800;font-size:1.1rem}
-.mm-centre small{display:block;font-weight:500;font-size:.78rem;opacity:.9}
-.mm-branches{list-style:none;margin:0;padding:0;display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
-.mm-branches>li{border:2px solid #c9a24a;border-radius:14px;padding:12px 14px;background:#fffdf7}
-.mm-branches>li>strong{display:block;margin-bottom:6px;color:#6b1030}
-.mm-branches ul{margin:0;padding-left:18px;font-size:.92rem}
-.mm-branches ul li{margin:3px 0}
 
 /* Code couleur des cartes de la liste des membres (Lamia, 23 nov. 2026) */
 .membre-carte { border-left: 6px solid var(--carte-c, #c9c2b6); background: var(--carte-fond, #fff); }
@@ -622,3 +620,21 @@
 .tdb-ecrire-zone { display: grid; gap: 10px; }
 .tdb-ecrire-zone label { display: grid; gap: 6px; font-weight: 600; }
 .tdb-ecrire-zone textarea { font-size: 16px; width: 100%; }
+
+/* ---------------------------------------------------------------- Charte du 26 nov. 2026 (Lamia)
+   Bleu du logo vers violet, fond clair, une seule police : DM Sans. Placé en dernier pour l'emporter
+   sur les anciennes couches (crème, bordeaux, Cormorant). */
+.tdb :is(h1,h2,h3,h4,summary,strong,.tdb-marque,.kpi strong,.tuile strong,.pc-texte strong,.groupe summary,.compte-tete h2,.mot) { font-family: var(--sans) !important; font-style: normal; }
+.tdb-top { background: #fff !important; color: #23304b !important; border-color: #d8e1ef !important; }
+.tdb-marque, .tdb-onglets button, .tdb-plus > summary, .tdb-lien { color: #23304b; }
+.tdb-marque em { color: #6b43a8; }
+.tdb-top .ico { color: #6b43a8; }
+.tdb-onglets button[aria-current="true"] { background: #e6edfa; color: #273b80; }
+.tdb-titre { color: #273b80; font-weight: 700; }
+.tdb-titre::after { background: linear-gradient(90deg, #273b80, #6b43a8); }
+.tdb-gros, .kpi { background: linear-gradient(115deg, #273b80, #6b43a8); color: #fff; }
+.kpi span { color: #e6edfa; }
+.tuile strong { color: #273b80; }
+@media (max-width: 760px) {
+  .tdb .tdb-onglets > button, .tdb .tdb-plus > summary { font-size: 11px !important; line-height: 1.25; }
+}

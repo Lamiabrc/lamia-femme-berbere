@@ -4,7 +4,7 @@
   --ty-bleu:#273b80; --ty-violet:#6b43a8; --ty-bordeaux:var(--ty-bleu); --ty-accent:var(--ty-bleu);
   --ty-teinte:#edf2fb; --ty-ivoire:#fff; --ty-encre:#23304b; --ty-doux:#52627d; --ty-ligne:#d8e1ef;
   --blanc:#fff; --chaux:#f5f8fc; --encre:#23304b; --gris:#52627d; --ligne:#d8e1ef; --rouge:#273b80;
-  --sans:'DM Sans',system-ui,sans-serif; --serif:'Cormorant Garamond',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif; --serif:var(--sans); /* 26 nov. : Lamia ne veut plus de police à empattements */
   background:#f5f8fc; color:var(--ty-encre);
 }
 body.tayri-shell[data-tayri-univers] { background:#f5f8fc!important; font-family:var(--sans)!important; }
