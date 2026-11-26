@@ -1,6 +1,6 @@
 /* Espace de Lamia pour les confidences : pensé d'abord pour le téléphone. */
 :root { --ivoire: #fbf6f1; --poudre: #efe7d8; --poudre-fonce: #e5d8be; --vieux-rose: #6C5BA7; --vieux-rose-fonce: #6C5BA7; --champagne: #d8bd91; --encre: #3d3034; --gris: #7d6a6e;
-  --serif: 'Cormorant Garamond', Georgia, serif; --sans: 'DM Sans', system-ui, sans-serif; color-scheme: light; }
+  --serif: 'DM Sans', system-ui, sans-serif; --sans: 'DM Sans', system-ui, sans-serif; color-scheme: light; }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 body.cl { margin: 0; min-height: 100vh; font: 16px/1.5 var(--sans); color: var(--encre); background: linear-gradient(180deg, #f6f2e9, var(--ivoire) 40%); -webkit-text-size-adjust: 100%; }
