@@ -4988,3 +4988,7 @@ body:has(.espace) .site-header .maison-menu-panneau a, body:has(.espace) .site-h
 .annonce-menu { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 8px; }
 .annonce-menu button { padding: 8px 12px; border-radius: 999px; border: 2px solid var(--cc); background: #fff; color: #2F2B3D; font: 600 13px var(--sans, sans-serif); cursor: pointer; }
 .annonce-menu button.annonce-menu-on { background: var(--cc); color: #fff; }
+/* Demander à Lamia de nous mettre en relation (8 €), dans « Voir le profil » du swipe. */
+.swipe-lamia { margin-top: 1.2rem; padding: .9rem 1rem; border: 1px solid #ddd6ee; border-radius: 14px; background: #f7f5fc; display: grid; gap: .5rem; }
+.swipe-lamia p { margin: 0; }
+.swipe-lamia .po-btn { min-height: 46px; }
