@@ -1,6 +1,7 @@
 import { O, lib } from '/assets/matching-options.mjs';
 import { champsCreation, lireCreation } from '/completer-profil.js';
 import {pseudoDepuisTikTok,urlDepuisTikTok} from '/assets/liens-tiktok.mjs';
+import { etapesFiche } from '/fiches-etapes.js';
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (x) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));
 const ETATS = { en_attente: 'En attente de confirmation', confirmee: 'Confirmée', retiree: 'Retirée' };
 const ERREURS = { forbidden: 'Connecte-toi avec ton compte administratrice.', genre_requis: 'Choisis femme ou homme.', age_invalide: 'Indique un âge entre 18 et 99 ans.', ages_recherches: 'Vérifie les âges recherchés : de 18 à 99 ans, du plus petit au plus grand.', annonce_incomplete: 'Complète le pays et les deux textes de l’annonce.', requete_deja_utilisee: 'Cette tentative a déjà créé une fiche avec un autre texte. Actualise la liste pour la retrouver.', not_found: 'Aucune fiche avec ce numéro.', not_configured: 'L’environnement de test n’est pas encore configuré.' };
@@ -18,6 +19,7 @@ export function monterFichesAdmin({ appel }) {
   });
   panel.querySelectorAll('[data-fiche-cases]').forEach((c) => { c.className = 'cp-cases'; c.innerHTML = O[c.dataset.ficheCases].map((x) => `<label><input type="checkbox" name="${c.dataset.ficheCases}" value="${esc(x)}"> ${esc(lib(x))}</label>`).join(''); });
   { const z = panel.querySelector('[data-fiche-plus]'), c = panel.querySelector('[data-fiche-plus-cherche]'); if (z) z.innerHTML = champsCreation('lui'); if (c) c.innerHTML = champsCreation('cherche'); }
+  etapesFiche(form);
   const corps = () => { const f = new FormData(form), p = Object.fromEntries(f); for (const k of Object.keys(p)) if (k.startsWith('m_')) delete p[k]; p.matching = lireCreation(form); p.origine = f.get('origine') ? [f.get('origine')] : []; p.caracteristiques = f.getAll('caracteristiques'); delete p.publier; return { profil: p, publier: f.get('publier') === 'on' }; };
   const apercu = () => {
     const p = corps().profil;

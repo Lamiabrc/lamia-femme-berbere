@@ -335,6 +335,7 @@ function dessinerMembre() {
   box.innerHTML = `<div class="tdb-membre-fiche">
     <h3>${esc(m.prenom || 'Sans prénom')} · <a class="fiche-ref" href="#profil-${esc(m.ref)}">n° ${esc(m.ref)}</a>${m.autre_ref ? ` <span class="aide">(aussi n° ${esc(m.autre_ref)} dans l’outil)</span>` : ''}</h3>
     <ul>${lignes.map((l) => `<li>${esc(l)}</li>`).join('')}</ul>
+    ${m.compte ? '' : `<div class="tdb-ecrire" data-tdb-ecrire-boite data-tdb-direct-boite="${esc(m.ref)}"><button class="btn btn-line" type="button" data-tdb-ecrire="${esc(m.ref)}">Voir le message</button></div>`}
     ${m.joignable ? `<label>Lui écrire<textarea data-membre-texte rows="3" placeholder="Ton message (il arrive dans sa conversation privée avec toi)"></textarea></label>
     <div class="tdb-filtres-journal"><button type="button" data-membre-envoyer="">Envoyer le message</button><button type="button" data-membre-envoyer="abonnement">Envoyer avec le bouton « Abonnement »</button><button type="button" data-membre-envoyer="profil">Envoyer avec le bouton « Compléter mon profil »</button></div>
     <div class="tdb-filtres-journal"><span>Offrir une formule :</span>${offre('passion')}${offre('prestige')}${m.formule_offerte ? '<button type="button" data-membre-offrir="">Reprendre</button>' : ''}${m.formule && !m.formule_offerte ? `<span class="aide">il paie déjà ${esc(NOM_FORMULE[m.formule] || m.formule)} : son abonnement reste prioritaire</span>` : ''}</div>` : '<p class="aide">Cette personne n’a pas de compte sur le site : on ne peut ni lui écrire ni lui offrir une formule d’ici.</p>'}
@@ -344,6 +345,7 @@ function dessinerMembre() {
 async function voirMembre(ref) {
   membreVu = (await conf({ action: 'live_outil_membre', ref: Number(ref) })).membre;
   dessinerMembre();
+  boutonDirect($('[data-membre-fiche] [data-tdb-direct-boite]'));
 }
 const ditMembre = (t) => { const st = $('[data-membre-statut]'); if (st) st.textContent = t; };
 const erreurMembre = (err) => ditMembre(err.texte || ERR_MEMBRE[err.code] || 'Ça n’a pas fonctionné. Réessaie dans un instant.');
@@ -1144,7 +1146,8 @@ async function ouvrirParRef(ref) {
   $('[data-compte-infos]').textContent = '';
   $('[data-compte-form]').hidden = true;
   $('[data-compte-soirees]').innerHTML = '<li>Fiche sans compte : pas d’inscription aux soirées.</li>';
-  $('[data-compte-liens]').innerHTML = '';
+  $('[data-compte-liens]').innerHTML = `<li class="tdb-ecrire" data-tdb-ecrire-boite data-tdb-direct-boite="${esc(ref)}"><button class="btn btn-line" type="button" data-tdb-ecrire="${esc(ref)}">Voir le message</button></li>`;
+  boutonDirect($('[data-compte-liens] [data-tdb-direct-boite]'));
   $('[data-compte-fiche]').hidden = false; $('[data-compte-fond]').hidden = false;
   boutonsSuivant();
   chargerDetail({ ref });
@@ -1473,7 +1476,7 @@ function peindreCoaching(d) {
   const aVenir = [...parJour].filter(([, l]) => l.some((c) => !passe(c)));
   // Séance en cours ou dans moins d'une heure : en haut, en grand, avec Entrer et « Lamia t'attend ».
   const proche = (d.creneaux || []).filter((c) => c.user_id && !passe(c) && new Date(c.debut).getTime() - Date.now() < 3600e3);
-  const bandeau = proche.map((c) => `<div class="tdb-carte" style="border:2px solid #7a1f2b"><h2>${new Date(c.debut) <= Date.now() ? 'Séance en cours' : 'Prochaine séance'} · ${esc(date(c.debut, { hour: '2-digit', minute: '2-digit' }))}${typeDe(c)}</h2><p><b>${esc(c.prenom || c.email || '')}</b></p><p><button class="btn btn-ink" type="button" data-coaching-entrer="${esc(c.id)}">Entrer dans la salle</button> <button class="btn btn-line" type="button" data-coaching-attend="${esc(c.id)}">Prévenir : Lamia t’attend</button></p></div>`).join('');
+  const bandeau = proche.map((c) => `<div class="tdb-carte" style="border:2px solid #273b80"><h2>${new Date(c.debut) <= Date.now() ? 'Séance en cours' : 'Prochaine séance'} · ${esc(date(c.debut, { hour: '2-digit', minute: '2-digit' }))}${typeDe(c)}</h2><p><b>${esc(c.prenom || c.email || '')}</b></p><p><button class="btn btn-ink" type="button" data-coaching-entrer="${esc(c.id)}">Entrer dans la salle</button> <button class="btn btn-line" type="button" data-coaching-attend="${esc(c.id)}">Prévenir : Lamia t’attend</button></p></div>`).join('');
   $('[data-coaching-planning]').innerHTML = bandeau + (aVenir.length ? `<div class="planning-grille">${aVenir.map(([k, l]) => `<section><h3>${esc(k)}</h3><ul>${l.map(cellule).join('')}</ul></section>`).join('')}</div>` : '<p>Aucun créneau ouvert à venir.</p>');
   $('[data-coaching-abonnes]').innerHTML = (d.abonnes || []).map((a) => `<li><span><b>${esc(a.nom || a.email)}</b> <small>${a.reserve ? `Visio du mois : ${esc(date(a.reserve))}` : 'Pas encore de visio ce mois-ci'}</small></span></li>`).join('') || '<li>Pas encore d’abonné Prestige actif.</li>';
 }
@@ -1537,3 +1540,85 @@ document.addEventListener('click', (e) => { const b = e.target.closest('[data-ta
 
 // Un numéro de profil déjà ouvert une fois se rouvre au clic (l'adresse ne change pas, donc pas de « hashchange »).
 document.addEventListener('click', (e) => { const a = e.target.closest('a[href^="#profil-"]'); if (a && token && location.hash === a.getAttribute('href')) { e.preventDefault(); suivreHashProfil(); } });
+
+// Fiche sans compte (créée en live) : écrire à la personne sur son réseau (Lamia, 26 nov. 2026).
+// Le message est préparé par le serveur, modifiable ; « Copier et ouvrir » copie le texte puis ouvre son TikTok.
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-tdb-ecrire]');
+  if (!b) return;
+  const zone = b.closest('[data-tdb-ecrire-boite], li');
+  const deja = zone.querySelector('[data-tdb-ecrire-zone]');
+  if (deja) { deja.remove(); return; }
+  b.disabled = true;
+  const p = document.createElement('div'); p.className = 'tdb-ecrire-zone'; p.dataset.tdbEcrireZone = '';
+  try {
+    const r = await conf({ action: 'annonce_contact_preparer', ref: b.dataset.tdbEcrire });
+    const quand = r.dernier_at ? new Date(r.dernier_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }) : '';
+    p.innerHTML = `${quand ? `<p class="aide"><b>Déjà contactée le ${esc(quand)}.</b></p>` : ''}
+      <label>Message préparé (tu peux le changer)<textarea rows="7" data-tdb-ecrire-texte>${esc(r.message)}</textarea></label>
+      ${r.lien ? `<p><a class="btn btn-ink" href="${esc(r.lien)}" target="_blank" rel="noopener" data-tdb-ecrire-ouvrir="${esc(r.ref)}">Copier et ouvrir ${esc(r.reseau)}</a></p>
+      <p class="aide" role="status" data-tdb-ecrire-statut>Dans ${esc(r.reseau)} : touche Message, colle, envoie.</p>`
+      : '<p class="aide" role="status">Je n’ai pas son réseau sur le site : écris-lui depuis ton outil.</p>'}`;
+  } catch (err) {
+    p.innerHTML = `<p class="aide">${err?.code === 'fiche_retiree' || err?.message === 'fiche_retiree' ? 'Cette personne a retiré sa fiche : pas de message.' : 'Le message n’a pas pu être préparé. Réessaie dans un instant.'}</p>`;
+  }
+  b.disabled = false; zone.append(p);
+});
+document.addEventListener('click', (e) => {
+  const o = e.target.closest('[data-tdb-ecrire-ouvrir]');
+  if (!o) return;
+  const z = o.closest('[data-tdb-ecrire-zone]'), t = z.querySelector('[data-tdb-ecrire-texte]'), st = z.querySelector('[data-tdb-ecrire-statut]');
+  // Copié pendant le toucher, avant de quitter la page : sinon l'iPhone refuse.
+  const secours = () => { t.select(); try { return document.execCommand('copy'); } catch { return false; } };
+  if (navigator.clipboard?.writeText) navigator.clipboard.writeText(t.value).catch(secours); else secours();
+  if (st) st.textContent = 'Message copié. Colle-le dans TikTok et envoie.';
+  conf({ action: 'annonce_contact_note', ref: o.dataset.tdbEcrireOuvrir }).catch(() => {});
+});
+
+// Fiches du live à relancer : liste paginée (20), chargée à l'ouverture du bloc.
+let pageRelance = 0, pagesRelance = 1;
+async function chargerRelances() {
+  const ul = $('[data-relancer-liste]'), st = $('[data-relancer-statut]');
+  if (!ul) return;
+  st.textContent = 'Chargement…';
+  try {
+    const r = await conf({ action: 'annonce_fiches_a_relancer', page: pageRelance });
+    pagesRelance = Math.max(1, r.pages);
+    $('[data-relancer-compte]').textContent = `· ${r.a_faire} à faire sur ${r.total}`;
+    $('[data-relancer-pages]').textContent = `Page ${pageRelance + 1} sur ${pagesRelance}`;
+    ul.innerHTML = r.fiches.map((f) => `<li class="tdb-ecrire" data-tdb-ecrire-boite><div><strong><a class="fiche-ref" href="#profil-${esc(f.ref)}">n° ${esc(f.ref)}</a> · ${f.genre === 'femme' ? 'Femme' : f.genre === 'homme' ? 'Homme' : ''}${f.age ? `, ${esc(f.age)} ans` : ''}</strong>
+      <span class="aide"> ${esc([f.ville, f.pays].filter(Boolean).join(', '))} · @${esc(f.pseudo)} ${f.dernier_at ? `· contactée le ${esc(new Date(f.dernier_at).toLocaleDateString('fr-FR'))}` : '· jamais contactée'}</span></div>
+      <div class="tdb-filtres-journal">${f.lien ? `<a class="btn ${f.dernier_at ? 'btn-line' : 'btn-ink'}" href="${esc(f.lien)}" target="_blank" rel="noopener" data-tdb-direct="${esc(f.ref)}" data-message="${esc(f.message)}">Ouvrir son ${esc(f.reseau || 'TikTok')}</a>` : ''}<button class="btn btn-line" type="button" data-tdb-ecrire="${esc(f.ref)}">Voir le message</button></div></li>`).join('') || '<li>Aucune fiche à relancer.</li>';
+    st.textContent = '';
+    $$('[data-relancer-page]').forEach((b) => { b.disabled = pageRelance + Number(b.dataset.relancerPage) < 0 || pageRelance + Number(b.dataset.relancerPage) >= pagesRelance; });
+  } catch { st.textContent = 'La liste ne s’affiche pas. Réessaie dans un instant.'; }
+}
+$('[data-relancer]')?.addEventListener('toggle', (e) => { if (e.target.open) chargerRelances(); });
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-relancer-page]'); if (!b) return;
+  pageRelance = Math.max(0, Math.min(pagesRelance - 1, pageRelance + Number(b.dataset.relancerPage))); chargerRelances();
+});
+
+// Un seul geste (Lamia, 26 nov. 2026) : « Ouvrir son TikTok » ouvre directement son profil (lien venu de l'outil)
+// et copie le message en même temps ; il ne reste qu'à coller et envoyer.
+async function boutonDirect(boite) {
+  if (!boite) return;
+  try {
+    const r = await conf({ action: 'annonce_contact_preparer', ref: boite.dataset.tdbDirectBoite });
+    if (!r.lien) { boite.insertAdjacentHTML('afterbegin', '<p class="aide">Pas de TikTok pour cette fiche dans l’outil.</p>'); return; }
+    const quand = r.dernier_at ? ` · déjà contactée le ${new Date(r.dernier_at).toLocaleDateString('fr-FR')}` : '';
+    boite.insertAdjacentHTML('afterbegin', `<a class="btn btn-ink" href="${esc(r.lien)}" target="_blank" rel="noopener" data-tdb-direct="${esc(r.ref)}" data-message="${esc(r.message)}">Ouvrir son ${esc(r.reseau)}${esc(quand)}</a>`);
+  } catch { /* le bouton « Voir le message » reste disponible */ }
+}
+document.addEventListener('click', (e) => {
+  const a = e.target.closest('[data-tdb-direct]');
+  if (!a) return;
+  const texte = a.dataset.message || '';
+  // Copié pendant le clic, avant que l'onglet TikTok s'ouvre : sinon l'iPhone refuse.
+  const secours = () => { const t = document.createElement('textarea'); t.value = texte; document.body.append(t); t.select(); try { document.execCommand('copy'); } catch { /* */ } t.remove(); };
+  if (navigator.clipboard?.writeText) navigator.clipboard.writeText(texte).catch(secours); else secours();
+  conf({ action: 'annonce_contact_note', ref: a.dataset.tdbDirect }).catch(() => {});
+  const li = a.closest('li, [data-tdb-direct-boite]');
+  li?.querySelector('.tdb-copie')?.remove();
+  li?.insertAdjacentHTML('beforeend', '<p class="aide tdb-copie" role="status">Message copié : dans TikTok, touche Message, colle, envoie.</p>');
+});

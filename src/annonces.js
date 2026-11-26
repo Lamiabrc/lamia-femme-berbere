@@ -575,7 +575,7 @@ async function monterFormulaireConnecte(box, { existant = null, token = null } =
       try { localStorage.removeItem(BROUILLON); } catch { /* */ }
       await brouillonLocal(scope,null).catch(()=>{});
       box.classList.add('inscription-resultat');
-      box.innerHTML = `<div class="annonce-merci"><p class="lfb-azul" lang="ber">ⵜⴰⵏⴻⵎⵎⵉⵔⵜ</p><h3>Merci ${esc(f.prenom.value.trim())}, ton profil est bien arrivé.</h3><p>Lamia va le vérifier. Il attend sa validation avant d’être proposé pour une rencontre.</p><p><a class="btn btn-ink" href="/mon-espace/">Retrouver mon espace</a></p></div>`;
+      box.innerHTML = `<div class="annonce-merci"><p class="lfb-azul" lang="ber">ⵜⴰⵏⴻⵎⵎⵉⵔⵜ</p><h3>Merci ${esc(f.prenom.value.trim())}, ton profil est bien arrivé.</h3>${fin.en_ligne ? '<p>Il est en ligne : tu peux découvrir les profils dès maintenant.</p><p><a class="btn btn-ink" href="/rencontres/swipe/">Découvrir les profils</a></p>' : '<p>Il manque encore quelque chose pour le mettre en ligne : retrouve-le dans ton espace.</p><p><a class="btn btn-ink" href="/mon-espace/">Retrouver mon espace</a></p>'}</div>`;
     } catch (err) {
       btn.disabled = false;
       if (err.data?.brouillon_id) { const ancien=scope;scope=err.data.brouillon_id;if(await sauverCourt())await brouillonLocal(ancien,null).catch(()=>{});else scope=ancien; }

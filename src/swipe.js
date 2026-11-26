@@ -78,6 +78,9 @@ function carte(a) {
       ${a.profil ? `<h3>Qui je suis</h3><p data-membre>${esc(a.profil)}</p>` : ''}
       ${a.recherche || cherche(a).length ? `<h3>Qui je cherche${ages}</h3>${cherche(a).length ? `<p class="annonce-tags">${cherche(a).map((t) => `<span>${esc(t)}</span>`).join('')}</p>` : ''}${a.recherche ? `<p data-membre>${esc(a.recherche)}</p>` : ''}` : ''}
       ${foiEtVie(a).replace(/<h4>/g, '<h3>').replace(/<\/h4>/g, '</h3>')}
+      <div class="swipe-lamia"><p><b>Tu veux que Lamia vous mette en relation ?</b> Elle regarde vos deux profils et vous présente l’un à l’autre. 8 €.</p>
+        <label class="lettre-cgv"><input type="checkbox" data-lamia-cgv><span>J’accepte les <a class="text-link" href="/cgv/" target="_blank">conditions de vente</a></span></label>
+        <p class="po-actions"><button type="button" class="po-btn" data-lamia-match="${a.ref}">Demander à Lamia · 8 €</button></p></div>
       <p class="profil-moderer"><button type="button" class="link-button" data-moderer="${a.ref}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#flag"/></svg> Bloquer et signaler</button></p>
     </div>
   </article>`;
@@ -507,3 +510,19 @@ async function recharger() {
   } catch { message('<h2>Les profils ne s’affichent pas pour le moment</h2><p>Réessaie dans un instant.</p>'); }
   enRecharge = false;
 }
+
+// Demander à Lamia de nous mettre en relation : 8 €, payés par celui qui demande (Lamia, 26 nov. 2026).
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-lamia-match]');
+  if (!b) return;
+  const boite = b.closest('.swipe-lamia');
+  if (!boite.querySelector('[data-lamia-cgv]').checked) return toast('Coche les conditions de vente pour continuer.');
+  b.disabled = true;
+  try {
+    const r = await fetch('/api/preorder', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ action: 'abonnement_payer', unite: 'match_lamia', ref: b.dataset.lamiaMatch, cgv_accepted: true }) });
+    const j = await r.json().catch(() => ({}));
+    if (j.url) { location.href = j.url; return; }
+    toast(j.error === 'profil_requis' ? 'Il faut ton profil en ligne pour demander une mise en relation.' : j.error === 'profil_indisponible' ? 'Ce profil n’est plus disponible.' : 'Le paiement n’a pas pu s’ouvrir. Réessaie dans un instant.');
+  } catch { toast('Le paiement n’a pas pu s’ouvrir. Réessaie dans un instant.'); }
+  b.disabled = false;
+});

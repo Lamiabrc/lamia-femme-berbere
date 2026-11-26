@@ -58,18 +58,6 @@
   <section data-panel="accueil" hidden>
     <h1 class="tdb-titre">Bonjour Lamia</h1>
     <p><button type="button" class="btn btn-ink" data-go="creer-profil">Créer un profil et son annonce</button></p>
-    <div class="tdb-carte tdb-carte-carte" aria-label="La carte du projet">
-      <h2>La carte du projet</h2>
-      <p class="aide">Où on va, dans l’ordre. Rien de nouveau tant que le reste ne marche pas.</p>
-      <div class="mm">
-        <div class="mm-centre">TAYRI<small>appli + live, ta source de revenus</small></div>
-        <ul class="mm-branches">
-          <li class="mm-b1"><strong>1 · Que tout marche</strong><ul><li>Design de la maquette (4 écrans)</li><li>Inscription par annonce : « Confirmer », photo, email, mot de passe</li><li>Vidéo du parcours d’inscription avec voix</li><li>Test complet sur téléphone, bugs corrigés</li></ul></li>
-          <li class="mm-b2"><strong>2 · Le cœur du produit</strong><ul><li>Inscription courte, profil à 70 % avant le 1er cœur</li><li>« Quelqu’un t’a choisi » : Oui / Non + raison</li><li>Swipe trié, différences en rouge</li><li>Lien de connexion par email, réessai si la base cale</li></ul></li>
-          <li class="mm-b3"><strong>3 · Grandir</strong><ul><li>Live : « L’annonce du soir » dans l’appli</li><li>Speed datings et coaching en vente régulière</li><li>Jeux de couple et vie de communauté</li><li>4 langues relues, Google Play puis iOS</li></ul></li>
-        </ul>
-      </div>
-    </div>
     <!-- Ce qui compte en premier (Lamia, 16 nov. 2026) : les abonnés et l'argent généré. Le reste n'est qu'un moyen. -->
     <div class="tdb-essentiel" aria-label="L’essentiel">
       <button type="button" class="tdb-gros" data-go="ventes"><span>Abonnés</span><strong data-k="abonnes">—</strong><small data-k="abonnes-detail"></small></button>
@@ -189,6 +177,13 @@
       <div data-membre-fiche></div>
       <p class="aide" data-membre-statut role="status"></p>
     </div>
+    <details class="tdb-carte tdb-relancer" data-relancer>
+      <summary><h2>Fiches du live à relancer <span data-relancer-compte></span></h2></summary>
+      <p class="aide">Les fiches créées en live, sans compte, dont tu as le TikTok. Jamais contactées en premier. « Écrire sur TikTok » prépare le message (email + 2 photos), le copie et ouvre son profil.</p>
+      <ul class="relancer-liste" data-relancer-liste></ul>
+      <div class="tdb-filtres-journal"><button type="button" data-relancer-page="-1">← Précédents</button><span data-relancer-pages></span><button type="button" data-relancer-page="1">Suivants →</button></div>
+      <p class="aide" role="status" data-relancer-statut></p>
+    </details>
     <p class="aide">Une carte par personne. Clique sur une carte pour ouvrir sa fiche.</p>
     <div class="tdb-kpis" data-comptes-kpis></div>
     <div class="tdb-filtres">

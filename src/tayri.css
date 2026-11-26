@@ -266,7 +266,7 @@ html[dir='rtl'] .tayri-shell[data-tayri-univers] :is(.head-arch.has-image, .head
 /* Les pages autonomes partagent les mêmes repères, sans décor derrière les outils. */
 .tayri-raccourcis-outil { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 24px; min-block-size: 56px; padding: 10px clamp(16px, 4vw, 40px); background: #fffaf3; color: #7a1f35; border-block-end: 1px solid #d7bc88; font: 500 14px/1.4 system-ui, sans-serif; }
 .tayri-raccourcis-outil > a { display: inline-flex; align-items: center; min-block-size: 40px; text-underline-offset: 4px; }
-.tayri-raccourcis-outil .tayri-marque-outil { gap: 8px; margin-inline-end: auto; text-decoration: none; font: 600 23px/1.2 Georgia, serif; }
+.tayri-raccourcis-outil .tayri-marque-outil { gap: 8px; margin-inline-end: auto; text-decoration: none; font: 700 23px/1.2 var(--sans); }
 .tayri-raccourcis-outil img { inline-size: 32px; block-size: 32px; object-fit: contain; }
 .tayri-autonome :is(input, select, textarea, button) { font-size: 16px; }
 .tayri-autonome :is(h1, h2) { line-height: 1.2; }
