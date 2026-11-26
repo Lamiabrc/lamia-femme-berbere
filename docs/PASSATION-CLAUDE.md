@@ -28,6 +28,8 @@ Il reste des délais Supabase intermittents observés avant publication : trois 
 
 ## Validation et continuité
 
+Complément demandé ensuite : retrouver toutes les anciennes fiches des lives et les rechercher par TikTok. Voir `docs/fiches-retrouvees.md` et la branche `codex/fiches-lives-tiktok` / PR associée pour la publication exacte. Rubrique `/tableau-de-bord#fiches`, liste paginée, liens TikTok privés et modification du lien sans changement des autres critères ou états. Aucun ancien profil n’est republié automatiquement.
+
 Avant : 478 tests sur le SHA de départ. Phase 1 : **501 tests réussis, aucun échec ; 383 pages générées**. Avec le complément de limites email : **504 tests réussis, aucun échec**, dont les réservations concurrentes exécutées sur PostgreSQL local. Commandes : `npm test`, `npm run build`. Les tests doivent rester isolés de la production ; ne pas injecter de secrets de production. Recette locale : `node tests/serve-inscription.mjs`, puis http://127.0.0.1:4181/rencontres/#confier. Données fictives et API locales uniquement. Maquettes : `/docs/phase1-maquettes.html` sur ce serveur.
 
 Tests dédiés : `email-secours`, `inscription-phase1`, `inscription-verification`, `payment-status`. Recette navigateur réalisée en 375 px et sur ordinateur : étapes, validations, deux images fictives, reprise sans mot de passe, dépôt en attente de Lamia. Le temps inférieur à deux minutes reste à mesurer avec les personnes de recette. Des avertissements de traductions manquantes existaient déjà au build.

@@ -491,6 +491,12 @@
 .fiche-admin-liste li { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; padding: 16px 0; border-top: 1px solid var(--qvt-sable); }
 .fiche-admin-liste li div { display: grid; gap: 3px; }
 .fiche-admin-liste small { color: var(--qvt-taupe); }
+body.tdb [data-panel="fiches"] :is(input,select,button) { font-size:16px; min-height:48px; }
+body.tdb [data-panel="fiches"] .tdb-filtres-journal label { display:grid; gap:6px; min-inline-size:0; }
+body.tdb [data-panel="fiches"] .tdb-filtres-journal { align-items:end; }
+body.tdb [data-panel="fiches"] .tdb-filtres-journal .fiche-filtre-compte { display:flex; align-items:center; gap:10px; min-height:48px; }
+body.tdb [data-panel="fiches"] .fiche-filtre-compte input { inline-size:22px; block-size:22px; min-height:22px; padding:0; margin:0; flex:none; }
+body.tdb [data-panel="fiches"] [data-fiche-tiktok] { display:grid; gap:12px; margin-top:20px; }
 @media (max-width: 760px) {
   .fiche-admin-grille { grid-template-columns: minmax(0, 1fr); }
   .fiche-admin-apercu { position: static; }

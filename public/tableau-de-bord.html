@@ -25,6 +25,7 @@
       <div>
       <button type="button" data-tab="match-direct"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Match en direct</button>
       <button type="button" data-tab="creer-profil"><svg class="ico" aria-hidden="true"><use href="/icones.svg#user"/></svg> Créer un profil</button>
+      <button type="button" data-tab="fiches">Toutes les fiches</button>
       <button type="button" data-tab="rencontres"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Matchs à suivre</button>
       <button type="button" data-tab="application"><svg class="ico" aria-hidden="true"><use href="/icones.svg#smartphone"/></svg> Application <span class="tdb-pastille" data-journal-pastille hidden></span></button>
       <button type="button" data-tab="coaching"><svg class="ico" aria-hidden="true"><use href="/icones.svg#video"/></svg> Coaching</button>
@@ -180,7 +181,7 @@
 
   <!-- ===================================================== Comptes -->
   <section data-panel="comptes" hidden>
-    <div class="tdb-entete"><h1 class="tdb-titre">Les membres</h1><div class="actions"><button class="btn btn-ink" type="button" data-go="creer-profil">Créer un profil</button> <button class="btn btn-line" type="button" data-comptes-maj>Actualiser</button></div></div>
+    <div class="tdb-entete"><h1 class="tdb-titre">Les membres</h1><div class="actions"><button class="btn btn-line" type="button" data-go="fiches">Toutes les fiches</button> <button class="btn btn-ink" type="button" data-go="creer-profil">Créer un profil</button> <button class="btn btn-line" type="button" data-comptes-maj>Actualiser</button></div></div>
     <div class="tdb-carte tdb-membre-num" id="membre">
       <h2>Un membre par son numéro</h2>
       <p class="aide">Lui écrire, lui offrir une formule, le mettre en relation avec qui tu veux. Les mêmes gestes que dans ton outil.</p>
@@ -564,10 +565,17 @@
         <p class="aide">La fiche enregistrée applique le masquage des contacts. Le numéro est attribué à sa création.</p>
       </aside>
     </div>
+    <p><button type="button" class="btn btn-line" data-go="fiches">Retrouver toutes les fiches, y compris celles des lives</button></p>
+  </section>
+
+  <section data-panel="fiches" hidden>
+    <div class="tdb-entete"><h1 class="tdb-titre">Toutes les fiches</h1><button class="btn btn-ink" type="button" data-go="creer-profil">Créer un profil</button></div>
+    <p class="lead">Les anciennes fiches des lives et les fiches créées sur le site, avec ou sans compte. Les fiches retirées gardent leur statut.</p>
+    <div class="fiche-admin-resultat tdb-carte" data-fiche-resultat hidden aria-live="polite"></div>
     <div class="tdb-carte">
-      <div class="tdb-entete"><h2>Les fiches créées ici</h2><button class="btn btn-line" type="button" data-fiches-actualiser>Actualiser</button></div>
-      <p class="aide">Retrouve leur lien personnel et suis leur confirmation.</p>
-      <form data-fiche-lien-chercher class="tdb-filtres-journal"><label>Retrouver une fiche par son numéro<input name="ref" type="number" min="5001" required></label><button type="submit" class="btn btn-line">Retrouver son lien</button></form>
+      <div class="tdb-entete"><h2>Retrouver une fiche</h2><button class="btn btn-line" type="button" data-fiches-actualiser>Actualiser</button></div>
+      <form data-fiche-lien-chercher class="tdb-filtres-journal"><label>Numéro, lien TikTok ou @pseudo<input name="recherche" type="search" maxlength="240" placeholder="8366 ou https://www.tiktok.com/@pseudo" required></label><button type="submit" class="btn btn-line">Rechercher</button><button type="button" class="btn btn-line" data-fiches-reinitialiser>Effacer la recherche</button></form>
+      <div class="tdb-filtres-journal"><label>Origine de la fiche<select data-fiches-source><option value="toutes">Toutes les fiches</option><option value="live">Anciennes fiches des lives</option><option value="site">Créées sur le site</option></select></label><label class="fiche-filtre-compte"><input type="checkbox" data-fiches-sans-compte-filtre> Sans compte uniquement</label></div>
       <p role="status" data-fiches-statut></p><ul class="fiche-admin-liste" data-fiches-admin></ul>
       <button type="button" class="btn btn-line" data-fiches-suite hidden>Afficher les suivantes</button>
     </div>
