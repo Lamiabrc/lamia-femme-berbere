@@ -110,9 +110,11 @@ test('intérêt reçu : la personne voit la fiche anonyme (sans prénom) et rép
       if(interet.reponse)return Response.json([]);const v=JSON.parse(o.body);Object.assign(interet,v);patches.push(['annonce_interets',u,v]);return Response.json([interet]);
     }return ctx.call(u,o);
   },read: async (u) => {
+    if (u.startsWith('/rest/v1/annonces?or=')) return [{id:'profil-valide',ref:20,user_id:'u-1',email:'moi@example.com',status:'publiee',fiche_ref:5020}];
+    if (u.includes('/annonce_files?annonce_id=eq.profil-valide')) return [{kind:'photo'},{kind:'photo'}];
     if (u.includes('declarations_sincerite')) return [{ user_id: 'u-1' }];
     if (u.startsWith('/rest/v1/profils_outil?user_id=eq.u-1')) return [{ ref: 5020 }];
-    if (u.startsWith('/rest/v1/annonce_interets?cible_ref=in.(5020)')) return [interet];
+    if (u.startsWith('/rest/v1/annonce_interets?cible_ref=in.') && u.includes('5020')) return [interet];
     if (u.startsWith(`/rest/v1/annonce_interets?id=eq.${interet.id}`)) return [interet];
     return read0(u);
   } };

@@ -3,8 +3,11 @@ import assert from 'node:assert/strict';
 import { handleAnnonces } from '../lib/annonces.mjs';
 
 // Une petite base en mémoire qui comprend les filtres utilisés (eq, in, is.null, not.is.null, or, and).
-function base(initial = {}) {
+function base(initial = {}, { valides = false } = {}) {
   const db = { annonces: [], profils_outil: [], annonce_interets: [], annonce_passes: [], blocages: [], discussions: [], propositions: [], platform_settings: [], scores_outil: [], ...initial };
+  // Les scénarios de rencontre partent explicitement de membres validés par Lamia.
+  // Les scénarios d'inscription gardent « valides:false » et testent l'attente réelle.
+  if(valides) for(const f of db.profils_outil.filter(f=>f.user_id)) if(!db.annonces.some(a=>a.user_id===f.user_id)) db.annonces.push({id:`a-${f.user_id}`,ref:3000+db.annonces.length,user_id:f.user_id,email:`${f.user_id.slice(2)}@example.com`,status:'publiee',prenom:f.user_id.slice(2),genre:f.genre,birth_date:'1991-01-01',pays:f.pays,ville:f.ville,en_match:false,test:false,visible_anonyme:false,fiche_ref:f.ref,outil_id:f.outil_id,matching:{zoneGeo:f.secteur||''}});
   let n = 1000;
   const cond = (ligne, c) => {
     const m = c.match(/^([a-z_]+)\.(not\.is|is|eq|neq|in|gte)\.(.*)$/s);
@@ -83,7 +86,7 @@ test('fiche confirmée : le swipe s’ouvre, sans refaire de profil, et sa propr
 });
 
 test('le profil interne n’apparaît jamais dans la liste des autres', async () => {
-  const { ctx } = base({ annonces: [annonceNina()], profils_outil: [FICHE(100001, 'u-rachid', 'homme')] });
+  const { ctx } = base({ annonces: [annonceNina()], profils_outil: [FICHE(100001, 'u-rachid', 'homme')] }, { valides:true });
   await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID));
   const r = await lire(await handleAnnonces('annonce_swipe_liste', {}, ctx(NINA)));
   assert.deepEqual(r.profils.map((p) => p.ref), [100001]);
@@ -103,7 +106,7 @@ test('fiche sans âge : message dédié, rien de créé', async () => {
 });
 
 test('réciprocité : elle choisit sa fiche après qu’il l’a choisie', async () => {
-  const { db, ctx } = base({ annonces: [annonceNina()], profils_outil: [FICHE(100001, 'u-rachid', 'homme')] });
+  const { db, ctx } = base({ annonces: [annonceNina()], profils_outil: [FICHE(100001, 'u-rachid', 'homme')] }, { valides:true });
   await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID));
   let r = await lire(await handleAnnonces('annonce_swipe', { ref: 11, choix: 'oui' }, ctx(RACHID)));
   assert.equal(r.match, false);
@@ -113,7 +116,7 @@ test('réciprocité : elle choisit sa fiche après qu’il l’a choisie', async
 });
 
 test('réciprocité : il la choisit après qu’elle a choisi sa fiche', async () => {
-  const { db, ctx } = base({ annonces: [annonceNina()], profils_outil: [FICHE(100001, 'u-rachid', 'homme')] });
+  const { db, ctx } = base({ annonces: [annonceNina()], profils_outil: [FICHE(100001, 'u-rachid', 'homme')] }, { valides:true });
   await handleAnnonces('annonce_swipe', { ref: 100001, choix: 'oui' }, ctx(NINA));
   await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID));
   const r = await lire(await handleAnnonces('annonce_swipe', { ref: 11, choix: 'oui' }, ctx(RACHID)));
@@ -122,7 +125,7 @@ test('réciprocité : il la choisit après qu’elle a choisi sa fiche', async (
 });
 
 test('un seul match : engagé par sa fiche, il ne peut plus matcher ; le dématch le libère', async () => {
-  const { db, ctx } = base({ annonces: [annonceNina()], profils_outil: [FICHE(100001, 'u-rachid', 'homme'), FICHE(100002, null, 'femme')] });
+  const { db, ctx } = base({ annonces: [annonceNina()], profils_outil: [FICHE(100001, 'u-rachid', 'homme'), FICHE(100002, null, 'femme')] }, { valides:true });
   await handleAnnonces('annonce_swipe', { ref: 100001, choix: 'oui' }, ctx(NINA));
   await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID));
   await handleAnnonces('annonce_swipe', { ref: 11, choix: 'oui' }, ctx(RACHID)); // réciproque : mise en relation automatique
@@ -138,7 +141,7 @@ test('un seul match : engagé par sa fiche, il ne peut plus matcher ; le dématc
 });
 
 test('blocage : bloquer sa fiche vaut aussi pour son profil, dans les deux sens', async () => {
-  const { db, ctx } = base({ annonces: [annonceNina()], profils_outil: [FICHE(100001, 'u-rachid', 'homme')] });
+  const { db, ctx } = base({ annonces: [annonceNina()], profils_outil: [FICHE(100001, 'u-rachid', 'homme')] }, { valides:true });
   await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID));
   db.blocages.push({ auteur_user: 'u-nina', auteur_ref: 11, cible_ref: 100001, cible_user: 'u-rachid' });
   const n = await lire(await handleAnnonces('annonce_swipe_liste', {}, ctx(NINA)));
@@ -202,7 +205,7 @@ test('liste : mes critères d’âge et de lieu, ceux qui me cherchent aussi d�
 });
 
 test('le swipe ne s’arrête jamais : les profils passés reviennent, jamais ceux déjà choisis ni bloqués', async () => {
-  const { db, ctx } = base({ profils_outil: [FICHE(100001, 'u-rachid', 'homme'), FICHE(100002, null, 'femme'), FICHE(100003, null, 'femme'), FICHE(100004, null, 'femme')] });
+  const { db, ctx } = base({ profils_outil: [FICHE(100001, 'u-rachid', 'homme'), FICHE(100002, null, 'femme'), FICHE(100003, null, 'femme'), FICHE(100004, null, 'femme')] }, { valides:true });
   await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID));
   await handleAnnonces('annonce_swipe', { ref: 100002, choix: 'non' }, ctx(RACHID));
   await handleAnnonces('annonce_swipe', { ref: 100003, choix: 'oui' }, ctx(RACHID));
@@ -235,7 +238,7 @@ test('recommandation : posée sur la fiche, visible dans la liste, retirable', a
 });
 
 test('Passion : 3 matchs en cours ; finir l’un garde les autres et libère une place', async () => {
-  const { db, ctx } = base({ annonces: [annonceNina()], profils_outil: [FICHE(100001, 'u-rachid', 'homme'), FICHE(100003, 'u-karim', 'homme'), FICHE(100005, 'u-yanis', 'homme'), FICHE(100004, null, 'homme')] });
+  const { db, ctx } = base({ annonces: [annonceNina()], profils_outil: [FICHE(100001, 'u-rachid', 'homme'), FICHE(100003, 'u-karim', 'homme'), FICHE(100005, 'u-yanis', 'homme'), FICHE(100004, null, 'homme')] }, { valides:true });
   const KARIM = { id: 'u-karim', email: 'karim@example.com', user_metadata: { first_name: 'Karim' } };
   const YANIS = { id: 'u-yanis', email: 'yanis@example.com', user_metadata: { first_name: 'Yanis' } };
   const passion = (u) => ({ ...ctx(u), formuleDe: async (mail) => (mail === NINA.email ? 'passion' : 'decouverte') });
@@ -271,7 +274,7 @@ test('swipe : les personnes qui ont un compte passent d’abord, même moins bie
   const { ctx } = base({
     profils_outil: [FICHE(100001, 'u-rachid', 'homme'), FICHE(100002, null, 'femme'), FICHE(100003, 'u-sans', 'femme')],
     scores_outil: [{ a_ref: 100001, b_ref: 100002, score: 95 }, { a_ref: 100001, b_ref: 100003, score: 40 }],
-  });
+  }, { valides:true });
   const r = await lire(await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID)));
   assert.deepEqual(r.profils.map((p) => p.ref), [100003, 100002]);
 });
@@ -411,7 +414,7 @@ test('profil validé sans ses 2 photos : remis en attente et prévenu, revalidab
   assert.deepEqual(db.annonces.map((a) => [a.ref, a.status]), [[40, 'a_verifier'], [41, 'publiee'], [42, 'a_verifier']]);
 });
 
-test('fiche du live sans compte ou sans ses 2 photos : proposée, marquée « en attente de validation du profil »', async () => {
+test('fiche liée sans 2 photos : invisible ; deux photos et validation humaine ouvrent sa visibilité', async () => {
   const { db, ctx } = base({
     profils_outil: [FICHE(100001, 'u-rachid', 'homme'), FICHE(100002, 'u-lina', 'femme'), FICHE(100003, null, 'femme')],
     annonces: [{ id: 'a-lina', ref: 20, user_id: 'u-lina', email: 'lina@example.com', status: 'publiee', prenom: 'Lina', genre: 'femme', en_match: false, test: false, fiche_ref: 100002 }],
@@ -419,8 +422,9 @@ test('fiche du live sans compte ou sans ses 2 photos : proposée, marquée « en
   });
   let r = await lire(await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID)));
   const att = () => Object.fromEntries(r.profils.map((p) => [p.ref, p.attente_validation]));
-  assert.deepEqual(att(), { 100002: true, 100003: true });
+  assert.deepEqual(att(), { 100003: true });
   db.annonce_files.push({ id: 'p2', annonce_id: 'a-lina', kind: 'photo' });
+  db.annonces.find(a=>a.id==='a-lina').status='publiee'; // validation humaine explicite de la fixture
   r = await lire(await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID)));
   assert.deepEqual(att(), { 100002: false, 100003: true });
 });
@@ -438,7 +442,7 @@ test('revenir en arrière dans le swipe : Découverte seulement le dernier profi
 });
 
 test('formule prise pendant un match : pas d’autre match sans l’accord de la personne (réclamation du 16 nov. 2026)', async () => {
-  const { db, ctx } = base({ annonces: [annonceNina()], profils_outil: [FICHE(100001, 'u-rachid', 'homme'), FICHE(100003, 'u-karim', 'homme')] });
+  const { db, ctx } = base({ annonces: [annonceNina()], profils_outil: [FICHE(100001, 'u-rachid', 'homme'), FICHE(100003, 'u-karim', 'homme')] }, { valides:true });
   const KARIM = { id: 'u-karim', email: 'karim@example.com', user_metadata: { first_name: 'Karim' } };
   const passion = (u) => ({ ...ctx(u), formuleDe: async (mail) => (mail === NINA.email ? 'passion' : 'decouverte') });
   for (const ref of [100001, 100003]) await handleAnnonces('annonce_swipe', { ref, choix: 'oui' }, passion(NINA));

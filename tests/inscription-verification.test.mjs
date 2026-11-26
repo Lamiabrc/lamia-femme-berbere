@@ -8,7 +8,7 @@ const credentials = { email: 'Nina@Example.com', password: 'motdepasse-test', pr
 function serveur({ delivered = true, link = SIGNUP_LINK, failure = null } = {}) {
   const calls = [], mails = [], attempts = [];
   const ctx = {
-    env: { SUPABASE_SERVICE_ROLE_KEY: 'test' }, admin: false, user: null, ipHash: 'ip-test',
+    env: { SUPABASE_SERVICE_ROLE_KEY: 'test', INSCRIPTION_EMAIL_VERIFIE: '1' }, admin: false, user: null, ipHash: 'ip-test',
     now: () => new Date('2026-11-19T10:00:00Z'), alerter: async () => {},
     read: async () => { if (failure === 'read') throw new Error('database'); return []; },
     insert: async (table, value) => { if (failure === 'insert') throw new Error('database'); attempts.push({ table, value }); },
@@ -22,20 +22,22 @@ function serveur({ delivered = true, link = SIGNUP_LINK, failure = null } = {}) 
   return { calls, mails, attempts, send: (body = credentials) => handleAnnonces('annonce_creer_compte', body, ctx) };
 }
 
-test('compte créé : validé automatiquement, mot de passe et lien jamais envoyés par email', async () => {
+test('compte créé : confirmation réelle par email, sans valider l’adresse côté administrateur', async () => {
   const s = serveur();
   const r = await s.send();
   assert.equal(r.status, 200);
-  assert.deepEqual(await r.json(), { ok: true, a_reconfirmer: true });
+  assert.deepEqual(await r.json(), { ok: true, confirmation_requise: true });
   assert.equal(s.calls[0].body.redirect_to, 'https://lamia-femme-berbere.com/confirmer/?n=12&t=fiche#suite');
   assert.equal(s.calls[0].body.type, 'signup');
   assert.equal(s.calls[0].body.password, credentials.password);
   assert.equal(s.calls[0].body.data.first_name, '<Nina>');
   assert.equal(s.attempts.length, 1);
-  assert.equal(s.mails.length, 0);
+  assert.equal(s.mails.length, 1);
+  assert.ok(s.mails[0][2].includes(SIGNUP_LINK.replaceAll('&','&amp;')));
+  assert.ok(!s.mails[0].join('').includes(credentials.password));
+  assert.equal(s.mails[0][4], true);
   const maj = s.calls.find((c) => c.path.startsWith('/auth/v1/admin/users/'));
-  assert.equal(maj.body.email_confirm, true);
-  assert.equal(maj.body.user_metadata.a_reconfirmer, true);
+  assert.equal(maj, undefined);
 });
 
 test('une destination externe ne devient jamais la destination de confirmation', async () => {
@@ -55,14 +57,13 @@ test('sans quota lisible ou sans journalisation, aucune création et aucun email
   }
 });
 
-test('email impossible (quota) : le compte est validé et marqué à reconfirmer ; lien manquant : erreur', async () => {
+test('email impossible : erreur explicite, sans contourner la preuve d’adresse ; lien manquant : erreur', async () => {
   const s = serveur({ delivered: false });
   const r = await s.send();
-  assert.equal(r.status, 200);
-  assert.deepEqual(await r.json(), { ok: true, a_reconfirmer: true });
+  assert.equal(r.status, 502);
+  assert.deepEqual(await r.json(), { error: 'envoi_impossible', confirmation_requise: true });
   const maj = s.calls.find((c) => c.path === '/auth/v1/admin/users/u-test');
-  assert.equal(maj.body.email_confirm, true);
-  assert.equal(maj.body.user_metadata.a_reconfirmer, true);
+  assert.equal(maj, undefined);
   const missing = serveur({ link: null });
   assert.equal((await missing.send()).status, 502);
   assert.equal(missing.mails.length, 0);

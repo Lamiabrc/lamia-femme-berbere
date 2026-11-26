@@ -2332,7 +2332,8 @@ await cp(join(ROOT, 'content', 'matching-options.mjs'), join(DIST, 'assets', 'ma
 await cp(join(ROOT, 'content', 'etat-matchs.mjs'), join(DIST, 'assets', 'etat-matchs.mjs'));
 await cp(join(ROOT, 'content', 'signalement.mjs'), join(DIST, 'assets', 'signalement.mjs'));
 await cp(join(ROOT, 'src', 'i18n.js'), join(DIST, 'assets', 'i18n.js'));
-await cp(join(ROOT, 'src', 'tayri.css'), join(DIST, 'assets', 'tayri.css'));
+await writeFile(join(DIST, 'assets', 'tayri.css'), `${await readFile(join(ROOT, 'src', 'tayri.css'), 'utf8')}\n${await readFile(join(ROOT, 'src', 'tayri-phase1.css'), 'utf8')}`);
+await cp(join(ROOT, 'src', 'inscription-courte.mjs'), join(DIST, 'assets', 'inscription-courte.mjs'));
 await mkdir(join(DIST, 'assets', 'i18n'), { recursive: true });
 await cp(join(ROOT, 'content', 'en', 'products.json'), join(DIST, 'assets', 'i18n', 'products-en.json'));
 const MOTIFS_EN = JSON.parse(await readFile(join(ROOT, 'content', 'en', 'patterns.json'), 'utf8'));

@@ -266,7 +266,7 @@ async function chargerReglages() {
     f.email_alerte.value = r.email_alerte;
     f.silence_debut.value = r.silence_debut ?? '';
     f.silence_fin.value = r.silence_fin ?? '';
-    $('[data-email-etat]').textContent = email_configure ? 'Le service d’envoi d’emails est configuré.' : 'Le service d’envoi d’emails n’est pas encore configuré (clé RESEND_API_KEY à ajouter dans Vercel) : en attendant, seules les notifications fonctionnent.';
+    $('[data-email-etat]').textContent = email_configure ? 'Le service d’envoi d’emails est configuré.' : 'La connexion du service d’envoi d’emails reste à terminer. En attendant, les notifications restent disponibles.';
   } catch (err) { say($('[data-reglages-statut]'), erreur(err.code), true); }
   etatPush();
 }
