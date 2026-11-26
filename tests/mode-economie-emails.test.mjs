@@ -4,7 +4,7 @@ import { backend } from './fake-confidences.mjs';
 import { handleConfidences } from '../lib/confidences.mjs';
 
 // 24 nov. 2026 : quota Resend du mois dépassé (3 353 / 3 000). Seuls la confirmation de compte et le lien de connexion partent.
-const base = { SUPABASE_SERVICE_ROLE_KEY: 'sb_secret_fixture', RESEND_API_KEY: 're_test', RESEND_PAUSE_MS: '1' };
+const base = { SUPABASE_SERVICE_ROLE_KEY: 'sb_secret_fixture', RESEND_API_KEY: 're_test', RESEND_PAUSE_MS: '1', INSCRIPTION_EMAIL_VERIFIE: '1' };
 
 function serveur(env) {
   const be = backend();
@@ -30,10 +30,10 @@ test('mode économie : le lien de connexion part toujours', async () => {
   assert.equal(s.be.mails.length, 1);
 });
 
-test('compte créé : validé automatiquement, sans email, et Lamia est prévenue', async () => {
+test('mode économie : la confirmation de compte reste un email essentiel', async () => {
   const s = serveur(base);
   const r = await s.appeler({ action: 'annonce_creer_compte', email: 'nadia@exemple.fr', password: 'Motdepasse12', prenom: 'Nadia', source: 'site' });
-  assert.equal(r.body.a_reconfirmer, true, JSON.stringify(r));
-  assert.equal(r.body.confirmation_requise, undefined);
-  assert.equal(s.be.mails.length, 0);
+  assert.equal(r.body.confirmation_requise, true, JSON.stringify(r));
+  assert.equal(r.body.a_reconfirmer, undefined);
+  assert.equal(s.be.mails.length, 1);
 });

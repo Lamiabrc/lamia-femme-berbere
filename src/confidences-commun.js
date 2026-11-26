@@ -26,9 +26,9 @@ export const erreur = (code) => ERREURS[code] || 'L’envoi n’a pas fonctionn�
 
 // La confirmation est un état d'attente : aucune connexion par mot de passe avant la preuve d'adresse.
 export const CONFIRMATION_COMPTE = 'Un email de confirmation vient de partir. Ouvre-le pour confirmer ton adresse et continuer (regarde aussi les courriers indésirables). Si tu ne le retrouves pas, demande un lien de connexion dans Mon espace.';
-export async function creerCompte({ email, password, prenom = '', source = 'site' }) {
-  const resultat = await api({ action: 'annonce_creer_compte', email, password, prenom, source, retour: location.pathname + location.search + location.hash });
-  if (resultat.confirmation_requise) throw Object.assign(new Error(CONFIRMATION_COMPTE), { code: 'confirmation_requise' });
+export async function creerCompte({ email, password, prenom = '', source = 'site', brouillon }) {
+  const resultat = await api({ action: 'annonce_creer_compte', email, password, prenom, source, ...(brouillon ? { brouillon } : {}), retour: location.pathname + location.search + location.hash });
+  if (resultat.confirmation_requise) throw Object.assign(new Error(CONFIRMATION_COMPTE), { code: 'confirmation_requise', data: resultat });
   return resultat;
 }
 

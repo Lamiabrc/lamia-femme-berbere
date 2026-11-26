@@ -1,4 +1,8 @@
-# Design TAYRI — cadre commun et accueil illustré
+# Design TAYRI — bleu du logo jusqu’au violet
+
+Le 26 novembre 2026, Lamia remplace la direction crème/bordeaux par le bleu de son logo avec un dégradé vers le violet. Le fond de lecture reste clair et les formulaires blancs. Les touches dorées restent discrètes ; les fichiers des logos officiels sont conservés strictement. Le premier lot applique ce cadre commun et l’inscription en trois étapes. Le détail, les maquettes et les limites de publication figurent dans [la fiche de phase 1](phase1-inscription-et-email.md).
+
+## Repères des lots précédents
 
 L’accueil présente TAYRI avec le fichier original du cœur bleu, les deux parcours relationnels et la boutique. La porte et le projet de zoom sont écartés conformément à la décision de Lamia. Les outils, profils et données gardent leurs parcours existants.
 

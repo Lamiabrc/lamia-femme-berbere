@@ -107,8 +107,10 @@ $('[data-conv-lien]')?.addEventListener('submit', async (e) => {
   const st = $('[data-conv-lien-statut]');
   const email = new FormData(e.target).get('email');
   say(st, 'Un instant…');
-  const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: `${location.origin}/confidences/#conversation`, shouldCreateUser: true } });
-  if (error) return say(st, /rate|limit/i.test(error.message) ? 'Trop de demandes de lien en peu de temps. Réessaie dans une heure.' : 'Le lien n’a pas pu partir. Vérifie ton adresse et réessaie.', true);
+  try {
+    const r=await api({action:'annonce_lien_connexion',email,retour:'confidences'});
+    if(r.existe===false)return say(st,'Crée d’abord ton compte dans Mon espace, puis reviens ici.',true);
+  } catch(e) { return say(st,e.code==='trop_de_demandes'?'Trop de demandes de lien en peu de temps. Réessaie dans une heure.':'Le lien n’a pas pu partir. Vérifie ton adresse et réessaie dans un instant.',true); }
   say(st, 'C’est parti : ouvre l’email reçu et clique sur le lien (pense à regarder les courriers indésirables). Tu reviendras directement ici.');
 });
 

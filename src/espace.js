@@ -1023,6 +1023,8 @@ function direErreurReponse(boutons, err) {
   p.className = 'interet-erreur'; p.setAttribute('role', 'alert');
   p.innerHTML = err?.code === 'annonce_en_pause'
     ? '<strong>Ton annonce est en pause.</strong> Reprends-la pour dire oui : le bouton est dans ton profil, plus haut.'
+    : err?.code === 'profil_non_verifie'
+    ? '<strong>La rencontre attend la validation de Lamia.</strong> Tu retrouveras son suivi dans ton profil.'
     : err?.code === 'photos_requises'
     ? '<strong>Il te manque tes 2 photos</strong> pour dire oui. Elles restent privées. <a class="text-link" href="#photos">Ajouter mes photos</a>'
     : err?.code === 'sincerite_requise'

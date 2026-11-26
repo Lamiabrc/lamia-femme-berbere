@@ -2,6 +2,7 @@
 import { api, esc, PUBLIC_KEY, creerCompte, matchsOuverts, SECURITE_APPLI } from './confidences-commun.js';
 import { O, lib, secteurLisible, telephoneNormal, foiEtVie, badgesProfil, origineLisible, metierEtReligion, texteCredible } from './matching-options.mjs';
 import { createClient } from '/vendor/supabase.mjs';
+import { composerInscription, brouillonLocal, perime, valeursBrouillon } from './inscription-courte.mjs';
 
 // Compte (le même que « Mon espace ») : chaque profil y est lié pour pouvoir être modifié.
 const supabase = createClient('https://tybwvxinigahhntfeeur.supabase.co', PUBLIC_KEY);
@@ -33,6 +34,7 @@ const ERR = {
   upload_failed: 'Tes photos ne sont pas arrivées. Vérifie ta connexion, puis appuie à nouveau sur « Envoyer » : ton profil reprend là où il s’est arrêté.',
   contact_requis: 'Indique le lien de ton TikTok, Instagram ou Facebook : Lamia en a besoin pour la mise en relation.',
   compte_requis: 'Crée d’abord ton compte (ou connecte-toi) : il faut un compte pour créer ton profil ou dire qu’un profil t’intéresse.',
+  profil_non_verifie: 'La rencontre attend la validation de Lamia. Tu peux suivre ton profil dans Mon espace.',
   connexion: 'Email ou mot de passe incorrect.',
   trop_de_demandes: 'Trop de demandes en ce moment. Réessaie dans une heure.',
   compte_impossible: 'La création du compte n’a pas fonctionné. Réessaie dans un instant.',
@@ -267,11 +269,10 @@ function apercu(ul, fichiers, retirer) {
   $$('button', ul).forEach((b) => b.addEventListener('click', () => retirer(Number(b.dataset.i))));
 }
 
-// Le compte d'abord : sans être connecté(e), on ne voit que la création de compte / connexion.
+// Le compte vient à la fin ; on peut commencer sans être connecté.
 export async function monterFormulaire(box, { existant = null, token = null } = {}) {
   if (!box) return;
-  if (!existant && !(await sessionActive())) { porteCompte(box); return; }
-  monterFormulaireConnecte(box, { existant, token });
+  await monterFormulaireConnecte(box, { existant, token });
   appliquerInteret(box);
 }
 
@@ -355,7 +356,7 @@ function appliquerInteret(box) {
   info.textContent = `Le profil n° ${ref} t’intéresse : crée ton profil ci-dessous. Lamia est prévenue et regarde si vous pouvez correspondre. Ton identité reste secrète.`;
 }
 
-function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
+async function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
   box.innerHTML = formulaireHtml();
   const form = $('[data-annonce-form]', box), st = $('[data-annonce-statut]', form);
   const estLive = () => form.querySelector('[name=live]:checked')?.value === 'oui';
@@ -367,18 +368,22 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
     form.classList.toggle('is-live', estLive());
   });
   // Déjà connecté(e) : l'email du compte est repris, pas de mot de passe à donner.
-  sessionActive().then((s) => {
+  const sessionInitiale = await sessionActive();
+  Promise.resolve(sessionInitiale).then((s) => {
     if (!s || existant) return;
     form.elements.email.value = s.user.email; form.elements.email.readOnly = true;
     $('[data-mdp]', form)?.setAttribute('hidden', '');
     const c = $('[data-connecte]', form); c.hidden = false; c.textContent = `Tu es connecté(e) : ton profil sera lié à ton compte ${s.user.email}.`;
   });
   let medias = [], identite = [], envoi = null;
-  const majMedias = () => apercu($('[data-medias-liste]', form), medias, (i) => { medias.splice(i, 1); majMedias(); });
+  let sauverCourt = async () => true;
+  const majMedias = () => { apercu($('[data-medias-liste]', form), medias, (i) => { if(envoi)return say(st,'Termine l’envoi en cours. Tu pourras modifier tes photos depuis ton espace.'); medias.splice(i, 1); majMedias(); }); sauverCourt(); };
   const majId = () => { apercu($('[data-identite-liste]', form), identite, (i) => { identite.splice(i, 1); majId(); }); const acc = $('[data-identite-accord]', form); if (acc) acc.hidden = !identite.length; };
   $('[data-medias]', form).addEventListener('change', async (e) => {
+    if(envoi)return say(st,'Termine l’envoi en cours avant de modifier tes photos.');
     const choisis = [...e.target.files]; e.target.value = '';
     if (!choisis.length) return;
+    if(choisis.some(f=>!PHOTOS_OK.includes(typeDe(f))))return say(st,'Choisis une photo JPG, PNG, WebP ou HEIC. Ce fichier n’est pas une photo acceptée.',true);
     say(st, 'Préparation de tes photos…');
     let nouveaux;
     try { nouveaux = await copier(choisis, 1600); } catch { return say(st, 'Cette photo ne peut pas être lue par ton téléphone. Choisis-la à nouveau, ou prends une autre photo.', true); }
@@ -411,8 +416,17 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
   const corrige = (e) => e.target.closest?.('.is-manquant, label')?.classList.remove('is-manquant');
   form.addEventListener('input', corrige); form.addEventListener('change', corrige);
   if (existant) return monterEdition(form, st, existant, token);
-  // Inscription courte : l'essentiel d'abord (qui tu es, ton origine, tes 2 photos). Le reste se complète dans « Mon espace ».
-  $$('[data-plus-tard]', form).forEach((el) => { el.hidden = true; });
+  const court = composerInscription(form, { optionsOrigine: O.origine, esc });
+  court.connexion(sessionInitiale);
+  let scope = sessionInitiale?.user.id || 'invite', etapes;
+  let historique=null;
+  const reponses=()=>({...valeursBrouillon(form),...(historique?{historique}:{})});
+  let sauvegarde = Promise.resolve(true), erreurStockage = false;
+  sauverCourt = () => {
+    const valeur = { savedAt: Date.now(), valeurs: reponses(), medias: [...medias], etape: etapes?.index() || 0, envoi: envoi ? { ...envoi, faits: [...envoi.faits] } : null };
+    sauvegarde = sauvegarde.then(async () => { try { await brouillonLocal(scope, valeur); erreurStockage = false; return true; } catch { erreurStockage = true; return false; } });
+    return sauvegarde;
+  };
   // Tout ce qui manque, d'un coup : la liste exacte, chaque champ entouré, et un clic emmène au champ.
   const calculerManques = () => {
     const f = form.elements;
@@ -424,13 +438,19 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
     const ans = Number.parseInt(f.age.value, 10);
     if (!f.age.value.trim()) manque('Ton âge', f.age);
     else if (!(ans >= 18 && ans <= 99)) manque('Ton âge : il faut avoir 18 ans ou plus', f.age);
-    if (!form.querySelector('[name=origineTags]:checked')) manque('Ton origine', form.querySelector('[name=origineTags]')?.closest('.annonce-puces'));
+    if (!f.origineCourte.value) manque('Ton origine', f.origineCourte);
     if (live && !f.tiktok_live.value.trim()) manque('Ton pseudo ou lien TikTok du live', f.tiktok_live);
     if (!live) {
       if (!f.ville.value.trim()) manque('Ta ville', f.ville);
       if (!f.pays.value) manque('Ton pays', f.pays);
       if (medias.length < 2) manque('2 photos de toi', $('[data-medias]', form).closest('label'));
     }
+    const amin=Number(f.age_min.value), amax=Number(f.age_max.value);
+    if (!(amin>=18&&amin<=99&&amax>=amin&&amax<=99)) manque('L’âge recherché : de 18 à 99 ans, minimum avant maximum', f.age_min);
+    if (!f.zoneGeo.value) manque('Le secteur où tu cherches', f.zoneGeo);
+    if (f.recherche.value.trim().length<20 || !texteCredible(f.recherche.value)) manque('Une phrase sur la personne que tu cherches (20 caractères minimum)', f.recherche);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(f.email.value.trim())) manque('Ton email', f.email);
+    if (!sessionInitiale && f.inscription_password.value.length<8) manque('Un mot de passe de 8 caractères minimum', f.inscription_password);
     if (sansReseau() && !telephoneNormal(f.telephone.value)) manque(f.telephone.value.trim() ? 'Ton numéro de téléphone n’est pas valide (mets l’indicatif si tu n’es pas en France)' : 'Ton numéro de téléphone (puisque tu n’as pas de réseau social)', f.telephone);
     // Inscription courte : situation, études, religion et âge recherché sont cachés ici (« plus tard ») ; ils se complètent dans
     // « Mon espace » avant le premier cœur. Les exiger ici bloquait toutes les inscriptions depuis le 15 nov. 2026.
@@ -457,32 +477,82 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
     return false;
   };
   // Formulaire en étapes, comme une appli : une étape à la fois, barre de progression, brouillon gardé.
-  const etapes = monterEtapes(form, { calculerManques, afficherManques });
+  const sauverEtape = async()=>{await sauverCourt();if(sessionInitiale)await api({action:'annonce_brouillon',donnees:reponses(),etape:etapes.index()+1},sessionInitiale.access_token).catch(()=>{});};
+  etapes = monterEtapes(form, { calculerManques, afficherManques, court: true, sauvegarder: sauverEtape });
+  const pause=document.createElement('button');pause.type='button';pause.className='inscription-pause';pause.textContent='Continuer plus tard';
+  form.append(pause,form.querySelector('.inscription-confiance'));
+  pause.addEventListener('click',async()=>{
+    const ok=await sauverCourt();
+    if(sessionInitiale) await api({action:'annonce_brouillon',donnees:reponses(),etape:etapes.index()+1},sessionInitiale.access_token).catch(()=>{});
+    say(st,ok?'Tes réponses et tes photos sont gardées 7 jours sur cet appareil. Reviens ici pour reprendre.':'Ce navigateur ne permet pas de garder le brouillon. Garde cette page ouverte, ou utilise Safari ou Chrome.',!ok);
+    st.scrollIntoView({block:'nearest'});
+  });
+  form.addEventListener('input',()=>{sauverCourt();});form.addEventListener('change',()=>{sauverCourt();});
+  let reprise=null;
+  try { reprise=await brouillonLocal(scope);if(perime(reprise)){await brouillonLocal(scope,null);reprise=null;} } catch { erreurStockage=true; }
+  if(!reprise&&sessionInitiale)try{const r=await api({action:'annonce_brouillon'},sessionInitiale.access_token);if(r.brouillon)reprise={savedAt:Date.parse(r.brouillon.saved_at),valeurs:r.brouillon.donnees,etape:r.brouillon.etape-1,medias:[],depuisServeur:true};}catch{/* le formulaire reste utilisable */}
+  // Après connexion d'un compte existant : proposer explicitement le brouillon commencé
+  // avant connexion, sans le recopier automatiquement dans un autre compte.
+  if(!reprise&&sessionInitiale)try{const invite=await brouillonLocal('invite');if(!perime(invite))reprise={...invite,scopeInvite:true};}catch{/* */}
+  // Reprendre aussi l'ancien formulaire sans jeter ses réponses détaillées.
+  if(!reprise)try{
+    const ancien=JSON.parse(localStorage.getItem(BROUILLON)||'null');
+    if(ancien&&typeof ancien==='object'){
+      const matching={};for(const k of [...CHAMPS,...LISTES,...CASES])if(Object.hasOwn(ancien,k))matching[k]=CASES.includes(k)?(Array.isArray(ancien[k])?ancien[k].length>0:ancien[k]===true):ancien[k];
+      reprise={savedAt:Date.now(),valeurs:{...ancien,origineCourte:ancien.origineTags?.[0]||'',historique:{profil:ancien.profil||'',matching}},etape:0,medias:[]};
+    }
+  }catch{/* ancien brouillon illisible : rien n'est effacé */}
+  if(reprise){
+    form.hidden=true;
+    const choix=document.createElement('div');choix.className='inscription-reprise';choix.innerHTML=`<h3>On reprend là où tu en étais ?</h3><p>${reprise.depuisServeur?'Tes réponses sont retrouvées dans ton compte. Choisis de nouveau tes photos sur cet appareil.':'Tes réponses et tes photos ont été gardées sur cet appareil pendant 7 jours. Ton mot de passe n’est pas enregistré.'}</p><button class="btn btn-ink" type="button" data-reprendre>Reprendre mon inscription</button><button class="inscription-pause" type="button" data-recommencer>Commencer une autre inscription</button>`;box.prepend(choix);
+    $('[data-reprendre]',choix).addEventListener('click',async()=>{
+      historique=reprise.valeurs?.historique||null;
+      for(const [nom,v] of Object.entries(reprise.valeurs||{})){const el=form.querySelector(`[name="${CSS.escape(nom)}"]`);if(!el||el.type==='password'||el.type==='file'||nom==='email')continue;if(['checkbox','radio'].includes(el.type)){if(el.type==='radio')form.querySelectorAll(`[name=${nom}]`).forEach(x=>x.checked=x.value===v);else el.checked=v===true;}else el.value=v;}
+      court.origine.dispatchEvent(new Event('change',{bubbles:true}));medias=(reprise.medias||[]).filter(x=>x instanceof Blob).slice(0,2);
+      if(reprise.envoi)envoi={...reprise.envoi,faits:new Set(reprise.envoi.faits||[])};
+      form.hidden=false;choix.remove();etapes.montrer(reprise.etape||0);majMedias();
+      if(reprise.scopeInvite && await sauverCourt())await brouillonLocal('invite',null).catch(()=>{});
+    });
+    $('[data-recommencer]',choix).addEventListener('click',async()=>{await brouillonLocal(scope,null).catch(()=>{});form.hidden=false;choix.remove();});
+  }
+  else window.lfbEvent?.('inscription_etape_1');
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const f = form.elements;
     const live = estLive();
     const manques = calculerManques();
     if (manques.length) { etapes?.allerA(manques[0].el); afficherManques(manques, etapes ? etapes.courante() : st); fenetreManques(manques, form, { allerA: (el) => etapes?.allerA(el) }); return; }
-    const session = await sessionActive();
-    if (!session) { monterFormulaire(box); return; }
+    let session = await sessionActive();
     const btn = $('.annonce-envoyer', form); btn.disabled = true;
     const fichiers = [...medias.map((x) => ({ blob: x, role: 'media' })), ...identite.map((x) => ({ blob: x, role: 'identite' }))];
     // Si un premier essai a échoué pendant l'envoi des photos, on reprend le même profil (pas de doublon).
     const cle = fichiers.map((x) => `${x.role}:${x.blob.size}`).join('|');
     if (envoi && envoi.cle !== cle) envoi = null;
     try {
+      await sauverCourt();
+      if (!session) {
+        say(st,'Création de ton compte…');
+        await creerCompte({email:f.email.value.trim(),password:f.inscription_password.value,prenom:f.prenom.value,source:'inscription-phase1',brouillon:reponses()});
+        // Compatibilité avec le fonctionnement actuel : seulement quand le serveur
+        // n'a pas demandé de confirmation email, connecter le compte qui vient d'être créé.
+        const connexion=await supabase.auth.signInWithPassword({email:f.email.value.trim(),password:f.inscription_password.value});
+        if(connexion.error || !connexion.data?.session)throw Object.assign(new Error('Connecte-toi pour continuer.'),{code:'compte_existe'});
+        session=connexion.data.session;
+        const ancien=scope;scope=session.user.id;if(await sauverCourt())await brouillonLocal(ancien,null).catch(()=>{});else scope=ancien;
+      }
       say(st, 'Envoi de ton annonce…');
       const res = envoi?.res || await api({
         live, tiktok_live: f.tiktok_live.value,
         action: 'annonce_deposer', prenom: f.prenom.value, genre: form.querySelector('[name=genre]:checked').value, age: f.age.value,
-        ville: f.ville.value, pays: f.pays.value, profil: f.profil.value, recherche: f.recherche.value,
-        matching: lireMatching(form),
+        ville: f.ville.value, pays: f.pays.value, profil: historique?.profil || f.profil.value, recherche: f.recherche.value,
+        matching: {...(historique?.matching||{}),origineTags:historique?.matching?.origineTags?.[0]===f.origineCourte.value?historique.matching.origineTags:[f.origineCourte.value],zoneGeo:f.zoneGeo.value}, inscription_version: 1,
         age_min: f.age_min.value, age_max: f.age_max.value, email: session.user.email, sans_reseau: sansReseau(), telephone: sansReseau() ? f.telephone.value : '',
         majeur: true, publication: true, identite_ok: Boolean(identite.length && f.identite_ok.checked), website: f.zz_site.value, anonyme_ok: f.anonyme_ok.checked, photo_partage: f.photo_partage.checked, interet_ref: f.interet_ref.value,
         medias: fichiers.map((x) => ({ role: x.role, type: typeDe(x.blob), size: x.blob.size })),
       }, session?.access_token);
       if (!envoi) envoi = { cle, res, faits: new Set() };
+      $$('input,select,textarea',form).forEach(el=>{el.disabled=true;});
+      await sauverCourt();
       for (const [i, up] of (res.uploads || []).entries()) {
         if (envoi.faits.has(i)) continue;
         say(st, `Envoi de tes fichiers (${i + 1}/${res.uploads.length})…`);
@@ -497,15 +567,23 @@ function monterFormulaireConnecte(box, { existant = null, token = null } = {}) {
         }
         if (!ok) throw Object.assign(new Error('upload_failed'), { code: 'upload_failed' });
         envoi.faits.add(i);
+        await sauverCourt();
       }
       const fin = res.annonce_id ? await api({ action: 'annonce_finaliser', annonce_id: res.annonce_id, token: res.token }) : {};
       envoi = null;
       window.lfbEvent?.('annonce_deposee');
       try { localStorage.removeItem(BROUILLON); } catch { /* */ }
-      box.innerHTML = `<div class="annonce-merci"><p class="lfb-azul" lang="ber">ⵜⴰⵏⴻⵎⵎⵉⵔⵜ</p><h3>Merci ${esc(f.prenom.value.trim())}, c’est enregistré !</h3><p><a class="btn btn-ink" href="/rencontres/swipe/?bienvenue=1">Découvrir les profils</a></p></div>`;
-      setTimeout(() => location.assign('/rencontres/swipe/?bienvenue=1'), 1800);
+      await brouillonLocal(scope,null).catch(()=>{});
+      box.classList.add('inscription-resultat');
+      box.innerHTML = `<div class="annonce-merci"><p class="lfb-azul" lang="ber">ⵜⴰⵏⴻⵎⵎⵉⵔⵜ</p><h3>Merci ${esc(f.prenom.value.trim())}, ton profil est bien arrivé.</h3><p>Lamia va le vérifier. Il attend sa validation avant d’être proposé pour une rencontre.</p><p><a class="btn btn-ink" href="/mon-espace/">Retrouver mon espace</a></p></div>`;
     } catch (err) {
       btn.disabled = false;
+      if (err.data?.brouillon_id) { const ancien=scope;scope=err.data.brouillon_id;if(await sauverCourt())await brouillonLocal(ancien,null).catch(()=>{});else scope=ancien; }
+      if (['confirmation_requise','envoi_impossible','compte_existe','brouillon_indisponible'].includes(err.code)) {
+        f.inscription_password.value='';
+        say(st,err.code==='confirmation_requise'?'Ouvre l’email TAYRI pour confirmer ton adresse, puis reviens ici : tes réponses sont gardées.':err.code==='compte_existe'?'Tu as déjà un compte. Connecte-toi pour reprendre ton inscription.':err.code==='brouillon_indisponible'?'Le compte a été créé, mais la sauvegarde en ligne n’a pas répondu. Ton brouillon reste sur cet appareil. Reçois un lien pour continuer.':'Le compte est créé, mais l’email n’a pas pu partir. Ton brouillon est gardé : redemande un lien dans un instant.',err.code!=='confirmation_requise');
+        const lien=document.createElement('a');lien.className='btn btn-line';lien.href='/mon-espace/?retour=%2Frencontres%2F%23confier';lien.textContent='Me connecter / recevoir un lien';st.append(document.createElement('br'),lien);return;
+      }
       say(st, ERR[err.code] || (err.code && !/^http_/.test(err.code) ? `L’envoi n’a pas abouti (${err.code}). Réessaie, ou écris à Lamia en lui donnant ce code.` : 'L’envoi n’a pas abouti : la connexion a coupé ou le serveur n’a pas répondu. Réessaie dans un instant ; si ça recommence, écris à Lamia.'), true);
     }
   });
@@ -518,7 +596,10 @@ function lireMatching(form) {
   const f = form.elements, m = {};
   for (const n of CHAMPS) m[n] = f[n]?.value || '';
   for (const n of LISTES) m[n] = $$(`[name=${n}]:checked`, form).map((x) => x.value);
-  for (const n of CASES) m[n] = f[n].checked;
+  for (const n of CASES) {
+    if(f[n].tagName==='SELECT')m[n]=f[n].value?f[n].value==='oui':null;
+    else m[n]=f[n].checked;
+  }
   return m;
 }
 
@@ -577,7 +658,13 @@ function monterEdition(form, st, p, token) {
   poser('niveauEtudeCategorie', m.niveauEtudeCategorie);
   for (const n of CHAMPS) if (n !== 'niveauEtudeCategorie') poser(n, m[n]);
   for (const n of LISTES) for (const v of m[n] || []) { const c = form.querySelector(`[name=${n}][value="${CSS.escape(v)}"]`); if (c) c.checked = true; }
-  for (const n of CASES) F[n].checked = Boolean(m[n]);
+  for (const n of CASES) {
+    const ancien=F[n], choix=document.createElement('select');choix.name=n;
+    choix.innerHTML='<option value="">Non renseigné</option><option value="oui">Oui</option><option value="non">Non</option>';
+    choix.value=m[n]===true?'oui':m[n]===false?'non':'';
+    ancien.replaceWith(choix);
+    const label=choix.closest('label'),texte=label?.querySelector('span');if(texte)label.insertBefore(texte,choix);
+  }
   F.anonyme_ok.checked = Boolean(p.anonyme_ok);
   if (p.sans_reseau) { F.sans_reseau.checked = true; F.telephone.value = p.telephone || ''; F.sans_reseau.dispatchEvent(new Event('change')); }
   F.photo_partage.checked = Boolean(p.photo_partage);
@@ -777,16 +864,18 @@ addEventListener('hashchange', viaAncre);
 
 // ---------------------------------------------------------------- formulaire en étapes (création de profil)
 const BROUILLON = 'lfb-brouillon-profil';
-function monterEtapes(form, { calculerManques, afficherManques, edition = false }) {
+function monterEtapes(form, { calculerManques, afficherManques, edition = false, court = false, sauvegarder = null }) {
   // La fin du formulaire (accords + bouton d'envoi) devient la dernière étape.
   const enfants = [...form.children];
   const derniere = enfants.filter((x) => x.classList.contains('annonce-etape')).pop();
   if (!derniere) return null;
-  const fin = document.createElement('div');
+  const fin = court ? derniere : document.createElement('div');
+  if (!court) {
   fin.className = 'annonce-etape annonce-etape-fin';
   fin.innerHTML = '<h3><span>✓</span> Tes accords, et c’est parti</h3>';
   enfants.slice(enfants.indexOf(derniere) + 1).forEach((x) => { if (!x.matches('[data-interet-info]')) fin.append(x); });
   form.append(fin);
+  }
   const toutes = () => $$(':scope > .annonce-etape', form).filter((x) => !x.hidden);
   const progres = document.createElement('div');
   progres.className = 'annonce-progres';
@@ -794,7 +883,7 @@ function monterEtapes(form, { calculerManques, afficherManques, edition = false 
   form.prepend(progres);
   const nav = document.createElement('div');
   nav.className = 'annonce-nav';
-  nav.innerHTML = '<button type="button" class="btn btn-line" data-etape-prec>← Retour</button><button type="button" class="btn btn-ink" data-etape-suiv>Continuer →</button>';
+  nav.innerHTML = '<button type="button" class="btn btn-line" data-etape-prec>← Précédent</button><button type="button" class="btn btn-ink" data-etape-suiv>Suivant →</button>';
   form.append(nav);
   // Menu des cartes (Lamia, 26 nov. 2026) : en modification, on saute directement à la carte voulue.
   const menu = document.createElement('div');
@@ -812,9 +901,10 @@ function monterEtapes(form, { calculerManques, afficherManques, edition = false 
     $('p', progres).textContent = `Étape ${i + 1} sur ${l.length}`;
     $('[data-etape-prec]', nav).hidden = i === 0;
     $('[data-etape-suiv]', nav).hidden = i === l.length - 1;
-    if (!edition) sauver();
+    if (!edition && !court) sauver();
+    if (court && defiler) { sauvegarder?.(); window.lfbEvent?.(`inscription_etape_${i+1}`); }
     $$('[data-menu-carte]', menu).forEach((x, k) => { x.classList.toggle('annonce-menu-on', k === i); x.setAttribute('aria-current', k === i ? 'step' : 'false'); });
-    if (defiler) try { progres.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch { /* */ }
+    if (defiler) try { progres.scrollIntoView({ behavior: 'smooth', block: 'start' }); toutes()[i].querySelector('h3')?.focus({preventScroll:true}); } catch { /* */ }
   };
   $('[data-etape-prec]', nav).addEventListener('click', () => montrer(i - 1));
   $('[data-etape-suiv]', nav).addEventListener('click', () => {
@@ -837,7 +927,7 @@ function monterEtapes(form, { calculerManques, afficherManques, edition = false 
     } catch { /* stockage indisponible */ }
   };
   let brouillon = null;
-  if (!edition) try { brouillon = JSON.parse(localStorage.getItem(BROUILLON) || 'null'); } catch { /* */ }
+  if (!edition && !court) try { brouillon = JSON.parse(localStorage.getItem(BROUILLON) || 'null'); } catch { /* */ }
   if (brouillon) {
     const remplir = () => {
       for (const el of form.elements) {
@@ -857,9 +947,11 @@ function monterEtapes(form, { calculerManques, afficherManques, edition = false 
     $('button', note).addEventListener('click', () => { try { localStorage.removeItem(BROUILLON); } catch { /* */ } location.reload(); });
     progres.after(note);
   }
-  if (!edition) { form.addEventListener('input', sauver); form.addEventListener('change', sauver); }
+  if (!edition && !court) { form.addEventListener('input', sauver); form.addEventListener('change', sauver); }
   montrer(brouillon?._etape || 0, false);
   return {
+    index: () => i,
+    montrer,
     courante: () => toutes()[i],
     allerA: (el) => { const k = toutes().findIndex((x) => x.contains(el)); if (k >= 0 && k !== i) montrer(k, false); },
   };

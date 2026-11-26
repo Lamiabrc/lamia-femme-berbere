@@ -185,6 +185,7 @@ test('« en match » resté à vrai sans aucun match en cours : il se corrige to
   const { ctx, db } = monde();
   const user = { id: 'u1', email: 'nina@example.com' };
   db.annonces.push({ id: 'a1', ref: 7, user_id: 'u1', email: 'nina@example.com', status: 'publiee', prenom: 'Nina', en_match: true });
+  db.annonces.push({ id: 'a2', ref: 9, user_id: 'u2', email: 'karim@example.com', status: 'publiee', prenom: 'Karim' });
   const r = await handleAnnonces('annonce_interet', { ref: 9 }, ctx(user));
   assert.equal(r.status, 200);
   assert.equal(db.annonce_interets[0].cible_ref, 9);
@@ -230,6 +231,7 @@ test('swipe : deux personnes qui se choisissent → intérêt réciproque et ale
 test('swipe sans limite ; matchs en cours selon la formule : Découverte 1, Passion 3, Prestige 10', async () => {
   const { ctx, db } = monde();
   db.annonces.push({ id: 'a1', ref: 21, user_id: 'u1', email: 'nina@example.com', status: 'publiee', prenom: 'Nina', genre: 'femme', en_match: false, matchs_bonus: 0 });
+  for(const ref of [31,32,33,34,35,36])db.annonces.push({id:`c-${ref}`,ref,status:'publiee',email:`c${ref}@example.invalid`});
   const nina = { id: 'u1', email: 'nina@example.com' };
   const base = ctx().read;
   const c = (formule, enCours) => ({ ...ctx(nina, formule), read: async (u) => (u.includes('reciproque=eq.true&statut=in.') ? Array.from({ length: enCours }, (_, i) => ({ id: 'm' + i })) : base(u)) });
@@ -253,6 +255,7 @@ test('swipe sans limite ; matchs en cours selon la formule : Découverte 1, Pass
 test('quotas : matchs illimités pour tout le monde (Lamia, 14 nov. 2026) ; seules les places en cours changent', async () => {
   const { ctx, db } = monde();
   db.annonces.push({ id: 'a1', ref: 21, user_id: 'u1', email: 'nina@example.com', status: 'publiee', prenom: 'Nina', genre: 'femme', en_match: false, matchs_bonus: 0, pays: 'France' });
+  db.annonces.push({id:'c-31',ref:31,status:'publiee',email:'c31@example.invalid'});
   const nina = { id: 'u1', email: 'nina@example.com' };
   const c = (formule, nb) => { const x = ctx(nina, formule), base = x.read; return { ...x, read: async (u) => (u.includes('statut=in.(mis_en_relation,dematche)') ? Array.from({ length: nb }, () => ({ cible_ref: 900, updated_at: new Date().toISOString(), annonces: { ref: 21 } })) : base(u)) }; };
   const oui = async (formule, nb) => { const r = await handleAnnonces('annonce_swipe', { ref: 31, choix: 'oui' }, c(formule, nb)); return [r.status, await r.json()]; };
@@ -286,16 +289,16 @@ test('la personne choisie est prévenue par email (sans savoir qui), au plus une
   assert.deepEqual(mails.map((m) => m[0]).sort(), ['nina@example.com', 'sam@example.com']);
   assert.ok(mails.every((m) => /réciproque/.test(m[1])));
 });
-test('création de compte : validation automatique sans email et cinq tentatives maximum par heure', async () => {
+test('création de compte : confirmation par email et cinq tentatives maximum par heure', async () => {
   const appels = [];
-  const ctx = { env: { SUPABASE_SERVICE_ROLE_KEY: 'x' }, admin: false, user: null, ipHash: 'ip', now: () => new Date('2026-10-31T00:00:00Z'), email: async () => true, alerter: async () => {},
+  const ctx = { env: { SUPABASE_SERVICE_ROLE_KEY: 'x', INSCRIPTION_EMAIL_VERIFIE: '1' }, admin: false, user: null, ipHash: 'ip', now: () => new Date('2026-10-31T00:00:00Z'), email: async () => true, alerter: async () => {},
     call: async (u, o = {}) => { appels.push([u, o.body && JSON.parse(o.body)]); return { ok: true, status: 200, json: async () => ({ user: { id: 'u' }, action_link: 'https://auth.example/verify?token=secret' }) }; },
     read: async () => [], insert: async () => ({}), patch: async () => ({}) };
   let r = await handleAnnonces('annonce_creer_compte', { email: 'pas-un-email', password: '12345678' }, ctx);
   assert.equal(r.status, 400);
   r = await handleAnnonces('annonce_creer_compte', { email: 'Nina@Example.com', password: '12345678', prenom: 'Nina' }, ctx);
   assert.equal(r.status, 200);
-  assert.deepEqual(await r.json(), { ok: true, a_reconfirmer: true });
+  assert.deepEqual(await r.json(), { ok: true, confirmation_requise: true });
   assert.equal(appels[0][0], '/auth/v1/admin/generate_link');
   assert.equal(appels[0][1].type, 'signup');
   assert.equal(appels[0][1].email_confirm, undefined);
@@ -304,7 +307,7 @@ test('création de compte : validation automatique sans email et cinq tentatives
   const plein = { ...ctx, read: async () => [1, 2, 3, 4, 5] };
   r = await handleAnnonces('annonce_creer_compte', { email: 'x@example.com', password: '12345678' }, plein);
   assert.equal(r.status, 429);
-  const existe = { ...ctx, call: async () => ({ ok: false, status: 422 }) };
+  const existe = { ...ctx, call: async () => Response.json({code:'email_exists'}, {status:422}) };
   r = await handleAnnonces('annonce_creer_compte', { email: 'x@example.com', password: '12345678' }, existe);
   assert.equal((await r.json()).error, 'compte_existe');
 });
