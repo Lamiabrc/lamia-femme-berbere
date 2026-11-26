@@ -638,3 +638,10 @@
 @media (max-width: 760px) {
   .tdb .tdb-onglets > button, .tdb .tdb-plus > summary { font-size: 11px !important; line-height: 1.25; }
 }
+
+.tdb-relancer summary { cursor: pointer; list-style: none; }
+.tdb-relancer summary h2 { display: inline; }
+.tdb-relancer summary::-webkit-details-marker { display: none; }
+.relancer-liste { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.relancer-liste > li { border: 1px solid #e6e2f0; border-radius: 14px; padding: 12px 14px; display: grid; gap: 8px; }
+@media (min-width: 760px) { .relancer-liste > li { grid-template-columns: 1fr auto; align-items: center; } .relancer-liste > li > .tdb-ecrire-zone { grid-column: 1 / -1; } }
