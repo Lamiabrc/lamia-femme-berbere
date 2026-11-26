@@ -28,7 +28,9 @@ Il reste des délais Supabase intermittents observés avant publication : trois 
 
 ## Validation et continuité
 
-Complément demandé ensuite : retrouver toutes les anciennes fiches des lives et les rechercher par TikTok. Voir `docs/fiches-retrouvees.md` et la branche `codex/fiches-lives-tiktok` / PR associée pour la publication exacte. Rubrique `/tableau-de-bord#fiches`, liste paginée, liens TikTok privés et modification du lien sans changement des autres critères ou états. Aucun ancien profil n’est republié automatiquement.
+Complément demandé ensuite : retrouver toutes les anciennes fiches des lives et les rechercher par TikTok. Voir `docs/fiches-retrouvees.md` et la branche `codex/fiches-lives-tiktok` / PR associée pour la publication exacte. Rubrique `/tableau-de-bord#fiches`, liste paginée, liens TikTok privés et modification du lien sans changement des autres critères ou états. Ce correctif ne réactive pas les fiches retirées ou en pause.
+
+Pendant ce complément, `main` a avancé jusqu’à `6d83056347b90eb5fa8adea6aab747e70f3d03db` (PR 327). Ces changements ont été intégrés et conservés : étapes du formulaire, charte d’administration, relances TikTok et option de mise en relation payante. La PR 326 avait aussi remplacé la validation humaine initialement décrite dans ce document par la mise en ligne automatique des profils complets avec photos ; le présent correctif de liste ne modifie pas cette règle de production. Les liens corrigés sont pris en compte également dans les nouvelles relances, en conservant les dates de contact.
 
 Avant : 478 tests sur le SHA de départ. Phase 1 : **501 tests réussis, aucun échec ; 383 pages générées**. Avec le complément de limites email : **504 tests réussis, aucun échec**, dont les réservations concurrentes exécutées sur PostgreSQL local. Commandes : `npm test`, `npm run build`. Les tests doivent rester isolés de la production ; ne pas injecter de secrets de production. Recette locale : `node tests/serve-inscription.mjs`, puis http://127.0.0.1:4181/rencontres/#confier. Données fictives et API locales uniquement. Maquettes : `/docs/phase1-maquettes.html` sur ce serveur.
 
