@@ -583,3 +583,36 @@
 .cp .cp-tuile-on{background:var(--cp-c);color:#fff}.cp .cp-tuile-manque small{font-weight:700}
 .cp .cp-carte{border-left:6px solid var(--cp-c);padding:4px 0 4px 12px;margin:8px 0}
 @media(min-width:720px){.cp .cp-menu{grid-template-columns:repeat(4,1fr)}}
+
+/* « Créer un profil » en cartes (26 nov. 2026) : un thème par écran, Précédent / Suivant. */
+.fe-tete { display: grid; gap: 10px; scroll-margin-top: 90px; }
+.fe-barre { height: 8px; border-radius: 99px; background: #e6e2f0; overflow: hidden; }
+.fe-barre span { display: block; height: 100%; width: 10%; border-radius: inherit; background: linear-gradient(90deg, #2d3a8c, #6b46c1); transition: width .25s ease; }
+.fe-compte { margin: 0; font-weight: 700; font-size: 16px; }
+.fe-pastilles { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
+.fe-pastilles button { flex: 0 0 auto; min-height: 40px; padding: 6px 14px; border-radius: 99px; border: 1px solid #d8d2e6; background: #fff; color: #3b3550; font: inherit; font-size: 14px; cursor: pointer; white-space: nowrap; }
+.fe-pastilles button.fe-faite { background: #f1edfa; }
+.fe-pastilles button[aria-selected="true"] { background: #4b3fa3; border-color: #4b3fa3; color: #fff; font-weight: 700; }
+.fe-carte { display: grid; gap: 14px; }
+.fe-carte[hidden] { display: none; }
+.fe-carte h2 { outline: none; }
+.fe-carte .aide { margin: 0; }
+.fe-champs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.fe-champs > fieldset, .fe-champs > .cp-cases, .fe-champs > .fe-sous-titre, .fe-champs > label:has(textarea), .fe-champs > .fiche-admin-coche { grid-column: 1 / -1; }
+.fe-champs input:not([type=checkbox]):not([type=radio]), .fe-champs select, .fe-champs textarea { font-size: 16px; min-height: 46px; }
+.fe-carte label.cp-case, .fe-carte .cp-cases label { display: flex; align-items: center; gap: 10px; font-weight: 500; min-height: 44px; }
+.fe-carte input[type=checkbox], .fe-carte input[type=radio] { width: 22px; height: 22px; min-height: 0; flex: 0 0 22px; margin: 0; }
+.fe-carte .cp-cases { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 4px 12px; }
+.fe-carte fieldset { border: 0; padding: 0; margin: 0; }
+.fe-carte legend { font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+.fe-plus { border: 1px dashed #d8d2e6; border-radius: 14px; padding: 4px 14px 12px; }
+.fe-plus summary { font-weight: 700; color: #4b3fa3; min-height: 44px; display: flex; align-items: center; }
+.fe-plus[open] summary { margin-bottom: 10px; }
+.fe-sous-titre { margin: 0; font-weight: 600; font-size: 14px; }
+.fe-nav { display: flex; gap: 12px; justify-content: space-between; flex-wrap: wrap; }
+.fe-nav .btn { min-height: 48px; flex: 1 1 160px; }
+.fe-nav [hidden] { display: none; }
+@media (max-width: 640px) {
+  .fe-champs { grid-template-columns: 1fr; }
+  .fe-nav { flex-direction: column-reverse; }
+}
