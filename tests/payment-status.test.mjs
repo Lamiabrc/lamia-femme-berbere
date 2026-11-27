@@ -1,6 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import paymentStatus from '../api/payment-status.js';
+import {GET as webhookStatus} from '../api/stripe-webhook.mjs';
+
+test('le diagnostic du webhook ne prétend pas que le paiement est coupé quand il est activé',async()=>{
+ const avant=process.env.CHECKOUT_ENABLED;
+ try{process.env.CHECKOUT_ENABLED='true';assert.equal((await (await webhookStatus()).json()).checkoutEnabled,true);process.env.CHECKOUT_ENABLED='false';assert.equal((await (await webhookStatus()).json()).checkoutEnabled,false);}
+ finally{if(avant===undefined)delete process.env.CHECKOUT_ENABLED;else process.env.CHECKOUT_ENABLED=avant;}
+});
 const keys=['STRIPE_SECRET_KEY','SUPABASE_SERVICE_ROLE_KEY','SUPABASE_SECRET_KEY','STRIPE_WEBHOOK_SECRET','CHECKOUT_ENABLED'];
 async function probe({enabled='true',charges=true,response=null,error=false}={}){
  const before=Object.fromEntries(keys.map(k=>[k,process.env[k]])),fetchBefore=globalThis.fetch;

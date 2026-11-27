@@ -1731,6 +1731,7 @@ const tableauFormules = () => {
     ['Seconde chance après un cœur refusé', non, '2 fois par profil', '4 fois par profil'],
     ['Revenir en arrière dans le swipe', 'Le dernier profil', '10 profils', 'Sans limite'],
     ['Discussion avec ton match', '7 jours', '14 jours', 'Sans limite'],
+    ['Échange de numéros avec votre accord à tous les deux', 'Non inclus', 'Inclus', 'Inclus'],
     ['Le profil de qui t’a choisi·e', 'Le nombre seulement', v(pa.quiMaChoisi), v(pr.quiMaChoisi)],
     ['La photo de ton match, s’il ou elle l’accepte', `${eurosAbo(UNITES.find((u) => u.id === 'photo_match').prix)} pour 1 heure`, 'Incluse', 'Incluse'],
     ['Profil prioritaire dans le matching', non, non, oui],
@@ -2331,6 +2332,7 @@ await cp(join(ROOT, 'content', 'rubriques.mjs'), join(DIST, 'assets', 'rubriques
 await cp(join(ROOT, 'content', 'matching-options.mjs'), join(DIST, 'assets', 'matching-options.mjs'));
 await cp(join(ROOT, 'content', 'etat-matchs.mjs'), join(DIST, 'assets', 'etat-matchs.mjs'));
 await cp(join(ROOT, 'content', 'liens-tiktok.mjs'), join(DIST, 'assets', 'liens-tiktok.mjs'));
+await cp(join(ROOT, 'content', 'liens-reseaux.mjs'), join(DIST, 'assets', 'liens-reseaux.mjs'));
 await cp(join(ROOT, 'content', 'signalement.mjs'), join(DIST, 'assets', 'signalement.mjs'));
 await cp(join(ROOT, 'src', 'i18n.js'), join(DIST, 'assets', 'i18n.js'));
 await writeFile(join(DIST, 'assets', 'tayri.css'), `${await readFile(join(ROOT, 'src', 'tayri.css'), 'utf8')}\n${await readFile(join(ROOT, 'src', 'tayri-phase1.css'), 'utf8')}`);
