@@ -1,6 +1,6 @@
 // Tableau de bord de Lamia : ventes, produits, soirées, alertes, textes du site, visites.
 import {chercherReseau,effacerRechercheReseau} from '/recherche-reseaux.js';
-import { cartesCompleter, carteValider, monterCompleter } from '/completer-profil.js';
+import { cartesCompleter, carteValider, cartePause, monterCompleter } from '/completer-profil.js';
 import { FAMILLES } from '/assets/rubriques.mjs';
 import { createClient } from '/vendor/supabase.mjs';
 import { monterFichesAdmin } from '/fiches-admin.js';
@@ -297,7 +297,7 @@ document.addEventListener('submit', async (e) => {
 
 // ---------------------------------------------------------------- Application : journal « qui fait quoi », retraits, notifications
 let filtreJournal = '';
-monterCompleter({ appel: (body) => conf(body), recharger: (ref) => ouvrirParRef(ref) });
+monterCompleter({ appel: (body) => conf(body), recharger: async (ref) => { await chargerComptes(); await ouvrirParRef(ref); } });
 const matchDirect = monterMatchDirect({ appel: (body) => conf(body), voirProfil: (ref) => ouvrirParRef(ref) });
 const conf = async (body) => { const r = await fetch('/api/confidences/', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(body) }); const d = await r.json().catch(() => ({})); if (!r.ok) throw Object.assign(new Error(d.error || 'erreur'), { code: d.error, texte: d.message, manques: d.manques }); return d; };
 
@@ -537,7 +537,7 @@ document.addEventListener('click', async (e) => {
     try { await conf({ action: 'annonce_effacement_fait', ref: Number(ef.dataset.effacementFait) }); message('Effacement noté.'); chargerJournal(); } catch { message('L’effacement n’a pas pu être noté.', true); }
   }
 });
-const ETATS_DISC = { ouverte: 'en cours', numeros: 'numéros échangés', terminee: 'terminée sans échange', dematch: 'dématché', signalee: 'signalée' };
+const ETATS_DISC = { ouverte: 'en cours', numeros: 'en cours · numéros échangés', terminee: 'terminée', au_revoir: 'au revoir · match terminé', dematch: 'dématché', signalee: 'signalée' };
 async function chargerDiscussions(id = null) {
   const box = $('[data-discussions]');
   try {
@@ -1007,13 +1007,14 @@ function listeComptes() {
     const age = ageDe(c.profil?.birth_date) ?? c.age_fiche ?? null;
     const vraie = c.annonces.find((a) => !a.test && a.status === 'publiee') || c.annonces.find((a) => !a.test && ETAT[a.status]);
     const num = vraie?.ref || c.fiches[0]?.ref || null;
-    const etat = [LIBELLE_ETAT[c.etat] || '—', c.etat === 'valide' ? 'is-ok' : /^(att_|suspendu|en_cours|photos_a|retire)/.test(c.etat) ? 'is-alerte' : ''];
+    const code = c.en_pause ? c.validation_etat || c.etat : c.etat;
+    const etat = [LIBELLE_ETAT[code] || '—', code === 'valide' ? 'is-ok' : /^(att_|suspendu|en_cours|photos_a|retire)/.test(code) ? 'is-alerte' : ''];
     const qui = [c.profil?.gender ? GENRE[c.profil.gender] : '', age != null ? `${age} ans` : '', c.profil?.city || ''].filter(Boolean).join(' · ');
     const soirees = c.inscriptions.filter((i) => i.statut !== 'cancelled').length;
     return `<article class="membre-carte couleur-${COULEUR_ETAT[c.etat] || 'gris'}" data-compte="${esc(c.id)}" tabindex="0" role="button">
       <header><strong>${esc(nomDe(c))}</strong>${(() => { const autre = [...c.annonces.map((a) => a.prenom), ...c.fiches.map((f) => f.pseudo)].find((x) => x && x.toLowerCase() !== String(nomDe(c)).toLowerCase()); return autre ? ` <small class="membre-autre">(annonce : ${esc(autre)})</small>` : ''; })()}${num ? `<span class="membre-num">n° ${esc(num)}</span>` : ''}</header>
       <p class="membre-qui">${esc(qui) || '<span class="compte-badge is-alerte">genre et âge ?</span>'}</p>
-      <p class="membre-badges"><span class="compte-badge ${etat[1]}">${etat[0]}</span>${soirees ? `<span class="compte-badge is-bal">${soirees} soirée${soirees > 1 ? 's' : ''}</span>` : ''}${c.admin ? '<span class="compte-badge">toi (admin)</span>' : ''}${c.testeur_play ? '<span class="compte-badge is-bal">Testeur Play</span>' : ''}${c.sans_profil && c.relance_le ? `<span class="compte-badge is-alerte">Relancé·e le ${esc(date(c.relance_le, { day: 'numeric', month: 'short' }))}</span>` : ''}</p>
+      <p class="membre-badges"><span class="compte-badge ${etat[1]}">${etat[0]}</span>${c.en_pause ? '<span class="compte-badge">Rencontres en pause</span>' : ''}${soirees ? `<span class="compte-badge is-bal">${soirees} soirée${soirees > 1 ? 's' : ''}</span>` : ''}${c.admin ? '<span class="compte-badge">toi (admin)</span>' : ''}${c.testeur_play ? '<span class="compte-badge is-bal">Testeur Play</span>' : ''}${c.sans_profil && c.relance_le ? `<span class="compte-badge is-alerte">Relancé·e le ${esc(date(c.relance_le, { day: 'numeric', month: 'short' }))}</span>` : ''}</p>
       <small>${c.vu_le ? `Vu·e le ${esc(date(c.vu_le, { day: 'numeric', month: 'short' }))}` : 'Jamais reconnecté·e'} · inscrit·e le ${esc(date(c.cree_le, { day: 'numeric', month: 'short' }))}</small>
     </article>`;
   }).join('') : '<p class="aide">Aucun membre ne correspond.</p>';
@@ -1035,6 +1036,7 @@ function ouvrirCompte(id) {
     `Compte créé le ${date(c.cree_le, { day: 'numeric', month: 'long', year: 'numeric' })}`,
     c.vu_le ? `dernière connexion le ${date(c.vu_le, { day: 'numeric', month: 'long' })}` : 'jamais reconnecté·e',
     c.email_confirme ? 'email confirmé' : 'email non confirmé',
+    c.en_pause ? 'rencontres en pause (indépendamment de la validation)' : '',
     c.testeur_play ? `testeur Google Play depuis le ${date(c.testeur_play.demande_at, { day: 'numeric', month: 'long' })}${c.testeur_play.ajoute_at ? ' (sur la liste)' : ' (pas encore sur la liste)'}` : '',
     c.source ? `venu·e de ${c.source}` : '',
   ].filter(Boolean).join(' · ');
@@ -1053,8 +1055,8 @@ function ouvrirCompte(id) {
     : '<option value="">Aucune autre soirée à venir</option>';
   $('[data-compte-inscrire]').disabled = !dispo.length;
   $('[data-compte-liens]').innerHTML = [
-    ...c.annonces.map((a) => `<li><div><strong>Annonce n° ${esc(a.ref)}</strong><small>${esc(ANNONCE[a.status] || a.status)}${a.test ? ' · test' : ''}</small></div><button class="btn btn-line" type="button" data-rencontres-aller="annonces">Voir dans Rencontres</button></li>`),
-    ...c.fiches.map((x) => `<li><div><strong>Fiche de l’outil n° ${esc(x.ref)}</strong><small>${x.retiree ? 'retirée' : x.confirmee ? 'confirmée' : 'en attente de confirmation'}</small></div></li>`),
+    ...c.annonces.map((a) => `<li><div><strong>Annonce n° ${esc(a.ref)}</strong><small>${esc(ANNONCE[a.status] || a.status)}${a.pause_at ? ' · rencontres en pause' : ''}${a.test ? ' · test' : ''}</small></div><button class="btn btn-line" type="button" data-rencontres-aller="annonces">Voir dans Rencontres</button></li>`),
+    ...c.fiches.map((x) => `<li><div><strong>Fiche de l’outil n° ${esc(x.ref)}</strong><small>${x.retiree ? 'retirée' : x.confirmee ? 'confirmée' : 'en attente de confirmation'}${x.pause_at ? ' · rencontres en pause' : ''}</small></div></li>`),
   ].join('') || '<li>Ni annonce ni fiche de l’outil liée à ce compte.</li>';
   $$('[data-sp-un]').forEach((x) => { x.hidden = !c.sans_profil; x.disabled = false; });
   $('[data-sp-un-statut]').textContent = c.sans_profil ? (c.relance_le ? `Sans profil · relancé·e le ${date(c.relance_le, { day: 'numeric', month: 'long' })}` : 'Sans profil · jamais relancé·e') : '';
@@ -1081,7 +1083,7 @@ function profilComplet(a) {
   const videos = (a.medias || []).filter((x) => x.kind === 'video').map((x) => `<video controls preload="none" src="${esc(x.url)}"></video>`).join('');
   const reponses = Object.entries(m).filter(([k]) => !CACHES.has(k)).map(([k, v]) => [LIBELLES[k] || k, v]);
   const badges = [a.identite_verifiee_at ? 'pièce d’identité validée' : '', a.recommande_at ? 'recommandé' : '', a.moderateur_at ? 'modérateur' : '', a.visible_anonyme === false ? 'masqué dans les profils' : '', a.outil_id || a.exportee_at ? 'importé dans l’outil' : 'pas encore importé dans l’outil'].filter(Boolean).join(' · ');
-  return `<article class="profil-complet"><h4>Profil n° ${esc(a.ref)}</h4><p class="aide">${esc(badges)}</p>
+  return `<article class="profil-complet"><h4>Profil n° ${esc(a.ref)}${a.pause_at ? ' · rencontres en pause' : ''}</h4><p class="aide">${esc(badges)}</p>
     ${rendreModerationPhotos(a)}
     ${videos ? `<div class="profil-medias">${videos}</div>` : ''}
     ${a.profil ? `<h5>Qui je suis</h5><p>${esc(a.profil)}</p>` : ''}${a.recherche ? `<h5>Qui je cherche${a.age_min || a.age_max ? ` · ${esc(a.age_min || 18)} à ${esc(a.age_max || 99)} ans` : ''}</h5><p>${esc(a.recherche)}</p>` : ''}
@@ -1110,7 +1112,7 @@ function rendreDetail(d) {
   const complet = [...(d.annonces || []).map(profilComplet), ...(d.fiches || []).map((f) => ficheComplete(f, (d.annonces || []).reduce((n, a) => n + (a.medias || []).filter((m) => m.kind === 'photo').length, 0)))].join('');
   const blocComplet = complet ? `<div class="tdb-carte"><h3 style="margin-top:0">Son profil complet</h3>${complet}</div>` : '';
   if (d.sans_compte) {
-    box.innerHTML = `${pourquoi}${carteValider(d)}<div class="tdb-carte"><h3 style="margin-top:0">À qui est ce profil</h3><ul class="fiche-liste">${qui}</ul><p class="aide">Cette personne n’a pas de compte.${(d.fiches || []).some((f) => f.pseudo || f.lien_reseau) ? ` Pseudo : ${esc((d.fiches || []).map((f) => f.pseudo).filter(Boolean).join(', ') || '—')} · Lien réseau : ${esc((d.fiches || []).map((f) => f.lien_reseau).filter(Boolean).join(', ') || '—')}.` : ' Son prénom et ses contacts sont dans ton outil de live (cherche ce n° dans « Le site »).'}</p></div>${blocComplet}${(d.choisi_par || []).length ? `<div class="tdb-carte"><h3 style="margin-top:0">Choisie par</h3><ul class="fiche-liste">${d.choisi_par.map((x) => `<li>${refBouton(x.ref)} ${esc(x.prenom || '')}<small>${esc(STATUT_DEMANDE[x.statut] || x.statut)} · ${esc(quand(x.le))}</small></li>`).join('')}</ul></div>` : ''}`;
+    box.innerHTML = `${pourquoi}${cartePause(d)}${carteValider(d)}<div class="tdb-carte"><h3 style="margin-top:0">À qui est ce profil</h3><ul class="fiche-liste">${qui}</ul><p class="aide">Cette personne n’a pas de compte.${(d.fiches || []).some((f) => f.pseudo || f.lien_reseau) ? ` Pseudo : ${esc((d.fiches || []).map((f) => f.pseudo).filter(Boolean).join(', ') || '—')} · Lien réseau : ${esc((d.fiches || []).map((f) => f.lien_reseau).filter(Boolean).join(', ') || '—')}.` : ' Son prénom et ses contacts sont dans ton outil de live (cherche ce n° dans « Le site »).'}</p></div>${blocComplet}${(d.choisi_par || []).length ? `<div class="tdb-carte"><h3 style="margin-top:0">Choisie par</h3><ul class="fiche-liste">${d.choisi_par.map((x) => `<li>${refBouton(x.ref)} ${esc(x.prenom || '')}<small>${esc(STATUT_DEMANDE[x.statut] || x.statut)} · ${esc(quand(x.le))}</small></li>`).join('')}</ul></div>` : ''}`;
     return;
   }
   const a = d.activite;
@@ -1118,7 +1120,7 @@ function rendreDetail(d) {
   box.innerHTML = `${c.bloque ? '<p class="fiche-bloque"><svg class="ico" aria-hidden="true"><use href="/icones.svg#ban"/></svg> Ce compte est bloqué.</p>' : ''}${pourquoi}
     <div class="tdb-carte"><h3 style="margin-top:0">À qui est ce profil</h3><ul class="fiche-liste">${qui || '<li>Compte sans profil.</li>'}</ul>
       <p class="aide">Formule : ${esc({ decouverte: 'Découverte', passion: 'Passion', prestige: 'Prestige', couple: 'Couple Amour', couple_prestige: 'Couple Prestige' }[d.formule] || d.formule)}${d.formule_offerte ? ' (offerte)' : ''} · Dernière activité : ${esc(quand(c.derniere_action) || 'aucune')}</p></div>
-    ${carteValider(d)}${cartesCompleter(d)}${blocComplet}
+    ${cartePause(d)}${carteValider(d)}${cartesCompleter(d)}${blocComplet}
     <div class="tdb-carte"><h3 style="margin-top:0">Son activité</h3><div class="fiche-chiffres">
       ${[['Swipes oui', a.swipes_oui], ['Swipes non', a.swipes_non], ['Demandes', a.demandes], ['Choisi·e par', a.recus], ['Matchs en cours', a.en_cours.length], ['Dématchs', a.dematchs], ['Messages', a.messages], ['Photos', a.photos]].map(([n, v]) => `<div><b>${esc(v)}</b><span>${esc(n)}</span></div>`).join('')}</div>
       ${a.en_cours.length ? `<p>En match avec : ${a.en_cours.map(refBouton).join(', ')}</p>` : ''}</div>
@@ -1134,7 +1136,7 @@ function rendreDetail(d) {
       ${d.cadeaux.length ? `<p class="aide">Déjà offert : ${d.cadeaux.map((x) => `${x.quantite} ${{ mise_en_relation: 'match', speed_dating: 'speed dating', coaching: 'coaching' }[x.type] || x.type} (${esc(date(x.le, { day: 'numeric', month: 'short' }))})`).join(' · ')}</p>` : ''}</div>
     ${carte(`Ses choix (${d.choix.length}) et qui l’a choisi·e (${d.choisi_par.length})`, `<h4>Ses choix</h4>${liste(d.choix, (x) => `<li>${refBouton(x.ref)}<small>${esc(STATUT_DEMANDE[x.statut] || x.statut)} · ${esc(quand(x.le))}</small></li>`, 'Aucun choix.')}<h4>L’ont choisi·e</h4>${liste(d.choisi_par, (x) => `<li>${refBouton(x.ref)} ${esc(x.prenom || '')}<small>${esc(STATUT_DEMANDE[x.statut] || x.statut)} · ${esc(quand(x.le))}</small></li>`, 'Personne pour l’instant.')}`)}
     ${carte(`Blocages et signalements (${d.blocages.fait.length + d.blocages.subi.length + d.signalements.fait.length + d.signalements.subi.length})`, `<h4>A bloqué</h4>${liste(d.blocages.fait, (x) => `<li>${refBouton(x.ref)}<small>${esc(x.motif || 'Sans motif')} · ${esc(quand(x.le))}</small></li>`, 'Personne.')}<h4>Bloqué·e par</h4>${liste(d.blocages.subi, (x) => `<li>${refBouton(x.ref)}<small>${esc(x.motif || 'Sans motif')} · ${esc(quand(x.le))}</small></li>`, 'Personne.')}<h4>A signalé</h4>${liste(d.signalements.fait, (x) => `<li>${refBouton(x.ref)}<small>${esc(x.motif || 'Sans motif')} · ${esc(quand(x.le))}</small></li>`, 'Personne.')}<h4>Signalé·e par</h4>${liste(d.signalements.subi, (x) => `<li>${refBouton(x.ref)}<small>${esc(x.motif || 'Sans motif')} · ${esc(quand(x.le))}</small></li>`, 'Personne.')}`)}
-    ${carte(`Ses discussions (${d.discussions.length})`, liste(d.discussions, (x) => `<li>Avec ${refBouton(x.avec)}<small>Ouverte ${esc(quand(x.ouverte))}${x.ferme ? ` · fermée ${esc(quand(x.ferme))}` : ''}</small></li>`, 'Aucune discussion.'))}
+    ${carte(`Ses discussions (${d.discussions.length})`, liste(d.discussions, (x) => `<li>Avec ${refBouton(x.avec)}<small>${esc(x.etat || 'État à vérifier')} · ouverte ${esc(quand(x.ouverte))}${x.ferme ? ` · échéance ${esc(quand(x.ferme))}` : ''}</small></li>`, 'Aucune discussion.'))}
     ${c.admin ? '' : `<div class="tdb-carte"><h3 style="margin-top:0">Modérer</h3>
       ${(d.annonces || []).filter((x) => x.ref && ['publiee', 'a_verifier'].includes(x.status)).map((x) => `<p><button class="btn btn-line" type="button" data-suspendre="${esc(x.ref)}" data-etat="${x.status === 'publiee' ? 'suspendre' : 'remettre'}">${x.status === 'publiee' ? `Suspendre le profil n° ${esc(x.ref)}` : `Remettre en ligne le profil n° ${esc(x.ref)}`}</button></p>`).join('')}
       <p><button class="btn btn-line fiche-danger" type="button" data-bloquer-compte="${c.bloque ? 'non' : 'oui'}">${c.bloque ? 'Débloquer ce compte' : 'Bloquer ce compte'}</button></p>
@@ -1153,9 +1155,10 @@ async function chargerDetail(cible) {
     const detail = await conf({ action: 'annonce_profil_detail', ...cible });
     if (demande !== chargementDetail) return;
     detailCourant = detail; rendreDetail(detail);
-  } catch {
+  } catch (err) {
     if (demande !== chargementDetail) return;
-    box.innerHTML = '<p class="aide">Cette fiche n’a pas pu être chargée. Réessaie dans un instant.</p>';
+    box.innerHTML = `<p class="aide" role="status">${err.code === 'not_found' ? 'La fiche n’a pas été retrouvée.' : 'Le chargement de cette fiche est temporairement indisponible. Cela ne signifie pas que la personne est bloquée ou sans activité.'}</p><button type="button" class="btn btn-line" data-reessayer-detail>Réessayer de charger la fiche</button>`;
+    box.querySelector('[data-reessayer-detail]').addEventListener('click', () => chargerDetail(cible));
     correction.innerHTML = '<p role="status">Les informations n’ont pas pu être chargées. Ferme ce volet puis rouvre la fiche.</p>';
   }
 }

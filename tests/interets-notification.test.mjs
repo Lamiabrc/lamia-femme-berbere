@@ -26,6 +26,14 @@ test('un ancien oui sans suite ne promet plus un match, une réserve dit clairem
   assert.match(notificationInteret({id:iid,statut:'en_reserve',reponse:'oui'}).texte,/attente de disponibilité/);
   assert.match(lienInteret(iid),new RegExp(`interet=${iid}#interets$`));
 });
+
+test('un intérêt reçu encore « mis en relation » expose la fin réelle de sa discussion',async()=>{
+  const b=base({statut:'mis_en_relation',reponse:'oui'});
+  const read=b.ctx.read;
+  b.ctx.read=async p=>p.startsWith('/rest/v1/discussions?')?[{interet_id:iid,a_user:uid,b_user:'autre',ferme_at:'2026-11-19T00:00:00Z'}]:read(p);
+  const r=await b.action('annonce_interets_recus');
+  assert.equal(r.interets[0].etat_affiche.code,'termine');
+});
 test('une création concurrente en doublon renvoie un seul nouvel intérêt, sans 409',async()=>{
   const lignes=[];const call=async(_path,opt)=>{
     assert.match(opt.headers.Prefer,/ignore-duplicates/);const row=JSON.parse(opt.body);

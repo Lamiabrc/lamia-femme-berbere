@@ -78,7 +78,7 @@ test('carte d\'activité : un match ancien reste compté même avec plus de 1000
   const A = { id: 'a-1', ref: 1, prenom: 'Amel', status: 'publiee', test: false, user_id: 'u-1', en_match: true, pause_at: null };
   const recentes = Array.from({ length: 1200 }, (_, i) => ({ id: `r${String(i).padStart(5, '0')}`, cible_ref: 5000 + i, statut: 'pas_compatible', updated_at: `2026-11-17T12:${String(i % 60).padStart(2, '0')}:00Z`, annonces: { ref: 1, prenom: 'Amel', status: 'publiee' } }));
   const ancien = { id: 'zz-match', cible_ref: 2, statut: 'mis_en_relation', updated_at: '2026-11-01T10:00:00Z', annonces: { ref: 1, prenom: 'Amel', status: 'publiee' } };
-  const db = { annonces: [A], profils_outil: [], annonce_interets: [...recentes, ancien], propositions: [], discussions: [], platform_settings: [] };
+  const db = { annonces: [A], profils_outil: [], annonce_interets: [...recentes, ancien], propositions: [], discussions: [{ id: 'd-match', interet_id: 'zz-match', ferme_at: '2026-12-01T00:00:00Z' }], platform_settings: [] };
   // Comme la base : les plus récentes d'abord.
   db.annonce_interets.sort((x, y) => y.updated_at.localeCompare(x.updated_at));
   const { read } = baseCoupee(db);

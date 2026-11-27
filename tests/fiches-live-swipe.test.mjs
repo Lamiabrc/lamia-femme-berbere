@@ -367,6 +367,7 @@ test('mise en relation à la main : un profil pas validé donne un message clair
 test('où en est un profil : ses matchs en cours et les oui réciproques en attente', async () => {
   const { ctx } = base({
     annonces: [annonceNina(), annonceKarim()],
+    discussions: [{ id: 'd-1', interet_id: 'i-1', a_user: 'u-nina', b_user: 'u-karim', a_ref: 11, b_ref: 12, ferme_at: '2026-12-01T00:00:00Z' }],
     annonce_interets: [
       { id: 'i-1', demandeur_id: 'a-nina', cible_ref: 12, statut: 'mis_en_relation', reciproque: true, created_at: '2026-11-02T00:00:00Z' },
       { id: 'i-2', demandeur_id: 'a-karim', cible_ref: 100009, statut: 'a_traiter', reciproque: true, created_at: '2026-11-02T00:00:00Z' },

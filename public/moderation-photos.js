@@ -4,6 +4,7 @@ export function stylePhotos() {
   const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = '/moderation-photos.css'; l.dataset.styleModerationPhotos = ''; document.head.append(l);
 }
 export function rendreModerationPhotos(a) {
+  if (a.medias_indisponibles) return `<section class="photos-controle"><h5>Photos du profil</h5><p role="status">Certaines photos ne peuvent pas être chargées. Recharge la fiche avant de les contrôler ; cela ne signifie pas qu’elles sont absentes ou refusées.</p>${Number.isInteger(a.nb_photos) ? `<p>${esc(a.nb_photos)} photo(s) enregistrée(s).</p>` : ''}</section>`;
   const m = a.photos_moderation, photos = (a.medias || []).filter((p) => p.kind === 'photo');
   const active = ['avertissement','suspendu'].includes(m?.etat);
   // Photos déjà refusées : elles restent affichées « Refusée » après l'envoi (sinon tout repasse en vert).
@@ -30,7 +31,8 @@ export function rendreModerationPhotos(a) {
 const TYPES_PHOTO = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp', heic: 'image/heic', heif: 'image/heif' };
 const typePhoto = (f) => (f.type && f.type !== 'application/octet-stream' ? f.type : TYPES_PHOTO[String(f.name || '').split('.').pop().toLowerCase()] || '');
 export function rendreAjoutPhotos(a) {
-  const manque = 2 - (a.medias || []).filter((p) => p.kind === 'photo').length;
+  if (a.medias_indisponibles) return '';
+  const manque = 2 - (a.nb_photos ?? (a.medias || []).filter((p) => p.kind === 'photo').length);
   if (manque <= 0 || a.status === 'retiree' || a.bloque_at) return '';
   return `<form class="photos-controle photos-ajout" data-photos-ajout="${esc(a.ref)}" data-manque="${manque}">
     <h5>Ajouter ${manque > 1 ? 'les 2 photos' : 'la photo manquante'} à sa place</h5>

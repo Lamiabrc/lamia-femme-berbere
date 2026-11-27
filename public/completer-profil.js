@@ -108,8 +108,14 @@ export function cartesCompleter(d) {
 
 // Valider un profil à la main, même s'il manque des photos ou des infos.
 export function carteValider(d) {
-  const l = (d.annonces || []).filter((a) => a.ref && !a.test && a.status !== 'retiree' && a.status !== 'refusee' && (a.status !== 'publiee' || a.photos_refusees_at || ['suspendu', 'avertissement'].includes(a.photos_moderation?.etat) || (a.medias || []).filter((m) => m.kind === 'photo').length < 2));
-  return l.map((a) => `<div class="tdb-carte cp-valider"><h3 style="margin-top:0">Profil n° ${esc(a.ref)} : ${a.status === 'publiee' ? 'bloqué' : 'pas encore validé'}</h3><p class="aide">${a.status === 'publiee' ? 'Il est publié mais bloqué (photos).' : 'Il ne peut pas swiper tant qu’il n’est pas validé.'} Tu peux le valider tout de suite, même s’il manque des photos ou des infos.</p><button class="btn btn-ink" type="button" data-valider-profil="${esc(a.ref)}">✓ Valider ce profil</button> <span class="aide" role="status" data-valider-statut></span></div>`).join('');
+  const l = (d.annonces || []).filter((a) => a.ref && !a.test && !a.bloque_at && a.status !== 'retiree' && a.status !== 'refusee' && (a.status !== 'publiee' || a.photos_refusees_at || ['suspendu', 'avertissement'].includes(a.photos_moderation?.etat) || (a.photos_moderation?.dispense !== true && !a.medias_indisponibles && (a.nb_photos ?? (a.medias || []).filter((m) => m.kind === 'photo').length) < 2)));
+  return l.map((a) => `<div class="tdb-carte cp-valider"><h3 style="margin-top:0">Profil n° ${esc(a.ref)} : ${a.status === 'publiee' ? 'photos à vérifier' : 'pas encore validé'}</h3><p class="aide">${a.status === 'publiee' ? 'Une vérification des photos reste à traiter.' : 'Ce profil attend sa validation.'} Tu peux le valider tout de suite, même s’il manque des photos ou des infos.${a.pause_at ? ' Sa pause dans les rencontres sera conservée.' : ''}</p><button class="btn btn-ink" type="button" data-valider-profil="${esc(a.ref)}">✓ Valider ce profil</button> <span class="aide" role="status" data-valider-statut></span></div>`).join('');
+}
+
+export function cartePause(d) {
+  const annonces = d.annonces || [], refsLiees = new Set(annonces.map((a) => a.fiche_ref));
+  const l = [...annonces.filter((a) => a.pause_at), ...(d.fiches || []).filter((f) => f.pause_at && !refsLiees.has(f.ref))];
+  return l.map((p) => `<section class="tdb-carte"><h3>Rencontres en pause · n° ${esc(p.ref)}</h3><p>La pause masque ce profil dans les rencontres. Elle est indépendante de sa validation et sera conservée tant qu’une reprise n’est pas demandée.</p>${!p.bloque_at && !p.bloquee && !p.retiree && !p.retire_at && !p.photos_refusees_at && (!p.status || p.status === 'publiee') ? `<button class="btn btn-line" type="button" data-reprendre-profil="${esc(p.ref)}">Reprendre les rencontres</button>` : '<p>Traite d’abord sa suspension ou son retrait.</p>'}<p role="status" data-reprendre-statut></p></section>`).join('');
 }
 
 // Lecture d'un formulaire (préfixe « m_ » dans « Créer un profil »).
@@ -142,14 +148,23 @@ export function monterCompleter({ appel, recharger }) {
     b.disabled = true; st.textContent = 'Validation…';
     const lancer = (forcer) => appel({ action: 'annonce_admin_valider', ref, forcer });
     try {
-      try { await lancer(false); }
+      let resultat;
+      try { resultat = await lancer(false); }
       catch (err) {
         if (err.code !== 'manques') throw err;
         if (!window.confirm('Il manque : ' + ((err.manques || err.donnees?.manques || []).join(', ') || 'des éléments') + '. Valider quand même ?')) { st.textContent = 'Pas validé.'; b.disabled = false; return; }
-        await lancer(true);
+        resultat = await lancer(true);
       }
-      st.textContent = 'Validé ✓ : il peut swiper.'; recharger?.(ref);
+      st.textContent = resultat.en_pause ? 'Validé ✓ · rencontres toujours en pause. Utilise « Reprendre les rencontres » pour lever la pause.' : 'Validé ✓.'; await recharger?.(ref);
     } catch (err) { st.textContent = ({ profil_inactif: 'Ce profil est retiré ou bloqué.', forbidden: 'Reconnecte-toi.' }[err.code]) || 'Pas validé. Réessaie.'; b.disabled = false; }
+  });
+  document.addEventListener('click', async (e) => {
+    const b = e.target.closest('[data-reprendre-profil]'); if (!b || b.disabled) return;
+    const st = b.parentElement.querySelector('[data-reprendre-statut]'), ref = Number(b.dataset.reprendreProfil);
+    if (!window.confirm('Lever la pause de ce profil ? Assure-toi que la personne souhaite reprendre les rencontres.')) return;
+    b.disabled = true; st.textContent = 'Reprise…';
+    try { await appel({ action: 'annonce_admin_reprendre', ref }); st.textContent = 'Pause levée ✓.'; await recharger?.(ref); }
+    catch (err) { st.textContent = ['profil_inactif', 'profil_non_valide'].includes(err.code) ? 'Ce profil doit d’abord être validé ou débloqué.' : 'La reprise n’a pas abouti. Réessaie.'; b.disabled = false; }
   });
   document.addEventListener('submit', async (e) => {
     const f = e.target.closest('[data-completer]'); if (!f) return;
