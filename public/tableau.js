@@ -349,6 +349,14 @@ async function voirMembre(ref) {
   boutonDirect($('[data-membre-fiche] [data-tdb-direct-boite]'));
 }
 const ditMembre = (t) => { const st = $('[data-membre-statut]'); if (st) st.textContent = t; };
+const suiviMatch = ns => (ns || []).map(n => `n° ${n.ref} : ${n.notifications > 0 ? 'notification téléphone envoyée' : n.email_envoye ? 'email accepté par le service d’envoi' : 'aucun nouvel email ni push confirmé pour cette tentative'}`).join(' · ');
+function proposerNotificationMatch(id) {
+  const st = $('[data-membre-statut]');
+  if (!st || !id) return;
+  const bouton = document.createElement('button');
+  bouton.type = 'button'; bouton.dataset.matchPrevenir = id; bouton.textContent = 'Prévenir les deux membres du match';
+  st.append(document.createTextNode(' '),bouton);
+}
 const erreurMembre = (err) => ditMembre(err.texte || ERR_MEMBRE[err.code] || 'Ça n’a pas fonctionné. Réessaie dans un instant.');
 document.addEventListener('submit', async (e) => {
   if (e.target.matches('[data-membre-chercher]')) {
@@ -367,15 +375,27 @@ document.addEventListener('submit', async (e) => {
     ditMembre('Vérification et ouverture de la discussion…');
     try {
       const d = await conf({ action: 'outil_matcher', a: membreVu.ref, b: Number(e.target.b.value) });
-      const suivi = (d.notifications || []).map(n => `n° ${n.ref} : ${n.notifications > 0 ? 'notification téléphone envoyée' : n.email_envoye ? 'email accepté par le service d’envoi' : 'alerte dans son espace uniquement ; aucun email ni push confirmé'}`).join(' · ');
+      const suivi = suiviMatch(d.notifications);
       ditMembre(`${d.discussion ? d.discussion.cree ? 'Nouvelle discussion ouverte' : 'Discussion déjà ouverte ; aucun nouvel envoi' : 'Mise en relation enregistrée ; pas de discussion entre deux comptes'} : ${d.fait || ''}.${suivi ? ` ${suivi}.` : ''}`);
       e.target.reset();
+      if (d.discussion && (!d.notifications?.length || d.notifications.some(n=>!n.notifications&&!n.email_envoye))) proposerNotificationMatch(d.discussion.id);
     }
     catch (err) { erreurMembre(err); }
     finally { if (bouton) bouton.disabled = false; }
   }
 });
 document.addEventListener('click', async (e) => {
+  const prevenirMatch = e.target.closest('[data-match-prevenir]');
+  if (prevenirMatch) {
+    if (prevenirMatch.disabled) return;
+    prevenirMatch.disabled = true;
+    try {
+      const d = await conf({action:'annonce_pilote',op:'notifier_match',id:prevenirMatch.dataset.matchPrevenir});
+      ditMembre(`Résultat de cette tentative : ${suiviMatch(d.notifications)}. Les alertes restent dans leurs espaces.`);
+    } catch (err) { erreurMembre(err); }
+    finally { prevenirMatch.disabled = false; }
+    return;
+  }
   const env = e.target.closest('[data-membre-envoyer]'), off = e.target.closest('[data-membre-offrir]');
   if ((!env && !off) || !membreVu) return;
   const m = membreVu, b = env || off;
