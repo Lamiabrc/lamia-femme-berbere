@@ -132,3 +132,11 @@ test('valider à la main : réservé à l’administratrice, demande confirmatio
   assert.equal(a.photos_refusees_at, null);
   assert.equal(a.photos_moderation.dispense, true);
 });
+
+test('valider à la main conserve une pause volontaire et annonce cette pause dans la réponse', async (t) => {
+  const b = await recette(t);
+  await b.db.query("update annonces set pause_at='2026-11-23T22:19:00Z' where id=$1", [b.id]);
+  const r = await admin(b, 'annonce_admin_valider', { ref: 42, forcer: true });
+  assert.equal(r.en_pause, true);
+  const a = await b.a(); assert.equal(a.pause_at, '2026-11-23T22:19:00Z'); assert.equal(a.status, 'publiee'); assert.equal(a.photos_moderation.dispense, true);
+});

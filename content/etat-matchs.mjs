@@ -1,5 +1,17 @@
 // État destiné à l'affichage : la limite technique d'ouverture conserve son propre calcul.
-export function compterMatchsAffiches({ sortants = [], recus = [], discussions = [], moi, refs = [], maintenant = new Date() }) {
+export function etatRelation(i, discussions = [], maintenant = new Date()) {
+  if (i.statut === 'dematche') return (discussions || []).some((d) => d.interet_id === i.id && !d.close_raison && d.dematch_at && new Date(d.ferme_at) > maintenant)
+    ? { code: 'au_revoir', libelle: 'Au revoir en cours · match terminé', actif: false }
+    : { code: 'termine', libelle: 'Match terminé', actif: false };
+  if (i.statut !== 'mis_en_relation') return { code: i.statut, libelle: libelleInteret(i), actif: false };
+  if (discussions === null) return { code: 'inconnu', libelle: 'État de la discussion indisponible', actif: false };
+  const ds = discussions.filter((d) => d.interet_id === i.id);
+  if (ds.some((d) => !d.close_raison && !d.dematch_at && new Date(d.ferme_at) > maintenant)) return { code: 'en_cours', libelle: 'Match en cours', actif: true };
+  if (ds.some((d) => !d.close_raison && d.dematch_at && new Date(d.ferme_at) > maintenant)) return { code: 'au_revoir', libelle: 'Au revoir en cours · match terminé', actif: false };
+  return ds.length ? { code: 'termine', libelle: 'Discussion terminée', actif: false } : { code: 'a_ouvrir', libelle: 'Mise en relation enregistrée · discussion non ouverte', actif: false };
+}
+
+export function compterMatchsAffiches({ sortants = [], recus = [], discussions = [], discussionsConfirmees = false, moi, refs = [], maintenant = new Date() }) {
   const alias = new Map(), parInteret = new Map(), parPartenaire = new Map(), actives = new Set(), attentes = new Set(), auRevoir = new Set();
   const refCle = (r) => Number(r) > 0 ? `ref:${Number(r)}` : null;
   for (const i of recus) if (i.annonces?.user_id && i.annonces.ref) alias.set(refCle(i.annonces.ref), `user:${i.annonces.user_id}`);
@@ -22,6 +34,7 @@ export function compterMatchsAffiches({ sortants = [], recus = [], discussions =
     if (!cle) return;
     if (i.statut === 'mis_en_relation') {
       const liees = parInteret.get(i.id);
+      if (discussionsConfirmees && !liees && !actives.has(cle)) return;
       if (!liees && parPartenaire.has(cle)) {
         const anciennes = parPartenaire.get(cle);
         const fin = Math.max(...anciennes.map((d) => new Date(d.dematch_at || d.ferme_at).getTime()));
@@ -29,7 +42,7 @@ export function compterMatchsAffiches({ sortants = [], recus = [], discussions =
         if (!anciennes.some((d) => ouverte(d) && !d.dematch_at) && !(maj > fin)) return;
       }
       if (!liees || liees.some((d) => ouverte(d) && !d.dematch_at)) actives.add(cle);
-    } else if (i.statut === 'a_traiter' && i.reciproque && i.reponse !== 'non') attentes.add(cle);
+    } else if (['a_traiter', 'en_reserve'].includes(i.statut) && (i.reciproque || i.reponse === 'oui') && i.reponse !== 'non') attentes.add(cle);
   };
   for (const i of sortants) ajouter(i, cleRef(i.cible_ref));
   for (const i of recus) ajouter(i, i.annonces?.user_id ? `user:${i.annonces.user_id}` : cleRef(i.annonces?.ref));
@@ -42,11 +55,12 @@ export function capaciteMatchs(matchs) {
 }
 
 export function libelleInteret(i) {
+  if (i.etat_affiche?.libelle) return i.etat_affiche.libelle;
   if (i.statut === 'dematche') return 'Match terminé';
   if (i.statut === 'mis_en_relation') return 'Match en cours';
   if (i.reponse === 'non') return 'Tu as dit non';
-  if (i.reponse === 'oui' && i.statut === 'a_traiter') return 'Intérêt réciproque · en attente de mise en relation';
-  if (i.reponse === 'oui' && i.statut === 'en_reserve') return 'Intérêt réciproque · en attente de disponibilité';
+  if ((i.reponse === 'oui' || i.reciproque) && i.statut === 'a_traiter') return 'Intérêt réciproque · en attente de mise en relation';
+  if ((i.reponse === 'oui' || i.reciproque) && i.statut === 'en_reserve') return 'Intérêt réciproque · en attente de disponibilité';
   if (i.statut === 'pas_compatible') return 'Sans suite';
   return i.reponse === 'oui' ? 'Tu as dit oui' : 'Réponse attendue';
 }

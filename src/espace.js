@@ -740,16 +740,18 @@ async function suivi(el, p) {
   // Demandes : les attentes regroupées en une ligne, le reste en court ; les terminées repliées.
   const date = (d) => new Date(d).toLocaleDateString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { day: 'numeric', month: 'long' });
   const toutes = p.interets || [];
-  const attente = toutes.filter((i) => i.statut === 'a_traiter');
-  const vivantes = toutes.filter((i) => ['mis_en_relation', 'en_reserve'].includes(i.statut));
-  const finies = toutes.filter((i) => !['a_traiter', 'mis_en_relation', 'en_reserve'].includes(i.statut));
+  const reciproques = toutes.filter((i) => ['a_traiter', 'en_reserve'].includes(i.statut) && (i.reciproque || i.reponse === 'oui') && i.reponse !== 'non');
+  const attente = toutes.filter((i) => i.statut === 'a_traiter' && !reciproques.includes(i));
+  const terminee = (i) => ['termine', 'au_revoir'].includes(i.etat_affiche?.code);
+  const vivantes = toutes.filter((i) => ['mis_en_relation', 'en_reserve'].includes(i.statut) && !reciproques.includes(i) && !terminee(i));
+  const finies = toutes.filter((i) => !['a_traiter', 'mis_en_relation', 'en_reserve'].includes(i.statut) || terminee(i));
   // Seconde chance (formules Passion et Prestige) : après un « pas pour moi », la demande peut repartir, 2 fois par profil.
   const relance = (i) => (!i.relancable ? '' : i.relancable.inclus
     ? (i.relancable.restantes > 0 ? ` <button type="button" class="btn btn-line espace-relancer" data-relancer="${esc(i.cible_ref)}">Renvoyer ma demande</button> <small>(encore ${esc(i.relancable.restantes)})</small>` : '')
     : (window.LFB_PLAY || p.algerie ? '' : ' <a class="text-link" href="/abonnement/?formule=passion">Seconde chance avec Passion</a>'));
-  const ligne = (i) => `<li>n° ${esc(i.cible_ref)} · <strong>${esc(FIN_DEMANDE[i.fin] || ETAT_DEMANDE[i.statut] || i.statut)}</strong>${i.date ? ` <small>${esc(date(i.date))}</small>` : ''}${relance(i)}</li>`;
+  const ligne = (i) => `<li>n° ${esc(i.cible_ref)} · <strong>${esc(i.etat_affiche?.libelle || FIN_DEMANDE[i.fin] || (reciproques.includes(i) ? libelleInteret(i) : ETAT_DEMANDE[i.statut] || i.statut))}</strong>${i.date ? ` <small>${esc(date(i.date))}</small>` : ''}${relance(i)}</li>`;
   const ici = attente.filter((i) => !i.sans_compte), absents = attente.filter((i) => i.sans_compte);
-  const demandes = !toutes.length ? '' : `${ici.length ? `<p class="espace-demandes-attente"><strong>En attente de sa réponse</strong> <span class="espace-nb">${ici.length}</span><br>La personne a reçu ton cœur. Dès qu’elle répond, tu es prévenu·e.<br><small>n° ${ici.map((i) => esc(i.cible_ref)).join(', n° ')}</small></p>` : ''}${absents.length ? `<p class="espace-demandes-attente"><strong>Pas encore sur l’appli</strong> <span class="espace-nb">${absents.length}</span><br>Ces personnes n’ont pas encore créé leur compte : elles ne peuvent pas te répondre pour l’instant. Continue à swiper.<br><small>n° ${absents.map((i) => esc(i.cible_ref)).join(', n° ')}</small></p>` : ''}${vivantes.length ? `<ul>${vivantes.map(ligne).join('')}</ul>` : ''}${finies.length ? `<details class="espace-demandes-finies"><summary>Sans suite <span class="espace-nb">${finies.length}</span></summary><p><small>Vous n’étiez pas en relation : ce ne sont pas des dématchs.</small></p><ul>${finies.map(ligne).join('')}</ul></details>` : ''}`;
+  const demandes = !toutes.length ? '' : `${ici.length ? `<p class="espace-demandes-attente"><strong>En attente de sa réponse</strong> <span class="espace-nb">${ici.length}</span><br>La personne a reçu ton cœur. Dès qu’elle répond, tu es prévenu·e.<br><small>n° ${ici.map((i) => esc(i.cible_ref)).join(', n° ')}</small></p>` : ''}${absents.length ? `<p class="espace-demandes-attente"><strong>Pas encore sur l’appli</strong> <span class="espace-nb">${absents.length}</span><br>Ces personnes n’ont pas encore créé leur compte : elles ne peuvent pas te répondre pour l’instant. Continue à swiper.<br><small>n° ${absents.map((i) => esc(i.cible_ref)).join(', n° ')}</small></p>` : ''}${vivantes.length ? `<ul>${vivantes.map(ligne).join('')}</ul>` : ''}${finies.length ? `<details class="espace-demandes-finies"><summary>Historique <span class="espace-nb">${finies.length}</span></summary><p><small>Les demandes sans suite et les discussions terminées restent ici, avec leur état.</small></p><ul>${finies.map(ligne).join('')}</ul></details>` : ''}`;
   const heure = (d) => new Date(d).toLocaleTimeString(({ en: 'en-GB', ar: 'ar-DZ' }[document.documentElement.lang] || 'fr-FR'), { hour: '2-digit', minute: '2-digit' });
   // Une photo par match en cours. Pas d'achat dans l'appli Play, ni depuis l'Algérie (paiement en ligne impossible).
   const peutPayer = !window.LFB_PLAY && !p.algerie;
@@ -770,7 +772,7 @@ async function suivi(el, p) {
   const blocAvant = finAvant ? `<h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#star"/></svg> Ton profil est mis en avant</h3><p>En tête du swipe jusqu’au ${esc(finAvant)}.</p>` : peutPayer ? `<h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#star"/></svg> Mets ton profil en avant</h3><p>7 jours en tête du swipe.</p>${boutonService('profil_avant', 'Profil mis en avant pendant 7 jours', '5 €', 'Mettre en avant · 5 €')}` : '';
   el.innerHTML = `<h3>Mon suivi</h3>${badgeFormule}<ul>${lignes}</ul>${blocChoisi}${blocAvant}${blocPhoto}
     <p><a class="po-btn" href="/rencontres/swipe/"><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Swiper les profils</a></p>
-    <h3>Mes demandes de match</h3>${demandes ? demandes : '<p>Aucune pour l’instant. <a class="text-link" href="/rencontres/#profils-anonymes">Voir les profils</a></p>'}`;
+    <h3>Mes demandes de match</h3>${reciproques.length ? `<section class="espace-demandes-attente"><h4>Intérêts réciproques en attente</h4><p>Vous vous êtes choisis. La discussion pourra s’ouvrir lorsque les conditions de mise en relation seront réunies. Ce n’est pas un blocage de ton compte.</p><ul>${reciproques.map(ligne).join('')}</ul></section>` : ''}${demandes ? demandes : !reciproques.length ? '<p>Aucune pour l’instant. <a class="text-link" href="/rencontres/#profils-anonymes">Voir les profils</a></p>' : ''}`;
   el.querySelectorAll('[data-relancer]').forEach((b) => b.addEventListener('click', async () => {
     b.disabled = true;
     try {
