@@ -2925,14 +2925,17 @@ body .preorder .form-status.is-error, body[data-ambiance] .preorder .form-status
 @media (prefers-reduced-motion: reduce) { .po-app * { animation: none !important; } }
 /* Patio : catégories Femmes / Hommes, comme les onglets de l'outil */
 .annonce-onglets { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 18px; }
-.annonce-onglets button { border-radius: 12px; padding: 10px 18px; font: 600 15px Inter, system-ui, sans-serif; cursor: pointer; color: #fff4ec; background: rgba(255,255,255,.08); border: 1px solid rgba(255,235,210,.25); }
-.annonce-onglets button b { margin-left: 4px; padding: 1px 8px; border-radius: 999px; background: rgba(255,255,255,.12); font-size: 13px; }
-.annonce-onglets button[aria-selected="true"] { background: linear-gradient(90deg, rgba(255,90,74,.45), rgba(233, 223, 250,.2)); border-color: #E9DFFA; color: #fff; }
+.annonce-onglets button { min-height: 44px; border-radius: 12px; padding: 10px 18px; font: 600 15px var(--sans); cursor: pointer; color: #303f8f; background: #fff; border: 1px solid #6976b8; }
+.annonce-onglets button b { margin-left: 4px; padding: 1px 8px; border-radius: 999px; background: #edf0fc; font-size: 13px; }
+.annonce-onglets button[aria-selected="true"] { background: linear-gradient(115deg, #303f8f, #6941a5); border-color: #303f8f; color: #fff; }
+.annonce-onglets button[aria-selected="true"] b { color: #fff; background: rgba(255,255,255,.18); }
 .annonce-pages { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: -16px 0 36px; }
 .annonce-pages:empty { display: none; }
-.annonce-pages button { min-width: 42px; height: 42px; padding: 0 12px; border-radius: 12px; font: 600 15px Inter, system-ui, sans-serif; cursor: pointer; color: #fff4ec; background: rgba(255,255,255,.08); border: 1px solid rgba(255,235,210,.25); }
-.annonce-pages button[aria-current="page"] { background: linear-gradient(90deg, #E9DFFA, #f6dc98); color: #272433; border-color: transparent; }
-.annonce-pages button:disabled { opacity: .35; cursor: default; }
+.annonce-pages button { min-width: 44px; height: 44px; padding: 0 12px; border-radius: 12px; font: 600 15px var(--sans); cursor: pointer; color: #303f8f; background: #fff; border: 1px solid #6976b8; }
+.annonce-pages button[aria-current="page"] { background: linear-gradient(115deg, #303f8f, #6941a5); color: #fff; border-color: #303f8f; }
+.annonce-pages button:disabled { color: #64708f; background: #eef1f8; border-color: #c7cfe4; cursor: default; }
+.annonce-pages button:hover:not(:disabled):not([aria-current="page"]), .annonce-onglets button:hover:not([aria-selected="true"]) { color: #303f8f; background: #edf0fc; }
+.annonce-pages button:focus-visible, .annonce-onglets button:focus-visible { outline: 3px solid #303f8f; outline-offset: 3px; }
 .annonce-onglets { scroll-margin-top: 90px; }
 /* Salon : l'outil de matching en live (même habillage que le Patio) */
 .outil-live { max-width: 1240px; margin: 30px auto; border-radius: 24px; padding: clamp(20px, 4vw, 44px); display: grid; gap: 22px; scroll-margin-top: 90px; }
