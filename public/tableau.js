@@ -1,4 +1,5 @@
 // Tableau de bord de Lamia : ventes, produits, soirées, alertes, textes du site, visites.
+import {chercherReseau,effacerRechercheReseau} from '/recherche-reseaux.js';
 import { cartesCompleter, carteValider, monterCompleter } from '/completer-profil.js';
 import { FAMILLES } from '/assets/rubriques.mjs';
 import { createClient } from '/vendor/supabase.mjs';
@@ -22,7 +23,7 @@ const fichesAdmin = monterFichesAdmin({ appel: async (body) => {
   const { data: { session }, error } = await supabase.auth.getSession();
   if (error || session?.user?.app_metadata?.role !== 'admin') throw Object.assign(new Error('forbidden'), {code:'forbidden'});
   const r = await fetch('/api/confidences/', {method:'POST', headers:{'Content-Type':'application/json',Authorization:`Bearer ${session.access_token}`},body:JSON.stringify(body),signal:AbortSignal.timeout(20000)});
-  const d = await r.json(); if (!r.ok || !d.ok) throw Object.assign(new Error(d.error || 'erreur'), {code:d.error}); return d;
+  const d = await r.json(); if (!r.ok || !d.ok) throw Object.assign(new Error(d.error || 'erreur'), {code:d.error,donnees:d}); return d;
 } });
 
 function message(t, err = false) { const m = $('[data-message]'); m.textContent = t; m.classList.toggle('is-error', err); if (t && !err) setTimeout(() => { if (m.textContent === t) m.textContent = ''; }, 4000); }
@@ -353,7 +354,9 @@ document.addEventListener('submit', async (e) => {
   if (e.target.matches('[data-membre-chercher]')) {
     e.preventDefault();
     ditMembre(''); membreVu = null; dessinerMembre();
-    try { await voirMembre(e.target.ref.value); } catch (err) { erreurMembre(err); }
+    const valeur=e.target.elements.ref.value.trim();
+    if(!/^\d+$/.test(valeur)){await chercherReseau(valeur,$('[data-membre-fiche]'),conf);return;}
+    try { await voirMembre(valeur); } catch (err) { erreurMembre(err); }
   }
   if (e.target.matches('[data-membre-matcher]')) {
     e.preventDefault();
@@ -1023,6 +1026,8 @@ function ouvrirCompte(id) {
   const c = comptes?.comptes.find((x) => x.id === id);
   if (!c) return;
   compteOuvert = id;
+  $('[data-compte-contacter]').hidden = false;
+  $('[data-compte-soiree]').disabled = false;
   const p = c.profil || {};
   $('[data-compte-email]').textContent = c.email || '';
   $('[data-compte-nom]').textContent = nomDe(c);
@@ -1091,6 +1096,13 @@ function ficheComplete(f, photosSite) {
 }
 function rendreDetail(d) {
   const box = $('[data-compte-detail]'), c = d.compte;
+  const correction = $('[data-compte-fiche-correction]');
+  $('[data-fiche-aller="bloquer"]').hidden = Boolean(d.sans_compte);
+  correction.hidden = !d.sans_compte;
+  correction.innerHTML = d.sans_compte ? cartesCompleter(d) : '';
+  correction.querySelectorAll('details').forEach(x => { x.open = true; });
+  $('[data-compte-form]').hidden = Boolean(d.sans_compte);
+  if (d.sans_compte && !correction.innerHTML) correction.innerHTML = '<p role="status">Aucune fiche modifiable n’a été trouvée. Ferme ce volet puis recherche à nouveau son numéro.</p>';
   nomsRefs = d.noms || {};
   const carte = (titre, html, ouvert = false) => `<details class="tdb-repli" ${ouvert ? 'open' : ''}><summary>${titre}</summary><div>${html}</div></details>`;
   const pourquoi = d.journal?.length ? `<div class="tdb-carte fiche-pourquoi"><h3 style="margin-top:0">Pourquoi tu as reçu une alerte</h3><ul class="fiche-liste">${d.journal.slice(0, 4).map((j) => `<li><strong>${avecRefs(j.titre)}</strong><small>${esc(quand(j.created_at))}</small>${(j.lignes || []).map((l) => `<div>${avecRefs(l)}</div>`).join('')}</li>`).join('')}</ul></div>` : '';
@@ -1098,7 +1110,7 @@ function rendreDetail(d) {
   const complet = [...(d.annonces || []).map(profilComplet), ...(d.fiches || []).map((f) => ficheComplete(f, (d.annonces || []).reduce((n, a) => n + (a.medias || []).filter((m) => m.kind === 'photo').length, 0)))].join('');
   const blocComplet = complet ? `<div class="tdb-carte"><h3 style="margin-top:0">Son profil complet</h3>${complet}</div>` : '';
   if (d.sans_compte) {
-    box.innerHTML = `${pourquoi}${carteValider(d)}${cartesCompleter(d)}<div class="tdb-carte"><h3 style="margin-top:0">À qui est ce profil</h3><ul class="fiche-liste">${qui}</ul><p class="aide">Cette personne n’a pas de compte.${(d.fiches || []).some((f) => f.pseudo || f.lien_reseau) ? ` Pseudo : ${esc((d.fiches || []).map((f) => f.pseudo).filter(Boolean).join(', ') || '—')} · Lien réseau : ${esc((d.fiches || []).map((f) => f.lien_reseau).filter(Boolean).join(', ') || '—')}.` : ' Son prénom et ses contacts sont dans ton outil de live (cherche ce n° dans « Le site »).'}</p></div>${blocComplet}${(d.choisi_par || []).length ? `<div class="tdb-carte"><h3 style="margin-top:0">Choisie par</h3><ul class="fiche-liste">${d.choisi_par.map((x) => `<li>${refBouton(x.ref)} ${esc(x.prenom || '')}<small>${esc(STATUT_DEMANDE[x.statut] || x.statut)} · ${esc(quand(x.le))}</small></li>`).join('')}</ul></div>` : ''}`;
+    box.innerHTML = `${pourquoi}${carteValider(d)}<div class="tdb-carte"><h3 style="margin-top:0">À qui est ce profil</h3><ul class="fiche-liste">${qui}</ul><p class="aide">Cette personne n’a pas de compte.${(d.fiches || []).some((f) => f.pseudo || f.lien_reseau) ? ` Pseudo : ${esc((d.fiches || []).map((f) => f.pseudo).filter(Boolean).join(', ') || '—')} · Lien réseau : ${esc((d.fiches || []).map((f) => f.lien_reseau).filter(Boolean).join(', ') || '—')}.` : ' Son prénom et ses contacts sont dans ton outil de live (cherche ce n° dans « Le site »).'}</p></div>${blocComplet}${(d.choisi_par || []).length ? `<div class="tdb-carte"><h3 style="margin-top:0">Choisie par</h3><ul class="fiche-liste">${d.choisi_par.map((x) => `<li>${refBouton(x.ref)} ${esc(x.prenom || '')}<small>${esc(STATUT_DEMANDE[x.statut] || x.statut)} · ${esc(quand(x.le))}</small></li>`).join('')}</ul></div>` : ''}`;
     return;
   }
   const a = d.activite;
@@ -1128,12 +1140,24 @@ function rendreDetail(d) {
       <p><button class="btn btn-line fiche-danger" type="button" data-bloquer-compte="${c.bloque ? 'non' : 'oui'}">${c.bloque ? 'Débloquer ce compte' : 'Bloquer ce compte'}</button></p>
       <p><button class="btn btn-line fiche-danger" type="button" data-supprimer-compte>Supprimer ce compte</button></p></div>`}`;
 }
-let detailCourant = null;
+let detailCourant = null, chargementDetail = 0;
 async function chargerDetail(cible) {
   const box = $('[data-compte-detail]');
+  const demande = ++chargementDetail;
+  detailCourant = null;
+  const correction = $('[data-compte-fiche-correction]');
+  correction.innerHTML = '<p role="status">Chargement des informations…</p>';
+  correction.hidden = Boolean(compteOuvert);
   box.innerHTML = '<p class="aide">Chargement de sa fiche…</p>';
-  try { detailCourant = await conf({ action: 'annonce_profil_detail', ...cible }); rendreDetail(detailCourant); }
-  catch { box.innerHTML = '<p class="aide">Cette fiche n’a pas pu être chargée. Réessaie dans un instant.</p>'; }
+  try {
+    const detail = await conf({ action: 'annonce_profil_detail', ...cible });
+    if (demande !== chargementDetail) return;
+    detailCourant = detail; rendreDetail(detail);
+  } catch {
+    if (demande !== chargementDetail) return;
+    box.innerHTML = '<p class="aide">Cette fiche n’a pas pu être chargée. Réessaie dans un instant.</p>';
+    correction.innerHTML = '<p role="status">Les informations n’ont pas pu être chargées. Ferme ce volet puis rouvre la fiche.</p>';
+  }
 }
 // Depuis une notification : /tableau-de-bord#profil-48 ouvre directement la fiche du n° 48.
 async function ouvrirParRef(ref) {
@@ -1145,6 +1169,13 @@ async function ouvrirParRef(ref) {
   $('[data-compte-nom]').textContent = 'Fiche créée par toi (pas de compte)';
   $('[data-compte-infos]').textContent = '';
   $('[data-compte-form]').hidden = true;
+  $('[data-compte-form]').reset();
+  $('[data-compte-contacter]').hidden = true;
+  $('[data-compte-soiree]').innerHTML = '<option value="">Compte requis pour les soirées</option>';
+  $('[data-compte-soiree]').disabled = true;
+  $('[data-compte-inscrire]').disabled = true;
+  $$('[data-sp-un]').forEach(x => { x.hidden = true; });
+  $('[data-sp-un-statut]').textContent = '';
   $('[data-compte-soirees]').innerHTML = '<li>Fiche sans compte : pas d’inscription aux soirées.</li>';
   $('[data-compte-liens]').innerHTML = `<li class="tdb-ecrire" data-tdb-ecrire-boite data-tdb-direct-boite="${esc(ref)}"><button class="btn btn-line" type="button" data-tdb-ecrire="${esc(ref)}">Voir le message</button></li>`;
   boutonDirect($('[data-compte-liens] [data-tdb-direct-boite]'));
@@ -1227,11 +1258,17 @@ $('[data-compte-detail]').addEventListener('submit', async (e) => {
     chargerDetail({ user_id: detailCourant.compte.id });
   } catch (err) { st.textContent = ERREURS[err.code] || ERREURS[err.message] || 'Ça n’a pas abouti. Réessaie dans un instant.'; }
 });
-function fermerCompte() { compteOuvert = null; $('[data-compte-fiche]').hidden = true; $('[data-compte-fond]').hidden = true; }
+function fermerCompte() { ++chargementDetail; detailCourant=null; compteOuvert = null; $('[data-compte-fiche]').hidden = true; $('[data-compte-fond]').hidden = true; }
 
 $('[data-comptes]').addEventListener('click', (e) => { const l = e.target.closest('[data-compte]'); if (l) ouvrirCompte(l.dataset.compte); });
 $('[data-comptes]').addEventListener('keydown', (e) => { const l = e.target.closest('[data-compte]'); if (l && e.key === 'Enter') ouvrirCompte(l.dataset.compte); });
-$('[data-comptes-cherche]').addEventListener('input', () => { limiteComptes = 24; listeComptes(); });
+let attenteRechercheReseau;
+$('[data-comptes-cherche]').addEventListener('input', (e) => {
+  limiteComptes = 24; listeComptes();
+  clearTimeout(attenteRechercheReseau);const zone=$('[data-reseau-resultats]');effacerRechercheReseau(zone);
+  const valeur=e.target.value.trim();
+  if(/@|(?:tiktok|instagram|facebook|fb)\.com/i.test(valeur)) attenteRechercheReseau=setTimeout(()=>chercherReseau(valeur,zone,conf),350);
+});
 $('[data-comptes-plus]').addEventListener('click', () => { limiteComptes += 24; listeComptes(); });
 // ---- Comptes sans profil : un compte sans profil ne sert à rien. Relancer ou supprimer, un par un ou tous ensemble.
 const SEPT_JOURS = 7 * 864e5;
@@ -1295,9 +1332,9 @@ document.addEventListener('click', async (e) => {
 document.addEventListener('click', (e) => {
   const b = e.target.closest('[data-fiche-aller]');
   if (!b) return;
-  const cible = { modifier: '[data-compte-modifier]', contacter: '[data-compte-contacter]', bloquer: '[data-bloquer-compte]' }[b.dataset.ficheAller];
-  const el = $(cible);
-  if (!el) return;
+  const cible = { modifier: '[data-compte-modifier]', contacter: compteOuvert ? '[data-compte-contacter]' : '[data-compte-liens]', bloquer: '[data-bloquer-compte]' }[b.dataset.ficheAller];
+  const el = cible && $(cible);
+  if (!el || el.hidden) return;
   if (el.tagName === 'DETAILS') el.open = true;
   el.scrollIntoView({ behavior: 'smooth', block: 'center' });
 });
@@ -1333,6 +1370,7 @@ $('[data-compte-fiche]').addEventListener('click', (e) => { if (e.target.closest
 $('[data-compte-form]').addEventListener('submit', async (e) => {
   e.preventDefault();
   const f = e.target, st = $('[data-compte-statut]');
+  if (!compteOuvert) { st.textContent = 'Cette fiche n’a pas de compte. Utilise le menu de correction de la fiche.'; return; }
   const profil = Object.fromEntries(['real_first_name', 'display_name', 'gender', 'birth_date', 'city', 'country', 'profile_status'].map((k) => [k, f.elements[k].value]));
   st.textContent = 'Enregistrement…';
   try {
@@ -1352,7 +1390,7 @@ $('[data-compte-fiche]').addEventListener('click', async (e) => {
   catch (err) { message(err.message, true); b.disabled = false; }
 });
 $('[data-compte-inscrire]').addEventListener('click', async () => {
-  const ev = $('[data-compte-soiree]').value; if (!ev) return;
+  const ev = $('[data-compte-soiree]').value; if (!ev || !compteOuvert) return;
   try { await api({ action: 'comptes_inscription', user_id: compteOuvert, event_id: ev, statut: 'registered' }); message('Personne inscrite à la soirée.'); await chargerComptes(); }
   catch (err) { message(err.message, true); }
 });

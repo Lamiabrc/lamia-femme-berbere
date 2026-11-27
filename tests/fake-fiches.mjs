@@ -7,9 +7,9 @@ function correspond(row,expression){
  const [,col,non,op,v]=m,cell=row[col];if(cell==null&&op!=='is')return false;
  let ok;if(op==='eq')ok=String(cell)===valeur(v);else if(op==='lt')ok=cell<Number(v);else if(op==='gt')ok=cell>Number(v);else if(op==='is')ok=v==='null'?cell==null:String(cell)===v;else if(op==='in')ok=decouper(v.slice(1,-1)).map(valeur).includes(String(cell));else {const motif=valeur(v).split('*').map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('.*');ok=new RegExp('^'+motif+'$').test(String(cell));}return non?!ok:ok;
 }
-export function lireFiches(path,{fiches=[],contacts=[],empreintes=[]}){
+export function lireFiches(path,{fiches=[],contacts=[],empreintes=[],annonces=[]}){
  const u=new URL(path,'https://recette.invalid'),q=u.searchParams;
- const table=u.pathname.split('/').pop(),source=table==='profils_outil'?fiches:table==='contacts_lamia'?contacts:table==='outil_tiktok'?empreintes:[];
+ const table=u.pathname.split('/').pop(),source=table==='profils_outil'?fiches:table==='contacts_lamia'?contacts:table==='outil_tiktok'?empreintes:table==='annonces'?annonces:[];
  let rows=source.filter(row=>[...q].every(([k,v])=>['select','order','limit','on_conflict'].includes(k)||correspond(row,k==='and'||k==='or'?k+v:k+'.'+v)));
  const ordre=q.get('order');if(ordre){const [col,direction]=ordre.split('.');rows=[...rows].sort((a,b)=>(direction==='desc'?-1:1)*(typeof a[col]==='number'?a[col]-b[col]:String(a[col]||'').localeCompare(String(b[col]||''))));}
  if(q.has('limit'))rows=rows.slice(0,Number(q.get('limit')));

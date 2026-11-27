@@ -1,3 +1,4 @@
+import {liensResultats,chercherReseau,effacerRechercheReseau} from '/recherche-reseaux.js';
 import { O, lib } from '/assets/matching-options.mjs';
 import { champsCreation, lireCreation } from '/completer-profil.js';
 import {pseudoDepuisTikTok,urlDepuisTikTok} from '/assets/liens-tiktok.mjs';
@@ -20,6 +21,12 @@ export function monterFichesAdmin({ appel }) {
   panel.querySelectorAll('[data-fiche-cases]').forEach((c) => { c.className = 'cp-cases'; c.innerHTML = O[c.dataset.ficheCases].map((x) => `<label><input type="checkbox" name="${c.dataset.ficheCases}" value="${esc(x)}"> ${esc(lib(x))}</label>`).join(''); });
   { const z = panel.querySelector('[data-fiche-plus]'), c = panel.querySelector('[data-fiche-plus-cherche]'); if (z) z.innerHTML = champsCreation('lui'); if (c) c.innerHTML = champsCreation('cherche'); }
   etapesFiche(form);
+  // Dès le lien renseigné, retrouver l'existant avant de remplir toutes les étapes.
+  const champLien=form.elements.lien_reseau;
+  champLien.closest('label').insertAdjacentHTML('afterend','<div data-fiche-verifier aria-live="polite"></div>');
+  const verification=form.querySelector('[data-fiche-verifier]');
+  champLien.addEventListener('change',()=>{const valeur=champLien.value.trim();if(valeur)chercherReseau(valeur,verification,appel);else effacerRechercheReseau(verification);});
+  form.addEventListener('reset',()=>effacerRechercheReseau(verification));
   const corps = () => { const f = new FormData(form), p = Object.fromEntries(f); for (const k of Object.keys(p)) if (k.startsWith('m_')) delete p[k]; p.matching = lireCreation(form); p.origine = f.get('origine') ? [f.get('origine')] : []; p.caracteristiques = f.getAll('caracteristiques'); delete p.publier; return { profil: p, publier: f.get('publier') === 'on' }; };
   const apercu = () => {
     const p = corps().profil;
@@ -72,7 +79,10 @@ export function monterFichesAdmin({ appel }) {
     try {
       const r = await appel({action:'annonce_fiche_admin_creer',requete_id:requete.id,...body});
       montrer(r.fiche); form.reset(); requete = null; apercu(); st.textContent = 'Fiche enregistrée. Son lien est prêt à copier.'; charger();
-    } catch(err) { st.textContent = direErreur(err); }
+    } catch(err) {
+      st.textContent = err.code==='profil_existant'?'Ce lien est déjà associé à une fiche ou un profil. Ouvre-le pour le corriger : aucune nouvelle fiche n’a été créée.':err.code==='recherche_indisponible'?'La vérification des doublons est indisponible. Ton formulaire est conservé ; réessaie.':direErreur(err);
+      if(err.code==='profil_existant'){const zone=panel.querySelector('[data-fiche-resultat]');zone.hidden=false;zone.innerHTML=liensResultats(err.donnees?.existants||[]);}
+    }
     finally { btn.disabled = false; }
   });
   async function retrouver(ref) {

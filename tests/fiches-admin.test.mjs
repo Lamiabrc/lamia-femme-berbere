@@ -10,9 +10,9 @@ const profil = () => ({genre:'femme',age:34,pays:'France',ville:'Lyon',profil:'C
 const creation = (extra={}) => ({requete_id:randomUUID(),profil:profil(),...extra});
 const lire = async (r) => ({status:r.status,...await r.json()});
 function base() {
-  const fiches=[],contacts=[],empreintes=[], ecritures=[], appels=[]; let sequence=5001;
+  const fiches=[],contacts=[],empreintes=[],annonces=[], ecritures=[], appels=[]; let sequence=5001;
   const read = async (path) => {
-    appels.push(path);return lireFiches(path,{fiches,contacts,empreintes});
+    appels.push(path);return lireFiches(path,{fiches,contacts,empreintes,annonces});
   };
   const insert = async (table,row) => {
     assert.equal(table,'profils_outil');
@@ -26,8 +26,48 @@ function base() {
   const contexte = (user=ADMIN) => ({env:{SUPABASE_SERVICE_ROLE_KEY:'recette-seulement'},user,admin:user?.app_metadata?.role==='admin',read,insert,patch,
     now:()=>new Date('2026-11-19T16:00:00Z'),call:async()=>{throw new Error('Aucun appel Auth ou envoi autorisé dans cette recette');},alerter:async()=>{}});
   const envoyer = (action,body={},user=ADMIN,dep={})=>handleAnnonces(action,body,{...contexte(user),...dep}).then(lire);
-  return {fiches,contacts,empreintes,ecritures,appels,envoyer,contexte,insert};
+  return {fiches,contacts,empreintes,annonces,ecritures,appels,envoyer,contexte,insert};
 }
+
+test('recherche globale : contact de live sans compte et lien réseau du profil du site',async()=>{
+ const b=base();b.fiches.push({ref:36906,outil_id:'live-fictif'});b.contacts.push({ref:36906,reseau:'tiktok',pseudo:'Recette_homere'});
+ b.annonces.push({ref:232,matching:{contactReseau:'https://www.tiktok.com/@recette_homere?share=1'}});
+ const r=await b.envoyer('annonce_rechercher_reseau',{recherche:'https://www.tiktok.com/@RECETTE_homere/'});
+ assert.equal(r.status,200);assert.deepEqual(r.resultats,[{ref:232,type:'profil'},{ref:36906,type:'fiche'}]);
+ assert.deepEqual(b.ecritures,[]);
+ assert.equal((await b.envoyer('annonce_rechercher_reseau',{recherche:'@recette_homere'},MEMBRE)).status,403);
+});
+
+test('nouvelle tentative avec un lien déjà connu : pas de doublon ni de modification de l’ancien',async()=>{
+ for(const origine of ['contact','site','empreinte','profil']){
+  const b=base();if(origine!=='profil')b.fiches.push({ref:8366,outil_id:'ancien',retire_at:'2026-11-01',visible:false});
+  if(origine==='contact')b.contacts.push({ref:8366,reseau:'tiktok',pseudo:'recette.test'});
+  if(origine==='site')b.fiches[0].lien_reseau='https://www.tiktok.com/@RECETTE.test?lang=fr';
+  if(origine==='empreinte')b.empreintes.push({h:empreinteLien('tiktok:recette.test'),outil_id:'ancien'});
+  if(origine==='profil')b.annonces.push({ref:232,matching:{tiktokLive:'@recette.test'}});
+  const r=await b.envoyer('annonce_fiche_admin_creer',creation({profil:{...profil(),lien_reseau:'https://www.tiktok.com/@recette.test/'}}));
+  assert.equal(r.status,409,origine);assert.equal(r.error,'profil_existant');assert.equal(r.existants[0].ref,origine==='profil'?232:8366);assert.equal(b.ecritures.length,0);
+ }
+});
+
+test('deux créations concurrentes, liens équivalents et tentatives différentes : une seule fiche',async()=>{
+ const b=base(),p={...profil(),lien_reseau:'https://www.tiktok.com/@recette.unique'};
+ const r=await Promise.all([b.envoyer('annonce_fiche_admin_creer',creation({profil:p})),b.envoyer('annonce_fiche_admin_creer',creation({profil:{...p,lien_reseau:'https://www.tiktok.com/@RECETTE.unique?lang=fr'}}))]);
+ assert.equal(b.fiches.length,1);assert.ok(r.some(x=>x.status===200));assert.ok(r.every(x=>[200,409].includes(x.status)));
+});
+
+test('vérification des doublons en panne : ne pas créer à l’aveugle',async()=>{
+ const b=base(),lire=b.contexte().read;
+ const r=await b.envoyer('annonce_fiche_admin_creer',creation({profil:{...profil(),lien_reseau:'@recette.unique'}}),ADMIN,{read:async p=>{if(p.includes('contacts_lamia'))throw Error('panne');return lire(p);}});
+ assert.equal(r.status,503);assert.equal(r.error,'recherche_indisponible');assert.equal(b.fiches.length,0);
+});
+
+test('Instagram et Facebook : liens de profil équivalents reconnus, domaines trompeurs refusés',async()=>{
+ for(const [lien,recherche] of [['https://www.instagram.com/Recette.Test/?hl=fr','https://instagram.com/recette.test'],['https://www.facebook.com/profile.php?id=123456','https://facebook.com/profile.php?id=123456&ref=share']]){
+  const b=base();b.fiches.push({ref:8366,lien_reseau:lien});const r=await b.envoyer('annonce_rechercher_reseau',{recherche});assert.deepEqual(r.resultats,[{ref:8366,type:'fiche'}]);
+ }
+ const b=base();assert.equal((await b.envoyer('annonce_rechercher_reseau',{recherche:'https://tiktok.com.evil.invalid/@recette'})).status,400);
+});
 
 test('TikTok : normaliser les liens de profil et pseudos, refuser les redirections et domaines trompeurs',()=>{
  for(const s of ['@Nina.Test','nina.test','https://www.tiktok.com/@Nina.Test?lang=fr&share=1','https://m.tiktok.com/@Nina.Test/video/123'])assert.equal(pseudoDepuisTikTok(s),'nina.test');

@@ -74,6 +74,14 @@ const RACHID = { id: 'u-rachid', email: 'rachid@example.com', user_metadata: { f
 const annonceNina = () => ({ id: 'a-nina', ref: 11, user_id: 'u-nina', email: 'nina@example.com', status: 'publiee', prenom: 'Nina', genre: 'femme', en_match: false, test: false, visible_anonyme: true, anonyme_ok: true, birth_date: '1990-01-01', pays: 'France', matching: {}, profil: 'p', recherche: 'r' });
 const lire = async (r) => ({ status: r.status, ...(await r.json()) });
 
+test('accord pour plusieurs matchs : un échec de sauvegarde ne confirme ni ne déclenche de mise en relation',async()=>{
+  const {db,ctx}=base({annonces:[annonceNina()]});
+  const c=ctx(NINA),appel=c.call;
+  const r=await lire(await handleAnnonces('annonce_matchs_multiples',{choix:'oui'},{...c,call:async(u,o)=>u.includes('/platform_settings?on_conflict=key')?new Response('{}',{status:503}):appel(u,o)}));
+  assert.equal(r.status,503);assert.equal(r.error,'preference_indisponible');
+  assert.deepEqual(db.platform_settings,[]);assert.deepEqual(db.annonce_interets,[]);
+});
+
 test('fiche confirmée : le swipe s’ouvre, sans refaire de profil, et sa propre fiche n’apparaît pas', async () => {
   const { db, ctx } = base({ profils_outil: [FICHE(100001, 'u-rachid', 'homme'), FICHE(100002, null, 'femme'), FICHE(100003, null, 'homme')] });
   const r = await lire(await handleAnnonces('annonce_swipe_liste', {}, ctx(RACHID)));

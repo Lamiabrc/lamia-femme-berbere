@@ -289,13 +289,6 @@ async function mesBlocages(session) {
   box.hidden = !liste.length;
   box.querySelector('[data-blocages-liste]').innerHTML = liste.map((x) => `<li>Profil n° ${esc(x.ref)} <button type="button" class="link-button" data-debloquer="${esc(x.ref)}">Débloquer</button></li>`).join('');
   ecouter(box, 'click', async (e) => {
-    const mc = e.target.closest('[data-multiples-choix]');
-    if (mc) {
-      if (mc.dataset.multiplesChoix === 'oui' && !confirm('D’autres matchs pourront s’ouvrir, et ton match actuel le verra. Tu confirmes ?')) return;
-      mc.disabled = true;
-      try { await appelProfil({ action: 'annonce_matchs_multiples', choix: mc.dataset.multiplesChoix }, session); await monProfil(session); } catch { mc.disabled = false; }
-      return;
-    }
     const b = e.target.closest('[data-debloquer]');
     if (!b) return;
     b.disabled = true;
@@ -573,6 +566,7 @@ async function monProfil(session) {
         ${p.matchs.choix_multiples === '24h' ? '<p class="aide">C’est noté : d’autres matchs pourront s’ouvrir 24 h après le début de ta discussion.</p>' : ''}
         <p class="espace-sans-liens"><button type="button" class="btn btn-line" data-multiples-choix="non">Je reste avec mon match</button> <button type="button" class="btn btn-line" data-multiples-choix="24h">Pas pendant notre premier échange (24 h)</button> <button type="button" class="btn btn-ink" data-multiples-choix="oui">Ouvrir d’autres matchs</button></p>`}
       </div>` : ''}
+      <p class="form-status" role="status" data-matchs-preference-statut></p>
       ${p.matchs ? compteurMatchs(p.matchs) : ''}</div>
       <div class="espace-achat-droite">${!window.LFB_PLAY && p.matchs && p.matchs.formule !== 'prestige' ? (p.algerie ? '<a class="btn btn-line" href="/salon/">Plus de matchs au live</a> ' : `<a class="btn btn-ink espace-abo-btn" href="${p.matchs.formule === 'passion' ? '/abonnement/?formule=prestige">Passer à Prestige' : '/abonnement/">S’abonner'}</a> `) : ''}${p.fiche_live ? '<a class="btn btn-ink" href="#mes-fiches">Modifier mon profil</a>' : '<button class="btn btn-ink" type="button" data-profil-modifier>Modifier mon profil</button>'}</div></article>
       ${(p.matchs_lies || []).length ? `<ul class="espace-matchs-liste">${p.matchs_lies.map((m) => `<li>${m.url ? `<img class="espace-match-avatar" src="${esc(m.url)}" alt="Photo de ton match" loading="lazy" draggable="false">` : ''}<span><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Match avec le profil n° ${esc(m.ref)}</span><button class="btn btn-ink" type="button" data-voir-match="${esc(m.ref)}">Voir son profil complet</button> <button class="btn btn-line" type="button" data-profil-dematcher="${esc(m.ref)}">Mettre fin à ce match</button></li>`).join('')}</ul>` : ''}
@@ -589,6 +583,19 @@ async function monProfil(session) {
       <div class="espace-suivi" data-profil-suivi></div>
       <label class="annonce-case espace-photo"><input type="checkbox" data-profil-photo${p.photo_partage ? ' checked' : ''}> <span>Si un match me convient, <strong>ma photo</strong> peut être transmise à la personne avec qui elle me met en relation (et à elle seule).</span></label>
       <p class="form-status" data-profil-statut></p><div data-profil-edition hidden></div>`;
+    ecouter(box,'click',async e=>{
+      const b=e.target.closest('[data-multiples-choix]');if(!b)return;
+      const choix=b.dataset.multiplesChoix;
+      if(choix==='oui'&&!confirm('D’autres matchs pourront s’ouvrir, et ton match actuel le verra. Tu confirmes ?'))return;
+      const boutons=[...box.querySelectorAll('[data-multiples-choix]')],st=box.querySelector('[data-matchs-preference-statut]');
+      boutons.forEach(x=>x.disabled=true);st.textContent='Enregistrement de ton choix…';
+      try{
+        await appelProfil({action:'annonce_matchs_multiples',choix},session);
+        await monProfil(session);
+        const message=box.querySelector('[data-matchs-preference-statut]');if(message)message.textContent=choix==='oui'?'Ton accord est enregistré. D’autres matchs pourront s’ouvrir quand l’intérêt est réciproque.':choix==='24h'?'Ton choix est enregistré : pas de nouveau match pendant les premières 24 heures.':'Ton choix est enregistré : tu restes avec ton match.';
+        if(choix==='oui')await discussions(session);
+      }catch{boutons.forEach(x=>x.disabled=false);const message=box.querySelector('[data-matchs-preference-statut]');if(message)message.textContent='Ton choix n’a pas pu être enregistré. Réessaie.';}
+    });
     box.querySelector('[data-pause-ouvrir]')?.addEventListener('click', () => { box.querySelector('[data-pause-choix]').hidden = false; });
     box.querySelector('[data-pause-annuler]')?.addEventListener('click', () => { box.querySelector('[data-pause-choix]').hidden = true; });
     box.querySelectorAll('[data-annonce-pause]').forEach((b) => b.addEventListener('click', async () => {
@@ -1193,6 +1200,7 @@ async function discussions(session) {
   const raisonsDematch = [['physique', 'Physique'], ['enfants', 'Enfants'], ['localisation', 'Localisation'], ['caractere', 'Caractère'], ['valeurs', 'Valeurs'], ['parcours', 'Une étape du parcours'], ['autre', 'Autre raison']]
     .map(([v, t]) => `<label><input type="radio" name="raison" value="${v}" required> ${t}</label>`).join('');
   let dematchOuvert = null;
+  const peutNumero = (d) => d.numero_possible ?? (d.ouverte && !d.dematch && !d.close_raison);
   // Fin des 7 jours (Lamia, 16 nov. 2026) : une bulle « C'est fini ? ou on est en couple ? ».
   // Si les deux disent « en couple », leur espace commun s'ouvre et la discussion ne se termine plus.
   const finBulle = (d) => {
@@ -1217,8 +1225,9 @@ async function discussions(session) {
       ? `<div class="disc-numeros is-ok"><svg class="ico" aria-hidden="true"><use href="/icones.svg#phone"/></svg> Vous avez échangé vos numéros. Celui de ${esc(d.avec)} : <a href="tel:${esc(d.son_numero)}"><strong>${esc(d.son_numero)}</strong></a></div>`
       : d.mon_numero
         ? `<div class="disc-numeros"><svg class="ico" aria-hidden="true"><use href="/icones.svg#phone"/></svg> Tu as donné ton numéro. ${esc(d.avec)} le verra dès qu’il ou elle aura donné le sien${d.il_a_partage ? '' : ' (on l’a prévenu·e)'}.</div>`
-        : d.ouverte && numeroBloque ? `<div class="disc-numeros"><svg class="ico" aria-hidden="true"><use href="/icones.svg#phone"/></svg> ${d.il_a_partage ? `<strong>${esc(d.avec)} a donné son numéro.</strong> ` : ''}${parrainage ? `Pour échanger vos numéros, invite ${parrainage.besoin} amis à s’inscrire sur TAYRI avec ton lien (${Math.min(parrainage.filleuls, parrainage.besoin)}/${parrainage.besoin}).${parrainage.code ? ` <button type="button" class="btn btn-ink" data-inviter="${esc(String(parrainage.code))}">Inviter mes amis</button>` : ''}` : `L’échange de numéros est inclus dans Passion et Prestige.${window.LFB_PLAY ? '' : ' <a class="btn btn-ink" href="/abonnement/">Voir les formules</a>'}`}</div>`
-        : d.ouverte ? `<form class="disc-numeros" data-disc-numero><label><svg class="ico" aria-hidden="true"><use href="/icones.svg#phone"/></svg> ${d.il_a_partage ? `<strong>${esc(d.avec)} a donné son numéro</strong> : donne le tien pour le voir` : `${salut ? `${esc(salut)}, prêt${e}` : `Prêt${e}`} à passer au téléphone ? Donne ton numéro`} <input name="telephone" type="tel" autocomplete="tel" placeholder="06 12 34 56 78" required></label><button class="btn btn-ink" type="submit">Échanger nos numéros</button><small>Ton numéro n’est montré que quand vous l’avez donné tous les deux.</small></form>` : '';
+        : peutNumero(d) && numeroIndisponible ? `<p class="disc-numeros" role="status">L’échange de numéros est momentanément indisponible. Réessaie dans quelques instants.</p>`
+        : peutNumero(d) && numeroBloque ? `<div class="disc-numeros"><svg class="ico" aria-hidden="true"><use href="/icones.svg#phone"/></svg> ${d.il_a_partage ? `<strong>${esc(d.avec)} a donné son numéro.</strong> ` : ''}${parrainage ? `Pour échanger vos numéros, invite ${parrainage.besoin} amis à s’inscrire sur TAYRI avec ton lien (${Math.min(parrainage.filleuls, parrainage.besoin)}/${parrainage.besoin}).${parrainage.code ? ` <button type="button" class="btn btn-ink" data-inviter="${esc(String(parrainage.code))}">Inviter mes amis</button>` : ''}` : `L’échange de numéros est inclus dans Passion et Prestige.${window.LFB_PLAY ? '' : ' <a class="btn btn-ink" href="/abonnement/">Voir les formules</a>'}`}</div>`
+        : peutNumero(d) ? `<form class="disc-numeros" data-disc-numero><label><svg class="ico" aria-hidden="true"><use href="/icones.svg#phone"/></svg> ${d.il_a_partage ? `<strong>${esc(d.avec)} a donné son numéro</strong> : donne le tien pour le voir` : `${salut ? `${esc(salut)}, prêt${e}` : `Prêt${e}`} à passer au téléphone ? Donne ton numéro`} <input name="telephone" type="tel" autocomplete="tel" placeholder="06 12 34 56 78" required></label><button class="btn btn-ink" type="submit">Échanger nos numéros</button><small>Ton numéro n’est montré que quand vous l’avez donné tous les deux.</small></form>` : '';
     // Discussion ouverte bien encadrée (Lamia, 17 nov. 2026 : « sinon c'est fondu dans le fond »).
     const ecrire = d.ouverte && !d.dematch;
     return `<article class="disc${ecrire ? ' is-ouverte' : ''}" data-disc="${esc(d.id)}">
@@ -1237,6 +1246,7 @@ async function discussions(session) {
       ${d.ouverte && !d.dematch && !d.prenom?.partage ? (d.prenom?.demander
         ? `<div class="disc-prenom"><p><svg class="ico" aria-hidden="true"><use href="/icones.svg#hand"/></svg> <strong>Veux-tu partager ton prénom${d.prenom.mien ? ` (${esc(d.prenom.mien)})` : ''} avec ton match ?</strong> Rien ne presse : tu peux aussi le faire plus tard, après vos premiers échanges.</p><p><button type="button" class="btn btn-ink" data-disc-prenom="partager">Oui, partager</button> <button type="button" class="btn btn-line" data-disc-prenom="plus_tard">Plus tard</button></p></div>`
         : '<p class="disc-prenom-lien"><button type="button" class="link-button" data-disc-prenom="partager"><svg class="ico" aria-hidden="true"><use href="/icones.svg#hand"/></svg> Partager mon prénom</button></p>') : ''}
+      ${!d.ouverte && peutNumero(d) && !d.echange ? '<p class="disc-numeros">Le délai de discussion est terminé. Vous pouvez encore choisir d’échanger vos numéros si vous le souhaitez tous les deux.</p>' : ''}
       ${d.dematch ? '' : numeros}
       ${d.son_bloque_photos ? '<p class="disc-photos-requises"><strong>Votre match est bloqué.</strong> Ses photos ont été refusées (ou manquent) : nous attendons sa correction. La discussion reprend dès qu’elles sont validées.</p>' : ''}
       ${d.prolongeable && !window.LFB_PLAY && new Date(d.ferme_at) - Date.now() < 72 * 3600e3 ? `<div class="disc-prolonger">${d.ouverte ? '' : '<p>Votre discussion est terminée, mais vous pouvez la rouvrir.</p>'}${boutonService('prolonger_discussion', 'Prolonger la discussion de 7 jours', '3 €', '7 jours de plus · 3 €', d.id)}</div>` : ''}
@@ -1265,7 +1275,7 @@ async function discussions(session) {
     const fin = (d) => d.dematch ? `dématché${d.dematch.raison ? ` · ${esc(d.dematch.raison)}` : ''}` : d.echange ? 'numéros échangés' : d.close_raison === 'signalee' ? 'fermé (signalé)' : d.annulee ? 'annulé' : 'terminé';
     el.innerHTML = `<h3><svg class="ico" aria-hidden="true"><use href="/icones.svg#heart"/></svg> Mes matchs</h3>
       ${enCours.length ? `<ul class="mm-liste">${enCours.map((d) => `<li><span><strong>${esc(d.avec)}</strong><small>${esc(reste(d))}</small></span><span class="mm-actions"><button type="button" class="btn btn-ink" data-mm-voir="${esc(d.id)}">Voir la discussion</button><button type="button" class="btn btn-line" data-mm-dematcher="${esc(d.id)}">Dématcher</button></span></li>`).join('')}</ul>` : '<p>Aucun match en cours pour l’instant.</p>'}
-      ${passes.length ? `<details class="mm-histo"><summary>Historique (${passes.length})</summary><ul>${passes.map((d) => `<li><strong>${esc(d.avec)}</strong> · ${fin(d)}${d.ferme_at ? ` · ${esc(new Date(d.ferme_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }))}` : ''} <button type="button" class="link-button" data-mm-voir="${esc(d.id)}">Relire</button></li>`).join('')}</ul></details>` : ''}`;
+      ${passes.length ? `<details class="mm-histo"><summary>Historique (${passes.length})</summary><ul>${passes.map((d) => `<li><strong>${esc(d.avec)}</strong> · ${fin(d)}${d.ferme_at ? ` · ${esc(new Date(d.ferme_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }))}` : ''} <button type="button" class="link-button" data-mm-voir="${esc(d.id)}">${d.echange ? 'Voir le numéro' : peutNumero(d) ? 'Échanger nos numéros' : 'Relire'}</button></li>`).join('')}</ul></details>` : ''}`;
   };
   if ($('[data-mes-matchs]')) ecouter($('[data-mes-matchs]'), 'click', (ev) => {
     const voir = ev.target.closest('[data-mm-voir]'), dem = ev.target.closest('[data-mm-dematcher]');
@@ -1275,16 +1285,16 @@ async function discussions(session) {
     const art = box.querySelector(`[data-disc="${CSS.escape(id)}"]`);
     (dem ? art?.querySelector('[data-disc-dematch-form]') : art)?.scrollIntoView({ behavior: 'smooth', block: dem ? 'center' : 'start' });
   });
-  let photosRequises = false, numeroBloque = false, parrainage = null;
+  let photosRequises = false, numeroBloque = false, numeroIndisponible = false, parrainage = null;
   const afficher = () => {
     bloc.hidden = !liste.length;
     resume();
     if (!liste.length) return;
     const brouillons = Object.fromEntries([...box.querySelectorAll('[data-disc]')].map((a) => [a.dataset.disc, a.querySelector('textarea')?.value || '']));
-    box.innerHTML = (photosRequises ? '<p class="disc-photos-requises"><strong>Ajoute tes 2 photos pour continuer.</strong> Sans photo validée, tu ne peux plus écrire dans tes discussions. <a class="text-link" href="#mon-profil">Modifier mon profil</a></p>' : '') + liste.filter((d) => d.ouverte || !d.vide).map(vue).join('');
+    box.innerHTML = (photosRequises ? '<p class="disc-photos-requises"><strong>Ajoute tes 2 photos pour continuer.</strong> Sans photo validée, tu ne peux plus écrire dans tes discussions. <a class="text-link" href="#mon-profil">Modifier mon profil</a></p>' : '') + liste.filter((d) => d.ouverte || !d.vide || peutNumero(d) || d.echange || d.mon_numero).map(vue).join('');
     box.querySelectorAll('[data-disc]').forEach((a) => { const t = a.querySelector('textarea'); if (t && brouillons[a.dataset.disc]) t.value = brouillons[a.dataset.disc]; const f = a.querySelector('[data-disc-fil]'); f.scrollTop = f.scrollHeight; });
   };
-  const charger = async () => { try { const r = await appelProfil({ action: 'annonce_discussions' }, session); liste = r.discussions || []; photosRequises = Boolean(r.photos_requises); numeroBloque = r.numero_ok === false; parrainage = r.parrainage || null; if (document.documentElement.lang !== 'en') { salut = r.adresse || ''; e = r.accord ?? e; const h1 = $('[data-espace-nom]')?.closest('h1'); if (salut && h1) h1.textContent = salut; } afficher(); } catch { /* */ } };
+  const charger = async () => { try { const r = await appelProfil({ action: 'annonce_discussions' }, session); liste = r.discussions || []; photosRequises = Boolean(r.photos_requises); numeroBloque = r.numero_ok === false; numeroIndisponible = Boolean(r.numero_indisponible); parrainage = r.parrainage || null; if (document.documentElement.lang !== 'en') { salut = r.adresse || ''; e = r.accord ?? e; const h1 = $('[data-espace-nom]')?.closest('h1'); if (salut && h1) h1.textContent = salut; } afficher(); } catch { /* */ } };
   { const h = location.hash.match(/^#dematcher-(.+)$/); if (h) dematchOuvert = decodeURIComponent(h[1]); }
   await charger();
   if (dematchOuvert && liste.length) box.querySelector(`[data-disc="${CSS.escape(dematchOuvert)}"] [data-disc-dematch-form]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1293,7 +1303,8 @@ async function discussions(session) {
   // après 15 minutes sans geste, on arrête (le prochain geste relance). Économie de la base (17 nov. 2026).
   let dernierGeste = Date.now();
   ['pointerdown', 'keydown', 'scroll'].forEach((t) => window.addEventListener(t, () => { dernierGeste = Date.now(); }, { passive: true }));
-  if (liste.some((d) => d.ouverte)) minuterieDiscussions = setInterval(() => { if (!document.hidden && !dematchOuvert && !box.contains(document.activeElement) && Date.now() - dernierGeste < 15 * 60e3) charger(); }, 20000);
+  const aSuivre = () => liste.some((d) => d.ouverte || (peutNumero(d) && !d.echange));
+  if (aSuivre()) minuterieDiscussions = setInterval(() => { if (aSuivre() && !document.hidden && !dematchOuvert && !box.contains(document.activeElement) && Date.now() - dernierGeste < 15 * 60e3) charger(); }, 20000);
   ecouter(box, 'submit', async (e) => {
     e.preventDefault();
     const a = e.target.closest('[data-disc]'), id = a?.dataset.disc;
@@ -1319,17 +1330,9 @@ async function discussions(session) {
       }
       await charger();
     } catch (err) {
-      alert(err.code === 'telephone_invalide' ? 'Ce numéro ne semble pas valide. Exemple : 06 12 34 56 78 ou +213 5 12 34 56 78.' : err.code === 'au_revoir_fini' ? 'Tu as écrit tes deux messages d’au revoir.' : err.code === 'raison_requise' ? 'Choisis une raison.' : err.code === 'discussion_fermee' ? 'Cette discussion est terminée.' : err.code === 'photos_requises' ? 'Ajoute tes 2 photos (dans « Modifier mon profil ») pour continuer la discussion.' : err.code === 'numero_formule' ? 'L’échange de numéros est inclus dans Passion et Prestige.' : err.code === 'rate_limited' ? 'Doucement Réessaie dans quelques minutes.' : 'Le message n’est pas parti. Réessaie.');
+      alert(err.code === 'telephone_invalide' ? 'Ce numéro ne semble pas valide. Exemple : 06 12 34 56 78 ou +213 5 12 34 56 78.' : err.code === 'au_revoir_fini' ? 'Tu as écrit tes deux messages d’au revoir.' : err.code === 'raison_requise' ? 'Choisis une raison.' : err.code === 'discussion_fermee' ? 'Cette discussion est terminée.' : err.code === 'photos_requises' ? 'Ajoute tes 2 photos (dans « Modifier mon profil ») pour continuer la discussion.' : err.code === 'numero_indisponible' ? 'L’échange de numéros est momentanément indisponible. Réessaie dans quelques instants.' : err.code === 'numero_formule' ? 'L’échange de numéros est inclus dans Passion et Prestige.' : err.code === 'rate_limited' ? 'Doucement Réessaie dans quelques minutes.' : e.target.matches('[data-disc-numero]') ? 'Ton numéro n’a pas pu être enregistré. Réessaie.' : 'Le message n’est pas parti. Réessaie.');
     }
     bouton.disabled = false;
-  });
-  ecouter(box, 'click', async (e) => {
-    const b = e.target.closest('[data-inviter]');
-    if (!b) return;
-    const lien = `${location.origin}/?invite=${encodeURIComponent(b.dataset.inviter)}`;
-    const texte = `Rejoins-moi sur TAYRI, l’appli de rencontres kabyles sérieuses de Lamia Femme Berbère : ${lien}`;
-    try { if (navigator.share) { await navigator.share({ title: 'TAYRI', text: texte, url: lien }); return; } } catch { return; }
-    try { await navigator.clipboard.writeText(texte); alert('Lien copié : colle-le dans WhatsApp, Messenger ou un SMS.'); } catch { prompt('Copie ce lien et envoie-le à tes amis :', lien); }
   });
   ecouter(box, 'change', (e) => {
     if (e.target.name !== 'raison') return;
@@ -1337,6 +1340,14 @@ async function discussions(session) {
     if (champ) champ.hidden = e.target.value !== 'parcours';
   });
   ecouter(box, 'click', async (e) => {
+    const b = e.target.closest('[data-inviter]');
+    if (b) {
+    const lien = `${location.origin}/?invite=${encodeURIComponent(b.dataset.inviter)}`;
+    const texte = `Rejoins-moi sur TAYRI, l’appli de rencontres kabyles sérieuses de Lamia Femme Berbère : ${lien}`;
+    try { if (navigator.share) { await navigator.share({ title: 'TAYRI', text: texte, url: lien }); return; } } catch { return; }
+    try { await navigator.clipboard.writeText(texte); alert('Lien copié : colle-le dans WhatsApp, Messenger ou un SMS.'); } catch { prompt('Copie ce lien et envoie-le à tes amis :', lien); }
+    return;
+    }
     const finBtn = e.target.closest('[data-disc-fin]');
     if (finBtn) {
       finBtn.disabled = true;

@@ -171,9 +171,9 @@
   <section data-panel="comptes" hidden>
     <div class="tdb-entete"><h1 class="tdb-titre">Les membres</h1><div class="actions"><button class="btn btn-line" type="button" data-go="fiches">Toutes les fiches</button> <button class="btn btn-ink" type="button" data-go="creer-profil">Créer un profil</button> <button class="btn btn-line" type="button" data-comptes-maj>Actualiser</button></div></div>
     <div class="tdb-carte tdb-membre-num" id="membre">
-      <h2>Un membre par son numéro</h2>
+      <h2>Retrouver une personne</h2>
       <p class="aide">Lui écrire, lui offrir une formule, le mettre en relation avec qui tu veux. Les mêmes gestes que dans ton outil.</p>
-      <form data-membre-chercher class="tdb-filtres-journal"><input name="ref" inputmode="numeric" pattern="[0-9]+" placeholder="N° de la personne" required aria-label="Numéro de la personne"> <button type="submit">Voir</button></form>
+      <form data-membre-chercher class="tdb-filtres-journal"><input name="ref" maxlength="240" placeholder="Numéro, lien réseau ou @pseudo TikTok" required aria-label="Numéro ou lien réseau de la personne"> <button type="submit">Rechercher</button></form>
       <div data-membre-fiche></div>
       <p class="aide" data-membre-statut role="status"></p>
     </div>
@@ -187,7 +187,8 @@
     <p class="aide">Une carte par personne. Clique sur une carte pour ouvrir sa fiche.</p>
     <div class="tdb-kpis" data-comptes-kpis></div>
     <div class="tdb-filtres">
-      <label>Chercher<input type="search" data-comptes-cherche placeholder="Prénom, email, ville, n° de profil…" autocomplete="off"></label>
+      <label>Chercher<input type="search" data-comptes-cherche placeholder="Prénom, email, ville, n°, lien réseau ou @pseudo…" autocomplete="off"></label>
+      <div data-reseau-resultats aria-live="polite"></div>
       <div class="tdb-filtres-journal" data-comptes-filtres>
         <button type="button" class="is-on" data-filtre="tous">Tous</button>
         <button type="button" data-filtre="e:valide">Validés</button>
@@ -604,6 +605,7 @@
         </div>
         <p class="actions"><button class="btn btn-ink" type="submit">Enregistrer le profil</button> <span class="aide" data-compte-statut></span></p>
       </form>
+      <div data-compte-fiche-correction hidden></div>
       </details>
       <div class="tdb-carte">
         <h3 style="margin-top:0">Soirées</h3>

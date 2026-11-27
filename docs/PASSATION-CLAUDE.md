@@ -1,5 +1,7 @@
 # TAYRI — passation à Claude, 26 novembre 2026
 
+Complément du 27 novembre : voir `docs/correctifs-parcours-27-novembre.md` pour les corrections des boutons, l'échange mutuel des numéros après échéance, la recherche sociale et la protection contre les nouvelles fiches en doublon, ainsi que les limites du diagnostic des ventes. Branche `codex/matchs-numeros` ; vérifier sa PR et le déploiement réel avant reprise.
+
 ## Lot demandé par Lamia
 
 Publication explicitement autorisée dans le chat. Branche `codex/phase1-inscription-secours-email`, issue de `ec4dfedc4de51e3a7e2ad03c820519be0dbdf59a`. Dépôt `Lamiabrc/lamia-femme-berbere`, production https://lamia-femme-berbere.com. Vérifier la PR de cette branche et le SHA effectivement servi dans Vercel avant toute nouvelle intervention.

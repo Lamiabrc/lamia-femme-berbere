@@ -20,6 +20,41 @@ function base() {
 }
 const json = async (r) => [r.status, await r.json()];
 
+test('échéance naturelle : le choix de partager reste disponible, sans rouvrir le chat ni révéler un numéro unilatéral', async () => {
+  const {db,ctx}=base();
+  await ouvrirDiscussion(ctx,{interetId:'expire',a:{user_id:A,ref:3},b:{user_id:B,ref:27}});
+  db.discussions[0].ferme_at='2026-10-31T10:00:00Z';
+  const c={...ctx,user:{id:A},droitNumero:async()=>({ok:true})};
+  let [,r]=await json(await actionDiscussion('annonce_discussions',{},c));
+  assert.equal(r.discussions[0].ouverte,false);assert.equal(r.discussions[0].numero_possible,true);
+  assert.equal((await actionDiscussion('annonce_discussion_numero',{id:D,telephone:'06 12 34 56 78'},c)).status,200);
+  [,r]=await json(await actionDiscussion('annonce_discussions',{}, {...c,user:{id:B}}));
+  assert.equal(r.discussions[0].son_numero,null);assert.equal(r.discussions[0].il_a_partage,true);
+  assert.equal((await actionDiscussion('annonce_discussion_envoyer',{id:D,texte:'Salam'},c)).status,409);
+  assert.equal((await actionDiscussion('annonce_discussion_numero',{id:D,telephone:'07 12 34 56 78'}, {...c,user:{id:B}})).status,200);
+  [,r]=await json(await actionDiscussion('annonce_discussions',{},c));
+  assert.equal(r.discussions[0].echange,true);assert.equal(r.discussions[0].son_numero,'+33712345678');assert.equal(r.discussions[0].ouverte,false);
+});
+
+test('fin volontaire, dématch, signalement ou clôture : aucun nouveau partage de numéro',async()=>{
+  for(const fermeture of [{dematch_at:'2026-11-01'},{close_raison:'annulee'},{signalee_at:'2026-11-01'},{a_fini_at:'2026-11-01'},{b_fini_at:'2026-11-01'}]){
+    const {db,ctx}=base();await ouvrirDiscussion(ctx,{interetId:'ferme',a:{user_id:A,ref:3},b:{user_id:B,ref:27}});
+    Object.assign(db.discussions[0],fermeture);
+    const c={...ctx,user:{id:A},droitNumero:async()=>({ok:true})};
+    const [,r]=await json(await actionDiscussion('annonce_discussions',{},c));assert.equal(r.discussions[0].numero_possible,false);
+    assert.equal((await actionDiscussion('annonce_discussion_numero',{id:D,telephone:'06 12 34 56 78'},c)).status,409);
+    assert.equal(db.discussions[0].a_numero,undefined);
+  }
+});
+
+test('droits de numéro indisponibles : pas de partage ni de faux refus de formule',async()=>{
+  const {db,ctx}=base();await ouvrirDiscussion(ctx,{interetId:'droits',a:{user_id:A,ref:3},b:{user_id:B,ref:27}});
+  const c={...ctx,user:{id:A},droitNumero:async()=>{throw Error('temporaire');}};
+  const [,r]=await json(await actionDiscussion('annonce_discussions',{},c));assert.equal(r.numero_ok,false);assert.equal(r.numero_indisponible,true);
+  const [status,erreur]=await json(await actionDiscussion('annonce_discussion_numero',{id:D,telephone:'06 12 34 56 78'},c));
+  assert.equal(status,503);assert.equal(erreur.error,'numero_indisponible');assert.equal(db.discussions[0].a_numero,undefined);
+});
+
 test('discussion : ouverte 7 jours, contacts masqués, numéros montrés quand les deux les ont donnés', async () => {
   const { db, pushes, ctx } = base();
   await ouvrirDiscussion(ctx, { interetId: 'i1', a: { user_id: A, ref: 3, prenom: 'Melina' }, b: { user_id: B, ref: 27, prenom: 'Rachid' } });
