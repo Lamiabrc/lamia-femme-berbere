@@ -361,8 +361,18 @@ document.addEventListener('submit', async (e) => {
   if (e.target.matches('[data-membre-matcher]')) {
     e.preventDefault();
     if (!membreVu) return;
-    try { const d = await conf({ action: 'outil_matcher', a: membreVu.ref, b: Number(e.target.b.value) }); ditMembre(`Mis en relation : ${d.fait || ''}.`); e.target.reset(); }
+    const bouton = e.target.querySelector('button[type="submit"]');
+    if (bouton?.disabled) return;
+    if (bouton) bouton.disabled = true;
+    ditMembre('Vérification et ouverture de la discussion…');
+    try {
+      const d = await conf({ action: 'outil_matcher', a: membreVu.ref, b: Number(e.target.b.value) });
+      const suivi = (d.notifications || []).map(n => `n° ${n.ref} : ${n.notifications > 0 ? 'notification téléphone envoyée' : n.email_envoye ? 'email accepté par le service d’envoi' : 'alerte dans son espace uniquement ; aucun email ni push confirmé'}`).join(' · ');
+      ditMembre(`${d.discussion ? d.discussion.cree ? 'Nouvelle discussion ouverte' : 'Discussion déjà ouverte ; aucun nouvel envoi' : 'Mise en relation enregistrée ; pas de discussion entre deux comptes'} : ${d.fait || ''}.${suivi ? ` ${suivi}.` : ''}`);
+      e.target.reset();
+    }
     catch (err) { erreurMembre(err); }
+    finally { if (bouton) bouton.disabled = false; }
   }
 });
 document.addEventListener('click', async (e) => {

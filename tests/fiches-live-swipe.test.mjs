@@ -10,13 +10,14 @@ function base(initial = {}, { valides = false } = {}) {
   if(valides) for(const f of db.profils_outil.filter(f=>f.user_id)) if(!db.annonces.some(a=>a.user_id===f.user_id)) db.annonces.push({id:`a-${f.user_id}`,ref:3000+db.annonces.length,user_id:f.user_id,email:`${f.user_id.slice(2)}@example.com`,status:'publiee',prenom:f.user_id.slice(2),genre:f.genre,birth_date:'1991-01-01',pays:f.pays,ville:f.ville,en_match:false,test:false,visible_anonyme:false,fiche_ref:f.ref,outil_id:f.outil_id,matching:{zoneGeo:f.secteur||''}});
   let n = 1000;
   const cond = (ligne, c) => {
-    const m = c.match(/^([a-z_]+)\.(not\.is|is|eq|neq|in|gte)\.(.*)$/s);
+    const m = c.match(/^([a-z_]+)\.(not\.is|is|eq|neq|in|gte|lte)\.(.*)$/s);
     if (!m) return true;
     const [, k, op, v0] = m; const v = decodeURIComponent(v0); const x = ligne[k];
     if (op === 'eq') return String(x) === v;
     if (op === 'neq') return String(x) !== v;
     if (op === 'is') return x === null || x === undefined;
     if (op === 'not.is') return x !== null && x !== undefined;
+    if (op === 'lte') return x != null && new Date(x) <= new Date(v);
     if (op === 'in') return v.replace(/[()"]/g, '').split(',').includes(String(x));
     return true;
   };
@@ -364,6 +365,66 @@ test('mise en relation à la main : un profil pas validé donne un message clair
   assert.match(r.message, /n° 12 n’est pas encore validé/);
 });
 
+test('nouveau match manuel prioritaire sur un email récent, puis aucun renvoi au second clic', async () => {
+  const { db, ctx } = base({ annonces: [annonceNina(), annonceKarim()], alertes_membres: [
+    { id: 'recent-n', user_id: 'u-nina', email_envoye: true, created_at: '2026-11-03T11:30:00Z' },
+    { id: 'recent-k', user_id: 'u-karim', email_envoye: true, created_at: '2026-11-03T11:30:00Z' },
+  ] });
+  const mails = [], c = { ...ctx({ id: 'adm' }), admin: true, email: async mail => { mails.push(mail); return true; } };
+  const matcher = () => handleAnnonces('annonce_pilote', { op: 'matcher', a: '11', b: '12' }, c).then(lire);
+  const r = await matcher();
+  assert.equal(r.status, 200); assert.equal(r.discussion.cree, true);
+  assert.equal(r.notifications.length, 2); assert.ok(r.notifications.every(n => n.notifications === 0 && n.email_envoye));
+  assert.equal(mails.length, 2);
+  const encore = await matcher();
+  assert.equal(encore.status, 200); assert.equal(encore.discussion.cree, false);
+  assert.deepEqual(encore.notifications, []); assert.equal(mails.length, 2); assert.equal(db.discussions.length, 1);
+  const inverse = await lire(await handleAnnonces('annonce_pilote', { op: 'matcher', a: '12', b: '11' }, c));
+  assert.equal(inverse.discussion.id, r.discussion.id); assert.equal(inverse.discussion.cree, false);
+  assert.equal(mails.length, 2); assert.equal(db.discussions.length, 1); assert.equal(db.annonce_interets.length, 1);
+});
+
+test('ancienne relation fermée : une RPC indisponible ne confirme ni nouveau chat ni notification', async () => {
+  const { db, ctx } = base({ annonces: [annonceNina(), annonceKarim()],
+    annonce_interets: [{ id: 'ancien', demandeur_id: 'a-nina', cible_ref: 12, statut: 'mis_en_relation' }],
+    discussions: [{ id: 'ancien-chat', interet_id: 'ancien', a_user: 'u-nina', b_user: 'u-karim', a_ref: 11, b_ref: 12,
+      ferme_at: '2026-11-02', close_raison: 'dematch', dematch_at: '2026-11-02' }],
+  });
+  let mails = 0;
+  const r = await lire(await handleAnnonces('annonce_pilote', { op: 'matcher', a: '11', b: '12' }, {
+    ...ctx({ id: 'adm' }), admin: true, email: async () => { mails++; return true; },
+  }));
+  assert.equal(r.status, 409); assert.equal(r.error, 'discussion_indisponible');
+  assert.match(r.message, /n’a pas pu être confirmée/); assert.equal(mails, 0);
+  assert.equal(db.discussions.length, 1); assert.equal(db.discussions[0].close_raison, 'dematch');
+  assert.equal((db.alertes_membres || []).length, 0);
+});
+
+test('première ouverture refusée : intérêt conservé à traiter et aucun email promettant un match', async () => {
+  const { db, ctx } = base({ annonces: [annonceNina(), annonceKarim()] });
+  const c = ctx({ id: 'adm' }); let mails = 0;
+  const r = await lire(await handleAnnonces('annonce_pilote', { op: 'matcher', a: '11', b: '12' }, {
+    ...c, admin: true, insert: async (table, row) => { if (table === 'discussions') throw Error('indisponible'); return c.insert(table, row); },
+    email: async () => { mails++; return true; },
+  }));
+  assert.equal(r.status, 409); assert.equal(r.error, 'discussion_indisponible');
+  assert.equal(db.annonce_interets[0].statut, 'a_traiter'); assert.equal(mails, 0);
+});
+
+test('ancien statut en relation : un rematch non forcé doit encore respecter la capacité réelle', async () => {
+  const { ctx } = base({ annonces: [annonceNina(), annonceKarim()],
+    annonce_interets: [{ id: UUID_NINA, demandeur_id: 'a-nina', cible_ref: 12, statut: 'mis_en_relation' }],
+    discussions: [
+      { id: 'ancienne', interet_id: UUID_NINA, a_user: 'u-nina', b_user: 'u-karim', a_ref: 11, b_ref: 12,
+        ferme_at: '2026-11-02', close_raison: 'dematch' },
+      { id: 'autre', interet_id: 'autre', a_user: 'u-nina', b_user: 'u-autre', a_ref: 11, b_ref: 99,
+        ferme_at: '2026-11-10', dematch_at: null, close_raison: null },
+    ],
+  });
+  const r = await lire(await handleAnnonces('match_demande_statut', { id: UUID_NINA, statut: 'mis_en_relation' }, { ...ctx({ id: 'adm' }), admin: true }));
+  assert.equal(r.status, 409); assert.equal(r.error, 'deja_en_match');
+});
+
 test('où en est un profil : ses matchs en cours et les oui réciproques en attente', async () => {
   const { ctx } = base({
     annonces: [annonceNina(), annonceKarim()],
@@ -540,4 +601,24 @@ test('au revoir en cours : une demande restée « en relation » sans nouvelle d
   });
   await handleAnnonces('annonce_matchs_cron', {}, { ...ctx(null), cron: true });
   assert.deepEqual(db.annonce_interets.map((i) => i.statut), ['dematche', 'dematche']);
+});
+
+test('ancien au revoir déjà lu par le cron : le rematch du même intérêt reste actif', async () => {
+  const { db, ctx } = base({ annonces: [annonceNina(), annonceKarim()],
+    annonce_interets: [{ id: 'meme-interet', demandeur_id: 'a-nina', cible_ref: 12, statut: 'mis_en_relation', updated_at: '2026-11-03T11:00:00Z' }],
+    discussions: [
+      { id: 'ancienne', interet_id: null, interet_origine_id: 'meme-interet', a_user: 'u-nina', b_user: 'u-karim', a_ref: 11, b_ref: 12,
+        ouverte_at: '2026-11-01', ferme_at: '2026-11-02', dematch_at: '2026-11-02', close_raison: null },
+      { id: 'nouvelle', interet_id: 'meme-interet', a_user: 'u-nina', b_user: 'u-karim', a_ref: 11, b_ref: 12,
+        ouverte_at: '2026-11-03T11:00:00Z', ferme_at: '2026-11-10', dematch_at: null, close_raison: null },
+    ],
+  });
+  const c = ctx(null), read = c.read;
+  await handleAnnonces('annonce_matchs_cron', {}, { ...c, cron: true, read: async path => {
+    const rows = await read(path);
+    // Lecture commencée avant le commit du rematch : ancienne valeur du lien dans le résultat du passage.
+    return path.includes('/discussions?dematch_at=not.is.null') ? rows.map(d => ({ ...d, interet_id: 'meme-interet' })) : rows;
+  } });
+  assert.equal(db.annonce_interets[0].statut, 'mis_en_relation');
+  assert.equal(db.discussions[1].close_raison, null);
 });
