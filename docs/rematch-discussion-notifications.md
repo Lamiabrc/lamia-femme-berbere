@@ -31,3 +31,11 @@ Suite complète : 552 tests réussis, aucun échec. Vérification syntaxique du 
 - Ces tests utilisent uniquement des membres fictifs. Aucun email réel ni accès aux messages privés n'est nécessaire.
 
 Limite : les notifications restent des effets externes après la transaction. Une interruption après création et avant envoi peut nécessiter une reprise manuelle vérifiée dans le journal ; cette correction ne constitue pas une file d'envoi transactionnelle et ne relance pas aveuglément un fournisseur après une réponse incertaine.
+
+## Complément : transport et reprise des notifications
+
+La limite de 24 heures existe aussi dans `reserverNotification`, sous le gestionnaire de matchs. La priorité doit donc traverser `prevenirMembre`, le wrapper email et le transport commun. Un événement serveur `match:<id du nouveau chat>` réserve une seule notification par chat et destinataire dans `platform_settings`, même après 24 heures. Le compteur global de 80 par jour reste obligatoire, et un envoi prioritaire actualise aussi la fenêtre des alertes ordinaires. L'identifiant d'événement entre dans la clé d'idempotence du fournisseur.
+
+Le bouton admin « Prévenir les deux membres du match » permet une reprise explicite sur une discussion existante, sans rouvrir ni recréer le chat. Le serveur exige un admin authentifié, un match manuel encore actif, les propriétaires attendus et l'absence de blocage. Un double clic ou une répétition ne réserve pas une seconde fois le même événement. Une réservation dont la réponse ou l'envoi est incertain reste conservatrice : vérifier le journal fournisseur avant toute autre intervention.
+
+Le test `match-notification-email.test.mjs` traverse le vrai gestionnaire HTTP, la notification membre, le transport et son budget avec un fournisseur fictif. Il vérifie qu'un email récent ne supprime pas l'email de reprise du match, que les répétitions ne renvoient rien, qu'un membre ne peut pas déclencher l'action admin et qu'un chat fermé n'est pas notifié. Aucun changement de schéma supplémentaire.

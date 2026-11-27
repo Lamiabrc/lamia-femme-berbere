@@ -15,7 +15,7 @@ async function monde(){
   const url=new URL(u);if(url.hostname==='api.resend.com'){mails.push(JSON.parse(o.body));return Response.json({id:'fictif'});}
   assert.equal(url.pathname,'/rest/v1/platform_settings');const b=o.body?JSON.parse(o.body):null;
   let rows;
-  if(o.method==='POST')rows=(await db.query('insert into platform_settings values($1,$2,$3) on conflict(key) do nothing returning key',[b.key,b.value,b.updated_at])).rows;
+  if(o.method==='POST')rows=(await db.query('insert into platform_settings values($1,$2,$3) on conflict(key) '+(o.headers.Prefer.includes('merge-duplicates')?'do update set value=excluded.value,updated_at=excluded.updated_at':'do nothing')+' returning key',[b.key,b.value,b.updated_at])).rows;
   else {
    const key=url.searchParams.get('key').slice(3);
    if(o.method==='PATCH'){
@@ -57,4 +57,18 @@ test('si le budget est indisponible, aucune notification ; les liens essentiels 
  const msg={to:'nina@example.invalid',subject:'Lien demandé',text:'Contenu fictif'};
  assert.equal((await envoyerEmail({...msg,notification:true},{env,fetcher})).ok,false);assert.equal(mails.length,0);
  assert.equal((await envoyerEmail(msg,{env,fetcher})).ok,true);assert.equal(mails.length,1);
+});
+
+test('match prioritaire : une seule réservation par chat et destinataire, toujours sous le budget global',async()=>{
+ const m=await monde();try{
+  const to='nina@example.invalid', evenement='match:11111111-1111-4111-8111-111111111111';
+  assert.equal((await reserverNotification(to,m.ctx)).ok,true);
+  const results=await Promise.all(Array.from({length:6},()=>reserverNotification(to,{...m.ctx,evenement})));
+  assert.equal(results.filter(r=>r.ok).length,1);
+  assert.equal((await reserverNotification(to,m.ctx)).motif,'personne_24h');
+  m.avancer(86400e3);
+  assert.equal((await reserverNotification(to,{...m.ctx,evenement})).motif,'evenement_deja_reserve');
+  await m.db.query('insert into platform_settings values($1,$2,$3)',['email-notification-jour-2026-11-27',{compteur:80},new Date('2026-11-27T12:00Z')]);
+  assert.equal((await reserverNotification(to,{...m.ctx,evenement:'match:22222222-2222-4222-8222-222222222222'})).motif,'plafond_jour');
+ }finally{await m.close();}
 });

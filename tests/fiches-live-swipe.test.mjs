@@ -370,12 +370,13 @@ test('nouveau match manuel prioritaire sur un email récent, puis aucun renvoi a
     { id: 'recent-n', user_id: 'u-nina', email_envoye: true, created_at: '2026-11-03T11:30:00Z' },
     { id: 'recent-k', user_id: 'u-karim', email_envoye: true, created_at: '2026-11-03T11:30:00Z' },
   ] });
-  const mails = [], c = { ...ctx({ id: 'adm' }), admin: true, email: async mail => { mails.push(mail); return true; } };
+  const mails = [], evenements = [], c = { ...ctx({ id: 'adm' }), admin: true, email: async (mail,_titre,_html,_texte,_essentiel,options) => { mails.push(mail); evenements.push(options?.evenement); return true; } };
   const matcher = () => handleAnnonces('annonce_pilote', { op: 'matcher', a: '11', b: '12' }, c).then(lire);
   const r = await matcher();
   assert.equal(r.status, 200); assert.equal(r.discussion.cree, true);
   assert.equal(r.notifications.length, 2); assert.ok(r.notifications.every(n => n.notifications === 0 && n.email_envoye));
   assert.equal(mails.length, 2);
+  assert.deepEqual(evenements,[`match:${r.discussion.id}`,`match:${r.discussion.id}`]);
   const encore = await matcher();
   assert.equal(encore.status, 200); assert.equal(encore.discussion.cree, false);
   assert.deepEqual(encore.notifications, []); assert.equal(mails.length, 2); assert.equal(db.discussions.length, 1);
