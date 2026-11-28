@@ -611,16 +611,42 @@ function ventesAppli() {
   const f = $('[data-app-filtre]').value;
   $('[data-app-lignes]').innerHTML = a.lignes.filter((l) => !f || l.famille === f).map((l) => `<tr><td>${esc(date(l.date))}</td><td>${esc(l.service)}${l.detail ? `<br><small>${esc(l.detail)}</small>` : ''}${l.quantite > 1 ? ` × ${esc(l.quantite)}` : ''}</td><td>${esc(l.client)}</td><td>${money(l.montant)}</td></tr>`).join('') || '<tr><td colspan="4">Rien pour l’instant.</td></tr>';
   $('[data-app-livrer]').hidden = !a.a_livrer.length;
-  $('[data-app-livrer-liste]').innerHTML = a.a_livrer.map((u) => `<li><span><b>${esc(u.service)}</b>${u.reste > 1 ? ` × ${esc(u.reste)}` : ''} <small>${esc(u.client)} · ${esc(date(u.date))}</small></span><button class="btn btn-line" type="button" data-app-fait="${esc(u.id)}">Fait</button></li>`).join('');
+  $('[data-app-livrer-liste]').innerHTML = a.a_livrer.map(ligneALivrer).join('');
+  // Les mises en relation payées s'affichent aussi en haut de « Aujourd'hui ».
+  const rel = a.a_livrer.filter((u) => u.type === 'match_lamia');
+  $('[data-carte-relations]').hidden = !rel.length;
+  $('[data-relations-liste]').innerHTML = rel.map(ligneALivrer).join('');
 }
+// Une mise en relation payée : qui avec qui, et un bouton « Matcher ». Les autres services : « Fait ».
+function ligneALivrer(u) {
+  if (u.type === 'match_lamia') {
+    const ok = u.a && u.b;
+    return `<li><span><b>n° ${esc(u.a || '?')} veut n° ${esc(u.b || '?')}</b> <small>8 € payés · ${esc(u.client)} · ${esc(date(u.date))}</small></span><span class="tdb-relation-actions">${ok ? `<button class="btn btn-ink" type="button" data-relation-matcher="${esc(u.id)}" data-a="${esc(u.a)}" data-b="${esc(u.b)}">Matcher</button>` : ''}<button class="btn btn-line" type="button" data-app-fait="${esc(u.id)}">Fait</button></span></li>`;
+  }
+  return `<li><span><b>${esc(u.service)}</b>${u.reste > 1 ? ` × ${esc(u.reste)}` : ''} <small>${esc(u.client)} · ${esc(date(u.date))}</small></span><button class="btn btn-line" type="button" data-app-fait="${esc(u.id)}">Fait</button></li>`;
+}
+// « Matcher » : met les deux en relation (comme « Mettre en relation à la main »), puis marque l'achat comme fait.
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-relation-matcher]');
+  if (!b) return;
+  const { a, b: cible } = b.dataset;
+  if (!confirm(`Mettre en relation n° ${a} et n° ${cible} ?\n\nLes deux sont prévenus et une discussion de 7 jours s’ouvre. Cela passe avant la limite de leur formule.`)) return;
+  b.disabled = true;
+  try {
+    await conf({ action: 'annonce_pilote', op: 'matcher', a, b: cible });
+    await conf({ action: 'annonce_unite_utiliser', id: b.dataset.relationMatcher });
+    message(`C’est fait : n° ${a} et n° ${cible} sont en relation.`);
+    await charger();
+  } catch (err) { message(err.texte || 'La mise en relation n’a pas fonctionné. Réessaie, ou utilise « Mettre en relation à la main » dans Activité.', true); b.disabled = false; }
+});
 $('[data-app-filtre]')?.addEventListener('change', ventesAppli);
-$('[data-app-livrer-liste]')?.addEventListener('click', async (e) => {
+[$('[data-app-livrer-liste]'), $('[data-relations-liste]')].forEach((liste) => liste?.addEventListener('click', async (e) => {
   const b = e.target.closest('[data-app-fait]');
   if (!b) return;
   b.disabled = true;
   try { await conf({ action: 'annonce_unite_utiliser', id: b.dataset.appFait }); await charger(); }
   catch { message('Ça n’a pas été enregistré. Réessaie.', true); b.disabled = false; }
-});
+}));
 function ventes() {
   ventesAppli();
   const filtre = $('[data-filtre-ventes]').value;

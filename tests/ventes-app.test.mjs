@@ -32,3 +32,11 @@ test('l’onglet Ventes additionne abonnements, unité et soirées payantes', as
   assert.equal(v.services.find((s) => s.service === 'Passage en priorité en live').montant, 500); // prix du catalogue si le montant manque
   assert.deepEqual(v.a_livrer.map((x) => x.id), ['u2']);
 });
+
+test('une mise en relation payée (8 €) est à faire, avec les deux numéros pour « Matcher »', async () => {
+  const achats = [...tables.achats_unite, { id: 'm1', email: 'e@x.fr', nom: 'e@x.fr', type: 'match_lamia', quantite: 1, utilisees: 0, montant_centimes: 800, cible: '8047', demandeur_ref: '359', stripe_session_id: 'cs_live_1', created_at: '2026-11-03T19:46:00Z' }, { id: 'm2', email: 'f@x.fr', type: 'match_lamia', quantite: 1, utilisees: 1, montant_centimes: 800, cible: '262', demandeur_ref: '360', stripe_session_id: 'cs_live_2', created_at: '2026-11-03T21:56:00Z' }];
+  const v = await ventesApp({ read: async (u) => (u.includes('achats_unite') ? achats : read(u)), now: () => new Date('2026-11-04T12:00:00Z') });
+  const rel = v.a_livrer.filter((u) => u.type === 'match_lamia');
+  assert.deepEqual(rel.map((u) => [u.a, u.b]), [['359', '8047']]); // celle déjà faite n'y est plus
+  assert.ok(v.lignes.some((l) => l.service === 'Lamia vous met en relation' && l.montant === 800));
+});

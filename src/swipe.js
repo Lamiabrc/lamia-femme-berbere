@@ -78,7 +78,7 @@ function carte(a) {
       ${a.profil ? `<h3>Qui je suis</h3><p data-membre>${esc(a.profil)}</p>` : ''}
       ${a.recherche || cherche(a).length ? `<h3>Qui je cherche${ages}</h3>${cherche(a).length ? `<p class="annonce-tags">${cherche(a).map((t) => `<span>${esc(t)}</span>`).join('')}</p>` : ''}${a.recherche ? `<p data-membre>${esc(a.recherche)}</p>` : ''}` : ''}
       ${foiEtVie(a).replace(/<h4>/g, '<h3>').replace(/<\/h4>/g, '</h3>')}
-      <div class="swipe-lamia"><p><b>Tu veux que Lamia vous mette en relation ?</b> Elle regarde vos deux profils et vous présente l’un à l’autre. 8 €.</p>
+      <div class="swipe-lamia"><p><b>Tu veux que Lamia vous mette en relation ?</b> 8 €.</p><ul class="swipe-lamia-etapes"><li>Lamia regarde vos deux profils.</li><li>Elle vous met en relation, sans attendre son cœur.</li><li>Vous êtes prévenus tous les deux et une discussion privée s’ouvre.</li></ul>
         <label class="lettre-cgv"><input type="checkbox" data-lamia-cgv><span>J’accepte les <a class="text-link" href="/cgv/" target="_blank">conditions de vente</a></span></label>
         <p class="po-actions"><button type="button" class="po-btn" data-lamia-match="${a.ref}">Demander à Lamia · 8 €</button></p></div>
       <p class="profil-moderer"><button type="button" class="link-button" data-moderer="${a.ref}"><svg class="ico" aria-hidden="true"><use href="/icones.svg#flag"/></svg> Bloquer et signaler</button></p>

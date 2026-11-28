@@ -34,7 +34,7 @@ export const UNITES = [
   // Inviter Lamia dans sa discussion de match, comme une wali (Lamia, 16 nov. 2026).
   { id: 'inviter_lamia', nom: 'Inviter Lamia dans votre discussion', prix: 2000, horsVente: true, depuisEspace: true, texte: 'Lamia rejoint votre discussion, comme une wali : elle vous lit et vous conseille, tous les deux. Depuis ta discussion, dans Mon espace.' },
   // Lamia met en relation à la main, ou un membre lui demande de le faire : 8 € payés par celui qui demande (Lamia, 26 nov. 2026).
-  { id: 'match_lamia', nom: 'Lamia vous met en relation', prix: 800, depuisEspace: true, lien: '/rencontres/swipe/', texte: 'Tu choisis un profil, Lamia le regarde et vous met en relation. Depuis « Voir le profil », dans le swipe.' },
+  { id: 'match_lamia', nom: 'Lamia vous met en relation', prix: 800, depuisEspace: true, lien: '/rencontres/swipe/', texte: 'Tu choisis un profil. Lamia regarde vos deux profils et vous met en relation, sans attendre son cœur. Vous êtes prévenus tous les deux et une discussion privée s’ouvre. Depuis « Voir le profil », dans le swipe.' },
   { id: 'photo_match', nom: 'La photo de ton match', prix: 300, heures: 1, depuisEspace: true, texte: 'Visible pendant 1 heure, si ton match accepte de la transmettre. Depuis Mon espace, pendant le match.' },
 ];
 // Visuel de chaque prestation de coaching.
