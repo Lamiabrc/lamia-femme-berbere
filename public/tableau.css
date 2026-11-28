@@ -651,3 +651,11 @@ body.tdb [data-panel="fiches"] [data-fiche-tiktok] { display:grid; gap:12px; mar
 .relancer-liste { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
 .relancer-liste > li { border: 1px solid #e6e2f0; border-radius: 14px; padding: 12px 14px; display: grid; gap: 8px; }
 @media (min-width: 760px) { .relancer-liste > li { grid-template-columns: 1fr auto; align-items: center; } .relancer-liste > li > .tdb-ecrire-zone { grid-column: 1 / -1; } }
+
+/* Mises en relation payées (28 nov. 2026) : « Matcher » et « Fait » côte à côte, sous le texte sur téléphone. */
+.tdb-relation-actions { display: flex; gap: .5rem; flex-shrink: 0; }
+@media (max-width: 640px) {
+  [data-carte-relations] .tdb-retraits li, [data-app-livrer-liste] li:has(.tdb-relation-actions) { flex-wrap: wrap; }
+  .tdb-relation-actions { width: 100%; }
+  .tdb-relation-actions .btn { flex: 1; }
+}
